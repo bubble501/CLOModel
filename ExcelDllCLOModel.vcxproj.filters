@@ -1,0 +1,222 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;cxx;c;def</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h</Extensions>
+    </Filter>
+    <Filter Include="Form Files">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>moc;h;cpp</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\Debug">
+      <UniqueIdentifier>{5d970ca5-d3b2-42e2-baf0-601a88cf965d}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\Release">
+      <UniqueIdentifier>{edd4427d-1815-4134-97d0-0ad7a6ddd4e1}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Header Files\Bloomberg">
+      <UniqueIdentifier>{247beaf7-9ca2-4a84-a503-3ec3077ca259}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Bloomberg">
+      <UniqueIdentifier>{d894bbbe-ff18-44a5-8fda-47ac897a0259}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Deal Structure">
+      <UniqueIdentifier>{472fc214-582f-4e54-8d2a-413ac4c5e292}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Deal Structure">
+      <UniqueIdentifier>{dc776f6b-1361-4ea6-9d06-7ece4cdbbb36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Loans">
+      <UniqueIdentifier>{49eb2156-f342-416d-ba3e-12c1ec9ee6b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Loans">
+      <UniqueIdentifier>{b93c855f-ec18-4c03-abc4-fec7abcf11b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Stress Test">
+      <UniqueIdentifier>{5b9e29ed-527c-4664-8009-e03440356a6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Stress Test">
+      <UniqueIdentifier>{036cb0a9-0d5d-4350-8417-6d58f9bf6a4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Excel">
+      <UniqueIdentifier>{d74e4e51-2d5b-4f9c-be7d-5ffd722ca11e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Excel">
+      <UniqueIdentifier>{99276cef-8759-4550-ae47-19ef42a8467c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Definition Files">
+      <UniqueIdentifier>{1de686ff-a554-4a33-a580-f5941e9f458e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CommonFunctions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BloombergWorker.h">
+      <Filter>Header Files\Bloomberg</Filter>
+    </ClInclude>
+    <ClInclude Include="ExcelCommons.h">
+      <Filter>Header Files\Excel</Filter>
+    </ClInclude>
+    <ClInclude Include="ExcelOutput.h">
+      <Filter>Header Files\Excel</Filter>
+    </ClInclude>
+    <ClInclude Include="Mortgage.h">
+      <Filter>Header Files\Loans</Filter>
+    </ClInclude>
+    <ClInclude Include="MtgCashFlow.h">
+      <Filter>Header Files\Loans</Filter>
+    </ClInclude>
+    <ClInclude Include="ReinvestmentTest.h">
+      <Filter>Header Files\Deal Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="WatFalPrior.h">
+      <Filter>Header Files\Deal Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="Tranche.h">
+      <Filter>Header Files\Deal Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="TrancheCashFlow.h">
+      <Filter>Header Files\Deal Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="Waterfall.h">
+      <Filter>Header Files\Deal Structure</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="CentralUnit.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="MtgCalculator.h">
+      <Filter>Header Files\Loans</Filter>
+    </CustomBuild>
+    <CustomBuild Include="MtgCalculatorThread.h">
+      <Filter>Header Files\Loans</Filter>
+    </CustomBuild>
+    <CustomBuild Include="StressTest.h">
+      <Filter>Header Files\Stress Test</Filter>
+    </CustomBuild>
+    <CustomBuild Include="StressWorker.h">
+      <Filter>Header Files\Stress Test</Filter>
+    </CustomBuild>
+    <CustomBuild Include="StressThread.h">
+      <Filter>Header Files\Stress Test</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="GeneratedFiles\Debug\moc_CentralUnit.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_CentralUnit.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_MtgCalculator.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_MtgCalculator.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_MtgCalculatorThread.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_MtgCalculatorThread.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_StressTest.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_StressTest.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_StressThread.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_StressThread.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_StressWorker.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_StressWorker.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CentralUnit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CommonFunctions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BloombergWorker.cpp">
+      <Filter>Source Files\Bloomberg</Filter>
+    </ClCompile>
+    <ClCompile Include="ExcelCommons.cpp">
+      <Filter>Source Files\Excel</Filter>
+    </ClCompile>
+    <ClCompile Include="ExcelOutput.cpp">
+      <Filter>Source Files\Excel</Filter>
+    </ClCompile>
+    <ClCompile Include="ExcelInput.cpp">
+      <Filter>Source Files\Excel</Filter>
+    </ClCompile>
+    <ClCompile Include="Mortgage.cpp">
+      <Filter>Source Files\Loans</Filter>
+    </ClCompile>
+    <ClCompile Include="MtgCashFlow.cpp">
+      <Filter>Source Files\Loans</Filter>
+    </ClCompile>
+    <ClCompile Include="MtgCalculator.cpp">
+      <Filter>Source Files\Loans</Filter>
+    </ClCompile>
+    <ClCompile Include="MtgCalculatorThread.cpp">
+      <Filter>Source Files\Loans</Filter>
+    </ClCompile>
+    <ClCompile Include="ReinvestmentTest.cpp">
+      <Filter>Source Files\Deal Structure</Filter>
+    </ClCompile>
+    <ClCompile Include="Tranche.cpp">
+      <Filter>Source Files\Deal Structure</Filter>
+    </ClCompile>
+    <ClCompile Include="TrancheCashFlow.cpp">
+      <Filter>Source Files\Deal Structure</Filter>
+    </ClCompile>
+    <ClCompile Include="Waterfall.cpp">
+      <Filter>Source Files\Deal Structure</Filter>
+    </ClCompile>
+    <ClCompile Include="WatFalPrior.cpp">
+      <Filter>Source Files\Deal Structure</Filter>
+    </ClCompile>
+    <ClCompile Include="StressTest.cpp">
+      <Filter>Source Files\Stress Test</Filter>
+    </ClCompile>
+    <ClCompile Include="StressWorker.cpp">
+      <Filter>Source Files\Stress Test</Filter>
+    </ClCompile>
+    <ClCompile Include="StressThread.cpp">
+      <Filter>Source Files\Stress Test</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ExcelFunctionExport.def">
+      <Filter>Definition Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>

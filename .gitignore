@@ -1,0 +1,37 @@
+#ignore thumbnails created by windows
+Thumbs.db
+photothumb.db
+[Dd]esktop.ini
+#Ignore files build by Visual Studio
+*.obj
+*.exe
+*.dll
+*.pdb
+*.user
+*.aps
+*.pch
+*.vspscc
+*_i.c
+*_p.c
+*.ncb
+*.suo
+*.tlb
+*.tlh
+*.bak
+*.cache
+*.ilk
+*.log
+*.sln
+*.sdf
+*.opensdf
+[Bb]in*/
+ipch*/
+[Dd]ebug*/
+[Gg]enerated[Ff]iles*/
+*.lib
+*.sbr
+.*log
+obj/
+[Rr]elease*/
+_ReSharper*/
+[Tt]est[Rr]esult*

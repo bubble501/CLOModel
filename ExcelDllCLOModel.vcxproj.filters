@@ -121,6 +121,12 @@
     <CustomBuild Include="StressThread.h">
       <Filter>Header Files\Stress Test</Filter>
     </CustomBuild>
+    <CustomBuild Include="WaterfallCalculator.h">
+      <Filter>Header Files\Deal Structure</Filter>
+    </CustomBuild>
+    <CustomBuild Include="WaterfallCalcThread.h">
+      <Filter>Header Files\Deal Structure</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\Debug\moc_CentralUnit.cpp">
@@ -212,6 +218,24 @@
     </ClCompile>
     <ClCompile Include="StressThread.cpp">
       <Filter>Source Files\Stress Test</Filter>
+    </ClCompile>
+    <ClCompile Include="WaterfallCalcThread.cpp">
+      <Filter>Source Files\Deal Structure</Filter>
+    </ClCompile>
+    <ClCompile Include="WaterfallCalculator.cpp">
+      <Filter>Source Files\Deal Structure</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_WaterfallCalculator.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_WaterfallCalculator.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_WaterfallCalcThread.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_WaterfallCalcThread.cpp">
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

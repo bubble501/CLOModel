@@ -5,7 +5,7 @@
 #include "MtgCalculator.h"
 #include "Waterfall.h"
 #include "StressTest.h"
-
+class WaterfallCalculator;
 class CentralUnit : public QObject{
 	Q_OBJECT
 public:
@@ -69,6 +69,7 @@ public:
 	bool GetRunCall() const{return RunCall;}
 	void SetRunCall(bool a){RunCall=a;}
 private:
+	WaterfallCalculator* ParallWatFalls;
 	MtgCalculator LoansCalculator;
 	Waterfall Structure;
 	Waterfall CallStructure;

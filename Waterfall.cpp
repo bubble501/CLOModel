@@ -93,6 +93,7 @@ Waterfall::Waterfall(const Waterfall& a)
 	,m_UseCall(a.m_UseCall)
 	,m_CallMultiple(a.m_CallMultiple)
 	,m_CallReserve(a.m_CallReserve)
+	,m_CalculatedMtgPayments(a.m_CalculatedMtgPayments)
 {
 	for(QList<Tranche*>::const_iterator i=a.m_Tranches.constBegin();i!=a.m_Tranches.constEnd();i++){
 		m_Tranches.append(new Tranche(**i));
@@ -103,6 +104,8 @@ Waterfall::Waterfall(const Waterfall& a)
 	m_unpackedCCCcurve=UnpackVect(m_CCCcurve,m_PaymentFrequency,false);
 }
 Waterfall& Waterfall::operator=(const Waterfall& a){
+	ResetSteps();
+	ResetTranches();
 	m_SeniorExpenses=a.m_SeniorExpenses;
 	m_SeniorFees=a.m_SeniorFees;
 	m_JuniorFees=a.m_JuniorFees;
@@ -129,6 +132,7 @@ Waterfall& Waterfall::operator=(const Waterfall& a){
 	m_UseCall=a.m_UseCall;
 	m_CallMultiple=a.m_CallMultiple;
 	m_CallReserve=a.m_CallReserve;
+	m_CalculatedMtgPayments=a.m_CalculatedMtgPayments;
 	for(QList<Tranche*>::const_iterator i=a.m_Tranches.constBegin();i!=a.m_Tranches.constEnd();i++){
 		m_Tranches.append(new Tranche(**i));
 	}
@@ -847,7 +851,7 @@ QDataStream& operator>>(QDataStream & stream, Waterfall& flows){
 		>> flows.m_CCCTestLimit
 	;
 	stream >> TempString;
-	flows.SetCCCcurve(TempString);//TODO check if it's unpacked
+	flows.SetCCCcurve(TempString);
 	stream
 		>> flows.m_CCChaircut
 		>> flows.m_UseTurbo

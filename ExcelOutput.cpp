@@ -34,7 +34,7 @@ HRESULT ExcelOutput::PrintMortgagesRepLines(
 				for (int i = 0; i < Numrows; i++)
 				{
 					pdFreq->vt = VT_I4;
-					pdFreq->lVal = i;
+					pdFreq->intVal = i;
 					pdFreq++;
 				}
 			}
@@ -484,5 +484,67 @@ HRESULT ExcelOutput::PrintStressTest(const StressTest& stresser, const QString& 
 	}
 	SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
 	SysFreeString(Params.rgvarg[Params.cArgs-3].bstrVal);
+	return hr;
+}
+HRESULT ExcelOutput::PrintMergedCell(const QString& msg, const QString& TargetCell, int RowDim, int ColDim,const QColor& FillColor){
+	QString ColorString=
+		QString("%1,%2,%3").arg(FillColor.red()).arg(FillColor.green()).arg(FillColor.blue());
+	HRESULT hr;
+	static DISPID dispid = 0;
+	DISPPARAMS Params;
+	VARIANTARG Command[6];
+	int CurrentCmdIndex=6-1;
+	if(!ExcelCommons::pExcelDisp)return S_FALSE;
+	try
+	{
+		Command[CurrentCmdIndex].vt = VT_BSTR;
+		Command[CurrentCmdIndex--].bstrVal = SysAllocString(L"PrintMergedCell");
+		Command[CurrentCmdIndex].vt = VT_BSTR;
+		Command[CurrentCmdIndex--].bstrVal = SysAllocString(msg.toStdWString().c_str());
+		Command[CurrentCmdIndex].vt = VT_BSTR;
+		Command[CurrentCmdIndex--].bstrVal = SysAllocString(TargetCell.toStdWString().c_str());
+		Command[CurrentCmdIndex].vt = VT_I4;
+		Command[CurrentCmdIndex--].intVal=RowDim;
+		Command[CurrentCmdIndex].vt = VT_I4;
+		Command[CurrentCmdIndex--].intVal=ColDim;
+		Command[CurrentCmdIndex].vt = VT_BSTR;
+		Command[CurrentCmdIndex--].bstrVal = SysAllocString(ColorString.toStdWString().c_str());
+		Params.rgdispidNamedArgs = NULL;
+		Params.rgvarg=Command;
+		Params.cArgs = 6;
+		Params.cNamedArgs = 0;
+		if(dispid == 0)
+		{
+			wchar_t *ucName = L"Run";
+			hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
+				LOCALE_SYSTEM_DEFAULT, &dispid);
+			if(FAILED(hr))
+			{
+				SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
+				SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
+				SysFreeString(Params.rgvarg[Params.cArgs-3].bstrVal);
+				SysFreeString(Params.rgvarg[Params.cArgs-6].bstrVal);
+				return hr;
+			}
+		}
+		hr = ExcelCommons::pExcelDisp->Invoke(dispid,IID_NULL,LOCALE_SYSTEM_DEFAULT,
+			DISPATCH_METHOD, &Params, NULL, NULL, NULL);
+		if(FAILED(hr))
+		{
+			SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
+			SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
+			SysFreeString(Params.rgvarg[Params.cArgs-3].bstrVal);
+			SysFreeString(Params.rgvarg[Params.cArgs-6].bstrVal);
+			return hr;
+		}
+	}
+	catch(_com_error &ce)
+	{
+		hr = ce.Error();
+	}
+	SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
+	SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
+	SysFreeString(Params.rgvarg[Params.cArgs-3].bstrVal);
+	SysFreeString(Params.rgvarg[Params.cArgs-6].bstrVal);
 	return hr;
 }

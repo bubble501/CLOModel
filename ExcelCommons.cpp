@@ -62,6 +62,7 @@ QString ExcelCommons::CellOffset(QString StartCell,int RowOff, int ColOff){
 	PathFinder.setPattern("^(.+)!.+$");
 	PathFinder.exactMatch(StartCell);
 	QString SheetName=PathFinder.cap(1);
+	SheetName.replace('\'',"");
 	//if(SheetName.at(0)!='\'') SheetName.prepend('\'');
 	//if(SheetName.at(SheetName.size()-1)!='\'') SheetName.append('\'');
 	QString RawAddress=StartCell;

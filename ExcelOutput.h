@@ -42,5 +42,6 @@ namespace ExcelOutput{
 		const QString& DestinationAddress,
 		bool SetupConditionalFormatting  = false
 	);
+	HRESULT PrintMergedCell(const QString& msg, const QString& TargetCell, int RowDim=1, int ColDim=1 ,const QColor& FillColor=Qt::white);
 }
 #endif // ExcelOutput_h__

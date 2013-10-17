@@ -21,7 +21,7 @@ const Tranche* Waterfall::GetTranche(int Index) const{
 }
 const Tranche* Waterfall::GetTranche(const QString& TrancheName) const{
 	for(int i=0;i<m_Tranches.size();i++){
-		if(m_Tranches.at(i)->GetTrancheName()==TrancheName) return GetTranche(i);
+		if(m_Tranches.at(i)->GetTrancheName().trimmed().toUpper()==TrancheName.trimmed().toUpper()) return GetTranche(i);
 	}
 	return NULL;
 }
@@ -104,8 +104,6 @@ Waterfall::Waterfall(const Waterfall& a)
 	m_unpackedCCCcurve=UnpackVect(m_CCCcurve,m_PaymentFrequency,false);
 }
 Waterfall& Waterfall::operator=(const Waterfall& a){
-	ResetSteps();
-	ResetTranches();
 	m_SeniorExpenses=a.m_SeniorExpenses;
 	m_SeniorFees=a.m_SeniorFees;
 	m_JuniorFees=a.m_JuniorFees;
@@ -133,9 +131,11 @@ Waterfall& Waterfall::operator=(const Waterfall& a){
 	m_CallMultiple=a.m_CallMultiple;
 	m_CallReserve=a.m_CallReserve;
 	m_CalculatedMtgPayments=a.m_CalculatedMtgPayments;
+	ResetTranches();
 	for(QList<Tranche*>::const_iterator i=a.m_Tranches.constBegin();i!=a.m_Tranches.constEnd();i++){
 		m_Tranches.append(new Tranche(**i));
 	}
+	ResetSteps();
 	for(QList<WatFalPrior*>::const_iterator i=a.m_WaterfallStesps.constBegin();i!=a.m_WaterfallStesps.constEnd();i++){
 		m_WaterfallStesps.append(new WatFalPrior(**i));
 	}
@@ -869,11 +869,13 @@ QDataStream& operator>>(QDataStream & stream, Waterfall& flows){
 		>> flows.m_CallReserve
 		>> TempInt
 	;
+	flows.ResetTranches();
 	for(int i=0;i<TempInt;i++){
 		stream >> TempTranche;
 		flows.AddTranche(TempTranche);
 	}
 	stream >> TempInt;
+	flows.ResetSteps();
 	for(int i=0;i<TempInt;i++){
 		stream >> TempStep;
 		flows.AddStep(TempStep);

@@ -137,6 +137,7 @@ TrancheCashFlow& TrancheCashFlow::operator=(const TrancheCashFlow& a){
 TrancheCashFlow::TrancheCashFlow(const TrancheCashFlow& a)
 	:OutstandingAmt(a.OutstandingAmt)
 {
+	ResetFlows();
 	AddFlow(a);
 }
 void TrancheCashFlow::ReplaceDate(const QDate& OriginalDate, const QDate& NewDate){
@@ -173,6 +174,8 @@ QDataStream& operator>>(QDataStream & stream, TrancheCashFlow& flows){
 		>> flows.Interest
 		>> flows.Principal
 		>> flows.OCTest
-	;
+		>> flows.ICTest
+		>> flows.Deferred
+		;
 	return stream;
 }

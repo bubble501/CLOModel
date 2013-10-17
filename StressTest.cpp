@@ -236,6 +236,7 @@ QDataStream& operator>>(QDataStream & stream, StressTest& flows){
 	flows.StressDimension[1]=StressTest::StressVariability(tempint);
 	stream >> flows.SequentialComputation;
 	stream >> tempint;
+	flows.ResetLoans();
 	for (int i=0;i<tempint;i++){
 		stream >> TempMtg;
 		flows.AddLoan(TempMtg);

@@ -123,14 +123,17 @@ double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, double I
 	}
 	return Result;
 }
+bool Sign(qreal a){return a>=0.0;}
 double CalculateIRR(const QList<QDate>& Dte, const QList<double>& Flws, int Daycount, double Guess,int precision){
+	if(Guess<=0 || Guess>10) Guess=0.05;
 	double Result=Guess;
-	double PreviuousGuess=Guess+0.01;
+	double PreviuousGuess=0;//Guess+0.01;
 	double CurrentGuess=Guess;
-	double PreviousNPV=CalculateNPV(Dte,Flws,PreviuousGuess,Daycount);
+	double PreviousNPV=0;//CalculateNPV(Dte,Flws,PreviuousGuess,Daycount);
 	double CurrentNPV=CalculateNPV(Dte,Flws,Result,Daycount);
 	while(qAbs(CurrentNPV)>qPow(10.0,-static_cast<double>(precision))){
 		Result-=CurrentNPV*(Result-PreviuousGuess)/(CurrentNPV-PreviousNPV);
+		if(Result<0.0 || Result>10.0) return 0.0;
 		PreviousNPV=CurrentNPV;
 		PreviuousGuess=CurrentGuess;
 		CurrentGuess=Result;
@@ -139,5 +142,13 @@ double CalculateIRR(const QList<QDate>& Dte, const QList<double>& Flws, int Dayc
 	return Result;
 }
 double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, double BaseRate,int Daycount, double Guess,int precision){
-	return CalculateIRR(Dte,Flws,Daycount,Guess,precision)-BaseRate;
+	double Yld = CalculateIRR(Dte,Flws,Daycount,Guess,precision);
+	double Freq=1.0;
+	if(Dte.size()>2){
+		Freq=(1.0/((static_cast<double>(Dte.at(1).daysTo(Dte.last())))/(static_cast<double>(Dte.size())-2.0)/365.0));
+		if(Freq-static_cast<double>(static_cast<int>(Freq))>=0.5) Freq=RoundUp(Freq);
+		else Freq=static_cast<double>(static_cast<int>(Freq));
+	}
+	double AdjYeld= (qPow(1.0+Yld,1.0/Freq)-1.0)*Freq;
+	return (AdjYeld-BaseRate)*10000.0;
 }

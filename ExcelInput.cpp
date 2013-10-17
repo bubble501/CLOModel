@@ -3,6 +3,7 @@
 #include "WatFalPrior.h"
 #include <QDate>
 #include <QString>
+#include <QFile>
 //#define DebuggungInputs //TODO Comment me
 #ifdef DebuggungInputs
 #include <QApplication>
@@ -20,7 +21,6 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	VARIANT HUGEP *pdFreq;
 	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
 	if (!SUCCEEDED(hr))return;
-	std::wstring TmpWstr;
 	int NumElements;
 	{ //Loans
 		QDate Matur;
@@ -33,8 +33,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		QMessageBox::information(0,"Mutui",QString("Numero Mutui: %1").arg(NumElements));
 #endif
 		for(int i=0;i<NumElements;i++){
-			TmpWstr=pdFreq->bstrVal;pdFreq++;
-			Matur=QDate::fromString(QString(std::string(TmpWstr.begin(),TmpWstr.end()).c_str()),"yyyy-MM-dd");
+			Matur=QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd");pdFreq++;
 #ifdef DebuggungInputs
 			if(i==0) QMessageBox::information(0,"Data Ok","Prima Data: "+Matur.toString("dd/MM/yy"));
 #endif
@@ -42,13 +41,11 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 #ifdef DebuggungInputs
 			if(i==0) QMessageBox::information(0,"Ammontare Mutuo OK",QString("Outstanding: %1").arg(sze));
 #endif
-			TmpWstr=pdFreq->bstrVal;pdFreq++;
-			Intr=QString(std::string(TmpWstr.begin(),TmpWstr.end()).c_str());
+			Intr=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 #ifdef DebuggungInputs
 			if(i==0) QMessageBox::information(0,"Interest Ok","Interest Vector: "+Intr);
 #endif
-			TmpWstr=pdFreq->bstrVal;pdFreq++;
-			Ann=QString(std::string(TmpWstr.begin(),TmpWstr.end()).c_str());
+			Ann=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 #ifdef DebuggungInputs
 			if(i==0) QMessageBox::information(0,"Annuity Ok","Annuity Vector: "+Ann);
 #endif
@@ -80,8 +77,9 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		QMessageBox::information(0,"Mutui",QString("Numero Tranches: %1").arg(NumElements));
 #endif
 		for(int i=0;i<NumElements;i++){
-			TmpWstr=pdFreq->bstrVal;pdFreq++;
-			TrName=QString(std::string(TmpWstr.begin(),TmpWstr.end()).c_str());
+			//TmpWstr=pdFreq->bstrVal;pdFreq++;
+			//TrName=QString(std::string(TmpWstr.begin(),TmpWstr.end()).c_str());
+			TrName=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 #ifdef DebuggungInputs
 			if(i==0) QMessageBox::information(0,"name Ok","Name: "+TrName);
 #endif
@@ -93,8 +91,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 #ifdef DebuggungInputs
 			if(i==0) QMessageBox::information(0,"Original Out OK",QString("Original Out: %1").arg(origOut));
 #endif
-			TmpWstr=pdFreq->bstrVal;pdFreq++;
-			Curr=QString(std::string(TmpWstr.begin(),TmpWstr.end()).c_str());
+			Curr=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 #ifdef DebuggungInputs
 			if(i==0) QMessageBox::information(0,"Currency Ok","Name: "+Curr);
 #endif
@@ -110,18 +107,15 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 #ifdef DebuggungInputs
 			if(i==0) QMessageBox::information(0,"Intr OK",QString("Coupon: %1").arg(coup));
 #endif
-			TmpWstr=pdFreq->bstrVal;pdFreq++;
-			RefRt=QString(std::string(TmpWstr.begin(),TmpWstr.end()).c_str());
+			RefRt=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 #ifdef DebuggungInputs
 			if(i==0) QMessageBox::information(0,"Ref Rate OK",QString("Ref Rate: %1").arg(RefRt));
 #endif
-			TmpWstr=pdFreq->bstrVal;pdFreq++;
-			PrevIPD=QDate::fromString(QString(std::string(TmpWstr.begin(),TmpWstr.end()).c_str()),"yyyy-MM-dd");
+			PrevIPD=QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd");pdFreq++;
 #ifdef DebuggungInputs
 			if(i==0) QMessageBox::information(0,"Prev IPD Ok","Prev IPD: "+PrevIPD.toString("dd/MM/yyyy"));
 #endif
-			TmpWstr=pdFreq->bstrVal;pdFreq++;
-			BasRt=QString(std::string(TmpWstr.begin(),TmpWstr.end()).c_str());
+			BasRt=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 #ifdef DebuggungInputs
 			if(i==0) QMessageBox::information(0,"Base rate Ok","Base rate: "+BasRt);
 #endif
@@ -173,25 +167,20 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		TempUnit.SetJuniorFees(pdFreq->dblVal);pdFreq++;
 		TempUnit.SetJuniorFeesCoupon(pdFreq->dblVal);pdFreq++;
 		TempUnit.SetPaymentFrequency(pdFreq->intVal);pdFreq++;
-		TmpWstr=pdFreq->bstrVal;pdFreq++;
-		TempUnit.SetFirstIPDdate(QDate::fromString(QString(std::string(TmpWstr.begin(),TmpWstr.end()).c_str()),"yyyy-MM-dd"));
-		TmpWstr=pdFreq->bstrVal;pdFreq++;
-		TempUnit.SetLastIPDdate(QDate::fromString(QString(std::string(TmpWstr.begin(),TmpWstr.end()).c_str()),"yyyy-MM-dd"));
+		TempUnit.SetFirstIPDdate(QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd"));pdFreq++;
+		TempUnit.SetLastIPDdate(QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd"));pdFreq++;
 		TempUnit.SetUseTurbo(pdFreq->boolVal);pdFreq++;
-		TmpWstr=pdFreq->bstrVal;pdFreq++;
-		TempUnit.SetCCCcurve(QString(std::string(TmpWstr.begin(),TmpWstr.end()).c_str()));
+		TempUnit.SetCCCcurve(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
 		TempUnit.SetCCChaircut(pdFreq->dblVal);pdFreq++;
 		TempUnit.SetCCCTestLimit(pdFreq->dblVal);pdFreq++;
-		TmpWstr=pdFreq->bstrVal;pdFreq++;
-		TempUnit.SetCallDate(QDate::fromString(QString(std::string(TmpWstr.begin(),TmpWstr.end()).c_str()),"yyyy-MM-dd"));
+		TempUnit.SetCallDate(QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd"));pdFreq++;
 		TempUnit.SetCallMultiple(pdFreq->dblVal);pdFreq++;
 		TempUnit.SetCallReserve(pdFreq->dblVal);pdFreq++;
 		TempUnit.SetPoolValueAtCall(pdFreq->dblVal);pdFreq++;
 		{// Reinvestment Test
 			QDate ReinPer;
 			double ReinvLim,IISha,IRsha,OIsha,ORsha;
-			TmpWstr=pdFreq->bstrVal;pdFreq++;
-			ReinPer=QDate::fromString(QString(std::string(TmpWstr.begin(),TmpWstr.end()).c_str()),"yyyy-MM-dd");
+			ReinPer=QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd");pdFreq++;
 			ReinvLim=pdFreq->dblVal;pdFreq++;
 			IRsha=pdFreq->dblVal;pdFreq++;
 			IISha=pdFreq->dblVal;pdFreq++;
@@ -201,36 +190,115 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			QString Intr, CPR,CDR,LS,WAL;
 			int Frq;
 			double BaseVal;
-			TmpWstr=pdFreq->bstrVal;pdFreq++;
-			Intr=QString(std::string(TmpWstr.begin(),TmpWstr.end()).c_str());
-			TmpWstr=pdFreq->bstrVal;pdFreq++;
-			CPR=QString(std::string(TmpWstr.begin(),TmpWstr.end()).c_str());
-			TmpWstr=pdFreq->bstrVal;pdFreq++;
-			CDR=QString(std::string(TmpWstr.begin(),TmpWstr.end()).c_str());
-			TmpWstr=pdFreq->bstrVal;pdFreq++;
-			LS=QString(std::string(TmpWstr.begin(),TmpWstr.end()).c_str());
-			TmpWstr=pdFreq->bstrVal;pdFreq++;
-			WAL=QString(std::string(TmpWstr.begin(),TmpWstr.end()).c_str());
+			Intr=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
+			CPR=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
+			CDR=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
+			LS=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
+			WAL=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			Frq=pdFreq->intVal; pdFreq++;
 			BaseVal=pdFreq->dblVal;pdFreq++;
 			TempUnit.SetupReinvBond(Intr,CPR,CDR,LS,WAL,Frq,"N",BaseVal);
 		}
 		TempUnit.SetPrincipalAvailable(pdFreq->dblVal);pdFreq++;
 		TempUnit.SetInterestAvailable(pdFreq->dblVal);pdFreq++;
-		TmpWstr=pdFreq->bstrVal;pdFreq++;
-		TempUnit.SetPoolCutOff(QDate::fromString(QString(std::string(TmpWstr.begin(),TmpWstr.end()).c_str()),"yyyy-MM-dd"));
+		TempUnit.SetPoolCutOff(QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd"));pdFreq++;
 		TempUnit.SetRunCall(pdFreq->boolVal);pdFreq++;
 #ifdef DebuggungInputs
 		QMessageBox::information(0,"Call",QString("Use Call: %1").arg(TempUnit.GetRunCall()));
 #endif
-		TmpWstr=pdFreq->bstrVal;pdFreq++;
-		TempUnit.SetMtgOutputAddress(QString(std::string(TmpWstr.begin(),TmpWstr.end()).c_str()));
-		TmpWstr=pdFreq->bstrVal;pdFreq++;
-		TempUnit.SetTranchesOutputAddress(QString(std::string(TmpWstr.begin(),TmpWstr.end()).c_str()));
-		TmpWstr=pdFreq->bstrVal;pdFreq++;
-		TempUnit.SetFolderPath(QString(std::string(TmpWstr.begin(),TmpWstr.end()).c_str()));
+		TempUnit.SetMtgOutputAddress(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
+		TempUnit.SetTranchesOutputAddress(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
+		TempUnit.SetFolderPath(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
 	}
+	SafeArrayUnaccessData(*ArrayData);
 #ifndef DebuggungInputs
 	TempUnit.Calculate();
 #endif
+}
+
+double __stdcall CLODiscountMargin(LPSAFEARRAY *ArrayData){
+	VARIANT HUGEP *pdFreq;
+	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
+	if (!SUCCEEDED(hr)) return 0.0;
+	QString FolderPath=QString::fromStdWString(pdFreq->bstrVal);pdFreq++;
+	QString TrancheName=QString::fromStdWString(pdFreq->bstrVal);pdFreq++;
+	bool ToCall=pdFreq->boolVal;pdFreq++;
+	double NewPrice=pdFreq->dblVal;pdFreq++;
+	SafeArrayUnaccessData(*ArrayData);
+#ifdef DebuggungInputs
+	char *argv[] = {"NoArgumnets"};
+	int argc = sizeof(argv) / sizeof(char*) - 1;
+	QApplication ComputationLoop(argc,argv);
+	QMessageBox::information(0,"Arguments OK","Arguments are right");
+#endif
+	Waterfall TempWaterfall;
+	QString Filename=FolderPath+"\\BaseCase.clo";
+#ifndef Q_WS_WIN
+	Filename.prepend('.');
+#endif
+	QFile file(Filename);
+	if(!file.exists()){
+#ifdef DebuggungInputs
+		QMessageBox::information(0,"File Non Esiste",QString("Il File "+ Filename +" Non Esiste"));
+#endif
+		return 0.0;
+	}
+#ifdef DebuggungInputs
+	QMessageBox::information(0,"File Esiste",QString("Il File "+ Filename +" Esiste"));
+#endif
+	if (!file.open(QIODevice::ReadOnly)){
+#ifdef DebuggungInputs
+		QMessageBox::information(0,"Impossibile Aprire",QString("Il File "+ Filename +" Non puo' essere aperto"));
+#endif
+		return 0.0;
+	}
+#ifdef DebuggungInputs
+	QMessageBox::information(0,"Aperto",QString("Il File "+ Filename +" e' stato aperto"));
+#endif
+	QDataStream out(&file);
+	out.setVersion(QDataStream::Qt_4_8);
+	out >> TempWaterfall;
+	if(ToCall) out >> TempWaterfall;
+	file.close();
+	const Tranche* TranchPoint=TempWaterfall.GetTranche(TrancheName);
+	if(!TranchPoint){
+#ifdef DebuggungInputs
+		QString TranchesNames;
+		for(int i=0;i<TempWaterfall.GetTranchesCount();i++) TranchesNames+='\n'+TempWaterfall.GetTranche(i)->GetTrancheName();
+		QMessageBox::information(0,"Tranche non Trovata",QString("La Tranche "+TrancheName+" non e' Stata Trovata\nTranches Disponibili:"+TranchesNames));
+#endif
+		return 0.0;
+	}
+#ifdef DebuggungInputs
+	QMessageBox::information(0,"Tranche Trovata",QString("La Tranche "+TrancheName+" e' Stata Trovata"));
+#endif
+	Tranche TempTranche(*TranchPoint);
+	TempTranche.SetPrice(NewPrice);
+	return TempTranche.GetDiscountMargin();
+}
+double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
+	VARIANT HUGEP *pdFreq;
+	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
+	if (!SUCCEEDED(hr)) return 0.0;
+	QString FolderPath=QString::fromStdWString(pdFreq->bstrVal);pdFreq++;
+	QString TrancheName=QString::fromStdWString(pdFreq->bstrVal);pdFreq++;
+	QDate StartDate=QDate::fromString(QString::fromStdWString(pdFreq->bstrVal),"yyyy-MM-dd");pdFreq++;
+	bool ToCall=pdFreq->boolVal;pdFreq++;
+	double NewPrice=pdFreq->dblVal;pdFreq++;
+	SafeArrayUnaccessData(*ArrayData);
+	Waterfall TempWaterfall;
+	QString Filename=FolderPath+"\\BaseCase.clo";
+	QFile file(Filename);
+	if(!file.exists())return 0.0;
+	if (!file.open(QIODevice::ReadOnly))return 0.0;
+	QDataStream out(&file);
+	out.setVersion(QDataStream::Qt_4_8);
+	out >> TempWaterfall;
+	if(ToCall) out >> TempWaterfall;
+	file.close();
+	const Tranche* TranchPoint=TempWaterfall.GetTranche(TrancheName);
+	if(!TranchPoint) return 0.0;
+	Tranche TempTranche(*TranchPoint);
+	TempTranche.SetPrice(NewPrice);
+	return TempTranche.GetWALife(StartDate);
 }

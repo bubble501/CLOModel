@@ -133,21 +133,23 @@ double Tranche::GetLossRate() const{
 	return Result;
 }
 double Tranche::GetDiscountMargin() const{
+	if(GetLossRate()>0.0000) return 0.0;
 	QList<QDate> FlowsDates;
 	QList<double> FlowsValues;
 	FlowsDates.append(LastPaymentDate);
-	FlowsValues.append(-OutstandingAmt*Price);
+	FlowsValues.append(-OutstandingAmt*Price/100.0);
 	for (int i=0;i<CashFlow.Count();i++){
 		FlowsDates.append(CashFlow.GetDate(i));
 		FlowsValues.append(CashFlow.GetTotalFlow(i));
 	}
 	if(ReferenceRateValue==-1.0){
+		QString ApplicableRate=(ReferenceRate.isEmpty() ? DefaultRefRate:ReferenceRate);
 		BloombergWorker Bee;
-		Bee.AddSecurity(ReferenceRate,"Index");
+		Bee.AddSecurity(ApplicableRate,"Index");
 		Bee.AddField("PX_LAST");
-		ReferenceRateValue=Bee.StartRequest().value(ReferenceRate).value("PX_LAST").toDouble()/100.0;
+		ReferenceRateValue=Bee.StartRequest().value(ApplicableRate).value("PX_LAST").toDouble()/100.0;
 	}
-	return CalculateDM(FlowsDates,FlowsValues,ReferenceRateValue,DayCount);
+	return qMax(0.0,CalculateDM(FlowsDates,FlowsValues,ReferenceRateValue,DayCount));
 }
 bool Tranche::operator>(const Tranche& a) const {
 	return ProrataGroup>a.ProrataGroup;
@@ -158,6 +160,17 @@ bool Tranche::operator<(const Tranche& a) const {
 double Tranche::GetCurrentOutstanding()const{
 	if(CashFlow.Count()==0) return OutstandingAmt;
 	return CashFlow.GetAmountOutstanding(CashFlow.Count()-1);
+}
+double Tranche::GetWALife(const QDate& StartDate)const{
+	double RunningSum=0.0, Result=0.0, CurrentPrinc;
+	for(int i=0;i<CashFlow.Count();i++){
+		CurrentPrinc=CashFlow.GetPrincipal(i);
+		if(CurrentPrinc>0){
+			RunningSum+=CurrentPrinc;
+			Result+=CurrentPrinc*static_cast<double>(StartDate.daysTo(CashFlow.GetDate(i)))/365.25;
+		}
+	}
+	return Result/RunningSum;
 }
 QDataStream& operator<<(QDataStream & stream, const Tranche& flows){
 	stream

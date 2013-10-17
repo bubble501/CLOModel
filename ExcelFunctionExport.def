@@ -1,3 +1,5 @@
 LIBRARY CLOmodel
 EXPORTS
 	RunModel
+	CLODiscountMargin
+	CLOWALife

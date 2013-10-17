@@ -84,6 +84,7 @@ public:
 	double GetLossRate() const;
 	double GetDiscountMargin() const;
 	double GetCurrentOutstanding() const;
+	double GetWALife(const QDate& StartDate) const;
 	friend QDataStream& operator<<(QDataStream & stream, const Tranche& flows);
 	friend QDataStream& operator>>(QDataStream & stream, Tranche& flows);
 };

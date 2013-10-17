@@ -37,4 +37,5 @@ void WaterfallCalculator::BeeReturned(int ID,const Waterfall& a){
 	connect(Bee,SIGNAL(Calculated(int,const Waterfall&)),this,SLOT(BeeReturned(int,const Waterfall&)));
 	connect(Bee,SIGNAL(Calculated(int,const Waterfall&)),Bee,SLOT(stop()),Qt::QueuedConnection);
 	Bee->start();
+	BeesSent++;
 }

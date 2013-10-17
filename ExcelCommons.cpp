@@ -1,6 +1,7 @@
 #include "ExcelCommons.h"
 #include <QRegExp>
 #include <qmath.h>
+//#include <tchar.h>
 IDispatch* ExcelCommons::pExcelDisp = NULL;
 bool ExcelCommons::xll_initialised = false;
 bool ExcelCommons::InitExcelOLE()

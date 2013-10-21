@@ -3,3 +3,4 @@ EXPORTS
 	RunModel
 	CLODiscountMargin
 	CLOWALife
+	StressTargetChanged

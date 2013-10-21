@@ -44,5 +44,6 @@ namespace ExcelOutput{
 	);
 	HRESULT PrintMergedCell(const QString& msg, const QString& TargetCell, int RowDim=1, int ColDim=1 ,const QColor& FillColor=Qt::white);
 	HRESULT PrintColumn(const QString& Title, const QList<double>& Values ,const QString& TargetCell,const QString& ValFormat="0.00",const QColor& FillColor=Qt::white);
+	HRESULT PrintDataColumn(const QList<double>& Values ,const QString& TargetCell,const QString& ValFormat="0.00");
 }
 #endif // ExcelOutput_h__

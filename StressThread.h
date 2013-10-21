@@ -15,7 +15,7 @@ public slots:
 	void run();
 	void stop(){exit(0);}
 signals:
-	void ScenarioCalculated(int,int,Waterfall);
+	void ScenarioCalculated(int,int,const Waterfall&);
 public:
 	StressThread(int IDx,int IDy, const QString& Xs,const QString& Ys,const QString& Cp,const QList<Mortgage*>& Mtgs,const Waterfall& Stct,const QDate& StDt,StressTest::StressVariability Xv,StressTest::StressVariability Yv,QObject* parent=0);
 };

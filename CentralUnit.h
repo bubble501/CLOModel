@@ -58,16 +58,18 @@ public:
 	void SetUseCall(bool a){RunCall=a;}
 	const QString& GetMtgOutputAddress() const{return MtgOutputAddress;}
 	const QString& GetTranchesOutputAddress() const{return TranchesOutputAddress;}
-	const QString& GetStressOutputAddress() const{return StressOutputAddress;}
 	void SetMtgOutputAddress(const QString& a){MtgOutputAddress=a;}
 	void SetTranchesOutputAddress(const QString& a){TranchesOutputAddress=a;}
-	void SetStressOutputAddress(const QString& a){StressOutputAddress=a;}
 	void Calculate();
 	void CalculateStress();
 	void SetFolderPath(const QString& a);
 	const QString& GetFolderPath() const {return FolderPath;}
 	bool GetRunCall() const{return RunCall;}
 	void SetRunCall(bool a){RunCall=a;}
+	void SetLossOutputAddress(const QString& a){LossOutputAddress=a;}
+	void SetLossOnCallOutputAddress(const QString& a){LossOnCallOutputAddress=a;}
+	void SetCreditEnanAddress(const QString& a){CreditEnanAddress=a;}
+	void SetStressToCall(bool a){StressToCall=a;}
 private:
 	WaterfallCalculator* ParallWatFalls;
 	MtgCalculator LoansCalculator;
@@ -81,7 +83,9 @@ private:
 	QString MtgOutputAddress;
 	QString TranchesOutputAddress;
 	QString CallTranchesOutputAddress;
-	QString StressOutputAddress;
+	QString LossOutputAddress;
+	QString LossOnCallOutputAddress;
+	QString CreditEnanAddress;
 	QString FolderPath;
 signals:
 	void LoopStarted();

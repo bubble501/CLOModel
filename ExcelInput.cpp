@@ -1,12 +1,14 @@
 #include "ExcelCommons.h"
 #include "CentralUnit.h"
 #include "WatFalPrior.h"
+#include "ExcelOutput.h"
+#include "SummaryView.h"
 #include <QDate>
 #include <QString>
 #include <QFile>
 //#define DebuggungInputs //TODO Comment me
-#ifdef DebuggungInputs
 #include <QApplication>
+#ifdef DebuggungInputs
 #include <QMessageBox>
 #endif
 void __stdcall RunModel(LPSAFEARRAY *ArrayData){
@@ -16,7 +18,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	QApplication ComputationLoop(argc,argv);
 	QMessageBox::information(0,"Partito",QString("Dimensione Vettore: %1").arg((*ArrayData)->rgsabound->cElements));
 #endif
-
+	bool RunStress;
 	CentralUnit TempUnit;
 	VARIANT HUGEP *pdFreq;
 	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
@@ -208,11 +210,42 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 #endif
 		TempUnit.SetMtgOutputAddress(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
 		TempUnit.SetTranchesOutputAddress(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
+		TempUnit.SetLossOutputAddress(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
+		TempUnit.SetLossOnCallOutputAddress(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
+		TempUnit.SetCreditEnanAddress(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
 		TempUnit.SetFolderPath(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
+		RunStress=pdFreq->boolVal;pdFreq++;
+		if(RunStress){// Stress Test
+			QString ConstPar=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
+#ifdef DebuggungInputs
+			QMessageBox::information(0,"Stress Constant Parameter",QString("Stress Constant Parameter: "+ConstPar));
+#endif
+			int XVar=pdFreq->intVal;pdFreq++;
+			int YVar=pdFreq->intVal;pdFreq++;
+			int NumElem=pdFreq->intVal;pdFreq++;
+			QList<QString> XSpann;
+			for(int i=0;i<NumElem;i++){
+				XSpann.append(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
+#ifdef DebuggungInputs
+				QMessageBox::information(0,"Stress XSpann Parameter",QString("Stress XSpann[%1]: ").arg(i) +XSpann.last());
+#endif
+			}
+			NumElem=pdFreq->intVal;pdFreq++;
+			QList<QString> YSpann;
+			for(int i=0;i<NumElem;i++){
+				YSpann.append(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
+#ifdef DebuggungInputs
+				QMessageBox::information(0,"Stress YSpann Parameter",QString("Stress YSpann[%1]: ").arg(i) +YSpann.last());
+#endif
+			}
+			TempUnit.SetupStress(ConstPar,XSpann,YSpann,StressTest::StressVariability(XVar),StressTest::StressVariability(YVar));
+			TempUnit.SetStressToCall(pdFreq->boolVal);pdFreq++;
+		}
 	}
 	SafeArrayUnaccessData(*ArrayData);
 #ifndef DebuggungInputs
-	TempUnit.Calculate();
+	if(RunStress) TempUnit.CalculateStress();
+	else TempUnit.Calculate();
 #endif
 }
 
@@ -232,7 +265,7 @@ double __stdcall CLODiscountMargin(LPSAFEARRAY *ArrayData){
 	QMessageBox::information(0,"Arguments OK","Arguments are right");
 #endif
 	Waterfall TempWaterfall;
-	QString Filename=FolderPath+"\\BaseCase.clo";
+	QString Filename=FolderPath+"\\.BaseCase.clo";
 #ifndef Q_WS_WIN
 	Filename.prepend('.');
 #endif
@@ -287,7 +320,7 @@ double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
 	double NewPrice=pdFreq->dblVal;pdFreq++;
 	SafeArrayUnaccessData(*ArrayData);
 	Waterfall TempWaterfall;
-	QString Filename=FolderPath+"\\BaseCase.clo";
+	QString Filename=FolderPath+"\\.BaseCase.clo";
 	QFile file(Filename);
 	if(!file.exists())return 0.0;
 	if (!file.open(QIODevice::ReadOnly))return 0.0;
@@ -302,3 +335,59 @@ double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
 	TempTranche.SetPrice(NewPrice);
 	return TempTranche.GetWALife(StartDate);
 }
+void __stdcall StressTargetChanged(LPSAFEARRAY *ArrayData){
+	StressTest TempStress;
+	VARIANT HUGEP *pdFreq;
+	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
+	if (!SUCCEEDED(hr)) return;
+	QString FolderPath=QString::fromStdWString(pdFreq->bstrVal);pdFreq++;
+	QString TrancheName=QString::fromStdWString(pdFreq->bstrVal);pdFreq++;
+	QString TargetCell=QString::fromStdWString(pdFreq->bstrVal);pdFreq++;
+	int XVar=pdFreq->intVal;pdFreq++;
+	int YVar=pdFreq->intVal;pdFreq++;
+	QString Filename=(FolderPath+"\\.StressResult%1%2.csr").arg(XVar).arg(YVar);
+	QFile file(Filename);
+	if(!file.exists())return ;
+	if (!file.open(QIODevice::ReadOnly))return;
+	QDataStream out(&file);
+	out.setVersion(QDataStream::Qt_4_8);
+	out >> TempStress;
+	ExcelOutput::PrintStressTest(TempStress,TrancheName,TargetCell,true);
+}
+void __stdcall InspectStress(LPSAFEARRAY *ArrayData){
+	StressTest TempStress;
+	VARIANT HUGEP *pdFreq;
+	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
+	if (!SUCCEEDED(hr)) return;
+	QString FolderPath=QString::fromStdWString(pdFreq->bstrVal);pdFreq++;
+	QString RowHead=QString::fromStdWString(pdFreq->bstrVal);pdFreq++;
+	QString ColHead=QString::fromStdWString(pdFreq->bstrVal);pdFreq++;
+	int XVar=pdFreq->intVal;pdFreq++;
+	int YVar=pdFreq->intVal;pdFreq++;
+	QString Filename=(FolderPath+"\\.StressResult%1%2.csr").arg(XVar).arg(YVar);
+	QFile file(Filename);
+	if(!file.exists())return ;
+	if (!file.open(QIODevice::ReadOnly))return;
+	QDataStream out(&file);
+	out.setVersion(QDataStream::Qt_4_8);
+	out >> TempStress;
+
+	char *argv[] = {"NoArgumnets"};
+	int argc = sizeof(argv) / sizeof(char*) - 1;
+	QApplication ComputationLoop(argc,argv);
+	SummaryView SitRep;
+	SitRep.SetStructure(TempStress.GetResults().value(RowHead).value(ColHead));
+	SitRep.show();
+	ComputationLoop.exec();	
+}
+
+#ifdef DebuggungInputs
+void __stdcall TestingInput(LPBSTR a){
+	BSTR b=SysAllocString(*a);
+	char *argv[] = {"NoArgumnets"};
+	int argc = sizeof(argv) / sizeof(char*) - 1;
+	QApplication ComputationLoop(argc,argv);
+	QMessageBox::information(0,"Stringa letta",QString::fromWCharArray(b));
+	SysFreeString(b);
+}
+#endif

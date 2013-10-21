@@ -824,11 +824,11 @@ QDataStream& operator<<(QDataStream & stream, const Waterfall& flows){
 		<< flows.m_CallReserve
 		<< flows.m_Tranches.size()
 	;
-	foreach(Tranche* SingleTranche,flows.m_Tranches)
-		stream << *SingleTranche;
+	foreach(const Tranche* SingleTranche,flows.m_Tranches)
+		stream << (*SingleTranche);
 	stream << flows.m_WaterfallStesps.size();
-	foreach(WatFalPrior* SingleStep,flows.m_WaterfallStesps)
-		stream << *SingleStep;
+	foreach(const WatFalPrior* SingleStep,flows.m_WaterfallStesps)
+		stream << (*SingleStep);
 	return stream;
 }
 QDataStream& operator>>(QDataStream & stream, Waterfall& flows){
@@ -849,10 +849,7 @@ QDataStream& operator>>(QDataStream & stream, Waterfall& flows){
 		>> flows.m_TotalJuniorFees
 		>> flows.m_ReinvestmentTest
 		>> flows.m_CCCTestLimit
-	;
-	stream >> TempString;
-	flows.SetCCCcurve(TempString);
-	stream
+		>> flows.m_CCCcurve
 		>> flows.m_CCChaircut
 		>> flows.m_UseTurbo
 		>> flows.m_PrincipalAvailable
@@ -869,6 +866,7 @@ QDataStream& operator>>(QDataStream & stream, Waterfall& flows){
 		>> flows.m_CallReserve
 		>> TempInt
 	;
+	flows.m_unpackedCCCcurve=UnpackVect(flows.m_CCCcurve,flows.m_PaymentFrequency);
 	flows.ResetTranches();
 	for(int i=0;i<TempInt;i++){
 		stream >> TempTranche;

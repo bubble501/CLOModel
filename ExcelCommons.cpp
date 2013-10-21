@@ -1,7 +1,6 @@
 #include "ExcelCommons.h"
 #include <QRegExp>
 #include <qmath.h>
-//#include <tchar.h>
 IDispatch* ExcelCommons::pExcelDisp = NULL;
 bool ExcelCommons::xll_initialised = false;
 bool ExcelCommons::InitExcelOLE()
@@ -41,24 +40,9 @@ void ExcelCommons::UninitExcelOLE(){
 	pExcelDisp = NULL;
 	OleUninitialize();
 }
-
-/*
-int __stdcall xlAutoOpen(){
-	if(ExcelCommons::xll_initialised)
-		return 1;
-	if(!ExcelCommons::InitExcelOLE()) return 0;
-	ExcelCommons::xll_initialised = true;
-	return 1;
-}
-int __stdcall xlAutoClose(void)
-{
-	if(!ExcelCommons::xll_initialised)
-		return 1;
-	ExcelCommons::UninitExcelOLE();
-	ExcelCommons::xll_initialised = false;
-	return 1;
-}*/
-QString ExcelCommons::CellOffset(QString StartCell,int RowOff, int ColOff){
+QString ExcelCommons::CellOffset(const QString& StrtCell,int RowOff, int ColOff){
+	QString StartCell(StrtCell);
+	StartCell.replace("$","");
 	QRegExp PathFinder;
 	PathFinder.setPattern("^(.+)!.+$");
 	PathFinder.exactMatch(StartCell);

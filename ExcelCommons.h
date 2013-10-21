@@ -6,7 +6,7 @@
 namespace ExcelCommons{
 	bool InitExcelOLE();
 	void UninitExcelOLE();
-	QString CellOffset(QString StartCell,int RowOff=0, int ColOff=0);
+	QString CellOffset(const QString& StartCell,int RowOff=0, int ColOff=0);
 	extern IDispatch *pExcelDisp;
 	extern bool xll_initialised;
 }

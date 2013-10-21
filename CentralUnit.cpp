@@ -179,10 +179,8 @@ void CentralUnit::CheckCalculationDone()
 		Structure=*(ParallWatFalls->GetWaterfalls().at(0));
 		CallStructure=*(ParallWatFalls->GetWaterfalls().at(1));
 	}
-	QString Filename=FolderPath+"\\BaseCase.clo";
-	#ifndef Q_WS_WIN
-	Filename.prepend('.');
-	#endif
+	
+	QString Filename=FolderPath+"\\.BaseCase.clo";
 	QFile file(Filename);
 	if (file.open(QIODevice::WriteOnly)) {
 		QDataStream out(&file);
@@ -217,6 +215,10 @@ void CentralUnit::CheckCalculationDone()
 		ExcelOutput::PrintColumn("Annualized Excess Spread",TempValList,ExcelCommons::CellOffset(TranchesOutputAddress,2,4+(6*Structure.GetTranchesCount())),"0.00%",Structure.GetTranchesCount()%2!=0 ? QColor(235,241,222) : QColor(216,228,188));
 		TempValList.clear(); for(int i=0;i<Structure.GetTranche(0)->GetCashFlow().Count();i++) TempValList.append(Structure.GetWACostOfCapital(i));
 		ExcelOutput::PrintColumn("WA Cost of Funding",TempValList,ExcelCommons::CellOffset(TranchesOutputAddress,2,5+(6*Structure.GetTranchesCount())),"0.00%",Structure.GetTranchesCount()%2==0 ? QColor(235,241,222) : QColor(216,228,188));
+		TempValList.clear(); for(int i=0;i<Structure.GetTranchesCount();i++) TempValList.append(Structure.GetTranche(i)->GetLossRate());
+		ExcelOutput::PrintDataColumn(TempValList,ExcelCommons::CellOffset(LossOutputAddress),"0.00%");
+		TempValList.clear(); for(int i=0;i<Structure.GetTranchesCount();i++) TempValList.append(Structure.GetCreditEnhancement(i));
+		ExcelOutput::PrintDataColumn(TempValList,ExcelCommons::CellOffset(CreditEnanAddress),"0.00%");
 
 		if(RunCall){
 			ExcelOutput::PrintMergedCell("Scenario To Call",ExcelCommons::CellOffset(TranchesOutputAddress,3+Structure.GetTranche(0)->GetCashFlow().Count(),0),1,6+(6*Structure.GetTranchesCount()),QColor(118,147,60));
@@ -238,26 +240,23 @@ void CentralUnit::CheckCalculationDone()
 			ExcelOutput::PrintColumn("Annualized Excess Spread",TempValList,ExcelCommons::CellOffset(TranchesOutputAddress,5+Structure.GetTranche(0)->GetCashFlow().Count(),4+(6*CallStructure.GetTranchesCount())),"0.00%",CallStructure.GetTranchesCount()%2!=0 ? QColor(235,241,222) : QColor(216,228,188));
 			TempValList.clear(); for(int i=0;i<CallStructure.GetTranche(0)->GetCashFlow().Count();i++) TempValList.append(CallStructure.GetWACostOfCapital(i));
 			ExcelOutput::PrintColumn("WA Cost of Funding",TempValList,ExcelCommons::CellOffset(TranchesOutputAddress,5+Structure.GetTranche(0)->GetCashFlow().Count(),5+(6*CallStructure.GetTranchesCount())),"0.00%",CallStructure.GetTranchesCount()%2==0 ? QColor(235,241,222) : QColor(216,228,188));
+			TempValList.clear(); for(int i=0;i<CallStructure.GetTranchesCount();i++) TempValList.append(CallStructure.GetTranche(i)->GetLossRate());
+			ExcelOutput::PrintDataColumn(TempValList,ExcelCommons::CellOffset(LossOnCallOutputAddress),"0.00%");
 		}
 	}
 	QApplication::quit();
 }
 void CentralUnit::StressFinished(){
-	QString Filename=(FolderPath+"\\StressResult%1%2.csr").arg(int(Stresser->GetXVariability())).arg(int(Stresser->GetYVariability()));
-	#ifndef Q_WS_WIN
-		Filename.prepend('.');
-	#endif
+	QString Filename=(FolderPath+"\\.StressResult%1%2.csr").arg(int(Stresser->GetXVariability())).arg(int(Stresser->GetYVariability()));
 	QFile file(Filename);
-	if (!file.open(QIODevice::WriteOnly)) {
-		QApplication::quit();
-		return;
-	}
+	if (file.open(QIODevice::WriteOnly)) {
 	QDataStream out(&file);
-	out.setVersion(QDataStream::Qt_4_8);
-	out << Stresser;
-	file.close();
-	#ifdef Q_WS_WIN
-		SetFileAttributes(Filename.toStdWString().c_str(),FILE_ATTRIBUTE_HIDDEN);
-	#endif
+		out.setVersion(QDataStream::Qt_4_8);
+		out << *Stresser;
+		file.close();
+		#ifdef Q_WS_WIN
+			SetFileAttributes(Filename.toStdWString().c_str(),FILE_ATTRIBUTE_HIDDEN);
+		#endif
+	}
 	QApplication::quit();
 }

@@ -6,7 +6,7 @@
 #include <QHash>
 #include <QObject>
 #include "Waterfall.h"
-class QProgressDialog;
+class ProgressWidget;
 class Mortgage;
 class StressTest:public QObject{
 	Q_OBJECT
@@ -20,7 +20,7 @@ private:
 #ifdef PrintExecutionTime
 	QTime ExecutionTime;
 #endif
-	QProgressDialog* ProgressForm;
+	ProgressWidget* ProgressForm;
 	QList<QString> XSpann;
 	QList<QString> YSpann;
 	QString ConstantPar;
@@ -70,7 +70,7 @@ public:
 public slots:
 	void RunStressTest();
 private slots:
-	void RecievedData(int IDx,int IDy,Waterfall Res);
+	void RecievedData(int IDx,int IDy,const Waterfall& Res);
 	void StopCalculation();
 signals:
 	void AllFinished();

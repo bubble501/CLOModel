@@ -3,7 +3,7 @@
 #include "CommonFunctions.h"
 #include "StressThread.h"
 #include "Waterfall.h"
-#include <QProgressDialog>
+#include "ProgressWidget.h"
 #include <QApplication>
 #ifdef PrintExecutionTime
 #include <QMessageBox>
@@ -70,10 +70,10 @@ void StressTest::RunStressTest(){
 #ifdef PrintExecutionTime
 	ExecutionTime.start();
 #endif
-	ProgressForm=new QProgressDialog("Calculating Stress Test","Cancel",0,1);
-	connect(ProgressForm,SIGNAL(canceled()),this,SLOT(StopCalculation()));
-	ProgressForm->setValue(0);
-	ProgressForm->setMaximum(XSpann.size()*YSpann.size());
+	ProgressForm=new ProgressWidget;
+	connect(ProgressForm,SIGNAL(Cancelled()),this,SLOT(StopCalculation()));
+	ProgressForm->SetValue(0);
+	ProgressForm->SetMax(XSpann.size()*YSpann.size());
 	ProgressForm->show();
 	ContinueCalculation=true;
 	BeesReturned=0;
@@ -82,7 +82,7 @@ void StressTest::RunStressTest(){
 			for(int j=0;j<YSpann.size();j++){
 				if(!ContinueCalculation) return;
 				CalculateScenario(i,j);
-				ProgressForm->setValue((i*(j+1))+j+1);
+				ProgressForm->SetValue((i*(j+1))+j+1);
 				QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 			}
 		}
@@ -103,7 +103,7 @@ void StressTest::RunStressTest(){
 				,this
 			);
 			connect(WorkingThread,SIGNAL(ScenarioCalculated(int,int,Waterfall)),this,SLOT(RecievedData(int,int,Waterfall)));
-			connect(WorkingThread,SIGNAL(ScenarioCalculated(int,int,Waterfall)),WorkingThread,SLOT(stop()));
+			connect(WorkingThread,SIGNAL(ScenarioCalculated(int,int,Waterfall)),WorkingThread,SLOT(stop()),Qt::QueuedConnection);
 			WorkingThread->start();
 		}
 	}
@@ -162,7 +162,7 @@ void StressTest::CalculateScenario(int XDim,int YDim){
 	LocalStructure.CalculateTranchesCashFlows();
 	RecievedData(XDim,YDim,LocalStructure);
 }
-void StressTest::RecievedData(int IDx,int IDy,Waterfall Res){
+void StressTest::RecievedData(int IDx,int IDy,const Waterfall& Res){
 		if (!ContinueCalculation) return;
 		Results[XSpann.at(IDx)][YSpann.at(IDy)]=Res;
 		BeesReturned++;
@@ -187,7 +187,7 @@ void StressTest::RecievedData(int IDx,int IDy,Waterfall Res){
 				SentBees++;
 			}
 		}
-		if(ProgressForm) ProgressForm->setValue(BeesReturned);
+		if(ProgressForm) ProgressForm->SetValue(BeesReturned);
 		QApplication::processEvents();
 		if(BeesReturned==XSpann.size()*YSpann.size()){
 #ifdef PrintExecutionTime
@@ -217,7 +217,7 @@ QDataStream& operator<<(QDataStream & stream, const StressTest& flows){
 		<< flows.Loans.size()
 	;
 	foreach(Mortgage* SilgleLoan,flows.Loans)
-		stream << *SilgleLoan;
+		stream << (*SilgleLoan);
 	return stream;
 }
 QDataStream& operator>>(QDataStream & stream, StressTest& flows){

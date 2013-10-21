@@ -96,7 +96,6 @@ void Tranche::SetBloombergExtension(const QString& a){
 	if(AdjustedString=="Mtge" || AdjustedString=="Corp") BloombergExtension=a;
 }
 void Tranche::GetDataFromBloomberg(){
-	//TODO add default ref rate based on frequency
 	BloombergWorker Bee;
 	Bee.AddSecurity(TrancheName,BloombergExtension);
 	Bee.AddField("MTG_ORIG_AMT");
@@ -107,20 +106,31 @@ void Tranche::GetDataFromBloomberg(){
 	Bee.AddField("FLT_SPREAD");
 	Bee.AddField("RESET_IDX");
 	Bee.AddField("CPN");
+	Bee.AddField("CPN_FREQ");
 	QHash<QString,QString> Result(Bee.StartRequest().value(TrancheName));
 	OutstandingAmt=Result.value("AMT_OUTSTANDING").toDouble()/ExchangeRate;
 	CashFlow.SetInitialOutstanding(OutstandingAmt);
 	OriginalAmt=Result.value("MTG_ORIG_AMT").toDouble()/ExchangeRate;
 	Currency=Result.value("CRNCY");
 	LastPaymentDate=QDate::fromString(Result.value("START_ACC_DT"),"yyyy-MM-dd");
+	PaymentFrequency=static_cast<int>(12.0/Result.value("CPN_FREQ").toDouble());
 	if(Result.value("MTG_TYP").contains("FLT")) InterestType=FloatingInterest;
 	else InterestType=FixedInterest;
+	ReferenceRateValue=-1.0;
 	if(InterestType==FloatingInterest){
 		ReferenceRate=Result.value("RESET_IDX");
-		ReferenceRateValue=-1.0;
 		Coupon=Result.value("FLT_SPREAD").toDouble()/10000.0;
 	}
-	else Coupon=Result.value("CPN").toDouble()/100.0;
+	else{
+		Coupon=Result.value("CPN").toDouble()/100.0;
+		QString DeafultRefRateString;
+		if(Currency=="EUR")DeafultRefRateString="EUR";
+		else if(Currency=="GBP")DeafultRefRateString="BP";
+		else if(Currency=="USD")DeafultRefRateString="US";
+		else return;
+		DeafultRefRateString+=QString("%1M").arg(PaymentFrequency,6-DeafultRefRateString.size(),10,QChar('0'));
+		DefaultRefRate=DeafultRefRateString;
+	}
 }
 double Tranche::GetLossRate() const{
 	double Result=0.0;
@@ -150,6 +160,7 @@ double Tranche::GetDiscountMargin() const{
 		ReferenceRateValue=Bee.StartRequest().value(ApplicableRate).value("PX_LAST").toDouble()/100.0;
 	}
 	return qMax(0.0,CalculateDM(FlowsDates,FlowsValues,ReferenceRateValue,DayCount));
+	//return qMax(0.0,CalculateDMSimple(FlowsDates,FlowsValues,ReferenceRateValue,DayCount));
 }
 bool Tranche::operator>(const Tranche& a) const {
 	return ProrataGroup>a.ProrataGroup;

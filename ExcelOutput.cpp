@@ -419,8 +419,8 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 
 HRESULT ExcelOutput::PrintStressTest(const StressTest& stresser, const QString& TrancheTarget, const QString& DestinationAddress, bool SetupConditionalFormatting){
 	ExcelCommons::InitExcelOLE();
-	int NumOfCols=stresser.GetXSpann().size();
-	int Numrows=stresser.GetYSpann().size();
+	int Numrows=stresser.GetXSpann().size();
+	int NumOfCols=stresser.GetYSpann().size();
 	SAFEARRAYBOUND  Bound[2];
 	Bound[0].lLbound   = 1;
 	Bound[0].cElements = Numrows;
@@ -453,7 +453,7 @@ HRESULT ExcelOutput::PrintStressTest(const StressTest& stresser, const QString& 
 		Command[CurrentCmdIndex].vt = VT_ARRAY | VT_VARIANT;
 		Command[CurrentCmdIndex--].parray = saData;
 		Command[CurrentCmdIndex].vt = VT_BSTR;
-		Command[CurrentCmdIndex--].bstrVal = SysAllocString(DestinationAddress.toStdWString().c_str());
+		Command[CurrentCmdIndex--].bstrVal = SysAllocString(ExcelCommons::CellOffset(DestinationAddress,0,0).toStdWString().c_str());
 		Command[CurrentCmdIndex].vt = VT_BOOL;
 		Command[CurrentCmdIndex--].boolVal=SetupConditionalFormatting;
 		Params.rgdispidNamedArgs = NULL;
@@ -631,5 +631,74 @@ HRESULT ExcelOutput::PrintColumn(const QString& Title, const QList<double>& Valu
 	SysFreeString(Params.rgvarg[Params.cArgs-4].bstrVal);
 	SysFreeString(Params.rgvarg[Params.cArgs-5].bstrVal);
 	SysFreeString(Params.rgvarg[Params.cArgs-6].bstrVal);
+	return hr;
+}
+HRESULT ExcelOutput::PrintDataColumn(const QList<double>& Values ,const QString& TargetCell,const QString& ValFormat){
+	ExcelCommons::InitExcelOLE();
+	SAFEARRAYBOUND  Bound;
+	Bound.lLbound   = 1;
+	Bound.cElements = Values.size();
+	SAFEARRAY* saData;
+	saData = SafeArrayCreate(VT_VARIANT, 1, &Bound);
+	VARIANT HUGEP *pdFreq;
+	HRESULT hr = SafeArrayAccessData(saData, (void HUGEP* FAR*)&pdFreq);
+	if (SUCCEEDED(hr))
+	{
+		foreach(const double& singleValue,Values){
+			pdFreq->vt = VT_R8;
+			pdFreq->dblVal = singleValue;
+			pdFreq++;
+		}
+		SafeArrayUnaccessData(saData);
+	}
+	static DISPID dispid = 0;
+	DISPPARAMS Params;
+	VARIANTARG Command[4];
+	int CurrentCmdIndex=4-1;
+	if(!ExcelCommons::pExcelDisp)return S_FALSE;
+	try
+	{
+		Command[CurrentCmdIndex].vt = VT_BSTR;
+		Command[CurrentCmdIndex--].bstrVal = SysAllocString(L"PrintDataColumn");
+		Command[CurrentCmdIndex].vt = VT_ARRAY | VT_VARIANT;
+		Command[CurrentCmdIndex--].parray = saData;
+		Command[CurrentCmdIndex].vt = VT_BSTR;
+		Command[CurrentCmdIndex--].bstrVal = SysAllocString(TargetCell.toStdWString().c_str());
+		Command[CurrentCmdIndex].vt = VT_BSTR;
+		Command[CurrentCmdIndex--].bstrVal = SysAllocString(ValFormat.toStdWString().c_str());
+		Params.rgdispidNamedArgs = NULL;
+		Params.rgvarg=Command;
+		Params.cArgs = 4;
+		Params.cNamedArgs = 0;
+		if(dispid == 0)
+		{
+			wchar_t *ucName = L"Run";
+			hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
+				LOCALE_SYSTEM_DEFAULT, &dispid);
+			if(FAILED(hr))
+			{
+				SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
+				SysFreeString(Params.rgvarg[Params.cArgs-3].bstrVal);
+				SysFreeString(Params.rgvarg[Params.cArgs-4].bstrVal);
+				return hr;
+			}
+		}
+		hr = ExcelCommons::pExcelDisp->Invoke(dispid,IID_NULL,LOCALE_SYSTEM_DEFAULT,
+			DISPATCH_METHOD, &Params, NULL, NULL, NULL);
+		if(FAILED(hr))
+		{
+			SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
+			SysFreeString(Params.rgvarg[Params.cArgs-3].bstrVal);
+			SysFreeString(Params.rgvarg[Params.cArgs-4].bstrVal);
+			return hr;
+		}
+	}
+	catch(_com_error &ce)
+	{
+		hr = ce.Error();
+	}
+	SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
+				SysFreeString(Params.rgvarg[Params.cArgs-3].bstrVal);
+				SysFreeString(Params.rgvarg[Params.cArgs-4].bstrVal);
 	return hr;
 }

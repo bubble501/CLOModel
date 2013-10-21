@@ -210,6 +210,8 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 #endif
 		TempUnit.SetMtgOutputAddress(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
 		TempUnit.SetTranchesOutputAddress(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
+		TempUnit.SetPlotsSheet(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
+		TempUnit.SetPlotIndexes(pdFreq->intVal,0);pdFreq++;
 		TempUnit.SetLossOutputAddress(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
 		TempUnit.SetLossOnCallOutputAddress(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
 		TempUnit.SetCreditEnanAddress(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
@@ -345,17 +347,18 @@ void __stdcall StressTargetChanged(LPSAFEARRAY *ArrayData){
 	QString TargetCell=QString::fromStdWString(pdFreq->bstrVal);pdFreq++;
 	int XVar=pdFreq->intVal;pdFreq++;
 	int YVar=pdFreq->intVal;pdFreq++;
-	QString Filename=(FolderPath+"\\.StressResult%1%2.csr").arg(XVar).arg(YVar);
-	QFile file(Filename);
+	QString Filename=(FolderPath+"\\.StressResult%1%2.fcsr").arg(XVar).arg(YVar);
+	TempStress.LoadResultsFromFile(Filename);
+	/*QFile file(Filename);
 	if(!file.exists())return ;
 	if (!file.open(QIODevice::ReadOnly))return;
 	QDataStream out(&file);
 	out.setVersion(QDataStream::Qt_4_8);
-	out >> TempStress;
+	out >> TempStress;*/
 	ExcelOutput::PrintStressTest(TempStress,TrancheName,TargetCell,true);
 }
 void __stdcall InspectStress(LPSAFEARRAY *ArrayData){
-	StressTest TempStress;
+	Waterfall TempStructure;
 	VARIANT HUGEP *pdFreq;
 	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
 	if (!SUCCEEDED(hr)) return;
@@ -364,20 +367,13 @@ void __stdcall InspectStress(LPSAFEARRAY *ArrayData){
 	QString ColHead=QString::fromStdWString(pdFreq->bstrVal);pdFreq++;
 	int XVar=pdFreq->intVal;pdFreq++;
 	int YVar=pdFreq->intVal;pdFreq++;
-	QString Filename=(FolderPath+"\\.StressResult%1%2.csr").arg(XVar).arg(YVar);
-	QFile file(Filename);
-	if(!file.exists())return ;
-	if (!file.open(QIODevice::ReadOnly))return;
-	QDataStream out(&file);
-	out.setVersion(QDataStream::Qt_4_8);
-	out >> TempStress;
-
+	TempStructure=StressTest::GetScenarioFromFile((FolderPath+"\\.StressResult%1%2.fcsr").arg(XVar).arg(YVar),RowHead,ColHead);
 	char *argv[] = {"NoArgumnets"};
 	int argc = sizeof(argv) / sizeof(char*) - 1;
 	QApplication ComputationLoop(argc,argv);
 	SummaryView SitRep;
-	SitRep.SetStructure(TempStress.GetResults().value(RowHead).value(ColHead));
 	SitRep.show();
+	SitRep.SetStructure(TempStructure);
 	ComputationLoop.exec();	
 }
 

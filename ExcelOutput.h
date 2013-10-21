@@ -22,6 +22,18 @@ namespace ExcelOutput{
 		bool PrintOCtest  = true, 
 		bool PrintICtest  = true
 	);
+	HRESULT PlotMortgagesFlows(
+		const MtgCashFlow& source,
+		const QString& DestinationSheet,
+		int DestinationIndex,
+		bool PrintDates= true, 
+		bool PrintOutstanding= true, 
+		bool PrintInterest= true, 
+		bool PrintScheduled= true, 
+		bool PrintPrepay= true, 
+		bool PrintTotalPrincipal= false,
+		bool PrintLoss= true
+	);
 	HRESULT PrintMortgagesRepLines(
 		const MtgCashFlow& source,
 		const QString& DestinationAddress,

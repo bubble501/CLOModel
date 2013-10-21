@@ -3,6 +3,7 @@
 #include <QRegExp>
 #include <QStringList>
 #include <qmath.h>
+#include <QDir>
 int MonthDiff(const QDate& a,const QDate& b){
 	int Result;
 	Result=(a.year()-b.year())*12;
@@ -178,4 +179,26 @@ double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, double Ba
 }
 double CalculateDMSimple(const QList<QDate>& Dte, const QList<double>& Flws, double BaseRate,int Daycount, double Guess,int precision){
 	return (CalculateIRRSimple(Dte,Flws,Daycount,Guess,precision)-BaseRate)*10000.0;
+}
+bool removeDir(const QString & dirName)
+{
+	bool result = true;
+	QDir dir(dirName);
+
+	if (dir.exists(dirName)) {
+		Q_FOREACH(QFileInfo info, dir.entryInfoList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst)) {
+			if (info.isDir()) {
+				result = removeDir(info.absoluteFilePath());
+			}
+			else {
+				result = QFile::remove(info.absoluteFilePath());
+			}
+
+			if (!result) {
+				return result;
+			}
+		}
+		result = dir.rmdir(dirName);
+	}
+	return result;
 }

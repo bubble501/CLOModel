@@ -24,6 +24,7 @@ TrancheViewer::TrancheViewer(QWidget* parent)
 	MainTable->verticalHeader()->setVisible(false);
 	MainTable->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	MainTable->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	MainTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 	QVBoxLayout* mainLay=new QVBoxLayout(this);
 	mainLay->addWidget(MainTable);
 }

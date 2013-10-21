@@ -1,20 +1,19 @@
 #include "CentralUnit.h"
 #include <QMetaType>
 #include <QApplication>
-#include <QtConcurrentRun>
-#include <QtConcurrentFilter>
-#include <QtConcurrentMap>
 #include <QTimer>
 #include <QFile>
 #include "ExcelOutput.h"
 #include "WaterfallCalculator.h"
 
+#include <QMessageBox>//TODO Erase Me
 
 CentralUnit::CentralUnit(QObject* parent)
 	:QObject(parent)
 	,Stresser(NULL)
 	,RunCall(false)
 {
+	for(int i=0;i<6;i++) PlotIndexes[i]=0;
 	if(!QMetaType::isRegistered(qMetaTypeId<Waterfall>()))
 		qRegisterMetaType<Waterfall>("Waterfall");
 	if(!QMetaType::isRegistered(qMetaTypeId<MtgCashFlow>()))
@@ -194,6 +193,9 @@ void CentralUnit::CheckCalculationDone()
 	if(!MtgOutputAddress.isEmpty()){
 		ExcelOutput::PrintMortgagesRepLines(Structure.GetCalculatedMtgPayments(),ExcelCommons::CellOffset(MtgOutputAddress));
 	}
+	if(!PlotsSheet.isEmpty() && PlotIndexes[0]>0){
+		ExcelOutput::PlotMortgagesFlows(Structure.GetCalculatedMtgPayments(),PlotsSheet,PlotIndexes[0]);
+	}
 	if(!TranchesOutputAddress.isEmpty()){
 		QList<double> TempValList;
 		ExcelOutput::PrintMergedCell("Scenario To Maturity",ExcelCommons::CellOffset(TranchesOutputAddress,0,0),1,6+(6*Structure.GetTranchesCount()),QColor(118,147,60));
@@ -247,7 +249,8 @@ void CentralUnit::CheckCalculationDone()
 	QApplication::quit();
 }
 void CentralUnit::StressFinished(){
-	QString Filename=(FolderPath+"\\.StressResult%1%2.csr").arg(int(Stresser->GetXVariability())).arg(int(Stresser->GetYVariability()));
+	Stresser->SaveResults(FolderPath);
+	/*QString Filename=(FolderPath+"\\.StressResult%1%2.csr").arg(int(Stresser->GetXVariability())).arg(int(Stresser->GetYVariability()));
 	QFile file(Filename);
 	if (file.open(QIODevice::WriteOnly)) {
 	QDataStream out(&file);
@@ -257,6 +260,6 @@ void CentralUnit::StressFinished(){
 		#ifdef Q_WS_WIN
 			SetFileAttributes(Filename.toStdWString().c_str(),FILE_ATTRIBUTE_HIDDEN);
 		#endif
-	}
+	}*/
 	QApplication::quit();
 }

@@ -65,6 +65,9 @@ public:
 	void SetYVariability(StressVariability a){StressDimension[1]=a;}
 	void UseMultithread(bool a=true){SequentialComputation=!a;}
 	void ResetStressLevels(){XSpann.clear(); YSpann.clear();}
+	void SaveResults(const QString& DestPath)const;
+	void LoadResultsFromFile(const QString& DestPath);
+	static Waterfall GetScenarioFromFile(const QString& DestPath,const QString& XScenario,const QString& YScenario);
 	friend QDataStream& operator<<(QDataStream & stream, const StressTest& flows);
 	friend QDataStream& operator>>(QDataStream & stream, StressTest& flows);
 public slots:

@@ -16,3 +16,4 @@ double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, double Ba
 double CalculateIRRSimple(const QList<QDate>& Dte, const QList<double>& Flws, int Daycount=360, double Guess=0.05,int precision=3);
 double CalculateNPVSimple(const QList<QDate>& Dte, const QList<double>& Flws, double Interest, int Daycount=360);
 double CalculateDMSimple(const QList<QDate>& Dte, const QList<double>& Flws, double BaseRate,int Daycount=360, double Guess=0.05,int precision=3);
+bool removeDir(const QString & dirName);

@@ -44,6 +44,7 @@ public:
 	double GetBaseCurrencyOriginal() const {return OriginalAmt*ExchangeRate;}
 	TrancheInterestType GetInterestType() const {return InterestType;}
 	double GetCoupon() const;
+	double GetRawCoupon() const{return Coupon;}
 	const QString& GetReferenceRate() const{return ReferenceRate;}
 	double GetReferenceRateValue() const {return ReferenceRateValue;}
 	double GetPrice() const {return Price;}

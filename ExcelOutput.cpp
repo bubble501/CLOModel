@@ -210,7 +210,211 @@ HRESULT ExcelOutput::PrintMortgagesRepLines(
 		}
 		return hr;
 }
+HRESULT ExcelOutput::PlotMortgagesFlows(
+	const MtgCashFlow& source,
+	const QString& DestinationSheet,
+	int DestinationIndex,
+	bool PrintDates, 
+	bool PrintOutstanding, 
+	bool PrintInterest, 
+	bool PrintScheduled, 
+	bool PrintPrepay, 
+	bool PrintTotalPrincipal,
+	bool PrintLoss
+	){
+		ExcelCommons::InitExcelOLE();
+		SAFEARRAYBOUND  Bound;
+		Bound.lLbound   = 1;
+		Bound.cElements = source.Count();
+		VARIANT HUGEP *pdFreq;
+		SAFEARRAY* DatesArray = SafeArrayCreate(VT_VARIANT, 1, &Bound);
+		HRESULT hr = SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
+		if (SUCCEEDED(hr))
+		{
+			if(PrintDates){
+				for (int i = 0; i < source.Count(); i++)
+				{
+					pdFreq->vt = VT_BSTR;
+					pdFreq->bstrVal = SysAllocString(source.GetDate(i).toString("yyyy-MM-dd").toStdWString().c_str());
+					pdFreq++;
+				}
+			}
+			SafeArrayUnaccessData(DatesArray);
+		}
+		SAFEARRAY* OutstandingArray = SafeArrayCreate(VT_VARIANT, 1, &Bound);
+		hr = SafeArrayAccessData(OutstandingArray, (void HUGEP* FAR*)&pdFreq);
+		if (SUCCEEDED(hr))
+		{
+			if(PrintOutstanding){
+				for (int i = 0; i < source.Count(); i++)
+				{
+					pdFreq->vt = VT_R8;
+					pdFreq->dblVal = source.GetAmountOut(i);
+					pdFreq++;
+				}
+			}
+			SafeArrayUnaccessData(OutstandingArray);
+		}
+		SAFEARRAY* InterestArray = SafeArrayCreate(VT_VARIANT, 1, &Bound);
+		hr = SafeArrayAccessData(InterestArray, (void HUGEP* FAR*)&pdFreq);
+		if (SUCCEEDED(hr))
+		{
+			if(PrintInterest){
+				for (int i = 0; i < source.Count(); i++)
+				{
+					pdFreq->vt = VT_R8;
+					pdFreq->dblVal = source.GetInterest(i);
+					pdFreq++;
+				}
+			}
+			SafeArrayUnaccessData(InterestArray);
+		}
+		SAFEARRAY* ScheduledArray = SafeArrayCreate(VT_VARIANT, 1, &Bound);
+		hr = SafeArrayAccessData(ScheduledArray, (void HUGEP* FAR*)&pdFreq);
+		if (SUCCEEDED(hr))
+		{
+			if(PrintScheduled){
+				for (int i = 0; i < source.Count(); i++)
+				{
+					pdFreq->vt = VT_R8;
+					pdFreq->dblVal = source.GetScheduled(i);
+					pdFreq++;
+				}
+			}
+			SafeArrayUnaccessData(ScheduledArray);
+		}
+		SAFEARRAY* PrepayArray = SafeArrayCreate(VT_VARIANT, 1, &Bound);
+		hr = SafeArrayAccessData(PrepayArray, (void HUGEP* FAR*)&pdFreq);
+		if (SUCCEEDED(hr))
+		{
+			if(PrintPrepay){
+				for (int i = 0; i < source.Count(); i++)
+				{
+					pdFreq->vt = VT_R8;
+					pdFreq->dblVal = source.GetPrepay(i);
+					pdFreq++;
+				}
+			}
+			SafeArrayUnaccessData(PrepayArray);
+		}
+		SAFEARRAY* TotalPrincipalArray = SafeArrayCreate(VT_VARIANT, 1, &Bound);
+		hr = SafeArrayAccessData(TotalPrincipalArray, (void HUGEP* FAR*)&pdFreq);
+		if (SUCCEEDED(hr))
+		{
+			if(PrintTotalPrincipal){
+				for (int i = 0; i < source.Count(); i++)
+				{
+					pdFreq->vt = VT_R8;
+					pdFreq->dblVal = source.GetPrincipal(i);
+					pdFreq++;
+				}
+			}
+			SafeArrayUnaccessData(TotalPrincipalArray);
+		}
+		SAFEARRAY* LossArray = SafeArrayCreate(VT_VARIANT, 1, &Bound);
+		hr = SafeArrayAccessData(LossArray, (void HUGEP* FAR*)&pdFreq);
+		if (SUCCEEDED(hr))
+		{
+			if(PrintLoss){
+				for (int i = 0; i < source.Count(); i++)
+				{
+					pdFreq->vt = VT_R8;
+					pdFreq->dblVal = source.GetLoss(i);
+					pdFreq++;
+				}
+			}
+			SafeArrayUnaccessData(LossArray);
+		}
 
+		static DISPID dispid = 0;
+		DISPPARAMS Params;
+		VARIANTARG Command[10];
+		int CurrentCmdIndex=10-1;
+		if(!ExcelCommons::pExcelDisp)return S_FALSE;
+		try
+		{
+			Command[CurrentCmdIndex].vt = VT_BSTR;
+			Command[CurrentCmdIndex--].bstrVal = SysAllocString(L"PlotMortgagesFlows");
+			Command[CurrentCmdIndex].vt = VT_BSTR;
+			Command[CurrentCmdIndex--].bstrVal = SysAllocString(DestinationSheet.toStdWString().c_str());
+			Command[CurrentCmdIndex].vt = VT_I4;
+			Command[CurrentCmdIndex--].intVal = DestinationIndex;
+			Command[CurrentCmdIndex].vt = VT_ARRAY | VT_VARIANT;
+			Command[CurrentCmdIndex--].parray = DatesArray;
+			Command[CurrentCmdIndex].vt = VT_ARRAY | VT_VARIANT;
+			Command[CurrentCmdIndex--].parray = OutstandingArray;
+			Command[CurrentCmdIndex].vt = VT_ARRAY | VT_VARIANT;
+			Command[CurrentCmdIndex--].parray = InterestArray;
+			Command[CurrentCmdIndex].vt = VT_ARRAY | VT_VARIANT;
+			Command[CurrentCmdIndex--].parray = ScheduledArray;
+			Command[CurrentCmdIndex].vt = VT_ARRAY | VT_VARIANT;
+			Command[CurrentCmdIndex--].parray = PrepayArray;
+			Command[CurrentCmdIndex].vt = VT_ARRAY | VT_VARIANT;
+			Command[CurrentCmdIndex--].parray = TotalPrincipalArray;
+			Command[CurrentCmdIndex].vt = VT_ARRAY | VT_VARIANT;
+			Command[CurrentCmdIndex--].parray = LossArray;
+
+			Params.rgdispidNamedArgs = NULL;
+			Params.rgvarg=Command;
+			Params.cArgs = 10;
+			Params.cNamedArgs = 0;
+			if(dispid == 0)
+			{
+				wchar_t *ucName = L"Run";
+				hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
+					LOCALE_SYSTEM_DEFAULT, &dispid);
+				if(FAILED(hr))
+				{
+					SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
+					SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
+					if(PrintDates){
+						SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
+						for (DWORD i = 0; i < source.Count(); i++)
+						{
+							SysFreeString(pdFreq->bstrVal);
+							pdFreq++;
+						}
+						SafeArrayUnaccessData(DatesArray);
+					}
+					return hr;
+				}
+			}
+			hr = ExcelCommons::pExcelDisp->Invoke(dispid,IID_NULL,LOCALE_SYSTEM_DEFAULT,
+				DISPATCH_METHOD, &Params, NULL, NULL, NULL);
+			if(FAILED(hr))
+			{
+				SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
+				SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
+				if(PrintDates){
+					SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
+					for (DWORD i = 0; i < source.Count(); i++)
+					{
+						SysFreeString(pdFreq->bstrVal);
+						pdFreq++;
+					}
+					SafeArrayUnaccessData(DatesArray);
+				}
+				return hr;
+			}
+		}
+		catch(_com_error &ce)
+		{
+			hr = ce.Error();
+		}
+		SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
+		SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
+		if(PrintDates){
+			SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
+			for (DWORD i = 0; i < source.Count(); i++)
+			{
+				SysFreeString(pdFreq->bstrVal);
+				pdFreq++;
+			}
+			SafeArrayUnaccessData(DatesArray);
+		}
+		return hr;
+			
+}
 HRESULT ExcelOutput::PrintTrancheFlow(
 	const Tranche& source,
 	const QString& DestinationAddress,

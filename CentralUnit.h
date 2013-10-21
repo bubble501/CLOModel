@@ -70,6 +70,8 @@ public:
 	void SetLossOnCallOutputAddress(const QString& a){LossOnCallOutputAddress=a;}
 	void SetCreditEnanAddress(const QString& a){CreditEnanAddress=a;}
 	void SetStressToCall(bool a){StressToCall=a;}
+	void SetPlotsSheet(const QString& a){PlotsSheet=a;}
+	void SetPlotIndexes(int val,int index){if(index>0 && index<6) PlotIndexes[index]=val;}
 private:
 	WaterfallCalculator* ParallWatFalls;
 	MtgCalculator LoansCalculator;
@@ -87,6 +89,8 @@ private:
 	QString LossOnCallOutputAddress;
 	QString CreditEnanAddress;
 	QString FolderPath;
+	QString PlotsSheet;
+	int PlotIndexes[6];
 signals:
 	void LoopStarted();
 	void StressLoopStarted();

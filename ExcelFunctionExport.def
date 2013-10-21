@@ -4,3 +4,4 @@ EXPORTS
 	CLODiscountMargin
 	CLOWALife
 	StressTargetChanged
+	InspectStress

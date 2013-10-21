@@ -5,6 +5,12 @@
 #include "Waterfall.h"
 #include "ProgressWidget.h"
 #include <QApplication>
+#include <QDir>
+#include <QFile>
+#include "QuaZip\JlCompress.h"
+#ifdef Q_WS_WIN
+#include <Windows.h>
+#endif
 #ifdef PrintExecutionTime
 #include <QMessageBox>
 #endif
@@ -248,5 +254,65 @@ void StressTest::StopCalculation(){
 	if(ProgressForm){
 		ProgressForm->deleteLater();
 		ProgressForm=NULL;
+	}
+}
+void StressTest::SaveResults(const QString& DestPath)const{
+	QString DestinationPath(DestPath.trimmed());
+	if(DestinationPath.at(DestinationPath.size()-1)!='\\') DestinationPath.append('\\');
+	QDir curDir;
+	QStringList FileNames;
+	QString DestinationFull = DestinationPath+QString("\\.StressResult%1%2.fcsr").arg(StressDimension[0]).arg(StressDimension[1]);
+	if (curDir.exists(DestinationFull)) {
+		if (!curDir.remove(DestinationFull)) return;
+	}
+	if(!curDir.exists(DestinationPath+"TempStressResults")) curDir.mkpath(DestinationPath+"TempStressResults");
+	foreach(const QString& SingleX,XSpann){
+		foreach(const QString& SingleY,YSpann){
+			FileNames.append(DestinationPath+"TempStressResults\\"+SingleX+"#,#"+SingleY+".csw");
+			QFile file(FileNames.last());
+			if (file.open(QIODevice::WriteOnly)) {
+				QDataStream out(&file);
+				out.setVersion(QDataStream::Qt_4_8);
+				out << Results.value(SingleX).value(SingleY);
+				file.close();
+			}
+		}
+	}
+	JlCompress::compressFiles(DestinationFull, FileNames);
+	removeDir(DestinationPath+"TempStressResults");
+#ifdef Q_WS_WIN
+	SetFileAttributes(DestinationFull.toStdWString().c_str(),FILE_ATTRIBUTE_HIDDEN);
+#endif
+}
+Waterfall StressTest::GetScenarioFromFile(const QString& DestPath,const QString& XScenario,const QString& YScenario){
+	Waterfall Result;
+	if(!QFile::exists(DestPath)) return Result;
+	QuaZip zip(DestPath);
+	if(!zip.open(QuaZip::mdUnzip)) return Result;
+	QuaZipFile TargetFile(&zip);
+	if(!zip.setCurrentFile(XScenario+"#,#"+YScenario+".csw")) return Result;
+	TargetFile.open(QIODevice::ReadOnly);
+	QDataStream out(&TargetFile);
+	out.setVersion(QDataStream::Qt_4_8);
+	out >> Result;
+	TargetFile.close();
+	return Result;
+}
+void StressTest::LoadResultsFromFile(const QString& DestPath){
+	XSpann.clear();
+	YSpann.clear();
+	if(!QFile::exists(DestPath)) return;
+	QuaZip zip(DestPath);
+	if(!zip.open(QuaZip::mdUnzip)) return;
+	QuaZipFile TargetFile(&zip);
+	for(bool more=zip.goToFirstFile(); more; more=zip.goToNextFile()) {
+		TargetFile.open(QIODevice::ReadOnly);
+		QStringList Spanns=TargetFile.getActualFileName().left(TargetFile.getActualFileName().lastIndexOf(".")).split("#,#");
+		XSpann.append(Spanns.at(0));
+		YSpann.append(Spanns.at(1));
+		QDataStream out(&TargetFile);
+		out.setVersion(QDataStream::Qt_4_8);
+		out >> (Results[Spanns.at(0)][Spanns.at(1)]);
+		TargetFile.close();
 	}
 }

@@ -2,6 +2,9 @@
 #include "Mortgage.h"
 #include "TrancheViewer.h"
 #include "CommonFunctions.h"
+#ifdef UseCharts
+#include "ChartPlotter.h"
+#endif
 #include <QTableWidget>
 #include <QHeaderView>
 #include <QScrollBar>
@@ -114,6 +117,41 @@ SummaryView::SummaryView(QWidget* parent)
 	ReinvestmentsTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 	MainWidget->addTab(ReinvestmentsTable,"Reinvestments");
 
+#ifdef UseCharts
+	QWidget* ChartsWidget=new QWidget(this);
+	QHBoxLayout* ChartLay=new QHBoxLayout(ChartsWidget);
+	ChartsArea=new QStackedWidget(ChartsWidget);
+	ChartsList=new QListWidget(ChartsWidget);
+	ChartsList->setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Expanding);
+	connect(ChartsList,SIGNAL(currentRowChanged(int)),ChartsArea,SLOT(setCurrentIndex(int)));
+
+	Charts.append(new ChartPlotter(this));
+	Charts.last()->SetTitle("Loans Flows");
+	Charts.last()->SetYAxisTitle("Flows (millions)",ChartSeries::Primary);
+	Charts.last()->SetYAxisTitle("Outstanding (millions)",ChartSeries::Secondary);
+	ChartsArea->addWidget(Charts.last());
+	ChartsList->addItem("Loans");
+	Charts.append(new ChartPlotter(this));
+	ChartsArea->addWidget(Charts.last());
+	ChartsList->addItem("Notes");
+	Charts.append(new ChartPlotter(this));
+	ChartsArea->addWidget(Charts.last());
+	ChartsList->addItem("OC Test");
+	Charts.append(new ChartPlotter(this));
+	ChartsArea->addWidget(Charts.last());
+	ChartsList->addItem("IC Test");
+	Charts.append(new ChartPlotter(this));
+	ChartsArea->addWidget(Charts.last());
+	ChartsList->addItem("Excess Spread");
+	Charts.append(new ChartPlotter(this));
+	ChartsArea->addWidget(Charts.last());
+	ChartsList->addItem("Cost of Funding");
+
+	ChartLay->addWidget(ChartsList);
+	ChartLay->addWidget(ChartsArea);
+	MainWidget->addTab(ChartsWidget,"Charts");
+#endif
+
 	QHBoxLayout* mainLay=new QHBoxLayout(this);
 	mainLay->addWidget(MainWidget);
 	connect(MainWidget,SIGNAL(currentChanged(int)),this,SLOT(AdjustTableSizes()));
@@ -130,7 +168,18 @@ void SummaryView::ResetTranches(){
 	TrancheTables.clear();
 	TranchesList->clear();
 }
+#ifdef UseCharts
+void SummaryView::ResetCharts(){
+	for(QList<ChartPlotter*>::iterator i=Charts.begin();i!=Charts.end();i++)
+		(*i)->deleteLater();
+	Charts.clear();
+	ChartsList->clear();
+}
+#endif
 void SummaryView::DisplayStructure(){
+	QLinearGradient OutstandingGradient(0,0,0,100);
+	OutstandingGradient.setColorAt(0.0,"#FFEAB1");
+	OutstandingGradient.setColorAt(1.0,"#F5CB81");
 	setWindowTitle(
 		"Stress Scenario - "
 		"CPR: "+Structure.GetReinvestmentTest().GetCPRAssumption()
@@ -145,6 +194,45 @@ void SummaryView::DisplayStructure(){
 		TranchesList->addItem(Structure.GetTranche(i)->GetTrancheName());
 	}
 	TranchesList->setCurrentRow(0);
+#ifdef UseCharts
+	ChartSeries TempSeries;
+	Charts[0]->ClearSeries();
+	for (int i=0;i<Structure.GetCalculatedMtgPayments().Count();i++){
+		TempSeries.AddValue(Structure.GetCalculatedMtgPayments().GetDate(i),Structure.GetCalculatedMtgPayments().GetAmountOut(i));
+	}
+	TempSeries.SetAxisTarget(ChartSeries::Secondary);
+	TempSeries.SetTypeOfSeries(ChartSeries::AreaStackedSeries);
+	TempSeries.SetName("Outstanding");
+	TempSeries.SetBrush(QBrush(OutstandingGradient));
+	Charts[0]->AddSeries(TempSeries);
+	TempSeries.SetAxisTarget(ChartSeries::Primary);
+	TempSeries.SetTypeOfSeries(ChartSeries::ColumnStackedSeries);
+	for (int i=0;i<Structure.GetCalculatedMtgPayments().Count();i++){
+		TempSeries.AddValue(Structure.GetCalculatedMtgPayments().GetDate(i),Structure.GetCalculatedMtgPayments().GetLoss(i));
+	}
+	TempSeries.SetName("Loss");
+	TempSeries.SetColor(Charts[0]->SeriesCount()/*-1*/);
+	Charts[0]->AddSeries(TempSeries);
+	for (int i=0;i<Structure.GetCalculatedMtgPayments().Count();i++){
+		TempSeries.AddValue(Structure.GetCalculatedMtgPayments().GetDate(i),Structure.GetCalculatedMtgPayments().GetScheduled(i));
+	}
+	TempSeries.SetName("Scheduled Principal");
+	TempSeries.SetColor(Charts[0]->SeriesCount()-1);
+	Charts[0]->AddSeries(TempSeries);
+	for (int i=0;i<Structure.GetCalculatedMtgPayments().Count();i++){
+		TempSeries.AddValue(Structure.GetCalculatedMtgPayments().GetDate(i),Structure.GetCalculatedMtgPayments().GetPrepay(i));
+	}
+	TempSeries.SetName("Prepayments");
+	TempSeries.SetColor(Charts[0]->SeriesCount()-1);
+	Charts[0]->AddSeries(TempSeries);
+	for (int i=0;i<Structure.GetCalculatedMtgPayments().Count();i++){
+		TempSeries.AddValue(Structure.GetCalculatedMtgPayments().GetDate(i),Structure.GetCalculatedMtgPayments().GetInterest(i));
+	}
+	TempSeries.SetName("Interest");
+	TempSeries.SetColor(Charts[0]->SeriesCount()-1);
+	Charts[0]->AddSeries(TempSeries);
+#endif
+
 	MtgTable->setRowCount(0);
 	MtgTable->setRowCount(Structure.GetCalculatedMtgPayments().Count());
 	for (int i=0;i<Structure.GetCalculatedMtgPayments().Count();i++){

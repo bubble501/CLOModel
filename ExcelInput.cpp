@@ -3,6 +3,7 @@
 #include "WatFalPrior.h"
 #include "ExcelOutput.h"
 #include "SummaryView.h"
+#include "WaterfallViewer.h"
 #include <QDate>
 #include <QString>
 #include <QFile>
@@ -212,6 +213,11 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		TempUnit.SetTranchesOutputAddress(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
 		TempUnit.SetPlotsSheet(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
 		TempUnit.SetPlotIndexes(pdFreq->intVal,0);pdFreq++;
+		TempUnit.SetPlotIndexes(pdFreq->intVal,1);pdFreq++;
+		TempUnit.SetPlotIndexes(pdFreq->intVal,2);pdFreq++;
+		TempUnit.SetPlotIndexes(pdFreq->intVal,3);pdFreq++;
+		TempUnit.SetPlotIndexes(pdFreq->intVal,4);pdFreq++;
+		TempUnit.SetPlotIndexes(pdFreq->intVal,5);pdFreq++;
 		TempUnit.SetLossOutputAddress(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
 		TempUnit.SetLossOnCallOutputAddress(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
 		TempUnit.SetCreditEnanAddress(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
@@ -342,20 +348,19 @@ void __stdcall StressTargetChanged(LPSAFEARRAY *ArrayData){
 	VARIANT HUGEP *pdFreq;
 	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
 	if (!SUCCEEDED(hr)) return;
-	QString FolderPath=QString::fromStdWString(pdFreq->bstrVal);pdFreq++;
-	QString TrancheName=QString::fromStdWString(pdFreq->bstrVal);pdFreq++;
-	QString TargetCell=QString::fromStdWString(pdFreq->bstrVal);pdFreq++;
+	QString FolderPath=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
+	QString TrancheName=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
+	QString TargetCell=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 	int XVar=pdFreq->intVal;pdFreq++;
 	int YVar=pdFreq->intVal;pdFreq++;
+	QString PlotSheet=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
+	int PlotIndex=pdFreq->intVal;pdFreq++;
+	SafeArrayUnaccessData(*ArrayData);
 	QString Filename=(FolderPath+"\\.StressResult%1%2.fcsr").arg(XVar).arg(YVar);
 	TempStress.LoadResultsFromFile(Filename);
-	/*QFile file(Filename);
-	if(!file.exists())return ;
-	if (!file.open(QIODevice::ReadOnly))return;
-	QDataStream out(&file);
-	out.setVersion(QDataStream::Qt_4_8);
-	out >> TempStress;*/
 	ExcelOutput::PrintStressTest(TempStress,TrancheName,TargetCell,true);
+	if(!PlotSheet.isEmpty() && PlotIndex>0)
+		ExcelOutput::PlotStressMargin(TempStress,PlotSheet,PlotIndex,TrancheName);
 }
 void __stdcall InspectStress(LPSAFEARRAY *ArrayData){
 	Waterfall TempStructure;
@@ -367,6 +372,7 @@ void __stdcall InspectStress(LPSAFEARRAY *ArrayData){
 	QString ColHead=QString::fromStdWString(pdFreq->bstrVal);pdFreq++;
 	int XVar=pdFreq->intVal;pdFreq++;
 	int YVar=pdFreq->intVal;pdFreq++;
+	SafeArrayUnaccessData(*ArrayData);
 	TempStructure=StressTest::GetScenarioFromFile((FolderPath+"\\.StressResult%1%2.fcsr").arg(XVar).arg(YVar),RowHead,ColHead);
 	char *argv[] = {"NoArgumnets"};
 	int argc = sizeof(argv) / sizeof(char*) - 1;
@@ -376,7 +382,26 @@ void __stdcall InspectStress(LPSAFEARRAY *ArrayData){
 	SitRep.SetStructure(TempStructure);
 	ComputationLoop.exec();	
 }
-
+void __stdcall InspectWaterfall(LPSAFEARRAY *ArrayData){
+	char *argv[] = {"NoArgumnets"};
+	int argc = sizeof(argv) / sizeof(char*) - 1;
+	QApplication ComputationLoop(argc,argv);
+	WaterfallViewer SitRep;
+	SitRep.show();
+	VARIANT HUGEP *pdFreq;
+	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
+	if (!SUCCEEDED(hr)) return;
+	int NumSteps=pdFreq->intVal;pdFreq++;
+	for(int i=0;i<NumSteps;i++){
+		WatFalPrior TempStep;
+		TempStep.SetPriorityType(WatFalPrior::WaterfallStepType(pdFreq->intVal));pdFreq++;
+		TempStep.SetGroupTarget(pdFreq->intVal);pdFreq++;
+		TempStep.SetRedemptionGroup(pdFreq->intVal);pdFreq++;
+		TempStep.SetRedemptionShare(pdFreq->dblVal);pdFreq++;
+		SitRep.AddStep(TempStep);
+	}
+	ComputationLoop.exec();	
+}
 #ifdef DebuggungInputs
 void __stdcall TestingInput(LPBSTR a){
 	BSTR b=SysAllocString(*a);

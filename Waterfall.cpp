@@ -880,3 +880,25 @@ QDataStream& operator>>(QDataStream & stream, Waterfall& flows){
 	}
 	return stream;
 }
+QDate Waterfall::GetCalledPeriod() const{
+	QDate RollingNextIPD;
+	double ActualCallReserveLevel;
+	double TotalPayable;
+	bool IsCallPaymentDate=false;
+	for(int PeriodsCounter=0;!IsCallPaymentDate;PeriodsCounter++){
+		RollingNextIPD=m_FirstIPDdate.addMonths(PeriodsCounter*m_PaymentFrequency);
+		ActualCallReserveLevel=0.0;
+		TotalPayable=0.0;
+		if(m_CallReserve>0 && m_CallMultiple>0){
+			foreach(Tranche* SingleTranche, m_Tranches){
+				TotalPayable+=SingleTranche->GetCashFlow().GetAmountOutstanding(RollingNextIPD);
+				if(SingleTranche->GetProrataGroup()==m_CallReserve) ActualCallReserveLevel+=SingleTranche->GetCashFlow().GetAmountOutstanding(RollingNextIPD);
+			}
+			if(ActualCallReserveLevel==0.0)ActualCallReserveLevel=m_CallReserve;
+			ActualCallReserveLevel*=m_CallMultiple;
+			IsCallPaymentDate=ActualCallReserveLevel>=TotalPayable-m_PrincipalAvailable;
+		}
+		IsCallPaymentDate= IsCallPaymentDate || (!m_CallDate.isNull() && RollingNextIPD>=m_CallDate) || RollingNextIPD>=m_MortgagesPayments.GetDate(m_MortgagesPayments.Count()-1);
+	}
+	return RollingNextIPD;
+}

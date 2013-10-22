@@ -902,7 +902,823 @@ HRESULT ExcelOutput::PrintDataColumn(const QList<double>& Values ,const QString&
 		hr = ce.Error();
 	}
 	SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
-				SysFreeString(Params.rgvarg[Params.cArgs-3].bstrVal);
-				SysFreeString(Params.rgvarg[Params.cArgs-4].bstrVal);
+	SysFreeString(Params.rgvarg[Params.cArgs-3].bstrVal);
+	SysFreeString(Params.rgvarg[Params.cArgs-4].bstrVal);
+	return hr;
+}
+
+HRESULT ExcelOutput::PlotTranchesDynamic(
+	const Waterfall& source,
+	const QString& DestinationSheet,
+	int DestinationIndex,
+	const QDate& CallDate
+	){
+		ExcelCommons::InitExcelOLE();
+		SAFEARRAYBOUND  Bound[2];
+		Bound[0].lLbound   = 1;
+		Bound[0].cElements = source.GetTranche(0)->GetCashFlow().Count();
+		Bound[1].lLbound   = 1;
+		Bound[1].cElements = source.GetTranchesCount();
+		VARIANT HUGEP *pdFreq;
+		SAFEARRAY* DatesArray = SafeArrayCreate(VT_VARIANT, 1, Bound);
+		HRESULT hr = SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
+		if (SUCCEEDED(hr))
+		{
+			for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++){
+				pdFreq->vt = VT_BSTR;
+				pdFreq->bstrVal = SysAllocString(source.GetTranche(0)->GetCashFlow().GetDate(i).toString("yyyy-MM-dd").toStdWString().c_str());
+				pdFreq++;
+			}
+			SafeArrayUnaccessData(DatesArray);
+		}
+		SAFEARRAY* OutstandingArray = SafeArrayCreate(VT_VARIANT, 2, Bound);
+		hr = SafeArrayAccessData(OutstandingArray, (void HUGEP* FAR*)&pdFreq);
+		if (SUCCEEDED(hr))
+		{
+			for (int j=0;j<source.GetTranchesCount();j++){
+				for (int i = 0; i < source.GetTranche(j)->GetCashFlow().Count(); i++){
+					pdFreq->vt = VT_R8;
+					pdFreq->dblVal = source.GetTranche(j)->GetCashFlow().GetAmountOutstanding(i);
+					pdFreq++;
+				}
+			}
+			SafeArrayUnaccessData(OutstandingArray);
+		}
+		SAFEARRAY* TitlesArray = SafeArrayCreate(VT_VARIANT, 1, Bound+1);
+		hr = SafeArrayAccessData(TitlesArray, (void HUGEP* FAR*)&pdFreq);
+		if (SUCCEEDED(hr)){
+			for (int j=0;j<source.GetTranchesCount();j++){
+				pdFreq->vt = VT_BSTR;
+				pdFreq->bstrVal = SysAllocString(source.GetTranche(j)->GetTrancheName().toStdWString().c_str());
+				pdFreq++;
+			}
+		}
+
+		static DISPID dispid = 0;
+		DISPPARAMS Params;
+		VARIANTARG Command[7];
+		int CurrentCmdIndex=7-1;
+		if(!ExcelCommons::pExcelDisp)return S_FALSE;
+		try
+		{
+			Command[CurrentCmdIndex].vt = VT_BSTR;
+			Command[CurrentCmdIndex--].bstrVal = SysAllocString(L"PlotTranchesDynamic");
+			Command[CurrentCmdIndex].vt = VT_BSTR;
+			Command[CurrentCmdIndex--].bstrVal = SysAllocString(DestinationSheet.toStdWString().c_str());
+			Command[CurrentCmdIndex].vt = VT_I4;
+			Command[CurrentCmdIndex--].intVal = DestinationIndex;
+			Command[CurrentCmdIndex].vt = VT_ARRAY | VT_VARIANT;
+			Command[CurrentCmdIndex--].parray = DatesArray;
+			Command[CurrentCmdIndex].vt = VT_ARRAY | VT_VARIANT;
+			Command[CurrentCmdIndex--].parray = OutstandingArray;
+			Command[CurrentCmdIndex].vt = VT_ARRAY | VT_VARIANT;
+			Command[CurrentCmdIndex--].parray = TitlesArray;
+			Command[CurrentCmdIndex].vt = VT_BSTR;
+			Command[CurrentCmdIndex--].bstrVal = SysAllocString(CallDate.isNull() ? L"" : CallDate.toString("yyyy-MM-dd").toStdWString().c_str());
+
+			Params.rgdispidNamedArgs = NULL;
+			Params.rgvarg=Command;
+			Params.cArgs = 7;
+			Params.cNamedArgs = 0;
+			if(dispid == 0)
+			{
+				wchar_t *ucName = L"Run";
+				hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
+					LOCALE_SYSTEM_DEFAULT, &dispid);
+				if(FAILED(hr))
+				{
+					SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
+					SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
+					SysFreeString(Params.rgvarg[Params.cArgs-7].bstrVal);
+					SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
+					for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+					{
+						SysFreeString(pdFreq->bstrVal);
+						pdFreq++;
+					}
+					SafeArrayUnaccessData(DatesArray);
+					SafeArrayAccessData(TitlesArray, (void HUGEP* FAR*)&pdFreq);
+					for (DWORD i = 0; i < source.GetTranchesCount(); i++)
+					{
+						SysFreeString(pdFreq->bstrVal);
+						pdFreq++;
+					}
+					SafeArrayUnaccessData(TitlesArray);
+					return hr;
+				}
+			}
+			hr = ExcelCommons::pExcelDisp->Invoke(dispid,IID_NULL,LOCALE_SYSTEM_DEFAULT,
+				DISPATCH_METHOD, &Params, NULL, NULL, NULL);
+			if(FAILED(hr))
+			{
+				SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
+				SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
+				SysFreeString(Params.rgvarg[Params.cArgs-7].bstrVal);
+				SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
+				for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+				{
+					SysFreeString(pdFreq->bstrVal);
+					pdFreq++;
+				}
+				SafeArrayUnaccessData(DatesArray);
+				SafeArrayAccessData(TitlesArray, (void HUGEP* FAR*)&pdFreq);
+				for (DWORD i = 0; i < source.GetTranchesCount(); i++)
+				{
+					SysFreeString(pdFreq->bstrVal);
+					pdFreq++;
+				}
+				SafeArrayUnaccessData(TitlesArray);
+				return hr;
+			}
+		}
+		catch(_com_error &ce)
+		{
+			hr = ce.Error();
+		}
+		SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
+		SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
+		SysFreeString(Params.rgvarg[Params.cArgs-7].bstrVal);
+		SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
+		for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+		{
+			SysFreeString(pdFreq->bstrVal);
+			pdFreq++;
+		}
+		SafeArrayUnaccessData(DatesArray);
+		SafeArrayAccessData(TitlesArray, (void HUGEP* FAR*)&pdFreq);
+		for (DWORD i = 0; i < source.GetTranchesCount(); i++)
+		{
+			SysFreeString(pdFreq->bstrVal);
+			pdFreq++;
+		}
+		SafeArrayUnaccessData(TitlesArray);
+		return hr;
+}
+HRESULT ExcelOutput::PlotOCTest(
+	const Waterfall& source,
+	const QString& DestinationSheet,
+	int DestinationIndex,
+	const QDate& CallDate
+	){
+		ExcelCommons::InitExcelOLE();
+		SAFEARRAYBOUND  Bound[2];
+		Bound[0].lLbound   = 1;
+		Bound[0].cElements = source.GetTranche(0)->GetCashFlow().Count();
+		Bound[1].lLbound   = 1;
+		Bound[1].cElements = source.GetTranchesCount();
+		VARIANT HUGEP *pdFreq;
+		SAFEARRAY* DatesArray = SafeArrayCreate(VT_VARIANT, 1, Bound);
+		HRESULT hr = SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
+		if (SUCCEEDED(hr))
+		{
+			for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++){
+				pdFreq->vt = VT_BSTR;
+				pdFreq->bstrVal = SysAllocString(source.GetTranche(0)->GetCashFlow().GetDate(i).toString("yyyy-MM-dd").toStdWString().c_str());
+				pdFreq++;
+			}
+			SafeArrayUnaccessData(DatesArray);
+		}
+		SAFEARRAY* OutstandingArray = SafeArrayCreate(VT_VARIANT, 2, Bound);
+		hr = SafeArrayAccessData(OutstandingArray, (void HUGEP* FAR*)&pdFreq);
+		if (SUCCEEDED(hr))
+		{
+			for (int j=0;j<source.GetTranchesCount();j++){
+				for (int i = 0; i < source.GetTranche(j)->GetCashFlow().Count(); i++){
+					pdFreq->vt = VT_R8;
+					pdFreq->dblVal = source.GetTranche(j)->GetCashFlow().GetOCTest(i);
+					pdFreq++;
+				}
+			}
+			SafeArrayUnaccessData(OutstandingArray);
+		}
+		SAFEARRAY* TitlesArray = SafeArrayCreate(VT_VARIANT, 1, Bound+1);
+		hr = SafeArrayAccessData(TitlesArray, (void HUGEP* FAR*)&pdFreq);
+		if (SUCCEEDED(hr)){
+			for (int j=0;j<source.GetTranchesCount();j++){
+				pdFreq->vt = VT_BSTR;
+				pdFreq->bstrVal = SysAllocString(source.GetTranche(j)->GetTrancheName().toStdWString().c_str());
+				pdFreq++;
+			}
+		}
+
+		static DISPID dispid = 0;
+		DISPPARAMS Params;
+		VARIANTARG Command[7];
+		int CurrentCmdIndex=7-1;
+		if(!ExcelCommons::pExcelDisp)return S_FALSE;
+		try
+		{
+			Command[CurrentCmdIndex].vt = VT_BSTR;
+			Command[CurrentCmdIndex--].bstrVal = SysAllocString(L"PlotOCTest");
+			Command[CurrentCmdIndex].vt = VT_BSTR;
+			Command[CurrentCmdIndex--].bstrVal = SysAllocString(DestinationSheet.toStdWString().c_str());
+			Command[CurrentCmdIndex].vt = VT_I4;
+			Command[CurrentCmdIndex--].intVal = DestinationIndex;
+			Command[CurrentCmdIndex].vt = VT_ARRAY | VT_VARIANT;
+			Command[CurrentCmdIndex--].parray = DatesArray;
+			Command[CurrentCmdIndex].vt = VT_ARRAY | VT_VARIANT;
+			Command[CurrentCmdIndex--].parray = OutstandingArray;
+			Command[CurrentCmdIndex].vt = VT_ARRAY | VT_VARIANT;
+			Command[CurrentCmdIndex--].parray = TitlesArray;
+			Command[CurrentCmdIndex].vt = VT_BSTR;
+			Command[CurrentCmdIndex--].bstrVal = SysAllocString(CallDate.isNull() ? L"" : CallDate.toString("yyyy-MM-dd").toStdWString().c_str());
+
+			Params.rgdispidNamedArgs = NULL;
+			Params.rgvarg=Command;
+			Params.cArgs = 7;
+			Params.cNamedArgs = 0;
+			if(dispid == 0)
+			{
+				wchar_t *ucName = L"Run";
+				hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
+					LOCALE_SYSTEM_DEFAULT, &dispid);
+				if(FAILED(hr))
+				{
+					SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
+					SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
+					SysFreeString(Params.rgvarg[Params.cArgs-7].bstrVal);
+					SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
+					for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+					{
+						SysFreeString(pdFreq->bstrVal);
+						pdFreq++;
+					}
+					SafeArrayUnaccessData(DatesArray);
+					SafeArrayAccessData(TitlesArray, (void HUGEP* FAR*)&pdFreq);
+					for (DWORD i = 0; i < source.GetTranchesCount(); i++)
+					{
+						SysFreeString(pdFreq->bstrVal);
+						pdFreq++;
+					}
+					SafeArrayUnaccessData(TitlesArray);
+					return hr;
+				}
+			}
+			hr = ExcelCommons::pExcelDisp->Invoke(dispid,IID_NULL,LOCALE_SYSTEM_DEFAULT,
+				DISPATCH_METHOD, &Params, NULL, NULL, NULL);
+			if(FAILED(hr))
+			{
+				SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
+				SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
+				SysFreeString(Params.rgvarg[Params.cArgs-7].bstrVal);
+				SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
+				for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+				{
+					SysFreeString(pdFreq->bstrVal);
+					pdFreq++;
+				}
+				SafeArrayUnaccessData(DatesArray);
+				SafeArrayAccessData(TitlesArray, (void HUGEP* FAR*)&pdFreq);
+				for (DWORD i = 0; i < source.GetTranchesCount(); i++)
+				{
+					SysFreeString(pdFreq->bstrVal);
+					pdFreq++;
+				}
+				SafeArrayUnaccessData(TitlesArray);
+				return hr;
+			}
+		}
+		catch(_com_error &ce)
+		{
+			hr = ce.Error();
+		}
+		SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
+		SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
+		SysFreeString(Params.rgvarg[Params.cArgs-7].bstrVal);
+		SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
+		for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+		{
+			SysFreeString(pdFreq->bstrVal);
+			pdFreq++;
+		}
+		SafeArrayUnaccessData(DatesArray);
+		SafeArrayAccessData(TitlesArray, (void HUGEP* FAR*)&pdFreq);
+		for (DWORD i = 0; i < source.GetTranchesCount(); i++)
+		{
+			SysFreeString(pdFreq->bstrVal);
+			pdFreq++;
+		}
+		SafeArrayUnaccessData(TitlesArray);
+		return hr;
+}
+HRESULT ExcelOutput::PlotICTest(
+	const Waterfall& source,
+	const QString& DestinationSheet,
+	int DestinationIndex,
+	const QDate& CallDate
+	){
+		ExcelCommons::InitExcelOLE();
+		SAFEARRAYBOUND  Bound[2];
+		Bound[0].lLbound   = 1;
+		Bound[0].cElements = source.GetTranche(0)->GetCashFlow().Count();
+		Bound[1].lLbound   = 1;
+		Bound[1].cElements = source.GetTranchesCount();
+		VARIANT HUGEP *pdFreq;
+		SAFEARRAY* DatesArray = SafeArrayCreate(VT_VARIANT, 1, Bound);
+		HRESULT hr = SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
+		if (SUCCEEDED(hr))
+		{
+			for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++){
+				pdFreq->vt = VT_BSTR;
+				pdFreq->bstrVal = SysAllocString(source.GetTranche(0)->GetCashFlow().GetDate(i).toString("yyyy-MM-dd").toStdWString().c_str());
+				pdFreq++;
+			}
+			SafeArrayUnaccessData(DatesArray);
+		}
+		SAFEARRAY* OutstandingArray = SafeArrayCreate(VT_VARIANT, 2, Bound);
+		hr = SafeArrayAccessData(OutstandingArray, (void HUGEP* FAR*)&pdFreq);
+		if (SUCCEEDED(hr))
+		{
+			for (int j=0;j<source.GetTranchesCount();j++){
+				for (int i = 0; i < source.GetTranche(j)->GetCashFlow().Count(); i++){
+					pdFreq->vt = VT_R8;
+					pdFreq->dblVal = source.GetTranche(j)->GetCashFlow().GetICTest(i);
+					pdFreq++;
+				}
+			}
+			SafeArrayUnaccessData(OutstandingArray);
+		}
+		SAFEARRAY* TitlesArray = SafeArrayCreate(VT_VARIANT, 1, Bound+1);
+		hr = SafeArrayAccessData(TitlesArray, (void HUGEP* FAR*)&pdFreq);
+		if (SUCCEEDED(hr)){
+			for (int j=0;j<source.GetTranchesCount();j++){
+				pdFreq->vt = VT_BSTR;
+				pdFreq->bstrVal = SysAllocString(source.GetTranche(j)->GetTrancheName().toStdWString().c_str());
+				pdFreq++;
+			}
+		}
+
+		static DISPID dispid = 0;
+		DISPPARAMS Params;
+		VARIANTARG Command[7];
+		int CurrentCmdIndex=7-1;
+		if(!ExcelCommons::pExcelDisp)return S_FALSE;
+		try
+		{
+			Command[CurrentCmdIndex].vt = VT_BSTR;
+			Command[CurrentCmdIndex--].bstrVal = SysAllocString(L"PlotICTest");
+			Command[CurrentCmdIndex].vt = VT_BSTR;
+			Command[CurrentCmdIndex--].bstrVal = SysAllocString(DestinationSheet.toStdWString().c_str());
+			Command[CurrentCmdIndex].vt = VT_I4;
+			Command[CurrentCmdIndex--].intVal = DestinationIndex;
+			Command[CurrentCmdIndex].vt = VT_ARRAY | VT_VARIANT;
+			Command[CurrentCmdIndex--].parray = DatesArray;
+			Command[CurrentCmdIndex].vt = VT_ARRAY | VT_VARIANT;
+			Command[CurrentCmdIndex--].parray = OutstandingArray;
+			Command[CurrentCmdIndex].vt = VT_ARRAY | VT_VARIANT;
+			Command[CurrentCmdIndex--].parray = TitlesArray;
+			Command[CurrentCmdIndex].vt = VT_BSTR;
+			Command[CurrentCmdIndex--].bstrVal = SysAllocString(CallDate.isNull() ? L"" : CallDate.toString("yyyy-MM-dd").toStdWString().c_str());
+
+			Params.rgdispidNamedArgs = NULL;
+			Params.rgvarg=Command;
+			Params.cArgs = 7;
+			Params.cNamedArgs = 0;
+			if(dispid == 0)
+			{
+				wchar_t *ucName = L"Run";
+				hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
+					LOCALE_SYSTEM_DEFAULT, &dispid);
+				if(FAILED(hr))
+				{
+					SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
+					SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
+					SysFreeString(Params.rgvarg[Params.cArgs-7].bstrVal);
+					SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
+					for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+					{
+						SysFreeString(pdFreq->bstrVal);
+						pdFreq++;
+					}
+					SafeArrayUnaccessData(DatesArray);
+					SafeArrayAccessData(TitlesArray, (void HUGEP* FAR*)&pdFreq);
+					for (DWORD i = 0; i < source.GetTranchesCount(); i++)
+					{
+						SysFreeString(pdFreq->bstrVal);
+						pdFreq++;
+					}
+					SafeArrayUnaccessData(TitlesArray);
+					return hr;
+				}
+			}
+			hr = ExcelCommons::pExcelDisp->Invoke(dispid,IID_NULL,LOCALE_SYSTEM_DEFAULT,
+				DISPATCH_METHOD, &Params, NULL, NULL, NULL);
+			if(FAILED(hr))
+			{
+				SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
+				SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
+				SysFreeString(Params.rgvarg[Params.cArgs-7].bstrVal);
+				SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
+				for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+				{
+					SysFreeString(pdFreq->bstrVal);
+					pdFreq++;
+				}
+				SafeArrayUnaccessData(DatesArray);
+				SafeArrayAccessData(TitlesArray, (void HUGEP* FAR*)&pdFreq);
+				for (DWORD i = 0; i < source.GetTranchesCount(); i++)
+				{
+					SysFreeString(pdFreq->bstrVal);
+					pdFreq++;
+				}
+				SafeArrayUnaccessData(TitlesArray);
+				return hr;
+			}
+		}
+		catch(_com_error &ce)
+		{
+			hr = ce.Error();
+		}
+		SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
+		SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
+		SysFreeString(Params.rgvarg[Params.cArgs-7].bstrVal);
+		SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
+		for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+		{
+			SysFreeString(pdFreq->bstrVal);
+			pdFreq++;
+		}
+		SafeArrayUnaccessData(DatesArray);
+		SafeArrayAccessData(TitlesArray, (void HUGEP* FAR*)&pdFreq);
+		for (DWORD i = 0; i < source.GetTranchesCount(); i++)
+		{
+			SysFreeString(pdFreq->bstrVal);
+			pdFreq++;
+		}
+		SafeArrayUnaccessData(TitlesArray);
+		return hr;
+}
+HRESULT ExcelOutput::PlotAnnualExcess(
+	const Waterfall& source,
+	const QString& DestinationSheet,
+	int DestinationIndex,
+	const QDate& CallDate
+	){
+		ExcelCommons::InitExcelOLE();
+		SAFEARRAYBOUND  Bound[1];
+		Bound[0].lLbound   = 1;
+		Bound[0].cElements = source.GetTranche(0)->GetCashFlow().Count();
+		VARIANT HUGEP *pdFreq;
+		SAFEARRAY* DatesArray = SafeArrayCreate(VT_VARIANT, 1, Bound);
+		HRESULT hr = SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
+		if (SUCCEEDED(hr))
+		{
+			for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++){
+				pdFreq->vt = VT_BSTR;
+				pdFreq->bstrVal = SysAllocString(source.GetTranche(0)->GetCashFlow().GetDate(i).toString("yyyy-MM-dd").toStdWString().c_str());
+				pdFreq++;
+			}
+			SafeArrayUnaccessData(DatesArray);
+		}
+		SAFEARRAY* OutstandingArray = SafeArrayCreate(VT_VARIANT, 1, Bound);
+		hr = SafeArrayAccessData(OutstandingArray, (void HUGEP* FAR*)&pdFreq);
+		if (SUCCEEDED(hr))
+		{
+			for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++){
+				pdFreq->vt = VT_R8;
+				pdFreq->dblVal = source.GetAnnualizedExcess(i);
+				pdFreq++;
+			}
+			SafeArrayUnaccessData(OutstandingArray);
+		}
+
+		static DISPID dispid = 0;
+		DISPPARAMS Params;
+		VARIANTARG Command[6];
+		int CurrentCmdIndex=6-1;
+		if(!ExcelCommons::pExcelDisp)return S_FALSE;
+		try
+		{
+			Command[CurrentCmdIndex].vt = VT_BSTR;
+			Command[CurrentCmdIndex--].bstrVal = SysAllocString(L"PlotAnnualExcess");
+			Command[CurrentCmdIndex].vt = VT_BSTR;
+			Command[CurrentCmdIndex--].bstrVal = SysAllocString(DestinationSheet.toStdWString().c_str());
+			Command[CurrentCmdIndex].vt = VT_I4;
+			Command[CurrentCmdIndex--].intVal = DestinationIndex;
+			Command[CurrentCmdIndex].vt = VT_ARRAY | VT_VARIANT;
+			Command[CurrentCmdIndex--].parray = DatesArray;
+			Command[CurrentCmdIndex].vt = VT_ARRAY | VT_VARIANT;
+			Command[CurrentCmdIndex--].parray = OutstandingArray;
+			Command[CurrentCmdIndex].vt = VT_BSTR;
+			Command[CurrentCmdIndex--].bstrVal = SysAllocString(CallDate.isNull() ? L"" : CallDate.toString("yyyy-MM-dd").toStdWString().c_str());
+
+			Params.rgdispidNamedArgs = NULL;
+			Params.rgvarg=Command;
+			Params.cArgs = 6;
+			Params.cNamedArgs = 0;
+			if(dispid == 0)
+			{
+				wchar_t *ucName = L"Run";
+				hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
+					LOCALE_SYSTEM_DEFAULT, &dispid);
+				if(FAILED(hr))
+				{
+					SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
+					SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
+					SysFreeString(Params.rgvarg[Params.cArgs-6].bstrVal);
+					SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
+					for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+					{
+						SysFreeString(pdFreq->bstrVal);
+						pdFreq++;
+					}
+					SafeArrayUnaccessData(DatesArray);
+					return hr;
+				}
+			}
+			hr = ExcelCommons::pExcelDisp->Invoke(dispid,IID_NULL,LOCALE_SYSTEM_DEFAULT,
+				DISPATCH_METHOD, &Params, NULL, NULL, NULL);
+			if(FAILED(hr))
+			{
+				SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
+				SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
+				SysFreeString(Params.rgvarg[Params.cArgs-6].bstrVal);
+				SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
+				for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+				{
+					SysFreeString(pdFreq->bstrVal);
+					pdFreq++;
+				}
+				SafeArrayUnaccessData(DatesArray);
+				return hr;
+			}
+		}
+		catch(_com_error &ce)
+		{
+			hr = ce.Error();
+		}
+		SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
+		SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
+		SysFreeString(Params.rgvarg[Params.cArgs-6].bstrVal);
+		SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
+		for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+		{
+			SysFreeString(pdFreq->bstrVal);
+			pdFreq++;
+		}
+		SafeArrayUnaccessData(DatesArray);
+		return hr;
+}
+HRESULT ExcelOutput::PlotCostFunding(
+	const Waterfall& source,
+	const QString& DestinationSheet,
+	int DestinationIndex,
+	const QDate& CallDate
+	){
+		ExcelCommons::InitExcelOLE();
+		SAFEARRAYBOUND  Bound[1];
+		Bound[0].lLbound   = 1;
+		Bound[0].cElements = source.GetTranche(0)->GetCashFlow().Count();
+		VARIANT HUGEP *pdFreq;
+		SAFEARRAY* DatesArray = SafeArrayCreate(VT_VARIANT, 1, Bound);
+		HRESULT hr = SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
+		if (SUCCEEDED(hr))
+		{
+			for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++){
+				pdFreq->vt = VT_BSTR;
+				pdFreq->bstrVal = SysAllocString(source.GetTranche(0)->GetCashFlow().GetDate(i).toString("yyyy-MM-dd").toStdWString().c_str());
+				pdFreq++;
+			}
+			SafeArrayUnaccessData(DatesArray);
+		}
+		SAFEARRAY* OutstandingArray = SafeArrayCreate(VT_VARIANT, 1, Bound);
+		hr = SafeArrayAccessData(OutstandingArray, (void HUGEP* FAR*)&pdFreq);
+		if (SUCCEEDED(hr))
+		{
+			for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++){
+				if(source.GetWACostOfCapital(i)>0){
+					pdFreq->vt = VT_R8;
+					pdFreq->dblVal = source.GetWACostOfCapital(i);
+				}
+				pdFreq++;
+			}
+			SafeArrayUnaccessData(OutstandingArray);
+		}
+
+		static DISPID dispid = 0;
+		DISPPARAMS Params;
+		VARIANTARG Command[6];
+		int CurrentCmdIndex=6-1;
+		if(!ExcelCommons::pExcelDisp)return S_FALSE;
+		try
+		{
+			Command[CurrentCmdIndex].vt = VT_BSTR;
+			Command[CurrentCmdIndex--].bstrVal = SysAllocString(L"PlotCostFunding");
+			Command[CurrentCmdIndex].vt = VT_BSTR;
+			Command[CurrentCmdIndex--].bstrVal = SysAllocString(DestinationSheet.toStdWString().c_str());
+			Command[CurrentCmdIndex].vt = VT_I4;
+			Command[CurrentCmdIndex--].intVal = DestinationIndex;
+			Command[CurrentCmdIndex].vt = VT_ARRAY | VT_VARIANT;
+			Command[CurrentCmdIndex--].parray = DatesArray;
+			Command[CurrentCmdIndex].vt = VT_ARRAY | VT_VARIANT;
+			Command[CurrentCmdIndex--].parray = OutstandingArray;
+			Command[CurrentCmdIndex].vt = VT_BSTR;
+			Command[CurrentCmdIndex--].bstrVal = SysAllocString(CallDate.isNull() ? L"":CallDate.toString("yyyy-MM-dd").toStdWString().c_str());
+
+			Params.rgdispidNamedArgs = NULL;
+			Params.rgvarg=Command;
+			Params.cArgs = 6;
+			Params.cNamedArgs = 0;
+			if(dispid == 0)
+			{
+				wchar_t *ucName = L"Run";
+				hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
+					LOCALE_SYSTEM_DEFAULT, &dispid);
+				if(FAILED(hr))
+				{
+					SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
+					SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
+					SysFreeString(Params.rgvarg[Params.cArgs-6].bstrVal);
+					SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
+					for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+					{
+						SysFreeString(pdFreq->bstrVal);
+						pdFreq++;
+					}
+					SafeArrayUnaccessData(DatesArray);
+					return hr;
+				}
+			}
+			hr = ExcelCommons::pExcelDisp->Invoke(dispid,IID_NULL,LOCALE_SYSTEM_DEFAULT,
+				DISPATCH_METHOD, &Params, NULL, NULL, NULL);
+			if(FAILED(hr))
+			{
+				SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
+				SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
+				SysFreeString(Params.rgvarg[Params.cArgs-6].bstrVal);
+				SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
+				for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+				{
+					SysFreeString(pdFreq->bstrVal);
+					pdFreq++;
+				}
+				SafeArrayUnaccessData(DatesArray);
+				return hr;
+			}
+		}
+		catch(_com_error &ce)
+		{
+			hr = ce.Error();
+		}
+		SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
+		SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
+		SysFreeString(Params.rgvarg[Params.cArgs-6].bstrVal);
+		SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
+		for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+		{
+			SysFreeString(pdFreq->bstrVal);
+			pdFreq++;
+		}
+		SafeArrayUnaccessData(DatesArray);
+		return hr;
+}
+HRESULT ExcelOutput::PlotStressMargin(const StressTest& source,const QString& DestinationSheet,int DestinationIndex,const QString& TrancheTarget){
+	ExcelCommons::InitExcelOLE();
+	const QList<QString> XAlias=source.GetXSpann();
+	const QList<QString> YAlias=source.GetYSpann();
+	SAFEARRAYBOUND  Bound[2];
+	Bound[0].lLbound   = 1;
+	Bound[0].cElements = XAlias.size();
+	Bound[1].lLbound   = 1;
+	Bound[1].cElements = YAlias.size();
+	VARIANT HUGEP *pdFreq;
+	SAFEARRAY* Margins = SafeArrayCreate(VT_VARIANT, 2, Bound);
+	HRESULT hr = SafeArrayAccessData(Margins, (void HUGEP* FAR*)&pdFreq);
+	if (SUCCEEDED(hr))
+	{
+		for(QList<QString>::const_iterator i=XAlias.begin();i!=XAlias.end();i++){
+			for (QList<QString>::const_iterator j=YAlias.begin();j!=YAlias.end();j++){
+				pdFreq->vt = VT_R8;
+				pdFreq->dblVal = source.GetResults().value(*i).value(*j).GetTranche(TrancheTarget)->GetDiscountMargin();
+				pdFreq++;
+			}
+		}
+		SafeArrayUnaccessData(Margins);
+	}
+	SAFEARRAY* XHeaders = SafeArrayCreate(VT_VARIANT, 1, Bound);
+	hr = SafeArrayAccessData(XHeaders, (void HUGEP* FAR*)&pdFreq);
+	if (SUCCEEDED(hr)){
+		for(QList<QString>::const_iterator i=XAlias.begin();i!=XAlias.end();i++){
+			pdFreq->vt = VT_BSTR;
+			pdFreq->bstrVal = SysAllocString(i->toStdWString().c_str());
+			pdFreq++;
+		}
+		SafeArrayUnaccessData(XHeaders);
+	}
+	SAFEARRAY* YHeaders = SafeArrayCreate(VT_VARIANT, 1, Bound+1);
+	hr = SafeArrayAccessData(YHeaders, (void HUGEP* FAR*)&pdFreq);
+	if (SUCCEEDED(hr)){
+		for(QList<QString>::const_iterator i=YAlias.begin();i!=YAlias.end();i++){
+			pdFreq->vt = VT_BSTR;
+			pdFreq->bstrVal = SysAllocString(i->toStdWString().c_str());
+			pdFreq++;
+		}
+		SafeArrayUnaccessData(YHeaders);
+	}
+
+
+	static DISPID dispid = 0;
+	DISPPARAMS Params;
+	VARIANTARG Command[8];
+	int CurrentCmdIndex=8-1;
+	if(!ExcelCommons::pExcelDisp)return S_FALSE;
+	try
+	{
+		Command[CurrentCmdIndex].vt = VT_BSTR;
+		Command[CurrentCmdIndex--].bstrVal = SysAllocString(L"PlotStressMargin");
+		Command[CurrentCmdIndex].vt = VT_BSTR;
+		Command[CurrentCmdIndex--].bstrVal = SysAllocString(DestinationSheet.toStdWString().c_str());
+		Command[CurrentCmdIndex].vt = VT_I4;
+		Command[CurrentCmdIndex--].intVal = DestinationIndex;
+		Command[CurrentCmdIndex].vt = VT_ARRAY | VT_VARIANT;
+		Command[CurrentCmdIndex--].parray = Margins;
+		Command[CurrentCmdIndex].vt = VT_I4;
+		Command[CurrentCmdIndex--].intVal = static_cast<int>(source.GetXVariability());
+		Command[CurrentCmdIndex].vt = VT_I4;
+		Command[CurrentCmdIndex--].intVal = static_cast<int>(source.GetYVariability());
+		Command[CurrentCmdIndex].vt = VT_ARRAY | VT_VARIANT;
+		Command[CurrentCmdIndex--].parray = XHeaders;
+		Command[CurrentCmdIndex].vt = VT_ARRAY | VT_VARIANT;
+		Command[CurrentCmdIndex--].parray = YHeaders;
+
+		Params.rgdispidNamedArgs = NULL;
+		Params.rgvarg=Command;
+		Params.cArgs = 8;
+		Params.cNamedArgs = 0;
+		if(dispid == 0)
+		{
+			wchar_t *ucName = L"Run";
+			hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
+				LOCALE_SYSTEM_DEFAULT, &dispid);
+			if(FAILED(hr))
+			{
+				SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
+				SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
+				hr = SafeArrayAccessData(YHeaders, (void HUGEP* FAR*)&pdFreq);
+				if (SUCCEEDED(hr)){
+					for(QList<QString>::const_iterator i=YAlias.begin();i!=YAlias.end();i++){
+						SysFreeString(pdFreq->bstrVal);
+						pdFreq++;
+					}
+					SafeArrayUnaccessData(YHeaders);
+				}
+				hr = SafeArrayAccessData(XHeaders, (void HUGEP* FAR*)&pdFreq);
+				if (SUCCEEDED(hr)){
+					for(QList<QString>::const_iterator i=XAlias.begin();i!=XAlias.end();i++){
+						SysFreeString(pdFreq->bstrVal);
+						pdFreq++;
+					}
+					SafeArrayUnaccessData(XHeaders);
+				}
+				return hr;
+			}
+		}
+		hr = ExcelCommons::pExcelDisp->Invoke(dispid,IID_NULL,LOCALE_SYSTEM_DEFAULT,
+			DISPATCH_METHOD, &Params, NULL, NULL, NULL);
+		if(FAILED(hr))
+		{
+			SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
+			SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
+			hr = SafeArrayAccessData(YHeaders, (void HUGEP* FAR*)&pdFreq);
+			if (SUCCEEDED(hr)){
+				for(QList<QString>::const_iterator i=YAlias.begin();i!=YAlias.end();i++){
+					SysFreeString(pdFreq->bstrVal);
+					pdFreq++;
+				}
+				SafeArrayUnaccessData(YHeaders);
+			}
+			hr = SafeArrayAccessData(XHeaders, (void HUGEP* FAR*)&pdFreq);
+			if (SUCCEEDED(hr)){
+				for(QList<QString>::const_iterator i=XAlias.begin();i!=XAlias.end();i++){
+					SysFreeString(pdFreq->bstrVal);
+					pdFreq++;
+				}
+				SafeArrayUnaccessData(XHeaders);
+			}
+			return hr;
+		}
+	}
+	catch(_com_error &ce)
+	{
+		hr = ce.Error();
+	}
+	SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
+	SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
+	hr = SafeArrayAccessData(YHeaders, (void HUGEP* FAR*)&pdFreq);
+	if (SUCCEEDED(hr)){
+		for(QList<QString>::const_iterator i=YAlias.begin();i!=YAlias.end();i++){
+			SysFreeString(pdFreq->bstrVal);
+			pdFreq++;
+		}
+		SafeArrayUnaccessData(YHeaders);
+	}
+	hr = SafeArrayAccessData(XHeaders, (void HUGEP* FAR*)&pdFreq);
+	if (SUCCEEDED(hr)){
+		for(QList<QString>::const_iterator i=XAlias.begin();i!=XAlias.end();i++){
+			SysFreeString(pdFreq->bstrVal);
+			pdFreq++;
+		}
+		SafeArrayUnaccessData(XHeaders);
+	}
 	return hr;
 }

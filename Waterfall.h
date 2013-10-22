@@ -79,7 +79,8 @@ public:
 	const QDate& GetFirstIPDdate() const {return m_FirstIPDdate;}
 	const TrancheCashFlow& GetReinvested() const {return m_Reinvested;} 
 	const QDate& GetLastIPDdate() const {return m_LastIPDdate;} 
-	const QDate& GetCallDate() const {return m_CallDate;} 
+	const QDate& GetCallDate() const {return m_CallDate;}
+	QDate GetCalledPeriod() const;
 	QDate GetStructureMaturity() const;
 	const WatFalPrior* GetStep(int Index) const;
 	const Tranche* GetTranche(int Index) const;

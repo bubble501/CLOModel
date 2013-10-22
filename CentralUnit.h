@@ -71,7 +71,7 @@ public:
 	void SetCreditEnanAddress(const QString& a){CreditEnanAddress=a;}
 	void SetStressToCall(bool a){StressToCall=a;}
 	void SetPlotsSheet(const QString& a){PlotsSheet=a;}
-	void SetPlotIndexes(int val,int index){if(index>0 && index<6) PlotIndexes[index]=val;}
+	void SetPlotIndexes(int val,int index){if(index>=0 && index<6) PlotIndexes[index]=val;}
 private:
 	WaterfallCalculator* ParallWatFalls;
 	MtgCalculator LoansCalculator;

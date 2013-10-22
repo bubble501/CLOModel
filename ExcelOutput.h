@@ -6,7 +6,9 @@
 #include "ExcelCommons.h"
 class Tranche;
 class MtgCashFlow;
+class Waterfall;
 class StressTest;
+class QDate;
 namespace ExcelOutput{
 	
 	HRESULT PrintTrancheFlow(
@@ -57,5 +59,11 @@ namespace ExcelOutput{
 	HRESULT PrintMergedCell(const QString& msg, const QString& TargetCell, int RowDim=1, int ColDim=1 ,const QColor& FillColor=Qt::white);
 	HRESULT PrintColumn(const QString& Title, const QList<double>& Values ,const QString& TargetCell,const QString& ValFormat="0.00",const QColor& FillColor=Qt::white);
 	HRESULT PrintDataColumn(const QList<double>& Values ,const QString& TargetCell,const QString& ValFormat="0.00");
+	HRESULT PlotTranchesDynamic(const Waterfall& source,const QString& DestinationSheet,int DestinationIndex,const QDate& CallDate);
+	HRESULT PlotOCTest(const Waterfall& source,const QString& DestinationSheet,int DestinationIndex,const QDate& CallDate);
+	HRESULT PlotICTest(const Waterfall& source,const QString& DestinationSheet,int DestinationIndex,const QDate& CallDate);
+	HRESULT PlotAnnualExcess(const Waterfall& source,const QString& DestinationSheet,int DestinationIndex,const QDate& CallDate);
+	HRESULT PlotCostFunding(const Waterfall& source,const QString& DestinationSheet,int DestinationIndex,const QDate& CallDate);
+	HRESULT PlotStressMargin(const StressTest& source,const QString& DestinationSheet,int DestinationIndex,const QString& TrancheTarget);
 }
 #endif // ExcelOutput_h__

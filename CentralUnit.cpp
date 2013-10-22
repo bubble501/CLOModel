@@ -246,20 +246,19 @@ void CentralUnit::CheckCalculationDone()
 			ExcelOutput::PrintDataColumn(TempValList,ExcelCommons::CellOffset(LossOnCallOutputAddress),"0.00%");
 		}
 	}
+	if(!PlotsSheet.isEmpty() && PlotIndexes[1]>0)
+		ExcelOutput::PlotTranchesDynamic(Structure,PlotsSheet,PlotIndexes[1],RunCall ? CallStructure.GetCalledPeriod():QDate());
+	if(!PlotsSheet.isEmpty() && PlotIndexes[2]>0)
+		ExcelOutput::PlotOCTest(Structure,PlotsSheet,PlotIndexes[2],RunCall ? CallStructure.GetCalledPeriod():QDate());
+	if(!PlotsSheet.isEmpty() && PlotIndexes[3]>0)
+		ExcelOutput::PlotICTest(Structure,PlotsSheet,PlotIndexes[3],RunCall ? CallStructure.GetCalledPeriod():QDate());
+	if(!PlotsSheet.isEmpty() && PlotIndexes[4]>0)
+		ExcelOutput::PlotAnnualExcess(Structure,PlotsSheet,PlotIndexes[4],RunCall ? CallStructure.GetCalledPeriod():QDate());
+	if(!PlotsSheet.isEmpty() && PlotIndexes[5]>0)
+		ExcelOutput::PlotCostFunding(Structure,PlotsSheet,PlotIndexes[5],RunCall ? CallStructure.GetCalledPeriod():QDate());
 	QApplication::quit();
 }
 void CentralUnit::StressFinished(){
 	Stresser->SaveResults(FolderPath);
-	/*QString Filename=(FolderPath+"\\.StressResult%1%2.csr").arg(int(Stresser->GetXVariability())).arg(int(Stresser->GetYVariability()));
-	QFile file(Filename);
-	if (file.open(QIODevice::WriteOnly)) {
-	QDataStream out(&file);
-		out.setVersion(QDataStream::Qt_4_8);
-		out << *Stresser;
-		file.close();
-		#ifdef Q_WS_WIN
-			SetFileAttributes(Filename.toStdWString().c_str(),FILE_ATTRIBUTE_HIDDEN);
-		#endif
-	}*/
 	QApplication::quit();
 }

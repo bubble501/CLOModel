@@ -10,15 +10,19 @@ ProgressWidget::ProgressWidget(QWidget* parent)
 {
 	setWindowIcon(QIcon(":/Icons/Logo.png"));
 	setWindowTitle("Loading");
+	setMinimumSize(220,80);
 	ProgBar=new QProgressBar(this);
 	ProgBar->setObjectName("ProgBar");
 	TextLabel=new QLabel(this);
 	TextLabel->setObjectName("TextLabel");
 	TextLabel->setText("Please Wait");
+	TextLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 	AnimationFile=new QMovie(":/Icons/Loading.gif");
 	AnimLabel=new QLabel(this);
 	AnimLabel->setObjectName("AnimLabel");
 	AnimLabel->setMovie(AnimationFile);
+	AnimLabel->setScaledContents(true);
+	AnimLabel->setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Maximum);
 	AnimationFile->start();
 	QGridLayout* mainLay=new QGridLayout(this);
 	mainLay->addWidget(AnimLabel,0,0);

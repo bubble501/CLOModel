@@ -5,7 +5,9 @@
 #include "MtgCalculator.h"
 #include "Waterfall.h"
 #include "StressTest.h"
+
 class WaterfallCalculator;
+class ErrorsViewer;
 class CentralUnit : public QObject{
 	Q_OBJECT
 public:

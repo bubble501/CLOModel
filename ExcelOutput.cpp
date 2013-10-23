@@ -1572,10 +1572,10 @@ HRESULT ExcelOutput::PlotCostFunding(
 		SafeArrayUnaccessData(DatesArray);
 		return hr;
 }
-HRESULT ExcelOutput::PlotStressMargin(const StressTest& source,const QString& DestinationSheet,int DestinationIndex,const QString& TrancheTarget){
+HRESULT ExcelOutput::PlotStressMargin(const StressTest& source,const QString& DestinationSheet,int DestinationIndex,const QString& TrancheTarget, double NewPrice){
 	ExcelCommons::InitExcelOLE();
-	const QList<QString> XAlias=source.GetXSpann();
-	const QList<QString> YAlias=source.GetYSpann();
+	const QList<QString>& XAlias=source.GetXSpann();
+	const QList<QString>& YAlias=source.GetYSpann();
 	SAFEARRAYBOUND  Bound[2];
 	Bound[0].lLbound   = 1;
 	Bound[0].cElements = XAlias.size();
@@ -1586,10 +1586,10 @@ HRESULT ExcelOutput::PlotStressMargin(const StressTest& source,const QString& De
 	HRESULT hr = SafeArrayAccessData(Margins, (void HUGEP* FAR*)&pdFreq);
 	if (SUCCEEDED(hr))
 	{
-		for(QList<QString>::const_iterator i=XAlias.begin();i!=XAlias.end();i++){
-			for (QList<QString>::const_iterator j=YAlias.begin();j!=YAlias.end();j++){
+		for (QList<QString>::const_iterator j=YAlias.begin();j!=YAlias.end();j++){
+			for(QList<QString>::const_iterator i=XAlias.begin();i!=XAlias.end();i++){
 				pdFreq->vt = VT_R8;
-				pdFreq->dblVal = source.GetResults().value(*i).value(*j).GetTranche(TrancheTarget)->GetDiscountMargin();
+				pdFreq->dblVal = source.GetResults().value(*i).value(*j).GetTranche(TrancheTarget)->GetDiscountMargin(NewPrice);
 				pdFreq++;
 			}
 		}

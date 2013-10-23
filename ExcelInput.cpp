@@ -313,9 +313,7 @@ double __stdcall CLODiscountMargin(LPSAFEARRAY *ArrayData){
 #ifdef DebuggungInputs
 	QMessageBox::information(0,"Tranche Trovata",QString("La Tranche "+TrancheName+" e' Stata Trovata"));
 #endif
-	Tranche TempTranche(*TranchPoint);
-	TempTranche.SetPrice(NewPrice);
-	return TempTranche.GetDiscountMargin();
+	return TranchPoint->GetDiscountMargin(NewPrice);
 }
 double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
 	VARIANT HUGEP *pdFreq;
@@ -344,23 +342,54 @@ double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
 	return TempTranche.GetWALife(StartDate);
 }
 void __stdcall StressTargetChanged(LPSAFEARRAY *ArrayData){
+#ifdef DebuggungInputs
+	char *argv[] = {"NoArgumnets"};
+	int argc = sizeof(argv) / sizeof(char*) - 1;
+	QApplication ComputationLoop(argc,argv);
+#endif
 	StressTest TempStress;
 	VARIANT HUGEP *pdFreq;
 	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
 	if (!SUCCEEDED(hr)) return;
 	QString FolderPath=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
+#ifdef DebuggungInputs
+	QMessageBox::information(0,"Folder Path",QString("FolderPath: %1").arg(FolderPath));
+#endif
 	QString TrancheName=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
+#ifdef DebuggungInputs
+	QMessageBox::information(0,"Tranche Name",QString("TrancheName: %1").arg(TrancheName));
+#endif
 	QString TargetCell=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
+#ifdef DebuggungInputs
+	QMessageBox::information(0,"Target Cell",QString("TargetCell: %1").arg(TargetCell));
+#endif
 	int XVar=pdFreq->intVal;pdFreq++;
+#ifdef DebuggungInputs
+	QMessageBox::information(0,"XVar",QString("XVar: %1").arg(XVar));
+#endif
 	int YVar=pdFreq->intVal;pdFreq++;
+#ifdef DebuggungInputs
+	QMessageBox::information(0,"YVar",QString("YVar: %1").arg(YVar));
+#endif
+	double NewPrice=pdFreq->dblVal;pdFreq++;
+#ifdef DebuggungInputs
+	QMessageBox::information(0,"New Price",QString("NewPrice: %1").arg(NewPrice));
+#endif
 	QString PlotSheet=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
+#ifdef DebuggungInputs
+	QMessageBox::information(0,"Plot Sheet",QString("PlotSheet: %1").arg(PlotSheet));
+#endif
 	int PlotIndex=pdFreq->intVal;pdFreq++;
+#ifdef DebuggungInputs
+	QMessageBox::information(0,"Plot Index",QString("PlotIndex: %1").arg(PlotIndex));
+#endif
 	SafeArrayUnaccessData(*ArrayData);
 	QString Filename=(FolderPath+"\\.StressResult%1%2.fcsr").arg(XVar).arg(YVar);
+	if(!QFile::exists(Filename))return;
 	TempStress.LoadResultsFromFile(Filename);
 	ExcelOutput::PrintStressTest(TempStress,TrancheName,TargetCell,true);
 	if(!PlotSheet.isEmpty() && PlotIndex>0)
-		ExcelOutput::PlotStressMargin(TempStress,PlotSheet,PlotIndex,TrancheName);
+		ExcelOutput::PlotStressMargin(TempStress,PlotSheet,PlotIndex,TrancheName,NewPrice);
 }
 void __stdcall InspectStress(LPSAFEARRAY *ArrayData){
 	Waterfall TempStructure;
@@ -400,6 +429,7 @@ void __stdcall InspectWaterfall(LPSAFEARRAY *ArrayData){
 		TempStep.SetRedemptionShare(pdFreq->dblVal);pdFreq++;
 		SitRep.AddStep(TempStep);
 	}
+	SafeArrayUnaccessData(*ArrayData);
 	ComputationLoop.exec();	
 }
 #ifdef DebuggungInputs

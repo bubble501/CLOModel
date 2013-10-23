@@ -902,3 +902,39 @@ QDate Waterfall::GetCalledPeriod() const{
 	}
 	return RollingNextIPD;
 }
+QString Waterfall::ReadyToCalculate()const{
+	QString Result;
+	if(m_SeniorExpenses<0.0) Result+="Senior Expenses\n";
+	if(m_SeniorFees<0.0) Result+="Senior Fees\n";
+	if(m_JuniorFees<0.0) Result+="Junior Fees\n";
+	if(m_Tranches.isEmpty()) Result+="Tranches\n";
+	if(m_WaterfallStesps.isEmpty()) Result+="Waterfall Steps\n";
+	if(m_MortgagesPayments.Count()==0) Result+="Loans Payments\n";
+	if(m_PaymentFrequency<1) Result+="IDP Frequency\n";
+	if(m_ReinvestmentTest.GetCDRAssumption().isEmpty())Result+="CDR\n";
+	if(m_ReinvestmentTest.GetCPRAssumption().isEmpty())Result+="CPR\n";
+	if(m_ReinvestmentTest.GetLSAssumption().isEmpty())Result+="LS\n";
+	if(m_ReinvestmentTest.GetWALAssumption().isEmpty())Result+="Reinvestment Bond WAL\n";
+	if(m_ReinvestmentTest.GetReinvestmentPeriod()<QDate(2000,1,1))Result+="Reinvestment Period\n";
+	if(m_ReinvestmentTest.GetTestLevel()<0.0)Result+="Reinvestment Test Limit\n";
+	if(m_ReinvestmentTest.GetReinvestmentBond().GetPaymentFreq()<1) Result+="Reinvestment Bond Payment Frequency\n";
+	if(m_ReinvestmentTest.GetReinvestmentBond().GetInterest().isEmpty())Result+="Reinvestment Bond Spread\n";
+	if(m_CCCcurve.isEmpty())Result+="CCC Curve\n";
+	if(m_CCChaircut<0.0)Result+="CCC Value\n";
+	if(m_PoolValueAtCall<0.0)Result+="Pool Value at Call\n";
+	if(m_UseCall && m_CallDate<QDate(2000,1,1) && (m_CallReserve<=0.0 || m_CallMultiple<=0.0))Result+="Specify a call Criteria to use the Call\n";
+	if(m_MortgagesPayments.Count()>0 && m_MortgagesPayments.GetDate(0)<QDate(2000,1,1))Result+="Pool Cut Off Date\n";
+	if(m_CCCTestLimit<0.0)Result+="CCC Test Limit\n";
+	if(
+		m_ReinvestmentTest.GetShare(ReinvestmentTest::InRedempShare)<0.0
+		|| m_ReinvestmentTest.GetShare(ReinvestmentTest::OutRedempShare)<0.0
+		|| m_ReinvestmentTest.GetShare(ReinvestmentTest::InReinvShare)<0.0
+		|| m_ReinvestmentTest.GetShare(ReinvestmentTest::OutReinvShare)<0.0
+		|| m_ReinvestmentTest.GetShare(ReinvestmentTest::InRedempShare)+m_ReinvestmentTest.GetShare(ReinvestmentTest::InReinvShare)>1.0
+		|| m_ReinvestmentTest.GetShare(ReinvestmentTest::OutRedempShare)+m_ReinvestmentTest.GetShare(ReinvestmentTest::OutReinvShare)>1.0
+	)Result+="Reinvestment Test Shares\n";
+	if(m_FirstIPDdate<QDate(2000,1,1))Result+="Next IDP\n";
+	if(m_LastIPDdate<QDate(2000,1,1))Result+="Last IDP\n";
+	if(!Result.isEmpty()) return Result.left(Result.size()-1);
+	return Result;
+}

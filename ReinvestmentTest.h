@@ -17,7 +17,7 @@ public:
 	ReinvestmentTest& operator=(const ReinvestmentTest& a);
 	const QDate& GetReinvestmentPeriod() const {return ReinvestmentPeriod;}
 	double GetTestLevel() const{return ReinvestmentTestLevel;}
-	double GetShare(ShareType Tpe){return ReinvestmentShare[Tpe];}
+	double GetShare(ShareType Tpe)const{return ReinvestmentShare[Tpe];}
 	const Mortgage& GetReinvestmentBond() const {return ReinvestmentBond;}
 	const QString& GetCPRAssumption() const {return CPRAssumption;}
 	const QString& GetCDRAssumption() const {return CDRAssumption;}

@@ -162,6 +162,25 @@ double Tranche::GetDiscountMargin() const{
 	return qMax(0.0,CalculateDM(FlowsDates,FlowsValues,ReferenceRateValue,DayCount));
 	//return qMax(0.0,CalculateDMSimple(FlowsDates,FlowsValues,ReferenceRateValue,DayCount));
 }
+double Tranche::GetDiscountMargin(double NewPrice)const{
+	if(GetLossRate()>0.0000) return 0.0;
+	QList<QDate> FlowsDates;
+	QList<double> FlowsValues;
+	FlowsDates.append(LastPaymentDate);
+	FlowsValues.append(-OutstandingAmt*NewPrice/100.0);
+	for (int i=0;i<CashFlow.Count();i++){
+		FlowsDates.append(CashFlow.GetDate(i));
+		FlowsValues.append(CashFlow.GetTotalFlow(i));
+	}
+	if(ReferenceRateValue==-1.0){
+		QString ApplicableRate=(ReferenceRate.isEmpty() ? DefaultRefRate:ReferenceRate);
+		BloombergWorker Bee;
+		Bee.AddSecurity(ApplicableRate,"Index");
+		Bee.AddField("PX_LAST");
+		ReferenceRateValue=Bee.StartRequest().value(ApplicableRate).value("PX_LAST").toDouble()/100.0;
+	}
+	return qMax(0.0,CalculateDM(FlowsDates,FlowsValues,ReferenceRateValue,DayCount));
+}
 bool Tranche::operator>(const Tranche& a) const {
 	return ProrataGroup>a.ProrataGroup;
 }

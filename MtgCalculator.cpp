@@ -57,3 +57,13 @@ void MtgCalculator::Reset(){
 	}
 	Loans.clear();
 }
+QString MtgCalculator::ReadyToCalculate()const{
+	QString Result;
+	QString TempStr;
+	for (QList<Mortgage*>::const_iterator i=Loans.begin();i!=Loans.end();i++){
+		TempStr=(*i)->ReadyToCalculate();
+		if(!TempStr.isEmpty()) Result+=TempStr+'\n';
+	}
+	if(!Result.isEmpty()) return Result.left(Result.size()-1);
+	return Result;
+}

@@ -308,8 +308,8 @@ void StressTest::LoadResultsFromFile(const QString& DestPath){
 	for(bool more=zip.goToFirstFile(); more; more=zip.goToNextFile()) {
 		TargetFile.open(QIODevice::ReadOnly);
 		QStringList Spanns=TargetFile.getActualFileName().left(TargetFile.getActualFileName().lastIndexOf(".")).split("#,#");
-		XSpann.append(Spanns.at(0));
-		YSpann.append(Spanns.at(1));
+		if(!XSpann.contains(Spanns.at(0))) XSpann.append(Spanns.at(0));
+		if(!YSpann.contains(Spanns.at(1))) YSpann.append(Spanns.at(1));
 		QDataStream out(&TargetFile);
 		out.setVersion(QDataStream::Qt_4_8);
 		out >> (Results[Spanns.at(0)][Spanns.at(1)]);

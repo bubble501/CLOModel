@@ -64,6 +64,6 @@ namespace ExcelOutput{
 	HRESULT PlotICTest(const Waterfall& source,const QString& DestinationSheet,int DestinationIndex,const QDate& CallDate);
 	HRESULT PlotAnnualExcess(const Waterfall& source,const QString& DestinationSheet,int DestinationIndex,const QDate& CallDate);
 	HRESULT PlotCostFunding(const Waterfall& source,const QString& DestinationSheet,int DestinationIndex,const QDate& CallDate);
-	HRESULT PlotStressMargin(const StressTest& source,const QString& DestinationSheet,int DestinationIndex,const QString& TrancheTarget);
+	HRESULT PlotStressMargin(const StressTest& source,const QString& DestinationSheet,int DestinationIndex,const QString& TrancheTarget, double NewPrice);
 }
 #endif // ExcelOutput_h__

@@ -48,7 +48,7 @@ SummaryView::SummaryView(QWidget* parent)
 	StructureTable->setColumnCount(HeadersStrings.size());
 	StructureTable->setHorizontalHeaderLabels(HeadersStrings);
 	StructureTable->verticalHeader()->setVisible(false);
-	StructureTable->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	//StructureTable->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	StructureTable->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	StructureTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 	MainWidget->addTab(StructureTable,"Structure");

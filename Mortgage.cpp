@@ -146,3 +146,16 @@ void Mortgage::SetInterest(const QString& a){
 		 ;
 	 return stream;
  }
+ QString Mortgage::ReadyToCalculate()const{
+	QString Result;
+	if(m_MaturityDate<QDate(2000,1,1)) Result+="Loan Maturity Date\n";
+	if(m_AnnuityVect.isEmpty())Result+="Loan Annuity Vector\n";
+	if(m_Size<0.0)Result+="Loan Size\n";
+	if(m_LossMultiplier<0.0) Result+="Loss Multiplier\n";
+	if(m_PrepayMultiplier<0.0) Result+="Prepay Multiplier\n";
+	if(m_InterestVect.isEmpty())Result+="Loan Coupon\n";
+	if(m_FloatingRateBase<0.0)Result+="Loan Base Rate\n";
+	if(m_PaymentFreq<1)Result+="Loan Payment Frequency\n";
+	if(!Result.isEmpty()) return Result.left(Result.size()-1);
+	return Result;
+ }

@@ -61,7 +61,7 @@ QString ExcelCommons::CellOffset(const QString& StrtCell,int RowOff, int ColOff)
 	RowPart.replace(PathFinder,"");
 	int ColResult=0;
 	for(int i=0;i<ColPart.size();i++){
-		ColResult+=(ColPart.at(i).toAscii()-'A'+1)*qPow(26,i);
+		ColResult+=(ColPart.at(ColPart.size()-1-i).toAscii()-'A'+1)*qPow(26,i);
 	}
 	return (SheetName+"!%1,%2").arg(RowPart.toInt()+RowOff).arg(ColResult+ColOff);
 }

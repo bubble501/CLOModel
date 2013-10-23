@@ -119,6 +119,7 @@ public:
 	void AddTranche(const Tranche& a){m_Tranches.append(new Tranche(a));}
 	void ResetTranches();
 	bool CalculateTranchesCashFlows();
+	QString ReadyToCalculate() const;
 	friend QDataStream& operator<<(QDataStream & stream, const Waterfall& flows);
 	friend QDataStream& operator>>(QDataStream & stream, Waterfall& flows);
 };

@@ -84,6 +84,7 @@ public:
 	void GetDataFromBloomberg();
 	double GetLossRate() const;
 	double GetDiscountMargin() const;
+	double GetDiscountMargin(double NewPrice) const;
 	double GetCurrentOutstanding() const;
 	double GetWALife(const QDate& StartDate) const;
 	friend QDataStream& operator<<(QDataStream & stream, const Tranche& flows);

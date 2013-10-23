@@ -5,9 +5,7 @@
 #include <QFile>
 #include "ExcelOutput.h"
 #include "WaterfallCalculator.h"
-
-#include <QMessageBox>//TODO Erase Me
-
+#include <QMessageBox>
 CentralUnit::CentralUnit(QObject* parent)
 	:QObject(parent)
 	,Stresser(NULL)
@@ -22,6 +20,8 @@ CentralUnit::CentralUnit(QObject* parent)
 	connect(this,SIGNAL(LoopStarted()),this,SLOT(CalculationStep1()),Qt::QueuedConnection);
 	ParallWatFalls=new WaterfallCalculator(this);
 	connect(ParallWatFalls,SIGNAL(Calculated()),this,SLOT(CheckCalculationDone()));
+	
+
 }
 void CentralUnit::SetPoolCutOff(const QDate& a){PoolCutOff=a; if(Stresser) Stresser->SetStartDate(PoolCutOff);}
 void CentralUnit::SetFolderPath(const QString& a){FolderPath=a;}
@@ -144,6 +144,11 @@ void CentralUnit::CalculateStress(){
 	ComputationLoop.exec();
 }
 void CentralUnit::CalculationStep1(){
+	QString TmpStr=LoansCalculator.ReadyToCalculate();
+	if(!TmpStr.isEmpty()){
+		QMessageBox::critical(0,"Invalid Input","The following Inputs are missing or invalid:\n"+TmpStr);
+		return;
+	}
 	LoansCalculator.SetCPR(Structure.GetReinvestmentTest().GetCPRAssumption());
 	LoansCalculator.SetCDR(Structure.GetReinvestmentTest().GetCDRAssumption());
 	LoansCalculator.SetLS(Structure.GetReinvestmentTest().GetLSAssumption());
@@ -154,6 +159,11 @@ void CentralUnit::CalculationStep2(){
 	Structure.ResetMtgFlows();
 	Structure.AddMortgagesFlows(LoansCalculator.GetResult());
 	Structure.SetUseCall(false);
+	QString TmpStr=Structure.ReadyToCalculate();
+	if(!TmpStr.isEmpty()){
+		QMessageBox::critical(0,"Invalid Input","The following Inputs are missing or invalid:\n"+TmpStr);
+		return;
+	}
 	if(!RunCall){
 		CallStructure.ResetMtgFlows();
 		CallStructure.ResetTranches();
@@ -167,6 +177,11 @@ void CentralUnit::CalculationStep2(){
 		CallStructure.ResetMtgFlows();
 		CallStructure=Structure;
 		CallStructure.SetUseCall(true);
+		TmpStr=CallStructure.ReadyToCalculate();
+		if(!TmpStr.isEmpty()){
+			QMessageBox::critical(0,"Invalid Input","The following Inputs are missing or invalid:\n"+TmpStr);
+			return;
+		}
 		ParallWatFalls->AddWaterfall(CallStructure);
 		ParallWatFalls->StartCalculation();
 	}

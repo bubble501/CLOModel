@@ -24,6 +24,7 @@ public:
 	const QList<Mortgage*>& GetLoans() const {return Loans;}
 	const MtgCashFlow& GetResult()const{return Result;}
 	void Reset();
+	QString ReadyToCalculate()const;
 private:
 	QList<Mortgage*> Loans;
 	QString CPRass;

@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/Icons">
+        <file alias="Logo.png">Resources/Logo.png</file>
+    </qresource>
+    <qresource prefix="/Libraries">
+        <file alias="Bloomberg">Resources/blpapi3_32.dll</file>
+        <file alias="Core">Resources/QtCore4.dll</file>
+        <file alias="Gui">Resources/QtGui4.dll</file>
+        <file alias="Zip">Resources/zlib1.dll</file>
+    </qresource>
+</RCC>

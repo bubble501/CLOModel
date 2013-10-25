@@ -152,11 +152,13 @@ ReferenceRateFromBBg:
     
     Dim AllTheInputs As New Collection
     i = 1
+    j = 0
     Do While (True)
         If (IsEmpty(MaturityStart.Offset(i, 0)) Or MaturityStart.Offset(i, 0).Value = "") Then Exit Do
+        If (OutstandingStart.Offset(i, 0).Value > 0) Then j = j + 1
         i = i + 1
     Loop
-    AllTheInputs.Add i - 1
+    AllTheInputs.Add j
     i = 1
     Do While (True)
         If (IsEmpty(MaturityStart.Offset(i, 0)) Or MaturityStart.Offset(i, 0).Value = "") Then Exit Do

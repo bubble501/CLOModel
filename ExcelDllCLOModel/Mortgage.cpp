@@ -74,8 +74,8 @@ void Mortgage::SetInterest(const QString& a){
 		CurrentLS=LossVector.at(qMin(j,LossVector.size()-1));
 		CurrentInterest=m_FloatingRateBase+InterestVector.at(qMin(j,InterestVector.size()-1));
 		CurrentAnnuity=AnnuityVector.at(qMin(j,AnnuityVector.size()-1));
-		TempFlow=CurrentInterest*CurrentAmtOut;
-		m_CashFlows.AddFlow( CurrentMonth, TempFlow + m_CashFlows.GetAccruedInterest(m_CashFlows.Count()-1), MtgCashFlow::AccruedInterestFlow);
+		TempFlow=(CurrentInterest*CurrentAmtOut)+((1.0+CurrentInterest)*m_CashFlows.GetAccruedInterest(m_CashFlows.Count()-1));
+		m_CashFlows.AddFlow( CurrentMonth, TempFlow, MtgCashFlow::AccruedInterestFlow);
 		if (CurrentMonth >= NextPaymentDate || j == NumPayments){
 			m_CashFlows.AddFlow (CurrentMonth, m_CashFlows.GetAccruedInterest(CurrentMonth), MtgCashFlow::InterestFlow);
 			m_CashFlows.AddFlow (CurrentMonth, -m_CashFlows.GetAccruedInterest(CurrentMonth), MtgCashFlow::AccruedInterestFlow);
@@ -111,9 +111,9 @@ void Mortgage::SetInterest(const QString& a){
 	}
 	m_CashFlows.AddFlow( StartDate, m_Size, MtgCashFlow::AmountOutstandingFlow);
  }
- double Mortgage::pmt(double Interest, int Periods, double PresentValue) const{
-	 if(Periods<=0) return 0;
-	 if(Interest=0){
+ double Mortgage::pmt(double Interest, int Periods, double PresentValue){
+	 if(Periods<=0) return 0.0;
+	 if(Interest==0.0){
 		 return PresentValue/static_cast<double>(Periods);
 	 }
 	 return (PresentValue*qPow(1.0+Interest,Periods))/((qPow(1.0+Interest,Periods)-1.0)/Interest);

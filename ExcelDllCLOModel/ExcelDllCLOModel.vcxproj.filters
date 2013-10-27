@@ -9,10 +9,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h</Extensions>
     </Filter>
-    <Filter Include="Form Files">
-      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
-      <Extensions>ui</Extensions>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
       <Extensions>qrc;*</Extensions>
@@ -74,12 +70,6 @@
     </Filter>
     <Filter Include="QuaZip">
       <UniqueIdentifier>{e656433e-7801-4e86-be3b-6fb2d1f1b41e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Widgets\Chart">
-      <UniqueIdentifier>{28417e66-ec4e-4105-a7f6-d2543a004ba8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Widgets\Chart">
-      <UniqueIdentifier>{dbcc98a6-bfb5-4355-b532-3778340f248c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -155,12 +145,6 @@
     <ClInclude Include="quazip\zip.h">
       <Filter>QuaZip</Filter>
     </ClInclude>
-    <ClInclude Include="ChartSeries.h">
-      <Filter>Header Files\Widgets\Chart</Filter>
-    </ClInclude>
-    <ClInclude Include="ChartValue.h">
-      <Filter>Header Files\Widgets\Chart</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="CentralUnit.h">
@@ -208,10 +192,10 @@
     <CustomBuild Include="quazip\quazipfile.h">
       <Filter>QuaZip</Filter>
     </CustomBuild>
-    <CustomBuild Include="ChartPlotter.h">
-      <Filter>Header Files\Widgets\Chart</Filter>
-    </CustomBuild>
     <CustomBuild Include="WaterfallViewer.h">
+      <Filter>Header Files\Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ChartsWidget.h">
       <Filter>Header Files\Widgets</Filter>
     </CustomBuild>
   </ItemGroup>
@@ -411,21 +395,6 @@
     <ClCompile Include="quazip\quazipnewinfo.cpp">
       <Filter>QuaZip</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_ChartPlotter.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_ChartPlotter.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="ChartPlotter.cpp">
-      <Filter>Source Files\Widgets\Chart</Filter>
-    </ClCompile>
-    <ClCompile Include="ChartSeries.cpp">
-      <Filter>Source Files\Widgets\Chart</Filter>
-    </ClCompile>
-    <ClCompile Include="ChartValue.cpp">
-      <Filter>Source Files\Widgets\Chart</Filter>
-    </ClCompile>
     <ClCompile Include="WaterfallViewer.cpp">
       <Filter>Source Files\Widgets</Filter>
     </ClCompile>
@@ -434,6 +403,15 @@
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_WaterfallViewer.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ChartsWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ChartsWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartsWidget.cpp">
+      <Filter>Source Files\Widgets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

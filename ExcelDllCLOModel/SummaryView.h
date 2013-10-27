@@ -1,6 +1,5 @@
 #ifndef TestTable_h__
 #define TestTable_h__
-//#define UseCharts
 #include <QWidget>
 #include <QList>
 #include "Waterfall.h"
@@ -12,7 +11,7 @@ class QTabWidget;
 class QStackedWidget;
 class QListWidget;
 class QLineEdit;
-class ChartPlotter;
+class ChartsWidget;
 class SummaryView : public QWidget{
 	Q_OBJECT
 private:
@@ -26,12 +25,8 @@ private:
 	QTableWidget* ReinvestmentsTable;
 	QTableWidget* StructureTable;
 	QList<QLineEdit*> PricesLabel;
-#ifdef UseCharts
-	QList<ChartPlotter*> Charts;
-	QStackedWidget* ChartsArea;
-	QListWidget* ChartsList;
+	ChartsWidget* ChartPlotter;
 	void ResetCharts();
-#endif
 	void DisplayStructure();
 	void ResetTranches();
 	void ResetPricesLabel();

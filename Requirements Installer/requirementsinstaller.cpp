@@ -12,7 +12,7 @@ RequirementsInstaller::RequirementsInstaller(QWidget *parent)
 	setWindowIcon(QIcon(":/Icons/Logo.png"));
 	ProgIndicator=new QProgressBar(this);
 	ProgIndicator->setMinimum(0);
-	ProgIndicator->setMaximum(4);
+	ProgIndicator->setMaximum(5);
 	ProgIndicator->setValue(0);
 	MainLabel=new QLabel(this);
 	MainLabel->setText("Installing Required Files");
@@ -36,6 +36,9 @@ void RequirementsInstaller::Install(){
 	if(!QFile::exists("C:\\Windows\\system\\zlib1.dll"))
 		QFile::copy(":/Libraries/Zip","C:\\Windows\\system\\zlib1.dll");
 	ProgIndicator->setValue(4);
+	if(!QFile::exists("C:\\Windows\\system\\kdchart2.dll"))
+		QFile::copy(":/Libraries/Charts","C:\\Windows\\system\\kdchart2.dll");
+	ProgIndicator->setValue(5);
 	close();
 }
 

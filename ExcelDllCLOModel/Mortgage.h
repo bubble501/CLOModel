@@ -15,8 +15,8 @@ private:
 	MtgCashFlow m_CashFlows;
 	double m_FloatingRateBase;
 	int m_PaymentFreq;
-	double pmt(double Interest, int Periods, double PresentValue) const;
 public:
+	static double pmt(double Interest, int Periods, double PresentValue);
 	Mortgage();
 	Mortgage(const Mortgage& a);
 	const Mortgage& operator=(const Mortgage& a);

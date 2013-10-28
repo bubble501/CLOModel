@@ -8,5 +8,6 @@
         <file alias="Gui">Resources/QtGui4.dll</file>
         <file alias="Zip">Resources/zlib1.dll</file>
         <file alias="Charts">Resources/kdchart2.dll</file>
+        <file alias="SVG">Resources/QtSvg4.dll</file>
     </qresource>
 </RCC>

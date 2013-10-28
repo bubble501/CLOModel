@@ -597,10 +597,18 @@ bool Waterfall::CalculateTranchesCashFlows(){
 								TotalPayable+=m_Tranches.at(h)->GetOriginalAmount();
 							}
 						}
-						while(ProRataBonds.size()>0){
-							int ProrataIndex=ProRataBonds.dequeue();
-							m_Tranches[ProrataIndex]->AddCashFlow(CurrentDate,AvailableInterest*m_Tranches.at(ProrataIndex)->GetOriginalAmount()/TotalPayable,TrancheCashFlow::InterestFlow);
-							m_Tranches[ProrataIndex]->AddCashFlow(CurrentDate,AvailablePrincipal*m_Tranches.at(ProrataIndex)->GetOriginalAmount()/TotalPayable,TrancheCashFlow::PrincipalFlow);
+						{
+							int OriginalProRataBondsSize=ProRataBonds.size();
+							while(ProRataBonds.size()>0){
+								int ProrataIndex=ProRataBonds.dequeue();
+								if(TotalPayable>0){
+									m_Tranches[ProrataIndex]->AddCashFlow(CurrentDate,AvailableInterest*m_Tranches.at(ProrataIndex)->GetOriginalAmount()/TotalPayable,TrancheCashFlow::InterestFlow);
+									m_Tranches[ProrataIndex]->AddCashFlow(CurrentDate,AvailablePrincipal*m_Tranches.at(ProrataIndex)->GetOriginalAmount()/TotalPayable,TrancheCashFlow::PrincipalFlow);
+								} else {
+									m_Tranches[ProrataIndex]->AddCashFlow(CurrentDate,AvailableInterest/OriginalProRataBondsSize,TrancheCashFlow::InterestFlow);
+									m_Tranches[ProrataIndex]->AddCashFlow(CurrentDate,AvailablePrincipal/OriginalProRataBondsSize,TrancheCashFlow::PrincipalFlow);
+								}
+							}
 						}
 					}
 					else{

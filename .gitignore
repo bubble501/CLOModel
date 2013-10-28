@@ -21,7 +21,6 @@ photothumb.db
 *.cache
 *.ilk
 *.log
-*.sln
 *.sdf
 *.opensdf
 [Bb]in*/

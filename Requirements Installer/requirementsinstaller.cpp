@@ -12,7 +12,7 @@ RequirementsInstaller::RequirementsInstaller(QWidget *parent)
 	setWindowIcon(QIcon(":/Icons/Logo.png"));
 	ProgIndicator=new QProgressBar(this);
 	ProgIndicator->setMinimum(0);
-	ProgIndicator->setMaximum(5);
+	ProgIndicator->setMaximum(6);
 	ProgIndicator->setValue(0);
 	MainLabel=new QLabel(this);
 	MainLabel->setText("Installing Required Files");
@@ -24,21 +24,26 @@ RequirementsInstaller::RequirementsInstaller(QWidget *parent)
 	emit ReadyToStrat();
 }
 void RequirementsInstaller::Install(){
-	if(!QFile::exists("C:\\Windows\\system\\blpapi3_32.dll"))
-		QFile::copy(":/Libraries/Bloomberg","C:\\Windows\\system\\blpapi3_32.dll");
+	bool Check=true;
+	if(QFile::exists("C:\\Windows\\system\\blpapi3_32.dll")) QFile::remove("C:\\Windows\\system\\blpapi3_32.dll");
+	Check = Check && QFile::copy(":/Libraries/Bloomberg","C:\\Windows\\system\\blpapi3_32.dll");
 	ProgIndicator->setValue(1);
-	if(!QFile::exists("C:\\Windows\\system\\QtCore4.dll"))
-		QFile::copy(":/Libraries/Core","C:\\Windows\\system\\QtCore4.dll");
+	if(QFile::exists("C:\\Windows\\system\\QtCore4.dll")) QFile::remove("C:\\Windows\\system\\QtCore4.dll");
+	Check = Check && QFile::copy(":/Libraries/Core","C:\\Windows\\system\\QtCore4.dll");
 	ProgIndicator->setValue(2);
-	if(!QFile::exists("C:\\Windows\\system\\QtGui4.dll"))
-		QFile::copy(":/Libraries/Gui","C:\\Windows\\system\\QtGui4.dll");
+	if(QFile::exists("C:\\Windows\\system\\QtGui4.dll")) QFile::remove("C:\\Windows\\system\\QtGui4.dll");
+	Check = Check && QFile::copy(":/Libraries/Gui","C:\\Windows\\system\\QtGui4.dll");
 	ProgIndicator->setValue(3);
-	if(!QFile::exists("C:\\Windows\\system\\zlib1.dll"))
-		QFile::copy(":/Libraries/Zip","C:\\Windows\\system\\zlib1.dll");
+	if(QFile::exists("C:\\Windows\\system\\zlib1.dll")) QFile::remove("C:\\Windows\\system\\zlib1.dll");
+	Check = Check && QFile::copy(":/Libraries/Zip","C:\\Windows\\system\\zlib1.dll");
 	ProgIndicator->setValue(4);
-	if(!QFile::exists("C:\\Windows\\system\\kdchart2.dll"))
-		QFile::copy(":/Libraries/Charts","C:\\Windows\\system\\kdchart2.dll");
+	if(QFile::exists("C:\\Windows\\system\\kdchart2.dll")) QFile::remove("C:\\Windows\\system\\kdchart2.dll");
+	Check = Check && QFile::copy(":/Libraries/Charts","C:\\Windows\\system\\kdchart2.dll");
 	ProgIndicator->setValue(5);
-	close();
+	if(QFile::exists("C:\\Windows\\system\\QtSvg4.dll")) QFile::remove("C:\\Windows\\system\\QtSvg4.dll");
+	Check = Check && QFile::copy(":/Libraries/SVG","C:\\Windows\\system\\QtSvg4.dll");
+	ProgIndicator->setValue(6);
+	if(Check) MainLabel->setText("Done");
+	else MainLabel->setText("Errors Occured");
 }
 

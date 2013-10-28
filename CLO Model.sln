@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Requirements Installer", "Requirements Installer\Requirements Installer.vcxproj", "{D1195E79-ED25-46A6-A919-589FD6450B05}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExcelDllCLOModel", "ExcelDllCLOModel\ExcelDllCLOModel.vcxproj", "{DB486B74-3438-4DE6-9FDD-876EBC720D91}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D1195E79-ED25-46A6-A919-589FD6450B05}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D1195E79-ED25-46A6-A919-589FD6450B05}.Debug|Win32.Build.0 = Debug|Win32
+		{D1195E79-ED25-46A6-A919-589FD6450B05}.Release|Win32.ActiveCfg = Release|Win32
+		{D1195E79-ED25-46A6-A919-589FD6450B05}.Release|Win32.Build.0 = Release|Win32
+		{DB486B74-3438-4DE6-9FDD-876EBC720D91}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DB486B74-3438-4DE6-9FDD-876EBC720D91}.Debug|Win32.Build.0 = Debug|Win32
+		{DB486B74-3438-4DE6-9FDD-876EBC720D91}.Release|Win32.ActiveCfg = Release|Win32
+		{DB486B74-3438-4DE6-9FDD-876EBC720D91}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

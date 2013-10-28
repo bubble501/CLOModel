@@ -7,7 +7,7 @@
 #include <QDate>
 #include <QString>
 #include <QFile>
-#define DebuggungInputs //TODO Comment me
+//#define DebuggungInputs //TODO Comment me
 #include <QApplication>
 #ifdef DebuggungInputs
 #include <QMessageBox>

@@ -8,6 +8,7 @@
 #include <QDir>
 #include <QFile>
 #include "QuaZip\JlCompress.h"
+#include <QMessageBox>
 #ifdef Q_WS_WIN
 #include <Windows.h>
 #endif
@@ -266,6 +267,14 @@ void StressTest::SaveResults(const QString& DestPath)const{
 		if (!curDir.remove(DestinationFull)) return;
 	}
 	if(!curDir.exists(DestinationPath+"TempStressResults")) curDir.mkpath(DestinationPath+"TempStressResults");
+	FileNames.append(DestinationPath+"TempStressResults\\VersionIdentifier");
+	QFile file(FileNames.last());
+	if (file.open(QIODevice::WriteOnly)) {
+		QDataStream out(&file);
+		out.setVersion(QDataStream::Qt_4_8);
+		out << qint32(ModelVersionNumber);
+		file.close();
+	}
 	foreach(const QString& SingleX,XSpann){
 		foreach(const QString& SingleY,YSpann){
 			FileNames.append(DestinationPath+"TempStressResults\\"+SingleX+"#,#"+SingleY+".csw");
@@ -290,6 +299,28 @@ Waterfall StressTest::GetScenarioFromFile(const QString& DestPath,const QString&
 	QuaZip zip(DestPath);
 	if(!zip.open(QuaZip::mdUnzip)) return Result;
 	QuaZipFile TargetFile(&zip);
+	try{
+		if(!zip.setCurrentFile("VersionIdentifier")) throw 1;
+		qint32 VesionCheck;
+		TargetFile.open(QIODevice::ReadOnly);
+		QDataStream out(&TargetFile);
+		out.setVersion(QDataStream::Qt_4_8);
+		out >> VesionCheck;
+		TargetFile.close();
+		if(VesionCheck!=qint32(ModelVersionNumber)) throw 1;
+	}
+	catch(int ExcCode){
+		QApplication* ComputationLoop;
+		if(!QApplication::instance()){
+			char *argv[] = {"NoArgumnets"};
+			int argc = sizeof(argv) / sizeof(char*) - 1;
+			ComputationLoop=new QApplication(argc,argv);
+		}
+		QMessageBox::critical(0,"Incompatible Version","The stress test data is not comaptible with the current model version\nPlease run ALL the stress tests again");
+		ComputationLoop->quit();
+		ComputationLoop->deleteLater();
+		return Result;
+	}
 	if(!zip.setCurrentFile(XScenario+"#,#"+YScenario+".csw")) return Result;
 	TargetFile.open(QIODevice::ReadOnly);
 	QDataStream out(&TargetFile);
@@ -305,8 +336,34 @@ void StressTest::LoadResultsFromFile(const QString& DestPath){
 	QuaZip zip(DestPath);
 	if(!zip.open(QuaZip::mdUnzip)) return;
 	QuaZipFile TargetFile(&zip);
+	try{
+		if(!zip.setCurrentFile("VersionIdentifier")) throw 1;
+		qint32 VesionCheck;
+		TargetFile.open(QIODevice::ReadOnly);
+		QDataStream out(&TargetFile);
+		out.setVersion(QDataStream::Qt_4_8);
+		out >> VesionCheck;
+		TargetFile.close();
+		if(VesionCheck!=qint32(ModelVersionNumber)) throw 1;
+	}
+	catch(int ExcCode){
+		QApplication* ComputationLoop;
+		if(!QApplication::instance()){
+			char *argv[] = {"NoArgumnets"};
+			int argc = sizeof(argv) / sizeof(char*) - 1;
+			ComputationLoop=new QApplication(argc,argv);
+		}
+		QMessageBox::critical(0,"Incompatible Version","The stress test data is not comaptible with the current model version\nPlease run ALL the stress tests again");
+		ComputationLoop->quit();
+		ComputationLoop->deleteLater();
+		return;
+	}
 	for(bool more=zip.goToFirstFile(); more; more=zip.goToNextFile()) {
 		TargetFile.open(QIODevice::ReadOnly);
+		if(TargetFile.getActualFileName()=="VersionIdentifier"){
+			TargetFile.close();
+			continue;
+		}
 		QStringList Spanns=TargetFile.getActualFileName().left(TargetFile.getActualFileName().lastIndexOf(".")).split("#,#");
 		if(!XSpann.contains(Spanns.at(0))) XSpann.append(Spanns.at(0));
 		if(!YSpann.contains(Spanns.at(1))) YSpann.append(Spanns.at(1));

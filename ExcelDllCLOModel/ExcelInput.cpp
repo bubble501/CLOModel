@@ -4,6 +4,7 @@
 #include "ExcelOutput.h"
 #include "SummaryView.h"
 #include "WaterfallViewer.h"
+#include "CommonFunctions.h"
 #include <QDate>
 #include <QString>
 #include <QFile>
@@ -307,8 +308,11 @@ double __stdcall CLODiscountMargin(LPSAFEARRAY *ArrayData){
 #ifdef DebuggungInputs
 	QMessageBox::information(0,"Aperto",QString("Il File "+ Filename +" e' stato aperto"));
 #endif
+	qint32 VersionChecker;
 	QDataStream out(&file);
 	out.setVersion(QDataStream::Qt_4_8);
+	out >> VersionChecker;
+	if(VersionChecker!=qint32(ModelVersionNumber)) return 0.0;
 	out >> TempWaterfall;
 	if(ToCall) out >> TempWaterfall;
 	file.close();
@@ -327,6 +331,7 @@ double __stdcall CLODiscountMargin(LPSAFEARRAY *ArrayData){
 	return TranchPoint->GetDiscountMargin(NewPrice);
 }
 double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
+	qint32 VersionChecker;
 	VARIANT HUGEP *pdFreq;
 	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
 	if (!SUCCEEDED(hr)) return 0.0;
@@ -343,6 +348,8 @@ double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
 	if (!file.open(QIODevice::ReadOnly))return 0.0;
 	QDataStream out(&file);
 	out.setVersion(QDataStream::Qt_4_8);
+	out >> VersionChecker;
+	if(VersionChecker!=qint32(ModelVersionNumber)) return 0.0;
 	out >> TempWaterfall;
 	if(ToCall) out >> TempWaterfall;
 	file.close();
@@ -453,3 +460,70 @@ void __stdcall TestingInput(LPBSTR a){
 	SysFreeString(b);
 }
 #endif
+/*!
+\file ExcelInput.cpp
+\brief Excel exported functions
+\author Luca Beldi
+\date November 2013
+
+\details File containing the definition of the function exported into the dll and available through Excel
+*/
+
+/*!
+\def DebuggungInputs
+  If this name is defined, instead of running the model, you'll get a diagnosis of your inputs.
+
+  Useful for debugging the input.
+\warning Must be undefined for the actual model to work
+*/
+
+/*! \fn void __stdcall InspectWaterfall(LPSAFEARRAY *ArrayData)
+\brief Function that displays the two waterfalls
+\param ArrayData Excel Variant Array of Inputs
+
+This function creates a Widget containing two tables each of them showing one of the waterfalls.
+
+ArrayData must contain, in order:
+- The number of steps in the aggregated waterfall
+- For each step in the waterfall
+	* Long representing the WatFalPrior::WaterfallStepType of the waterfall
+	* Long representing the target seniority group of the step
+	* Long representing funds sources or destination for the step
+	* Double between 0 and 1 representing the share of funds going toward redemption of the destination step (used only in OC Test)
+
+\sa WaterfallViewer
+ */
+
+/*! \fn void __stdcall InspectStress(LPSAFEARRAY *ArrayData)
+\brief Function that displays the whole waterfall results for a given stress scenario
+\param ArrayData Excel Variant Array of Inputs
+
+This function creates a Widget containing the waterfall results for the given stress scenario
+
+ArrayData must contain, in order:
+- A String containing the path to the stress result file
+- A String containing the value for the X Parameter
+- A String containing the value for the Y Parameter
+- A Long representing the StressTest::StressVariability dimention for the X parameter
+- A Long representing the StressTest::StressVariability dimention for the Y parameter
+
+\sa SummaryView
+ */
+/*! \fn void __stdcall StressTargetChanged(LPSAFEARRAY *ArrayData)
+\brief Function that has to be called to get the stress results for a different tranche
+\param ArrayData Excel Variant Array of Inputs
+
+This function loads the results of the stress test and invokes ExcelOutput::PrintStressTest() to send the stress test results of the appropriate tranche back to excel.
+
+ArrayData must contain, in order:
+- A String containing the path to the stress result file
+- A String containing the name of the tranche for which you want to display the results
+- A string containing the address of the cell where the stress results should be printed
+- A Long representing the StressTest::StressVariability dimention for the X parameter
+- A Long representing the StressTest::StressVariability dimention for the Y parameter
+- A double representing the price of the tranche
+- A String containing the name of the sheet where the discount margin plot should appear
+- A Long containing the index of the Chart where the discount margin plot should be displayed
+
+\sa ExcelOutput::PrintStressTest()
+ */

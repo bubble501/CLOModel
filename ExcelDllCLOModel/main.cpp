@@ -1,15 +1,33 @@
-#include "Waterfall.h"
-#include <QApplication>
-#include <QFile>
+#include "StressTest.h"
+#include <QtGui>
+#include <QtCore>
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
-	Waterfall w;
-	QFile TargetFile("C:/Temp/.BaseCase.clo");
-	TargetFile.open(QIODevice::ReadOnly);
-	QDataStream out(&TargetFile);
-	out.setVersion(QDataStream::Qt_4_8);
-	out >> w;
-	TargetFile.close();
+	QTableWidget Tabella;
+	QStringList Xhead;
+	QStringList Yhead;
+		StressTest w;
+		w.LoadResultsFromFile("C:/Temp/.StressResult01.fcsr");
+		
+		Xhead=w.GetXSpann();
+		Yhead=w.GetYSpann();
+		const QHash<QString,QHash<QString,Waterfall> >& Risultati=w.GetResults();
+	Tabella.setRowCount(Xhead.size());
+	Tabella.setColumnCount(Yhead.size());
+	Tabella.setHorizontalHeaderLabels(Yhead);
+	Tabella.setVerticalHeaderLabels(Xhead);
+	int countX=0,  countY=0;
+	for(QStringList::const_iterator i=Xhead.begin();i!=Xhead.end();i++){
+		for(QStringList::const_iterator j=Yhead.begin();j!=Yhead.end();j++){
+			Tabella.setItem(countX,countY,new QTableWidgetItem(QString::number(
+				Risultati.value(*i).value(*j).GetTranche("MERCT I-X B2")->GetLossRate()
+				*100.0,'f',2)));
+			countY++;
+		}
+		countY=0;
+		countX++;
+	}
+	Tabella.show();
 	return a.exec();
 }

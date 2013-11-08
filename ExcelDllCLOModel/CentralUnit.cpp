@@ -5,6 +5,7 @@
 #include <QFile>
 #include "ExcelOutput.h"
 #include "WaterfallCalculator.h"
+#include "CommonFunctions.h"
 #include <QMessageBox>
 CentralUnit::CentralUnit(QObject* parent)
 	:QObject(parent)
@@ -203,7 +204,7 @@ void CentralUnit::CheckCalculationDone()
 	if (file.open(QIODevice::WriteOnly)) {
 		QDataStream out(&file);
 		out.setVersion(QDataStream::Qt_4_8);
-		out << Structure << CallStructure;
+		out << qint32(ModelVersionNumber) << Structure << CallStructure;
 		file.close();
 		#ifdef Q_WS_WIN
 		SetFileAttributes(Filename.toStdWString().c_str(),FILE_ATTRIBUTE_HIDDEN);

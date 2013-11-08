@@ -1917,7 +1917,7 @@ MACRO_EXPANSION        = NO
 # The default value is: NO.
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
-EXPAND_ONLY_PREDEF     = NO
+EXPAND_ONLY_PREDEF     = YES
 
 # If the SEARCH_INCLUDES tag is set to YES the includes files in the
 # INCLUDE_PATH will be searched if a #include is found.
@@ -1958,7 +1958,7 @@ PREDEFINED             =
 # definition found in the source code.
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
-EXPAND_AS_DEFINED      = 
+EXPAND_AS_DEFINED      = ModelVersionNumber
 
 # If the SKIP_FUNCTION_MACROS tag is set to YES then doxygen's preprocessor will
 # remove all refrences to function-like macros that are alone on a line, have an

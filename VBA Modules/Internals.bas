@@ -206,6 +206,7 @@ Public Sub StructureFromBloomberg(FieldsLabels As Collection, InputsSheet As Str
     Dim CouponStart As Range
     Dim FixFloatStart As Range
     Dim PrevIPDCell As Range
+    Dim AccrIntrCell As Range
     Set BondStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("BondsNamesHeader"), LookAt:=xlWhole, LookIn:=xlValues)
     Set ProRataGroupStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("BondRataGroupHeader"), LookAt:=xlWhole, LookIn:=xlValues)
     Set CurrencyStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("CurrencyHead"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -215,6 +216,7 @@ Public Sub StructureFromBloomberg(FieldsLabels As Collection, InputsSheet As Str
     Set RefRateStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("RefRateHead"), LookAt:=xlWhole, LookIn:=xlValues)
     Set CouponStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("TrancheCouponHead"), LookAt:=xlWhole, LookIn:=xlValues)
     Set FixFloatStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("FixFloatHead"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set AccrIntrCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("IntrAccrHead"), LookAt:=xlWhole, LookIn:=xlValues)
     For i = LBound(TrancheExtensions) To UBound(TrancheExtensions)
         TrancheExtensions(i) = CStr(BbgResponse(i, 1))
         'InterestTypeString = CStr(bdp24(DealName + " " + TrancheExtensions(i) + " " + BloombergExtension, "MTG_TYP"))
@@ -227,17 +229,19 @@ Public Sub StructureFromBloomberg(FieldsLabels As Collection, InputsSheet As Str
         OriginalAmtStart.Offset(i - LBound(TrancheExtensions) + 1, 0).Value = _
             BBgInformations(UBound(TrancheExtensions) + 1 + i - LBound(TrancheExtensions))
             '"=IF(" + TickerAddress + "="""","""",BDP(" + TickerAddress + " & "" " + BloombergExtension + """,""MTG_ORIG_AMT""))"
-        CurrentAmtStart.Offset(i - LBound(TrancheExtensions) + 1, 0).formula = _
+        CurrentAmtStart.Offset(i - LBound(TrancheExtensions) + 1, 0).Formula = _
             "=IF(" + TickerAddress + "="""","""",BDP(" + TickerAddress + " & "" " + BloombergExtension + """,""AMT_OUTSTANDING""))"
-        RefRateStart.Offset(i - LBound(TrancheExtensions) + 1, 0).formula = _
+        AccrIntrCell.Offset(i - LBound(TrancheExtensions) + 1, 0).Formula = _
+            "=IF(" + TickerAddress + "="""","""",BDP(" + TickerAddress + " & "" " + BloombergExtension + """,""INT_ACC""))"
+        RefRateStart.Offset(i - LBound(TrancheExtensions) + 1, 0).Formula = _
             "=IF(" + TickerAddress + "="""","""",IF(LEFT(BDP(" + TickerAddress + " & "" " + BloombergExtension + """,""RESET_IDX""),4)=""#N/A"","""",BDP(" + TickerAddress + " & "" " + BloombergExtension + """,""RESET_IDX"")))"
-        CouponStart.Offset(i - LBound(TrancheExtensions) + 1, 0).formula = _
+        CouponStart.Offset(i - LBound(TrancheExtensions) + 1, 0).Formula = _
             "=if(" + FixFloatStart.Offset(i - LBound(TrancheExtensions) + 1, 0).Address + "=""Float""," + _
                 "IF(" + TickerAddress + "="""","""",IF(LEFT(BDP(" + TickerAddress + " & "" " + BloombergExtension + """,""FLT_SPREAD""),4)=""#N/A"",0,BDP(" + TickerAddress + " & "" " + BloombergExtension + """,""FLT_SPREAD"")))" _
             + "," + _
                 "IF(" + TickerAddress + "="""","""",IF(LEFT(BDP(" + TickerAddress + " & "" " + BloombergExtension + """,""CPN""),4)=""#N/A"",0,100*BDP(" + TickerAddress + " & "" " + BloombergExtension + """,""CPN"")))" _
             + ")"
-        RatingsStart.Offset(i - LBound(TrancheExtensions) + 1, 0).formula = _
+        RatingsStart.Offset(i - LBound(TrancheExtensions) + 1, 0).Formula = _
             "=IF(" + TickerAddress + "="""",""""," + _
                 "IF(LEFT(BDP(" + TickerAddress + " & "" " + BloombergExtension + """,""RTG_MOODY""),4)=""#N/A"",""NR"",BDP(" + TickerAddress + " & "" " + BloombergExtension + """,""RTG_MOODY""))" _
                 + " & "" | "" & " + "IF(LEFT(BDP(" + TickerAddress + " & "" " + BloombergExtension + """,""RTG_SP""),4)=""#N/A"",""NR"",BDP(" + TickerAddress + " & "" " + BloombergExtension + """,""RTG_SP""))" _
@@ -257,9 +261,56 @@ Public Sub StructureFromBloomberg(FieldsLabels As Collection, InputsSheet As Str
     Set IDPFreqCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("IPDfrequencyField"), LookAt:=xlWhole, LookIn:=xlValues)
     Set PrevIPDCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("PrevIPDField"), LookAt:=xlWhole, LookIn:=xlValues)
     TickerAddress = Replace(BondStart.Offset(1, 0).Address, "$", "")
-    SettleDateCell.Offset(0, 1).formula = "=IF(" + TickerAddress + "="""","""",DATEVALUE(BDP(" + TickerAddress + " & "" " + BloombergExtension + """,""SETTLE_DT"")))"
-    NextIPDCell.Offset(0, 1).formula = "=IF(" + TickerAddress + "="""","""",DATEVALUE(BDP(" + TickerAddress + " & "" " + BloombergExtension + """,""MTG_NXT_PAY_DT_SET_DT"")))"
-    PrevIPDCell.Offset(0, 1).formula = "=IF(" + TickerAddress + "="""","""",DATEVALUE(BDP(" + TickerAddress + " & "" " + BloombergExtension + """,""START_ACC_DT"")))"
-    IDPFreqCell.Offset(0, 1).formula = "=IF(" + TickerAddress + "="""","""",12/BDP(" + TickerAddress + " & "" " + BloombergExtension + """,""CPN_FREQ""))"
+    SettleDateCell.Offset(0, 1).Formula = "=IF(" + TickerAddress + "="""","""",DATEVALUE(BDP(" + TickerAddress + " & "" " + BloombergExtension + """,""SETTLE_DT"")))"
+    NextIPDCell.Offset(0, 1).Formula = "=IF(" + TickerAddress + "="""","""",DATEVALUE(BDP(" + TickerAddress + " & "" " + BloombergExtension + """,""MTG_NXT_PAY_DT_SET_DT"")))"
+    PrevIPDCell.Offset(0, 1).Formula = "=IF(" + TickerAddress + "="""","""",DATEVALUE(BDP(" + TickerAddress + " & "" " + BloombergExtension + """,""START_ACC_DT"")))"
+    IDPFreqCell.Offset(0, 1).Formula = "=IF(" + TickerAddress + "="""","""",12/BDP(" + TickerAddress + " & "" " + BloombergExtension + """,""CPN_FREQ""))"
     Application.ScreenUpdating = True
+End Sub
+Public Sub AddAccruedColumn()
+Dim AccrIntrCell As Range
+Dim BondNameCell As Range
+On Error Resume Next
+Set AccrIntrCell = Cells.Find(what:="Accrued Interest", LookAt:=xlWhole, LookIn:=xlValues)
+On Error GoTo 0
+If (Not AccrIntrCell Is Nothing) Then Exit Sub
+Set BondNameCell = Cells.Find(what:="Bond", LookAt:=xlWhole, LookIn:=xlValues)
+Set AccrIntrCell = Cells.Find(what:="IC test", LookAt:=xlWhole, LookIn:=xlValues).Offset(0, 1)
+With AccrIntrCell
+    .Value = "Accrued Interest"
+    With .Borders
+        .LineStyle = xlContinuous
+        .Weight = xlMedium
+        .ColorIndex = xlAutomatic
+    End With
+    .Font.Bold = True
+    .HorizontalAlignment = xlLeft
+    .Interior.Color = RGB(118, 147, 60)
+End With
+With AccrIntrCell.Offset(1, 0).Resize(16, 1)
+    .Interior.Color = RGB(216, 228, 188)
+    With .Borders
+        .LineStyle = xlContinuous
+        .Weight = xlMedium
+        .ColorIndex = xlAutomatic
+    End With
+    .Borders(xlInsideVertical).LineStyle = xlNone
+    .Borders(xlInsideHorizontal).LineStyle = xlNone
+End With
+With AccrIntrCell.Offset(17, 0)
+    With .Borders
+        .LineStyle = xlContinuous
+        .Weight = xlMedium
+        .ColorIndex = xlAutomatic
+    End With
+    .HorizontalAlignment = xlLeft
+    .Borders(xlEdgeLeft).LineStyle = xlNone
+    .Interior.Color = RGB(118, 147, 60)
+    .NumberFormat = "0.00"
+End With
+Dim i As Long
+For i = 1 To 16
+    AccrIntrCell.Offset(i, 0).Formula = _
+        "=IF(" + BondNameCell.Offset(i, 0).Address + "="""","""",BDP(" + BondNameCell.Offset(i, 0).Address + " & "" " + "Mtge" + """,""INT_ACC""))"
+Next i
 End Sub

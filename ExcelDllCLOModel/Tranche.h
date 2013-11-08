@@ -30,6 +30,8 @@ private:
 	QString DefaultRefRate;
 	double ExchangeRate;
 	int PaymentFrequency;
+	QDate SettlementDate;
+	double AccruedInterest;
 public:
 	Tranche();
 	Tranche(const Tranche& a);
@@ -87,6 +89,10 @@ public:
 	double GetDiscountMargin(double NewPrice) const;
 	double GetCurrentOutstanding() const;
 	double GetWALife(const QDate& StartDate) const;
+	double GetAccruedInterest() const{return AccruedInterest;}
+	const QDate& GetSettlementDate() const{return SettlementDate;}
+	void SetAccruedInterest(double a) {if(a>=0.0) AccruedInterest=a;}
+	void SetSettlementDate(const QDate& a){SettlementDate=a;}
 	friend QDataStream& operator<<(QDataStream & stream, const Tranche& flows);
 	friend QDataStream& operator>>(QDataStream & stream, Tranche& flows);
 };

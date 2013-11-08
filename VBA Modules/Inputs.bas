@@ -77,6 +77,7 @@ Public Sub GetInputFromStructure( _
     Dim LossToCallCell As Range
     Dim CallMultiplierCell As Range
     Dim CallReserveCell As Range
+    Dim AccruedIntrStart As Range
     Set MaturityStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("MaturityHeader"), LookAt:=xlWhole, LookIn:=xlValues)
     Set CouponStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("CouponHeader"), LookAt:=xlWhole, LookIn:=xlValues)
     Set OutstandingStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("OutstandingHeader"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -102,6 +103,7 @@ Public Sub GetInputFromStructure( _
     Set LossOutputCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("LossOutputHeader"), LookAt:=xlWhole, LookIn:=xlValues)
     Set LossToCallCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("LossToCallField"), LookAt:=xlWhole, LookIn:=xlValues)
     Set SettleDateCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SettleDateField"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set AccruedIntrStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("IntrAccrHead"), LookAt:=xlWhole, LookIn:=xlValues)
     Set TrancheCouponStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("TrancheCouponHead"), LookAt:=xlWhole, LookIn:=xlValues)
     Set RefRateStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("RefRateHead"), LookAt:=xlWhole, LookIn:=xlValues)
     Set WaterfallStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("WaterfallHeader"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -189,7 +191,7 @@ ReferenceRateFromBBg:
         Call AddInput(AllTheInputs, FromStringToInterestType(FixFloatStart.Offset(i, 0).Value))
         Call AddInput(AllTheInputs, TrancheCouponStart.Offset(i, 0).Value / 10000)
         Call AddInput(AllTheInputs, CStr(RefRateStart.Offset(i, 0).Value))
-        Call AddInput(AllTheInputs, Format(PrevIPDCell.Offset(0, 1), "yyyy-mm-dd"))
+        Call AddInput(AllTheInputs, Format(PrevIPDCell.Offset(0, 1).Value, "yyyy-mm-dd"))
         Call AddInput(AllTheInputs, CStr(InterestBaseCell.Offset(0, 1).Value))
         Call AddInput(AllTheInputs, CLng(IPDfrequencyCell.Offset(0, 1)))
         On Error GoTo SpreadFromBBg
@@ -215,6 +217,8 @@ DefaultExchange:
             Resume Next
         End If
         On Error GoTo 0
+        Call AddInput(AllTheInputs, Format(SettleDateCell.Offset(0, 1).Value, "yyyy-mm-dd"))
+        Call AddInput(AllTheInputs, AccruedIntrStart.Offset(i, 0).Value)
         i = i + 1
     Loop
     If (IsEmpty(WaterfallStart.Offset(2, 0))) Then
@@ -408,6 +412,7 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
     a.Add 4, "ICPlotIndex"
     a.Add 5, "CostFundingPlotIndex"
     a.Add 6, "AnnExcessPlotIndex"
+    a.Add "Accrued Interest", "IntrAccrHead"
 End Sub
 
 Private Function FromStringToInterestType(a As String) As Long

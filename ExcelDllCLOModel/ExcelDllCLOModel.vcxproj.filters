@@ -71,6 +71,12 @@
     <Filter Include="QuaZip">
       <UniqueIdentifier>{e656433e-7801-4e86-be3b-6fb2d1f1b41e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Probabilistic">
+      <UniqueIdentifier>{1d6ad41f-158b-4b11-b58c-3d776989d917}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Probabilistic">
+      <UniqueIdentifier>{40bf2139-8a4f-48b6-b5b1-ba061ad4d16c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommonFunctions.h">
@@ -144,6 +150,12 @@
     </ClInclude>
     <ClInclude Include="quazip\zip.h">
       <Filter>QuaZip</Filter>
+    </ClInclude>
+    <ClInclude Include="DistributionsGenerators.h">
+      <Filter>Header Files\Probabilistic</Filter>
+    </ClInclude>
+    <ClInclude Include="EigenMultivarNormal.h">
+      <Filter>Header Files\Probabilistic</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -412,6 +424,9 @@
     </ClCompile>
     <ClCompile Include="ChartsWidget.cpp">
       <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="DistributionsGenerators.cpp">
+      <Filter>Source Files\Probabilistic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

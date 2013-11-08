@@ -18,6 +18,7 @@ Tranche::Tranche()
 	,OutstandingAmt(0.0)
 	,Coupon(0)
 	,PaymentFrequency(3)
+	,AccruedInterest(0.0)
 {}
 Tranche::Tranche(const Tranche& a)
 	:DefaultRefRate(a.DefaultRefRate)
@@ -39,6 +40,8 @@ Tranche::Tranche(const Tranche& a)
 	,TrancheName(a.TrancheName)
 	,ReferenceRate(a.ReferenceRate)
 	,CashFlow(a.CashFlow)
+	,AccruedInterest(a.AccruedInterest)
+	,SettlementDate(a.SettlementDate)
 {}
 Tranche& Tranche::operator=(const Tranche& a){
 	DefaultRefRate=a.DefaultRefRate;
@@ -60,6 +63,8 @@ Tranche& Tranche::operator=(const Tranche& a){
 	TrancheName=a.TrancheName;
 	ReferenceRate=a.ReferenceRate;
 	CashFlow=a.CashFlow;
+	AccruedInterest=a.AccruedInterest;
+	SettlementDate=a.SettlementDate;
 	return *this;
 }
 void Tranche::SetOriginalAmount(double a){if(a>=0.0) OriginalAmt=a/ExchangeRate;}
@@ -107,6 +112,8 @@ void Tranche::GetDataFromBloomberg(){
 	Bee.AddField("RESET_IDX");
 	Bee.AddField("CPN");
 	Bee.AddField("CPN_FREQ");
+	Bee.AddField("INT_ACC");
+	Bee.AddField("SETTLE_DT");
 	QHash<QString,QString> Result(Bee.StartRequest().value(TrancheName));
 	OutstandingAmt=Result.value("AMT_OUTSTANDING").toDouble()/ExchangeRate;
 	CashFlow.SetInitialOutstanding(OutstandingAmt);
@@ -131,6 +138,8 @@ void Tranche::GetDataFromBloomberg(){
 		DeafultRefRateString+=QString("%1M").arg(PaymentFrequency,6-DeafultRefRateString.size(),10,QChar('0'));
 		DefaultRefRate=DeafultRefRateString;
 	}
+	AccruedInterest=Result.value("INT_ACC").toDouble()/100.0;
+	SettlementDate=QDate::fromString(Result.value("SETTLE_DT"),"yyyy-MM-dd");
 }
 double Tranche::GetLossRate() const{
 	double Result=0.0;
@@ -142,32 +151,13 @@ double Tranche::GetLossRate() const{
 	if(Result<0.00001) return 0;
 	return Result;
 }
-double Tranche::GetDiscountMargin() const{
-	if(GetLossRate()>0.0000) return 0.0;
-	QList<QDate> FlowsDates;
-	QList<double> FlowsValues;
-	FlowsDates.append(LastPaymentDate);
-	FlowsValues.append(-OutstandingAmt*Price/100.0);
-	for (int i=0;i<CashFlow.Count();i++){
-		FlowsDates.append(CashFlow.GetDate(i));
-		FlowsValues.append(CashFlow.GetTotalFlow(i));
-	}
-	if(ReferenceRateValue==-1.0){
-		QString ApplicableRate=(ReferenceRate.isEmpty() ? DefaultRefRate:ReferenceRate);
-		BloombergWorker Bee;
-		Bee.AddSecurity(ApplicableRate,"Index");
-		Bee.AddField("PX_LAST");
-		ReferenceRateValue=Bee.StartRequest().value(ApplicableRate).value("PX_LAST").toDouble()/100.0;
-	}
-	return qMax(0.0,CalculateDM(FlowsDates,FlowsValues,ReferenceRateValue,DayCount));
-	//return qMax(0.0,CalculateDMSimple(FlowsDates,FlowsValues,ReferenceRateValue,DayCount));
-}
+double Tranche::GetDiscountMargin() const {return GetDiscountMargin(Price);}
 double Tranche::GetDiscountMargin(double NewPrice)const{
 	if(GetLossRate()>0.0000) return 0.0;
 	QList<QDate> FlowsDates;
 	QList<double> FlowsValues;
-	FlowsDates.append(LastPaymentDate);
-	FlowsValues.append(-OutstandingAmt*NewPrice/100.0);
+	FlowsDates.append(SettlementDate);
+	FlowsValues.append(-OutstandingAmt*((NewPrice/100.0)+AccruedInterest));
 	for (int i=0;i<CashFlow.Count();i++){
 		FlowsDates.append(CashFlow.GetDate(i));
 		FlowsValues.append(CashFlow.GetTotalFlow(i));
@@ -223,6 +213,8 @@ QDataStream& operator<<(QDataStream & stream, const Tranche& flows){
 		<< flows.DefaultRefRate
 		<< flows.ExchangeRate
 		<< flows.PaymentFrequency
+		<< flows.SettlementDate
+		<< flows.AccruedInterest
 	;
 	return stream;
 }
@@ -232,8 +224,8 @@ QDataStream& operator>>(QDataStream & stream, Tranche& flows){
 		>> flows.TrancheName
 		>> flows.OriginalAmt
 		>> flows.Currency
-		>> flows.OutstandingAmt;
-		stream >> TempInt;
+		>> flows.OutstandingAmt
+		>> TempInt;
 		flows.InterestType=Tranche::TrancheInterestType(TempInt);
 	stream 
 		>> flows.Coupon
@@ -249,7 +241,9 @@ QDataStream& operator>>(QDataStream & stream, Tranche& flows){
 		>> flows.DayCount
 		>> flows.DefaultRefRate
 		>> flows.ExchangeRate
-		>> flows.PaymentFrequency;
-		;
+		>> flows.PaymentFrequency
+		>> flows.SettlementDate
+		>> flows.AccruedInterest
+	;
 	return stream;
 }

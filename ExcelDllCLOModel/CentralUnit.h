@@ -26,6 +26,8 @@ public:
 		,const QDate& LastPayDte
 		,const QString& DefRefRte
 		,int PayFreq
+		,const QDate& SettlementDate
+		,double AccruedInterest=0.0
 		,double RefRteValue=-1.0
 		,double MinOC=0.0
 		,double MinIC=0.0

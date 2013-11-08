@@ -64,6 +64,8 @@ void CentralUnit::AddTranche(
 	,const QDate& LastPayDte
 	,const QString& DefRefRte
 	,int PayFreq
+	,const QDate& SettlementDate
+	,double AccruedInterest
 	,double RefRteValue
 	,double MinOC
 	,double MinIC
@@ -84,6 +86,8 @@ void CentralUnit::AddTranche(
 	TempTrnch.SetLastPaymentDate(LastPayDte);
 	TempTrnch.SetDefaultRefRate(DefRefRte);
 	TempTrnch.SetPaymentFrequency(PayFreq);
+	TempTrnch.SetSettlementDate(SettlementDate);
+	TempTrnch.SetAccruedInterest(AccruedInterest);
 	TempTrnch.SetReferenceRateValue(RefRteValue);
 	TempTrnch.SetMinIClevel(MinIC);
 	TempTrnch.SetMinOClevel(MinOC);

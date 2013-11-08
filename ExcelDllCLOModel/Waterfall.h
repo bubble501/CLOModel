@@ -108,7 +108,7 @@ public:
 	void SetCallReserve(double a){if(a>=0.0) m_CallReserve=a;} 
 	void AddMortgagesFlows(const MtgCashFlow& a){m_MortgagesPayments+=a;}
 	void ResetMtgFlows(){m_MortgagesPayments.RemoveAllFlows();}
-	void SetCCCcurve(const QString& a); /**/
+	void SetCCCcurve(const QString& a);
 	void SetFirstIPDdate(const QDate& a){m_FirstIPDdate=a;}
 	void SetLastIPDdate(const QDate& a){m_LastIPDdate=a;}
 	void SetCallDate(const QDate& a){m_CallDate=a;}

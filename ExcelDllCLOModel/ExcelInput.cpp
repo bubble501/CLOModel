@@ -37,47 +37,47 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 #endif
 		for(int i=0;i<NumElements;i++){
 #ifdef DebuggungInputs
-			if(i==153) QMessageBox::information(0,"Data Not Ok","Prima Data: "+QString::fromWCharArray(pdFreq->bstrVal));
+			if(i==0) QMessageBox::information(0,"Data Not Ok","Prima Data: "+QString::fromWCharArray(pdFreq->bstrVal));
 #endif
 			Matur=QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd");pdFreq++;
 #ifdef DebuggungInputs
-			if(i==153) QMessageBox::information(0,"Data Ok","Prima Data: "+Matur.toString("dd/MM/yy"));
+			if(i==0) QMessageBox::information(0,"Data Ok","Prima Data: "+Matur.toString("dd/MM/yy"));
 #endif
 			sze=pdFreq->dblVal;pdFreq++;
 #ifdef DebuggungInputs
-			if(i==153) QMessageBox::information(0,"Ammontare Mutuo OK",QString("Outstanding: %1").arg(sze));
+			if(i==0) QMessageBox::information(0,"Ammontare Mutuo OK",QString("Outstanding: %1").arg(sze));
 #endif
 			Intr=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 #ifdef DebuggungInputs
-			if(i==153) QMessageBox::information(0,"Interest Ok","Interest Vector: "+Intr);
+			if(i==0) QMessageBox::information(0,"Interest Ok","Interest Vector: "+Intr);
 #endif
 			Ann=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 #ifdef DebuggungInputs
-			if(i==153) QMessageBox::information(0,"Annuity Ok","Annuity Vector: "+Ann);
+			if(i==0) QMessageBox::information(0,"Annuity Ok","Annuity Vector: "+Ann);
 #endif
 			frq=pdFreq->intVal; pdFreq++;
 #ifdef DebuggungInputs
-			if(i==153) QMessageBox::information(0,"Frequency OK",QString("Frequenza: %1").arg(frq));
+			if(i==0) QMessageBox::information(0,"Frequency OK",QString("Frequenza: %1").arg(frq));
 #endif
 			prem=pdFreq->intVal; pdFreq++;
 #ifdef DebuggungInputs
-			if(i==153) QMessageBox::information(0,"Prepay Multiplier OK",QString("Prepay Mult: %1").arg(prem));
+			if(i==0) QMessageBox::information(0,"Prepay Multiplier OK",QString("Prepay Mult: %1").arg(prem));
 #endif
 			lossm=pdFreq->intVal; pdFreq++;
 #ifdef DebuggungInputs
-			if(i==153) QMessageBox::information(0,"Loss Multiplier OK",QString("Loss Mult: %1").arg(lossm));
+			if(i==0) QMessageBox::information(0,"Loss Multiplier OK",QString("Loss Mult: %1").arg(lossm));
 #endif
 			if(sze>0.0) TempUnit.AddLoan(Matur,sze,Intr,Ann,frq,0.0,lossm,prem);
 #ifdef DebuggungInputs
-			if(i>150) QMessageBox::information(0,"Loan OK",QString("Loan %1 Aggiunto").arg(i+1));
+			if(i==0) QMessageBox::information(0,"Loan OK",QString("Loan %1 Aggiunto").arg(i+1));
 #endif
 		}
 	}
 	{//Tranches
 		QString TrName, Curr, RefRt, BasRt;
 		int ProRat,IntrTpe,IPDfrq;
-		double origOut,currOut,coup,RefRtVal,OClim,IClim,Price,Exchan;
-		QDate PrevIPD;
+		double origOut,currOut,coup,RefRtVal,OClim,IClim,Price,Exchan,accruedIntr;
+		QDate PrevIPD,SettDate;
 		NumElements=pdFreq++->intVal;
 #ifdef DebuggungInputs
 		QMessageBox::information(0,"Tranches",QString("Numero Tranches: %1").arg(NumElements));
@@ -149,7 +149,15 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 #ifdef DebuggungInputs
 			if(i==0) QMessageBox::information(0,"Exchan Ok",QString("Exchan: %1").arg(Exchan));
 #endif
-			TempUnit.AddTranche(TrName,ProRat,origOut,Curr,currOut,Tranche::TrancheInterestType(IntrTpe),coup,RefRt,PrevIPD,BasRt,IPDfrq,RefRtVal,OClim,IClim,Price,Exchan);
+			SettDate=QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd");pdFreq++;
+#ifdef DebuggungInputs
+			if(i==0) QMessageBox::information(0,"Settlement Date Ok","Settlement Date: "+SettDate.toString("dd-MM-yyyy"));
+#endif
+			accruedIntr=(pdFreq->dblVal)/100.0;pdFreq++;
+#ifdef DebuggungInputs
+			if(i==0) QMessageBox::information(0,"Accrued Interest Ok",QString("Accrued Interest: %1").arg(accruedIntr));
+#endif
+			TempUnit.AddTranche(TrName,ProRat,origOut,Curr,currOut,Tranche::TrancheInterestType(IntrTpe),coup,RefRt,PrevIPD,BasRt,IPDfrq,SettDate,accruedIntr,RefRtVal,OClim,IClim,Price,Exchan);
 		}
 	}
 	{ //Waterfall Steps

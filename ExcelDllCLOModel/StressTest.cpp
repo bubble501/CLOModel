@@ -310,15 +310,14 @@ Waterfall StressTest::GetScenarioFromFile(const QString& DestPath,const QString&
 		if(VesionCheck!=qint32(ModelVersionNumber)) throw 1;
 	}
 	catch(int ExcCode){
-		QApplication* ComputationLoop;
 		if(!QApplication::instance()){
 			char *argv[] = {"NoArgumnets"};
 			int argc = sizeof(argv) / sizeof(char*) - 1;
-			ComputationLoop=new QApplication(argc,argv);
+			QApplication ComputationLoop(argc,argv);
+			QMessageBox::critical(0,"Incompatible Version","The stress test data is not comaptible with the current model version\nPlease run ALL the stress tests again");
+			QApplication::quit();
 		}
-		QMessageBox::critical(0,"Incompatible Version","The stress test data is not comaptible with the current model version\nPlease run ALL the stress tests again");
-		ComputationLoop->quit();
-		ComputationLoop->deleteLater();
+		else QMessageBox::critical(0,"Incompatible Version","The stress test data is not comaptible with the current model version\nPlease run ALL the stress tests again");
 		return Result;
 	}
 	if(!zip.setCurrentFile(XScenario+"#,#"+YScenario+".csw")) return Result;
@@ -347,15 +346,17 @@ void StressTest::LoadResultsFromFile(const QString& DestPath){
 		if(VesionCheck!=qint32(ModelVersionNumber)) throw 1;
 	}
 	catch(int ExcCode){
-		QApplication* ComputationLoop;
+		
 		if(!QApplication::instance()){
 			char *argv[] = {"NoArgumnets"};
 			int argc = sizeof(argv) / sizeof(char*) - 1;
-			ComputationLoop=new QApplication(argc,argv);
+			QApplication ComputationLoop(argc,argv);
+			QMessageBox::critical(0,"Incompatible Version","The stress test data is not comaptible with the current model version\nPlease run ALL the stress tests again");
+			QApplication::quit();
 		}
-		QMessageBox::critical(0,"Incompatible Version","The stress test data is not comaptible with the current model version\nPlease run ALL the stress tests again");
-		ComputationLoop->quit();
-		ComputationLoop->deleteLater();
+		else {
+			QMessageBox::critical(0,"Incompatible Version","The stress test data is not comaptible with the current model version\nPlease run ALL the stress tests again");
+		}
 		return;
 	}
 	for(bool more=zip.goToFirstFile(); more; more=zip.goToNextFile()) {

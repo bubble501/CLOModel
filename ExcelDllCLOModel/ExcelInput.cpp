@@ -405,9 +405,18 @@ void __stdcall StressTargetChanged(LPSAFEARRAY *ArrayData){
 	QString Filename=(FolderPath+"\\.StressResult%1%2.fcsr").arg(XVar).arg(YVar);
 	if(!QFile::exists(Filename))return;
 	TempStress.LoadResultsFromFile(Filename);
+#ifdef DebuggungInputs
+	QMessageBox::information(0,"Results OK",QString("Results Loaded"));
+#endif
 	ExcelOutput::PrintStressTest(TempStress,TrancheName,TargetCell,true);
+#ifdef DebuggungInputs
+	QMessageBox::information(0,"Print OK",QString("Results Printed"));
+#endif
 	if(!PlotSheet.isEmpty() && PlotIndex>0)
 		ExcelOutput::PlotStressMargin(TempStress,PlotSheet,PlotIndex,TrancheName,NewPrice);
+#ifdef DebuggungInputs
+	QMessageBox::information(0,"Plot OK",QString("Results Plotted"));
+#endif
 }
 void __stdcall InspectStress(LPSAFEARRAY *ArrayData){
 	Waterfall TempStructure;

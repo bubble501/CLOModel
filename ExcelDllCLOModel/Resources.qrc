@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/Icons">
         <file alias="Logo.png">Resources/Logo.png</file>
+        <file alias="Loading.gif">Resources/Loading2.gif</file>
     </qresource>
 </RCC>

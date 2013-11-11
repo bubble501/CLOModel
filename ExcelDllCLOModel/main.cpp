@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
 	QStringList Xhead;
 	QStringList Yhead;
 		StressTest w;
-		w.LoadResultsFromFile("C:/Temp/.StressResult01.fcsr");
+		w.LoadResultsFromFile("Z:/24AM/ABS Trade Folders/CLO/MERCT I-X/.StressResult01.fcsr");
 		
 		Xhead=w.GetXSpann();
 		Yhead=w.GetYSpann();

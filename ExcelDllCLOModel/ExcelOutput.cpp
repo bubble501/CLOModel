@@ -622,9 +622,10 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 
 
 HRESULT ExcelOutput::PrintStressTest(const StressTest& stresser, const QString& TrancheTarget, const QString& DestinationAddress, bool SetupConditionalFormatting){
-	ExcelCommons::InitExcelOLE();
 	int Numrows=stresser.GetXSpann().size();
 	int NumOfCols=stresser.GetYSpann().size();
+	if(Numrows<=0 || Numrows<=0) return E_INVALIDARG;
+	ExcelCommons::InitExcelOLE();
 	SAFEARRAYBOUND  Bound[2];
 	Bound[0].lLbound   = 1;
 	Bound[0].cElements = Numrows;
@@ -1573,9 +1574,11 @@ HRESULT ExcelOutput::PlotCostFunding(
 		return hr;
 }
 HRESULT ExcelOutput::PlotStressMargin(const StressTest& source,const QString& DestinationSheet,int DestinationIndex,const QString& TrancheTarget, double NewPrice){
-	ExcelCommons::InitExcelOLE();
 	const QList<QString>& XAlias=source.GetXSpann();
 	const QList<QString>& YAlias=source.GetYSpann();
+	if(XAlias.size()<=0 || YAlias.size()<=0) return E_INVALIDARG;
+	ExcelCommons::InitExcelOLE();
+	
 	SAFEARRAYBOUND  Bound[2];
 	Bound[0].lLbound   = 1;
 	Bound[0].cElements = XAlias.size();

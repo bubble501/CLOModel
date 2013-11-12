@@ -6,9 +6,10 @@
 #include "TrancheCashFlow.h"
 class Tranche {
 public:
+	//! Enum defining what type of coupon the tranche is paying
 	enum TrancheInterestType{
-		FixedInterest,
-		FloatingInterest
+		FixedInterest, /*!< Fixed Coupon*/
+		FloatingInterest /*!< Floating Rate Coupon*/
 	};
 private:
 	QString TrancheName;

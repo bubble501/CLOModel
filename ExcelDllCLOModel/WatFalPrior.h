@@ -3,21 +3,22 @@
 #include <QDataStream>
 class WatFalPrior{
 public:
+	//! Enum defining the different types of waterfall steps
 	enum WaterfallStepType{
-		wst_SeniorExpenses,
-		wst_SeniorFees,
-		wst_Interest,
-		wst_Principal,
-		wst_OCTest,
-		wst_OCTestPrinc,
-		wst_ICTest,
-		wst_ICTestPrinc,
-		wst_DeferredInterest,
-		wst_DeferredPrinc,
-		wst_juniorFees,
-		wst_ReinvestmentTest,
-		wst_Excess,
-		wst_ReinvestPrincipal,
+		wst_SeniorExpenses, /*!< Senior Expenses*/
+		wst_SeniorFees, /*!< Senior Fees*/
+		wst_Interest, /*!< Interest Payment*/
+		wst_Principal,  /*!< Notes Redemption*/
+		wst_OCTest,  /*!< Over Collateralization test. Considered part of the interest waterfall*/
+		wst_OCTestPrinc, /*!< Over Collateralization test. Considered part of the principal waterfall*/
+		wst_ICTest, /*!< Interest Coverage test. Considered part of the interest waterfall*/
+		wst_ICTestPrinc, /*!< Interest Coverage test. Considered part of the principal waterfall*/
+		wst_DeferredInterest, /*!< Payment of deferred interest. Considered part of the interest waterfall*/
+		wst_DeferredPrinc, /*!< Payment of deferred interest. Considered part of the principal waterfall*/
+		wst_juniorFees, /*!< Junior Fees*/
+		wst_ReinvestmentTest, /*!< Reinvestment Test*/
+		wst_Excess, /*!< Excess Spread*/
+		wst_ReinvestPrincipal, /*!< Reinvest all available princiapl during the reinvestment period*/
 	};
 	int GetGroupTarget()const{return GroupTarget;}
 	int GetRedemptionGroup()const{return RedemptionGroup;}

@@ -37,9 +37,6 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		QMessageBox::information(0,"Mutui",QString("Numero Mutui: %1").arg(NumElements));
 #endif
 		for(int i=0;i<NumElements;i++){
-#ifdef DebuggungInputs
-			if(i==0) QMessageBox::information(0,"Data Not Ok","Prima Data: "+QString::fromWCharArray(pdFreq->bstrVal));
-#endif
 			Matur=QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd");pdFreq++;
 #ifdef DebuggungInputs
 			if(i==0) QMessageBox::information(0,"Data Ok","Prima Data: "+Matur.toString("dd/MM/yy"));
@@ -339,7 +336,6 @@ double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
 	QString TrancheName=QString::fromStdWString(pdFreq->bstrVal);pdFreq++;
 	QDate StartDate=QDate::fromString(QString::fromStdWString(pdFreq->bstrVal),"yyyy-MM-dd");pdFreq++;
 	bool ToCall=pdFreq->boolVal;pdFreq++;
-	double NewPrice=pdFreq->dblVal;pdFreq++;
 	SafeArrayUnaccessData(*ArrayData);
 	Waterfall TempWaterfall;
 	QString Filename=FolderPath+"\\.BaseCase.clo";
@@ -356,7 +352,6 @@ double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
 	const Tranche* TranchPoint=TempWaterfall.GetTranche(TrancheName);
 	if(!TranchPoint) return 0.0;
 	Tranche TempTranche(*TranchPoint);
-	TempTranche.SetPrice(NewPrice);
 	return TempTranche.GetWALife(StartDate);
 }
 void __stdcall StressTargetChanged(LPSAFEARRAY *ArrayData){
@@ -459,16 +454,7 @@ void __stdcall InspectWaterfall(LPSAFEARRAY *ArrayData){
 	SafeArrayUnaccessData(*ArrayData);
 	ComputationLoop.exec();	
 }
-#ifdef DebuggungInputs
-void __stdcall TestingInput(LPBSTR a){
-	BSTR b=SysAllocString(*a);
-	char *argv[] = {"NoArgumnets"};
-	int argc = sizeof(argv) / sizeof(char*) - 1;
-	QApplication ComputationLoop(argc,argv);
-	QMessageBox::information(0,"Stringa letta",QString::fromWCharArray(b));
-	SysFreeString(b);
-}
-#endif
+
 /*!
 \file ExcelInput.cpp
 \brief Excel exported functions
@@ -485,54 +471,185 @@ void __stdcall TestingInput(LPBSTR a){
   Useful for debugging the input.
 \warning Must be undefined for the actual model to work
 */
-
-/*! \fn void __stdcall InspectWaterfall(LPSAFEARRAY *ArrayData)
-\brief Function that displays the two waterfalls
+/*! \fn void __stdcall RunModel(LPSAFEARRAY *ArrayData)
+\brief Function that runs the cash flow model, and the stress test saves and prints the results in excel
 \param ArrayData Excel Variant Array of Inputs
+\details This function takes in input all the parameters of the model, runs the cash flows and saves the results. It then calls, when appropriate:
+- ExcelOutput::PrintMortgagesRepLines
+- ExcelOutput::PlotMortgagesFlows
+- ExcelOutput::PrintTrancheFlow
+- ExcelOutput::PlotTranchesDynamic
+- ExcelOutput::PlotOCTest
+- ExcelOutput::PlotICTest
+- ExcelOutput::PlotAnnualExcess
+- ExcelOutput::PlotCostFunding
 
-This function creates a Widget containing two tables each of them showing one of the waterfalls.
+To send the output to excel.
 
 ArrayData must contain, in order:
-- The number of steps in the aggregated waterfall
-- For each step in the waterfall
-	* Long representing the WatFalPrior::WaterfallStepType of the waterfall
-	* Long representing the target seniority group of the step
-	* Long representing funds sources or destination for the step
-	* Double between 0 and 1 representing the share of funds going toward redemption of the destination step (used only in OC Test)
+<ol><li>A Long representing the number of loans in the pool</li>
+<li>For each loan in the pool:</li>
+	<ol type="a"><li>A String containing the maturity date of the loan in the ISO 8601 format (yyyy-mm-dd)</li>
+	<li>A Double representing the current amount outstanding of the loan</li>
+	<li>A String containing a Bloomberg-like vector that represents the interest rate payed on the loan</li>
+	<li>A String containing a Bloomberg-like vector that represent if the loan is an annuity. The values must be either Y or N</li>
+	<li>A Long representing the number of months between two loans payments (e.g. if the loan pays quarterly this must be 3)</li>
+	<li>A Double representing the multiplier by which the loans is more likely to prepay compared to the base hypothesis. 100 is the base case.</li>
+	<li>A Double representing the multiplier by which the loans is more likely to experience losses compared to the base hypothesis. 100 is the base case.</li></ol>
+<li>A Long representing the number of tranches of the deal</li>
+<li>For each tranche in the deal:</li>
+	<ol type="a"><li>A String containing the name of the tranche</li>
+	<li>A Long representing the redemption priority level of the note (pro rata group)</li>
+	<li>A Double containing the original amount outstanding of the note</li>
+	<li>A String containing the Bloomberg code of the note currency (e.g. USD, EUR, GBP)</li>
+	<li>A double containing the current amount outstanding of the note</li>
+	<li>A Long representing the Tranche::TrancheInterestType code determining if the notes pays fixed or floating interest</li>
+	<li>A Double containing the margin or the interest rate paid by the note (in basis points)</li>
+	<li>A String containing the Bloomberg ticker of the of the reference rate for the interest (if the note pays fixed interest this will be ignored)</li>
+	<li>A String containing the last IPD in the ISO 8601 format (yyyy-mm-dd)</li>
+	<li>A String containing the Bloomberg ticker of the base rate on which discount margin will be calculated for fixed rate notes (for floating rate notes this will be ignored)</li>
+	<li>A Long containing the the number of months between two IPDs (e.g. if the deal pays quarterly this must be 3)</li>
+	<li>A Double containing the value of the reference rate for the note. -1.0 will cause the program to get the value from Bloomberg</li>
+	<li>A Double containing the limit of the OC test for the tranche (100% = 1.0)</li>
+	<li>A Double containing the limit of the IC test for the tranche (100% = 1.0)</li>
+	<li>A Double containing the price for the note in a 100 basis</li>
+	<li>A Double containing the exchange rate for the note currency (1.0 for the currency in which the loans are denominated)</li>
+	<li>A String containing the settlement date in the ISO 8601 format (yyyy-mm-dd)</li>
+	<li>A Double representing the interest accrued on the note from the last IPD</li></ol>
+<li>A Long containing the number of steps in the waterfall</li>
+<li>For each step in the waterfall:</li>
+	<ol type="a"><li>A Long representing the WatFalPrior::WaterfallStepType code for the step</li>
+	<li>A Long representing the pro rata group to which the step is referred to</li>
+	<li>A Long representing the source or destination of the payments due to this step (e.g. For Senior Expenses a 1 will deduct the expenses from interest while a 2 will deduct them from principal. For OC test this is the tranche that will be redeemed if the test fails)</li>
+	<li>A Double, used only in OC test and ignored otherwise, that determines what share of available funds will go toward the redemption of the note specified in the previous argument. The rest will go on top of the principal waterfall.</li></ol>
+<li>A Double containing senior expenses rate as a share of loans outstanding</li>
+<li>A Double containing senior fees rate as a share of loans outstanding</li>
+<li>A Double containing junior fees rate as a share of loans outstanding</li>
+<li>A Double containing the interest rate at which unpaid junior fees are compounded</li>
+<li>A Long containing the the number of months between two IPDs (e.g. if the deal pays quarterly this must be 3)</li>
+<li>A String containing the next IPD in the ISO 8601 format (yyyy-mm-dd)</li>
+<li>A String containing the previous IPD in the ISO 8601 format (yyyy-mm-dd)</li>
+<li>A Boolean: if set to false, reinvestment test and OC test turbo features will not be used</li>
+<li>A String containing a Bloomberg-like vector that represents the evoulution of CCC loans as a share of total loans</li>
+<li>A Double representing the haircut inflicted to CCC loans if the CCC test is failed</li>
+<li>A Double representing the CCC test limit</li>
+<li>A String containing the call date in the ISO 8601 format (yyyy-mm-dd). Empty string ("") if not applicable</li>
+<li>A Double by which the call reserve (see below) is multiplied for computing the call event. 0 if not applicable</li>
+<li>A Double containing the call reserve. It can be either a seniority level or an absolute amount. When the outstanding amount of the notes gets below this amount the deal will be called. 0 if not applicable</li>
+<li>A Double representing the value of the loan pool at the call date (in basis 100)</li>
+<li>A String containing the reinvestment period end date in the ISO 8601 format (yyyy-mm-dd).</li>
+<li>A Double representing the reinvestment test limit</li>
+<li>A Double representing how much interest will be diverted to notes redemption during the reinvestment period in case the reinvestment test is breached</li>
+<li>A Double representing how much interest will be diverted to acquire new collateral during the reinvestment period in case the reinvestment test is breached</li>
+<li>A Double representing how much interest will be diverted to notes redemption after the reinvestment period in case the reinvestment test is breached</li>
+<li>A Double representing how much interest will be diverted to acquire new collateral after the reinvestment period in case the reinvestment test is breached</li>
+<li>A String containing a Bloomberg-like vector that represents the spread payed by new collateral coming from reinvestment</li>
+<li>A String containing a Bloomberg-like vector that represents the CPR assumption for the model</li>
+<li>A String containing a Bloomberg-like vector that represents the CDR assumption for the model</li>
+<li>A String containing a Bloomberg-like vector that represents the LS assumption for the model</li>
+<li>A String containing a Bloomberg-like vector that represents the WAL (in years) of the reinvestment bond</li>
+<li>A Long representing the number of months between two payments made by newly acquired loans (e.g. if the loans pay quarterly this must be 3)</li>
+<li>A String containing the Bloomberg ticker of the of the reference rate for the new loans coming from reinvestment</li>
+<li>A Double containing the principal available amounts currently in the cash account of the issuer</li>
+<li>A Double containing the interest available amounts currently in the cash account of the issuer</li>
+<li>A String containing the pool cut off date in the ISO 8601 format (yyyy-mm-dd).</li>
+<li>A Boolean that determines if the call hypothesis should be evaluated or not</li>
+<li>A String containing the address of the cell where the loans cash flows should be printed. Empty string ("") if you don't want them to be printed</li>
+<li>A String containing the address of the cell where the tranches cash flows should be printed. Empty string ("") if you don't want them to be printed</li>
+<li>A String containing the name of the sheet where the charts are located</li>
+<li>A Long representing the index of the chart object where the loans cash flow graph should be printed on</li>
+<li>A Long representing the index of the chart object where the tranches cash flow graph should be printed on</li>
+<li>A Long representing the index of the chart object where the OC test graph should be printed on</li>
+<li>A Long representing the index of the chart object where the IC test graph should be printed on</li>
+<li>A Long representing the index of the chart object where the excess spread graph should be printed on</li>
+<li>A Long representing the index of the chart object where the WA cost of capital graph should be printed on</li>
+<li>A String containing the address of the cell where the loss rates of the notes should be printed. Empty string ("") if you don't want them to be printed</li>
+<li>A String containing the address of the cell where the loss rates of the notes, in the call scenario, should be printed. Empty string ("") if you don't want them to be printed</li>
+<li>A String containing the address of the cell where the credit enhancement of the notes should be printed. Empty string ("") if you don't want them to be printed</li>
+<li>A String containing the path to the folder where the results should be saved to</li>
+<li>A Boolean representing if the stress test should be run or just the base model</li></ol>
 
-\sa WaterfallViewer
+In case the stress test should be run, this additional inputs, in order, are necessary:
+<ol start="53"><li>A String containing a Bloomberg-like vector that represents the parameter that will be kept constant in the stress test</li>
+<li>A Long representing the StressTest::StressVariability code for the rows variation dimension</li>
+<li>A Long representing the StressTest::StressVariability code for the columns variation dimension</li>
+<li>A Long containing the number of scenarios on the rows variation dimension</li>
+<li>For scenario on the rows variation dimension:</li>
+	<ol type="a"><li>A String containing a Bloomberg-like vector that represents the variable stress value</li></ol>
+<li>A Long containing the number of scenarios on the columns variation dimension</li>
+<li>For scenario on the columns variation dimension:</li>
+	<ol type="a"><li>A String containing a Bloomberg-like vector that represents the variable stress value</li></ol>
+<li>A Boolean determining if the stress test should consider the call scenario</li>
+</ol>
+\warning Long refers to 32 bits integers. Using 16 bits one (Integer instead of Long in VBA) will lead to a crash
+*/
+/*! \fn double __stdcall CLODiscountMargin(LPSAFEARRAY *ArrayData)
+\brief Function that gets the discount margin for a tranche from a result file
+\param ArrayData Excel Variant Array of Inputs
+\return The discount margin of the selected tranche
+\details This function loads the results of the model and calculates the discount margin of a tranche associated with the given price
+
+ArrayData must contain, in order:
+-# A String containing the path to the stress result file
+-# A String containing the name of the tranche for which you want to display the results
+-# A Boolean defining if the calculation should consider the call option as exercised
+-# A Double containing the price of the tranche
  */
-
-/*! \fn void __stdcall InspectStress(LPSAFEARRAY *ArrayData)
-\brief Function that displays the whole waterfall results for a given stress scenario
+/*! \fn double __stdcall CLOWALife(LPSAFEARRAY *ArrayData)
+\brief Function that gets the weighted average life for a tranche from a result file
 \param ArrayData Excel Variant Array of Inputs
-
-This function creates a Widget containing the waterfall results for the given stress scenario
+\return The weighted average life of the selected tranche
+\details This function loads the results of the model and calculates the weighted average life of a tranche
 
 ArrayData must contain, in order:
-- A String containing the path to the stress result file
-- A String containing the value for the X Parameter
-- A String containing the value for the Y Parameter
-- A Long representing the StressTest::StressVariability dimention for the X parameter
-- A Long representing the StressTest::StressVariability dimention for the Y parameter
-
-\sa SummaryView
+-# A String containing the path to the stress result file
+-# A String containing the name of the tranche for which you want to display the results
+-# A string containing the date from which the WAL starts. It must be in the ISO 8601 format (yyyy-mm-dd)
+-# A Boolean defining if the calculation should consider the call option as exercised
  */
 /*! \fn void __stdcall StressTargetChanged(LPSAFEARRAY *ArrayData)
 \brief Function that has to be called to get the stress results for a different tranche
 \param ArrayData Excel Variant Array of Inputs
-
-This function loads the results of the stress test and invokes ExcelOutput::PrintStressTest() to send the stress test results of the appropriate tranche back to excel.
+\details This function loads the results of the stress test and invokes ExcelOutput::PrintStressTest() to send the stress test results of the appropriate tranche back to excel.
 
 ArrayData must contain, in order:
-- A String containing the path to the stress result file
-- A String containing the name of the tranche for which you want to display the results
-- A string containing the address of the cell where the stress results should be printed
-- A Long representing the StressTest::StressVariability dimention for the X parameter
-- A Long representing the StressTest::StressVariability dimention for the Y parameter
-- A double representing the price of the tranche
-- A String containing the name of the sheet where the discount margin plot should appear
-- A Long containing the index of the Chart where the discount margin plot should be displayed
+-# A String containing the path to the stress result file
+-# A String containing the name of the tranche for which you want to display the results
+-# A string containing the address of the cell where the stress results should be printed
+-# A Long representing the StressTest::StressVariability dimention for the X parameter
+-# A Long representing the StressTest::StressVariability dimention for the Y parameter
+-# A double representing the price of the tranche
+-# A String containing the name of the sheet where the discount margin plot should appear
+-# A Long containing the index of the Chart where the discount margin plot should be displayed
 
 \sa ExcelOutput::PrintStressTest()
+ */
+/*! \fn void __stdcall InspectStress(LPSAFEARRAY *ArrayData)
+\brief Function that displays the whole waterfall results for a given stress scenario
+\param ArrayData Excel Variant Array of Inputs
+\details This function creates a Widget containing the waterfall results for the given stress scenario
+
+ArrayData must contain, in order:
+-# A String containing the path to the stress result file
+-# A String containing the value for the X Parameter
+-# A String containing the value for the Y Parameter
+-# A Long representing the StressTest::StressVariability dimention for the X parameter
+-# A Long representing the StressTest::StressVariability dimention for the Y parameter
+
+\sa SummaryView
+ */
+/*! \fn void __stdcall InspectWaterfall(LPSAFEARRAY *ArrayData)
+\brief Function that displays the two waterfalls
+\param ArrayData Excel Variant Array of Inputs
+\details This function creates a Widget containing two tables each of them showing one of the waterfalls.
+
+ArrayData must contain, in order:
+<ol><li>The number of steps in the aggregated waterfall</li>
+<li>For each step in the waterfall</li>
+	<li>Long representing the WatFalPrior::WaterfallStepType of the waterfall</li>
+	<li>Long representing the target seniority group of the step</li>
+	<li>Long representing funds sources or destination for the step</li>
+	<li>Double between 0 and 1 representing the share of funds going toward redemption of the destination step (used only in OC Test)</li></ol></ol>
+
+\sa WaterfallViewer
  */

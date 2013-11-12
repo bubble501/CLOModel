@@ -11,10 +11,11 @@ class Mortgage;
 class StressTest:public QObject{
 	Q_OBJECT
 public:
+	//! Enum defining what parameter is currently being stressed
 	enum StressVariability{
-		ChangingCDR,
-		ChangingLS,
-		ChangingCPR
+		ChangingCDR, /*!< Constant Default Rate*/
+		ChangingLS, /*!< Loss Severity*/
+		ChangingCPR /*!< Constant Prepayment Rate*/
 	};
 private:
 #ifdef PrintExecutionTime

@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{024E204D-FFE3-4241-A7E4-50043741BA18}"
 	ProjectSection(SolutionItems) = preProject
 		Documentation\DoxygenConfig.doxyfile = Documentation\DoxygenConfig.doxyfile
+		Documentation\README.markdown = Documentation\README.markdown
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestWithApp", "ExcelDllCLOModel\TestWithApp.vcxproj", "{B8DE6C2B-7B7B-41E7-9F45-EFF7C5A61EDD}"

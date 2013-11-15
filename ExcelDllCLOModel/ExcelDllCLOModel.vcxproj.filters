@@ -77,6 +77,11 @@
     <Filter Include="Source Files\Probabilistic">
       <UniqueIdentifier>{40bf2139-8a4f-48b6-b5b1-ba061ad4d16c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Generated Files\Nightly">
+      <UniqueIdentifier>{006b09cf-88d6-4ba3-9e5b-c3962980d0a3}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommonFunctions.h">
@@ -157,6 +162,9 @@
     <ClInclude Include="EigenMultivarNormal.h">
       <Filter>Header Files\Probabilistic</Filter>
     </ClInclude>
+    <ClInclude Include="mvNormSampler.h">
+      <Filter>Header Files\Probabilistic</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="CentralUnit.h">
@@ -212,42 +220,6 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GeneratedFiles\Debug\moc_CentralUnit.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_CentralUnit.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_MtgCalculator.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_MtgCalculator.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_MtgCalculatorThread.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_MtgCalculatorThread.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_StressTest.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_StressTest.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_StressThread.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_StressThread.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_StressWorker.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_StressWorker.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="CentralUnit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -308,44 +280,14 @@
     <ClCompile Include="WaterfallCalculator.cpp">
       <Filter>Source Files\Deal Structure</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_WaterfallCalculator.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_WaterfallCalculator.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_WaterfallCalcThread.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_WaterfallCalcThread.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="ProgressWidget.cpp">
       <Filter>Source Files\Widgets</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\qrc_Resources.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_ProgressWidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_ProgressWidget.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_TrancheViewer.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_TrancheViewer.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="TrancheViewer.cpp">
       <Filter>Source Files\Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_SummaryView.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_SummaryView.cpp">
-      <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="SummaryView.cpp">
       <Filter>Source Files\Widgets</Filter>
@@ -355,24 +297,6 @@
     </ClCompile>
     <ClCompile Include="quazip\zip.c">
       <Filter>QuaZip</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_quagzipfile.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_quagzipfile.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_quaziodevice.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_quaziodevice.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_quazipfile.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_quazipfile.cpp">
-      <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="quazip\JlCompress.cpp">
       <Filter>QuaZip</Filter>
@@ -410,11 +334,137 @@
     <ClCompile Include="WaterfallViewer.cpp">
       <Filter>Source Files\Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="ChartsWidget.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="DistributionsGenerators.cpp">
+      <Filter>Source Files\Probabilistic</Filter>
+    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_WaterfallViewer.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_WaterfallViewer.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Nightly\moc_WaterfallViewer.cpp">
+      <Filter>Generated Files\Nightly</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_WaterfallCalculator.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_WaterfallCalculator.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Nightly\moc_WaterfallCalculator.cpp">
+      <Filter>Generated Files\Nightly</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_WaterfallCalcThread.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_WaterfallCalcThread.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Nightly\moc_WaterfallCalcThread.cpp">
+      <Filter>Generated Files\Nightly</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_TrancheViewer.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_TrancheViewer.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Nightly\moc_TrancheViewer.cpp">
+      <Filter>Generated Files\Nightly</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_SummaryView.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_SummaryView.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Nightly\moc_SummaryView.cpp">
+      <Filter>Generated Files\Nightly</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_StressWorker.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_StressWorker.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Nightly\moc_StressWorker.cpp">
+      <Filter>Generated Files\Nightly</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_StressThread.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_StressThread.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Nightly\moc_StressThread.cpp">
+      <Filter>Generated Files\Nightly</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_StressTest.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_StressTest.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Nightly\moc_StressTest.cpp">
+      <Filter>Generated Files\Nightly</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_quazipfile.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_quazipfile.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Nightly\moc_quazipfile.cpp">
+      <Filter>Generated Files\Nightly</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_quaziodevice.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_quaziodevice.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Nightly\moc_quaziodevice.cpp">
+      <Filter>Generated Files\Nightly</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_quagzipfile.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_quagzipfile.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Nightly\moc_quagzipfile.cpp">
+      <Filter>Generated Files\Nightly</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ProgressWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ProgressWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Nightly\moc_ProgressWidget.cpp">
+      <Filter>Generated Files\Nightly</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_MtgCalculatorThread.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_MtgCalculatorThread.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Nightly\moc_MtgCalculatorThread.cpp">
+      <Filter>Generated Files\Nightly</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_MtgCalculator.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_MtgCalculator.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Nightly\moc_MtgCalculator.cpp">
+      <Filter>Generated Files\Nightly</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_ChartsWidget.cpp">
       <Filter>Generated Files\Debug</Filter>
@@ -422,10 +472,19 @@
     <ClCompile Include="GeneratedFiles\Release\moc_ChartsWidget.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="ChartsWidget.cpp">
-      <Filter>Source Files\Widgets</Filter>
+    <ClCompile Include="GeneratedFiles\Nightly\moc_ChartsWidget.cpp">
+      <Filter>Generated Files\Nightly</Filter>
     </ClCompile>
-    <ClCompile Include="DistributionsGenerators.cpp">
+    <ClCompile Include="GeneratedFiles\Debug\moc_CentralUnit.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_CentralUnit.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Nightly\moc_CentralUnit.cpp">
+      <Filter>Generated Files\Nightly</Filter>
+    </ClCompile>
+    <ClCompile Include="mvNormSampler.cpp">
       <Filter>Source Files\Probabilistic</Filter>
     </ClCompile>
   </ItemGroup>

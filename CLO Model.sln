@@ -8,29 +8,42 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{024E204D-FFE3-4241-A7E4-50043741BA18}"
 	ProjectSection(SolutionItems) = preProject
 		Documentation\DoxygenConfig.doxyfile = Documentation\DoxygenConfig.doxyfile
-		Documentation\README.markdown = Documentation\README.markdown
+		README.markdown = README.markdown
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestWithApp", "ExcelDllCLOModel\TestWithApp.vcxproj", "{B8DE6C2B-7B7B-41E7-9F45-EFF7C5A61EDD}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestWithConsole", "ExcelDllCLOModel\TestWithConsole.vcxproj", "{39B79E72-ED68-4C51-9EFF-0CAA5C889D65}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
+		Nightly|Win32 = Nightly|Win32
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{D1195E79-ED25-46A6-A919-589FD6450B05}.Debug|Win32.ActiveCfg = Debug|Win32
 		{D1195E79-ED25-46A6-A919-589FD6450B05}.Debug|Win32.Build.0 = Debug|Win32
+		{D1195E79-ED25-46A6-A919-589FD6450B05}.Nightly|Win32.ActiveCfg = Release|Win32
 		{D1195E79-ED25-46A6-A919-589FD6450B05}.Release|Win32.ActiveCfg = Release|Win32
 		{D1195E79-ED25-46A6-A919-589FD6450B05}.Release|Win32.Build.0 = Release|Win32
 		{DB486B74-3438-4DE6-9FDD-876EBC720D91}.Debug|Win32.ActiveCfg = Debug|Win32
 		{DB486B74-3438-4DE6-9FDD-876EBC720D91}.Debug|Win32.Build.0 = Debug|Win32
+		{DB486B74-3438-4DE6-9FDD-876EBC720D91}.Nightly|Win32.ActiveCfg = Nightly|Win32
+		{DB486B74-3438-4DE6-9FDD-876EBC720D91}.Nightly|Win32.Build.0 = Nightly|Win32
 		{DB486B74-3438-4DE6-9FDD-876EBC720D91}.Release|Win32.ActiveCfg = Release|Win32
 		{DB486B74-3438-4DE6-9FDD-876EBC720D91}.Release|Win32.Build.0 = Release|Win32
 		{B8DE6C2B-7B7B-41E7-9F45-EFF7C5A61EDD}.Debug|Win32.ActiveCfg = Debug|Win32
 		{B8DE6C2B-7B7B-41E7-9F45-EFF7C5A61EDD}.Debug|Win32.Build.0 = Debug|Win32
+		{B8DE6C2B-7B7B-41E7-9F45-EFF7C5A61EDD}.Nightly|Win32.ActiveCfg = Release|Win32
 		{B8DE6C2B-7B7B-41E7-9F45-EFF7C5A61EDD}.Release|Win32.ActiveCfg = Release|Win32
 		{B8DE6C2B-7B7B-41E7-9F45-EFF7C5A61EDD}.Release|Win32.Build.0 = Release|Win32
+		{39B79E72-ED68-4C51-9EFF-0CAA5C889D65}.Debug|Win32.ActiveCfg = Debug|Win32
+		{39B79E72-ED68-4C51-9EFF-0CAA5C889D65}.Debug|Win32.Build.0 = Debug|Win32
+		{39B79E72-ED68-4C51-9EFF-0CAA5C889D65}.Nightly|Win32.ActiveCfg = Release|Win32
+		{39B79E72-ED68-4C51-9EFF-0CAA5C889D65}.Nightly|Win32.Build.0 = Release|Win32
+		{39B79E72-ED68-4C51-9EFF-0CAA5C889D65}.Release|Win32.ActiveCfg = Release|Win32
+		{39B79E72-ED68-4C51-9EFF-0CAA5C889D65}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

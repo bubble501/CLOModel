@@ -137,49 +137,13 @@
     <ClCompile Include="GeneratedFiles\Release\moc_quazipfile.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="BloombergWorker.cpp">
+    <ClCompile Include="quazip\unzip.c">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
     <ClCompile Include="quazip\zip.c">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
-    <ClCompile Include="CentralUnit.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="ChartsWidget.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonFunctions.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="DistributionsGenerators.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="ExcelCommons.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="ExcelInput.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="ExcelOutput.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
     <ClCompile Include="quazip\JlCompress.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="Mortgage.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="MtgCalculator.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="MtgCalculatorThread.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="MtgCashFlow.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="ProgressWidget.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
     <ClCompile Include="quazip\qioapi.cpp">
@@ -212,6 +176,48 @@
     <ClCompile Include="quazip\quazipnewinfo.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
+    <ClCompile Include="BloombergWorker.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="CentralUnit.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartsWidget.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="CommonFunctions.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="DistributionsGenerators.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="ExcelCommons.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="ExcelInput.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="ExcelOutput.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Mortgage.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="MtgCalculator.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="MtgCalculatorThread.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="MtgCashFlow.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="mvNormSampler.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="ProgressWidget.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
     <ClCompile Include="ReinvestmentTest.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
@@ -234,9 +240,6 @@
       <Filter>Source Files\Common</Filter>
     </ClCompile>
     <ClCompile Include="TrancheViewer.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\unzip.c">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
     <ClCompile Include="Waterfall.cpp">
@@ -278,6 +281,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MtgCashFlow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mvNormSampler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ReinvestmentTest.h">

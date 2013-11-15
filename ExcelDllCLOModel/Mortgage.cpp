@@ -53,9 +53,9 @@ void Mortgage::SetInterest(const QString& a){
 	QDate AdjStartDate;
 	AdjStartDate.setDate(StartDate.year(),StartDate.month(),15);
 	m_CashFlows.RemoveAllFlows();
-	QList<double> CPRVector=UnpackVect(CPRVec, m_PaymentFreq);
-	QList<double> CDRVector=UnpackVect(CDRVec, m_PaymentFreq);
-	QList<double> LossVector=UnpackVect(LossVec, m_PaymentFreq,false);
+	QList<double> CPRVector=UnpackVect(CPRVec);
+	QList<double> CDRVector=UnpackVect(CDRVec);
+	QList<double> LossVector=UnpackVect(LossVec,m_PaymentFreq,false);
 	QList<double> InterestVector=UnpackVect(m_InterestVect);
 	QList<QString> AnnuityVector=UnpackAnnuityVect(m_AnnuityVect);
 	double CurrentCPR;

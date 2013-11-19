@@ -159,12 +159,6 @@
     <ClInclude Include="DistributionsGenerators.h">
       <Filter>Header Files\Probabilistic</Filter>
     </ClInclude>
-    <ClInclude Include="EigenMultivarNormal.h">
-      <Filter>Header Files\Probabilistic</Filter>
-    </ClInclude>
-    <ClInclude Include="mvNormSampler.h">
-      <Filter>Header Files\Probabilistic</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="CentralUnit.h">
@@ -483,9 +477,6 @@
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Nightly\moc_CentralUnit.cpp">
       <Filter>Generated Files\Nightly</Filter>
-    </ClCompile>
-    <ClCompile Include="mvNormSampler.cpp">
-      <Filter>Source Files\Probabilistic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

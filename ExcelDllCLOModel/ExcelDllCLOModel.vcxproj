@@ -51,7 +51,6 @@
     </CustomBuild>
     <ClInclude Include="CommonFunctions.h" />
     <ClInclude Include="DistributionsGenerators.h" />
-    <ClInclude Include="EigenMultivarNormal.h" />
     <ClInclude Include="ExcelCommons.h" />
     <ClInclude Include="ExcelOutput.h" />
     <ClInclude Include="Mortgage.h" />
@@ -70,7 +69,6 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DEXCELDLLCLOMODEL_LIB -DQUAZIP_BUILD -D_WINDLL "-IC:\Eigen" "-IC:\boost_1_54_0" "-IC:\KDAB\KDChart-2.5.1\include\KDChart" "-IC:\Zlib\include" "-IC:\2010 Office System Developer Resources\Excel2010XLLSDK\INCLUDE" "-IC:\blp\API\APIv3\C++API\v3.6.2.0\include" "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui"</Command>
     </CustomBuild>
-    <ClInclude Include="mvNormSampler.h" />
     <ClInclude Include="quazip\crypt.h" />
     <ClInclude Include="quazip\ioapi.h" />
     <ClInclude Include="quazip\JlCompress.h" />
@@ -499,7 +497,6 @@
     <ClCompile Include="MtgCalculator.cpp" />
     <ClCompile Include="MtgCalculatorThread.cpp" />
     <ClCompile Include="MtgCashFlow.cpp" />
-    <ClCompile Include="mvNormSampler.cpp" />
     <ClCompile Include="ProgressWidget.cpp" />
     <ClCompile Include="quazip\JlCompress.cpp" />
     <ClCompile Include="quazip\qioapi.cpp" />

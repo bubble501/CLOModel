@@ -269,10 +269,13 @@ double Waterfall::GetCreditEnhancement(int TrancheIndex,int TimeIndex)const{
 		}
 	}
 	if(Runningsum==0.0) return 1.0;
-	if(TimeIndex>=0)
-		return (m_MortgagesPayments.GetAmountOut(m_Tranches.first()->GetCashFlow().GetDate(TimeIndex))/Runningsum)-1.0;
-	else
-		return ((m_MortgagesPayments.GetAmountOut(0)+m_PrincipalAvailable)/Runningsum)-1.0;
+	if(TimeIndex>=0){
+		if(m_MortgagesPayments.GetAmountOut(m_Tranches.first()->GetCashFlow().GetDate(TimeIndex))<=0.0) return 0.0;
+		return 1.0-(Runningsum/m_MortgagesPayments.GetAmountOut(m_Tranches.first()->GetCashFlow().GetDate(TimeIndex))); //(m_MortgagesPayments.GetAmountOut(m_Tranches.first()->GetCashFlow().GetDate(TimeIndex))/Runningsum)-1.0;
+	}else{
+		if((m_MortgagesPayments.GetAmountOut(0)+m_PrincipalAvailable)<=0.0) return 0.0;
+		return 1.0-(Runningsum/(m_MortgagesPayments.GetAmountOut(0)+m_PrincipalAvailable)); //((m_MortgagesPayments.GetAmountOut(0)+m_PrincipalAvailable)/Runningsum)-1.0;
+	}
 }
 double Waterfall::GroupOutstanding(int GroupTarget)const{
 	double Result=0.0;

@@ -11,37 +11,51 @@ int MtgCashFlow::GetPaymentFrequency() const{
 int MtgCashFlow::Count() const{
 	return m_FlowDates.size();
 }
-QDate MtgCashFlow::GetDate(const int index)const{
+QDate MtgCashFlow::GetDate(int index)const{
 	if(index<0 || index>m_FlowDates.size()-1) return QDate();
 	return m_FlowDates.at(index);
 }
-double MtgCashFlow::GetInterest(const int index) const{
+double MtgCashFlow::GetInterest(int index) const{
 	if(index<0 || index>m_Interest.size()-1) return 0.0;
 	return m_Interest.at(index);
 }
-double MtgCashFlow::GetScheduled(const int index) const{
+double MtgCashFlow::GetScheduled(int index) const{
 	if(index<0 || index>m_Scheduled.size()-1) return 0.0;
 	return m_Scheduled.at(index);
 }
-double MtgCashFlow::GetPrepay(const int index) const{
+double MtgCashFlow::GetPrepay(int index) const{
 	if(index<0 || index>m_Prepay.size()-1) return 0.0;
 	return m_Prepay.at(index);
 }
-double MtgCashFlow::GetLoss(const int index) const{
+double MtgCashFlow::GetLoss(int index) const{
 	if(index<0 || index>m_Loss.size()-1) return 0.0;
 	return m_Loss.at(index);
 }
-double MtgCashFlow::GetAccruedInterest(const int index) const{
+double MtgCashFlow::GetAccruedInterest(int index) const{
 	if(index<0 || index>m_AccruedInterest.size()-1) return 0.0;
 	return m_AccruedInterest.at(index);
 }
-double MtgCashFlow::GetLossOnInterest(const int index) const{
+double MtgCashFlow::GetLossOnInterest(int index) const{
 	if(index<0 || index>m_LossOnInterest.size()-1) return 0.0;
 	return m_LossOnInterest.at(index);
 }
-double MtgCashFlow::GetAmountOut(const int index) const{
+double MtgCashFlow::GetAmountOut(int index) const{
 	if(index<0 || index>m_AmountOut.size()-1) return 0.0;
 	return m_AmountOut.at(index);
+}
+double MtgCashFlow::GetWAcoupon(int index) const{
+	if(index<0 || index>m_CoupTimesOut.size()-1 || GetAmountOut(index)==0.0) return 0.0;
+	return m_CoupTimesOut.at(index)/GetAmountOut(index);
+}
+double MtgCashFlow::GetWAcoupon(const QDate& index) const{
+	int NewIndex=-1;
+	for(int i=0;i<m_FlowDates.size();i++){
+		if(m_FlowDates.at(i).year()==index.year() && m_FlowDates.at(i).month()==index.month()){
+			NewIndex=i;
+			break;
+		}
+	}
+	return GetWAcoupon(NewIndex);
 }
 int  MtgCashFlow::FindDate(const QDate& a) const{
 	return m_FlowDates.indexOf(a);
@@ -58,6 +72,7 @@ void MtgCashFlow::AddFlow(const QDate& Dte, double Amt, MtgFlowType FlowTpe){
 		m_AmountOut.append(0.0);
 		m_AccruedInterest.append(0.0);
 		m_LossOnInterest.append(0.0);
+		m_CoupTimesOut.append(0.0);
 		DateIndex=m_FlowDates.size()-1;
 		NeedSorting=true;
 	}
@@ -76,6 +91,8 @@ void MtgCashFlow::AddFlow(const QDate& Dte, double Amt, MtgFlowType FlowTpe){
 		m_AccruedInterest[DateIndex]+=Amt; break;
 	case LossOnInterestFlow:
 		m_LossOnInterest[DateIndex]+=Amt; break;
+	case WACouponFlow:
+		m_CoupTimesOut[DateIndex]+=Amt; break;
 	}
 	if(NeedSorting) SortByDate();
 }
@@ -93,6 +110,7 @@ void MtgCashFlow::AddFlow(const MtgCashFlow& a){
 			m_AmountOut.append(0.0);
 			m_AccruedInterest.append(0.0);
 			m_LossOnInterest.append(0.0);
+			m_CoupTimesOut.append(0.0);
 			DateIndex=m_FlowDates.size()-1;
 			NeedSorting=true;
 		}
@@ -101,6 +119,7 @@ void MtgCashFlow::AddFlow(const MtgCashFlow& a){
 		m_Prepay[DateIndex]+=a.GetPrepay(i);
 		m_Loss[DateIndex]+=a.GetLoss(i);
 		m_AmountOut[DateIndex]+=a.GetAmountOut(i);
+		m_CoupTimesOut[DateIndex]+=a.m_CoupTimesOut[i];
 		m_AccruedInterest[DateIndex]+=a.GetAccruedInterest(i);
 		m_LossOnInterest[DateIndex]+=a.GetLossOnInterest(i);
 	}
@@ -116,6 +135,7 @@ void MtgCashFlow::SortByDate(){
 	QMap<int,double> AmountOutSorter;
 	QMap<int,double> AccruedInterestSorter;
 	QMap<int,double> LossOnInterestSorter;
+	QMap<int,double> CoupTimesOutSorter;
 	for (int i=0;i<m_FlowDates.size();i++){
 		Orderer=0;
 		for (int j=0;j<m_FlowDates.size();j++){
@@ -130,6 +150,7 @@ void MtgCashFlow::SortByDate(){
 		AmountOutSorter.insert(m_FlowDates.size()-Orderer,m_AmountOut.at(i));
 		AccruedInterestSorter.insert(m_FlowDates.size()-Orderer,m_AccruedInterest.at(i));
 		LossOnInterestSorter.insert(m_FlowDates.size()-Orderer,m_LossOnInterest.at(i));
+		CoupTimesOutSorter.insert(m_FlowDates.size()-Orderer,m_CoupTimesOut.at(i));
 	}
 	m_FlowDates=DateSorter.values();
 	m_Interest=InerestSorter.values();
@@ -139,6 +160,7 @@ void MtgCashFlow::SortByDate(){
 	m_AmountOut=AmountOutSorter.values();
 	m_AccruedInterest=AccruedInterestSorter.values();
 	m_LossOnInterest=LossOnInterestSorter.values();
+	m_CoupTimesOut=CoupTimesOutSorter.values();
 }
 void MtgCashFlow::RemoveAllFlows(){
 	m_FlowDates.clear();
@@ -149,6 +171,7 @@ void MtgCashFlow::RemoveAllFlows(){
 	m_AmountOut.clear();
 	m_AccruedInterest.clear();
 	m_LossOnInterest.clear();
+	m_CoupTimesOut.clear();
 }
 const MtgCashFlow& MtgCashFlow::operator=(const MtgCashFlow& a){
 	RemoveAllFlows();
@@ -163,6 +186,7 @@ QDataStream& operator<<(QDataStream & stream, const MtgCashFlow& flows){
 		<< flows.m_Prepay
 		<< flows.m_Loss
 		<< flows.m_AmountOut
+		<< flows.m_CoupTimesOut
 		<< flows.m_AccruedInterest
 		<< flows.m_LossOnInterest
 	;
@@ -176,6 +200,7 @@ QDataStream& operator>>(QDataStream & stream, MtgCashFlow& flows){
 		>> flows.m_Prepay
 		>> flows.m_Loss
 		>> flows.m_AmountOut
+		>> flows.m_CoupTimesOut
 		>> flows.m_AccruedInterest
 		>> flows.m_LossOnInterest
 		;

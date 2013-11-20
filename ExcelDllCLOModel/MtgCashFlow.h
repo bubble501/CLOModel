@@ -11,6 +11,7 @@ private:
 	QList<double> m_Prepay;
 	QList<double> m_Loss;
 	QList<double> m_AmountOut;
+	QList<double> m_CoupTimesOut;
 	QList<double> m_AccruedInterest;
 	QList<double> m_LossOnInterest;
 	void SortByDate();
@@ -20,20 +21,22 @@ public:
 		PrincipalFlow,
 		PrepaymentFlow,
 		AmountOutstandingFlow,
+		WACouponFlow,
 		AccruedInterestFlow,
 		LossOnInterestFlow,
 		LossFlow
 	};
 	int GetPaymentFrequency() const;
-	QDate GetDate(const int index) const;
-	double GetInterest(const int index) const;
-	double GetScheduled(const int index) const;
-	double GetPrepay(const int index) const;
-	double GetPrincipal(const int index) const{return GetScheduled(index)+GetPrepay(index);}
-	double GetLoss(const int index) const;
-	double GetAmountOut(const int index) const;
-	double GetAccruedInterest(const int index) const;
-	double GetLossOnInterest(const int index) const;
+	QDate GetDate(int index) const;
+	double GetInterest(int index) const;
+	double GetScheduled(int index) const;
+	double GetPrepay(int index) const;
+	double GetPrincipal(int index) const{return GetScheduled(index)+GetPrepay(index);}
+	double GetLoss(int index) const;
+	double GetAmountOut(int index) const;
+	double GetAccruedInterest(int index) const;
+	double GetLossOnInterest(int index) const;
+	double GetWAcoupon(int index) const;
 	double GetInterest(const QDate& index) const{return GetInterest(FindDate(index));}
 	double GetScheduled(const QDate& index) const{return GetScheduled(FindDate(index));}
 	double GetPrepay(const QDate& index) const{return GetPrepay(FindDate(index));}
@@ -42,6 +45,7 @@ public:
 	double GetAmountOut(const QDate& index) const{return GetAmountOut(FindDate(index));}
 	double GetAccruedInterest(const QDate& index) const{return GetAccruedInterest(FindDate(index));}
 	double GetLossOnInterest(const QDate& index) const{return GetLossOnInterest(FindDate(index));}
+	double GetWAcoupon(const QDate& index) const;
 	int Count() const;
 	int FindDate(const QDate& a) const;
 	void AddFlow(const QDate& Dte, double Amt, MtgFlowType FlowTpe);

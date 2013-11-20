@@ -12,7 +12,7 @@ CentralUnit::CentralUnit(QObject* parent)
 	,Stresser(NULL)
 	,RunCall(false)
 {
-	for(int i=0;i<6;i++) PlotIndexes[i]=0;
+	for(int i=0;i<NumberOfPlots;i++) PlotIndexes[i]=0;
 	if(!QMetaType::isRegistered(qMetaTypeId<Waterfall>()))
 		qRegisterMetaType<Waterfall>("Waterfall");
 	if(!QMetaType::isRegistered(qMetaTypeId<MtgCashFlow>()))
@@ -276,6 +276,10 @@ void CentralUnit::CheckCalculationDone()
 		ExcelOutput::PlotAnnualExcess(Structure,PlotsSheet,PlotIndexes[4],RunCall ? CallStructure.GetCalledPeriod():QDate());
 	if(!PlotsSheet.isEmpty() && PlotIndexes[5]>0)
 		ExcelOutput::PlotCostFunding(Structure,PlotsSheet,PlotIndexes[5],RunCall ? CallStructure.GetCalledPeriod():QDate());
+	if(!PlotsSheet.isEmpty() && PlotIndexes[6]>0)
+		ExcelOutput::PlotCPRLS(Structure,PlotsSheet,PlotIndexes[6]);
+	if(!PlotsSheet.isEmpty() && PlotIndexes[7]>0)
+		ExcelOutput::PlotEquityReturn(Structure,PlotsSheet,PlotIndexes[7]);
 	QApplication::quit();
 }
 void CentralUnit::StressFinished(){

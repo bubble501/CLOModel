@@ -106,10 +106,12 @@ void Mortgage::SetInterest(const QString& a){
 		m_CashFlows.AddFlow (CurrentMonth, TempFlow,  MtgCashFlow::LossFlow);
 		CurrentAmtOut = CurrentAmtOut - TempFlow;
 		m_CashFlows.AddFlow( CurrentMonth, CurrentAmtOut, MtgCashFlow::AmountOutstandingFlow);
+		m_CashFlows.AddFlow( CurrentMonth, CurrentAmtOut*(qPow(1.0+CurrentInterest,12.0)-1.0), MtgCashFlow::WACouponFlow);
 		CurrentMonth = CurrentMonth.addMonths(1);
 		if (CurrentAmtOut < 0.01) break;
 	}
 	m_CashFlows.AddFlow( StartDate, m_Size, MtgCashFlow::AmountOutstandingFlow);
+	m_CashFlows.AddFlow( StartDate, m_Size*(qPow(1.0+InterestVector.first(),12.0)-1.0), MtgCashFlow::WACouponFlow);
  }
  double Mortgage::pmt(double Interest, int Periods, double PresentValue){
 	 if(Periods<=0) return 0.0;

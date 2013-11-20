@@ -133,7 +133,7 @@ It will call the VBA function PrintMortgagesRepLines passing it the following ar
 		bool PrintDates  = true, 
 		bool PrintOutstanding  = true, 
 		bool PrintInterest  = true, 
-		bool PrintScheduled  = false, 
+		bool PrintScheduled  = true, 
 		bool PrintPrepay  = true, 
 		bool PrintAccruedInterest  = true, 
 		bool PrintTotalPrincipal  = false,
@@ -155,6 +155,9 @@ It will call the VBA function PrintMortgagesRepLines passing it the following ar
 	HRESULT PlotAnnualExcess(const Waterfall& source,const QString& DestinationSheet,int DestinationIndex,const QDate& CallDate);
 	HRESULT PlotCostFunding(const Waterfall& source,const QString& DestinationSheet,int DestinationIndex,const QDate& CallDate);
 	HRESULT PlotStressMargin(const StressTest& source,const QString& DestinationSheet,int DestinationIndex,const QString& TrancheTarget, double NewPrice);
+	//HRESULT PlotCallToEquity(const Waterfall& source,const QString& DestinationSheet,int DestinationIndex,const QDate& CallDate);
+	HRESULT PlotCPRLS(const Waterfall& source,const QString& DestinationSheet,int DestinationIndex);
+	HRESULT PlotEquityReturn(const Waterfall& source,const QString& DestinationSheet,int DestinationIndex);
 }
 #endif // ExcelOutput_h__
 

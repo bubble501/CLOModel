@@ -8,7 +8,7 @@
 #include <QDate>
 #include <QString>
 #include <QFile>
-//#define DebuggungInputs //TODO Comment me
+//#define  DebuggungInputs//TODO Comment me
 #include <QApplication>
 #ifdef DebuggungInputs
 #include <QMessageBox>
@@ -227,6 +227,11 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		TempUnit.SetPlotIndexes(pdFreq->intVal,3);pdFreq++;
 		TempUnit.SetPlotIndexes(pdFreq->intVal,4);pdFreq++;
 		TempUnit.SetPlotIndexes(pdFreq->intVal,5);pdFreq++;
+		TempUnit.SetPlotIndexes(pdFreq->intVal,6);pdFreq++;
+		TempUnit.SetPlotIndexes(pdFreq->intVal,7);pdFreq++;
+#ifdef DebuggungInputs
+		QMessageBox::information(0,"Plots Ok","All Plots OK");
+#endif
 		TempUnit.SetLossOutputAddress(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
 		TempUnit.SetLossOnCallOutputAddress(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
 		TempUnit.SetCreditEnanAddress(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;

@@ -30,6 +30,7 @@ private:
 	double m_InterestAvailable; 
 	double m_JuniorFeesCoupon; 
 	TrancheCashFlow m_AnnualizedExcess; 
+	TrancheCashFlow m_EquityIncome;
 	QDate m_FirstIPDdate;
 	TrancheCashFlow m_Reinvested; 
 	QDate m_LastIPDdate; 
@@ -76,6 +77,8 @@ public:
 	const QString& GetCCCcurve() const {return m_CCCcurve;}
 	const TrancheCashFlow& GetRawAnnualizedExcess() const {return m_AnnualizedExcess;}
 	double GetAnnualizedExcess(int index, bool AsShareOfLoans=false)const;
+	double GetEquityReturn(int index)const;
+	double GetCumulativeEquityReturn(int index)const;
 	const QDate& GetFirstIPDdate() const {return m_FirstIPDdate;}
 	const TrancheCashFlow& GetReinvested() const {return m_Reinvested;} 
 	const QDate& GetLastIPDdate() const {return m_LastIPDdate;} 

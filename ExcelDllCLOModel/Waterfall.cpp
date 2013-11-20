@@ -94,6 +94,7 @@ Waterfall::Waterfall(const Waterfall& a)
 	,m_CallMultiple(a.m_CallMultiple)
 	,m_CallReserve(a.m_CallReserve)
 	,m_CalculatedMtgPayments(a.m_CalculatedMtgPayments)
+	,m_EquityIncome(a.m_EquityIncome)
 {
 	for(QList<Tranche*>::const_iterator i=a.m_Tranches.constBegin();i!=a.m_Tranches.constEnd();i++){
 		m_Tranches.append(new Tranche(**i));
@@ -131,6 +132,7 @@ Waterfall& Waterfall::operator=(const Waterfall& a){
 	m_CallMultiple=a.m_CallMultiple;
 	m_CallReserve=a.m_CallReserve;
 	m_CalculatedMtgPayments=a.m_CalculatedMtgPayments;
+	m_EquityIncome=a.m_EquityIncome;
 	ResetTranches();
 	for(QList<Tranche*>::const_iterator i=a.m_Tranches.constBegin();i!=a.m_Tranches.constEnd();i++){
 		m_Tranches.append(new Tranche(**i));
@@ -185,7 +187,7 @@ void Waterfall::FillAllDates(){
 			}
 		}
 	}
-	//dates from annualized excess to all the tranches
+	//dates from annualized excess to all the tranches (equity income dates included here)
 	for(int j=0;j<m_Tranches.size();j++){
 		for(int h=0;h<m_AnnualizedExcess.Count();h++){
 			if(m_Tranches.at(j)->GetCashFlow().FindDate(m_AnnualizedExcess.GetDate(h)) < 0){
@@ -591,6 +593,8 @@ bool Waterfall::CalculateTranchesCashFlows(){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				case WatFalPrior::wst_Excess:
 					m_AnnualizedExcess.AddFlow(CurrentDate,AvailableInterest,TrancheCashFlow::InterestFlow);
+					m_EquityIncome.AddFlow(CurrentDate,AvailablePrincipal,TrancheCashFlow::PrincipalFlow);
+					m_EquityIncome.AddFlow(CurrentDate,AvailableInterest,TrancheCashFlow::InterestFlow);
 					if(SingleStep->GetRedemptionGroup()>0){
 						ProRataBonds.clear();
 						TotalPayable=0.0;
@@ -825,6 +829,7 @@ QDataStream& operator<<(QDataStream & stream, const Waterfall& flows){
 		<< flows.m_InterestAvailable
 		<< flows.m_JuniorFeesCoupon
 		<< flows.m_AnnualizedExcess
+		<< flows.m_EquityIncome
 		<< flows.m_FirstIPDdate
 		<< flows.m_Reinvested
 		<< flows.m_LastIPDdate
@@ -867,6 +872,7 @@ QDataStream& operator>>(QDataStream & stream, Waterfall& flows){
 		>> flows.m_InterestAvailable
 		>> flows.m_JuniorFeesCoupon
 		>> flows.m_AnnualizedExcess
+		>> flows.m_EquityIncome
 		>> flows.m_FirstIPDdate
 		>> flows.m_Reinvested
 		>> flows.m_LastIPDdate
@@ -949,3 +955,78 @@ QString Waterfall::ReadyToCalculate()const{
 	if(!Result.isEmpty()) return Result.left(Result.size()-1);
 	return Result;
 }
+double Waterfall::GetEquityReturn(int index)const{
+	if(index<0 || index>=m_EquityIncome.Count()) return 0.0;
+	int EquityTranche;
+	foreach(WatFalPrior* SingleStep,m_WaterfallStesps){
+		if(SingleStep->GetPriorityType()==WatFalPrior::wst_Excess){
+			EquityTranche=SingleStep->GetRedemptionGroup();
+			break;
+		}
+	}
+	double denominator=0.0;
+	if(EquityTranche>0){
+		foreach(Tranche* SingleTranche, m_Tranches){
+			if(SingleTranche->GetProrataGroup()==EquityTranche) denominator+=SingleTranche->GetOriginalAmount();
+		}
+		if(denominator>0) return m_EquityIncome.GetTotalFlow(index)/denominator;
+	}
+	denominator=0.0;
+	foreach(Tranche* SingleTranche, m_Tranches){
+		denominator+=SingleTranche->GetOriginalAmount();
+	}
+	denominator=m_MortgagesPayments.GetAmountOut(0)-denominator;
+	if(denominator>0) return m_EquityIncome.GetTotalFlow(index)/denominator;
+	else return 0.0;
+
+}
+double Waterfall::GetCumulativeEquityReturn(int index)const{
+	if(index<0 || index>=m_EquityIncome.Count()) return 0.0;
+	double numerator=0.0;
+	for(int i=0;i<=index;i++) numerator+=m_EquityIncome.GetTotalFlow(i);
+	int EquityTranche;
+	foreach(WatFalPrior* SingleStep,m_WaterfallStesps){
+		if(SingleStep->GetPriorityType()==WatFalPrior::wst_Excess){
+			EquityTranche=SingleStep->GetRedemptionGroup();
+			break;
+		}
+	}
+	double denominator=0.0;
+	if(EquityTranche>0){
+		foreach(Tranche* SingleTranche, m_Tranches){
+			if(SingleTranche->GetProrataGroup()==EquityTranche) denominator+=SingleTranche->GetOriginalAmount();
+		}
+		if(denominator>0) return numerator/denominator;
+	}
+	denominator=0.0;
+	foreach(Tranche* SingleTranche, m_Tranches){
+		denominator+=SingleTranche->GetOriginalAmount();
+	}
+	denominator=m_MortgagesPayments.GetAmountOut(0)-denominator;
+	if(denominator>0) return numerator/denominator;
+	else return 0.0;
+}
+/*double Waterfall::GetCallEquityRatio(int index)const{
+	if(index<0 || index>=m_Tranches.first()->GetCashFlow().Count()) return 0.0;
+	int EquityTranche;
+	foreach(WatFalPrior* SingleStep,m_WaterfallStesps){
+		if(SingleStep->GetPriorityType()==WatFalPrior::wst_Excess){
+			EquityTranche=SingleStep->GetRedemptionGroup();
+			break;
+		}
+	}
+	double denominator=0.0;
+	if(EquityTranche>0){
+		foreach(Tranche* SingleTranche, m_Tranches){
+			if(SingleTranche->GetProrataGroup()==EquityTranche) denominator+=SingleTranche->GetOriginalAmount();
+		}
+		if(denominator>0) return (m_PoolValueAtCall*m_MortgagesPayments.GetAmountOut(0)/100.0)/denominator;
+	}
+	denominator=0.0;
+	foreach(Tranche* SingleTranche, m_Tranches){
+		denominator+=SingleTranche->GetOriginalAmount();
+	}
+	denominator=m_MortgagesPayments.GetAmountOut(0)-denominator;
+	if(denominator>0) return (m_PoolValueAtCall*m_MortgagesPayments.GetAmountOut(0)/100.0)/denominator;
+	else return 0.0;
+}*/

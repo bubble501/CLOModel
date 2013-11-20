@@ -5,7 +5,7 @@
 #include "MtgCalculator.h"
 #include "Waterfall.h"
 #include "StressTest.h"
-
+#define NumberOfPlots 8
 class WaterfallCalculator;
 class ErrorsViewer;
 class CentralUnit : public QObject{
@@ -75,7 +75,7 @@ public:
 	void SetCreditEnanAddress(const QString& a){CreditEnanAddress=a;}
 	void SetStressToCall(bool a){StressToCall=a;}
 	void SetPlotsSheet(const QString& a){PlotsSheet=a;}
-	void SetPlotIndexes(int val,int index){if(index>=0 && index<6) PlotIndexes[index]=val;}
+	void SetPlotIndexes(int val,int index){if(index>=0 && index<NumberOfPlots) PlotIndexes[index]=val;}
 private:
 	WaterfallCalculator* ParallWatFalls;
 	MtgCalculator LoansCalculator;
@@ -94,7 +94,7 @@ private:
 	QString CreditEnanAddress;
 	QString FolderPath;
 	QString PlotsSheet;
-	int PlotIndexes[6];
+	int PlotIndexes[NumberOfPlots];
 signals:
 	void LoopStarted();
 	void StressLoopStarted();

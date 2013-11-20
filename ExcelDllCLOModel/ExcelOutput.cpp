@@ -1701,7 +1701,7 @@ HRESULT ExcelOutput::PlotEquityReturn(
 		}
 		SafeArrayUnaccessData(DatesArray);
 		return hr;
-}/*
+}
 HRESULT ExcelOutput::PlotCallToEquity(
 	const Waterfall& source,
 	const QString& DestinationSheet,
@@ -1713,29 +1713,24 @@ HRESULT ExcelOutput::PlotCallToEquity(
 		Bound[0].lLbound   = 1;
 		Bound[0].cElements = source.GetTranche(0)->GetCashFlow().Count();
 		VARIANT HUGEP *pdFreq;
+		VARIANT HUGEP *pdCallEqtIter;
 		SAFEARRAY* DatesArray = SafeArrayCreate(VT_VARIANT, 1, Bound);
+		SAFEARRAY* allEqtArray = SafeArrayCreate(VT_VARIANT, 1, Bound);
 		HRESULT hr = SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
+		if (SUCCEEDED(hr)) hr = SafeArrayAccessData(allEqtArray, (void HUGEP* FAR*)&pdCallEqtIter);
+		else SafeArrayUnaccessData(DatesArray);
 		if (SUCCEEDED(hr))
 		{
 			for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++){
 				pdFreq->vt = VT_BSTR;
+				pdCallEqtIter->vt = VT_R8;
 				pdFreq->bstrVal = SysAllocString(source.GetTranche(0)->GetCashFlow().GetDate(i).toString("yyyy-MM-dd").toStdWString().c_str());
+				pdCallEqtIter->dblVal = source.GetCallEquityRatio(i);
 				pdFreq++;
+				pdCallEqtIter++;
 			}
 			SafeArrayUnaccessData(DatesArray);
-		}
-		SAFEARRAY* OutstandingArray = SafeArrayCreate(VT_VARIANT, 1, Bound);
-		hr = SafeArrayAccessData(OutstandingArray, (void HUGEP* FAR*)&pdFreq);
-		if (SUCCEEDED(hr))
-		{
-			for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++){
-				if(source.GetWACostOfCapital(i)>0){
-					pdFreq->vt = VT_R8;
-					pdFreq->dblVal = source.GetCallEquityRatio(i);
-				}
-				pdFreq++;
-			}
-			SafeArrayUnaccessData(OutstandingArray);
+			SafeArrayUnaccessData(allEqtArray);
 		}
 
 		static DISPID dispid = 0;
@@ -1754,7 +1749,7 @@ HRESULT ExcelOutput::PlotCallToEquity(
 			Command[CurrentCmdIndex].vt = VT_ARRAY | VT_VARIANT;
 			Command[CurrentCmdIndex--].parray = DatesArray;
 			Command[CurrentCmdIndex].vt = VT_ARRAY | VT_VARIANT;
-			Command[CurrentCmdIndex--].parray = OutstandingArray;
+			Command[CurrentCmdIndex--].parray = allEqtArray;
 			Command[CurrentCmdIndex].vt = VT_BSTR;
 			Command[CurrentCmdIndex--].bstrVal = SysAllocString(CallDate.isNull() ? L"":CallDate.toString("yyyy-MM-dd").toStdWString().c_str());
 
@@ -1814,7 +1809,7 @@ HRESULT ExcelOutput::PlotCallToEquity(
 		}
 		SafeArrayUnaccessData(DatesArray);
 		return hr;
-}*/
+}
 HRESULT ExcelOutput::PlotCPRLS(
 	const Waterfall& source,
 	const QString& DestinationSheet,

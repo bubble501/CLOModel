@@ -263,7 +263,7 @@ Public Sub StructureFromBloomberg(FieldsLabels As Collection, InputsSheet As Str
     TickerAddress = Replace(BondStart.Offset(1, 0).Address, "$", "")
     SettleDateCell.Offset(0, 1).Formula = "=IF(" + TickerAddress + "="""","""",DATEVALUE(BDP(" + TickerAddress + " & "" " + BloombergExtension + """,""SETTLE_DT"")))"
     NextIPDCell.Offset(0, 1).Formula = "=IF(" + TickerAddress + "="""","""",DATEVALUE(BDP(" + TickerAddress + " & "" " + BloombergExtension + """,""MTG_NXT_PAY_DT_SET_DT"")))"
-    PrevIPDCell.Offset(0, 1).Formula = "=IF(" + TickerAddress + "="""","""",DATEVALUE(BDP(" + TickerAddress + " & "" " + BloombergExtension + """,""START_ACC_DT"")))"
+    PrevIPDCell.Offset(0, 1).Formula = "=IF(" + TickerAddress + "="""","""",DATEVALUE(BDP(" + TickerAddress + " & "" " + BloombergExtension + """,""MTG_START_ACC_DT_SET_DT"")))"
     IDPFreqCell.Offset(0, 1).Formula = "=IF(" + TickerAddress + "="""","""",12/BDP(" + TickerAddress + " & "" " + BloombergExtension + """,""CPN_FREQ""))"
     Application.ScreenUpdating = True
 End Sub

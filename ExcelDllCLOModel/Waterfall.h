@@ -79,6 +79,7 @@ public:
 	double GetAnnualizedExcess(int index, bool AsShareOfLoans=false)const;
 	double GetEquityReturn(int index)const;
 	double GetCumulativeEquityReturn(int index)const;
+	double GetCallEquityRatio(int index)const;
 	const QDate& GetFirstIPDdate() const {return m_FirstIPDdate;}
 	const TrancheCashFlow& GetReinvested() const {return m_Reinvested;} 
 	const QDate& GetLastIPDdate() const {return m_LastIPDdate;} 

@@ -163,6 +163,7 @@ Private Sub ResetToDefault()
 End Sub
 Public Sub ImportFromOldVersion()
     Application.ScreenUpdating = False
+    Application.Calculation = xlCalculationManual
     Dim fd As FileDialog
     Dim i As Long
     Set fd = Application.FileDialog(msoFileDialogFilePicker)
@@ -179,6 +180,26 @@ Public Sub ImportFromOldVersion()
         End If
     End With
     Set fd = Nothing
+    Dim TempSheet As Worksheet
+    
+    
+    On Error Resume Next
+    Set TempSheet = DestinationBook.Sheets("Raw Portfolio")
+    If (TempSheet Is Nothing) Then
+        DestinationBook.Sheets.Add.Name = "Raw Portfolio"
+    Else
+        TempSheet.Cells.Clear
+    End If
+    Set TempSheet = Nothing
+    Set TempSheet = DestinationBook.Sheets("Monitoring")
+    If (TempSheet Is Nothing) Then
+        DestinationBook.Sheets.Add.Name = "Monitoring"
+    Else
+        TempSheet.Cells.Clear
+    End If
+    On Error GoTo 0
+    SourceBook.Sheets("Raw Portfolio").Cells.Copy Destination:=DestinationBook.Sheets("Raw Portfolio").Cells
+    SourceBook.Sheets("Monitoring").Cells.Copy Destination:=DestinationBook.Sheets("Monitoring").Cells
     DestinationBook.Sheets("Liabilities + input").Range("B1").formula = SourceBook.Sheets("Liabilities + input").Range("B1").formula
     DestinationBook.Sheets("Liabilities + input").Range("D1").formula = SourceBook.Sheets("Liabilities + input").Range("D1").formula
     DestinationBook.Sheets("Liabilities + input").Range("F1").formula = SourceBook.Sheets("Liabilities + input").Range("F1").formula
@@ -196,6 +217,7 @@ Public Sub ImportFromOldVersion()
         DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 13).formula = SourceBook.Sheets("Liabilities + input").Range("A3").Offset(i, 13).formula
         DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 22).formula = SourceBook.Sheets("Liabilities + input").Range("A3").Offset(i, 22).formula
         DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 23).formula = SourceBook.Sheets("Liabilities + input").Range("A3").Offset(i, 23).formula
+        DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 24).formula = "=BDP(" + DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 24).Address + "& "" Mtge"",""INT_ACC"")"
     Next i
     For i = 1 To 47
         If Not ( _
@@ -230,4 +252,5 @@ Public Sub ImportFromOldVersion()
         Next j
         i = i + 1
     Loop
+    Application.Calculation = xlCalculationAutomatic
 End Sub

@@ -280,6 +280,9 @@ DefaultExchange:
     Call AddInput(AllTheInputs, CLng(FieldsLabels("ICPlotIndex")))
     Call AddInput(AllTheInputs, CLng(FieldsLabels("CostFundingPlotIndex")))
     Call AddInput(AllTheInputs, CLng(FieldsLabels("AnnExcessPlotIndex")))
+    Call AddInput(AllTheInputs, CLng(FieldsLabels("CPRLSPlotIndex")))
+    Call AddInput(AllTheInputs, CLng(FieldsLabels("CallToEquityPlotIndex")))
+    Call AddInput(AllTheInputs, CLng(FieldsLabels("EquityReturnPlotIndex")))
     Call AddInput(AllTheInputs, InputsSheet + "!" + Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("LossOutputCell"), LookAt:=xlWhole, LookIn:=xlValues).Offset(1, 0).Address)
     Call AddInput(AllTheInputs, InputsSheet + "!" + Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("LossCallOutputCell"), LookAt:=xlWhole, LookIn:=xlValues).Offset(1, 0).Address)
     Call AddInput(AllTheInputs, InputsSheet + "!" + Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("CEcell"), LookAt:=xlWhole, LookIn:=xlValues).Offset(1, 0).Address)
@@ -412,6 +415,9 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
     a.Add 4, "ICPlotIndex"
     a.Add 5, "CostFundingPlotIndex"
     a.Add 6, "AnnExcessPlotIndex"
+    a.Add 8, "CPRLSPlotIndex"
+    a.Add 9, "CallToEquityPlotIndex"
+    a.Add 7, "EquityReturnPlotIndex"
     a.Add "Accrued Interest", "IntrAccrHead"
 End Sub
 
@@ -481,7 +487,6 @@ Public Function GetWAL(TrancheName As String, CutOffDate As Date, Price As Doubl
     result(1) = TrancheName
     result(2) = Format(CutOffDate, "yyyy-mm-dd")
     result(3) = ToCall
-    result(4) = Price
     GetWAL = CLOWALife(result)
 End Function
 Public Sub StressTargetEvent(NewTrancheName As String, StressTargetCell As String, Xvar As Long, Yvar As Long, NewPrice As Double, Optional PlotSheet As String = "", Optional PlotIndex As Long = 1)

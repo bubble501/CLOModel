@@ -229,6 +229,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		TempUnit.SetPlotIndexes(pdFreq->intVal,5);pdFreq++;
 		TempUnit.SetPlotIndexes(pdFreq->intVal,6);pdFreq++;
 		TempUnit.SetPlotIndexes(pdFreq->intVal,7);pdFreq++;
+		TempUnit.SetPlotIndexes(pdFreq->intVal,8);pdFreq++;
 #ifdef DebuggungInputs
 		QMessageBox::information(0,"Plots Ok","All Plots OK");
 #endif

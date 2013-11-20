@@ -889,6 +889,7 @@ Public Sub PlotCostFunding( _
     TargetPlotIndex As Long, _
     Dtes As Variant, _
     Values As Variant, _
+    LoansValues As Variant, _
     CallDateString As String _
 )
     Dim Dates() As Date
@@ -907,13 +908,14 @@ Public Sub PlotCostFunding( _
         Dates(i) = DateValue(Dtes(i))
     Next i
     With TargetPlot
-        .HasLegend = False
+        .HasLegend = True
+        .Legend.Position = xlLegendPositionRight
         .HasTitle = True
         .Axes(xlValue).HasTitle = False
         .Axes(xlCategory).HasTitle = False
         .Axes(xlCategory).TickLabels.NumberFormat = "mmm-yy"
         .ChartType = xlLine
-        .ChartTitle.Text = "WA Cost Of Funding"
+        .ChartTitle.Text = "Revenues and Costs"
         With .Axes(xlValue)
             .HasDisplayUnitLabel = False
             .DisplayUnit = xlNone
@@ -926,6 +928,11 @@ Public Sub PlotCostFunding( _
     With TargetPlot.SeriesCollection.NewSeries
         .Name = "WA Cost Of Funding"
         .Values = Values
+        .XValues = Dates
+    End With
+    With TargetPlot.SeriesCollection.NewSeries
+        .Name = "WA Loans Interest Rate"
+        .Values = LoansValues
         .XValues = Dates
     End With
     If (Len(CallDateString) > 0) Then
@@ -1008,3 +1015,203 @@ Public Sub PlotStressMargin( _
         .Axes(xlTimeScale).ReversePlotOrder = True
     End With
 End Sub
+Public Sub PlotCPRLS( _
+    TargetPlotSheet As String, _
+    TargetPlotIndex As Long, _
+    Dtes As Variant, _
+    CPRValues As Variant, _
+    LSValues As Variant _
+)
+    Dim Dates() As Date
+    Dim TargetPlot As Chart
+    Dim i As Long
+    Set TargetPlot = Sheets(TargetPlotSheet).ChartObjects(TargetPlotIndex).Chart
+    While (TargetPlot.SeriesCollection.Count > 0)
+        TargetPlot.SeriesCollection(1).Delete
+    Wend
+    ReDim Dates(LBound(Dtes) To UBound(Dtes))
+    For i = LBound(Dtes) To UBound(Dtes)
+        Dates(i) = DateValue(Dtes(i))
+    Next i
+    With TargetPlot
+        .HasLegend = True
+        .Legend.Position = xlLegendPositionTop
+        .HasTitle = True
+        .Axes(xlCategory).HasTitle = False
+        .Axes(xlCategory).TickLabels.NumberFormat = "mmm-yy"
+        .ChartType = xlLine
+        .ChartTitle.Text = "CPR and Loss Rate"
+    End With
+    With TargetPlot.SeriesCollection.NewSeries
+        .Name = "CPR"
+        .Values = CPRValues
+        .XValues = Dates
+    End With
+    With TargetPlot.SeriesCollection.NewSeries
+            .Name = "Loss Rate"
+            .Values = LSValues
+            .XValues = Dates
+            .AxisGroup = xlSecondary
+    End With
+    With TargetPlot
+        With .Axes(xlValue)
+            .HasTitle = True
+            .AxisTitle.Caption = "CPR"
+            .HasDisplayUnitLabel = False
+            .DisplayUnit = xlNone
+            .MinimumScaleIsAuto = True
+            .MaximumScaleIsAuto = True
+            .TickLabels.NumberFormat = "0.00%"
+        End With
+        With .Axes(xlValue, xlSecondary)
+            .HasTitle = True
+            .AxisTitle.Caption = "LR"
+            .HasDisplayUnitLabel = False
+            .DisplayUnit = xlNone
+            .MinimumScaleIsAuto = True
+            .MaximumScaleIsAuto = True
+            .TickLabels.NumberFormat = "0.00%"
+        End With
+    End With
+End Sub
+Public Sub PlotEquityReturn( _
+    TargetPlotSheet As String, _
+    TargetPlotIndex As Long, _
+    Dtes As Variant, _
+    CPRValues As Variant, _
+    LSValues As Variant _
+)
+    Dim Dates() As Date
+    Dim TargetPlot As Chart
+    Dim i As Long
+    Set TargetPlot = Sheets(TargetPlotSheet).ChartObjects(TargetPlotIndex).Chart
+    While (TargetPlot.SeriesCollection.Count > 0)
+        TargetPlot.SeriesCollection(1).Delete
+    Wend
+    ReDim Dates(LBound(Dtes) To UBound(Dtes))
+    For i = LBound(Dtes) To UBound(Dtes)
+        Dates(i) = DateValue(Dtes(i))
+    Next i
+    With TargetPlot
+        .HasLegend = True
+        .Legend.Position = xlLegendPositionTop
+        .HasTitle = True
+        .Axes(xlCategory).HasTitle = False
+        .Axes(xlCategory).TickLabels.NumberFormat = "mmm-yy"
+        .ChartType = xlLine
+        .ChartTitle.Text = "Equity Return"
+    End With
+    
+    With TargetPlot.SeriesCollection.NewSeries
+        .Name = "Equity Return"
+        .Values = CPRValues
+        .XValues = Dates
+    End With
+    With TargetPlot.SeriesCollection.NewSeries
+            .Name = "Comulative Equity Return"
+            .Values = LSValues
+            .XValues = Dates
+            .AxisGroup = xlSecondary
+    End With
+    
+    With TargetPlot
+        With .Axes(xlValue)
+            .HasTitle = True
+            .AxisTitle.Caption = "Equity Return"
+            .HasDisplayUnitLabel = False
+            .DisplayUnit = xlNone
+            .MinimumScaleIsAuto = True
+            .MaximumScaleIsAuto = True
+            .TickLabels.NumberFormat = "0.00%"
+        End With
+        With .Axes(xlValue, xlSecondary)
+            .HasTitle = True
+            .AxisTitle.Caption = "Comulative Equity Return"
+            .HasDisplayUnitLabel = False
+            .DisplayUnit = xlNone
+            .MinimumScaleIsAuto = True
+            .MaximumScaleIsAuto = True
+            .TickLabels.NumberFormat = "0.00%"
+        End With
+    End With
+End Sub
+Public Sub PlotCallToEquity( _
+    TargetPlotSheet As String, _
+    TargetPlotIndex As Long, _
+    Dtes As Variant, _
+    Values As Variant, _
+    CallDateString As String _
+)
+    Dim Dates() As Date
+    Dim CallDate As Date
+    Dim TempValues() As Double
+    Dim TargetPlot As Chart
+    Dim i As Long
+    If (Len(CallDateString) > 0) Then CallDate = DateValue(CallDateString)
+    Set TargetPlot = Sheets(TargetPlotSheet).ChartObjects(TargetPlotIndex).Chart
+    While (TargetPlot.SeriesCollection.Count > 0)
+        TargetPlot.SeriesCollection(1).Delete
+    Wend
+     ReDim Dates(LBound(Dtes) To UBound(Dtes))
+    ReDim TempValues(LBound(Values) To UBound(Values))
+    For i = LBound(Dtes) To UBound(Dtes)
+        Dates(i) = DateValue(Dtes(i))
+    Next i
+    With TargetPlot
+        .HasLegend = False
+        .HasTitle = True
+        .Axes(xlValue).HasTitle = False
+        .Axes(xlCategory).HasTitle = False
+        .Axes(xlCategory).TickLabels.NumberFormat = "mmm-yy"
+        .ChartType = xlLine
+        .ChartTitle.Text = "Pool call value to equity ratio"
+        With .Axes(xlValue)
+            .HasDisplayUnitLabel = False
+            .DisplayUnit = xlNone
+            .MinimumScaleIsAuto = True
+            .MaximumScaleIsAuto = True
+            .TickLabels.NumberFormat = "0.00%"
+        End With
+    End With
+    
+    With TargetPlot.SeriesCollection.NewSeries
+        .Name = "Call to Equity"
+        .Values = Values
+        .XValues = Dates
+    End With
+    If (Len(CallDateString) > 0) Then
+        Dim CallDateFound As Boolean
+        CallDateFound = False
+        For i = LBound(Dates) To UBound(Dates)
+            If (Dates(i) >= CallDate And (Not CallDateFound)) Then
+                TempValues(i) = 1
+                CallDateFound = True
+            Else
+                TempValues(i) = 0
+            End If
+        Next i
+        With TargetPlot.SeriesCollection.NewSeries
+            .ChartType = xlColumnClustered
+            .Name = "Call Date"
+            .Values = TempValues
+            .XValues = Dates
+            .AxisGroup = xlSecondary
+            .Format.Fill.Patterned msoPatternDarkHorizontal
+            .Format.Fill.ForeColor.RGB = RGB(90, 90, 90)
+        End With
+        TargetPlot.ChartGroups(TargetPlot.ChartGroups.Count).GapWidth = 500
+        With TargetPlot.Axes(xlValue, xlSecondary)
+            .MaximumScale = 1
+            .MinimumScale = 0
+            .HasTitle = False
+            .DisplayUnit = xlNone
+            .HasDisplayUnitLabel = False
+            .Border.Weight = xlHairline
+            .Border.LineStyle = xlNone
+            .MajorTickMark = xlNone
+            .MinorTickMark = xlNone
+            .TickLabelPosition = xlNone
+        End With
+    End If
+End Sub
+

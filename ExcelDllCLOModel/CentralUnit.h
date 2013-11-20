@@ -5,7 +5,7 @@
 #include "MtgCalculator.h"
 #include "Waterfall.h"
 #include "StressTest.h"
-#define NumberOfPlots 8
+#define NumberOfPlots 9
 class WaterfallCalculator;
 class ErrorsViewer;
 class CentralUnit : public QObject{

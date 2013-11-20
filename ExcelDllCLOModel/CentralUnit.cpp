@@ -280,6 +280,8 @@ void CentralUnit::CheckCalculationDone()
 		ExcelOutput::PlotCPRLS(Structure,PlotsSheet,PlotIndexes[6]);
 	if(!PlotsSheet.isEmpty() && PlotIndexes[7]>0)
 		ExcelOutput::PlotEquityReturn(Structure,PlotsSheet,PlotIndexes[7]);
+	if(!PlotsSheet.isEmpty() && PlotIndexes[8]>0)
+		ExcelOutput::PlotCallToEquity(Structure,PlotsSheet,PlotIndexes[8],RunCall ? CallStructure.GetCalledPeriod():QDate());
 	QApplication::quit();
 }
 void CentralUnit::StressFinished(){

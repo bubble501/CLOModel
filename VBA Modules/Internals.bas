@@ -75,12 +75,13 @@ Public Sub WaterfallStepChanged(TargetAllCell As Range)
                 TargetCell.Offset(0, 2).Validation.Add Type:=xlValidateWholeNumber, AlertStyle:=xlValidAlertStop, Operator:= _
                     xlBetween, Formula1:="0", Formula2:="=max(" + Range(TempRange, TempRange.End(xlDown)).Address + ")"
             Case UCase("Reinvestment test")
+                TargetCell.Offset(0, 1).AddComment ("Tranche that will be redeemed if the test fails and turbo is on" + vbCrLf + "Leave Blank for Sequential")
                 TargetCell.Offset(0, 2).Locked = False
                 TargetCell.Offset(0, 2).NumberFormat = "0"
                 TargetCell.Offset(0, 2).AddComment ("Tranche that will be redeemed if the test fails and turbo is on" + vbCrLf + "Leave Blank for Sequential")
             Case UCase("OC"), UCase("OC from Principal")
                 TargetCell.Offset(0, 2).Resize(1, 2).Locked = False
-                TargetCell.Offset(0, 2).AddComment ("Tranche that will be redeemed if the test fails and turbo is on." + vbCrLf + "Leave Blank for Sequential")
+                TargetCell.Offset(0, 2).AddComment ("Most junior tranche that will be considered for the test level")
                 TargetCell.Offset(0, 3).AddComment ("Share that will redeem that tranche")
                 TargetCell.Offset(0, 3).Value = 0
                 TargetCell.Offset(0, 3).NumberFormat = "0%"

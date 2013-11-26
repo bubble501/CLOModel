@@ -153,6 +153,7 @@ void WaterfallViewer::AddStep(const WatFalPrior& a){
 	case WatFalPrior::wst_ReinvestmentTest:
 		InterestTable->setRowCount(InterestTable->rowCount()+1);
 		InterestTable->setItem(InterestTable->rowCount()-1,0,new QTableWidgetItem("Reinvestment Test"));
+		InterestTable->setItem(InterestTable->rowCount()-1,1,new QTableWidgetItem(QString("%1").arg(a.GetGroupTarget())));
 		if(a.GetRedemptionGroup()>0) InterestTable->setItem(InterestTable->rowCount()-1,2,new QTableWidgetItem(QString("%1").arg(a.GetRedemptionGroup())));
 	break;
 	case WatFalPrior::wst_Excess:

@@ -18,7 +18,8 @@ SummaryView::SummaryView(QWidget* parent)
 	,ExpensesTable(NULL)
 {
 	setWindowIcon(QIcon(":/Icons/Logo.png"));
-	qRegisterMetaType<Waterfall>("Waterfall");
+	if(!QMetaType::isRegistered(qMetaTypeId<Waterfall>()))
+		qRegisterMetaType<Waterfall>("Waterfall");
 	setWindowTitle("Stress Scenario");
 	setMinimumSize(1024,768);
 	QStringList HeadersStrings;
@@ -157,6 +158,7 @@ void SummaryView::DisplayStructure(){
 
 	ChartPlotter->ResetCharts();
 	ChartPlotter->PlotStructure(Structure);
+	
 
 	MtgTable->setRowCount(0);
 	MtgTable->setRowCount(Structure.GetCalculatedMtgPayments().Count());

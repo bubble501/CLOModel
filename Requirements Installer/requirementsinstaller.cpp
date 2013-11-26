@@ -4,6 +4,7 @@
 #include <QVBoxLayout>
 #include <QIcon>
 #include <QFile>
+#include <QSettings>
 RequirementsInstaller::RequirementsInstaller(QWidget *parent)
 	: QWidget(parent)
 {
@@ -12,7 +13,7 @@ RequirementsInstaller::RequirementsInstaller(QWidget *parent)
 	setWindowIcon(QIcon(":/Icons/Logo.png"));
 	ProgIndicator=new QProgressBar(this);
 	ProgIndicator->setMinimum(0);
-	ProgIndicator->setMaximum(6);
+	ProgIndicator->setMaximum(7);
 	ProgIndicator->setValue(0);
 	MainLabel=new QLabel(this);
 	MainLabel->setText("Installing Required Files");
@@ -43,6 +44,11 @@ void RequirementsInstaller::Install(){
 	if(QFile::exists("C:\\Windows\\system\\QtSvg4.dll")) QFile::remove("C:\\Windows\\system\\QtSvg4.dll");
 	Check = Check && QFile::copy(":/Libraries/SVG","C:\\Windows\\system\\QtSvg4.dll");
 	ProgIndicator->setValue(6);
+#ifdef Q_WS_WIN
+// 	QSettings FileAssociation("HKEY_LOCAL_MACHINE\\SOFTWARE",QSettings::NativeFormat);
+// 	FileAssociation.setValue("CLOviewer/Path","Z:\\24AM\\Analytics\\CLO Model\\CLO Viewer.exe");
+#endif
+	ProgIndicator->setValue(7);
 	if(Check) MainLabel->setText("Done");
 	else MainLabel->setText("Errors Occured");
 }

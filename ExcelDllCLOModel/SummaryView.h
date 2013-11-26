@@ -36,7 +36,8 @@ public:
 protected:
 	void resizeEvent(QResizeEvent *event);
 private slots:
-	void AdjustTableSizes();
 	void PriceChanged();
+public slots:
+	void AdjustTableSizes();
 };
 #endif // TestTable_h__

@@ -72,7 +72,7 @@ void Mortgage::SetInterest(const QString& a){
 		CurrentCPR=CPRVector.at(qMin(j,CPRVector.size()-1));
 		CurrentCDR=CDRVector.at(qMin(j,CDRVector.size()-1));
 		CurrentLS=LossVector.at(qMin(j,LossVector.size()-1));
-		CurrentInterest=m_FloatingRateBase+InterestVector.at(qMin(j,InterestVector.size()-1));
+		CurrentInterest=qPow(1.0+m_FloatingRateBase,1.0/12.0)-1.0+InterestVector.at(qMin(j,InterestVector.size()-1));
 		CurrentAnnuity=AnnuityVector.at(qMin(j,AnnuityVector.size()-1));
 		TempFlow=(CurrentInterest*CurrentAmtOut)+((1.0+CurrentInterest)*m_CashFlows.GetAccruedInterest(m_CashFlows.Count()-1));
 		m_CashFlows.AddFlow( CurrentMonth, TempFlow, MtgCashFlow::AccruedInterestFlow);

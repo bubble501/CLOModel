@@ -1164,11 +1164,11 @@ Public Sub PlotCallToEquity( _
         .Axes(xlCategory).HasTitle = False
         .Axes(xlCategory).TickLabels.NumberFormat = "mmm-yy"
         .ChartType = xlLine
-        .ChartTitle.Text = "Pool call value to equity ratio"
+        .ChartTitle.Text = "Pool Call Value to Equity Ratio"
         With .Axes(xlValue)
             .HasDisplayUnitLabel = False
             .DisplayUnit = xlNone
-            .MinimumScaleIsAuto = True
+            .MinimumScale = 0
             .MaximumScaleIsAuto = True
             .TickLabels.NumberFormat = "0.00%"
         End With

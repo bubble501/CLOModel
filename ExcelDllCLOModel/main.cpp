@@ -16,6 +16,7 @@ int main(int argc, char *argv[])
 	if(VersionChecker!=qint32(ModelVersionNumber)) return 0;
 	out >> TempWaterfall;
 	file.close();
+	TempWaterfall.CalculateTranchesCashFlows();
 	ExcelOutput::PlotCallToEquity(TempWaterfall,"Graphical Output",6,TempWaterfall.GetCalledPeriod());
 	return a.exec();
 }

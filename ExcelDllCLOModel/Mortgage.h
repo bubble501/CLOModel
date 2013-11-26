@@ -40,6 +40,7 @@ public:
 	void SetSize(double a){if(a>=0) m_Size=a;}
 	void CalculateCashFlows(const QString& CPRVec,const QString& CDRVec,const QString& LossVec,const QDate& StartDate);
 	QString ReadyToCalculate() const;
+	void ResetFlows(){m_CashFlows.RemoveAllFlows();}
 	friend QDataStream& operator<<(QDataStream & stream, const Mortgage& flows);
 	friend QDataStream& operator>>(QDataStream & stream, Mortgage& flows);
 };

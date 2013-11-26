@@ -29,6 +29,7 @@ void ReinvestmentTest::SetupTest(
 	,double ORshare
 ){
 	ReinvestmentPeriod=ReinvPer;
+	ReinvestmentTestLevel=TstLvl;
 	if(IIshare>=0.0 && IIshare<=1.0) ReinvestmentShare[InReinvShare]=IIshare;
 	if(IRshare>=0.0 && IRshare<=1.0) ReinvestmentShare[InRedempShare]=IRshare;
 	if(OIshare>=0.0 && OIshare<=1.0) ReinvestmentShare[OutReinvShare]=OIshare;
@@ -74,6 +75,7 @@ ReinvestmentTest& ReinvestmentTest::operator=(const ReinvestmentTest& a){
 	return *this;
 }
 void ReinvestmentTest::CalculateBondCashFlows(double Size, QDate StartDate, int Period){
+	ReinvestmentBond.ResetFlows();
 	ReinvestmentBond.SetSize(Size);
 	QList<double>UnpackedWAL=UnpackVect(WALAssumption,1,false);
 	ReinvestmentBond.SetMaturityDate(StartDate.addDays(RoundUp(365.25*100.0*UnpackedWAL.at(qMin(UnpackedWAL.size()-1,Period)))));

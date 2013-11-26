@@ -57,6 +57,7 @@ public:
 	void AddYSpann(const QList<QString>& a);
 	void AddYSpann(const QString& a);
 	void ResetYSpann() {YSpann.clear();}
+	void ResetResult() {Results.clear();}
 	void SetConstantPar(const QString& a);
 	void AddLoan(const Mortgage& a);
 	void ResetLoans();

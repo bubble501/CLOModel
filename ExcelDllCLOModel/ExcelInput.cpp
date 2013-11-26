@@ -211,6 +211,9 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			BaseVal=pdFreq->dblVal;pdFreq++;
 			TempUnit.SetupReinvBond(Intr,CPR,CDR,LS,WAL,Frq,"N",BaseVal);
 		}
+#ifdef DebuggungInputs
+		QMessageBox::information(0,"Reivestment",QString("Reinvestment limit: %1").arg(ReinvLim));
+#endif
 		TempUnit.SetPrincipalAvailable(pdFreq->dblVal);pdFreq++;
 		TempUnit.SetInterestAvailable(pdFreq->dblVal);pdFreq++;
 		TempUnit.SetPoolCutOff(QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd"));pdFreq++;

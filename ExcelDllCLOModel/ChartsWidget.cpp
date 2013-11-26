@@ -38,6 +38,7 @@ void ChartsWidget::ResetCharts(){
 		(*i)->deleteLater();
 	Charts.clear();
 	ChartsModels.clear();
+	ChartsList->clear();
 }
 void ChartsWidget::PlotStructure(const Waterfall& a){
 	if(a.GetTranchesCount()<1) return;

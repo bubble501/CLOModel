@@ -153,7 +153,7 @@ double Tranche::GetLossRate() const{
 }
 double Tranche::GetDiscountMargin() const {return GetDiscountMargin(Price);}
 double Tranche::GetDiscountMargin(double NewPrice)const{
-	if(GetLossRate()>0.0000) return 0.0;
+	if(GetLossRate()>0.0000 || OutstandingAmt<0.01) return 0.0;
 	QList<QDate> FlowsDates;
 	QList<double> FlowsValues;
 	FlowsDates.append(SettlementDate);
@@ -182,6 +182,7 @@ double Tranche::GetCurrentOutstanding()const{
 	return CashFlow.GetAmountOutstanding(CashFlow.Count()-1);
 }
 double Tranche::GetWALife(const QDate& StartDate)const{
+	if(OutstandingAmt<0.01) return 0.0;
 	double RunningSum=0.0, Result=0.0, CurrentPrinc;
 	for(int i=0;i<CashFlow.Count();i++){
 		CurrentPrinc=CashFlow.GetPrincipal(i);

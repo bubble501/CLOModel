@@ -440,6 +440,7 @@ void __stdcall InspectStress(LPSAFEARRAY *ArrayData){
 	SummaryView SitRep;
 	SitRep.show();
 	SitRep.SetStructure(TempStructure);
+	SitRep.ShowCallStructure(false);
 	ComputationLoop.exec();	
 }
 void __stdcall InspectWaterfall(LPSAFEARRAY *ArrayData){

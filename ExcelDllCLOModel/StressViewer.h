@@ -9,6 +9,7 @@ class StressViewer : public QWidget{
 public:
 	StressViewer(QWidget* parent=0);
 	void LoadStress(const QString& filename);
+	QString GetFirstName() const{return StressTarget.GetResults().value(StressTarget.GetXSpann().first()).value(StressTarget.GetYSpann().first()).GetTranche(0)->GetTrancheName();}
 private:
 	QTableWidget* Table;
 	QLabel* TypeLabel;

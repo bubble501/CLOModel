@@ -81,6 +81,16 @@ SummaryView::SummaryView(QWidget* parent)
 	TranchesLay->addWidget(TranchesList);
 	TranchesLay->addWidget(TranchesArea);
 	MainWidget->addTab(TranchesWidget,"Tranches Results");
+
+	QWidget* CallTranchesWidget=new QWidget(this);
+	QHBoxLayout* CallTranchesLay=new QHBoxLayout(CallTranchesWidget);
+	CallTranchesArea=new QStackedWidget(CallTranchesWidget);
+	CallTranchesList=new QListWidget(CallTranchesWidget);
+	CallTranchesList->setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Expanding);
+	connect(CallTranchesList,SIGNAL(currentRowChanged(int)),CallTranchesArea,SLOT(setCurrentIndex(int)));
+	CallTranchesLay->addWidget(CallTranchesList);
+	CallTranchesLay->addWidget(CallTranchesArea);
+	MainWidget->addTab(CallTranchesWidget,"Call Tranches Results");
 	
 	ExpensesTable=new QTableWidget(this);
 	ExpensesTable->setColumnCount(6);
@@ -155,6 +165,12 @@ void SummaryView::DisplayStructure(){
 		TranchesArea->addWidget(TrancheTables.last());
 		TranchesList->addItem(Structure.GetTranche(i)->GetTrancheName());
 	}
+	for (int i=0;i<CallStructure.GetTranchesCount();i++){
+		CallTrancheTables.append(new TrancheViewer(this));
+		CallTrancheTables.last()->SetTranche(*(CallStructure.GetTranche(i)));
+		CallTranchesArea->addWidget(CallTrancheTables.last());
+		CallTranchesList->addItem(CallStructure.GetTranche(i)->GetTrancheName());
+	}
 
 	ChartPlotter->ResetCharts();
 	ChartPlotter->PlotStructure(Structure);
@@ -224,7 +240,7 @@ void SummaryView::DisplayStructure(){
 	}
 	AdjustTableSizes();
 }
-void SummaryView::SetStructure(const Waterfall& a){Structure=a; DisplayStructure();}
+void SummaryView::SetStructure(const Waterfall& a,const Waterfall& ca){Structure=a; CallStructure=ca; DisplayStructure();}
 void SummaryView::AdjustTableSizes(){
 	StructureTable->resizeColumnToContents(0);
 	for(int i=1;i<StructureTable->columnCount();i++){
@@ -252,4 +268,7 @@ void SummaryView::PriceChanged(){
 	TempTranche.SetPrice(static_cast<QLineEdit*>(sender())->text().toDouble());
 	StructureTable->item(RowToChange,11)->setText(Commarize(((TempTranche.GetDiscountMargin()/10000.0)+TempTranche.GetReferenceRateValue())*100.0,2U)+'%');
 	StructureTable->item(RowToChange,13)->setText(Commarize(((TempTranche.GetDiscountMargin()))));
+}
+void SummaryView::ShowCallStructure(bool a){
+	MainWidget->setTabEnabled(3,a);
 }

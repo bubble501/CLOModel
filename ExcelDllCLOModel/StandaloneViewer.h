@@ -24,6 +24,7 @@ private:
 	SummaryView* TheViewer;
 	StressViewer* StressWindow;
 	QStringList recentFiles;
+	QStringList recentNames;
 	QMenu *fileMenu;
 	QAction *recentFileActions[MaxRecentFiles];
 	QAction *openAction;
@@ -33,7 +34,6 @@ private:
 	QAction *separatorAction;
 	void createActions();
 	void createMenus();
-	bool loadFile(const QString &fileName);
 	bool loadStressFile(const QString &fileName);
 	void updateRecentFileActions();
 protected:

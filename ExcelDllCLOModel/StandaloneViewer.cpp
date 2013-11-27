@@ -101,7 +101,7 @@ void StandaloneViewer::updateRecentFileActions()
 		if (j < recentFiles.count()) {
 			QString text = tr("&%1 %2")
 				.arg(j + 1)
-				.arg(QFileInfo(recentFiles[j]).fileName());
+				.arg(recentNames.at(j));
 			recentFileActions[j]->setText(text);
 			recentFileActions[j]->setData(recentFiles[j]);
 			recentFileActions[j]->setVisible(true);
@@ -116,7 +116,9 @@ void StandaloneViewer::LoadFile(const QString& fileName){
 	QFile file(fileName);
 	if(!file.exists()) return;
 	if(QFileInfo(file).suffix().toLower()=="clo"){
+		StressWindow->hide();
 		Waterfall TempWaterfall;
+		Waterfall TempCallWaterfall;
 		QFile file(fileName);
 		file.open(QIODevice::ReadOnly);
 		qint32 VersionChecker;
@@ -128,8 +130,13 @@ void StandaloneViewer::LoadFile(const QString& fileName){
 			return;
 		}
 		out >> TempWaterfall;
+		out >> TempCallWaterfall;
 		file.close();
-		TheViewer->SetStructure(TempWaterfall);
+		TheViewer->SetStructure(TempWaterfall,TempCallWaterfall);
+		TheViewer->ShowCallStructure();
+		QString TempName=TempWaterfall.GetTranche(0)->GetTrancheName();
+		recentNames.removeAll(TempName);
+		recentNames.prepend(TempName);
 		recentFiles.removeAll(fileName);
 		recentFiles.prepend(fileName);
 		updateRecentFileActions();
@@ -137,6 +144,9 @@ void StandaloneViewer::LoadFile(const QString& fileName){
 	else if (QFileInfo(file).suffix().toLower()=="fcsr"){
 		 StressWindow->LoadStress(fileName);
 		 StressWindow->show();
+		 QString TempName=StressWindow->GetFirstName();
+		 recentNames.removeAll("Stress " +TempName);
+		 recentNames.prepend("Stress " +TempName);
 		 recentFiles.removeAll(fileName);
 		 recentFiles.prepend(fileName);
 		 updateRecentFileActions();
@@ -149,6 +159,7 @@ void StandaloneViewer::closeFile(){
 }
 void StandaloneViewer::HandleStressChange(Waterfall a){
 	TheViewer->SetStructure(a);
+	TheViewer->ShowCallStructure(false);
 }
 void StandaloneViewer::closeEvent(QCloseEvent *event){
 	StressWindow->close();

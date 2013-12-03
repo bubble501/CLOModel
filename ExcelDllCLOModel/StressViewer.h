@@ -4,6 +4,7 @@
 class QTableWidget;
 class QLabel;
 class QComboBox;
+class QDoubleSpinBox;
 class StressViewer : public QWidget{
 	Q_OBJECT
 public:
@@ -20,7 +21,8 @@ private:
 	QLabel* ConstParLabel;
 	QComboBox* TrancheCombo;
 	StressTest StressTarget;
-
+	QLabel* PriceLabel;
+	QDoubleSpinBox* PriceSpin;
 	int TrancheTarg;
 	int TypeTarg;
 protected:
@@ -32,6 +34,7 @@ private slots:
 	void AdjustTableSize();
 	void UpdateTable();
 	void CellSelected(int r,int c);
+	void PriceChanged(double a);
 signals:
 	void StressLevelChanged(Waterfall);
 	void Closing();

@@ -45,8 +45,34 @@ void RequirementsInstaller::Install(){
 	Check = Check && QFile::copy(":/Libraries/SVG","C:\\Windows\\system\\QtSvg4.dll");
 	ProgIndicator->setValue(6);
 #ifdef Q_WS_WIN
-// 	QSettings FileAssociation("HKEY_LOCAL_MACHINE\\SOFTWARE",QSettings::NativeFormat);
-// 	FileAssociation.setValue("CLOviewer/Path","Z:\\24AM\\Analytics\\CLO Model\\CLO Viewer.exe");
+ 	{
+		QSettings FileAssociation("HKEY_CURRENT_USER\\SOFTWARE\\Classes\\.clo",QSettings::NativeFormat);
+		FileAssociation.setValue("Default","CLO.BaseCase");
+	}
+	{
+		QSettings FileAssociation("HKEY_CURRENT_USER\\SOFTWARE\\Classes\\.clo\\ShellNew",QSettings::NativeFormat);
+		FileAssociation.setValue("NullFile","");
+	}
+	{
+		QSettings FileAssociation("HKEY_CURRENT_USER\\SOFTWARE\\Classes\\.fcsr",QSettings::NativeFormat);
+		FileAssociation.setValue("Default","CLO.BaseCase");
+	}
+	{
+		QSettings FileAssociation("HKEY_CURRENT_USER\\SOFTWARE\\Classes\\.fcsr\\ShellNew",QSettings::NativeFormat);
+		FileAssociation.setValue("NullFile","");
+	}
+	{
+		QSettings FileAssociation("HKEY_CURRENT_USER\\SOFTWARE\\Classes\\CLO.BaseCase",QSettings::NativeFormat);
+		FileAssociation.setValue("Default","CLO Viewer");
+	}
+	{
+		QSettings FileAssociation("HKEY_CURRENT_USER\\SOFTWARE\\Classes\\CLO.BaseCase\\DefaultIcon",QSettings::NativeFormat);
+		FileAssociation.setValue("Default","\"\\\\SYNSERVER2\\Company Share\\24AM\\Analytics\\CLO Model\\LogoIcon.ico\"");
+	}
+	{
+		QSettings FileAssociation("HKEY_CURRENT_USER\\SOFTWARE\\Classes\\CLO.BaseCase\\shell\\Open\\command\\",QSettings::NativeFormat);
+		FileAssociation.setValue("Default","\"\\\\SYNSERVER2\\Company Share\\24AM\\Analytics\\CLO Model\\CLO Viewer.exe\" \"%1\"");
+	}
 #endif
 	ProgIndicator->setValue(7);
 	if(Check) MainLabel->setText("Done");

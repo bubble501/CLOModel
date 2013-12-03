@@ -8,6 +8,7 @@
 #include <QScrollBar>
 #include <QHeaderView>
 #include <QCloseEvent>
+#include <QDoubleSpinBox>
 #include "CommonFunctions.h"
 StressViewer::StressViewer(QWidget* parent)
 	:QWidget(parent)
@@ -33,16 +34,28 @@ StressViewer::StressViewer(QWidget* parent)
 	connect(TrancheCombo,SIGNAL(currentIndexChanged(int)),this,SLOT(TrancheTargetChanged(int)));
 
 	ConstParLabel=new QLabel(this);
-	ConstParLabel->hide();
+
+	PriceLabel=new QLabel(this);
+	PriceLabel->setText("Price: ");
+	PriceSpin=new QDoubleSpinBox(this);
+	PriceSpin->setMinimum(0.0);
+	PriceSpin->setMaximum(200.0);
+	connect(PriceSpin,SIGNAL(valueChanged(double)),this,SLOT(PriceChanged(double)));
+	PriceLabel->hide();
+	PriceSpin->hide();
 
 	QHBoxLayout *TopLay=new QHBoxLayout;
 	TopLay->addWidget(TrancheLabel);
 	TopLay->addWidget(TrancheCombo);
 	QSpacerItem* HorSpacer1=new QSpacerItem(20,20,QSizePolicy::Expanding);
 	TopLay->addItem(HorSpacer1);
-	TopLay->addWidget(ConstParLabel);
+	TopLay->addWidget(PriceLabel);
+	TopLay->addWidget(PriceSpin);
 	QSpacerItem* HorSpacer2=new QSpacerItem(20,20,QSizePolicy::Expanding);
 	TopLay->addItem(HorSpacer2);
+	TopLay->addWidget(ConstParLabel);
+	QSpacerItem* HorSpacer3=new QSpacerItem(20,20,QSizePolicy::Expanding);
+	TopLay->addItem(HorSpacer3);
 	TopLay->addWidget(TypeLabel);
 	TopLay->addWidget(TypeCombo);
 
@@ -95,6 +108,7 @@ void StressViewer::LoadStress(const QString& filename){
 	XDimLabel->show();
 	YDimLabel->setText(StressVarnames[StressTarget.GetYVariability()]);
 	YDimLabel->show();
+	ConstParLabel->setText(StressVarnames[3-StressTarget.GetYVariability()-StressTarget.GetXVariability()] + ": " + StressTarget.GetConstantPar());
 	AdjustTableSize();
 	UpdateTable();
 }
@@ -120,10 +134,15 @@ void StressViewer::UpdateTable(){
 				if(lossValue>=1.0) Table->item(i,j)->setBackgroundColor(Qt::red);
 				else if(lossValue>0.0) Table->item(i,j)->setBackgroundColor(Qt::yellow);
 				else Table->item(i,j)->setBackgroundColor(Qt::green);
+				PriceLabel->hide();
+				PriceSpin->hide();
 			}else if(TypeTarg==1){
-				lossValue=StressTarget.GetResults().value(StressTarget.GetXSpann().at(i)).value(StressTarget.GetYSpann().at(j)).GetTranche(TrancheTarg)->GetDiscountMargin();
-				Table->setItem(i,j,new QTableWidgetItem(Commarize(lossValue,0)));
+				Tranche marginTranche=*(StressTarget.GetResults().value(StressTarget.GetXSpann().at(i)).value(StressTarget.GetYSpann().at(j)).GetTranche(TrancheTarg));
+				Table->setItem(i,j,new QTableWidgetItem(Commarize(marginTranche.GetDiscountMargin(),0)));
 				if(lossValue<=0.0) Table->item(i,j)->setBackgroundColor(Qt::red);
+				PriceSpin->setValue(marginTranche.GetPrice());
+				PriceLabel->show();
+				PriceSpin->show();
 			}
 		}
 	}
@@ -138,4 +157,12 @@ void StressViewer::CellSelected(int r,int c){
 		).value(
 			StressTarget.GetYSpann().at(c)
 		));
+}
+void StressViewer::PriceChanged(double a){
+	for(int i=0;i<StressTarget.GetXSpann().size();i++){
+		for(int j=0;j<StressTarget.GetYSpann().size();j++){
+			Tranche marginTranche=*(StressTarget.GetResults().value(StressTarget.GetXSpann().at(i)).value(StressTarget.GetYSpann().at(j)).GetTranche(TrancheTarg));
+			Table->item(i,j)->setText(Commarize(marginTranche.GetDiscountMargin(a),0));
+		}
+	}
 }

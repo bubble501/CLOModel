@@ -8,6 +8,7 @@
 #include <KDChartLineDiagram>
 #include <KDChartBarDiagram>
 #include <KDChartCartesianAxis>
+#include <qmath.h>
 ChartsWidget::ChartsWidget(QWidget* parent)
 	:QWidget(parent)
 {
@@ -93,7 +94,7 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 			TempIndex=ChartsModels.last()->index(i,2);
 			ChartsModels.last()->setData(TempIndex,a.GetCalculatedMtgPayments().GetScheduled(i)/1000000.0);
 			ChartsModels.last()->setData(TempIndex,"Date: "+a.GetCalculatedMtgPayments().GetDate(i).toString("MMM-yy")+" - Value: "+Commarize(a.GetCalculatedMtgPayments().GetScheduled(i)),Qt::ToolTipRole);
-			TempIndex=ChartsModels.last()->index(i,2);
+			TempIndex=ChartsModels.last()->index(i,3);
 			ChartsModels.last()->setData(TempIndex,a.GetCalculatedMtgPayments().GetInterest(i)/1000000.0);
 			ChartsModels.last()->setData(TempIndex,"Date: "+a.GetCalculatedMtgPayments().GetDate(i).toString("MMM-yy")+" - Value: "+Commarize(a.GetCalculatedMtgPayments().GetInterest(i)),Qt::ToolTipRole);
 		}
@@ -364,20 +365,84 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 
 	{//WA Cost of Funding
 		QStringList DatesLabels;
-		ChartsModels.append(new QStandardItemModel(a.GetTranche(0)->GetCashFlow().Count(),1,this));
+		ChartsModels.append(new QStandardItemModel(a.GetTranche(0)->GetCashFlow().Count(),2,this));
 		for(int i=0;i<a.GetTranche(0)->GetCashFlow().Count();i++){
 			QModelIndex TempIndex=ChartsModels.last()->index(i,0);
 			if(a.GetWACostOfCapital(i)>0.0)
 				ChartsModels.last()->setData(TempIndex, a.GetWACostOfCapital(i)*100.0);
 			ChartsModels.last()->setData(TempIndex,"Date: "+a.GetTranche(0)->GetCashFlow().GetDate(i).toString("MMM-yy")+" - Value: "+QString::number(a.GetWACostOfCapital(i)*100.0,'f',2)+'%',Qt::ToolTipRole);
+			
+			TempIndex=ChartsModels.last()->index(i,1);
+			if(a.GetCalculatedMtgPayments().GetWAcoupon(a.GetTranche(0)->GetCashFlow().GetDate(i))>0.0)
+				ChartsModels.last()->setData(TempIndex,a.GetCalculatedMtgPayments().GetWAcoupon(a.GetTranche(0)->GetCashFlow().GetDate(i))*100.0);
+			ChartsModels.last()->setData(TempIndex,"Date: "+a.GetTranche(0)->GetCashFlow().GetDate(i).toString("MMM-yy")+" - Value: "+QString::number(a.GetCalculatedMtgPayments().GetWAcoupon(a.GetTranche(0)->GetCashFlow().GetDate(i))*100.0,'f',2)+'%',Qt::ToolTipRole);
+			
 			DatesLabels << a.GetTranche(0)->GetCashFlow().GetDate(i).toString("MMM-yy");
 		}
+		QStringList CategoryLabels; 
+		CategoryLabels << "WA Cost of Funding"<< "WA Loans Coupon";
+		ChartsModels.last()->setHorizontalHeaderLabels(CategoryLabels);
 		KDChart::LineDiagram* AnnualizedExcessLine=new KDChart::LineDiagram;
 		KDChart::LineAttributes HideMissing=AnnualizedExcessLine->lineAttributes(0);
 		HideMissing.setMissingValuesPolicy(KDChart::LineAttributes::MissingValuesHideSegments);
 		AnnualizedExcessLine->setLineAttributes(0,HideMissing);
+		AnnualizedExcessLine->setLineAttributes(1,HideMissing);
 		KDChart::HeaderFooter* ChartTile=new KDChart::HeaderFooter;
-		ChartTile->setText("WA Cost of Funding");
+		ChartTile->setText("Costs and Revenues");
+		ChartTile->setPosition(KDChart::Position::North);
+		AnnualizedExcessLine->setUnitSuffix("%",Qt::Vertical);
+		QPen TempPen(AnnualizedExcessLine->pen(0));
+		TempPen.setWidth(ChartLinesWeight);
+		TempPen.setColor(Qt::darkBlue);
+		AnnualizedExcessLine->setPen(0,TempPen);
+		QPen TempPen2(AnnualizedExcessLine->pen(1));
+		TempPen2.setWidth(ChartLinesWeight);
+		TempPen2.setColor(Qt::darkRed);
+		AnnualizedExcessLine->setPen(1,TempPen2);
+
+		AnnualizedExcessLine->setModel(ChartsModels.last());
+		KDChart::CartesianAxis* XAxis=new KDChart::CartesianAxis(AnnualizedExcessLine);
+		KDChart::TextAttributes RotatedText(XAxis->textAttributes());
+		RotatedText.setRotation(-90);
+		XAxis->setTextAttributes(RotatedText);
+		XAxis->setLabels(DatesLabels);
+		XAxis->setPosition(KDChart::CartesianAxis::Bottom);
+		KDChart::CartesianAxis* YAxis=new KDChart::CartesianAxis(AnnualizedExcessLine);
+		YAxis->setPosition(KDChart::CartesianAxis::Left);
+		//YAxis->setTitleText("WA Costs and revenues");
+		AnnualizedExcessLine->addAxis(XAxis);
+		AnnualizedExcessLine->addAxis(YAxis);
+		Charts.append(new KDChart::Chart(this));
+		Charts.last()->coordinatePlane()->replaceDiagram(AnnualizedExcessLine);
+		KDChart::CartesianCoordinatePlane* plane =static_cast <KDChart::CartesianCoordinatePlane*>( AnnualizedExcessLine->coordinatePlane() );
+		KDChart::GridAttributes ga (plane->gridAttributes(Qt::Horizontal));
+		ga.setGridVisible(false);
+		plane->setGridAttributes(Qt::Horizontal,ga);
+		KDChart::Legend* ChartLegend=new KDChart::Legend(AnnualizedExcessLine,Charts.last());
+		ChartLegend->setPosition( KDChart::Position::East );
+		ChartLegend->setAlignment( Qt::AlignCenter );
+		ChartLegend->setShowLines( false );
+		ChartLegend->setOrientation( Qt::Vertical );
+		ChartLegend->setColor(0,Qt::darkBlue);
+		ChartLegend->setColor(1,Qt::darkRed);
+		Charts.last()->addLegend(ChartLegend);
+		Charts.last()->addHeaderFooter(ChartTile);
+		ChartsArea->addWidget(Charts.last());
+		ChartsList->addItem("Costs and Revenues");
+	}
+
+	{//Call Value to Equity
+		QStringList DatesLabels;
+		ChartsModels.append(new QStandardItemModel(a.GetTranche(0)->GetCashFlow().Count(),1,this));
+		for(int i=0;i<a.GetTranche(0)->GetCashFlow().Count();i++){
+			QModelIndex TempIndex=ChartsModels.last()->index(i,0);
+			ChartsModels.last()->setData(TempIndex,a.GetCallEquityRatio(i)*100.0);
+			ChartsModels.last()->setData(TempIndex,"Date: "+a.GetTranche(0)->GetCashFlow().GetDate(i).toString("MMM-yy")+" - Value: "+QString::number(a.GetCallEquityRatio(i)*100.0,'f',2)+'%',Qt::ToolTipRole);
+			DatesLabels << a.GetTranche(0)->GetCashFlow().GetDate(i).toString("MMM-yy");
+		}
+		KDChart::LineDiagram* AnnualizedExcessLine=new KDChart::LineDiagram;
+		KDChart::HeaderFooter* ChartTile=new KDChart::HeaderFooter;
+		ChartTile->setText("Pool Call Value to Equity Ratio");
 		ChartTile->setPosition(KDChart::Position::North);
 		AnnualizedExcessLine->setUnitSuffix("%",Qt::Vertical);
 		QPen TempPen(AnnualizedExcessLine->pen(0));
@@ -393,7 +458,7 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		XAxis->setPosition(KDChart::CartesianAxis::Bottom);
 		KDChart::CartesianAxis* YAxis=new KDChart::CartesianAxis(AnnualizedExcessLine);
 		YAxis->setPosition(KDChart::CartesianAxis::Left);
-		YAxis->setTitleText("Cost of Funding");
+		YAxis->setTitleText("Excess Spread");
 		AnnualizedExcessLine->addAxis(XAxis);
 		AnnualizedExcessLine->addAxis(YAxis);
 		Charts.append(new KDChart::Chart(this));
@@ -404,8 +469,175 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		plane->setGridAttributes(Qt::Horizontal,ga);
 		Charts.last()->addHeaderFooter(ChartTile);
 		ChartsArea->addWidget(Charts.last());
-		ChartsList->addItem("WA Cost of Funding");
+		ChartsList->addItem("Pool Call Value to Equity Ratio");
 	}
+
+	{//CPR and Loss Rate
+		QStringList DatesLabels;
+		double TempValue;
+		ChartsModels.append(new QStandardItemModel(a.GetCalculatedMtgPayments().Count(),1,this));
+		for(int i=0;i<a.GetCalculatedMtgPayments().Count();i++){
+			QModelIndex TempIndex=ChartsModels.last()->index(i,0);
+			TempValue=qPow(1.0+(a.GetCalculatedMtgPayments().GetLoss(i)/(a.GetCalculatedMtgPayments().GetAmountOut(i-1)-a.GetCalculatedMtgPayments().GetScheduled(i))),12.0)-1.0;
+			ChartsModels.last()->setData(TempIndex,TempValue*100.0);
+			ChartsModels.last()->setData(TempIndex,"Date: "+a.GetCalculatedMtgPayments().GetDate(i).toString("MMM-yy")+" - Value: "+QString::number(TempValue*100.0,'f',2)+'%',Qt::ToolTipRole);
+			if(i%3==0) DatesLabels << a.GetCalculatedMtgPayments().GetDate(i).toString("MMM-yy");
+			else DatesLabels << "";
+		}
+		QStringList CategoryLabels; CategoryLabels << "Loss Rate";
+		ChartsModels.last()->setHorizontalHeaderLabels(CategoryLabels);
+		KDChart::LineDiagram* LRline=new KDChart::LineDiagram;
+		LRline->setModel(ChartsModels.last());
+		ChartsModels.append(new QStandardItemModel(a.GetCalculatedMtgPayments().Count(),1,this));
+		for(int i=0;i<a.GetCalculatedMtgPayments().Count();i++){
+			QModelIndex TempIndex=ChartsModels.last()->index(i,0);
+			TempValue=qPow(1.0+(a.GetCalculatedMtgPayments().GetPrepay(i)/(a.GetCalculatedMtgPayments().GetAmountOut(i-1)-a.GetCalculatedMtgPayments().GetScheduled(i))),12.0)-1.0;
+			ChartsModels.last()->setData(TempIndex,TempValue*100.0);
+			ChartsModels.last()->setData(TempIndex,"Date: "+a.GetCalculatedMtgPayments().GetDate(i).toString("MMM-yy")+" - Value: "+QString::number(TempValue*100.0,'f',2)+'%',Qt::ToolTipRole);
+		}
+		CategoryLabels.clear(); CategoryLabels << "CPR";
+		ChartsModels.last()->setHorizontalHeaderLabels(CategoryLabels);
+		KDChart::LineDiagram* CPRline=new KDChart::LineDiagram;
+		CPRline->setModel(ChartsModels.last());
+		KDChart::CartesianAxis* XAxis=new KDChart::CartesianAxis(CPRline);
+		KDChart::CartesianAxis* YAxis=new KDChart::CartesianAxis(LRline);
+		KDChart::CartesianAxis* YAxis2=new KDChart::CartesianAxis(CPRline);
+		XAxis->setPosition(KDChart::CartesianAxis::Bottom);
+		YAxis->setPosition(KDChart::CartesianAxis::Left);
+		YAxis2->setPosition(KDChart::CartesianAxis::Right);
+		YAxis->setTitleText("Loss Rate");
+		YAxis2->setTitleText("CPR");
+		LRline->addAxis(YAxis);
+		CPRline->addAxis(XAxis);
+		CPRline->addAxis(YAxis2);
+		LRline->setUnitSuffix("%",Qt::Vertical);
+		CPRline->setUnitSuffix("%",Qt::Vertical);
+		KDChart::HeaderFooter* ChartTile=new KDChart::HeaderFooter;
+		ChartTile->setText("CPR and Loss Rate");
+		ChartTile->setPosition(KDChart::Position::North);
+		QPen TempPen(LRline->pen(0));
+		TempPen.setWidth(ChartLinesWeight);
+		TempPen.setColor(Qt::darkBlue);
+		LRline->setPen(0,TempPen);
+		QPen TempPen2(CPRline->pen(0));
+		TempPen2.setWidth(ChartLinesWeight);
+		TempPen2.setColor(Qt::darkRed);
+		CPRline->setPen(0,TempPen2);
+		KDChart::TextAttributes RotatedText(XAxis->textAttributes());
+		RotatedText.setRotation(-90);
+		XAxis->setTextAttributes(RotatedText);
+		XAxis->setLabels(DatesLabels);
+		Charts.append(new KDChart::Chart(this));
+		KDChart::CartesianCoordinatePlane* plane2 = new KDChart::CartesianCoordinatePlane(Charts.last());
+		Charts.last()->coordinatePlane()->replaceDiagram(LRline);
+		plane2->setReferenceCoordinatePlane(Charts.last()->coordinatePlane());
+		plane2->replaceDiagram(CPRline);
+		Charts.last()->addCoordinatePlane(plane2);		
+		KDChart::Legend* ChartLegend=new KDChart::Legend(LRline,Charts.last());
+		ChartLegend->addDiagram(CPRline);
+		ChartLegend->setPosition( KDChart::Position::East );
+		ChartLegend->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+		ChartLegend->setShowLines(false);
+		ChartLegend->setOrientation(Qt::Vertical);
+		ChartLegend->setColor(0,Qt::darkBlue);
+		ChartLegend->setColor(1,Qt::darkRed);
+		Charts.last()->addLegend(ChartLegend);
+		Charts.last()->addHeaderFooter(ChartTile);
+		KDChart::GridAttributes gv( plane2->gridAttributes(Qt::Horizontal));
+		gv.setGridVisible( false );
+		plane2->setGridAttributes( Qt::Horizontal, gv );
+		KDChart::CartesianCoordinatePlane* plane =qobject_cast <KDChart::CartesianCoordinatePlane*>(Charts.last()->coordinatePlane());
+		KDChart::GridAttributes ga (plane->gridAttributes(Qt::Horizontal));
+		ga.setGridVisible(false);
+		plane->setGridAttributes(Qt::Horizontal,ga);
+		plane->setGridAttributes(Qt::Vertical,ga);
+		ChartsArea->addWidget(Charts.last());
+		ChartsList->addItem("CPR and LR");
+	}
+	{//Equity Return
+		QStringList DatesLabels;
+		double TempValue;
+		ChartsModels.append(new QStandardItemModel(a.GetTranche(0)->GetCashFlow().Count(),1,this));
+		for(int i=0;i<a.GetTranche(0)->GetCashFlow().Count();i++){
+			QModelIndex TempIndex=ChartsModels.last()->index(i,0);
+			TempValue=a.GetEquityReturn(i)*100.0;
+			ChartsModels.last()->setData(TempIndex,TempValue);
+			ChartsModels.last()->setData(TempIndex,"Date: "+a.GetTranche(0)->GetCashFlow().GetDate(i).toString("MMM-yy")+" - Value: "+QString::number(TempValue,'f',2)+'%',Qt::ToolTipRole);
+			DatesLabels << a.GetTranche(0)->GetCashFlow().GetDate(i).toString("MMM-yy");
+		}
+		QStringList CategoryLabels; CategoryLabels << "Equity Return";
+		ChartsModels.last()->setHorizontalHeaderLabels(CategoryLabels);
+		KDChart::LineDiagram* LRline=new KDChart::LineDiagram;
+		LRline->setModel(ChartsModels.last());
+		ChartsModels.append(new QStandardItemModel(a.GetTranche(0)->GetCashFlow().Count(),1,this));
+		for(int i=0;i<a.GetTranche(0)->GetCashFlow().Count();i++){
+			QModelIndex TempIndex=ChartsModels.last()->index(i,0);
+			TempValue=a.GetCumulativeEquityReturn(i)*100.0;
+			ChartsModels.last()->setData(TempIndex,TempValue);
+			ChartsModels.last()->setData(TempIndex,"Date: "+a.GetTranche(0)->GetCashFlow().GetDate(i).toString("MMM-yy")+" - Value: "+QString::number(TempValue,'f',2)+'%',Qt::ToolTipRole);
+		}
+		CategoryLabels.clear(); CategoryLabels << "Cumulative";
+		ChartsModels.last()->setHorizontalHeaderLabels(CategoryLabels);
+		KDChart::LineDiagram* CPRline=new KDChart::LineDiagram;
+		CPRline->setModel(ChartsModels.last());
+		KDChart::CartesianAxis* XAxis=new KDChart::CartesianAxis(CPRline);
+		KDChart::CartesianAxis* YAxis=new KDChart::CartesianAxis(LRline);
+		KDChart::CartesianAxis* YAxis2=new KDChart::CartesianAxis(CPRline);
+		XAxis->setPosition(KDChart::CartesianAxis::Bottom);
+		YAxis->setPosition(KDChart::CartesianAxis::Left);
+		YAxis2->setPosition(KDChart::CartesianAxis::Right);
+		YAxis->setTitleText("Equity Return");
+		YAxis2->setTitleText("Cumulative Equity Return");
+		LRline->addAxis(YAxis);
+		CPRline->addAxis(XAxis);
+		CPRline->addAxis(YAxis2);
+		LRline->setUnitSuffix("%",Qt::Vertical);
+		CPRline->setUnitSuffix("%",Qt::Vertical);
+		KDChart::HeaderFooter* ChartTile=new KDChart::HeaderFooter;
+		ChartTile->setText("Equity Return");
+		ChartTile->setPosition(KDChart::Position::North);
+		QPen TempPen(LRline->pen(0));
+		TempPen.setWidth(ChartLinesWeight);
+		TempPen.setColor(Qt::darkBlue);
+		LRline->setPen(0,TempPen);
+		QPen TempPen2(CPRline->pen(0));
+		TempPen2.setWidth(ChartLinesWeight);
+		TempPen2.setColor(Qt::darkRed);
+		CPRline->setPen(0,TempPen2);
+		KDChart::TextAttributes RotatedText(XAxis->textAttributes());
+		RotatedText.setRotation(-90);
+		XAxis->setTextAttributes(RotatedText);
+		XAxis->setLabels(DatesLabels);
+		Charts.append(new KDChart::Chart(this));
+		KDChart::CartesianCoordinatePlane* plane2 = new KDChart::CartesianCoordinatePlane(Charts.last());
+		Charts.last()->coordinatePlane()->replaceDiagram(LRline);
+		plane2->setReferenceCoordinatePlane(Charts.last()->coordinatePlane());
+		plane2->replaceDiagram(CPRline);
+		Charts.last()->addCoordinatePlane(plane2);		
+		KDChart::Legend* ChartLegend=new KDChart::Legend(LRline,Charts.last());
+		ChartLegend->addDiagram(CPRline);
+		ChartLegend->setPosition( KDChart::Position::East );
+		ChartLegend->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+		ChartLegend->setShowLines(false);
+		ChartLegend->setOrientation(Qt::Vertical);
+		ChartLegend->setColor(0,Qt::darkBlue);
+		ChartLegend->setColor(1,Qt::darkRed);
+		Charts.last()->addLegend(ChartLegend);
+		Charts.last()->addHeaderFooter(ChartTile);
+		KDChart::GridAttributes gv( plane2->gridAttributes(Qt::Horizontal));
+		gv.setGridVisible( false );
+		plane2->setGridAttributes( Qt::Horizontal, gv );
+		KDChart::CartesianCoordinatePlane* plane =qobject_cast <KDChart::CartesianCoordinatePlane*>(Charts.last()->coordinatePlane());
+		KDChart::GridAttributes ga (plane->gridAttributes(Qt::Horizontal));
+		ga.setGridVisible(false);
+		plane->setGridAttributes(Qt::Horizontal,ga);
+		plane->setGridAttributes(Qt::Vertical,ga);
+		ChartsArea->addWidget(Charts.last());
+		ChartsList->addItem("Equity Return");
+	}
+
+	
+
 	for(QList<KDChart::Chart*>::iterator i=Charts.begin();i!=Charts.end();i++){
 		KDChart::BackgroundAttributes BackColor((*i)->backgroundAttributes());
 		BackColor.setBrush(QBrush(Qt::white));

@@ -272,7 +272,7 @@ void StressTest::SaveResults(const QString& DestPath)const{
 	if (file.open(QIODevice::WriteOnly)) {
 		QDataStream out(&file);
 		out.setVersion(QDataStream::Qt_4_8);
-		out << qint32(ModelVersionNumber);
+		out << qint32(ModelVersionNumber) << ConstantPar;
 		file.close();
 	}
 	foreach(const QString& SingleX,XSpann){
@@ -342,8 +342,12 @@ void StressTest::LoadResultsFromFile(const QString& DestPath){
 		QDataStream out(&TargetFile);
 		out.setVersion(QDataStream::Qt_4_8);
 		out >> VesionCheck;
+		if(VesionCheck!=qint32(ModelVersionNumber)){
+			TargetFile.close();
+			throw 1;
+		}
+		out >> ConstantPar;
 		TargetFile.close();
-		if(VesionCheck!=qint32(ModelVersionNumber)) throw 1;
 	}
 	catch(int ExcCode){
 		

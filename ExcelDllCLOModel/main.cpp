@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
 {
 	Waterfall TempWaterfall;
 	QApplication a(argc, argv);
-	QFile file("Z:/24AM/ABS Trade Folders/CLO/CADOG 5X/.BaseCase.clo");
+	QFile file("C:/Temp/.BaseCase.clo");
 	file.open(QIODevice::ReadOnly);
 	qint32 VersionChecker;
 	QDataStream out(&file);
@@ -16,7 +16,6 @@ int main(int argc, char *argv[])
 	if(VersionChecker!=qint32(ModelVersionNumber)) return 0;
 	out >> TempWaterfall;
 	file.close();
-	QDate TempDate=TempWaterfall.GetCalledPeriod();
-	QMessageBox::information(0,"Calculated Date",TempDate.toString("dd-MM-yyyy"));
+	double TempDate=TempWaterfall.GetTranche(0)->GetDiscountMargin(100);
 	return a.exec();
 }

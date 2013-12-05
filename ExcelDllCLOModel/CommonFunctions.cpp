@@ -141,7 +141,7 @@ double CalculateIRR(const QList<QDate>& Dte, const QList<double>& Flws, int Dayc
 	double CurrentNPV=CalculateNPV(Dte,Flws,Result,Daycount);
 	while(qAbs(CurrentNPV)>qPow(10.0,-static_cast<double>(precision))){
 		Result-=CurrentNPV*(Result-PreviuousGuess)/(CurrentNPV-PreviousNPV);
-		if(Result<0.0 || Result>10.0) return 0.0;
+		//if(Result<0.0 || Result>10.0) return 0.0;
 		PreviousNPV=CurrentNPV;
 		PreviuousGuess=CurrentGuess;
 		CurrentGuess=Result;
@@ -158,7 +158,7 @@ double CalculateIRRSimple(const QList<QDate>& Dte, const QList<double>& Flws, in
 	double CurrentNPV=CalculateNPVsimple(Dte,Flws,Result,Daycount);
 	while(qAbs(CurrentNPV)>qPow(10.0,-static_cast<double>(precision))){
 		Result-=CurrentNPV*(Result-PreviuousGuess)/(CurrentNPV-PreviousNPV);
-		if(Result<0.0 || Result>10.0) return 0.0;
+		//if(Result<0.0 || Result>10.0) return 0.0;
 		PreviousNPV=CurrentNPV;
 		PreviuousGuess=CurrentGuess;
 		CurrentGuess=Result;

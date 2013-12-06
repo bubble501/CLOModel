@@ -80,14 +80,14 @@ StressViewer::StressViewer(QWidget* parent)
 	MainLay->addLayout(TopLay);
 	MainLay->addLayout(tableLay);
 }
-void StressViewer::LoadStress(const QString& filename){
+bool StressViewer::LoadStress(const QString& filename){
 	QString StressVarnames[3]={"CDR","LS","CPR"};
 	StressTarget.ResetLoans();
 	StressTarget.ResetStressLevels();
 	StressTarget.ResetXSpann();
 	StressTarget.ResetYSpann();
 	StressTarget.ResetResult();
-	StressTarget.LoadResultsFromFile(filename);
+	if(!StressTarget.LoadResultsFromFile(filename)) return false;
 	Table->setRowCount(0);
 	Table->setColumnCount(0);
 	Table->setRowCount(StressTarget.GetXSpann().size());
@@ -111,6 +111,7 @@ void StressViewer::LoadStress(const QString& filename){
 	ConstParLabel->setText(StressVarnames[3-StressTarget.GetYVariability()-StressTarget.GetXVariability()] + ": " + StressTarget.GetConstantPar());
 	AdjustTableSize();
 	UpdateTable();
+	return true;
 }
 void StressViewer::AdjustTableSize(){
 	for(int i=0;i<Table->columnCount();i++){

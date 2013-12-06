@@ -113,6 +113,7 @@ void StandaloneViewer::updateRecentFileActions()
 }
 
 void StandaloneViewer::LoadFile(const QString& fileName){
+	closeFile();
 	QFile file(fileName);
 	if(!file.exists()) return;
 	if(QFileInfo(file).suffix().toLower()=="clo"){
@@ -127,7 +128,7 @@ void StandaloneViewer::LoadFile(const QString& fileName){
 		out >> VersionChecker;
 		if(VersionChecker!=qint32(ModelVersionNumber)){
 			QMessageBox::critical(this,"Invalid File Format","The selected file version is not compatible with this viewer");
-			return;
+			return closeFile();
 		}
 		out >> TempWaterfall;
 		out >> TempCallWaterfall;
@@ -142,7 +143,7 @@ void StandaloneViewer::LoadFile(const QString& fileName){
 		updateRecentFileActions();
 	}
 	else if (QFileInfo(file).suffix().toLower()=="fcsr"){
-		 StressWindow->LoadStress(fileName);
+		 if(!StressWindow->LoadStress(fileName)) return closeFile();
 		 StressWindow->show();
 		 QString TempName=StressWindow->GetFirstName();
 		 recentNames.removeAll("Stress " +TempName);
@@ -151,7 +152,10 @@ void StandaloneViewer::LoadFile(const QString& fileName){
 		 recentFiles.prepend(fileName);
 		 updateRecentFileActions();
 	}
-	else QMessageBox::critical(this,"Invalid File Extension","The selected file extension is not supported");
+	else {
+		QMessageBox::critical(this,"Invalid File Extension","The selected file extension is not supported");
+		return closeFile();
+	}
 }
 void StandaloneViewer::closeFile(){
 	StressWindow->hide();

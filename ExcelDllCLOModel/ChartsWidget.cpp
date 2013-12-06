@@ -143,43 +143,90 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		ChartsModels.last()->setHorizontalHeaderLabels(TranchesLabels);
 		KDChart::LineDiagram* AnnualizedExcessLine=new KDChart::LineDiagram;
 		AnnualizedExcessLine->setType(KDChart::LineDiagram::Stacked);
+		AnnualizedExcessLine->setModel(ChartsModels.last());
+
+		ChartsModels.append(new QStandardItemModel(a.GetTranche(0)->GetCashFlow().Count(),1,this));
+		QDate TempCallDate=a.GetCalledPeriod();
+		bool CallDatePlaced=false;
+		for(int i=0;i<a.GetTranche(0)->GetCashFlow().Count();i++){
+			QModelIndex TempIndex=ChartsModels.last()->index(i,0);
+			if(a.GetTranche(0)->GetCashFlow().GetDate(i)>=TempCallDate && !CallDatePlaced){
+				ChartsModels.last()->setData(TempIndex,1.0);
+				ChartsModels.last()->setData(TempIndex,"Call Date",Qt::ToolTipRole);
+				CallDatePlaced=true;
+			}
+			else ChartsModels.last()->setData(TempIndex,0.0);
+		}
+		TranchesLabels.clear(); TranchesLabels << "Call Date";
+		ChartsModels.last()->setHorizontalHeaderLabels(TranchesLabels);
+		KDChart::BarDiagram* CallDiagram=new KDChart::BarDiagram;
+		CallDiagram->setModel(ChartsModels.last());
+		QBrush TmpCallBrush=CallDiagram->brush(0);
+		TmpCallBrush.setColor(Qt::lightGray);
+		TmpCallBrush.setStyle(Qt::DiagCrossPattern);
+		CallDiagram->setBrush(0,TmpCallBrush);
+
 		for(int j=0;j<a.GetTranchesCount();j++){
 			KDChart::LineAttributes HideMissing=AnnualizedExcessLine->lineAttributes(j);
 			HideMissing.setMissingValuesPolicy(KDChart::LineAttributes::MissingValuesHideSegments);
 			HideMissing.setDisplayArea(true);
 			AnnualizedExcessLine->setLineAttributes(j,HideMissing);
 		}
+
 		KDChart::HeaderFooter* ChartTile=new KDChart::HeaderFooter;
 		ChartTile->setText("Notes Outstanding");
 		ChartTile->setPosition(KDChart::Position::North);
+
 		for (int j=0;j<a.GetTranchesCount();j++){
 			QPen TempPen(AnnualizedExcessLine->pen(j));
 			TempPen.setStyle(Qt::NoPen);
 			AnnualizedExcessLine->setPen(j,TempPen);
 		}
-		AnnualizedExcessLine->setModel(ChartsModels.last());
-		KDChart::CartesianAxis* XAxis=new KDChart::CartesianAxis(AnnualizedExcessLine);
+
+		KDChart::CartesianAxis* XAxis=new KDChart::CartesianAxis(CallDiagram);
 		KDChart::TextAttributes RotatedText(XAxis->textAttributes());
 		RotatedText.setRotation(-90);
 		XAxis->setTextAttributes(RotatedText);
 		XAxis->setLabels(DatesLabels);
 		XAxis->setPosition(KDChart::CartesianAxis::Bottom);
+
 		KDChart::CartesianAxis* YAxis=new KDChart::CartesianAxis(AnnualizedExcessLine);
 		YAxis->setPosition(KDChart::CartesianAxis::Left);
 		YAxis->setTitleText("Notes Outstanding (Millions)");
-		AnnualizedExcessLine->addAxis(XAxis);
+
+		KDChart::CartesianAxis* YAxis2=new KDChart::CartesianAxis(CallDiagram);
+		YAxis2->setPosition(KDChart::CartesianAxis::Right);
+		KDChart::RulerAttributes tmpRlrAttr(YAxis2->rulerAttributes());
+		tmpRlrAttr.setShowFirstTick(false);
+		tmpRlrAttr.setShowMajorTickMarks(false);
+		tmpRlrAttr.setShowMinorTickMarks(false);
+		tmpRlrAttr.setShowRulerLine(false);
+		YAxis2->setRulerAttributes(tmpRlrAttr);
+
 		AnnualizedExcessLine->addAxis(YAxis);
+		CallDiagram->addAxis(YAxis2);
+		CallDiagram->addAxis(XAxis);
 		Charts.append(new KDChart::Chart(this));
+		KDChart::CartesianCoordinatePlane* plane2 = new KDChart::CartesianCoordinatePlane(Charts.last());
 		Charts.last()->coordinatePlane()->replaceDiagram(AnnualizedExcessLine);
+		plane2->setReferenceCoordinatePlane(Charts.last()->coordinatePlane());
+		plane2->replaceDiagram(CallDiagram);
+		Charts.last()->addCoordinatePlane(plane2);	
 		KDChart::CartesianCoordinatePlane* plane =static_cast <KDChart::CartesianCoordinatePlane*>( AnnualizedExcessLine->coordinatePlane() );
 		KDChart::GridAttributes ga (plane->gridAttributes(Qt::Horizontal));
 		ga.setGridVisible(false);
+		KDChart::GridAttributes gv (plane2->gridAttributes(Qt::Horizontal));
+		gv.setGridVisible(false);
 		plane->setGridAttributes(Qt::Horizontal,ga);
+		plane2->setGridAttributes(Qt::Horizontal,gv);
+		plane2->setGridAttributes(Qt::Vertical,gv);
 		KDChart::Legend* ChartLegend=new KDChart::Legend(AnnualizedExcessLine,Charts.last());
+		ChartLegend->addDiagram(CallDiagram);
 		ChartLegend->setPosition( KDChart::Position::East );
 		ChartLegend->setAlignment( Qt::AlignCenter );
 		ChartLegend->setShowLines( false );
 		ChartLegend->setOrientation( Qt::Vertical );
+		ChartLegend->setBrush(a.GetTranchesCount(),TmpCallBrush);
 		Charts.last()->addLegend(ChartLegend);
 		Charts.last()->addHeaderFooter(ChartTile);
 		ChartsArea->addWidget(Charts.last());
@@ -212,6 +259,29 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		ChartsModels.last()->setHorizontalHeaderLabels(TranchesLabels);
 		KDChart::LineDiagram* AnnualizedExcessLine=new KDChart::LineDiagram;
 		KDChart::HeaderFooter* ChartTile=new KDChart::HeaderFooter;
+		AnnualizedExcessLine->setModel(ChartsModels.last());
+
+		ChartsModels.append(new QStandardItemModel(a.GetTranche(0)->GetCashFlow().Count(),1,this));
+		QDate TempCallDate=a.GetCalledPeriod();
+		bool CallDatePlaced=false;
+		for(int i=0;i<a.GetTranche(0)->GetCashFlow().Count();i++){
+			QModelIndex TempIndex=ChartsModels.last()->index(i,0);
+			if(a.GetTranche(0)->GetCashFlow().GetDate(i)>=TempCallDate && !CallDatePlaced){
+				ChartsModels.last()->setData(TempIndex,1.0);
+				ChartsModels.last()->setData(TempIndex,"Call Date",Qt::ToolTipRole);
+				CallDatePlaced=true;
+			}
+			else ChartsModels.last()->setData(TempIndex,0.0);
+		}
+		TranchesLabels.clear(); TranchesLabels << "Call Date";
+		ChartsModels.last()->setHorizontalHeaderLabels(TranchesLabels);
+		KDChart::BarDiagram* CallDiagram=new KDChart::BarDiagram;
+		CallDiagram->setModel(ChartsModels.last());
+		QBrush TmpCallBrush=CallDiagram->brush(0);
+		TmpCallBrush.setColor(Qt::lightGray);
+		TmpCallBrush.setStyle(Qt::DiagCrossPattern);
+		CallDiagram->setBrush(0,TmpCallBrush);
+
 		ChartTile->setText("OC Test");
 		ChartTile->setPosition(KDChart::Position::North);
 		AnnualizedExcessLine->setUnitSuffix("%",Qt::Vertical);
@@ -220,13 +290,14 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 			TempPen.setWidth(ChartLinesWeight);
 			AnnualizedExcessLine->setPen(j,TempPen);
 		}
-		AnnualizedExcessLine->setModel(ChartsModels.last());
-		KDChart::CartesianAxis* XAxis=new KDChart::CartesianAxis(AnnualizedExcessLine);
+
+		
 		for(int j=0;j<ColumnsCount;j++){
 			KDChart::LineAttributes HideMissing=AnnualizedExcessLine->lineAttributes(j);
 			HideMissing.setMissingValuesPolicy(KDChart::LineAttributes::MissingValuesHideSegments);
 			AnnualizedExcessLine->setLineAttributes(j,HideMissing);
 		}
+		KDChart::CartesianAxis* XAxis=new KDChart::CartesianAxis(CallDiagram);
 		KDChart::TextAttributes RotatedText(XAxis->textAttributes());
 		RotatedText.setRotation(-90);
 		XAxis->setTextAttributes(RotatedText);
@@ -235,19 +306,38 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		KDChart::CartesianAxis* YAxis=new KDChart::CartesianAxis(AnnualizedExcessLine);
 		YAxis->setPosition(KDChart::CartesianAxis::Left);
 		YAxis->setTitleText("OC Test");
-		AnnualizedExcessLine->addAxis(XAxis);
+		KDChart::CartesianAxis* YAxis2=new KDChart::CartesianAxis(CallDiagram);
+		YAxis2->setPosition(KDChart::CartesianAxis::Right);
+		KDChart::RulerAttributes tmpRlrAttr(YAxis2->rulerAttributes());
+		tmpRlrAttr.setShowFirstTick(false);
+		tmpRlrAttr.setShowMajorTickMarks(false);
+		tmpRlrAttr.setShowMinorTickMarks(false);
+		tmpRlrAttr.setShowRulerLine(false);
+		YAxis2->setRulerAttributes(tmpRlrAttr);
 		AnnualizedExcessLine->addAxis(YAxis);
+		CallDiagram->addAxis(YAxis2);
+		CallDiagram->addAxis(XAxis);
 		Charts.append(new KDChart::Chart(this));
+		KDChart::CartesianCoordinatePlane* plane2 = new KDChart::CartesianCoordinatePlane(Charts.last());
 		Charts.last()->coordinatePlane()->replaceDiagram(AnnualizedExcessLine);
+		plane2->setReferenceCoordinatePlane(Charts.last()->coordinatePlane());
+		plane2->replaceDiagram(CallDiagram);
+		Charts.last()->addCoordinatePlane(plane2);
 		KDChart::CartesianCoordinatePlane* plane =static_cast <KDChart::CartesianCoordinatePlane*>( AnnualizedExcessLine->coordinatePlane() );
 		KDChart::GridAttributes ga (plane->gridAttributes(Qt::Horizontal));
 		ga.setGridVisible(false);
+		KDChart::GridAttributes gv (plane2->gridAttributes(Qt::Horizontal));
+		gv.setGridVisible(false);
 		plane->setGridAttributes(Qt::Horizontal,ga);
+		plane2->setGridAttributes(Qt::Horizontal,gv);
+		plane2->setGridAttributes(Qt::Vertical,gv);
 		KDChart::Legend* ChartLegend=new KDChart::Legend(AnnualizedExcessLine,Charts.last());
+		ChartLegend->addDiagram(CallDiagram);
 		ChartLegend->setPosition( KDChart::Position::East );
 		ChartLegend->setAlignment( Qt::AlignCenter );
 		ChartLegend->setShowLines( false );
 		ChartLegend->setOrientation( Qt::Vertical );
+		ChartLegend->setBrush(a.GetTranchesCount(),TmpCallBrush);
 		Charts.last()->addLegend(ChartLegend);
 		Charts.last()->addHeaderFooter(ChartTile);
 		ChartsArea->addWidget(Charts.last());
@@ -284,6 +374,29 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 			HideMissing.setMissingValuesPolicy(KDChart::LineAttributes::MissingValuesHideSegments);
 			AnnualizedExcessLine->setLineAttributes(0,HideMissing);
 		}
+		AnnualizedExcessLine->setModel(ChartsModels.last());
+
+		ChartsModels.append(new QStandardItemModel(a.GetTranche(0)->GetCashFlow().Count(),1,this));
+		QDate TempCallDate=a.GetCalledPeriod();
+		bool CallDatePlaced=false;
+		for(int i=0;i<a.GetTranche(0)->GetCashFlow().Count();i++){
+			QModelIndex TempIndex=ChartsModels.last()->index(i,0);
+			if(a.GetTranche(0)->GetCashFlow().GetDate(i)>=TempCallDate && !CallDatePlaced){
+				ChartsModels.last()->setData(TempIndex,1.0);
+				ChartsModels.last()->setData(TempIndex,"Call Date",Qt::ToolTipRole);
+				CallDatePlaced=true;
+			}
+			else ChartsModels.last()->setData(TempIndex,0.0);
+		}
+		TranchesLabels.clear(); TranchesLabels << "Call Date";
+		ChartsModels.last()->setHorizontalHeaderLabels(TranchesLabels);
+		KDChart::BarDiagram* CallDiagram=new KDChart::BarDiagram;
+		CallDiagram->setModel(ChartsModels.last());
+		QBrush TmpCallBrush=CallDiagram->brush(0);
+		TmpCallBrush.setColor(Qt::lightGray);
+		TmpCallBrush.setStyle(Qt::DiagCrossPattern);
+		CallDiagram->setBrush(0,TmpCallBrush);
+
 		KDChart::HeaderFooter* ChartTile=new KDChart::HeaderFooter;
 		ChartTile->setText("IC Test");
 		ChartTile->setPosition(KDChart::Position::North);
@@ -293,8 +406,7 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 			TempPen.setWidth(ChartLinesWeight);
 			AnnualizedExcessLine->setPen(j,TempPen);
 		}
-		AnnualizedExcessLine->setModel(ChartsModels.last());
-		KDChart::CartesianAxis* XAxis=new KDChart::CartesianAxis(AnnualizedExcessLine);
+		KDChart::CartesianAxis* XAxis=new KDChart::CartesianAxis(CallDiagram);
 		KDChart::TextAttributes RotatedText(XAxis->textAttributes());
 		RotatedText.setRotation(-90);
 		XAxis->setTextAttributes(RotatedText);
@@ -303,19 +415,38 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		KDChart::CartesianAxis* YAxis=new KDChart::CartesianAxis(AnnualizedExcessLine);
 		YAxis->setPosition(KDChart::CartesianAxis::Left);
 		YAxis->setTitleText("IC Test");
-		AnnualizedExcessLine->addAxis(XAxis);
+		KDChart::CartesianAxis* YAxis2=new KDChart::CartesianAxis(CallDiagram);
+		YAxis2->setPosition(KDChart::CartesianAxis::Right);
+		KDChart::RulerAttributes tmpRlrAttr(YAxis2->rulerAttributes());
+		tmpRlrAttr.setShowFirstTick(false);
+		tmpRlrAttr.setShowMajorTickMarks(false);
+		tmpRlrAttr.setShowMinorTickMarks(false);
+		tmpRlrAttr.setShowRulerLine(false);
+		YAxis2->setRulerAttributes(tmpRlrAttr);
 		AnnualizedExcessLine->addAxis(YAxis);
+		CallDiagram->addAxis(YAxis2);
+		CallDiagram->addAxis(XAxis);
 		Charts.append(new KDChart::Chart(this));
+		KDChart::CartesianCoordinatePlane* plane2 = new KDChart::CartesianCoordinatePlane(Charts.last());
 		Charts.last()->coordinatePlane()->replaceDiagram(AnnualizedExcessLine);
+		plane2->setReferenceCoordinatePlane(Charts.last()->coordinatePlane());
+		plane2->replaceDiagram(CallDiagram);
+		Charts.last()->addCoordinatePlane(plane2);
 		KDChart::CartesianCoordinatePlane* plane =static_cast <KDChart::CartesianCoordinatePlane*>( AnnualizedExcessLine->coordinatePlane() );
 		KDChart::GridAttributes ga (plane->gridAttributes(Qt::Horizontal));
 		ga.setGridVisible(false);
+		KDChart::GridAttributes gv (plane2->gridAttributes(Qt::Horizontal));
+		gv.setGridVisible(false);
 		plane->setGridAttributes(Qt::Horizontal,ga);
+		plane2->setGridAttributes(Qt::Horizontal,gv);
+		plane2->setGridAttributes(Qt::Vertical,gv);
 		KDChart::Legend* ChartLegend=new KDChart::Legend(AnnualizedExcessLine,Charts.last());
+		ChartLegend->addDiagram(CallDiagram);
 		ChartLegend->setPosition( KDChart::Position::East );
 		ChartLegend->setAlignment( Qt::AlignCenter );
 		ChartLegend->setShowLines( false );
 		ChartLegend->setOrientation( Qt::Vertical );
+		ChartLegend->setBrush(a.GetTranchesCount(),TmpCallBrush);
 		Charts.last()->addLegend(ChartLegend);
 		Charts.last()->addHeaderFooter(ChartTile);
 		ChartsArea->addWidget(Charts.last());
@@ -332,6 +463,27 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 			DatesLabels << a.GetTranche(0)->GetCashFlow().GetDate(i).toString("MMM-yy");
 		}
 		KDChart::LineDiagram* AnnualizedExcessLine=new KDChart::LineDiagram;
+		AnnualizedExcessLine->setModel(ChartsModels.last());
+
+		ChartsModels.append(new QStandardItemModel(a.GetTranche(0)->GetCashFlow().Count(),1,this));
+		QDate TempCallDate=a.GetCalledPeriod();
+		bool CallDatePlaced=false;
+		for(int i=0;i<a.GetTranche(0)->GetCashFlow().Count();i++){
+			QModelIndex TempIndex=ChartsModels.last()->index(i,0);
+			if(a.GetTranche(0)->GetCashFlow().GetDate(i)>=TempCallDate && !CallDatePlaced){
+				ChartsModels.last()->setData(TempIndex,1.0);
+				ChartsModels.last()->setData(TempIndex,"Call Date",Qt::ToolTipRole);
+				CallDatePlaced=true;
+			}
+			else ChartsModels.last()->setData(TempIndex,0.0);
+		}
+		KDChart::BarDiagram* CallDiagram=new KDChart::BarDiagram;
+		CallDiagram->setModel(ChartsModels.last());
+		QBrush TmpCallBrush=CallDiagram->brush(0);
+		TmpCallBrush.setColor(Qt::lightGray);
+		TmpCallBrush.setStyle(Qt::DiagCrossPattern);
+		CallDiagram->setBrush(0,TmpCallBrush);
+
 		KDChart::HeaderFooter* ChartTile=new KDChart::HeaderFooter;
 		ChartTile->setText("Annualized Excess Spread");
 		ChartTile->setPosition(KDChart::Position::North);
@@ -340,8 +492,7 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		TempPen.setWidth(ChartLinesWeight);
 		TempPen.setColor(Qt::darkBlue);
 		AnnualizedExcessLine->setPen(0,TempPen);
-		AnnualizedExcessLine->setModel(ChartsModels.last());
-		KDChart::CartesianAxis* XAxis=new KDChart::CartesianAxis(AnnualizedExcessLine);
+		KDChart::CartesianAxis* XAxis=new KDChart::CartesianAxis(CallDiagram);
 		KDChart::TextAttributes RotatedText(XAxis->textAttributes());
 		RotatedText.setRotation(-90);
 		XAxis->setTextAttributes(RotatedText);
@@ -350,14 +501,31 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		KDChart::CartesianAxis* YAxis=new KDChart::CartesianAxis(AnnualizedExcessLine);
 		YAxis->setPosition(KDChart::CartesianAxis::Left);
 		YAxis->setTitleText("Excess Spread");
-		AnnualizedExcessLine->addAxis(XAxis);
+		KDChart::CartesianAxis* YAxis2=new KDChart::CartesianAxis(CallDiagram);
+		YAxis2->setPosition(KDChart::CartesianAxis::Right);
+		KDChart::RulerAttributes tmpRlrAttr(YAxis2->rulerAttributes());
+		tmpRlrAttr.setShowFirstTick(false);
+		tmpRlrAttr.setShowMajorTickMarks(false);
+		tmpRlrAttr.setShowMinorTickMarks(false);
+		tmpRlrAttr.setShowRulerLine(false);
+		YAxis2->setRulerAttributes(tmpRlrAttr);
 		AnnualizedExcessLine->addAxis(YAxis);
+		CallDiagram->addAxis(YAxis2);
+		CallDiagram->addAxis(XAxis);
 		Charts.append(new KDChart::Chart(this));
+		KDChart::CartesianCoordinatePlane* plane2 = new KDChart::CartesianCoordinatePlane(Charts.last());
 		Charts.last()->coordinatePlane()->replaceDiagram(AnnualizedExcessLine);
+		plane2->setReferenceCoordinatePlane(Charts.last()->coordinatePlane());
+		plane2->replaceDiagram(CallDiagram);
+		Charts.last()->addCoordinatePlane(plane2);
 		KDChart::CartesianCoordinatePlane* plane =static_cast <KDChart::CartesianCoordinatePlane*>( AnnualizedExcessLine->coordinatePlane() );
 		KDChart::GridAttributes ga (plane->gridAttributes(Qt::Horizontal));
 		ga.setGridVisible(false);
+		KDChart::GridAttributes gv (plane2->gridAttributes(Qt::Horizontal));
+		gv.setGridVisible(false);
 		plane->setGridAttributes(Qt::Horizontal,ga);
+		plane2->setGridAttributes(Qt::Horizontal,gv);
+		plane2->setGridAttributes(Qt::Vertical,gv);
 		Charts.last()->addHeaderFooter(ChartTile);
 		ChartsArea->addWidget(Charts.last());
 		ChartsList->addItem("Annualized Excess Spread");
@@ -383,6 +551,29 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		CategoryLabels << "WA Cost of Funding"<< "WA Loans Coupon";
 		ChartsModels.last()->setHorizontalHeaderLabels(CategoryLabels);
 		KDChart::LineDiagram* AnnualizedExcessLine=new KDChart::LineDiagram;
+		AnnualizedExcessLine->setModel(ChartsModels.last());
+
+		ChartsModels.append(new QStandardItemModel(a.GetTranche(0)->GetCashFlow().Count(),1,this));
+		QDate TempCallDate=a.GetCalledPeriod();
+		bool CallDatePlaced=false;
+		for(int i=0;i<a.GetTranche(0)->GetCashFlow().Count();i++){
+			QModelIndex TempIndex=ChartsModels.last()->index(i,0);
+			if(a.GetTranche(0)->GetCashFlow().GetDate(i)>=TempCallDate && !CallDatePlaced){
+				ChartsModels.last()->setData(TempIndex,1.0);
+				ChartsModels.last()->setData(TempIndex,"Call Date",Qt::ToolTipRole);
+				CallDatePlaced=true;
+			}
+			else ChartsModels.last()->setData(TempIndex,0.0);
+		}
+		CategoryLabels.clear(); CategoryLabels << "Call Date";
+		ChartsModels.last()->setHorizontalHeaderLabels(CategoryLabels);
+		KDChart::BarDiagram* CallDiagram=new KDChart::BarDiagram;
+		CallDiagram->setModel(ChartsModels.last());
+		QBrush TmpCallBrush=CallDiagram->brush(0);
+		TmpCallBrush.setColor(Qt::lightGray);
+		TmpCallBrush.setStyle(Qt::DiagCrossPattern);
+		CallDiagram->setBrush(0,TmpCallBrush);
+
 		KDChart::LineAttributes HideMissing=AnnualizedExcessLine->lineAttributes(0);
 		HideMissing.setMissingValuesPolicy(KDChart::LineAttributes::MissingValuesHideSegments);
 		AnnualizedExcessLine->setLineAttributes(0,HideMissing);
@@ -400,8 +591,7 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		TempPen2.setColor(Qt::darkRed);
 		AnnualizedExcessLine->setPen(1,TempPen2);
 
-		AnnualizedExcessLine->setModel(ChartsModels.last());
-		KDChart::CartesianAxis* XAxis=new KDChart::CartesianAxis(AnnualizedExcessLine);
+		KDChart::CartesianAxis* XAxis=new KDChart::CartesianAxis(CallDiagram);
 		KDChart::TextAttributes RotatedText(XAxis->textAttributes());
 		RotatedText.setRotation(-90);
 		XAxis->setTextAttributes(RotatedText);
@@ -409,22 +599,40 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		XAxis->setPosition(KDChart::CartesianAxis::Bottom);
 		KDChart::CartesianAxis* YAxis=new KDChart::CartesianAxis(AnnualizedExcessLine);
 		YAxis->setPosition(KDChart::CartesianAxis::Left);
-		//YAxis->setTitleText("WA Costs and revenues");
-		AnnualizedExcessLine->addAxis(XAxis);
+		KDChart::CartesianAxis* YAxis2=new KDChart::CartesianAxis(CallDiagram);
+		YAxis2->setPosition(KDChart::CartesianAxis::Right);
+		KDChart::RulerAttributes tmpRlrAttr(YAxis2->rulerAttributes());
+		tmpRlrAttr.setShowFirstTick(false);
+		tmpRlrAttr.setShowMajorTickMarks(false);
+		tmpRlrAttr.setShowMinorTickMarks(false);
+		tmpRlrAttr.setShowRulerLine(false);
+		YAxis2->setRulerAttributes(tmpRlrAttr);
 		AnnualizedExcessLine->addAxis(YAxis);
+		CallDiagram->addAxis(YAxis2);
+		CallDiagram->addAxis(XAxis);
 		Charts.append(new KDChart::Chart(this));
+		KDChart::CartesianCoordinatePlane* plane2 = new KDChart::CartesianCoordinatePlane(Charts.last());
 		Charts.last()->coordinatePlane()->replaceDiagram(AnnualizedExcessLine);
+		plane2->setReferenceCoordinatePlane(Charts.last()->coordinatePlane());
+		plane2->replaceDiagram(CallDiagram);
+		Charts.last()->addCoordinatePlane(plane2);
 		KDChart::CartesianCoordinatePlane* plane =static_cast <KDChart::CartesianCoordinatePlane*>( AnnualizedExcessLine->coordinatePlane() );
 		KDChart::GridAttributes ga (plane->gridAttributes(Qt::Horizontal));
 		ga.setGridVisible(false);
+		KDChart::GridAttributes gv (plane2->gridAttributes(Qt::Horizontal));
+		gv.setGridVisible(false);
 		plane->setGridAttributes(Qt::Horizontal,ga);
+		plane2->setGridAttributes(Qt::Horizontal,gv);
+		plane2->setGridAttributes(Qt::Vertical,gv);
 		KDChart::Legend* ChartLegend=new KDChart::Legend(AnnualizedExcessLine,Charts.last());
+		ChartLegend->addDiagram(CallDiagram);
 		ChartLegend->setPosition( KDChart::Position::East );
 		ChartLegend->setAlignment( Qt::AlignCenter );
 		ChartLegend->setShowLines( false );
 		ChartLegend->setOrientation( Qt::Vertical );
 		ChartLegend->setColor(0,Qt::darkBlue);
 		ChartLegend->setColor(1,Qt::darkRed);
+		ChartLegend->setBrush(2,TmpCallBrush);
 		Charts.last()->addLegend(ChartLegend);
 		Charts.last()->addHeaderFooter(ChartTile);
 		ChartsArea->addWidget(Charts.last());

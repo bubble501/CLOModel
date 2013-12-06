@@ -328,12 +328,12 @@ Waterfall StressTest::GetScenarioFromFile(const QString& DestPath,const QString&
 	TargetFile.close();
 	return Result;
 }
-void StressTest::LoadResultsFromFile(const QString& DestPath){
+bool StressTest::LoadResultsFromFile(const QString& DestPath){
 	XSpann.clear();
 	YSpann.clear();
-	if(!QFile::exists(DestPath)) return;
+	if(!QFile::exists(DestPath)) return false;
 	QuaZip zip(DestPath);
-	if(!zip.open(QuaZip::mdUnzip)) return;
+	if(!zip.open(QuaZip::mdUnzip)) return false;
 	QuaZipFile TargetFile(&zip);
 	try{
 		if(!zip.setCurrentFile("VersionIdentifier")) throw 1;
@@ -350,7 +350,6 @@ void StressTest::LoadResultsFromFile(const QString& DestPath){
 		TargetFile.close();
 	}
 	catch(int ExcCode){
-		
 		if(!QApplication::instance()){
 			char *argv[] = {"NoArgumnets"};
 			int argc = sizeof(argv) / sizeof(char*) - 1;
@@ -361,7 +360,7 @@ void StressTest::LoadResultsFromFile(const QString& DestPath){
 		else {
 			QMessageBox::critical(0,"Incompatible Version","The stress test data is not comaptible with the current model version\nPlease run ALL the stress tests again");
 		}
-		return;
+		return false;
 	}
 	for(bool more=zip.goToFirstFile(); more; more=zip.goToNextFile()) {
 		TargetFile.open(QIODevice::ReadOnly);
@@ -377,4 +376,5 @@ void StressTest::LoadResultsFromFile(const QString& DestPath){
 		out >> (Results[Spanns.at(0)][Spanns.at(1)]);
 		TargetFile.close();
 	}
+	return true;
 }

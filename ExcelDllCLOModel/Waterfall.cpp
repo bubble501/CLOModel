@@ -642,6 +642,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						Solution=(1.0-((m_unpackedCCCcurve.at(qMin(i,m_unpackedCCCcurve.size()-1))-m_CCCTestLimit)*m_CCChaircut))*m_MortgagesPayments.GetAmountOut(i);
 					else
 						Solution=m_MortgagesPayments.GetAmountOut(i);
+					Solution+=AvailablePrincipal;
 					if(Solution==0.0) Solution=1.0;
 					while(ProRataBonds.size()>0){
 						if(m_Tranches.at(ProRataBonds.head())->GetCashFlow().GetOCTest(CurrentDate)<=0.0)
@@ -898,50 +899,6 @@ QDataStream& operator>>(QDataStream & stream, Waterfall& flows){
 	return stream;
 }
 QDate Waterfall::GetCalledPeriod() const{
-
-
-/*
-	if(m_UseCall && !IsCallPaymentDate){
-		ActualCallReserveLevel=0.0;
-		TotalPayable=0.0;
-		if(m_CallReserve>0 && m_CallMultiple>0){
-			foreach(Tranche* SingleTranche, m_Tranches){
-				TotalPayable+=SingleTranche->GetCurrentOutstanding();
-				if(SingleTranche->GetProrataGroup()>=m_CallReserve) ActualCallReserveLevel+=SingleTranche->GetCurrentOutstanding();
-			}
-			if(ActualCallReserveLevel==0.0)ActualCallReserveLevel=m_CallReserve;
-			ActualCallReserveLevel*=m_CallMultiple;
-			IsCallPaymentDate=ActualCallReserveLevel>=TotalPayable-m_PrincipalAvailable;
-		}
-		IsCallPaymentDate= IsCallPaymentDate || (!m_CallDate.isNull() && CurrentDate>m_CallDate);
-	}
-	if(CurrentDate<RollingNextIPD && i<m_MortgagesPayments.Count()-1){
-		//This is not a Tranche payment date
-		bool ReinvestRightAway=false;
-		foreach(WatFalPrior* SingleStep,m_WaterfallStesps){
-			if(SingleStep->GetPriorityType()==WatFalPrior::wst_ReinvestPrincipal){
-				ReinvestRightAway=true;
-				break;
-			}
-		}
-		if(CurrentDate<=m_ReinvestmentTest.GetReinvestmentPeriod() && ReinvestRightAway && !IsCallPaymentDate){
-			//during reinvestment period
-			//reinvest
-			if(m_PrincipalAvailable>0.0){
-				m_ReinvestmentTest.CalculateBondCashFlows(m_PrincipalAvailable,CurrentDate,i);
-				m_MortgagesPayments.AddFlow(m_ReinvestmentTest.GetBondCashFlow());
-				m_Reinvested.AddFlow(CurrentDate,m_PrincipalAvailable,TrancheCashFlow::PrincipalFlow);
-				m_InterestAvailable+=m_ReinvestmentTest.GetBondCashFlow().GetInterest(CurrentDate);
-				m_PrincipalAvailable=m_ReinvestmentTest.GetBondCashFlow().GetPrincipal(CurrentDate);
-			}
-		}
-		continue;
-	}*/
-
-
-
-
-
 	QDate RollingNextIPD;
 	double ActualCallReserveLevel;
 	double TotalPayable;

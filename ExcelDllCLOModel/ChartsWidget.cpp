@@ -357,7 +357,7 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 			for(int i=0;i<a.GetTranche(j)->GetCashFlow().Count();i++){
 				QModelIndex TempIndex=ChartsModels.last()->index(i,ColumnsCount);
 				if(a.GetTranche(j)->GetCashFlow().GetICTest(i)<MaxICtoPlot || !FirstInifinityFound){
-					ChartsModels.last()->setData(TempIndex,qMin(MaxICtoPlot,a.GetTranche(j)->GetCashFlow().GetICTest(i))*100.0);
+					ChartsModels.last()->setData(TempIndex,qMax(0.0,qMin(MaxICtoPlot,a.GetTranche(j)->GetCashFlow().GetICTest(i))*100.0));
 					if(a.GetTranche(j)->GetCashFlow().GetICTest(i)<MaxICtoPlot)FirstInifinityFound=false;
 					else FirstInifinityFound=true;
 				}

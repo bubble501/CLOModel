@@ -16,6 +16,7 @@ int main(int argc, char *argv[])
 	if(VersionChecker!=qint32(ModelVersionNumber)) return 0;
 	out >> TempWaterfall;
 	file.close();
+	TempWaterfall.CalculateTranchesCashFlows();
 	double TempDate=TempWaterfall.GetTranche(0)->GetDiscountMargin(100);
 	return a.exec();
 }

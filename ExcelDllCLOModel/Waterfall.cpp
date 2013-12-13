@@ -434,7 +434,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 				}
 				IsCallPaymentDate= IsCallPaymentDate || (!m_CallDate.isNull() && CurrentDate>m_CallDate);
 			}
-			if(CurrentDate<RollingNextIPD && i<m_MortgagesPayments.Count()-1){
+			if((CurrentDate.year()<RollingNextIPD.year() || (CurrentDate.year()==RollingNextIPD.year() && CurrentDate.month()<RollingNextIPD.month())) && i<m_MortgagesPayments.Count()-1){
 				//This is not a Tranche payment date
 				bool ReinvestRightAway=false;
 				foreach(WatFalPrior* SingleStep,m_WaterfallStesps){
@@ -950,7 +950,14 @@ QString Waterfall::ReadyToCalculate()const{
 		|| m_ReinvestmentTest.GetShare(ReinvestmentTest::OutReinvShare)<0.0
 		|| m_ReinvestmentTest.GetShare(ReinvestmentTest::InRedempShare)+m_ReinvestmentTest.GetShare(ReinvestmentTest::InReinvShare)>1.0
 		|| m_ReinvestmentTest.GetShare(ReinvestmentTest::OutRedempShare)+m_ReinvestmentTest.GetShare(ReinvestmentTest::OutReinvShare)>1.0
-	)Result+="Reinvestment Test Shares\n";
+	)Result+=QString("Reinvestment Test Shares InRedempShare: %1 | OutRedempShare: %2 | InReinvShare: %3 | OutReinvShare: %4 | %5 | %6\n")
+		.arg(m_ReinvestmentTest.GetShare(ReinvestmentTest::InRedempShare))
+		.arg(m_ReinvestmentTest.GetShare(ReinvestmentTest::OutRedempShare))
+		.arg(m_ReinvestmentTest.GetShare(ReinvestmentTest::InReinvShare))
+		.arg(m_ReinvestmentTest.GetShare(ReinvestmentTest::OutReinvShare))
+		.arg(m_ReinvestmentTest.GetShare(ReinvestmentTest::InRedempShare)+m_ReinvestmentTest.GetShare(ReinvestmentTest::InReinvShare))
+		.arg(m_ReinvestmentTest.GetShare(ReinvestmentTest::OutRedempShare)+m_ReinvestmentTest.GetShare(ReinvestmentTest::OutReinvShare))
+	;
 	if(m_FirstIPDdate<QDate(2000,1,1))Result+="Next IDP\n";
 	if(m_LastIPDdate<QDate(2000,1,1))Result+="Last IDP\n";
 	if(!Result.isEmpty()) return Result.left(Result.size()-1);

@@ -67,7 +67,8 @@ void Mortgage::SetInterest(const QString& a){
 	double CurrentAmtOut=m_Size;
 	double TempFlow;
 	QDate NextPaymentDate=AdjStartDate.addMonths(m_PaymentFreq);
-	if(NextPaymentDate > m_MaturityDate) NextPaymentDate.setDate(m_MaturityDate.year(),m_MaturityDate.month(),15);
+	if(NextPaymentDate > m_MaturityDate)
+		NextPaymentDate.setDate(m_MaturityDate.year(),m_MaturityDate.month(),15);
 	for (int j=0;j<NumPayments;j++){
 		CurrentCPR=CPRVector.at(qMin(j,CPRVector.size()-1));
 		CurrentCDR=CDRVector.at(qMin(j,CDRVector.size()-1));
@@ -80,7 +81,14 @@ void Mortgage::SetInterest(const QString& a){
 			m_CashFlows.AddFlow (CurrentMonth, m_CashFlows.GetAccruedInterest(CurrentMonth), MtgCashFlow::InterestFlow);
 			m_CashFlows.AddFlow (CurrentMonth, -m_CashFlows.GetAccruedInterest(CurrentMonth), MtgCashFlow::AccruedInterestFlow);
 			if (CurrentAnnuity == "Y"){
-				TempFlow=qAbs(pmt(CurrentInterest, RoundUp(static_cast<double>(NumPayments) / static_cast<double>(m_PaymentFreq)) - static_cast<double>(j) + 1.0, CurrentAmtOut)) - TempFlow;
+				int CountPeriods=CurrentMonth == QDate(m_MaturityDate.year(),m_MaturityDate.month(),15) ? 0:-1;
+				QDate RollingdateCounter=CurrentMonth;
+				while(RollingdateCounter<=m_MaturityDate){
+					CountPeriods++;
+					RollingdateCounter=RollingdateCounter.addMonths(m_PaymentFreq);
+				}CountPeriods++;
+				double InterestApplicable=qPow(1.0+m_FloatingRateBase,static_cast<double>(m_PaymentFreq)/12.0)+qPow(1.0+InterestVector.at(qMin(j,InterestVector.size()-1)),static_cast<double>(m_PaymentFreq))-2.0;
+				TempFlow=qAbs(pmt(InterestApplicable, CountPeriods, CurrentAmtOut)) - TempFlow;
 			}
 			else if(j == NumPayments-1){TempFlow = CurrentAmtOut;}
 			else{TempFlow = 0.0;}

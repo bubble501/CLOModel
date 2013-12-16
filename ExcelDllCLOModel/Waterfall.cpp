@@ -773,7 +773,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 							}
 							//Redeem
 							if(SingleStep->GetRedemptionGroup()>0) Solution=RedeemNotes(Solution,SingleStep->GetRedemptionGroup(),i);
-							Solution=RedeemSequential(Solution,i);
+							else Solution=RedeemSequential(Solution,i);
 							AvailableInterest+=Solution;
 						}
 					}

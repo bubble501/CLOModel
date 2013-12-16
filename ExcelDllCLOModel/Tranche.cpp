@@ -191,6 +191,7 @@ double Tranche::GetWALife(const QDate& StartDate)const{
 			Result+=CurrentPrinc*static_cast<double>(StartDate.daysTo(CashFlow.GetDate(i)))/365.25;
 		}
 	}
+	if (RunningSum<=0) return 0.0;
 	return Result/RunningSum;
 }
 QDataStream& operator<<(QDataStream & stream, const Tranche& flows){

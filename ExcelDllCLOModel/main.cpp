@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
 	if(VersionChecker!=qint32(ModelVersionNumber)) return 0;
 	out >> TempWaterfall;
 	file.close();
-	TempWaterfall.CalculateTranchesCashFlows();
+	TempWaterfall.GetTranche(TempWaterfall.GetTranchesCount()-1)->GetWALife(QDate(2013,10,31));
 	
 	/*Mortgage TempLoan;
 	TempLoan.SetAnnuity("Y");

@@ -4,6 +4,7 @@
 #include <qmath.h>
 #include "Waterfall.h"
 #include "CommonFunctions.h"
+#include <QMessageBox>
 const WatFalPrior* Waterfall::GetStep(int Index)const {
 	if(Index<0 || Index>=m_WaterfallStesps.size()) return NULL;
 	return m_WaterfallStesps.at(Index);
@@ -236,8 +237,9 @@ void Waterfall::FillAllDates(){
 	}
 	QDate RollingNextIPD=m_FirstIPDdate;
 	int Multiplier=0;
+	
 	for (int i=0;i<m_CalculatedMtgPayments.Count();i++){
-		if(m_CalculatedMtgPayments.GetDate(i) >= RollingNextIPD || i >= m_CalculatedMtgPayments.Count()-1){
+		if(m_CalculatedMtgPayments.GetDate(i).year() > RollingNextIPD.year() || (m_CalculatedMtgPayments.GetDate(i).year() == RollingNextIPD.year() && m_CalculatedMtgPayments.GetDate(i).month() >= RollingNextIPD.month()) || i >= m_CalculatedMtgPayments.Count()-1){
 			for(int j=0;j<m_Tranches.size();j++){
 				m_Tranches[j]->GetCashFlow().ReplaceDate(m_CalculatedMtgPayments.GetDate(i),RollingNextIPD);
 			}
@@ -801,11 +803,11 @@ bool Waterfall::CalculateTranchesCashFlows(){
 			RollingNextIPD=m_FirstIPDdate.addMonths((++PeriodsCounter)*m_PaymentFrequency);
 			if(IsCallPaymentDate) break;
 		}//End Cicle in time
-		FillAllDates();
 		m_PrincipalAvailable=OriginalAvailablePrincipal;
 		m_InterestAvailable=OriginalAvailableInterest;
 		m_CalculatedMtgPayments=m_MortgagesPayments;
 		m_MortgagesPayments=OriginalMtgFlows;
+		FillAllDates();
 		return true;
 }
 

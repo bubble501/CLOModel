@@ -134,6 +134,7 @@ double CalculateNPVsimple(const QList<QDate>& Dte, const QList<double>& Flws, do
 }
 double CalculateIRR(const QList<QDate>& Dte, const QList<double>& Flws, int Daycount, double Guess,int precision){
 	if(Guess<=0 || Guess>10) Guess=0.05;
+	unsigned int CurrentIterations=0;
 	double Result=Guess;
 	double PreviuousGuess=Guess+0.01;
 	double CurrentGuess=Guess;
@@ -146,6 +147,7 @@ double CalculateIRR(const QList<QDate>& Dte, const QList<double>& Flws, int Dayc
 		PreviuousGuess=CurrentGuess;
 		CurrentGuess=Result;
 		CurrentNPV=CalculateNPV(Dte,Flws,Result,Daycount);
+		if(++CurrentIterations>=MaximumIRRIterations) return 0.0;
 	}
 	return Result;
 }

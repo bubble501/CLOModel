@@ -777,6 +777,7 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		ChartsModels.last()->setHorizontalHeaderLabels(CategoryLabels);
 		KDChart::LineDiagram* LRline=new KDChart::LineDiagram;
 		LRline->setModel(ChartsModels.last());
+
 		ChartsModels.append(new QStandardItemModel(a.GetTranche(0)->GetCashFlow().Count(),1,this));
 		for(int i=0;i<a.GetTranche(0)->GetCashFlow().Count();i++){
 			QModelIndex TempIndex=ChartsModels.last()->index(i,0);
@@ -788,6 +789,28 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		ChartsModels.last()->setHorizontalHeaderLabels(CategoryLabels);
 		KDChart::LineDiagram* CPRline=new KDChart::LineDiagram;
 		CPRline->setModel(ChartsModels.last());
+
+		ChartsModels.append(new QStandardItemModel(a.GetTranche(0)->GetCashFlow().Count(),1,this));
+		QDate TempCallDate=a.GetCalledPeriod();
+		bool CallDatePlaced=false;
+		for(int i=0;i<a.GetTranche(0)->GetCashFlow().Count();i++){
+			QModelIndex TempIndex=ChartsModels.last()->index(i,0);
+			if(a.GetTranche(0)->GetCashFlow().GetDate(i)>=TempCallDate && !CallDatePlaced){
+				ChartsModels.last()->setData(TempIndex,1.0);
+				ChartsModels.last()->setData(TempIndex,"Call Date",Qt::ToolTipRole);
+				CallDatePlaced=true;
+			}
+			else ChartsModels.last()->setData(TempIndex,0.0);
+		}
+		CategoryLabels.clear(); CategoryLabels << "Call Date";
+		ChartsModels.last()->setHorizontalHeaderLabels(CategoryLabels);
+		KDChart::BarDiagram* CallDiagram=new KDChart::BarDiagram;
+		CallDiagram->setModel(ChartsModels.last());
+		QBrush TmpCallBrush=CallDiagram->brush(0);
+		TmpCallBrush.setColor(Qt::lightGray);
+		TmpCallBrush.setStyle(Qt::DiagCrossPattern);
+		CallDiagram->setBrush(0,TmpCallBrush);
+
 		KDChart::CartesianAxis* XAxis=new KDChart::CartesianAxis(CPRline);
 		KDChart::CartesianAxis* YAxis=new KDChart::CartesianAxis(LRline);
 		KDChart::CartesianAxis* YAxis2=new KDChart::CartesianAxis(CPRline);
@@ -796,9 +819,20 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		YAxis2->setPosition(KDChart::CartesianAxis::Right);
 		YAxis->setTitleText("Equity Return");
 		YAxis2->setTitleText("Cumulative Equity Return");
+
+		KDChart::CartesianAxis* YAxis3=new KDChart::CartesianAxis(CallDiagram);
+		YAxis3->setPosition(KDChart::CartesianAxis::Right);
+		KDChart::RulerAttributes tmpRlrAttr(YAxis3->rulerAttributes());
+		tmpRlrAttr.setShowFirstTick(false);
+		tmpRlrAttr.setShowMajorTickMarks(false);
+		tmpRlrAttr.setShowMinorTickMarks(false);
+		tmpRlrAttr.setShowRulerLine(false);
+		YAxis3->setRulerAttributes(tmpRlrAttr);
+
 		LRline->addAxis(YAxis);
 		CPRline->addAxis(XAxis);
 		CPRline->addAxis(YAxis2);
+		CallDiagram->addAxis(YAxis3);
 		LRline->setUnitSuffix("%",Qt::Vertical);
 		CPRline->setUnitSuffix("%",Qt::Vertical);
 		KDChart::HeaderFooter* ChartTile=new KDChart::HeaderFooter;
@@ -818,12 +852,17 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		XAxis->setLabels(DatesLabels);
 		Charts.append(new KDChart::Chart(this));
 		KDChart::CartesianCoordinatePlane* plane2 = new KDChart::CartesianCoordinatePlane(Charts.last());
+		KDChart::CartesianCoordinatePlane* plane3 = new KDChart::CartesianCoordinatePlane(Charts.last());
 		Charts.last()->coordinatePlane()->replaceDiagram(LRline);
 		plane2->setReferenceCoordinatePlane(Charts.last()->coordinatePlane());
 		plane2->replaceDiagram(CPRline);
-		Charts.last()->addCoordinatePlane(plane2);		
+		Charts.last()->addCoordinatePlane(plane2);
+		plane3->setReferenceCoordinatePlane(Charts.last()->coordinatePlane());
+		plane3->replaceDiagram(CallDiagram);
+		Charts.last()->addCoordinatePlane(plane3);	
 		KDChart::Legend* ChartLegend=new KDChart::Legend(LRline,Charts.last());
 		ChartLegend->addDiagram(CPRline);
+		ChartLegend->addDiagram(CallDiagram);
 		ChartLegend->setPosition( KDChart::Position::East );
 		ChartLegend->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
 		ChartLegend->setShowLines(false);
@@ -840,6 +879,8 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		ga.setGridVisible(false);
 		plane->setGridAttributes(Qt::Horizontal,ga);
 		plane->setGridAttributes(Qt::Vertical,ga);
+		plane3->setGridAttributes(Qt::Horizontal,ga);
+		plane3->setGridAttributes(Qt::Vertical,ga);
 		ChartsArea->addWidget(Charts.last());
 		ChartsList->addItem("Equity Return");
 	}

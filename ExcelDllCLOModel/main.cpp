@@ -16,14 +16,14 @@ int main(int argc, char *argv[])
 	if(VersionChecker!=qint32(ModelVersionNumber)) return 0;
 	out >> TempWaterfall;
 	file.close();
-	TempWaterfall.CalculateTranchesCashFlows();
+	double test=TempWaterfall.GetTranche(7)->GetDiscountMargin();
 	
 	/*Mortgage TempLoan;
-	TempLoan.SetAnnuity("Y");
+	TempLoan.SetAnnuity("N");
 	TempLoan.SetSize(1000000.0);
 	TempLoan.SetInterest("5");
 	TempLoan.SetMaturityDate(QDate(2020,6,30));
 	TempLoan.SetPaymentFreq(3);
-	TempLoan.CalculateCashFlows("0","2","0",QDate(2013,5,30));*/
+	TempLoan.CalculateCashFlows("0","0","0",QDate(2013,5,30));*/
 	return a.exec();
 }

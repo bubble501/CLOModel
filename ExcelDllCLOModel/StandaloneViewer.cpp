@@ -73,14 +73,14 @@ void StandaloneViewer::createMenus()
 }
 void StandaloneViewer::open(){
 	QString fileName = QFileDialog::getOpenFileName(this,
-		tr("Open Base Case"), ".",
+		tr("Open Base Case"), "./.Basecase.clo",
 		tr("CLO Model Base Case (*.clo)"));
 	if (fileName.isEmpty()) return;
 	LoadFile(fileName);
 }
 void StandaloneViewer::openStress(){
 	QString fileName = QFileDialog::getOpenFileName(this,
-		tr("Open Stress Test"), ".",
+		tr("Open Stress Test"), "./.StressResult01.fcsr",
 		tr("CLO Model Stress Test (*.fcsr)"));
 	if (fileName.isEmpty()) return;
 	LoadFile(fileName);

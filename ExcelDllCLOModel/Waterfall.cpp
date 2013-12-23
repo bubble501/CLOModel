@@ -333,7 +333,7 @@ double Waterfall::RedeemNotes(double AvailableFunds,int GroupTarget, int PeriodI
 		int ProRataIndex=ProRataBonds.dequeue();
 		m_Tranches[ProRataIndex]->AddCashFlow(
 			TargetDate,
-			AvailableFunds * m_Tranches.at(ProRataIndex)->GetCurrentOutstanding() /TotalPayable,
+			AvailableFunds * (m_Tranches.at(ProRataIndex)->GetCurrentOutstanding() /TotalPayable),
 			TrancheCashFlow::PrincipalFlow
 		);
 	}
@@ -462,6 +462,9 @@ bool Waterfall::CalculateTranchesCashFlows(){
 			AvailablePrincipal = m_PrincipalAvailable;
 			AvailableInterest = m_InterestAvailable;
 			if(IsCallPaymentDate) AvailablePrincipal+=m_PoolValueAtCall*m_MortgagesPayments.GetAmountOut(i)/100.0;
+if(CurrentDate.year()>=2020 && CurrentDate.month()>=7){
+	i=i;
+}
 			foreach(WatFalPrior* SingleStep,m_WaterfallStesps){//Cicle through the steps of the waterfall
 				switch(SingleStep->GetPriorityType()){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -715,7 +718,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 								}
 							}
 							if(GroupWACoupon(SolutionDegree)>0.0)
-								TotalPayable=(SolutionDegree-InterestPayableBefore)/GroupWACoupon(SolutionDegree);
+								TotalPayable=(Solution-InterestPayableBefore)/GroupWACoupon(SolutionDegree); //Solution-InterestPayableBefore changed SolutionDegree to Solution
 							if(TotalPayable>GroupOutstanding(SolutionDegree) || GroupWACoupon(SolutionDegree)<=0){
 								if(++SolutionDegree<=SingleStep->GetGroupTarget()) SolutionFound=false;
 								else TotalPayable=0;
@@ -723,9 +726,9 @@ bool Waterfall::CalculateTranchesCashFlows(){
 							if(SolutionFound){
 								for(int h=1;h<SolutionDegree;h++) TotalPayable+=GroupOutstanding(h);
 								if(SingleStep->GetPriorityType()==WatFalPrior::wst_ICTestPrinc)
-									AvailablePrincipal=RedeemSequential(qMin(TotalPayable,AvailablePrincipal),i);
+									AvailablePrincipal+=RedeemSequential(qMin(TotalPayable,AvailablePrincipal),i)-qMin(TotalPayable,AvailablePrincipal);
 								else
-									AvailableInterest=RedeemSequential(qMin(TotalPayable,AvailableInterest),i);
+									AvailableInterest+=RedeemSequential(qMin(TotalPayable,AvailableInterest),i)-qMin(TotalPayable,AvailableInterest);
 							}
 						}while(!SolutionFound);
 					}
@@ -886,7 +889,7 @@ QDataStream& operator>>(QDataStream & stream, Waterfall& flows){
 		>> flows.m_CallReserve
 		>> TempInt
 	;
-	flows.m_unpackedCCCcurve=UnpackVect(flows.m_CCCcurve,flows.m_PaymentFrequency);
+	flows.m_unpackedCCCcurve=UnpackVect(flows.m_CCCcurve,flows.m_PaymentFrequency,false);
 	flows.ResetTranches();
 	for(int i=0;i<TempInt;i++){
 		stream >> TempTranche;

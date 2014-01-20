@@ -36,6 +36,7 @@ void MtgCalculator::StartCalculation(){
 void MtgCalculator::BeeReturned(const MtgCashFlow& a){
 	Result+=a;
 	BeesReturned++;
+	emit BeeCalculated(BeesReturned);
 	if(BeesReturned==Loans.size()){
 		emit Calculated();
 		return;

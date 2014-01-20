@@ -25,6 +25,7 @@ public:
 	const MtgCashFlow& GetResult()const{return Result;}
 	void Reset();
 	QString ReadyToCalculate()const;
+	int Count() const{return Loans.size();}
 private:
 	QList<Mortgage*> Loans;
 	QString CPRass;
@@ -38,5 +39,6 @@ private slots:
 	void BeeReturned(const MtgCashFlow& a);
 signals:
 	void Calculated();
+	void BeeCalculated(int);
 };
 #endif // MtgCalculator_h__

@@ -7,9 +7,11 @@
 #include "WaterfallCalculator.h"
 #include "CommonFunctions.h"
 #include <QMessageBox>
+#include <QProgressDialog>
 CentralUnit::CentralUnit(QObject* parent)
 	:QObject(parent)
 	,Stresser(NULL)
+	,MtgsProgress(NULL)
 	,RunCall(false)
 {
 	for(int i=0;i<NumberOfPlots;i++) PlotIndexes[i]=0;
@@ -21,8 +23,6 @@ CentralUnit::CentralUnit(QObject* parent)
 	connect(this,SIGNAL(LoopStarted()),this,SLOT(CalculationStep1()),Qt::QueuedConnection);
 	ParallWatFalls=new WaterfallCalculator(this);
 	connect(ParallWatFalls,SIGNAL(Calculated()),this,SLOT(CheckCalculationDone()));
-	
-
 }
 void CentralUnit::SetPoolCutOff(const QDate& a){PoolCutOff=a; if(Stresser) Stresser->SetStartDate(PoolCutOff);}
 void CentralUnit::SetFolderPath(const QString& a){FolderPath=a;}
@@ -158,11 +158,17 @@ void CentralUnit::CalculationStep1(){
 	LoansCalculator.SetCDR(Structure.GetReinvestmentTest().GetCDRAssumption());
 	LoansCalculator.SetLS(Structure.GetReinvestmentTest().GetLSAssumption());
 	LoansCalculator.SetStartDate(PoolCutOff);
+	if(MtgsProgress) MtgsProgress->deleteLater();
+	MtgsProgress=new QProgressDialog("Calculating Loans Cash Flows","Please Wait",0,LoansCalculator.Count());
+	connect(&LoansCalculator,SIGNAL(BeeCalculated(int)),MtgsProgress,SLOT(setValue(int)));
 	LoansCalculator.StartCalculation();
 }
 void CentralUnit::CalculationStep2(){
 	Structure.ResetMtgFlows();
 	Structure.AddMortgagesFlows(LoansCalculator.GetResult());
+	MtgsProgress->close();
+	MtgsProgress->deleteLater();
+	MtgsProgress=NULL;
 	Structure.SetUseCall(false);
 	QString TmpStr=Structure.ReadyToCalculate();
 	if(!TmpStr.isEmpty()){

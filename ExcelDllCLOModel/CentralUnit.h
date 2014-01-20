@@ -8,6 +8,7 @@
 #define NumberOfPlots 9
 class WaterfallCalculator;
 class ErrorsViewer;
+class QProgressDialog;
 class CentralUnit : public QObject{
 	Q_OBJECT
 public:
@@ -77,6 +78,7 @@ public:
 	void SetPlotsSheet(const QString& a){PlotsSheet=a;}
 	void SetPlotIndexes(int val,int index){if(index>=0 && index<NumberOfPlots) PlotIndexes[index]=val;}
 private:
+	QProgressDialog* MtgsProgress;
 	WaterfallCalculator* ParallWatFalls;
 	MtgCalculator LoansCalculator;
 	Waterfall Structure;

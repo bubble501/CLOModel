@@ -160,14 +160,18 @@ void CentralUnit::CalculationStep1(){
 	LoansCalculator.SetStartDate(PoolCutOff);
 	if(MtgsProgress) MtgsProgress->deleteLater();
 	MtgsProgress=new QProgressDialog("Calculating Loans Cash Flows","Please Wait",0,LoansCalculator.Count());
+	MtgsProgress->show();
+	QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 	connect(&LoansCalculator,SIGNAL(BeeCalculated(int)),MtgsProgress,SLOT(setValue(int)));
 	LoansCalculator.StartCalculation();
 }
 void CentralUnit::CalculationStep2(){
 	Structure.ResetMtgFlows();
 	Structure.AddMortgagesFlows(LoansCalculator.GetResult());
-	MtgsProgress->close();
-	MtgsProgress->deleteLater();
+	if(MtgsProgress){
+		MtgsProgress->deleteLater();
+		MtgsProgress->close();
+	}
 	MtgsProgress=NULL;
 	Structure.SetUseCall(false);
 	QString TmpStr=Structure.ReadyToCalculate();
@@ -294,3 +298,62 @@ void CentralUnit::StressFinished(){
 	Stresser->SaveResults(FolderPath);
 	QApplication::quit();
 }
+
+#ifdef _DEBUG
+QDataStream& operator<<(QDataStream & stream, const CentralUnit& flows){
+	stream 
+		<< flows.PoolCutOff
+		<< flows.RunCall
+		<< flows.RunStress
+		<< flows.StressToCall
+		<< flows.MtgOutputAddress
+		<< flows.TranchesOutputAddress
+		<< flows.CallTranchesOutputAddress
+		<< flows.LossOutputAddress
+		<< flows.LossOnCallOutputAddress
+		<< flows.CreditEnanAddress
+		<< flows.FolderPath
+		<< flows.PlotsSheet
+		<< flows.Structure
+		<< flows.CallStructure
+	;
+	for(int i=0;i<NumberOfPlots;i++){
+		stream << flows.PlotIndexes[i];
+	}
+	stream << flows.LoansCalculator.Count();
+	for(int i=0;i<flows.LoansCalculator.Count();i++){
+		stream << *(flows.LoansCalculator.GetLoans().at(i));
+	}
+	return stream;
+}
+QDataStream& operator>>(QDataStream & stream, CentralUnit& flows){
+	stream 
+		>> flows.PoolCutOff
+		>> flows.RunCall
+		>> flows.RunStress
+		>> flows.StressToCall
+		>> flows.MtgOutputAddress
+		>> flows.TranchesOutputAddress
+		>> flows.CallTranchesOutputAddress
+		>> flows.LossOutputAddress
+		>> flows.LossOnCallOutputAddress
+		>> flows.CreditEnanAddress
+		>> flows.FolderPath
+		>> flows.PlotsSheet
+		>> flows.Structure
+		>> flows.CallStructure
+		;
+	for(int i=0;i<NumberOfPlots;i++){
+		stream >> flows.PlotIndexes[i];
+	}
+	Mortgage TempMtg;
+	int CountMtgs;
+	stream >> CountMtgs;
+	for(int i=0;i<CountMtgs;i++){
+		stream >> TempMtg;
+		flows.LoansCalculator.AddLoan(TempMtg);
+		if(flows.Stresser)flows.Stresser->AddLoan(TempMtg);
+	}
+	return stream;
+}
+#endif

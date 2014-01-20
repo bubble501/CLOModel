@@ -253,8 +253,8 @@ DefaultExchange:
     Call AddInput(AllTheInputs, Format(ReinvestPeriodCell.Offset(0, 1).Value, "yyyy-mm-dd"))
     Call AddInput(AllTheInputs, ReinvestLimitCell.Offset(0, 1).Value)
     Call AddInput(AllTheInputs, ReinvestTableCell.Offset(1, 1).Value)
-    Call AddInput(AllTheInputs, ReinvestTableCell.Offset(2, 1).Value)
     Call AddInput(AllTheInputs, ReinvestTableCell.Offset(1, 2).Value)
+    Call AddInput(AllTheInputs, ReinvestTableCell.Offset(2, 1).Value)
     Call AddInput(AllTheInputs, ReinvestTableCell.Offset(2, 2).Value)
     Call AddInput(AllTheInputs, CStr(ReinvestSpreadCell.Offset(0, 1).Value))
     Call AddInput(AllTheInputs, CStr(CPRcell.Offset(0, 1).Value))
@@ -355,10 +355,10 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
     a.Add "Loss Multiplier", "LSMultiHead"
     a.Add "CPR", "CPRfield"
     a.Add "CDR", "CDRfield"
-    a.Add "Original Amount", "OriginalOutHead"
+    a.Add "Original Equivalent", "OriginalOutHead"
     a.Add "LS", "LSfield"
     a.Add "Pool cut off date", "CutOffField"
-    a.Add "Outstanding Amount", "CurrentOutHead"
+    a.Add "Current Equivalent", "CurrentOutHead"
     a.Add "Bond", "BondsNamesHeader"
     a.Add "Pro rata group", "BondRataGroupHeader"
     a.Add "Price", "BondPriceHeader"

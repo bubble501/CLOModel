@@ -105,7 +105,13 @@ private slots:
 	void CalculationStep1();
 	void CheckCalculationDone();
 	void StressFinished();
-
-
+	#ifdef _DEBUG
+	friend QDataStream& operator<<(QDataStream & stream, const CentralUnit& flows);
+	friend QDataStream& operator>>(QDataStream & stream, CentralUnit& flows);
+	#endif
 };
+#ifdef _DEBUG
+QDataStream& operator<<(QDataStream & stream, const CentralUnit& flows);
+QDataStream& operator>>(QDataStream & stream, CentralUnit& flows);
+#endif
 #endif // CentralUnit_h__

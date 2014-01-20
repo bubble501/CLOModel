@@ -428,6 +428,6 @@
     <None Include="..\Requirements Installer\Resources\LogoIcon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Standalone Viewer.rc" />
+    <ResourceCompile Include="StandaloneViewer.rc" />
   </ItemGroup>
 </Project>

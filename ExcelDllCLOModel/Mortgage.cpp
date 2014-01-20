@@ -80,8 +80,9 @@ void Mortgage::SetInterest(const QString& a){
 		if (CurrentMonth >= NextPaymentDate || j == NumPayments){
 			m_CashFlows.AddFlow (CurrentMonth, m_CashFlows.GetAccruedInterest(CurrentMonth), MtgCashFlow::InterestFlow);
 			m_CashFlows.AddFlow (CurrentMonth, -m_CashFlows.GetAccruedInterest(CurrentMonth), MtgCashFlow::AccruedInterestFlow);
-			if (CurrentAnnuity == "Y"){
-				int CountPeriods=CurrentMonth == QDate(m_MaturityDate.year(),m_MaturityDate.month(),15) ? 0:-1;
+			if(j == NumPayments-1){TempFlow = CurrentAmtOut;}
+			else if (CurrentAnnuity == "Y"){
+				int CountPeriods= 0;//CurrentMonth == QDate(m_MaturityDate.year(),m_MaturityDate.month(),15) ? 0:-1;
 				QDate RollingdateCounter=CurrentMonth;
 				while(RollingdateCounter<=m_MaturityDate){
 					CountPeriods++;
@@ -90,7 +91,6 @@ void Mortgage::SetInterest(const QString& a){
 				double InterestApplicable=qPow(1.0+m_FloatingRateBase,static_cast<double>(m_PaymentFreq)/12.0)+qPow(1.0+InterestVector.at(qMin(j,InterestVector.size()-1)),static_cast<double>(m_PaymentFreq))-2.0;
 				TempFlow=qAbs(pmt(InterestApplicable, CountPeriods, CurrentAmtOut)) - TempFlow;
 			}
-			else if(j == NumPayments-1){TempFlow = CurrentAmtOut;}
 			else{TempFlow = 0.0;}
 			m_CashFlows.AddFlow (CurrentMonth, TempFlow, MtgCashFlow::PrincipalFlow);
 			CurrentAmtOut = CurrentAmtOut - TempFlow;

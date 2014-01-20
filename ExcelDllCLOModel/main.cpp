@@ -5,8 +5,9 @@
 #include <QtCore>
 int main(int argc, char *argv[])
 {
-	Waterfall TempWaterfall;
+	
 	QApplication a(argc, argv);
+	/*Waterfall TempWaterfall;
 	QFile file("C:/Temp/.BaseCase.clo");
 	file.open(QIODevice::ReadOnly);
 	qint32 VersionChecker;
@@ -16,14 +17,14 @@ int main(int argc, char *argv[])
 	if(VersionChecker!=qint32(ModelVersionNumber)) return 0;
 	out >> TempWaterfall;
 	file.close();
-	double test=TempWaterfall.GetTranche(7)->GetDiscountMargin();
+	double test=TempWaterfall.GetTranche(5)->GetDiscountMargin();*/
 	
-	/*Mortgage TempLoan;
-	TempLoan.SetAnnuity("N");
+	Mortgage TempLoan;
+	TempLoan.SetAnnuity("Y");
 	TempLoan.SetSize(1000000.0);
 	TempLoan.SetInterest("5");
-	TempLoan.SetMaturityDate(QDate(2020,6,30));
+	TempLoan.SetMaturityDate(QDate(2014,6,1));
 	TempLoan.SetPaymentFreq(3);
-	TempLoan.CalculateCashFlows("0","0","0",QDate(2013,5,30));*/
+	TempLoan.CalculateCashFlows("0","0","0",QDate(2014,1,1));
 	return a.exec();
 }

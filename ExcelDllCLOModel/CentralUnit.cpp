@@ -169,16 +169,12 @@ void CentralUnit::CalculationStep1(){
 	LoansCalculator.StartCalculation();
 }
 void CentralUnit::CalculationStep2(){
+	MtgsProgress->SetValue(0);
+	MtgsProgress->SetTitle("Calculating Tranches");
+	MtgsProgress->SetMax(1);
+	QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 	Structure.ResetMtgFlows();
 	Structure.AddMortgagesFlows(LoansCalculator.GetResult());
-#ifdef _DEBUG
-	QMessageBox::information(0,"Reached","Begin Delete Window");
-#endif
-	if(MtgsProgress) MtgsProgress->deleteLater();
-	MtgsProgress=NULL;
-#ifdef _DEBUG
-	QMessageBox::information(0,"Reached","After Delete Window");
-#endif
 	Structure.SetUseCall(false);
 	QString TmpStr=Structure.ReadyToCalculate();
 	if(!TmpStr.isEmpty()){
@@ -206,15 +202,14 @@ void CentralUnit::CalculationStep2(){
 		ParallWatFalls->AddWaterfall(CallStructure);
 		ParallWatFalls->StartCalculation();
 	}
-#ifdef _DEBUG
-	QMessageBox::information(0,"Reached","Finish CalculationStep2");
-#endif
+
 }
 void CentralUnit::CheckCalculationDone()
 {
-#ifdef _DEBUG
-	QMessageBox::information(0,"Reached","Start CheckCalculationDone");
-#endif
+	MtgsProgress->SetValue(1);
+	QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+	if(MtgsProgress) MtgsProgress->deleteLater();
+	MtgsProgress=NULL;
 	Tranche TempTranche;
 	if(RunCall){
 		Structure=*(ParallWatFalls->GetWaterfalls().at(0));

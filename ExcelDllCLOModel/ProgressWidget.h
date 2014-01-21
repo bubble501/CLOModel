@@ -16,6 +16,7 @@ public:
 	void ShowAnimation(bool a=true);
 	void SetMin(int a);
 	void SetMax(int a);
+public slots:
 	void SetValue(int a);
 signals:
 	void Cancelled();

@@ -8,10 +8,11 @@
 #define NumberOfPlots 9
 class WaterfallCalculator;
 class ErrorsViewer;
-class QProgressDialog;
+class ProgressWidget;
 class CentralUnit : public QObject{
 	Q_OBJECT
 public:
+	~CentralUnit();
 	CentralUnit(QObject* parent=0);
 	void AddLoan(const QDate& Maturity, double Size, const QString& Interest, const QString& Annuity, int Freq=1,double floatBase=0.0, int LossMult=100, int PrepayMult=100);
 	void AddTranche(const QString& Name,int ProRataGroup, double MinOC=0.0, double MinIC=0.0, double Price=100.0,double FxRate= 1.0,const QString& BbgExt="Mtge", int DayCount=360);
@@ -78,7 +79,7 @@ public:
 	void SetPlotsSheet(const QString& a){PlotsSheet=a;}
 	void SetPlotIndexes(int val,int index){if(index>=0 && index<NumberOfPlots) PlotIndexes[index]=val;}
 private:
-	QProgressDialog* MtgsProgress;
+	ProgressWidget* MtgsProgress;
 	WaterfallCalculator* ParallWatFalls;
 	MtgCalculator LoansCalculator;
 	Waterfall Structure;

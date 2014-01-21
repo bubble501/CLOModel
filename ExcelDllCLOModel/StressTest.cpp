@@ -80,6 +80,7 @@ void StressTest::RunStressTest(){
 	ProgressForm=new ProgressWidget;
 	connect(ProgressForm,SIGNAL(Cancelled()),this,SLOT(StopCalculation()));
 	ProgressForm->SetValue(0);
+	ProgressForm->SetTitle("Stress Test");
 	ProgressForm->SetMax(XSpann.size()*YSpann.size());
 	ProgressForm->show();
 	ContinueCalculation=true;

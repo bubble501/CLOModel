@@ -7,7 +7,7 @@
 #include "WaterfallCalculator.h"
 #include "CommonFunctions.h"
 #include <QMessageBox>
-#include <QProgressDialog>
+#include "ProgressWidget.h"
 CentralUnit::CentralUnit(QObject* parent)
 	:QObject(parent)
 	,Stresser(NULL)
@@ -159,20 +159,26 @@ void CentralUnit::CalculationStep1(){
 	LoansCalculator.SetLS(Structure.GetReinvestmentTest().GetLSAssumption());
 	LoansCalculator.SetStartDate(PoolCutOff);
 	if(MtgsProgress) MtgsProgress->deleteLater();
-	MtgsProgress=new QProgressDialog("Calculating Loans Cash Flows","Please Wait",0,LoansCalculator.Count());
+	MtgsProgress=new ProgressWidget;
+	MtgsProgress->SetValue(0);
+	MtgsProgress->SetTitle("Calculating Loans");
+	MtgsProgress->SetMax(LoansCalculator.Count());
+	connect(&LoansCalculator,SIGNAL(BeeCalculated(int)),MtgsProgress,SLOT(SetValue(int)));
 	MtgsProgress->show();
 	QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
-	connect(&LoansCalculator,SIGNAL(BeeCalculated(int)),MtgsProgress,SLOT(setValue(int)));
 	LoansCalculator.StartCalculation();
 }
 void CentralUnit::CalculationStep2(){
 	Structure.ResetMtgFlows();
 	Structure.AddMortgagesFlows(LoansCalculator.GetResult());
-	if(MtgsProgress){
-		MtgsProgress->deleteLater();
-		MtgsProgress->close();
-	}
+#ifdef _DEBUG
+	QMessageBox::information(0,"Reached","Begin Delete Window");
+#endif
+	if(MtgsProgress) MtgsProgress->deleteLater();
 	MtgsProgress=NULL;
+#ifdef _DEBUG
+	QMessageBox::information(0,"Reached","After Delete Window");
+#endif
 	Structure.SetUseCall(false);
 	QString TmpStr=Structure.ReadyToCalculate();
 	if(!TmpStr.isEmpty()){
@@ -200,9 +206,15 @@ void CentralUnit::CalculationStep2(){
 		ParallWatFalls->AddWaterfall(CallStructure);
 		ParallWatFalls->StartCalculation();
 	}
+#ifdef _DEBUG
+	QMessageBox::information(0,"Reached","Finish CalculationStep2");
+#endif
 }
 void CentralUnit::CheckCalculationDone()
 {
+#ifdef _DEBUG
+	QMessageBox::information(0,"Reached","Start CheckCalculationDone");
+#endif
 	Tranche TempTranche;
 	if(RunCall){
 		Structure=*(ParallWatFalls->GetWaterfalls().at(0));
@@ -298,7 +310,9 @@ void CentralUnit::StressFinished(){
 	Stresser->SaveResults(FolderPath);
 	QApplication::quit();
 }
-
+CentralUnit::~CentralUnit(){
+	if(MtgsProgress) MtgsProgress->deleteLater();
+}
 #ifdef _DEBUG
 QDataStream& operator<<(QDataStream & stream, const CentralUnit& flows){
 	stream 

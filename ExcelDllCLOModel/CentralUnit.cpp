@@ -215,7 +215,20 @@ void CentralUnit::CheckCalculationDone()
 		Structure=*(ParallWatFalls->GetWaterfalls().at(0));
 		CallStructure=*(ParallWatFalls->GetWaterfalls().at(1));
 	}
-	
+	#ifdef SaveLoanTape
+	{
+		QFile file(FolderPath+"\\.Loans.clp");
+		if (file.open(QIODevice::WriteOnly)) {
+			QDataStream out(&file);
+			out.setVersion(QDataStream::Qt_4_8);
+			out << qint32(ModelVersionNumber) << LoansCalculator;
+			file.close();
+			#ifdef Q_WS_WIN
+				SetFileAttributes((FolderPath+"\\.Loans.clp").toStdWString().c_str(),FILE_ATTRIBUTE_HIDDEN);
+			#endif
+		}
+	}
+	#endif
 	QString Filename=FolderPath+"\\.BaseCase.clo";
 	QFile file(Filename);
 	if (file.open(QIODevice::WriteOnly)) {

@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QList>
 #include "MtgCashFlow.h"
+#include "CommonFunctions.h"
 class Mortgage;
 class MtgCashFlow;
 class MtgCalculator : public QObject{
@@ -40,5 +41,13 @@ private slots:
 signals:
 	void Calculated();
 	void BeeCalculated(int);
+#ifdef SaveLoanTape
+	friend QDataStream& operator<<(QDataStream & stream, const MtgCalculator& flows);
+	friend QDataStream& operator>>(QDataStream & stream, MtgCalculator& flows);
+#endif
 };
+#ifdef SaveLoanTape
+QDataStream& operator<<(QDataStream & stream, const MtgCalculator& flows);
+QDataStream& operator>>(QDataStream & stream, MtgCalculator& flows);
+#endif
 #endif // MtgCalculator_h__

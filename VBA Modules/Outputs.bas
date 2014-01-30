@@ -1108,7 +1108,7 @@ Public Sub PlotEquityReturn( _
         .XValues = Dates
     End With
     With TargetPlot.SeriesCollection.NewSeries
-            .Name = "Comulative Equity Return"
+            .Name = "Cumulative Equity Return"
             .Values = LSValues
             .XValues = Dates
             .AxisGroup = xlSecondary
@@ -1126,7 +1126,7 @@ Public Sub PlotEquityReturn( _
         End With
         With .Axes(xlValue, xlSecondary)
             .HasTitle = True
-            .AxisTitle.Caption = "Comulative Equity Return"
+            .AxisTitle.Caption = "Cumulative Equity Return"
             .HasDisplayUnitLabel = False
             .DisplayUnit = xlNone
             .MinimumScaleIsAuto = True

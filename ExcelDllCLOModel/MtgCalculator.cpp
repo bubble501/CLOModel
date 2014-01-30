@@ -1,5 +1,4 @@
 #include "MtgCalculator.h"
-#include "CommonFunctions.h"
 #include "MtgCalculatorThread.h"
 #include "Mortgage.h"
 MtgCalculator::MtgCalculator(QObject* parent)
@@ -68,3 +67,34 @@ QString MtgCalculator::ReadyToCalculate()const{
 	if(!Result.isEmpty()) return Result.left(Result.size()-1);
 	return Result;
 }
+#ifdef SaveLoanTape
+QDataStream& operator<<(QDataStream & stream, const MtgCalculator& flows){
+	stream 
+		<< flows.Loans.size()
+		<< flows.CPRass
+		<< flows.CDRass
+		<< flows.LSass
+		<< flows.StartDate
+	 ;
+	for(QList<Mortgage*>::const_iterator i=flows.Loans.begin();i!=flows.Loans.end();i++){
+		stream << **i;
+	}
+	return stream;
+}
+QDataStream& operator>>(QDataStream & stream, MtgCalculator& flows){
+	int tempInt;
+	stream 
+		>> tempInt
+		>> flows.CPRass
+		>> flows.CDRass
+		>> flows.LSass
+		>> flows.StartDate
+		;
+	Mortgage TmpMtg;
+	for(int i=0;i<tempInt;i++){
+		stream >> TmpMtg;
+	}
+	flows.AddLoan(TmpMtg);
+	return stream;
+}
+#endif

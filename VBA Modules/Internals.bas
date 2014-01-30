@@ -1,6 +1,6 @@
 Attribute VB_Name = "Internals"
 Option Explicit
-Public Sub PlotBloobergVector(BbgVct As String, TargetPlot As Chart, Optional StartDate As Date = 36526)
+Public Sub PlotBloobergVector(BbgVct As String, TargetPlot As Chart, Optional StartDate As Date = 36526, Optional Percent As Boolean = True)
     While (TargetPlot.SeriesCollection.Count > 0)
         TargetPlot.SeriesCollection(1).Delete
     Wend
@@ -12,7 +12,11 @@ Public Sub PlotBloobergVector(BbgVct As String, TargetPlot As Chart, Optional St
         .Axes(xlCategory).HasTitle = False
         .Axes(xlCategory).TickLabels.NumberFormat = "mmm-yy"
         .Axes(xlValue).DisplayUnit = xlNone
-        .Axes(xlValue).TickLabels.NumberFormat = "0.0%"
+        If (Percent) Then
+            .Axes(xlValue).TickLabels.NumberFormat = "0.0%"
+        Else
+            .Axes(xlValue).TickLabels.NumberFormat = "0.0"
+        End If
     End With
     If Not ValidBloombergVector(BbgVct) Then
         Exit Sub
@@ -27,7 +31,7 @@ Public Sub PlotBloobergVector(BbgVct As String, TargetPlot As Chart, Optional St
     ReDim PlotXValues(1 To UBound(PlotValues))
     Dim i As Long
     For i = 1 To UBound(PlotValues)
-        PlotValues(i) = SingleValues(Application.WorksheetFunction.Min(UBound(SingleValues), i))
+        PlotValues(i) = (1 + ((CLng(Percent) + 1) * (CLng(Percent) + 99))) * SingleValues(Application.WorksheetFunction.Min(UBound(SingleValues), i))
         PlotXValues(i) = CLng(CurrentDate)
         CurrentDate = NextMonth(CurrentDate)
     Next i
@@ -75,7 +79,7 @@ Public Sub WaterfallStepChanged(TargetAllCell As Range)
                 TargetCell.Offset(0, 2).Validation.Add Type:=xlValidateWholeNumber, AlertStyle:=xlValidAlertStop, Operator:= _
                     xlBetween, Formula1:="0", Formula2:="=max(" + Range(TempRange, TempRange.End(xlDown)).Address + ")"
             Case UCase("Reinvestment test")
-                TargetCell.Offset(0, 1).AddComment ("Tranche that will be redeemed if the test fails and turbo is on" + vbCrLf + "Leave Blank for Sequential")
+                TargetCell.Offset(0, 1).AddComment ("Most junior tranche that will be considered for reinvestment test")
                 TargetCell.Offset(0, 2).Locked = False
                 TargetCell.Offset(0, 2).NumberFormat = "0"
                 TargetCell.Offset(0, 2).AddComment ("Tranche that will be redeemed if the test fails and turbo is on" + vbCrLf + "Leave Blank for Sequential")

@@ -20,44 +20,56 @@ void StressWorker::Work(){
 		if(StressDimension[0]==StressTest::ChangingCDR){
 			if(StressDimension[1]==StressTest::ChangingLS){
 				i->CalculateCashFlows(ConstantPar,XSpann,YSpann,StartDate);
-				LocalStructure.GetReinvestmentTest().SetCPR(ConstantPar);
-				LocalStructure.GetReinvestmentTest().SetCDR(XSpann);
-				LocalStructure.GetReinvestmentTest().SetLS(YSpann);
+				if(i==Loans.begin()){
+					LocalStructure.GetReinvestmentTest().SetCPR(ConstantPar);
+					LocalStructure.GetReinvestmentTest().SetCDR(XSpann);
+					LocalStructure.GetReinvestmentTest().SetLS(YSpann);
+				}
 			}
 			else {
 				i->CalculateCashFlows(YSpann,XSpann,ConstantPar,StartDate);
-				LocalStructure.GetReinvestmentTest().SetCPR(YSpann);
-				LocalStructure.GetReinvestmentTest().SetCDR(XSpann);
-				LocalStructure.GetReinvestmentTest().SetLS(ConstantPar);
+				if(i==Loans.begin()){
+					LocalStructure.GetReinvestmentTest().SetCPR(YSpann);
+					LocalStructure.GetReinvestmentTest().SetCDR(XSpann);
+					LocalStructure.GetReinvestmentTest().SetLS(ConstantPar);
+				}
 			}
 
 		}
 		else if(StressDimension[0]==StressTest::ChangingLS){
 			if(StressDimension[1]==StressTest::ChangingCDR){
 				i->CalculateCashFlows(ConstantPar,YSpann,XSpann,StartDate);
-				LocalStructure.GetReinvestmentTest().SetCPR(ConstantPar);
-				LocalStructure.GetReinvestmentTest().SetCDR(YSpann);
-				LocalStructure.GetReinvestmentTest().SetLS(XSpann);
+				if(i==Loans.begin()){
+					LocalStructure.GetReinvestmentTest().SetCPR(ConstantPar);
+					LocalStructure.GetReinvestmentTest().SetCDR(YSpann);
+					LocalStructure.GetReinvestmentTest().SetLS(XSpann);
+				}
 			}
 			else {
 				i->CalculateCashFlows(YSpann,ConstantPar,XSpann,StartDate);
-				LocalStructure.GetReinvestmentTest().SetCPR(YSpann);
-				LocalStructure.GetReinvestmentTest().SetCDR(ConstantPar);
-				LocalStructure.GetReinvestmentTest().SetLS(XSpann);
+				if(i==Loans.begin()){
+					LocalStructure.GetReinvestmentTest().SetCPR(YSpann);
+					LocalStructure.GetReinvestmentTest().SetCDR(ConstantPar);
+					LocalStructure.GetReinvestmentTest().SetLS(XSpann);
+				}
 			}
 		}
 		else if(StressDimension[0]==StressTest::ChangingCPR){
 			if(StressDimension[1]==StressTest::ChangingCDR){
 				i->CalculateCashFlows(XSpann,YSpann,ConstantPar,StartDate);
-				LocalStructure.GetReinvestmentTest().SetCPR(XSpann);
-				LocalStructure.GetReinvestmentTest().SetCDR(YSpann);
-				LocalStructure.GetReinvestmentTest().SetLS(ConstantPar);
+				if(i==Loans.begin()){
+					LocalStructure.GetReinvestmentTest().SetCPR(XSpann);
+					LocalStructure.GetReinvestmentTest().SetCDR(YSpann);
+					LocalStructure.GetReinvestmentTest().SetLS(ConstantPar);
+				}
 			}
 			else{
 				i->CalculateCashFlows(XSpann,ConstantPar,YSpann,StartDate);
-				LocalStructure.GetReinvestmentTest().SetCPR(XSpann);
-				LocalStructure.GetReinvestmentTest().SetCDR(ConstantPar);
-				LocalStructure.GetReinvestmentTest().SetLS(YSpann);
+				if(i==Loans.begin()){
+					LocalStructure.GetReinvestmentTest().SetCPR(XSpann);
+					LocalStructure.GetReinvestmentTest().SetCDR(ConstantPar);
+					LocalStructure.GetReinvestmentTest().SetLS(YSpann);
+				}
 			}
 		}
 		TotalFlow+=i->GetCashFlow();

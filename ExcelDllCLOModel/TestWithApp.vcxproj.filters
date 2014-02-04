@@ -254,17 +254,17 @@
     <ClCompile Include="quazip\quazipnewinfo.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
-    <ClCompile Include="QuickObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_QuickObject.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_QuickObject.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\qrc_reso.cpp">
       <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StandaloneStress.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_StandaloneStress.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_StandaloneStress.cpp">
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -396,11 +396,11 @@
     <CustomBuild Include="WaterfallViewer.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="QuickObject.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="reso.qrc">
       <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="StandaloneStress.h">
+      <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

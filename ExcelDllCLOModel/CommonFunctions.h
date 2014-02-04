@@ -7,7 +7,7 @@ class QString;
 //! The current Version of the Model
 #define ModelVersionNumber 160
 #define MaximumIRRIterations INT_MAX-1
-#define SaveLoanTape
+//#define SaveLoanTape
 int MonthDiff(const QDate& a,const QDate& b);
 bool ValidAnnuityVector(const QString& AnnVect);
 bool ValidBloombergVector(const QString& BloombergVector);

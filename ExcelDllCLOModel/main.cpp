@@ -2,14 +2,14 @@
 #include "Waterfall.h"
 #include "ExcelOutput.h"
 #include "StressTest.h"
-#include "QuickObject.h"
+#include "StandaloneStress.h"
 #include <QtGui>
 #include <QtCore>
 int main(int argc, char *argv[])
 {
 	
 	QApplication a(argc, argv);
-	QuickObject TempObj;
+	StandaloneStress TempObj;
 	TempObj.show();
 	return a.exec();
 /*

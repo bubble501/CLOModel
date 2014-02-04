@@ -13,12 +13,12 @@ class QLabel;
 class QComboBox;
 class QSpinBox;
 class QPushButton;
-class QuickObject : public QWidget
+class StandaloneStress : public QWidget
 {
 	Q_OBJECT
 
 public:
-	QuickObject(QWidget *parent=0);
+	StandaloneStress(QWidget *parent=0);
 	
 private slots:
 	void Start();
@@ -26,6 +26,9 @@ private slots:
 	void ChangeType(int tpInd);
 	void CheckAllValid();
 	void RowsChanged();
+	void PasteFirst();
+	void PasteSecond();
+	void BrowseFolder();
 private:
 	QLabel* ConstantLabel;
 	StressTest *Stresser;

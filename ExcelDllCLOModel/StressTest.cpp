@@ -273,7 +273,7 @@ void StressTest::SaveResults(const QString& DestPath)const{
 	if (file.open(QIODevice::WriteOnly)) {
 		QDataStream out(&file);
 		out.setVersion(QDataStream::Qt_4_8);
-		out << qint32(ModelVersionNumber) << ConstantPar;
+		out << qint32(ModelVersionNumber) << ConstantPar << qint32(StressDimension[0]) << qint32(StressDimension[1]);
 		file.close();
 	}
 	foreach(const QString& SingleX,XSpann){
@@ -348,6 +348,13 @@ bool StressTest::LoadResultsFromFile(const QString& DestPath){
 			throw 1;
 		}
 		out >> ConstantPar;
+		if(!out.atEnd()){
+			out >> VesionCheck;
+			StressDimension[0]=StressVariability(VesionCheck);
+			out >> VesionCheck;
+			StressDimension[1]=StressVariability(VesionCheck);
+		}
+		
 		TargetFile.close();
 	}
 	catch(int ExcCode){

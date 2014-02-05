@@ -47,9 +47,9 @@ SummaryView::SummaryView(QWidget* parent)
 	StructureTable->setColumnCount(HeadersStrings.size());
 	StructureTable->setHorizontalHeaderLabels(HeadersStrings);
 	StructureTable->verticalHeader()->setVisible(false);
-	//StructureTable->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	StructureTable->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	StructureTable->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	StructureTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+	StructureTable->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
 	MainWidget->addTab(StructureTable,"Structure");
 
 	MtgTable=new QTableWidget(this);
@@ -68,8 +68,8 @@ SummaryView::SummaryView(QWidget* parent)
 	MtgTable->setHorizontalHeaderLabels(HeadersStrings);
 	MtgTable->verticalHeader()->setVisible(false);
 	MtgTable->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	MtgTable->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	MtgTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+	MtgTable->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
 	MainWidget->addTab(MtgTable,"Mortgages Results");
 
 	QWidget* TranchesWidget=new QWidget(this);
@@ -106,7 +106,7 @@ SummaryView::SummaryView(QWidget* parent)
 	ExpensesTable->setHorizontalHeaderLabels(HeadersStrings);
 	ExpensesTable->verticalHeader()->setVisible(false);
 	ExpensesTable->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	ExpensesTable->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	ExpensesTable->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
 	ExpensesTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 	MainWidget->addTab(ExpensesTable,"Waterfall Infos");
 
@@ -122,8 +122,8 @@ SummaryView::SummaryView(QWidget* parent)
 	ReinvestmentsTable->setHorizontalHeaderLabels(HeadersStrings);
 	ReinvestmentsTable->verticalHeader()->setVisible(false);
 	ReinvestmentsTable->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	ReinvestmentsTable->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	ReinvestmentsTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+	ReinvestmentsTable->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
 	MainWidget->addTab(ReinvestmentsTable,"Reinvestments");
 
 	ChartPlotter=new ChartsWidget(this);
@@ -131,14 +131,14 @@ SummaryView::SummaryView(QWidget* parent)
 
 	QHBoxLayout* mainLay=new QHBoxLayout(this);
 	mainLay->addWidget(MainWidget);
-	connect(MainWidget,SIGNAL(currentChanged(int)),this,SLOT(AdjustTableSizes()));
+	//connect(MainWidget,SIGNAL(currentChanged(int)),this,SLOT(AdjustTableSizes()));
 }
 
 
-void SummaryView::resizeEvent(QResizeEvent *event){
+/*void SummaryView::resizeEvent(QResizeEvent *event){
 	Q_UNUSED(event);
 	AdjustTableSizes();
-}
+}*/
 void SummaryView::ResetTranches(){
 	for(QList<TrancheViewer*>::iterator i=TrancheTables.begin();i!=TrancheTables.end();i++)
 		(*i)->deleteLater();
@@ -238,10 +238,9 @@ void SummaryView::DisplayStructure(){
 				);
 		}
 	}
-	AdjustTableSizes();
 }
 void SummaryView::SetStructure(const Waterfall& a,const Waterfall& ca){Structure=a; CallStructure=ca; DisplayStructure();}
-void SummaryView::AdjustTableSizes(){
+/*void SummaryView::AdjustTableSizes(){
 	StructureTable->resizeColumnToContents(0);
 	for(int i=1;i<StructureTable->columnCount();i++){
 		StructureTable->setColumnWidth(i,(StructureTable->width()-StructureTable->verticalScrollBar()->width()-StructureTable->columnWidth(0))/(StructureTable->columnCount()-1));
@@ -255,7 +254,7 @@ void SummaryView::AdjustTableSizes(){
 	for(int i=0;i<ExpensesTable->columnCount();i++){
 		ExpensesTable->setColumnWidth(i,(ExpensesTable->width()-ExpensesTable->verticalScrollBar()->width())/ExpensesTable->columnCount());
 	}	
-}
+}*/
 void SummaryView::ResetPricesLabel(){
 	for(QList<QLineEdit*>::iterator i=PricesLabel.begin();i!=PricesLabel.end();i++)
 		(*i)->deleteLater();

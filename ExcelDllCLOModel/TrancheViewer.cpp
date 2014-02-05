@@ -23,8 +23,8 @@ TrancheViewer::TrancheViewer(QWidget* parent)
 	MainTable->setHorizontalHeaderLabels(HeadersStrings);
 	MainTable->verticalHeader()->setVisible(false);
 	MainTable->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	MainTable->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	MainTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+	MainTable->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
 	QVBoxLayout* mainLay=new QVBoxLayout(this);
 	mainLay->addWidget(MainTable);
 }
@@ -53,9 +53,9 @@ void TrancheViewer::SetTranche(const Tranche& a){
 		}
 	}
 }
-void TrancheViewer::resizeEvent(QResizeEvent *event){
+/*void TrancheViewer::resizeEvent(QResizeEvent *event){
 	Q_UNUSED(event);
 	for(int i=0;i<MainTable->columnCount();i++){
 		MainTable->setColumnWidth(i,(MainTable->width()-MainTable->verticalScrollBar()->width())/MainTable->columnCount());
 	}
-}
+}*/

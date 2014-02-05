@@ -27,8 +27,9 @@ WaterfallViewer::WaterfallViewer(QWidget* parent/* =0 */)
 	InterestTable->setHorizontalHeaderLabels(HeadersStrings);
 	InterestTable->verticalHeader()->setVisible(false);
 	InterestTable->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	InterestTable->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	//InterestTable->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	InterestTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+	InterestTable->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
 	InterestTable->setObjectName("InterestTable");
 	InterestLabel=new QLabel(this);
 	InterestLabel->setObjectName("InterestLabel");
@@ -43,8 +44,9 @@ WaterfallViewer::WaterfallViewer(QWidget* parent/* =0 */)
 	PrincipalTable->setHorizontalHeaderLabels(HeadersStrings);
 	PrincipalTable->verticalHeader()->setVisible(false);
 	PrincipalTable->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	PrincipalTable->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	//PrincipalTable->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	PrincipalTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+	PrincipalTable->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
 	PrincipalTable->setObjectName("PrincipalTable");
 	PrincipalLabel=new QLabel(this);
 	PrincipalLabel->setObjectName("PrincipalLabel");
@@ -172,7 +174,7 @@ void WaterfallViewer::AddStep(const WatFalPrior& a){
 		QMessageBox::critical(this,"Invalid Step","The step you tried to add is invalid.\nPlease check the Waterfall");
 	}
 }
-void WaterfallViewer::resizeEvent(QResizeEvent *event){
+/*void WaterfallViewer::resizeEvent(QResizeEvent *event){
 	Q_UNUSED(event);
 	for(int i=0;i<PrincipalTable->columnCount();i++){
 		PrincipalTable->setColumnWidth(i,(PrincipalTable->width()-PrincipalTable->verticalScrollBar()->width())/PrincipalTable->columnCount());
@@ -180,4 +182,4 @@ void WaterfallViewer::resizeEvent(QResizeEvent *event){
 	for(int i=0;i<InterestTable->columnCount();i++){
 		InterestTable->setColumnWidth(i,(InterestTable->width()-InterestTable->verticalScrollBar()->width())/InterestTable->columnCount());
 	}
-}
+}*/

@@ -1,6 +1,7 @@
 #include <QWidget>
 #include "Waterfall.h"
 #include "StressTest.h"
+#include <QPropertyAnimation>
 class QTableWidget;
 class QLabel;
 class QComboBox;
@@ -25,13 +26,13 @@ private:
 	QDoubleSpinBox* PriceSpin;
 	int TrancheTarg;
 	int TypeTarg;
+	QPropertyAnimation GradientBase;
 protected:
-	void resizeEvent(QResizeEvent *event);
+	//void resizeEvent(QResizeEvent *event);
 	void closeEvent(QCloseEvent *event);
 private slots:
 	void TableTargetChanged(int a){TypeTarg=a; UpdateTable();}
 	void TrancheTargetChanged(int a){TrancheTarg=a; UpdateTable();}
-	void AdjustTableSize();
 	void UpdateTable();
 	void CellSelected(int r,int c);
 	void PriceChanged(double a);

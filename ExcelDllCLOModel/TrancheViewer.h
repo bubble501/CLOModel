@@ -11,7 +11,5 @@ public:
 	void SetTranche(const Tranche& a);
 private:
 	QTableWidget* MainTable;
-protected:
-	void resizeEvent(QResizeEvent *event);
 };
 #endif // TrancheViewer_h__

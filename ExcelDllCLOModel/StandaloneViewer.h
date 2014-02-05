@@ -12,7 +12,7 @@ class StandaloneViewer : public QMainWindow{
 public:
 	StandaloneViewer(QWidget *parent=0);
 public slots:
-	void AdjustTableSizes();
+	//void AdjustTableSizes();
 	void LoadFile(const QString& fileName);
 private slots:
 	void open();

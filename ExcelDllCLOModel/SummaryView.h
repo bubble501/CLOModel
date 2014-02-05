@@ -38,11 +38,7 @@ public:
 	void ShowCallStructure(bool a=true);
 	void SetStructure(const Waterfall& a,const Waterfall& ca=Waterfall());
 	SummaryView(QWidget* parent=0);
-protected:
-	void resizeEvent(QResizeEvent *event);
 private slots:
 	void PriceChanged();
-public slots:
-	void AdjustTableSizes();
 };
 #endif // TestTable_h__

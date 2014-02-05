@@ -28,7 +28,7 @@ StandaloneViewer::StandaloneViewer(QWidget *parent)
 	createActions();
 	createMenus();
 }
-void StandaloneViewer::AdjustTableSizes(){TheViewer->AdjustTableSizes();}
+//void StandaloneViewer::AdjustTableSizes(){TheViewer->AdjustTableSizes();}
 void StandaloneViewer::createActions(){
 	openAction=new QAction("&Open",this);
 	openAction->setIcon(QIcon::fromTheme("document-open"));

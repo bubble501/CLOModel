@@ -17,7 +17,5 @@ private:
 	QTableWidget* PrincipalTable;
 	QLabel* InterestLabel;
 	QLabel* PrincipalLabel;
-protected:
-	void resizeEvent(QResizeEvent *event);
 };
 #endif // WaterfallViewer_h__

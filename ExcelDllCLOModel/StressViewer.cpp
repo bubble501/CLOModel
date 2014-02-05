@@ -9,6 +9,7 @@
 #include <QHeaderView>
 #include <QCloseEvent>
 #include <QDoubleSpinBox>
+#include <QPainter>
 #include "CommonFunctions.h"
 StressViewer::StressViewer(QWidget* parent)
 	:QWidget(parent)
@@ -66,8 +67,10 @@ StressViewer::StressViewer(QWidget* parent)
 	YDimLabel->setAlignment(Qt::AlignCenter);
 	YDimLabel->hide();
 	Table=new QTableWidget(this);
-	Table->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-	Table->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	Table->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	Table->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	Table->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+	Table->verticalHeader()->setResizeMode(QHeaderView::Stretch);
 	Table->setSelectionMode(QAbstractItemView::SingleSelection);
 	connect(Table,SIGNAL(cellClicked(int,int)),this,SLOT(CellSelected(int,int)));
 
@@ -79,6 +82,14 @@ StressViewer::StressViewer(QWidget* parent)
 	QVBoxLayout* MainLay=new QVBoxLayout(this);
 	MainLay->addLayout(TopLay);
 	MainLay->addLayout(tableLay);
+
+
+
+
+	GradientBase.setEasingCurve(QEasingCurve::Linear) ;
+	GradientBase.setDuration(100.0) ;
+	GradientBase.setKeyValueAt(0.0, QColor(Qt::yellow));
+	GradientBase.setKeyValueAt(1.0, QColor(Qt::green));
 }
 bool StressViewer::LoadStress(const QString& filename){
 	QString StressVarnames[3]={"CDR","LS","CPR"};
@@ -109,24 +120,25 @@ bool StressViewer::LoadStress(const QString& filename){
 	YDimLabel->setText(StressVarnames[StressTarget.GetYVariability()]);
 	YDimLabel->show();
 	ConstParLabel->setText(StressVarnames[3-StressTarget.GetYVariability()-StressTarget.GetXVariability()] + ": " + StressTarget.GetConstantPar());
-	AdjustTableSize();
 	UpdateTable();
 	return true;
 }
-void StressViewer::AdjustTableSize(){
+/*void StressViewer::AdjustTableSize(){
 	for(int i=0;i<Table->columnCount();i++){
 		Table->setColumnWidth(i,(Table->width()-Table->verticalScrollBar()->width()-Table->verticalHeader()->width())/Table->columnCount());
 	}
 	for(int i=0;i<Table->rowCount();i++){
 		Table->setRowHeight(i,(Table->height()-Table->horizontalScrollBar()->height()-Table->horizontalHeader()->height())/Table->rowCount());
 	}
-}
-void StressViewer::resizeEvent(QResizeEvent *event){
+}*/
+/*void StressViewer::resizeEvent(QResizeEvent *event){
 	Q_UNUSED(event);
 	AdjustTableSize();
-}
+}*/
 void StressViewer::UpdateTable(){
 	double lossValue;
+	double MaxDisc, MinDisc;
+	bool Minset=false;
 	for(int i=0;i<StressTarget.GetXSpann().size();i++){
 		for(int j=0;j<StressTarget.GetYSpann().size();j++){
 			if(TypeTarg==0){
@@ -139,11 +151,28 @@ void StressViewer::UpdateTable(){
 				PriceSpin->hide();
 			}else if(TypeTarg==1){
 				Tranche marginTranche=*(StressTarget.GetResults().value(StressTarget.GetXSpann().at(i)).value(StressTarget.GetYSpann().at(j)).GetTranche(TrancheTarg));
-				Table->setItem(i,j,new QTableWidgetItem(Commarize(marginTranche.GetDiscountMargin(),0)));
-				if(lossValue<=0.0) Table->item(i,j)->setBackgroundColor(Qt::red);
+				double currentDisc=marginTranche.GetDiscountMargin();
+				if((i==0 && j==0) || currentDisc>MaxDisc) MaxDisc=currentDisc;
+				if((!Minset || currentDisc<MinDisc) && currentDisc>0) {MinDisc=currentDisc; Minset=true;}
+				Table->setItem(i,j,new QTableWidgetItem(Commarize(currentDisc,0)));
 				PriceSpin->setValue(marginTranche.GetPrice());
 				PriceLabel->show();
 				PriceSpin->show();
+			}
+		}
+	}
+	if(TypeTarg==1){
+		for(int i=0;i<StressTarget.GetXSpann().size();i++){
+			for(int j=0;j<StressTarget.GetYSpann().size();j++){
+				double CurrentVal=Table->item(i,j)->text().toDouble();
+				if(CurrentVal<=0) Table->item(i,j)->setBackgroundColor(Qt::red);
+				else{
+					if(MaxDisc-MinDisc<1.0) GradientBase.setCurrentTime(100.0);
+					else GradientBase.setCurrentTime(100.0*(CurrentVal-MinDisc)/(MaxDisc-MinDisc));
+					Table->item(i,j)->setBackgroundColor(
+						GradientBase.currentValue().value<QColor>()
+					);
+				}
 			}
 		}
 	}
@@ -160,10 +189,30 @@ void StressViewer::CellSelected(int r,int c){
 		));
 }
 void StressViewer::PriceChanged(double a){
+	double MaxDisc, MinDisc;
+	bool Minset=false;
+	QHash<int,QHash<int,double> > OriginalDiscounts;
 	for(int i=0;i<StressTarget.GetXSpann().size();i++){
 		for(int j=0;j<StressTarget.GetYSpann().size();j++){
 			Tranche marginTranche=*(StressTarget.GetResults().value(StressTarget.GetXSpann().at(i)).value(StressTarget.GetYSpann().at(j)).GetTranche(TrancheTarg));
-			Table->item(i,j)->setText(Commarize(marginTranche.GetDiscountMargin(a),0));
+			double currentDisc=marginTranche.GetDiscountMargin(a);
+			OriginalDiscounts[i][j]=currentDisc;
+			if((i==0 && j==0) || currentDisc>MaxDisc) MaxDisc=currentDisc;
+			if((!Minset || currentDisc<MinDisc) && currentDisc>0) {MinDisc=currentDisc; Minset=true;}
+			Table->item(i,j)->setText(Commarize(currentDisc,0));
+		}
+	}
+	for(int i=0;i<StressTarget.GetXSpann().size();i++){
+		for(int j=0;j<StressTarget.GetYSpann().size();j++){
+			double CurrentVal=OriginalDiscounts[i][j];
+			if(CurrentVal<=0) Table->item(i,j)->setBackgroundColor(Qt::red);
+			else{
+				if(MaxDisc-MinDisc<1.0) GradientBase.setCurrentTime(100.0);
+				else GradientBase.setCurrentTime(100.0*(CurrentVal-MinDisc)/(MaxDisc-MinDisc));
+				Table->item(i,j)->setBackgroundColor(
+					GradientBase.currentValue().value<QColor>()
+					);
+			}
 		}
 	}
 }

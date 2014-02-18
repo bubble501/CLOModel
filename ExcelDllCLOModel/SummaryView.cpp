@@ -277,5 +277,5 @@ void SummaryView::PriceChanged(){
 	StructureTable->item(RowToChange,13)->setText(Commarize(((TempTranche.GetDiscountMargin()))));
 }
 void SummaryView::ShowCallStructure(bool a){
-	MainWidget->setTabEnabled(3,a);
+	MainWidget->setTabEnabled(4,a);
 }

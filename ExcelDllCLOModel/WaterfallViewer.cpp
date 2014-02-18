@@ -1,4 +1,5 @@
 #include "WaterfallViewer.h"
+#include "Waterfall.h"
 #include <QTableWidget>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -172,6 +173,11 @@ void WaterfallViewer::AddStep(const WatFalPrior& a){
 	break;
 	default:
 		QMessageBox::critical(this,"Invalid Step","The step you tried to add is invalid.\nPlease check the Waterfall");
+	}
+}
+void WaterfallViewer::SetWaterfall(const Waterfall& a){
+	for(int i=0;i<a.GetStepsCount();i++){
+		AddStep(*(a.GetStep(i)));
 	}
 }
 /*void WaterfallViewer::resizeEvent(QResizeEvent *event){

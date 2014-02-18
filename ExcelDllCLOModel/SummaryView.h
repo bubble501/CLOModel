@@ -12,6 +12,7 @@ class QStackedWidget;
 class QListWidget;
 class QLineEdit;
 class ChartsWidget;
+class WaterfallViewer;
 class SummaryView : public QWidget{
 	Q_OBJECT
 private:
@@ -30,6 +31,7 @@ private:
 	QTableWidget* StructureTable;
 	QList<QLineEdit*> PricesLabel;
 	ChartsWidget* ChartPlotter;
+	WaterfallViewer* WatStructView;
 	void ResetCharts();
 	void DisplayStructure();
 	void ResetTranches();

@@ -1,6 +1,7 @@
 Attribute VB_Name = "Inputs"
 Option Explicit
 Declare Sub RunModel Lib "Z:\24AM\Analytics\CLO Model\ExcelDllCLOModel.dll" (ArrayData() As Variant)
+'Declare Sub RunModel Lib "Z:\24AM\Analytics\CLO Model\ExcelDllCLOModelLoanTape.dll" (ArrayData() As Variant) 'This will also save the loan pool file
 Declare Function CLODiscountMargin Lib "Z:\24AM\Analytics\CLO Model\ExcelDllCLOModel.dll" (ArrayData() As Variant) As Double
 Declare Function CLOWALife Lib "Z:\24AM\Analytics\CLO Model\ExcelDllCLOModel.dll" (ArrayData() As Variant) As Double
 Declare Sub StressTargetChanged Lib "Z:\24AM\Analytics\CLO Model\ExcelDllCLOModel.dll" (ArrayData() As Variant)
@@ -355,10 +356,10 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
     a.Add "Loss Multiplier", "LSMultiHead"
     a.Add "CPR", "CPRfield"
     a.Add "CDR", "CDRfield"
-    a.Add "Original Equivalent", "OriginalOutHead"
+    a.Add "Original Amount", "OriginalOutHead"
     a.Add "LS", "LSfield"
     a.Add "Pool cut off date", "CutOffField"
-    a.Add "Current Equivalent", "CurrentOutHead"
+    a.Add "Outstanding Amount", "CurrentOutHead"
     a.Add "Bond", "BondsNamesHeader"
     a.Add "Pro rata group", "BondRataGroupHeader"
     a.Add "Price", "BondPriceHeader"

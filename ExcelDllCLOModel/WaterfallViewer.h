@@ -5,6 +5,7 @@
 class QTableWidget;
 class WatFalPrior;
 class QLabel;
+class Waterfall;
 class WaterfallViewer : public QWidget{
 	Q_OBJECT
 public:
@@ -12,6 +13,7 @@ public:
 	void ResetSteps();
 	void AddStep(const WatFalPrior& a);
 	void AddStep(WatFalPrior::WaterfallStepType Step,int GroupTarget,int RedemptionGroup,double RedemptionShare);
+	void SetWaterfall(const Waterfall& a);
 private:
 	QTableWidget* InterestTable;
 	QTableWidget* PrincipalTable;

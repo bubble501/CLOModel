@@ -2,6 +2,7 @@
 #include "Mortgage.h"
 #include "TrancheViewer.h"
 #include "CommonFunctions.h"
+#include "WaterfallViewer.h"
 #include "ChartsWidget.h"
 #include <QTableWidget>
 #include <QHeaderView>
@@ -51,6 +52,9 @@ SummaryView::SummaryView(QWidget* parent)
 	StructureTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 	StructureTable->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
 	MainWidget->addTab(StructureTable,"Structure");
+
+	WatStructView=new WaterfallViewer(this);
+	MainWidget->addTab(WatStructView,"Waterfall Structure");
 
 	MtgTable=new QTableWidget(this);
 	MtgTable->setColumnCount(8);
@@ -175,6 +179,7 @@ void SummaryView::DisplayStructure(){
 	ChartPlotter->ResetCharts();
 	ChartPlotter->PlotStructure(Structure);
 	
+	WatStructView->SetWaterfall(Structure);
 
 	MtgTable->setRowCount(0);
 	MtgTable->setRowCount(Structure.GetCalculatedMtgPayments().Count());

@@ -4,7 +4,12 @@
 #include <QDate>
 #include <QString>
 #include "Mortgage.h"
-class ReinvestmentTest{
+#ifndef EXPORTING_CLASSES
+#define UNAMANGEDCLOMODEL_EXPORT
+#else
+#include "unamangedclomodel_global.h"
+#endif
+class UNAMANGEDCLOMODEL_EXPORT ReinvestmentTest{
 public:
 	enum ShareType{
 		InReinvShare,

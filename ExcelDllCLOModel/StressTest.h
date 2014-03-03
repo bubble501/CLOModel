@@ -6,9 +6,14 @@
 #include <QHash>
 #include <QObject>
 #include "Waterfall.h"
+#ifndef EXPORTING_CLASSES
+#define UNAMANGEDCLOMODEL_EXPORT
+#else
+#include "unamangedclomodel_global.h"
+#endif
 class ProgressWidget;
 class Mortgage;
-class StressTest:public QObject{
+class UNAMANGEDCLOMODEL_EXPORT StressTest:public QObject{
 	Q_OBJECT
 public:
 	//! Enum defining what parameter is currently being stressed
@@ -34,10 +39,13 @@ private:
 	int SentBees;
 	int BeesReturned;
 	bool ContinueCalculation;
+	bool ShowProgress;
 	void CalculateScenario(int XDim,int YDim);
 public:
 	StressTest(QObject* parent=0);
 	~StressTest();
+	void SetShowProgress(bool a=true){ShowProgress=a;}
+	bool GetShowProgress()const{return ShowProgress;}
 	const QList<QString>& GetXSpann()const{return XSpann;}
 	const QList<QString>& GetYSpann()const{return YSpann;}
 	const QString& GetConstantPar()const{return ConstantPar;}
@@ -48,7 +56,7 @@ public:
 	const QHash<QString,QHash<QString,Waterfall> > & GetResults() const{return Results;}
 	StressVariability GetXVariability()const{return StressDimension[0];}
 	StressVariability GetYVariability()const{return StressDimension[1];}
-	bool UseMultithread()const {return !SequentialComputation;}
+	bool GetUseMultithread()const {return !SequentialComputation;}
 	void SetXSpann(const QList<QString>& a);
 	void AddXSpann(const QList<QString>& a);
 	void AddXSpann(const QString& a);
@@ -78,6 +86,7 @@ private slots:
 	void RecievedData(int IDx,int IDy,const Waterfall& Res);
 	void StopCalculation();
 signals:
+	void ProgressStatus(double);
 	void AllFinished();
 };
 QDataStream& operator<<(QDataStream & stream, const StressTest& flows);

@@ -3,7 +3,12 @@
 #include <QList>
 #include <QDate>
 #include <QMetaType>
-class MtgCashFlow{
+#ifndef EXPORTING_CLASSES
+#define UNAMANGEDCLOMODEL_EXPORT
+#else
+#include "unamangedclomodel_global.h"
+#endif
+class UNAMANGEDCLOMODEL_EXPORT MtgCashFlow{
 private:
 	QList<QDate> m_FlowDates;
 	QList<double> m_Interest;

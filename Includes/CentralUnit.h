@@ -10,10 +10,10 @@
 #else
 #include "unamangedclomodel_global.h"
 #endif
-class WaterfallCalculator;
+class UNAMANGEDCLOMODEL_EXPORT WaterfallCalculator;
 class ErrorsViewer;
 class ProgressWidget;
-class UNAMANGEDCLOMODEL_EXPORT CentralUnit : public QObject{
+class CentralUnit : public QObject{
 	Q_OBJECT
 public:
 	~CentralUnit();

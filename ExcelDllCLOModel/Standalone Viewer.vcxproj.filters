@@ -425,7 +425,7 @@
     <None Include="Resources\Loading2.gif">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\Requirements Installer\Resources\LogoIcon.ico" />
+    <None Include="..\..\PIC Swarm\PIC Swarm\Resources\Logo.ico" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="StandaloneViewer.rc" />

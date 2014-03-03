@@ -22,6 +22,7 @@ StressTest::StressTest(QObject* parent)
 	,BeesReturned(0)
 	,ContinueCalculation(false)
 	,ProgressForm(NULL)
+	,ShowProgress(true)
 {
 	StressDimension[0]=ChangingCDR;
 	StressDimension[1]=ChangingLS;
@@ -195,6 +196,7 @@ void StressTest::RecievedData(int IDx,int IDy,const Waterfall& Res){
 				SentBees++;
 			}
 		}
+		emit ProgressStatus(100.0*static_cast<double>(BeesReturned)/static_cast<double>(XSpann.size()*YSpann.size()));
 		if(ProgressForm) ProgressForm->SetValue(BeesReturned);
 		QApplication::processEvents();
 		if(BeesReturned==XSpann.size()*YSpann.size()){

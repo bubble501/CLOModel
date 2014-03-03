@@ -457,7 +457,7 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Requirements Installer\Resources\LogoIcon.ico" />
+    <None Include="..\..\PIC Swarm\PIC Swarm\Resources\Logo.ico" />
     <None Include="Resources\Loading2.gif">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>

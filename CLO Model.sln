@@ -13,7 +13,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestWithApp", "ExcelDllCLOModel\TestWithApp.vcxproj", "{B8DE6C2B-7B7B-41E7-9F45-EFF7C5A61EDD}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Standalone Viewer", "ExcelDllCLOModel\Standalone Viewer.vcxproj", "{9D32C7A1-865F-4ADD-A04E-EFCC9DB66C31}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StandaloneViewer", "ExcelDllCLOModel\Standalone Viewer.vcxproj", "{9D32C7A1-865F-4ADD-A04E-EFCC9DB66C31}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnamangedCLOmodel", "ExcelDllCLOModel\UnamangedCLOmodel.vcxproj", "{4B18B1FF-B220-478B-832E-563C915B9E35}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,6 +46,12 @@ Global
 		{9D32C7A1-865F-4ADD-A04E-EFCC9DB66C31}.Nightly|Win32.Build.0 = Release|Win32
 		{9D32C7A1-865F-4ADD-A04E-EFCC9DB66C31}.Release|Win32.ActiveCfg = Release|Win32
 		{9D32C7A1-865F-4ADD-A04E-EFCC9DB66C31}.Release|Win32.Build.0 = Release|Win32
+		{4B18B1FF-B220-478B-832E-563C915B9E35}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4B18B1FF-B220-478B-832E-563C915B9E35}.Debug|Win32.Build.0 = Debug|Win32
+		{4B18B1FF-B220-478B-832E-563C915B9E35}.Nightly|Win32.ActiveCfg = Release|Win32
+		{4B18B1FF-B220-478B-832E-563C915B9E35}.Nightly|Win32.Build.0 = Release|Win32
+		{4B18B1FF-B220-478B-832E-563C915B9E35}.Release|Win32.ActiveCfg = Release|Win32
+		{4B18B1FF-B220-478B-832E-563C915B9E35}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

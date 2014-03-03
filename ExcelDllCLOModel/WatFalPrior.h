@@ -1,7 +1,12 @@
 #ifndef WatFalPrior_h__
 #define WatFalPrior_h__
 #include <QDataStream>
-class WatFalPrior{
+#ifndef EXPORTING_CLASSES
+#define UNAMANGEDCLOMODEL_EXPORT
+#else
+#include "unamangedclomodel_global.h"
+#endif
+class UNAMANGEDCLOMODEL_EXPORT WatFalPrior{
 public:
 	//! Enum defining the different types of waterfall steps
 	enum WaterfallStepType{

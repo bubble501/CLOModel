@@ -179,6 +179,7 @@ void SummaryView::DisplayStructure(){
 	ChartPlotter->ResetCharts();
 	ChartPlotter->PlotStructure(Structure);
 	
+	WatStructView->ResetSteps();
 	WatStructView->SetWaterfall(Structure);
 
 	MtgTable->setRowCount(0);

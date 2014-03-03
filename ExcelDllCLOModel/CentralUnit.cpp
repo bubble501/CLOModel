@@ -1,9 +1,9 @@
+#ifdef CentralUnit_h__
 #include "CentralUnit.h"
 #include <QMetaType>
 #include <QApplication>
 #include <QTimer>
 #include <QFile>
-#include "ExcelOutput.h"
 #include "WaterfallCalculator.h"
 #include "CommonFunctions.h"
 #include <QMessageBox>
@@ -236,9 +236,6 @@ void CentralUnit::CheckCalculationDone()
 		out.setVersion(QDataStream::Qt_4_8);
 		out << qint32(ModelVersionNumber) << Structure << CallStructure;
 		file.close();
-		#ifdef Q_WS_WIN
-		SetFileAttributes(Filename.toStdWString().c_str(),FILE_ATTRIBUTE_HIDDEN);
-		#endif
 	}	
 	if(!MtgOutputAddress.isEmpty()){
 		ExcelOutput::PrintMortgagesRepLines(Structure.GetCalculatedMtgPayments(),ExcelCommons::CellOffset(MtgOutputAddress));
@@ -321,6 +318,7 @@ void CentralUnit::StressFinished(){
 CentralUnit::~CentralUnit(){
 	if(MtgsProgress) MtgsProgress->deleteLater();
 }
+#endif
 #ifdef _DEBUG
 QDataStream& operator<<(QDataStream & stream, const CentralUnit& flows){
 	stream 

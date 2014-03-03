@@ -1,10 +1,14 @@
 #ifndef Mortgage_h__
 #define Mortgage_h__
-
 #include "MtgCashFlow.h"
 #include <QDate>
 #include <QString>
-class Mortgage {
+#ifndef EXPORTING_CLASSES
+#define UNAMANGEDCLOMODEL_EXPORT
+#else
+#include "unamangedclomodel_global.h"
+#endif
+class UNAMANGEDCLOMODEL_EXPORT Mortgage {
 private:
 	QDate m_MaturityDate;
 	QString m_AnnuityVect;

@@ -182,7 +182,7 @@ double Tranche::GetCurrentOutstanding()const{
 	return CashFlow.GetAmountOutstanding(CashFlow.Count()-1);
 }
 double Tranche::GetWALife(const QDate& StartDate)const{
-	if(OutstandingAmt<0.01) return 0.0;
+	if(OutstandingAmt<0.01 || StartDate.isNull()) return 0.0;
 	double RunningSum=0.0, Result=0.0, CurrentPrinc;
 	for(int i=0;i<CashFlow.Count();i++){
 		CurrentPrinc=CashFlow.GetPrincipal(i);

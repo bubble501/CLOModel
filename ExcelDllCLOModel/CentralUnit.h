@@ -11,7 +11,6 @@
 #include "unamangedclomodel_global.h"
 #endif
 class WaterfallCalculator;
-class ErrorsViewer;
 class ProgressWidget;
 class UNAMANGEDCLOMODEL_EXPORT CentralUnit : public QObject{
 	Q_OBJECT

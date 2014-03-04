@@ -40,7 +40,7 @@ private:
 	int BeesReturned;
 	bool ContinueCalculation;
 	bool ShowProgress;
-	void CalculateScenario(int XDim,int YDim);
+	//void CalculateScenario(int XDim,int YDim);
 public:
 	StressTest(QObject* parent=0);
 	~StressTest();

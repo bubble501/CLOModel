@@ -12,10 +12,13 @@ public:
 	void ResetWaterfalls();
 	const QList<Waterfall*>& GetWaterfalls() const{return Cascades;}
 	void StartCalculation();
+	void SetSequentialComputation(bool a){SequentialComputation=a;}
+	bool GetSequentialComputation()const {return SequentialComputation;}
 private:
 	QList<Waterfall*> Cascades;
 	int BeesReturned;
 	int BeesSent;
+	bool SequentialComputation;
 private slots:
 	void BeeReturned(int ID,const Waterfall& a);
 signals:

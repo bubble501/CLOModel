@@ -4,6 +4,7 @@ WaterfallCalculator::WaterfallCalculator(QObject* parent/* =0 */)
 	:QObject(parent)
 	,BeesReturned(0)
 	,BeesSent(0)
+	,SequentialComputation(false)
 {}
 void WaterfallCalculator::ResetWaterfalls(){
 	for (QList<Waterfall*>::iterator i=Cascades.begin();i!=Cascades.end();i++){
@@ -16,7 +17,9 @@ void WaterfallCalculator::AddWaterfall(const Waterfall& a){
 }
 void WaterfallCalculator::StartCalculation(){
 	BeesReturned=0;
-	for(BeesSent=0;BeesSent<Cascades.size() && BeesSent<QThread::idealThreadCount();BeesSent++){
+	int NumberOfThreads=QThread::idealThreadCount();
+	if(SequentialComputation || NumberOfThreads<1) NumberOfThreads=1;
+	for(BeesSent=0;BeesSent<Cascades.size() && BeesSent<NumberOfThreads;BeesSent++){
 		WaterfallCalcThread* Bee=new WaterfallCalcThread(BeesSent,this);
 		Bee->SetWaterfall(*(Cascades.at(BeesSent)));
 		connect(Bee,SIGNAL(Calculated(int,const Waterfall&)),this,SLOT(BeeReturned(int,const Waterfall&)));

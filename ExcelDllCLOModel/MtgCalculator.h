@@ -27,6 +27,8 @@ public:
 	void Reset();
 	QString ReadyToCalculate()const;
 	int Count() const{return Loans.size();}
+	void SetSequentialComputation(bool a){SequentialComputation=a;}
+	bool GetSequentialComputation()const {return SequentialComputation;}
 private:
 	QList<Mortgage*> Loans;
 	QString CPRass;
@@ -36,18 +38,15 @@ private:
 	MtgCashFlow Result;
 	int BeesSent;
 	int BeesReturned;
+	bool SequentialComputation;
 private slots:
 	void BeeReturned(const MtgCashFlow& a);
 signals:
 	void Calculated();
 	void BeeCalculated(int);
-#ifdef SaveLoanTape
 	friend QDataStream& operator<<(QDataStream & stream, const MtgCalculator& flows);
 	friend QDataStream& operator>>(QDataStream & stream, MtgCalculator& flows);
-#endif
 };
-#ifdef SaveLoanTape
 QDataStream& operator<<(QDataStream & stream, const MtgCalculator& flows);
 QDataStream& operator>>(QDataStream & stream, MtgCalculator& flows);
-#endif
 #endif // MtgCalculator_h__

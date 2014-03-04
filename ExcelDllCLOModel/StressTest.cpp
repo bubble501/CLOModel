@@ -86,37 +86,28 @@ void StressTest::RunStressTest(){
 	ProgressForm->show();
 	ContinueCalculation=true;
 	BeesReturned=0;
-	if(SequentialComputation){
-		for(int i=0;i<XSpann.size();i++){
-			for(int j=0;j<YSpann.size();j++){
-				if(!ContinueCalculation) return;
-				CalculateScenario(i,j);
-				ProgressForm->SetValue((i*(j+1))+j+1);
-				QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
-			}
-		}
-	}
-	else{
-		for(SentBees=0;SentBees<XSpann.size()*YSpann.size() && SentBees<QThread::idealThreadCount();SentBees++){
-			StressThread* WorkingThread=new StressThread(
-				SentBees/YSpann.size()
-				,SentBees%YSpann.size()
-				,XSpann.at(SentBees/YSpann.size())
-				,YSpann.at(SentBees%YSpann.size())
-				,ConstantPar
-				,Loans
-				,Structure
-				,StartDate
-				,StressDimension[0]
-				,StressDimension[1]
-				,this
-			);
-			connect(WorkingThread,SIGNAL(ScenarioCalculated(int,int,Waterfall)),this,SLOT(RecievedData(int,int,Waterfall)));
-			connect(WorkingThread,SIGNAL(ScenarioCalculated(int,int,Waterfall)),WorkingThread,SLOT(stop()),Qt::QueuedConnection);
-			WorkingThread->start();
-		}
+	int NumberOfThreads=QThread::idealThreadCount();
+	if(SequentialComputation || NumberOfThreads<1) NumberOfThreads=1;
+	for(SentBees=0;SentBees<XSpann.size()*YSpann.size() && SentBees<NumberOfThreads;SentBees++){
+		StressThread* WorkingThread=new StressThread(
+			SentBees/YSpann.size()
+			,SentBees%YSpann.size()
+			,XSpann.at(SentBees/YSpann.size())
+			,YSpann.at(SentBees%YSpann.size())
+			,ConstantPar
+			,Loans
+			,Structure
+			,StartDate
+			,StressDimension[0]
+			,StressDimension[1]
+			,this
+		);
+		connect(WorkingThread,SIGNAL(ScenarioCalculated(int,int,Waterfall)),this,SLOT(RecievedData(int,int,Waterfall)));
+		connect(WorkingThread,SIGNAL(ScenarioCalculated(int,int,Waterfall)),WorkingThread,SLOT(stop()),Qt::QueuedConnection);
+		WorkingThread->start();
 	}
 }
+/*
 void StressTest::CalculateScenario(int XDim,int YDim){
 	MtgCashFlow TotalFlow;
 	Waterfall LocalStructure(Structure);
@@ -170,31 +161,29 @@ void StressTest::CalculateScenario(int XDim,int YDim){
 	LocalStructure.AddMortgagesFlows(TotalFlow);
 	LocalStructure.CalculateTranchesCashFlows();
 	RecievedData(XDim,YDim,LocalStructure);
-}
+}*/
 void StressTest::RecievedData(int IDx,int IDy,const Waterfall& Res){
 		if (!ContinueCalculation) return;
 		Results[XSpann.at(IDx)][YSpann.at(IDy)]=Res;
 		BeesReturned++;
-		if(!SequentialComputation){
-			if(SentBees<XSpann.size()*YSpann.size()){
-				StressThread* WorkingThread=new StressThread(
-					SentBees/YSpann.size()
-					,SentBees%YSpann.size()
-					,XSpann.at(SentBees/YSpann.size())
-					,YSpann.at(SentBees%YSpann.size())
-					,ConstantPar
-					,Loans
-					,Structure
-					,StartDate
-					,StressDimension[0]
-					,StressDimension[1]
-					,this
-				);
-				connect(WorkingThread,SIGNAL(ScenarioCalculated(int,int,Waterfall)),this,SLOT(RecievedData(int,int,Waterfall)));
-				connect(WorkingThread,SIGNAL(ScenarioCalculated(int,int,Waterfall)),WorkingThread,SLOT(stop()));
-				WorkingThread->start();
-				SentBees++;
-			}
+		if(SentBees<XSpann.size()*YSpann.size()){
+			StressThread* WorkingThread=new StressThread(
+				SentBees/YSpann.size()
+				,SentBees%YSpann.size()
+				,XSpann.at(SentBees/YSpann.size())
+				,YSpann.at(SentBees%YSpann.size())
+				,ConstantPar
+				,Loans
+				,Structure
+				,StartDate
+				,StressDimension[0]
+				,StressDimension[1]
+				,this
+			);
+			connect(WorkingThread,SIGNAL(ScenarioCalculated(int,int,Waterfall)),this,SLOT(RecievedData(int,int,Waterfall)));
+			connect(WorkingThread,SIGNAL(ScenarioCalculated(int,int,Waterfall)),WorkingThread,SLOT(stop()));
+			WorkingThread->start();
+			SentBees++;
 		}
 		emit ProgressStatus(100.0*static_cast<double>(BeesReturned)/static_cast<double>(XSpann.size()*YSpann.size()));
 		if(ProgressForm) ProgressForm->SetValue(BeesReturned);

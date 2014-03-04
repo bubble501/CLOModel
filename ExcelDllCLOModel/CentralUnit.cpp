@@ -1,4 +1,3 @@
-#ifdef CentralUnit_h__
 #include "CentralUnit.h"
 #include <QMetaType>
 #include <QApplication>
@@ -318,7 +317,7 @@ void CentralUnit::StressFinished(){
 CentralUnit::~CentralUnit(){
 	if(MtgsProgress) MtgsProgress->deleteLater();
 }
-#endif
+
 #ifdef _DEBUG
 QDataStream& operator<<(QDataStream & stream, const CentralUnit& flows){
 	stream 

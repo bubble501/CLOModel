@@ -3,6 +3,7 @@
 #include "Mortgage.h"
 MtgCalculator::MtgCalculator(QObject* parent)
 	:QObject(parent)
+	,SequentialComputation(false)
 {
 
 }
@@ -20,7 +21,9 @@ void MtgCalculator::AddLoan(const Mortgage& a){
 }
 void MtgCalculator::StartCalculation(){
 	BeesReturned=0;
-	for(BeesSent=0;BeesSent<Loans.size() && BeesSent<QThread::idealThreadCount();BeesSent++){
+	int NumberOfThreads=QThread::idealThreadCount();
+	if(SequentialComputation || NumberOfThreads<1) NumberOfThreads=1;
+	for(BeesSent=0;BeesSent<Loans.size() && BeesSent<NumberOfThreads;BeesSent++){
 		MtgCalculatorThread* Bee=new MtgCalculatorThread(this);
 		Bee->SetLoan(*(Loans.at(BeesSent)));
 		Bee->SetCPR(CPRass);
@@ -67,7 +70,7 @@ QString MtgCalculator::ReadyToCalculate()const{
 	if(!Result.isEmpty()) return Result.left(Result.size()-1);
 	return Result;
 }
-#ifdef SaveLoanTape
+
 QDataStream& operator<<(QDataStream & stream, const MtgCalculator& flows){
 	stream 
 		<< flows.Loans.size()
@@ -97,4 +100,3 @@ QDataStream& operator>>(QDataStream & stream, MtgCalculator& flows){
 	flows.AddLoan(TmpMtg);
 	return stream;
 }
-#endif

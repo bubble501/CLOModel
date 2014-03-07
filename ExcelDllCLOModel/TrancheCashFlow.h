@@ -3,12 +3,7 @@
 
 #include <QList>
 #include <QDate>
-#ifndef EXPORTING_CLASSES
-#define UNAMANGEDCLOMODEL_EXPORT
-#else
-#include "unamangedclomodel_global.h"
-#endif
-class UNAMANGEDCLOMODEL_EXPORT TrancheCashFlow{
+class TrancheCashFlow{
 private:
 	double OutstandingAmt;
 	QList<QDate> FlowDates;

@@ -4,12 +4,7 @@
 #include <QString>
 #include <QObject>
 #include "TrancheCashFlow.h"
-#ifndef EXPORTING_CLASSES
-#define UNAMANGEDCLOMODEL_EXPORT
-#else
-#include "unamangedclomodel_global.h"
-#endif
-class UNAMANGEDCLOMODEL_EXPORT Tranche {
+class  Tranche {
 public:
 	//! Enum defining what type of coupon the tranche is paying
 	enum TrancheInterestType{

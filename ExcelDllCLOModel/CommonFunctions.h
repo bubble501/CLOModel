@@ -7,10 +7,6 @@ class QString;
 //! The current Version of the Model
 #define ModelVersionNumber 160
 #define MaximumIRRIterations INT_MAX-1
-#ifdef EXPORTING_CLASSES
-#include "unamangedclomodel_global.h"
-UNAMANGEDCLOMODEL_EXPORT const unsigned int VersionNumber=ModelVersionNumber;
-#endif
 //#define SaveLoanTape
 int MonthDiff(const QDate& a,const QDate& b);
 bool ValidAnnuityVector(const QString& AnnVect);

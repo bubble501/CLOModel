@@ -6,14 +6,9 @@
 #include <QHash>
 #include <QObject>
 #include "Waterfall.h"
-#ifndef EXPORTING_CLASSES
-#define UNAMANGEDCLOMODEL_EXPORT
-#else
-#include "unamangedclomodel_global.h"
-#endif
 class ProgressWidget;
 class Mortgage;
-class UNAMANGEDCLOMODEL_EXPORT StressTest:public QObject{
+class StressTest:public QObject{
 	Q_OBJECT
 public:
 	//! Enum defining what parameter is currently being stressed

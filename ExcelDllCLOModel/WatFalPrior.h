@@ -1,12 +1,7 @@
 #ifndef WatFalPrior_h__
 #define WatFalPrior_h__
 #include <QDataStream>
-#ifndef EXPORTING_CLASSES
-#define UNAMANGEDCLOMODEL_EXPORT
-#else
-#include "unamangedclomodel_global.h"
-#endif
-class UNAMANGEDCLOMODEL_EXPORT WatFalPrior{
+class WatFalPrior{
 public:
 	//! Enum defining the different types of waterfall steps
 	enum WaterfallStepType{
@@ -30,7 +25,7 @@ public:
 	double GetRedemptionShare() const{return RedemptionShare;}
 	WaterfallStepType GetPriorityType() const{return PriorityType;}
 	void SetGroupTarget(int a){if(a>0) GroupTarget=a;}
-	void SetRedemptionGroup(int a){if(a>0) RedemptionGroup=a;}
+	void SetRedemptionGroup(int a){if(a>=0) RedemptionGroup=a;}
 	void SetRedemptionShare(double a){if(a>=0.0 && a<=1.0) RedemptionShare=a;}
 	void SetPriorityType(WaterfallStepType a){PriorityType=a;}
 	WatFalPrior();

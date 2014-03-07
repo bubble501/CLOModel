@@ -1,12 +1,11 @@
 #ifndef CentralUnitAPI_h__
 #define CentralUnitAPI_h__
-#include "unamangedclomodel_global.h"
 #include <QObject>
 #include "MtgCalculator.h"
 #include "Waterfall.h"
 class WaterfallCalculator;
 class ProgressWidget;
-class UNAMANGEDCLOMODEL_EXPORT CentralUnitAPI : public QObject{
+class CentralUnitAPI : public QObject{
 	Q_OBJECT
 public:
 	CentralUnitAPI(QObject* parent=0);

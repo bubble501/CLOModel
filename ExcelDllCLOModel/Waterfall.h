@@ -6,12 +6,7 @@
 #include "WatFalPrior.h"
 #include "MtgCashFlow.h"
 #include "ReinvestmentTest.h"
-#ifndef EXPORTING_CLASSES
-#define UNAMANGEDCLOMODEL_EXPORT
-#else
-#include "unamangedclomodel_global.h"
-#endif
-class UNAMANGEDCLOMODEL_EXPORT Waterfall{
+class Waterfall{
 private:
 	double m_SeniorExpenses;
 	double m_SeniorFees; 

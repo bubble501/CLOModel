@@ -25,7 +25,7 @@ QDataStream& operator<<(QDataStream & stream, const WatFalPrior& flows){
 		<< flows.RedemptionGroup
 		<< flows.RedemptionShare
 		<< qint32(flows.PriorityType)
-	;
+		;
 	return stream;
 }
 QDataStream& operator>>(QDataStream & stream, WatFalPrior& flows){

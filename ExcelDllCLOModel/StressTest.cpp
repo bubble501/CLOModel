@@ -7,7 +7,7 @@
 #include <QApplication>
 #include <QDir>
 #include <QFile>
-#include "QuaZip\JlCompress.h"
+#include "JlCompress.h"
 #include <QMessageBox>
 #ifdef Q_WS_WIN
 #include <Windows.h>

@@ -1,4 +1,3 @@
-#ifdef EXPORTING_CLASSES
 #include "CentralUnitAPI.h"
 #include "ProgressWidget.h"
 #include <QMessageBox>
@@ -187,4 +186,3 @@ void CentralUnitAPI::HandleProgress(int a){
 		1000*static_cast<double>(a)/static_cast<double>(LoansCalculator.Count())
 	);
 }
-#endif // EXPORTING_CLASSES

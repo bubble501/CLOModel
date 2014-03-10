@@ -7,6 +7,8 @@
 #include "CommonFunctions.h"
 #include <QMessageBox>
 #include "ProgressWidget.h"
+#include "ExcelCommons.h"
+#include "ExcelOutput.h"
 CentralUnit::CentralUnit(QObject* parent)
 	:QObject(parent)
 	,Stresser(NULL)

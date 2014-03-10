@@ -1,10 +1,5 @@
 #include "ManUtilities.h"
-List<double>^ ABSUtilities::UnpackBloombergVect(String^ Vect, int PaymFreq, bool AdjustFreq){
-	QList<double> NativeRes=UnpackVect(String2QString(Vect),PaymFreq,AdjustFreq);
-	List<double>^ Result=gcnew List<double>(NativeRes.size());
-	for(int i=0;i<NativeRes.size();i++)Result[i]=NativeRes.at(i);
-	return Result;
-}
+#include <QList>
 #ifdef _DEBUG
 double ABSUtilities::IRRold(List<DateTime>^ Dte, List<double>^ Flws, int Daycount, double Guess,int precision){
 	QList<QDate> NativeDate;

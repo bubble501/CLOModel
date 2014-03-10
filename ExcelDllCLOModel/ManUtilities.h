@@ -27,23 +27,6 @@ public:
 	*/
 	static bool IsBloombergVector(String^ a){return ValidBloombergVector(String2QString(a));}
 	/*!
-	\brief Unpack a Bloomberg vector into the corresponding values
-	\arg Vect The Bloomberg vector
-	\arg AdjustFreq if set to true the values will be be de-annualized
-	\arg PaymFreq if AdjustFreq is true this will be the base of the de-annualization (see details)
-	\return The list of values or an empty list if Vect is invalid
-	\details This function converts a Bloomberg vector to their corresponding values.<br/>Examples:<br/>Vect: 5 2S 10 , AdjustFreq=false &rarr; 5 5 10<br/>Vect: 5 2R 10 , AdjustFreq=false &rarr; 5 7.5 10<br/>Vect: 5 2S 10, AdjustFreq=true,  PaymFreq=6 &rarr; 2.47 2.47 4.88 (biannual payments) 
-	*/
-	static List<double>^ UnpackBloombergVect(String^ Vect, int PaymFreq, bool AdjustFreq);
-	/*!
-	\brief Shifts a Bloomberg vector by n months
-	\arg OriginalVect The Bloomberg vector
-	\arg ByMonths The number of months to shift the vector by
-	\return The shifted vector of an empty string if OriginalVect is invalid
-	\details This function moves a bloomberg vector by a number of months<br/>Examples:<br/>OriginalVect: 5 2S 10 , ByMonths=1 &rarr; 5 1S 10<br/>OriginalVect: 5 2S 10 2S 5 , ByMonths=3 &rarr; 10 1S 5
-	*/
-	static String^ MoveBloombergVector(String^ OriginalVect, int ByMonths){return QString2String(ShiftBloombergVector(String2QString(OriginalVect),ByMonths));}
-	/*!
 	\brief Formats a number with commas to separate thousands and precision deciaml places
 	*/
 	static String^ FormatNumber(double num,unsigned int precision){return QString2String(Commarize(num,precision));}

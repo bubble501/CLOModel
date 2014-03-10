@@ -403,10 +403,4 @@
       <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="TestWithApp.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\Requirements Installer\Resources\LogoIcon.ico" />
-  </ItemGroup>
 </Project>

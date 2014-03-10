@@ -389,13 +389,11 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="MagicNumbers.markdown" />
     <None Include="Resources\Logo.png">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="Resources\Loading2.gif">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="NETapiREADME.markdown" />
   </ItemGroup>
 </Project>

@@ -91,13 +91,9 @@ namespace APIUnitTest
         [DeploymentItem("NETapi.dll")]
         public void FormatNumberTest()
         {
-            double num = 0F; // TODO: Initialize to an appropriate value
-            uint precision = 0; // TODO: Initialize to an appropriate value
-            string expected = string.Empty; // TODO: Initialize to an appropriate value
-            string actual;
-            actual = ABSUtilities_Accessor.FormatNumber(num, precision);
-            Assert.AreEqual(expected, actual);
-            Assert.Inconclusive("Verify the correctness of this test method.");
+
+            Assert.AreEqual<String>("1,234,567.9", ABSUtilities_Accessor.FormatNumber(1234567.89, 1));
+
         }
 
         /// <summary>
@@ -144,47 +140,15 @@ namespace APIUnitTest
         [DeploymentItem("NETapi.dll")]
         public void IsBloombergVectorTest()
         {
-            string a = string.Empty; // TODO: Initialize to an appropriate value
-            bool expected = false; // TODO: Initialize to an appropriate value
-            bool actual;
-            actual = ABSUtilities_Accessor.IsBloombergVector(a);
-            Assert.AreEqual(expected, actual);
-            Assert.Inconclusive("Verify the correctness of this test method.");
-        }
-
-        /// <summary>
-        ///A test for MoveBloombergVector
-        ///</summary>
-        [TestMethod()]
-        [DeploymentItem("NETapi.dll")]
-        public void MoveBloombergVectorTest()
-        {
-            string OriginalVect = string.Empty; // TODO: Initialize to an appropriate value
-            int ByMonths = 0; // TODO: Initialize to an appropriate value
-            string expected = string.Empty; // TODO: Initialize to an appropriate value
-            string actual;
-            actual = ABSUtilities_Accessor.MoveBloombergVector(OriginalVect, ByMonths);
-            Assert.AreEqual(expected, actual);
-            Assert.Inconclusive("Verify the correctness of this test method.");
+            Assert.IsTrue(ABSUtilities_Accessor.IsBloombergVector("5 24S 6"));
+            Assert.IsTrue(ABSUtilities_Accessor.IsBloombergVector("5 24R  6"));
+            Assert.IsTrue(ABSUtilities_Accessor.IsBloombergVector("5 12S\t6"));
+            Assert.IsFalse(ABSUtilities_Accessor.IsBloombergVector("5 12U 6"));
+            Assert.IsFalse(ABSUtilities_Accessor.IsBloombergVector("Ciao"));
         }
 
 
-        /// <summary>
-        ///A test for UnpackBloombergVect
-        ///</summary>
-        [TestMethod()]
-        [DeploymentItem("NETapi.dll")]
-        public void UnpackBloombergVectTest()
-        {
-            string Vect = string.Empty; // TODO: Initialize to an appropriate value
-            int PaymFreq = 0; // TODO: Initialize to an appropriate value
-            bool AdjustFreq = false; // TODO: Initialize to an appropriate value
-            List<double> expected = null; // TODO: Initialize to an appropriate value
-            List<double> actual;
-            actual = ABSUtilities_Accessor.UnpackBloombergVect(Vect, PaymFreq, AdjustFreq);
-            Assert.AreEqual(expected, actual);
-            Assert.Inconclusive("Verify the correctness of this test method.");
-        }
+   
 
         /// <summary>
         ///A test for pmt
@@ -193,14 +157,7 @@ namespace APIUnitTest
         [DeploymentItem("NETapi.dll")]
         public void pmtTest()
         {
-            double Inter = 0F; // TODO: Initialize to an appropriate value
-            int Periods = 0; // TODO: Initialize to an appropriate value
-            double PresentValue = 0F; // TODO: Initialize to an appropriate value
-            double expected = 0F; // TODO: Initialize to an appropriate value
-            double actual;
-            actual = ABSUtilities_Accessor.pmt(Inter, Periods, PresentValue);
-            Assert.AreEqual(expected, actual);
-            Assert.Inconclusive("Verify the correctness of this test method.");
+            Assert.AreEqual(12950.45,ABSUtilities_Accessor.pmt(0.05, 10, 100000),0.01);
         }
     }
 }

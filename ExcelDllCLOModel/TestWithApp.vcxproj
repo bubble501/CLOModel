@@ -428,10 +428,6 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="TestWithApp.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\Requirements Installer\Resources\LogoIcon.ico" />
     <CustomBuild Include="reso.qrc">
       <FileType>Document</FileType>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(FullPath);%(AdditionalInputs)</AdditionalInputs>

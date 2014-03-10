@@ -5,14 +5,9 @@
 #include "Waterfall.h"
 #include "StressTest.h"
 #define NumberOfPlots 9
-#ifndef EXPORTING_CLASSES
-#define UNAMANGEDCLOMODEL_EXPORT
-#else
-#include "unamangedclomodel_global.h"
-#endif
 class WaterfallCalculator;
 class ProgressWidget;
-class UNAMANGEDCLOMODEL_EXPORT CentralUnit : public QObject{
+class CentralUnit : public QObject{
 	Q_OBJECT
 public:
 	~CentralUnit();

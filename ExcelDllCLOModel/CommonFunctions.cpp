@@ -11,17 +11,17 @@ int MonthDiff(const QDate& a,const QDate& b){
 	return Result;
 }
 bool ValidAnnuityVector(const QString& AnnVect){
-	QRegExp Vigil("^[YN]( \\d+S [YN])*$",Qt::CaseInsensitive);
+	QRegExp Vigil("^[YN](\\s+\\d+S\\s+[YN])*$",Qt::CaseInsensitive);
 	return Vigil.exactMatch(AnnVect);
 }
 bool ValidBloombergVector(const QString& BloombergVector){
-	QRegExp Vigil("^[0-9]*[,.]?[0-9]+( \\d+[RS] [0-9]*[,.]?[0-9]+)*$",Qt::CaseInsensitive);
+	QRegExp Vigil("^[0-9]*[,.]?[0-9]+(\\s+\\d+[RS]\\s+[0-9]*[,.]?[0-9]+)*$",Qt::CaseInsensitive);
 	return Vigil.exactMatch(BloombergVector);
 }
 QList<double> UnpackVect(QString Vect, int PaymFreq, bool AdjustFreq){
 	QList<double> Result;
 	if(!ValidBloombergVector(Vect)) return Result;
-	QStringList StringParts=Vect.trimmed().toUpper().split(' ');
+	QStringList StringParts=Vect.trimmed().toUpper().split(QRegExp("\\s"),QString::SkipEmptyParts);
 	int StepLen;
 	QString TempStr;
 	for (int i=1;i<StringParts.size();i+=2){
@@ -55,7 +55,7 @@ QList<double> UnpackVect(QString Vect, int PaymFreq, bool AdjustFreq){
 QList<QString> UnpackAnnuityVect(QString Vect){
 	QList<QString> Result;
 	if(!ValidAnnuityVector(Vect)) return Result;
-	QStringList StringParts=Vect.trimmed().toUpper().split(' ');
+	QStringList StringParts=Vect.trimmed().toUpper().split(QRegExp("\\s"),QString::SkipEmptyParts);
 	int StepLen;
 	QString TempStr;
 	for (int i=1;i<StringParts.size();i+=2){
@@ -75,7 +75,7 @@ QString ShiftBloombergVector(const QString& OriginalVect, int ByMonths){
 	QString Result;
 	bool Shifted=false;
 	int ShiftedValue;
-	QStringList VectorParts=OriginalVect.toUpper().split(" ");
+	QStringList VectorParts=OriginalVect.toUpper().split(QRegExp("\\s"),QString::SkipEmptyParts);
 	for (int i=0;i<VectorParts.size();i++){
 		if(!Result.isEmpty()) Result+= ' ';
 		if(i%2==0 || Shifted) {Result+=VectorParts.at(i);}

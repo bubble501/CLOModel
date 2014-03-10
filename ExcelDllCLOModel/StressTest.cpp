@@ -7,7 +7,7 @@
 #include <QApplication>
 #include <QDir>
 #include <QFile>
-#include "JlCompress.h"
+#include "quazip/JlCompress.h"
 #include <QMessageBox>
 #ifdef Q_WS_WIN
 #include <Windows.h>
@@ -78,12 +78,14 @@ void StressTest::RunStressTest(){
 #ifdef PrintExecutionTime
 	ExecutionTime.start();
 #endif
-	ProgressForm=new ProgressWidget;
-	connect(ProgressForm,SIGNAL(Cancelled()),this,SLOT(StopCalculation()));
-	ProgressForm->SetValue(0);
-	ProgressForm->SetTitle("Stress Test");
-	ProgressForm->SetMax(XSpann.size()*YSpann.size());
-	ProgressForm->show();
+	if(ShowProgress){
+		ProgressForm=new ProgressWidget;
+		connect(ProgressForm,SIGNAL(Cancelled()),this,SLOT(StopCalculation()));
+		ProgressForm->SetValue(0);
+		ProgressForm->SetTitle("Stress Test");
+		ProgressForm->SetMax(XSpann.size()*YSpann.size());
+		ProgressForm->show();
+	}
 	ContinueCalculation=true;
 	BeesReturned=0;
 	int NumberOfThreads=QThread::idealThreadCount();
@@ -186,7 +188,7 @@ void StressTest::RecievedData(int IDx,int IDy,const Waterfall& Res){
 			SentBees++;
 		}
 		emit ProgressStatus(100.0*static_cast<double>(BeesReturned)/static_cast<double>(XSpann.size()*YSpann.size()));
-		if(ProgressForm) ProgressForm->SetValue(BeesReturned);
+		if(ProgressForm && ShowProgress) ProgressForm->SetValue(BeesReturned);
 		QApplication::processEvents();
 		if(BeesReturned==XSpann.size()*YSpann.size()){
 #ifdef PrintExecutionTime

@@ -52,6 +52,7 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ABSUtilitiesTest.cs" />
     <Compile Include="AVOCA6.cs" />
     <Compile Include="ManMortgageTest.cs" />
     <Compile Include="ManMtgCashFlowsTest.cs" />
@@ -61,6 +62,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Logo.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Shadow Include="Test References\NETapi.accessor" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

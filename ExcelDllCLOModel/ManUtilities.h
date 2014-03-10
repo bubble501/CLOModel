@@ -44,10 +44,6 @@ public:
 	*/
 	static String^ MoveBloombergVector(String^ OriginalVect, int ByMonths){return QString2String(ShiftBloombergVector(String2QString(OriginalVect),ByMonths));}
 	/*!
-	\brief Rounds a number up to the closest integer
-	*/
-	static double Ceiling(double a){return RoundUp(a);}
-	/*!
 	\brief Formats a number with commas to separate thousands and precision deciaml places
 	*/
 	static String^ FormatNumber(double num,unsigned int precision){return QString2String(Commarize(num,precision));}
@@ -81,6 +77,11 @@ public:
 	\details This function calculates the discount margin over a base rate of a series of cash flows happening on specific dates.<br/>When Flws contains more than negative number then there can be multiple roots and changing Guess may change the result of the function.
 	*/
 	static double DiscountMargin(List<DateTime>^ Dte, List<double>^ Flws, double BaseRate,int Daycount, double Guess,int precision);
+#ifdef _DEBUG
+	static double NPVold(List<DateTime>^ Dte, List<double>^ Flws, double Interest, int Daycount);
+	static double IRRold(List<DateTime>^ Dte, List<double>^ Flws, int Daycount, double Guess,int precision);
+	static double DiscountMarginold(List<DateTime>^ Dte, List<double>^ Flws, double BaseRate,int Daycount, double Guess,int precision);
+#endif
 };
 #endif // Utilities_h__
 

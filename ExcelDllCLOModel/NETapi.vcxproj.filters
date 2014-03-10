@@ -39,6 +39,9 @@
     <Filter Include="Header Files\Unmanaged">
       <UniqueIdentifier>{06f36fa8-d441-411f-b3fa-d197bf6397d9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="quzip">
+      <UniqueIdentifier>{3a292409-4979-40ae-9997-e193207dc93c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ManagedCommons.h">
@@ -101,12 +104,48 @@
     <ClInclude Include="Waterfall.h">
       <Filter>Header Files\Unmanaged</Filter>
     </ClInclude>
+    <ClInclude Include="quazip\crypt.h">
+      <Filter>quzip</Filter>
+    </ClInclude>
+    <ClInclude Include="quazip\ioapi.h">
+      <Filter>quzip</Filter>
+    </ClInclude>
+    <ClInclude Include="quazip\JlCompress.h">
+      <Filter>quzip</Filter>
+    </ClInclude>
+    <ClInclude Include="quazip\quaadler32.h">
+      <Filter>quzip</Filter>
+    </ClInclude>
+    <ClInclude Include="quazip\quachecksum32.h">
+      <Filter>quzip</Filter>
+    </ClInclude>
+    <ClInclude Include="quazip\quacrc32.h">
+      <Filter>quzip</Filter>
+    </ClInclude>
+    <ClInclude Include="quazip\quazip.h">
+      <Filter>quzip</Filter>
+    </ClInclude>
+    <ClInclude Include="quazip\quazip_global.h">
+      <Filter>quzip</Filter>
+    </ClInclude>
+    <ClInclude Include="quazip\quazipdir.h">
+      <Filter>quzip</Filter>
+    </ClInclude>
+    <ClInclude Include="quazip\quazipfileinfo.h">
+      <Filter>quzip</Filter>
+    </ClInclude>
+    <ClInclude Include="quazip\quazipnewinfo.h">
+      <Filter>quzip</Filter>
+    </ClInclude>
+    <ClInclude Include="quazip\unzip.h">
+      <Filter>quzip</Filter>
+    </ClInclude>
+    <ClInclude Include="quazip\zip.h">
+      <Filter>quzip</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="CentralUnitAPI.h">
-      <Filter>Header Files\Unmanaged</Filter>
-    </CustomBuild>
-    <CustomBuild Include="ChartsWidget.h">
       <Filter>Header Files\Unmanaged</Filter>
     </CustomBuild>
     <CustomBuild Include="MtgCalculator.h">
@@ -124,25 +163,13 @@
     <CustomBuild Include="StressThread.h">
       <Filter>Header Files\Unmanaged</Filter>
     </CustomBuild>
-    <CustomBuild Include="StressViewer.h">
-      <Filter>Header Files\Unmanaged</Filter>
-    </CustomBuild>
     <CustomBuild Include="StressWorker.h">
-      <Filter>Header Files\Unmanaged</Filter>
-    </CustomBuild>
-    <CustomBuild Include="SummaryView.h">
-      <Filter>Header Files\Unmanaged</Filter>
-    </CustomBuild>
-    <CustomBuild Include="TrancheViewer.h">
       <Filter>Header Files\Unmanaged</Filter>
     </CustomBuild>
     <CustomBuild Include="WaterfallCalcThread.h">
       <Filter>Header Files\Unmanaged</Filter>
     </CustomBuild>
     <CustomBuild Include="WaterfallCalculator.h">
-      <Filter>Header Files\Unmanaged</Filter>
-    </CustomBuild>
-    <CustomBuild Include="WaterfallViewer.h">
       <Filter>Header Files\Unmanaged</Filter>
     </CustomBuild>
     <CustomBuild Include="CentralUnitOverlay.h">
@@ -154,18 +181,21 @@
     <CustomBuild Include="StressTestOverlay.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="quazip\quagzipfile.h">
+      <Filter>quzip</Filter>
+    </CustomBuild>
+    <CustomBuild Include="quazip\quaziodevice.h">
+      <Filter>quzip</Filter>
+    </CustomBuild>
+    <CustomBuild Include="quazip\quazipfile.h">
+      <Filter>quzip</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\Debug\moc_CentralUnitAPI.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_CentralUnitAPI.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_ChartsWidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_ChartsWidget.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_MtgCalculator.cpp">
@@ -198,28 +228,10 @@
     <ClCompile Include="GeneratedFiles\Release\moc_StressThread.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_StressViewer.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_StressViewer.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_StressWorker.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_StressWorker.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_SummaryView.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_SummaryView.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_TrancheViewer.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_TrancheViewer.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_WaterfallCalcThread.cpp">
@@ -232,12 +244,6 @@
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_WaterfallCalculator.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_WaterfallViewer.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_WaterfallViewer.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="AssemblyInfo.cpp">
@@ -253,9 +259,6 @@
       <Filter>Source Files\Unmanaged</Filter>
     </ClCompile>
     <ClCompile Include="CentralUnitAPI.cpp">
-      <Filter>Source Files\Unmanaged</Filter>
-    </ClCompile>
-    <ClCompile Include="ChartsWidget.cpp">
       <Filter>Source Files\Unmanaged</Filter>
     </ClCompile>
     <ClCompile Include="Mortgage.cpp">
@@ -282,22 +285,13 @@
     <ClCompile Include="StressThread.cpp">
       <Filter>Source Files\Unmanaged</Filter>
     </ClCompile>
-    <ClCompile Include="StressViewer.cpp">
-      <Filter>Source Files\Unmanaged</Filter>
-    </ClCompile>
     <ClCompile Include="StressWorker.cpp">
-      <Filter>Source Files\Unmanaged</Filter>
-    </ClCompile>
-    <ClCompile Include="SummaryView.cpp">
       <Filter>Source Files\Unmanaged</Filter>
     </ClCompile>
     <ClCompile Include="Tranche.cpp">
       <Filter>Source Files\Unmanaged</Filter>
     </ClCompile>
     <ClCompile Include="TrancheCashFlow.cpp">
-      <Filter>Source Files\Unmanaged</Filter>
-    </ClCompile>
-    <ClCompile Include="TrancheViewer.cpp">
       <Filter>Source Files\Unmanaged</Filter>
     </ClCompile>
     <ClCompile Include="Waterfall.cpp">
@@ -307,9 +301,6 @@
       <Filter>Source Files\Unmanaged</Filter>
     </ClCompile>
     <ClCompile Include="WaterfallCalculator.cpp">
-      <Filter>Source Files\Unmanaged</Filter>
-    </ClCompile>
-    <ClCompile Include="WaterfallViewer.cpp">
       <Filter>Source Files\Unmanaged</Filter>
     </ClCompile>
     <ClCompile Include="WatFalPrior.cpp">
@@ -338,6 +329,63 @@
     </ClCompile>
     <ClCompile Include="ManUtilities.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="quazip\unzip.c">
+      <Filter>quzip</Filter>
+    </ClCompile>
+    <ClCompile Include="quazip\zip.c">
+      <Filter>quzip</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_quagzipfile.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_quagzipfile.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_quaziodevice.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_quaziodevice.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_quazipfile.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_quazipfile.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="quazip\JlCompress.cpp">
+      <Filter>quzip</Filter>
+    </ClCompile>
+    <ClCompile Include="quazip\qioapi.cpp">
+      <Filter>quzip</Filter>
+    </ClCompile>
+    <ClCompile Include="quazip\quaadler32.cpp">
+      <Filter>quzip</Filter>
+    </ClCompile>
+    <ClCompile Include="quazip\quacrc32.cpp">
+      <Filter>quzip</Filter>
+    </ClCompile>
+    <ClCompile Include="quazip\quagzipfile.cpp">
+      <Filter>quzip</Filter>
+    </ClCompile>
+    <ClCompile Include="quazip\quaziodevice.cpp">
+      <Filter>quzip</Filter>
+    </ClCompile>
+    <ClCompile Include="quazip\quazip.cpp">
+      <Filter>quzip</Filter>
+    </ClCompile>
+    <ClCompile Include="quazip\quazipdir.cpp">
+      <Filter>quzip</Filter>
+    </ClCompile>
+    <ClCompile Include="quazip\quazipfile.cpp">
+      <Filter>quzip</Filter>
+    </ClCompile>
+    <ClCompile Include="quazip\quazipfileinfo.cpp">
+      <Filter>quzip</Filter>
+    </ClCompile>
+    <ClCompile Include="quazip\quazipnewinfo.cpp">
+      <Filter>quzip</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

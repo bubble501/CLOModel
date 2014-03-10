@@ -21,6 +21,10 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NETapi", "ExcelDllCLOModel\NETapi.vcxproj", "{87F5AF67-EBDA-4554-8E03-2F9C974BD216}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DotNETapi", "DotNETapi", "{2A0D22FE-34EC-4192-81A2-63013A5ED4B6}"
+	ProjectSection(SolutionItems) = preProject
+		ExcelDllCLOModel\MagicNumbers.markdown = ExcelDllCLOModel\MagicNumbers.markdown
+		ExcelDllCLOModel\NETapiREADME.markdown = ExcelDllCLOModel\NETapiREADME.markdown
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

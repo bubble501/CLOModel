@@ -3,18 +3,15 @@
 This project integrates a .Net interface for the cash flow modelling tool for CLOs.
 
 ## Dependencies
-The project is based on the [Qt Libraries](http://qt-project.org/) version 4.8.
+The project is based on the [Qt Libraries](http://qt-project.org/) version 4.8 and the [.Net famework 4.0](http://www.microsoft.com/en-us/download/details.aspx?id=8279).
 
 In addition to those base libraries it makes use of:
 
-- [The Bloomberg Api](http://www.openbloomberg.com/open-api/) (A Bloomberg login is required only if you wish to use Bloomberg functionalities)
+- [The Bloomberg Api v3](http://www.openbloomberg.com/open-api/) (A Bloomberg login is required only if you wish to use Bloomberg functionalities)
 - [zlib](http://www.zlib.net/) to manage compressed files
-- [KD Chart](http://www.kdab.com/kdab-products/kd-chart/) to display charts
 
 ### Linked libraries
 - blpapi3_32.dll
-- kdchart2.dll
 - QtCore4.dll
 - QtGui4.dll
-- QtSvg4.dll
 - zlib1.dll

@@ -441,6 +441,12 @@
       <SubType>Designer</SubType>
     </CustomBuild>
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="StandaloneViewer.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\PIC Swarm\PIC Swarm\Resources\Logo.ico" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

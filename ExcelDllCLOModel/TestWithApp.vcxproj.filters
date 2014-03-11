@@ -403,4 +403,10 @@
       <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="StandaloneViewer.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\PIC Swarm\PIC Swarm\Resources\Logo.ico" />
+  </ItemGroup>
 </Project>

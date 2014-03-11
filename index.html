@@ -30,9 +30,9 @@
   <td id="projectlogo"><img alt="Logo" src="Logo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CLO Model
-   &#160;<span id="projectnumber">1.50</span>
+   &#160;<span id="projectnumber">1.60</span>
    </div>
-   <div id="projectbrief">Collateralised Loan Obligations Cash Flow Modeller</div>
+   <div id="projectbrief">Collateralised Loan Obligations Cash Flow Model</div>
   </td>
  </tr>
  </tbody>
@@ -46,6 +46,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li class="current"><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -73,7 +74,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Properties</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Events</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -87,46 +88,28 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">CLO Model Documentation</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h2></h2>
-<p>This project integrates cash flow modelling tool for CLOs usable entirely from Excel. </p>
-<h4>The project is divided into 3 parts:</h4>
-<ul>
-<li>The actual model written in C++ and compiled into a DLL that can be called from excel</li>
-<li>The VBA modules that take care of interfacing with the library providing input and output as well as implementing some functionality that can be used directly from excel and need no external library</li>
-<li>The Installer, a C++ executable that makes sure the required libraryes are installed on the user PC</li>
-</ul>
+<div class="textblock"><div class="image">
+<img src="http://www.twentyfouram.com/sites/all/themes/twentyfourasset/images/logo.jpg"  alt="TwentyFour Asset management"/>
+</div>
+<p> This project integrates a .Net interface for the cash flow modelling tool for CLOs.</p>
 <h2>Dependencies</h2>
-<p>The project is based on the <a href="http://qt-project.org/">Qt Libraries</a> version 4.8 and will need them to compile.</p>
+<p>The project is based on the <a href="http://qt-project.org/">Qt Libraries</a> version 4.8 and the <a href="http://www.microsoft.com/en-us/download/details.aspx?id=8279">.Net famework 4.0</a>.</p>
 <p>In addition to those base libraries it makes use of:</p>
 <ul>
-<li><a href="http://www.openbloomberg.com/open-api/">The Bloomberg Api</a> (A Bloomberg login is required only if you wish to use Bloomberg functionalities)</li>
-<li><a href="http://www.zlib.net/">zlib</a> to manage compressed files (this also require that the <b>QUAZIP_BUILD</b> simbol is defined)</li>
-<li><a href="http://www.microsoft.com/en-us/download/developer-tools.aspx">Microsoft Office SDK</a> to handle COM items used to comunicate with excel</li>
-<li><a href="http://www.kdab.com/kdab-products/kd-chart/">KD Chart</a> to display charts</li>
+<li><a href="http://www.openbloomberg.com/open-api/">The Bloomberg Api v3</a> (A Bloomberg login is required only if you wish to use Bloomberg functionalities)</li>
+<li><a href="http://www.zlib.net/">zlib</a> to manage compressed files</li>
 </ul>
-<p>Nightly builds also require:</p>
-<ul>
-<li><a href="http://www.boost.org/">Boost Libraries</a></li>
-<li><a href="http://eigen.tuxfamily.org/">Eigen Libraries</a></li>
-</ul>
-<p>To access the nightly builds define the <b>ModelNightly</b> preprocessor symbol on command line </p>
 <h3>Linked libraries</h3>
 <ul>
 <li>blpapi3_32.dll</li>
-<li>kdchart2.dll</li>
 <li>QtCore4.dll</li>
 <li>QtGui4.dll</li>
-<li>QtSvg4.dll</li>
-<li>zlib1.dll</li>
+<li>zlib1.dll </li>
 </ul>
-<h2>License</h2>
-<p>This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.</p>
-<p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.</p>
-<p>You should have received a copy of the GNU General Public License along with this program. If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>. </p>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Dec 5 2013 10:05:51 for CLO Model by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Mar 10 2014 17:59:48 for CLO Model by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>

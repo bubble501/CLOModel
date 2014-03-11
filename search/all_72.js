@@ -1,6 +1,30 @@
 var searchData=
 [
-  ['reinvestmenttest',['ReinvestmentTest',['../class_reinvestment_test.html',1,'']]],
-  ['requirementsinstaller',['RequirementsInstaller',['../class_requirements_installer.html',1,'']]],
-  ['runmodel',['RunModel',['../_excel_input_8cpp.html#acbb1728b6ec66f579da7b48743228ed6',1,'ExcelInput.cpp']]]
+  ['rawannualizedexcess',['RawAnnualizedExcess',['../class_managed_c_l_o_1_1_man_waterfall.html#a505ef76cabc65f813471b2d7ed0398dc',1,'ManagedCLO::ManWaterfall']]],
+  ['rawcoupon',['RawCoupon',['../class_managed_c_l_o_1_1_man_tranche.html#a57309874e66127c7ab0803590d0a9585',1,'ManagedCLO::ManTranche']]],
+  ['read',['Read',['../class_managed_c_l_o_1_1_man_mortgage.html#ae3e27f793bb72c21184b25bb3c88424f',1,'ManagedCLO::ManMortgage::Read()'],['../class_managed_c_l_o_1_1_man_mtg_cash_flows.html#ab83393ffe469301f1b19a177e0f56cd6',1,'ManagedCLO::ManMtgCashFlows::Read()'],['../class_managed_c_l_o_1_1_man_reinvestment_test.html#a68204ad38333f86d2debb431c2f4eb6e',1,'ManagedCLO::ManReinvestmentTest::Read()'],['../class_managed_c_l_o_1_1_man_tranche.html#abec57c1035e488d61d21e6bd53ed7967',1,'ManagedCLO::ManTranche::Read()'],['../class_managed_c_l_o_1_1_man_tranche_cash_flow.html#a621e735aa1e1a6989f71e2ba38466304',1,'ManagedCLO::ManTrancheCashFlow::Read()'],['../class_managed_c_l_o_1_1_man_waterfall.html#add5d673bfb3ae04d5b9cd39012762046',1,'ManagedCLO::ManWaterfall::Read()'],['../class_managed_c_l_o_1_1_man_wat_fal_prior.html#a0d704298c001f9eb8e67f7fc5575741d',1,'ManagedCLO::ManWatFalPrior::Read()']]],
+  ['readytocalculate',['ReadyToCalculate',['../class_managed_c_l_o_1_1_man_waterfall.html#ac8cb51afa355e3bc41c6876a479d1439',1,'ManagedCLO::ManWaterfall::ReadyToCalculate()'],['../class_managed_c_l_o_1_1_man_mortgage.html#abd5a87482e129157770cd9a0ac1193db',1,'ManagedCLO::ManMortgage::ReadyToCalculate()']]],
+  ['redemptiongroup',['RedemptionGroup',['../class_managed_c_l_o_1_1_man_wat_fal_prior.html#ac34b5f2953eebbfaa903f60e0dfafd94',1,'ManagedCLO::ManWatFalPrior']]],
+  ['redemptionshare',['RedemptionShare',['../class_managed_c_l_o_1_1_man_wat_fal_prior.html#a05d4b3b612d71762c7a9aa45f4145cfd',1,'ManagedCLO::ManWatFalPrior']]],
+  ['referencerate',['ReferenceRate',['../class_managed_c_l_o_1_1_man_tranche.html#a6aac8ce7f4b67af8d62b41869e4e39e9',1,'ManagedCLO::ManTranche']]],
+  ['referenceratevalue',['ReferenceRateValue',['../class_managed_c_l_o_1_1_man_tranche.html#a91b645e5c2b57f0175afa9d7468ffa0a',1,'ManagedCLO::ManTranche']]],
+  ['reinvested',['Reinvested',['../class_managed_c_l_o_1_1_man_waterfall.html#ad86d8041b34192055db26b1a66ab4f7f',1,'ManagedCLO::ManWaterfall']]],
+  ['reinvestmentbond',['ReinvestmentBond',['../class_managed_c_l_o_1_1_man_reinvestment_test.html#a15413db25b2a089083796ee31cf159e3',1,'ManagedCLO::ManReinvestmentTest']]],
+  ['reinvestmentperiod',['ReinvestmentPeriod',['../class_managed_c_l_o_1_1_man_reinvestment_test.html#a6c0d88b962cdd9bb4578b8f60ca6158d',1,'ManagedCLO::ManReinvestmentTest']]],
+  ['reinvestmenttest',['reinvestmentTest',['../class_managed_c_l_o_1_1_man_waterfall.html#ad8791f71563f3cb5f5efc709428479f6',1,'ManagedCLO::ManWaterfall']]],
+  ['removeallflows',['RemoveAllFlows',['../class_managed_c_l_o_1_1_man_mtg_cash_flows.html#ac184a85df7bfdbbf2002932b5a16a0d4',1,'ManagedCLO::ManMtgCashFlows']]],
+  ['replacedate',['ReplaceDate',['../class_managed_c_l_o_1_1_man_tranche_cash_flow.html#a6a7ad136b90e18d11f04e59314892786',1,'ManagedCLO::ManTrancheCashFlow']]],
+  ['resetflows',['ResetFlows',['../class_managed_c_l_o_1_1_man_mortgage.html#a53a13a45d799ad81577ed29e15457cd0',1,'ManagedCLO::ManMortgage::ResetFlows()'],['../class_managed_c_l_o_1_1_man_tranche_cash_flow.html#a68ce4f3bffdd8f882956af2680c50b48',1,'ManagedCLO::ManTrancheCashFlow::ResetFlows()']]],
+  ['resetloans',['ResetLoans',['../class_managed_c_l_o_1_1_man_central_unit.html#a25bf155bc6906ed85c69411cad03a9d8',1,'ManagedCLO::ManCentralUnit::ResetLoans()'],['../class_managed_c_l_o_1_1_man_stress_test.html#aaca4d7bd1cd33512ea748d492c1a1931',1,'ManagedCLO::ManStressTest::ResetLoans()']]],
+  ['resetmtgflows',['ResetMtgFlows',['../class_managed_c_l_o_1_1_man_waterfall.html#a80ad6ed33f75f4ac0ee59f1194a85f9f',1,'ManagedCLO::ManWaterfall']]],
+  ['resetresults',['ResetResults',['../class_managed_c_l_o_1_1_man_stress_test.html#a8bdd4b1f7fa643c0829dcc7d23fc800e',1,'ManagedCLO::ManStressTest']]],
+  ['resetsteps',['ResetSteps',['../class_managed_c_l_o_1_1_man_waterfall.html#a3b81c8f26d631ce1ad321b3c7958ec46',1,'ManagedCLO::ManWaterfall']]],
+  ['resetstresslevels',['ResetStressLevels',['../class_managed_c_l_o_1_1_man_stress_test.html#a3427fa5c8951194bef307da4548220b8',1,'ManagedCLO::ManStressTest']]],
+  ['resettrancheflows',['ResetTrancheFlows',['../class_managed_c_l_o_1_1_man_tranche.html#a9cefbdd32c45719884e34028b5d7003a',1,'ManagedCLO::ManTranche']]],
+  ['resettranches',['ResetTranches',['../class_managed_c_l_o_1_1_man_waterfall.html#a933d902cacc147b0753bbb7b7d4fad91',1,'ManagedCLO::ManWaterfall']]],
+  ['resetxspann',['ResetXSpann',['../class_managed_c_l_o_1_1_man_stress_test.html#a1a2bbb53adb9bdcf16cfa01d676b0e28',1,'ManagedCLO::ManStressTest']]],
+  ['resetyspann',['ResetYSpann',['../class_managed_c_l_o_1_1_man_stress_test.html#aff41aaffe3f7afd8b6fe11b605c91fc2',1,'ManagedCLO::ManStressTest']]],
+  ['result',['Result',['../class_managed_c_l_o_1_1_man_central_unit.html#a5175036c00748e868bdd33b5171cf89d',1,'ManagedCLO::ManCentralUnit']]],
+  ['runcall',['RunCall',['../class_managed_c_l_o_1_1_man_central_unit.html#a01beebe3568cd702246bf38869be5f71',1,'ManagedCLO::ManCentralUnit']]],
+  ['runstresstest',['RunStressTest',['../class_managed_c_l_o_1_1_man_stress_test.html#a40bb01860dcb506b9d37ff4ac50c829b',1,'ManagedCLO::ManStressTest']]]
 ];

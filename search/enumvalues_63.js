@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['changingcdr',['ChangingCDR',['../class_stress_test.html#a6a5c48282fd83957ead56beee9c894c6ae075a03198c1be5473c23a436684d60d',1,'StressTest']]],
-  ['changingcpr',['ChangingCPR',['../class_stress_test.html#a6a5c48282fd83957ead56beee9c894c6a8c7a8c96477218a61698d75ae6df36c6',1,'StressTest']]],
-  ['changingls',['ChangingLS',['../class_stress_test.html#a6a5c48282fd83957ead56beee9c894c6abda463dea0ed6b885e03543b962cf01b',1,'StressTest']]]
+  ['changingcdr',['ChangingCDR',['../class_managed_c_l_o_1_1_man_stress_test.html#a7c118b5bd5c82542515688ec86885b7fa659033b42779fbdf4f5ab4a704ab4353',1,'ManagedCLO::ManStressTest']]],
+  ['changingcpr',['ChangingCPR',['../class_managed_c_l_o_1_1_man_stress_test.html#a7c118b5bd5c82542515688ec86885b7fa7becedf8a6bf16b31eaf9bbbdd4515dc',1,'ManagedCLO::ManStressTest']]],
+  ['changingls',['ChangingLS',['../class_managed_c_l_o_1_1_man_stress_test.html#a7c118b5bd5c82542515688ec86885b7fabebe516d85fc26a34d065534b0fc1418',1,'ManagedCLO::ManStressTest']]]
 ];

@@ -30,7 +30,7 @@
   <td id="projectlogo"><img alt="Logo" src="Logo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CLO Model
-   &#160;<span id="projectnumber">1.60</span>
+   &#160;<span id="projectnumber">1.70</span>
    </div>
    <div id="projectbrief">Collateralised Loan Obligations Cash Flow Model</div>
   </td>
@@ -113,7 +113,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    <span class="keyword">public</span>:</div>
 <div class="line"><a name="l00025"></a><span class="lineno"><a class="line" href="class_managed_c_l_o_1_1_man_mortgage.html#a675ad18c01d06294beb26afee92e1631">   25</a></span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="class_managed_c_l_o_1_1_man_mortgage.html#a675ad18c01d06294beb26afee92e1631">Write</a>(IO::Stream^ Dest){</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;            <span class="keywordflow">if</span>(!Dest-&gt;CanWrite) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;            quint32 MagicNumber=((ClassIdentity &lt;&lt; 8) | VersionNumber);</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;            quint32 MagicNumber=((ClassIdentity &lt;&lt; 16) | VersionNumber);</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;            quint32 BlockSize;</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;            <span class="keywordflow">try</span>{</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;                IO::BinaryWriter StreamWriter(Dest);</div>
@@ -136,7 +136,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00054"></a><span class="lineno"><a class="line" href="class_managed_c_l_o_1_1_man_mortgage.html#ae3e27f793bb72c21184b25bb3c88424f">   54</a></span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="class_managed_c_l_o_1_1_man_mortgage.html#ae3e27f793bb72c21184b25bb3c88424f">Read</a>(IO::Stream^ Source){</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;            <span class="keywordflow">if</span>(!Source-&gt;CanRead) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;            quint32 BlockSize;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;            quint32 MagicNumber=((ClassIdentity &lt;&lt; 8) | VersionNumber);</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;            quint32 MagicNumber=((ClassIdentity &lt;&lt; 16) | VersionNumber);</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;            <span class="keywordflow">try</span>{</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;                IO::BinaryReader SizeReader(Source);</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;                BlockSize=SizeReader.ReadUInt32();</div>
@@ -236,7 +236,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Mar 10 2014 17:59:48 for CLO Model by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Mar 18 2014 11:54:37 for CLO Model by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>

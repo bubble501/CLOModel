@@ -30,7 +30,7 @@
   <td id="projectlogo"><img alt="Logo" src="Logo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CLO Model
-   &#160;<span id="projectnumber">1.60</span>
+   &#160;<span id="projectnumber">1.70</span>
    </div>
    <div id="projectbrief">Collateralised Loan Obligations Cash Flow Model</div>
   </td>
@@ -90,29 +90,33 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="contents">
 <div class="textblock"><p>When the classes are written to or read from a stream they will mark their identity using a "magic number"<br/>
  The ID number will be a 32 bits unsigned integer, the rightmost 16 bits will contain the version number of the model ensuring that old versions will not be loaded by accident, the 16 leftmost bits represents the class identity<br/>
- <b>The current model version number is: 160</b> (10100000 in binary) </p>
+ <b>The current model version number is: 170</b> (0000000010101010 in binary) </p>
 <table  style="text-align: center;" border="1" cellpadding="3">
 <tr>
 <th>Class Name </th><th>Class ID </th><th>Current Magic Number (binary) </th><th>Current Magic Number (decimal)   </th></tr>
 <tr>
-<td>ManMtgCashFlows </td><td>1 </td><td>00000001 10100000 </td><td>416  </td></tr>
+<td>ManMtgCashFlows </td><td>1 </td><td>0000000000000001 0000000010101010 </td><td>65706  </td></tr>
 <tr>
-<td>ManWatFalPrior </td><td>2 </td><td>00000010 10100000 </td><td>672  </td></tr>
+<td>ManWatFalPrior </td><td>2 </td><td>0000000000000010 0000000010101010 </td><td>131242  </td></tr>
 <tr>
-<td>ManMortgage </td><td>3 </td><td>00000011 10100000 </td><td>928  </td></tr>
+<td>ManMortgage </td><td>3 </td><td>0000000000000011 0000000010101010 </td><td>196778  </td></tr>
 <tr>
-<td>ManReinvestmentTest </td><td>4 </td><td>00000100 10100000 </td><td>1184  </td></tr>
+<td>ManReinvestmentTest </td><td>4 </td><td>0000000000000100 0000000010101010 </td><td>1184  </td></tr>
 <tr>
-<td>ManTranche </td><td>5 </td><td>00000101 10100000 </td><td>1440  </td></tr>
+<td>ManTranche </td><td>5 </td><td>0000000000000101 0000000010101010 </td><td>327850  </td></tr>
 <tr>
-<td>ManTrancheCashFlow </td><td>6 </td><td>00000110 10100000 </td><td>1696  </td></tr>
+<td>ManTrancheCashFlow </td><td>6 </td><td>0000000000000110 0000000010101010 </td><td>393386  </td></tr>
 <tr>
-<td>ManWaterfall </td><td>7 </td><td>00000111 10100000 </td><td>1952  </td></tr>
+<td>ManWaterfall </td><td>7 </td><td>0000000000000111 0000000010101010 </td><td>458922  </td></tr>
+<tr>
+<td>ManBloombergVector </td><td>8 </td><td>0000000000001000 0000000010101010 </td><td>524458  </td></tr>
+<tr>
+<td>ManAnnuityVector </td><td>9 </td><td>0000000000001001 0000000010101010 </td><td>589994  </td></tr>
 </table>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Mar 10 2014 17:59:48 for CLO Model by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Mar 18 2014 11:54:37 for CLO Model by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>

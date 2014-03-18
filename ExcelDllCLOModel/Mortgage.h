@@ -3,14 +3,16 @@
 #include "MtgCashFlow.h"
 #include <QDate>
 #include <QString>
+#include "AnnuityVector.h"
+#include "BloombergVector.h"
 class Mortgage {
 private:
 	QDate m_MaturityDate;
-	QString m_AnnuityVect;
+	AnnuityVector m_AnnuityVect;
 	double m_Size;
 	int m_LossMultiplier;
 	int m_PrepayMultiplier;
-	QString m_InterestVect;
+	BloombergVector m_InterestVect;
 	MtgCashFlow m_CashFlows;
 	double m_FloatingRateBase;
 	int m_PaymentFreq;
@@ -31,13 +33,14 @@ public:
 	int GetPrepayMultiplier() const {return m_PrepayMultiplier;}
 	void SetPrepayMultiplier(int a) {if(a>=0) m_PrepayMultiplier=a;}
 	const MtgCashFlow& GetCashFlow() const{return m_CashFlows;}
-	const QString& GetAnnuity() const {return m_AnnuityVect;}
+	QString GetAnnuity() const {return m_AnnuityVect.GetVector();}
 	void SetAnnuity(const QString& a);
-	const QString& GetInterest() const {return m_InterestVect;}
+	QString GetInterest() const {return m_InterestVect.GetVector();}
 	void SetInterest(const QString& a);
 	double GetSize() const{return m_Size;}
 	void SetSize(double a){if(a>=0) m_Size=a;}
-	void CalculateCashFlows(const QString& CPRVec,const QString& CDRVec,const QString& LossVec,const QDate& StartDate);
+	void CalculateCashFlows(const QString& CPRVecs,const QString& CDRVecs,const QString& LossVecs,const QDate& StartDate);
+	void CalculateCashFlows(const BloombergVector& CPRVecs,const BloombergVector& CDRVecs,const BloombergVector& LossVecs,const QDate& StartDate);
 	QString ReadyToCalculate() const;
 	void ResetFlows(){m_CashFlows.RemoveAllFlows();}
 	friend QDataStream& operator<<(QDataStream & stream, const Mortgage& flows);

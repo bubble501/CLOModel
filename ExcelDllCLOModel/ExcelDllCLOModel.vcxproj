@@ -34,6 +34,9 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AbstarctBbgVect.h" />
+    <ClInclude Include="AnnuityVector.h" />
+    <ClInclude Include="BloombergVector.h" />
     <ClInclude Include="BloombergWorker.h" />
     <CustomBuild Include="ChartsWidget.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath);%(AdditionalInputs)</AdditionalInputs>
@@ -285,6 +288,9 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AbstarctBbgVect.cpp" />
+    <ClCompile Include="AnnuityVector.cpp" />
+    <ClCompile Include="BloombergVector.cpp" />
     <ClCompile Include="BloombergWorker.cpp" />
     <ClCompile Include="CentralUnit.cpp" />
     <ClCompile Include="ChartsWidget.cpp" />

@@ -20,12 +20,7 @@ public:
 	\warning Inter must be referring to the same time interval between two payments.<br/>To convert an annual rate \f$ r \f$ for a loan that pays interest \f$ p \f$ times a year apply the formula Inter\f$= \left((1+r)^\frac{p}{12} \right)-1 \f$
 	*/
 	static double pmt(double Inter, int Periods, double PresentValue){return Mortgage::pmt(Inter,Periods,PresentValue);}
-	/*!
-	\brief Assess if a string is a valid Bloomberg vector
-	\arg a The possible Bloomberg vector
-	\details This function returns true if the provided string is a valid Bloomberg Vector
-	*/
-	static bool IsBloombergVector(String^ a){return ValidBloombergVector(String2QString(a));}
+
 	/*!
 	\brief Formats a number with commas to separate thousands and precision deciaml places
 	*/

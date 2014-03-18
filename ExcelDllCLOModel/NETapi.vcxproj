@@ -11,6 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AbstarctBbgVect.h" />
+    <ClInclude Include="AnnuityVector.h" />
+    <ClInclude Include="BloombergVector.h" />
     <ClInclude Include="BloombergWorker.h" />
     <CustomBuild Include="CentralUnitOverlay.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
@@ -24,6 +27,8 @@
     </CustomBuild>
     <ClInclude Include="CommonFunctions.h" />
     <ClInclude Include="ManagedCommons.h" />
+    <ClInclude Include="ManAnnuityVector.h" />
+    <ClInclude Include="ManBloombergVector.h" />
     <ClInclude Include="ManCentralUnit.h" />
     <ClInclude Include="ManMortgage.h" />
     <ClInclude Include="ManMtgCashFlow.h" />
@@ -186,12 +191,15 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AbstarctBbgVect.cpp" />
+    <ClCompile Include="AnnuityVector.cpp" />
     <ClCompile Include="AssemblyInfo.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</CompileAsManaged>
       <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExceptionHandling>
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</CompileAsManaged>
       <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExceptionHandling>
     </ClCompile>
+    <ClCompile Include="BloombergVector.cpp" />
     <ClCompile Include="BloombergWorker.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </CompileAsManaged>

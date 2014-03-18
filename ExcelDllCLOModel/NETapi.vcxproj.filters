@@ -143,6 +143,21 @@
     <ClInclude Include="quazip\zip.h">
       <Filter>quzip</Filter>
     </ClInclude>
+    <ClInclude Include="AbstarctBbgVect.h">
+      <Filter>Header Files\Unmanaged</Filter>
+    </ClInclude>
+    <ClInclude Include="AnnuityVector.h">
+      <Filter>Header Files\Unmanaged</Filter>
+    </ClInclude>
+    <ClInclude Include="BloombergVector.h">
+      <Filter>Header Files\Unmanaged</Filter>
+    </ClInclude>
+    <ClInclude Include="ManBloombergVector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ManAnnuityVector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="CentralUnitAPI.h">
@@ -386,6 +401,15 @@
     </ClCompile>
     <ClCompile Include="quazip\quazipnewinfo.cpp">
       <Filter>quzip</Filter>
+    </ClCompile>
+    <ClCompile Include="AbstarctBbgVect.cpp">
+      <Filter>Source Files\Unmanaged</Filter>
+    </ClCompile>
+    <ClCompile Include="AnnuityVector.cpp">
+      <Filter>Source Files\Unmanaged</Filter>
+    </ClCompile>
+    <ClCompile Include="BloombergVector.cpp">
+      <Filter>Source Files\Unmanaged</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -4,12 +4,13 @@
 #include <QStringList>
 #include <qmath.h>
 #include <QDir>
-int MonthDiff(const QDate& a,const QDate& b){
+int MonthDiff(const QDate& FutureDte,const QDate& PresentDte){
 	int Result;
-	Result=(a.year()-b.year())*12;
-	Result+=a.month()-b.month();
+	Result=(FutureDte.year()-PresentDte.year())*12;
+	Result+=FutureDte.month()-PresentDte.month();
 	return Result;
 }
+/*
 bool ValidAnnuityVector(const QString& AnnVect){
 	QRegExp Vigil("^[YN](\\s+\\d+S\\s+[YN])*$",Qt::CaseInsensitive);
 	return Vigil.exactMatch(AnnVect);
@@ -92,7 +93,7 @@ QString ShiftBloombergVector(const QString& OriginalVect, int ByMonths){
 		}
 	}
 	return Result;
-}
+}*/
 double RoundUp(double a){
 	double Result=static_cast<double>(static_cast<int>(a));
 	if(a>Result) Result+=1.0;

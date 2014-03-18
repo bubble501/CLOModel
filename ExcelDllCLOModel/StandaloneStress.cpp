@@ -17,6 +17,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include "CommonFunctions.h"
+#include "BloombergVector.h"
 StandaloneStress::StandaloneStress(QWidget *parent)
 	: QWidget(parent)
 {
@@ -128,14 +129,14 @@ void StandaloneStress::CheckAllValid(){
 		StartButton->setEnabled(false);
 		PathEdit->setStyleSheet("background-color: red;");
 	}
-	if(!ValidBloombergVector(ConstantEdit->text())){
+	if(!BloombergVector(ConstantEdit->text()).IsValid()){
 		StartButton->setEnabled(false);
 		ConstantEdit->setStyleSheet("background-color: red;");
 	}
 	for(int i=0;i<2;i++){
 		for(int j=0;j<VariablesList[i]->rowCount();j++){
 			if(VariablesList[i]->item(j,0)){
-				if(!ValidBloombergVector(VariablesList[i]->item(j,0)->text())){
+				if(!BloombergVector(VariablesList[i]->item(j,0)->text()).IsValid()){
 					StartButton->setEnabled(false);
 					VariablesList[i]->item(j,0)->setBackgroundColor(Qt::red);
 				}

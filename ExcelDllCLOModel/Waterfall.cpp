@@ -9,11 +9,10 @@ const WatFalPrior* Waterfall::GetStep(int Index)const {
 	if(Index<0 || Index>=m_WaterfallStesps.size()) return NULL;
 	return m_WaterfallStesps.at(Index);
 }
-void Waterfall::SetCCCcurve(const QString& a){if(ValidBloombergVector(a)) m_CCCcurve=a;}
+void Waterfall::SetCCCcurve(const QString& a){m_CCCcurve=a;}
 void Waterfall::SetPaymentFrequency(int a){
 	if(a>0){
 		m_PaymentFrequency=a;
-		m_unpackedCCCcurve=UnpackVect(m_CCCcurve,m_PaymentFrequency,false);
 	}
 }
 const Tranche* Waterfall::GetTranche(int Index) const{
@@ -65,7 +64,6 @@ Waterfall::Waterfall()
 	,m_CallMultiple(0.0)
 	,m_CallReserve(0.0)
 {
-	m_unpackedCCCcurve=UnpackVect(m_CCCcurve,m_PaymentFrequency,false);
 }
 Waterfall::Waterfall(const Waterfall& a)
 	:m_SeniorExpenses(a.m_SeniorExpenses)
@@ -103,7 +101,6 @@ Waterfall::Waterfall(const Waterfall& a)
 	for(QList<WatFalPrior*>::const_iterator i=a.m_WaterfallStesps.constBegin();i!=a.m_WaterfallStesps.constEnd();i++){
 		m_WaterfallStesps.append(new WatFalPrior(**i));
 	}
-	m_unpackedCCCcurve=UnpackVect(m_CCCcurve,m_PaymentFrequency,false);
 }
 Waterfall& Waterfall::operator=(const Waterfall& a){
 	m_SeniorExpenses=a.m_SeniorExpenses;
@@ -142,7 +139,6 @@ Waterfall& Waterfall::operator=(const Waterfall& a){
 	for(QList<WatFalPrior*>::const_iterator i=a.m_WaterfallStesps.constBegin();i!=a.m_WaterfallStesps.constEnd();i++){
 		m_WaterfallStesps.append(new WatFalPrior(**i));
 	}
-	m_unpackedCCCcurve=UnpackVect(m_CCCcurve,m_PaymentFrequency,false);
 	return *this;
 }
 Waterfall::~Waterfall(){
@@ -417,6 +413,8 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		m_TotalSeniorExpenses.ResetFlows();
 		m_TotalSeniorFees.ResetFlows();
 		m_TotalJuniorFees.ResetFlows();
+		bool NullCCCanchor= m_CCCcurve.GetAnchorDate().isNull();
+		if(NullCCCanchor) m_CCCcurve.SetAnchorDate(m_MortgagesPayments.GetDate(0));
 		foreach(Tranche* SingleTranche, m_Tranches) SingleTranche->GetCashFlow().ResetFlows();
 		for(int i=0;i<m_MortgagesPayments.Count();i++){
 			CurrentDate=m_MortgagesPayments.GetDate(i);
@@ -643,8 +641,8 @@ if(CurrentDate.year()>=2020 && CurrentDate.month()>=7){
 					}
 					TotalPayable=qMax(TotalPayable,0.000001);
 					//CCC test
-					if(m_unpackedCCCcurve.at(qMin(i,m_unpackedCCCcurve.size()-1))>m_CCCTestLimit)
-						Solution=(1.0-((m_unpackedCCCcurve.at(qMin(i,m_unpackedCCCcurve.size()-1))-m_CCCTestLimit)*m_CCChaircut))*m_MortgagesPayments.GetAmountOut(i);
+					if(m_CCCcurve.GetValue(CurrentDate,m_PaymentFrequency)>m_CCCTestLimit)
+						Solution=(1.0-((m_CCCcurve.GetValue(CurrentDate,m_PaymentFrequency)-m_CCCTestLimit)*m_CCChaircut))*m_MortgagesPayments.GetAmountOut(i);
 					else
 						Solution=m_MortgagesPayments.GetAmountOut(i);
 					Solution+=AvailablePrincipal;
@@ -747,8 +745,8 @@ if(CurrentDate.year()>=2020 && CurrentDate.month()>=7){
 						}
 						TotalPayable=qMax(TotalPayable,0.000001);
 						//CCC test
-						if(m_unpackedCCCcurve.at(qMin(i,m_unpackedCCCcurve.size()-1))>m_CCCTestLimit)
-							Solution=(1.0-((m_unpackedCCCcurve.at(qMin(i,m_unpackedCCCcurve.size()-1))-m_CCCTestLimit)*m_CCChaircut))*m_MortgagesPayments.GetAmountOut(i);
+						if(m_CCCcurve.GetValue(CurrentDate,m_PaymentFrequency)>m_CCCTestLimit)
+							Solution=(1.0-((m_CCCcurve.GetValue(CurrentDate,m_PaymentFrequency)-m_CCCTestLimit)*m_CCChaircut))*m_MortgagesPayments.GetAmountOut(i);
 						else
 							Solution=m_MortgagesPayments.GetAmountOut(i);
 						if(Solution==0.0) Solution=1.0;
@@ -811,6 +809,7 @@ if(CurrentDate.year()>=2020 && CurrentDate.month()>=7){
 		m_CalculatedMtgPayments=m_MortgagesPayments;
 		m_MortgagesPayments=OriginalMtgFlows;
 		FillAllDates();
+		if(NullCCCanchor) m_CCCcurve.RemoveAnchorDate();
 		return true;
 }
 
@@ -889,7 +888,6 @@ QDataStream& operator>>(QDataStream & stream, Waterfall& flows){
 		>> flows.m_CallReserve
 		>> TempInt
 	;
-	flows.m_unpackedCCCcurve=UnpackVect(flows.m_CCCcurve,flows.m_PaymentFrequency,false);
 	flows.ResetTranches();
 	for(int i=0;i<TempInt;i++){
 		stream >> TempTranche;
@@ -942,7 +940,7 @@ QString Waterfall::ReadyToCalculate()const{
 	if(m_ReinvestmentTest.GetTestLevel()<0.0)Result+="Reinvestment Test Limit\n";
 	if(m_ReinvestmentTest.GetReinvestmentBond().GetPaymentFreq()<1) Result+="Reinvestment Bond Payment Frequency\n";
 	if(m_ReinvestmentTest.GetReinvestmentBond().GetInterest().isEmpty())Result+="Reinvestment Bond Spread\n";
-	if(m_CCCcurve.isEmpty())Result+="CCC Curve\n";
+	if(m_CCCcurve.IsEmpty())Result+="CCC Curve\n";
 	if(m_CCChaircut<0.0)Result+="CCC Value\n";
 	if(m_PoolValueAtCall<0.0)Result+="Pool Value at Call\n";
 	if(m_UseCall && m_CallDate<QDate(2000,1,1) && (m_CallReserve<=0.0 || m_CallMultiple<=0.0))Result+="Specify a call Criteria to use the Call\n";

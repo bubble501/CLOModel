@@ -5,6 +5,7 @@
 #include <QList>
 #include "MtgCashFlow.h"
 #include "CommonFunctions.h"
+#include "BloombergVector.h"
 class Mortgage;
 class MtgCashFlow;
 class MtgCalculator : public QObject{
@@ -18,9 +19,9 @@ public:
 	void SetLS(const QString& a);
 	void SetStartDate(const QDate& a){StartDate=a;}
 	void StartCalculation();
-	const QString& GetCPR() const {return CPRass;}
-	const QString& GetCDR() const {return CDRass;}
-	const QString& GetCLR() const {return LSass;}
+	QString GetCPR() const {return CPRass.GetVector();}
+	QString GetCDR() const {return CDRass.GetVector();}
+	QString GetCLR() const {return LSass.GetVector();}
 	const QDate& GetStartDate()const {return StartDate;}
 	const QList<Mortgage*>& GetLoans() const {return Loans;}
 	const MtgCashFlow& GetResult()const{return Result;}
@@ -31,9 +32,9 @@ public:
 	bool GetSequentialComputation()const {return SequentialComputation;}
 private:
 	QList<Mortgage*> Loans;
-	QString CPRass;
-	QString CDRass;
-	QString LSass;
+	BloombergVector CPRass;
+	BloombergVector CDRass;
+	BloombergVector LSass;
 	QDate StartDate;
 	MtgCashFlow Result;
 	int BeesSent;

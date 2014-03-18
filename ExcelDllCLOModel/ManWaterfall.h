@@ -29,7 +29,7 @@ namespace ManagedCLO {
 		*/
 		bool Write(IO::Stream^ Dest){
 			if(!Dest->CanWrite) return false;
-			quint32 MagicNumber=((ClassIdentity << 8) | VersionNumber);
+			quint32 MagicNumber=((ClassIdentity << 16) | VersionNumber);
 			quint32 BlockSize;
 			try{
 				IO::BinaryWriter StreamWriter(Dest);
@@ -54,12 +54,12 @@ namespace ManagedCLO {
 		\arg Source Stream to read from
 		\details This function reads the class information from a Stream (e.g. FileStream or NetworkStream)
 		\warning If the first element in the stream is not of this class, the stream will be advanced by 8 bytes anyway
-		\return whether the write operation was successful
+		\return Whether the read operation was successful
 		*/
 		bool Read(IO::Stream^ Source){
 			if(!Source->CanRead) return false;
 			quint32 BlockSize;
-			quint32 MagicNumber=((ClassIdentity << 8) | VersionNumber);
+			quint32 MagicNumber=((ClassIdentity << 16) | VersionNumber);
 			try{
 				IO::BinaryReader SizeReader(Source);
 				BlockSize=SizeReader.ReadUInt32();

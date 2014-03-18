@@ -13,12 +13,12 @@ void MtgCalculatorThread::run(){
 	emit Calculated(Loan.GetCashFlow());
 	exec();
 }
-void MtgCalculatorThread::SetCPR(const QString& a){
-	if(ValidBloombergVector(a)) CPRass=a;
+void MtgCalculatorThread::SetCPR(const BloombergVector& a){
+	CPRass=a;
 }
-void MtgCalculatorThread::SetCDR(const QString& a){
-	if(ValidBloombergVector(a)) CDRass=a;
+void MtgCalculatorThread::SetCDR(const BloombergVector& a){
+	CDRass=a;
 }
-void MtgCalculatorThread::SetLS(const QString& a){
-	if(ValidBloombergVector(a)) LSass=a;
+void MtgCalculatorThread::SetLS(const BloombergVector& a){
+	LSass=a;
 }

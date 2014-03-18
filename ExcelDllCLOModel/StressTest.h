@@ -6,6 +6,7 @@
 #include <QHash>
 #include <QObject>
 #include "Waterfall.h"
+
 class ProgressWidget;
 class Mortgage;
 class StressTest:public QObject{

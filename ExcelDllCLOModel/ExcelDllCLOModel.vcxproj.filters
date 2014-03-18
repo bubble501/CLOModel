@@ -159,6 +159,15 @@
     <ClInclude Include="DistributionsGenerators.h">
       <Filter>Header Files\Probabilistic</Filter>
     </ClInclude>
+    <ClInclude Include="BloombergVector.h">
+      <Filter>Header Files\Bloomberg</Filter>
+    </ClInclude>
+    <ClInclude Include="AbstarctBbgVect.h">
+      <Filter>Header Files\Bloomberg</Filter>
+    </ClInclude>
+    <ClInclude Include="AnnuityVector.h">
+      <Filter>Header Files\Bloomberg</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="CentralUnit.h">
@@ -477,6 +486,15 @@
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Nightly\moc_CentralUnit.cpp">
       <Filter>Generated Files\Nightly</Filter>
+    </ClCompile>
+    <ClCompile Include="BloombergVector.cpp">
+      <Filter>Source Files\Bloomberg</Filter>
+    </ClCompile>
+    <ClCompile Include="AbstarctBbgVect.cpp">
+      <Filter>Source Files\Bloomberg</Filter>
+    </ClCompile>
+    <ClCompile Include="AnnuityVector.cpp">
+      <Filter>Source Files\Bloomberg</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

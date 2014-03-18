@@ -77,21 +77,23 @@ ReinvestmentTest& ReinvestmentTest::operator=(const ReinvestmentTest& a){
 void ReinvestmentTest::CalculateBondCashFlows(double Size, QDate StartDate, int Period){
 	ReinvestmentBond.ResetFlows();
 	ReinvestmentBond.SetSize(Size);
-	QList<double>UnpackedWAL=UnpackVect(WALAssumption,1,false);
-	ReinvestmentBond.SetMaturityDate(StartDate.addDays(RoundUp(365.25*100.0*UnpackedWAL.at(qMin(UnpackedWAL.size()-1,Period)))));
+	ReinvestmentBond.SetMaturityDate(StartDate.addDays(RoundUp(365.25*100.0*WALAssumption.GetValue(Period))));
+	CPRAssumption.SetAnchorDate(StartDate.addMonths(-Period));
+	CDRAssumption.SetAnchorDate(StartDate.addMonths(-Period));
+	LSAssumption.SetAnchorDate(StartDate.addMonths(-Period));
 	ReinvestmentBond.CalculateCashFlows(
-		ShiftBloombergVector(CPRAssumption,Period)
-		,ShiftBloombergVector(CDRAssumption,Period)
-		,ShiftBloombergVector(LSAssumption,Period)
+		CPRAssumption
+		,CDRAssumption
+		,LSAssumption
 		,StartDate
 	);
 }
 const MtgCashFlow& ReinvestmentTest::GetBondCashFlow() const{
 	return ReinvestmentBond.GetCashFlow();
 }
-void ReinvestmentTest::SetCPR(const QString& a){if(ValidBloombergVector(a)) CPRAssumption=a;}
-void ReinvestmentTest::SetCDR(const QString& a){if(ValidBloombergVector(a)) CDRAssumption=a;}
-void ReinvestmentTest::SetLS(const QString& a){if(ValidBloombergVector(a)) LSAssumption=a;}
+void ReinvestmentTest::SetCPR(const QString& a){CPRAssumption=a;}
+void ReinvestmentTest::SetCDR(const QString& a){CDRAssumption=a;}
+void ReinvestmentTest::SetLS(const QString& a){LSAssumption=a;}
 QDataStream& operator<<(QDataStream & stream, const ReinvestmentTest& flows){
 	stream 
 		<< flows.ReinvestmentPeriod

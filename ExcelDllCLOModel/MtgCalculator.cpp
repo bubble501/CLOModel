@@ -8,13 +8,13 @@ MtgCalculator::MtgCalculator(QObject* parent)
 
 }
 void MtgCalculator::SetCPR(const QString& a){
-	if(ValidBloombergVector(a)) CPRass=a;
+	CPRass=a;
 }
 void MtgCalculator::SetCDR(const QString& a){
-	if(ValidBloombergVector(a)) CDRass=a;
+	CDRass=a;
 }
 void MtgCalculator::SetLS(const QString& a){
-	if(ValidBloombergVector(a)) LSass=a;
+	LSass=a;
 }
 void MtgCalculator::AddLoan(const Mortgage& a){
 	Loans.append(new Mortgage(a));

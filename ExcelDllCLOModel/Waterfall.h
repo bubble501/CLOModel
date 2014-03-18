@@ -6,6 +6,7 @@
 #include "WatFalPrior.h"
 #include "MtgCashFlow.h"
 #include "ReinvestmentTest.h"
+#include "BloombergVector.h"
 class Waterfall{
 private:
 	double m_SeniorExpenses;
@@ -22,10 +23,9 @@ private:
 	TrancheCashFlow m_TotalJuniorFees; 
 	ReinvestmentTest m_ReinvestmentTest; 
 	double m_CCCTestLimit; 
-	QString m_CCCcurve; 
+	BloombergVector m_CCCcurve; 
 	double m_CCChaircut; 
 	bool m_UseTurbo; 
-	QList<double> m_unpackedCCCcurve;
 	double m_PrincipalAvailable; 
 	double m_InterestAvailable; 
 	double m_JuniorFeesCoupon; 
@@ -74,7 +74,7 @@ public:
 	const TrancheCashFlow& GetTotalJuniorFees() const {return m_TotalJuniorFees;} 
 	const ReinvestmentTest& GetReinvestmentTest() const {return m_ReinvestmentTest;}
 	ReinvestmentTest& GetReinvestmentTest() {return m_ReinvestmentTest;}
-	const QString& GetCCCcurve() const {return m_CCCcurve;}
+	QString GetCCCcurve() const {return m_CCCcurve.GetVector();}
 	const TrancheCashFlow& GetRawAnnualizedExcess() const {return m_AnnualizedExcess;}
 	double GetAnnualizedExcess(int index, bool AsShareOfLoans=false)const;
 	double GetEquityReturn(int index)const;

@@ -8,6 +8,7 @@
 #include <QDir>
 #include <QFile>
 #include "quazip/JlCompress.h"
+#include "BloombergVector.h"
 #include <QMessageBox>
 #ifdef Q_WS_WIN
 #include <Windows.h>
@@ -45,7 +46,7 @@ void StressTest::AddXSpann(const QList<QString>& a){
 	}
 }
 void StressTest::AddXSpann(const QString& a){
-	if(ValidBloombergVector(a))
+	if(!BloombergVector(a).IsEmpty())
 		XSpann.append(a);
 }
 void StressTest::SetYSpann(const QList<QString>& a){
@@ -58,11 +59,11 @@ void StressTest::AddYSpann(const QList<QString>& a){
 	}
 }
 void StressTest::AddYSpann(const QString& a){
-	if(ValidBloombergVector(a))
+	if(!BloombergVector(a).IsEmpty())
 		YSpann.append(a);
 }
 void StressTest::SetConstantPar(const QString& a){
-	if(ValidBloombergVector(a))
+	if(!BloombergVector(a).IsEmpty())
 		ConstantPar=a;
 }
 void StressTest::AddLoan(const Mortgage& a){
@@ -308,10 +309,10 @@ Waterfall StressTest::GetScenarioFromFile(const QString& DestPath,const QString&
 			char *argv[] = {"NoArgumnets"};
 			int argc = sizeof(argv) / sizeof(char*) - 1;
 			QApplication ComputationLoop(argc,argv);
-			QMessageBox::critical(0,"Incompatible Version","The stress test data is not comaptible with the current model version\nPlease run ALL the stress tests again");
+			QMessageBox::critical(0,"Incompatible Version","The stress test data is not compatible with the current model version\nPlease run ALL the stress tests again");
 			QApplication::quit();
 		}
-		else QMessageBox::critical(0,"Incompatible Version","The stress test data is not comaptible with the current model version\nPlease run ALL the stress tests again");
+		else QMessageBox::critical(0,"Incompatible Version","The stress test data is not compatible with the current model version\nPlease run ALL the stress tests again");
 		return Result;
 	}
 	if(!zip.setCurrentFile(XScenario+"#,#"+YScenario+".csw")) return Result;
@@ -355,11 +356,11 @@ bool StressTest::LoadResultsFromFile(const QString& DestPath){
 			char *argv[] = {"NoArgumnets"};
 			int argc = sizeof(argv) / sizeof(char*) - 1;
 			QApplication ComputationLoop(argc,argv);
-			QMessageBox::critical(0,"Incompatible Version","The stress test data is not comaptible with the current model version\nPlease run ALL the stress tests again");
+			QMessageBox::critical(0,"Incompatible Version","The stress test data is not compatible with the current model version\nPlease run ALL the stress tests again");
 			QApplication::quit();
 		}
 		else {
-			QMessageBox::critical(0,"Incompatible Version","The stress test data is not comaptible with the current model version\nPlease run ALL the stress tests again");
+			QMessageBox::critical(0,"Incompatible Version","The stress test data is not compatible with the current model version\nPlease run ALL the stress tests again");
 		}
 		return false;
 	}

@@ -11,12 +11,10 @@ Mortgage::Mortgage()
 	,m_Size(0.0)
 {}
 void Mortgage::SetAnnuity(const QString& a){
-	if(ValidAnnuityVector(a)) m_AnnuityVect=a;
-	else m_AnnuityVect="N";
+	m_AnnuityVect=a;
 }
 void Mortgage::SetInterest(const QString& a){
-	if(ValidBloombergVector(a)) m_InterestVect=a;
-	else m_InterestVect="0";
+	m_InterestVect=a;
 }
  Mortgage::Mortgage(const Mortgage& a)
 	 :m_LossMultiplier(a.m_LossMultiplier)
@@ -41,23 +39,33 @@ void Mortgage::SetInterest(const QString& a){
 	 m_CashFlows=a.m_CashFlows;
 	 return *this;
  }
- void Mortgage::CalculateCashFlows(const QString& CPRVec,const QString& CDRVec,const QString& LossVec,const QDate& StartDate){
+ void Mortgage::CalculateCashFlows(const QString& CPRVecs,const QString& CDRVecs,const QString& LossVecs,const QDate& StartDate){
+	 QDate AdjStartDate(StartDate.year(),StartDate.month(),15);
+	 BloombergVector CPRVec(CPRVecs,AdjStartDate);
+	 BloombergVector CDRVec(CDRVecs,AdjStartDate);
+	 BloombergVector LossVec(LossVecs,AdjStartDate);
+	 CalculateCashFlows(CPRVec,CDRVec,LossVec,StartDate);
+ }
+void Mortgage::CalculateCashFlows(const BloombergVector& CPRVecs,const BloombergVector& CDRVecs,const BloombergVector& LossVecs,const QDate& StartDate){
+	QDate AdjStartDate(StartDate.year(),StartDate.month(),15);
+	BloombergVector CPRVec(CPRVecs);
+	BloombergVector CDRVec(CDRVecs);
+	BloombergVector LossVec(LossVecs);
+	bool NullAnchorDates=m_InterestVect.GetAnchorDate().isNull();
+	if(CPRVec.GetAnchorDate().isNull()) CPRVec.SetAnchorDate(AdjStartDate);
+	if(CDRVec.GetAnchorDate().isNull()) CDRVec.SetAnchorDate(AdjStartDate);
+	if(LossVec.GetAnchorDate().isNull()) LossVec.SetAnchorDate(AdjStartDate);
+	if(NullAnchorDates) m_InterestVect.SetAnchorDate(AdjStartDate);
 	if (StartDate >= m_MaturityDate) return m_CashFlows.AddFlow (StartDate, m_Size, MtgCashFlow::PrincipalFlow);
 	int NumPayments=qAbs(MonthDiff(m_MaturityDate,StartDate));
 	if(
-		!ValidBloombergVector(CPRVec)
-		|| !ValidBloombergVector(CDRVec)
-		|| !ValidBloombergVector(LossVec)
+		CPRVec.IsEmpty()
+		|| CDRVec.IsEmpty()
+		|| LossVec.IsEmpty()
 		|| NumPayments<1
 	) return;
-	QDate AdjStartDate;
-	AdjStartDate.setDate(StartDate.year(),StartDate.month(),15);
+	
 	m_CashFlows.RemoveAllFlows();
-	QList<double> CPRVector=UnpackVect(CPRVec);
-	QList<double> CDRVector=UnpackVect(CDRVec);
-	QList<double> LossVector=UnpackVect(LossVec,m_PaymentFreq,false);
-	QList<double> InterestVector=UnpackVect(m_InterestVect);
-	QList<QString> AnnuityVector=UnpackAnnuityVect(m_AnnuityVect);
 	double CurrentCPR;
 	double CurrentCDR;
 	double CurrentLS;
@@ -70,11 +78,11 @@ void Mortgage::SetInterest(const QString& a){
 	if(NextPaymentDate > m_MaturityDate)
 		NextPaymentDate.setDate(m_MaturityDate.year(),m_MaturityDate.month(),15);
 	for (int j=0;j<NumPayments;j++){
-		CurrentCPR=CPRVector.at(qMin(j,CPRVector.size()-1));
-		CurrentCDR=CDRVector.at(qMin(j,CDRVector.size()-1));
-		CurrentLS=LossVector.at(qMin(j,LossVector.size()-1));
-		CurrentInterest=qPow(1.0+m_FloatingRateBase,1.0/12.0)-1.0+InterestVector.at(qMin(j,InterestVector.size()-1));
-		CurrentAnnuity=AnnuityVector.at(qMin(j,AnnuityVector.size()-1));
+		CurrentCPR=CPRVec.GetValue(CurrentMonth,1);
+		CurrentCDR=CDRVec.GetValue(CurrentMonth,1);
+		CurrentLS=LossVec.GetValue(CurrentMonth);
+		CurrentInterest=qPow(1.0+m_FloatingRateBase,1.0/12.0)-1.0+m_InterestVect.GetValue(CurrentMonth,1);
+		CurrentAnnuity=m_AnnuityVect.GetValue(CurrentMonth);
 		TempFlow=(CurrentInterest*CurrentAmtOut)+((1.0+CurrentInterest)*m_CashFlows.GetAccruedInterest(m_CashFlows.Count()-1));
 		m_CashFlows.AddFlow( CurrentMonth, TempFlow, MtgCashFlow::AccruedInterestFlow);
 		if (CurrentMonth >= NextPaymentDate || j == NumPayments){
@@ -88,7 +96,7 @@ void Mortgage::SetInterest(const QString& a){
 					CountPeriods++;
 					RollingdateCounter=RollingdateCounter.addMonths(m_PaymentFreq);
 				}CountPeriods++;
-				double InterestApplicable=qPow(1.0+m_FloatingRateBase,static_cast<double>(m_PaymentFreq)/12.0)+qPow(1.0+InterestVector.at(qMin(j,InterestVector.size()-1)),static_cast<double>(m_PaymentFreq))-2.0;
+				double InterestApplicable=qPow(1.0+m_FloatingRateBase,static_cast<double>(m_PaymentFreq)/12.0)-1.0+m_InterestVect.GetValue(CurrentMonth,m_PaymentFreq);
 				TempFlow=qAbs(pmt(InterestApplicable, CountPeriods, CurrentAmtOut)) - TempFlow;
 			}
 			else{TempFlow = 0.0;}
@@ -119,7 +127,8 @@ void Mortgage::SetInterest(const QString& a){
 		if (CurrentAmtOut < 0.01) break;
 	}
 	m_CashFlows.AddFlow( StartDate, m_Size, MtgCashFlow::AmountOutstandingFlow);
-	m_CashFlows.AddFlow( StartDate, m_Size*(qPow(1.0+InterestVector.first(),12.0)-1.0), MtgCashFlow::WACouponFlow);
+	m_CashFlows.AddFlow( StartDate, m_Size*m_InterestVect.GetValue(0), MtgCashFlow::WACouponFlow);
+	if(NullAnchorDates) m_InterestVect.RemoveAnchorDate();
  }
  double Mortgage::pmt(double Interest, int Periods, double PresentValue){
 	 if(Periods<=0) return 0.0;
@@ -159,11 +168,11 @@ void Mortgage::SetInterest(const QString& a){
  QString Mortgage::ReadyToCalculate()const{
 	QString Result;
 	if(m_MaturityDate<QDate(2000,1,1)) Result+="Loan Maturity Date\n";
-	if(m_AnnuityVect.isEmpty())Result+="Loan Annuity Vector\n";
+	if(m_AnnuityVect.IsEmpty())Result+="Loan Annuity Vector\n";
 	if(m_Size<0.0)Result+="Loan Size\n";
 	if(m_LossMultiplier<0.0) Result+="Loss Multiplier\n";
 	if(m_PrepayMultiplier<0.0) Result+="Prepay Multiplier\n";
-	if(m_InterestVect.isEmpty())Result+="Loan Coupon\n";
+	if(m_InterestVect.IsEmpty())Result+="Loan Coupon\n";
 	if(m_FloatingRateBase<0.0)Result+="Loan Base Rate\n";
 	if(m_PaymentFreq<1)Result+="Loan Payment Frequency\n";
 	if(!Result.isEmpty()) return Result.left(Result.size()-1);

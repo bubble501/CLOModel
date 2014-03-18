@@ -1,6 +1,6 @@
 #include "ManMtgCashFlow.h"
 #include "ManWaterfall.h"
-#include "ManTrancheCashFlow.h"*/
+#include "ManTrancheCashFlow.h"
 #include "ManWatFalPrior.h"
 #include "ManReinvestmentTest.h"
 #include "ManMortgage.h"
@@ -8,3 +8,5 @@
 #include "ManStressTest.h"
 #include "ManCentralUnit.h"
 #include "ManUtilities.h"
+#include "ManBloombergVector.h"
+#include "ManAnnuityVector.h"

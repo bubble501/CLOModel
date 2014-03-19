@@ -7,7 +7,7 @@ var searchData=
   ['loadresultsfromfile',['LoadResultsFromFile',['../class_managed_c_l_o_1_1_man_stress_test.html#a74368f19036e54ead17d64ed0119ed76',1,'ManagedCLO::ManStressTest']]],
   ['loanscount',['LoansCount',['../class_managed_c_l_o_1_1_man_central_unit.html#ac03226be4535383d82c4f3c3d8d1e83d',1,'ManagedCLO::ManCentralUnit::LoansCount()'],['../class_managed_c_l_o_1_1_man_stress_test.html#aba0715e75e556c7c0472660d307ae183',1,'ManagedCLO::ManStressTest::LoansCount()']]],
   ['lossflow',['LossFlow',['../class_managed_c_l_o_1_1_man_mtg_cash_flows.html#a5c6a490e7195143ae52e1abe16c97e58a38d88d7ee63f0c5cae64bda125a2a944',1,'ManagedCLO::ManMtgCashFlows']]],
-  ['lossmultiplier',['LossMultiplier',['../class_managed_c_l_o_1_1_man_mortgage.html#a5691192f31a3fde1eb15da4943d118f2',1,'ManagedCLO::ManMortgage']]],
+  ['lossmultiplier',['LossMultiplier',['../class_managed_c_l_o_1_1_man_mortgage.html#ab19b99bdc80a8e661b7d3c0456281aff',1,'ManagedCLO::ManMortgage']]],
   ['lossoninterestflow',['LossOnInterestFlow',['../class_managed_c_l_o_1_1_man_mtg_cash_flows.html#a5c6a490e7195143ae52e1abe16c97e58a67ff631eb8c49d6edd334c6201071dc7',1,'ManagedCLO::ManMtgCashFlows']]],
   ['lossrate',['LossRate',['../class_managed_c_l_o_1_1_man_tranche.html#a89fe50091465552a0514e2370d87aeb3',1,'ManagedCLO::ManTranche']]],
   ['lsassumption',['LSAssumption',['../class_managed_c_l_o_1_1_man_reinvestment_test.html#ae8a8e3d0de4be7d98691b931d65d28d3',1,'ManagedCLO::ManReinvestmentTest']]]

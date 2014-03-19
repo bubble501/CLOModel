@@ -41,12 +41,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GeneratedFiles\Debug\moc_CentralUnit.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_CentralUnit.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_ChartsWidget.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
@@ -194,22 +188,7 @@
     <ClCompile Include="BloombergWorker.cpp">
       <Filter>Source Files\Core Items</Filter>
     </ClCompile>
-    <ClCompile Include="CentralUnit.cpp">
-      <Filter>Source Files\Core Items</Filter>
-    </ClCompile>
     <ClCompile Include="CommonFunctions.cpp">
-      <Filter>Source Files\Core Items</Filter>
-    </ClCompile>
-    <ClCompile Include="ExcelCommons.cpp">
-      <Filter>Source Files\Core Items</Filter>
-    </ClCompile>
-    <ClCompile Include="DistributionsGenerators.cpp">
-      <Filter>Source Files\Core Items</Filter>
-    </ClCompile>
-    <ClCompile Include="ExcelInput.cpp">
-      <Filter>Source Files\Core Items</Filter>
-    </ClCompile>
-    <ClCompile Include="ExcelOutput.cpp">
       <Filter>Source Files\Core Items</Filter>
     </ClCompile>
     <ClCompile Include="Mortgage.cpp">
@@ -278,21 +257,21 @@
     <ClCompile Include="GeneratedFiles\Release\moc_StressViewer.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="AbstarctBbgVect.cpp">
+      <Filter>Source Files\Core Items</Filter>
+    </ClCompile>
+    <ClCompile Include="AnnuityVector.cpp">
+      <Filter>Source Files\Core Items</Filter>
+    </ClCompile>
+    <ClCompile Include="BloombergVector.cpp">
+      <Filter>Source Files\Core Items</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BloombergWorker.h">
       <Filter>Header Files\Core Items</Filter>
     </ClInclude>
     <ClInclude Include="CommonFunctions.h">
-      <Filter>Header Files\Core Items</Filter>
-    </ClInclude>
-    <ClInclude Include="DistributionsGenerators.h">
-      <Filter>Header Files\Core Items</Filter>
-    </ClInclude>
-    <ClInclude Include="ExcelCommons.h">
-      <Filter>Header Files\Core Items</Filter>
-    </ClInclude>
-    <ClInclude Include="ExcelOutput.h">
       <Filter>Header Files\Core Items</Filter>
     </ClInclude>
     <ClInclude Include="Mortgage.h">
@@ -358,6 +337,15 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AbstarctBbgVect.h">
+      <Filter>Header Files\Core Items</Filter>
+    </ClInclude>
+    <ClInclude Include="AnnuityVector.h">
+      <Filter>Header Files\Core Items</Filter>
+    </ClInclude>
+    <ClInclude Include="BloombergVector.h">
+      <Filter>Header Files\Core Items</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ChartsWidget.h">
@@ -374,9 +362,6 @@
     </CustomBuild>
     <CustomBuild Include="WaterfallViewer.h">
       <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="CentralUnit.h">
-      <Filter>Header Files\Core Items</Filter>
     </CustomBuild>
     <CustomBuild Include="MtgCalculator.h">
       <Filter>Header Files\Core Items</Filter>

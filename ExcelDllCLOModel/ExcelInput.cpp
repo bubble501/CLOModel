@@ -30,8 +30,8 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		QDate Matur;
 		double sze;
 		QString Intr;
-		QString Ann;
-		int lossm,prem,frq;
+		QString lossm,prem,Ann;
+		int frq;
 		NumElements=pdFreq++->intVal;
 #ifdef DebuggungInputs
 		QMessageBox::information(0,"Mutui",QString("Numero Mutui: %1").arg(NumElements));
@@ -57,11 +57,11 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 #ifdef DebuggungInputs
 			if(i==0) QMessageBox::information(0,"Frequency OK",QString("Frequenza: %1").arg(frq));
 #endif
-			prem=pdFreq->intVal; pdFreq++;
+			prem=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 #ifdef DebuggungInputs
 			if(i==0) QMessageBox::information(0,"Prepay Multiplier OK",QString("Prepay Mult: %1").arg(prem));
 #endif
-			lossm=pdFreq->intVal; pdFreq++;
+			lossm=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 #ifdef DebuggungInputs
 			if(i==0) QMessageBox::information(0,"Loss Multiplier OK",QString("Loss Mult: %1").arg(lossm));
 #endif
@@ -211,9 +211,6 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			BaseVal=pdFreq->dblVal;pdFreq++;
 			TempUnit.SetupReinvBond(Intr,CPR,CDR,LS,WAL,Frq,"N",BaseVal);
 		}
-#ifdef DebuggungInputs
-		QMessageBox::information(0,"Reivestment",QString("Reinvestment limit: %1").arg(ReinvLim));
-#endif
 		TempUnit.SetPrincipalAvailable(pdFreq->dblVal);pdFreq++;
 		TempUnit.SetInterestAvailable(pdFreq->dblVal);pdFreq++;
 		TempUnit.SetPoolCutOff(QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd"));pdFreq++;
@@ -264,8 +261,9 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 				QMessageBox::information(0,"Stress YSpann Parameter",QString("Stress YSpann[%1]: ").arg(i) +YSpann.last());
 #endif
 			}
-			TempUnit.SetupStress(ConstPar,XSpann,YSpann,StressTest::StressVariability(XVar),StressTest::StressVariability(YVar));
 			TempUnit.SetStressToCall(pdFreq->boolVal);pdFreq++;
+			TempUnit.SetupStress(ConstPar,XSpann,YSpann,StressTest::StressVariability(XVar),StressTest::StressVariability(YVar));
+			
 		}
 	}
 	SafeArrayUnaccessData(*ArrayData);
@@ -292,9 +290,6 @@ double __stdcall CLODiscountMargin(LPSAFEARRAY *ArrayData){
 #endif
 	Waterfall TempWaterfall;
 	QString Filename=FolderPath+"\\.BaseCase.clo";
-#ifndef Q_WS_WIN
-	Filename.prepend('.');
-#endif
 	QFile file(Filename);
 	if(!file.exists()){
 #ifdef DebuggungInputs

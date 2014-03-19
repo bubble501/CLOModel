@@ -100,19 +100,19 @@ namespace ManagedCLO {
 		}
 		/*!
 		\brief The multiplier for the loss amount.
-		\details This multiplier scales the losses incurred on the loans.<br/>The base is 100. Values greater than 100 denotes greater losses on the loan and viceversa.<br/>The formula to calculate the loss will be Outstanding * CDR * LS * (Loss Multiplier/100)
+		\details This multiplier scales the losses incurred on the loans.<br/>The base is 100. Values greater than 100 denotes greater losses on the loan and viceversa.<br/>The formula to calculate the loss will be Outstanding * CDR * LS * (Loss Multiplier/100)<br/>Bloomber vectors are accepted
 		*/
-		property int LossMultiplier{
-			int get(){return Unmanaged->GetLossMultiplier();}
-			void set(int a){Unmanaged->SetLossMultiplier(a);}
+		property String^ LossMultiplier{
+			String^ get(){return QString2String(Unmanaged->GetLossMultiplier());}
+			void set(String^ a){Unmanaged->SetLossMultiplier(String2QString(a));}
 		}
 		/*!
 		\brief The multiplier for the prepayment amount.
-		\details This multiplier scales the prepayments of the loans.<br/>The base is 100. Values greater than 100 denotes higher prepayments on the loan and viceversa.<br/>The formula to calculate the loss will be Outstanding * CPR * (Prepay Multiplier/100)
+		\details This multiplier scales the prepayments of the loans.<br/>The base is 100. Values greater than 100 denotes higher prepayments on the loan and viceversa.<br/>The formula to calculate the loss will be Outstanding * CPR * (Prepay Multiplier/100)<br/>Bloomber vectors are accepted
 		*/
-		property int PrepayMultiplier{
-			int get(){return Unmanaged->GetPrepayMultiplier();}
-			void set(int a){Unmanaged->SetPrepayMultiplier(a);}
+		property String^ PrepayMultiplier{
+			String^ get(){return QString2String(Unmanaged->GetPrepayMultiplier());}
+			void set(String^ a){Unmanaged->SetPrepayMultiplier(String2QString(a));}
 		}
 		/*!
 		\brief The loan cash flows

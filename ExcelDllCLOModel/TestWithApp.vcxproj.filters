@@ -59,18 +59,6 @@
     <ClCompile Include="GeneratedFiles\Release\moc_quazipfile.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_CentralUnit.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_CentralUnit.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_ChartsWidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_ChartsWidget.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_MtgCalculator.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
@@ -107,18 +95,6 @@
     <ClCompile Include="GeneratedFiles\Release\moc_StressWorker.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_SummaryView.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_SummaryView.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_TrancheViewer.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_TrancheViewer.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_WaterfallCalcThread.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
@@ -131,34 +107,10 @@
     <ClCompile Include="GeneratedFiles\Release\moc_WaterfallCalculator.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_WaterfallViewer.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_WaterfallViewer.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="BloombergWorker.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
-    <ClCompile Include="CentralUnit.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="ChartsWidget.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
     <ClCompile Include="CommonFunctions.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="DistributionsGenerators.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="ExcelCommons.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="ExcelInput.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="ExcelOutput.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
     <ClCompile Include="Mortgage.cpp">
@@ -188,16 +140,10 @@
     <ClCompile Include="StressWorker.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
-    <ClCompile Include="SummaryView.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
     <ClCompile Include="Tranche.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
     <ClCompile Include="TrancheCashFlow.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="TrancheViewer.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
     <ClCompile Include="Waterfall.cpp">
@@ -207,9 +153,6 @@
       <Filter>Source Files\Common</Filter>
     </ClCompile>
     <ClCompile Include="WaterfallCalculator.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="WaterfallViewer.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
     <ClCompile Include="WatFalPrior.cpp">
@@ -322,15 +265,6 @@
     <ClInclude Include="CommonFunctions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DistributionsGenerators.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ExcelCommons.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ExcelOutput.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Mortgage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -352,9 +286,6 @@
     <ClInclude Include="WatFalPrior.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="resource1.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="AbstarctBbgVect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -362,6 +293,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BloombergVector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -373,12 +307,6 @@
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="quazip\quazipfile.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="CentralUnit.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="ChartsWidget.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="MtgCalculator.h">
@@ -399,19 +327,10 @@
     <CustomBuild Include="StressWorker.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="SummaryView.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="TrancheViewer.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="WaterfallCalcThread.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="WaterfallCalculator.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="WaterfallViewer.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="reso.qrc">
@@ -423,8 +342,5 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="StandaloneViewer.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\PIC Swarm\PIC Swarm\Resources\Logo.ico" />
   </ItemGroup>
 </Project>

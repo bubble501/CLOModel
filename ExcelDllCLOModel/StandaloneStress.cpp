@@ -16,6 +16,7 @@
 #include <QMimeData>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QCheckBox>
 #include "CommonFunctions.h"
 #include "BloombergVector.h"
 StandaloneStress::StandaloneStress(QWidget *parent)
@@ -40,11 +41,15 @@ StandaloneStress::StandaloneStress(QWidget *parent)
 	StressTypeCombo->addItem("CDR-LS");
 	StressTypeCombo->addItem("CPR-LS");
 	StressTypeCombo->addItem("CPR-CDR");
+	StressToCallBox=new QCheckBox(this);
+	StressToCallBox->setText("Stress To Call");
+	StressToCallBox->setChecked(false);
 	
 	QHBoxLayout* TopLay=new QHBoxLayout;
 	QSpacerItem* TopSpace=new QSpacerItem(20,20,QSizePolicy::Expanding);
 	TopLay->addWidget(StressTypeCombo);
 	TopLay->addItem(TopSpace);
+	TopLay->addWidget(StressToCallBox);
 	TopLay->addWidget(ConstantLabel);
 	TopLay->addWidget(ConstantEdit);
 	MainLay->addLayout(TopLay);
@@ -129,14 +134,14 @@ void StandaloneStress::CheckAllValid(){
 		StartButton->setEnabled(false);
 		PathEdit->setStyleSheet("background-color: red;");
 	}
-	if(!BloombergVector(ConstantEdit->text()).IsValid()){
+	if(BloombergVector(ConstantEdit->text()).IsEmpty()){
 		StartButton->setEnabled(false);
 		ConstantEdit->setStyleSheet("background-color: red;");
 	}
 	for(int i=0;i<2;i++){
 		for(int j=0;j<VariablesList[i]->rowCount();j++){
 			if(VariablesList[i]->item(j,0)){
-				if(!BloombergVector(VariablesList[i]->item(j,0)->text()).IsValid()){
+				if(BloombergVector(VariablesList[i]->item(j,0)->text()).IsEmpty()){
 					StartButton->setEnabled(false);
 					VariablesList[i]->item(j,0)->setBackgroundColor(Qt::red);
 				}
@@ -202,7 +207,8 @@ void StandaloneStress::RowsChanged(){
 }
 void StandaloneStress::Start(){
 	Waterfall TempWaterfall;
-	QString Tempstring;
+	//QString Tempstring;
+	BloombergVector TempVector;
 	int countloans;
 	QDate StartDate;
 	Mortgage TmpMtg;
@@ -215,9 +221,9 @@ void StandaloneStress::Start(){
 	out >> VersionChecker;
 	if(VersionChecker!=qint32(ModelVersionNumber)) return;
 	out >> countloans;
-	out >> Tempstring;
-	out >> Tempstring;
-	out >> Tempstring;
+	out >> TempVector;
+	out >> TempVector;
+	out >> TempVector;
 	out >> StartDate;
 	for(int i=0;i<countloans;i++){
 		out >> TmpMtg;
@@ -258,6 +264,7 @@ void StandaloneStress::Start(){
 		Stresser->SetYVariability(StressTest::ChangingLS);
 	}
 	Stresser->SetStartDate(StartDate);
+	TempWaterfall.SetUseCall(StressToCallBox->isChecked());
 	Stresser->SetStructure(TempWaterfall);
 	hide();
 	Stresser->RunStressTest();

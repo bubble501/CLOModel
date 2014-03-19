@@ -2,8 +2,8 @@
 #include "CommonFunctions.h"
 #include <qmath.h>
 Mortgage::Mortgage()
-	:m_LossMultiplier(100)
-	,m_PrepayMultiplier(100)
+	:m_LossMultiplier("100")
+	,m_PrepayMultiplier("100")
 	,m_FloatingRateBase(0.0)
 	,m_PaymentFreq(1)
 	,m_AnnuityVect("N")
@@ -51,11 +51,13 @@ void Mortgage::CalculateCashFlows(const BloombergVector& CPRVecs,const Bloomberg
 	BloombergVector CPRVec(CPRVecs);
 	BloombergVector CDRVec(CDRVecs);
 	BloombergVector LossVec(LossVecs);
-	bool NullAnchorDates=m_InterestVect.GetAnchorDate().isNull();
+	bool NullAnchorDates[]={m_InterestVect.GetAnchorDate().isNull(),m_LossMultiplier.GetAnchorDate().isNull(),m_PrepayMultiplier.GetAnchorDate().isNull()};
 	if(CPRVec.GetAnchorDate().isNull()) CPRVec.SetAnchorDate(AdjStartDate);
 	if(CDRVec.GetAnchorDate().isNull()) CDRVec.SetAnchorDate(AdjStartDate);
 	if(LossVec.GetAnchorDate().isNull()) LossVec.SetAnchorDate(AdjStartDate);
-	if(NullAnchorDates) m_InterestVect.SetAnchorDate(AdjStartDate);
+	if(NullAnchorDates[0]) m_InterestVect.SetAnchorDate(AdjStartDate);
+	if(NullAnchorDates[1]) m_LossMultiplier.SetAnchorDate(AdjStartDate);
+	if(NullAnchorDates[2]) m_PrepayMultiplier.SetAnchorDate(AdjStartDate);
 	if (StartDate >= m_MaturityDate) return m_CashFlows.AddFlow (StartDate, m_Size, MtgCashFlow::PrincipalFlow);
 	int NumPayments=qAbs(MonthDiff(m_MaturityDate,StartDate));
 	if(
@@ -102,25 +104,26 @@ void Mortgage::CalculateCashFlows(const BloombergVector& CPRVecs,const Bloomberg
 			else{TempFlow = 0.0;}
 			m_CashFlows.AddFlow (CurrentMonth, TempFlow, MtgCashFlow::PrincipalFlow);
 			CurrentAmtOut = CurrentAmtOut - TempFlow;
-			TempFlow = CurrentAmtOut * CurrentCPR * (static_cast<double>(m_PrepayMultiplier) / 100.0);
+			TempFlow = qMin(CurrentAmtOut,CurrentAmtOut * CurrentCPR * m_PrepayMultiplier.GetValue(CurrentMonth));
 			m_CashFlows.AddFlow( CurrentMonth, TempFlow, MtgCashFlow::PrepaymentFlow);
 			CurrentAmtOut = CurrentAmtOut - TempFlow;
 			NextPaymentDate=NextPaymentDate.addMonths(m_PaymentFreq);
 			if(NextPaymentDate > m_MaturityDate) NextPaymentDate.setDate(m_MaturityDate.year(),m_MaturityDate.month(),15);
 		} else{
-			TempFlow = CurrentAmtOut * CurrentCPR * (static_cast<double>(m_PrepayMultiplier) / 100.0);
+			TempFlow = qMin(CurrentAmtOut,CurrentAmtOut * CurrentCPR * m_PrepayMultiplier.GetValue(CurrentMonth));
 			m_CashFlows.AddFlow( CurrentMonth, TempFlow / CurrentAmtOut * m_CashFlows.GetAccruedInterest(CurrentMonth),  MtgCashFlow::InterestFlow);
 			m_CashFlows.AddFlow( CurrentMonth, -(TempFlow / CurrentAmtOut * m_CashFlows.GetAccruedInterest(CurrentMonth)),  MtgCashFlow::AccruedInterestFlow);
 			m_CashFlows.AddFlow( CurrentMonth, TempFlow,  MtgCashFlow::PrepaymentFlow);
 			CurrentAmtOut = CurrentAmtOut - TempFlow;
 		}
-		TempFlow = CurrentAmtOut * CurrentCDR * CurrentLS * (static_cast<double>(m_LossMultiplier) / 100.0);
+		TempFlow = m_CashFlows.GetAccruedInterest(CurrentMonth) * CurrentCDR * CurrentLS * m_LossMultiplier.GetValue(CurrentMonth);
 		if (CurrentAmtOut > 0){
-			m_CashFlows.AddFlow( CurrentMonth, CurrentCDR * CurrentLS * (static_cast<double>(m_LossMultiplier) / 100.0) * m_CashFlows.GetAccruedInterest(CurrentMonth), MtgCashFlow::LossOnInterestFlow);
-			m_CashFlows.AddFlow( CurrentMonth, -(CurrentCDR * CurrentLS * (static_cast<double>(m_LossMultiplier) / 100.0) * m_CashFlows.GetAccruedInterest(CurrentMonth)), MtgCashFlow::AccruedInterestFlow);
+			m_CashFlows.AddFlow( CurrentMonth, qMin(TempFlow,m_CashFlows.GetAccruedInterest(CurrentMonth)), MtgCashFlow::LossOnInterestFlow);
+			m_CashFlows.AddFlow( CurrentMonth, -qMin(TempFlow,m_CashFlows.GetAccruedInterest(CurrentMonth)), MtgCashFlow::AccruedInterestFlow);
 		}
-		m_CashFlows.AddFlow (CurrentMonth, TempFlow,  MtgCashFlow::LossFlow);
-		CurrentAmtOut = CurrentAmtOut - TempFlow;
+		TempFlow = CurrentAmtOut * CurrentCDR * CurrentLS * m_LossMultiplier.GetValue(CurrentMonth);
+		m_CashFlows.AddFlow (CurrentMonth, qMin(TempFlow,CurrentAmtOut),  MtgCashFlow::LossFlow);
+		CurrentAmtOut = qMax(0.0,CurrentAmtOut - TempFlow);
 		m_CashFlows.AddFlow( CurrentMonth, CurrentAmtOut, MtgCashFlow::AmountOutstandingFlow);
 		m_CashFlows.AddFlow( CurrentMonth, CurrentAmtOut*(qPow(1.0+CurrentInterest,12.0)-1.0), MtgCashFlow::WACouponFlow);
 		CurrentMonth = CurrentMonth.addMonths(1);
@@ -128,7 +131,9 @@ void Mortgage::CalculateCashFlows(const BloombergVector& CPRVecs,const Bloomberg
 	}
 	m_CashFlows.AddFlow( StartDate, m_Size, MtgCashFlow::AmountOutstandingFlow);
 	m_CashFlows.AddFlow( StartDate, m_Size*m_InterestVect.GetValue(0), MtgCashFlow::WACouponFlow);
-	if(NullAnchorDates) m_InterestVect.RemoveAnchorDate();
+	if(NullAnchorDates[0]) m_InterestVect.RemoveAnchorDate();
+	if(NullAnchorDates[1]) m_LossMultiplier.RemoveAnchorDate();
+	if(NullAnchorDates[2]) m_PrepayMultiplier.RemoveAnchorDate();
  }
  double Mortgage::pmt(double Interest, int Periods, double PresentValue){
 	 if(Periods<=0) return 0.0;
@@ -170,8 +175,8 @@ void Mortgage::CalculateCashFlows(const BloombergVector& CPRVecs,const Bloomberg
 	if(m_MaturityDate<QDate(2000,1,1)) Result+="Loan Maturity Date\n";
 	if(m_AnnuityVect.IsEmpty())Result+="Loan Annuity Vector\n";
 	if(m_Size<0.0)Result+="Loan Size\n";
-	if(m_LossMultiplier<0.0) Result+="Loss Multiplier\n";
-	if(m_PrepayMultiplier<0.0) Result+="Prepay Multiplier\n";
+	if(m_LossMultiplier.IsEmpty()) Result+="Loss Multiplier\n";
+	if(m_PrepayMultiplier.IsEmpty()) Result+="Prepay Multiplier\n";
 	if(m_InterestVect.IsEmpty())Result+="Loan Coupon\n";
 	if(m_FloatingRateBase<0.0)Result+="Loan Base Rate\n";
 	if(m_PaymentFreq<1)Result+="Loan Payment Frequency\n";

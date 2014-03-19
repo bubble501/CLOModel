@@ -13,6 +13,7 @@ class QLabel;
 class QComboBox;
 class QSpinBox;
 class QPushButton;
+class QCheckBox;
 class StandaloneStress : public QWidget
 {
 	Q_OBJECT
@@ -39,6 +40,8 @@ private:
 	QLabel* VariablesCountlabel[2];
 	QSpinBox* VariablesCount[2];
 	QPushButton* StartButton;
+	QCheckBox* StressToCallBox;
+
 };
 
 #endif // QUICKOBJECT_H

@@ -25,7 +25,7 @@ BloombergVector::BloombergVector(const QString& Vec,const QDate& Anchor)
 void BloombergVector::UnpackVector(){
 	m_VectVal.clear();
 	QString TempVec(m_Vector);
-	QRegExp AnchorCheck("^A (\\d{1,2})/(\\d{1,2})/(\\d{4}) (.+)",Qt::CaseInsensitive);
+	QRegExp AnchorCheck("^A\\s+(\\d{1,2})/(\\d{1,2})/(\\d{4})\\s+(.+)",Qt::CaseInsensitive);
 	if(AnchorCheck.exactMatch(TempVec)){
 		QStringList dateVals=AnchorCheck.capturedTexts();
 		m_AnchorDate.setDate(dateVals.at(3).toInt(),dateVals.at(1).toInt(),dateVals.at(2).toInt());
@@ -56,7 +56,7 @@ void BloombergVector::UnpackVector(){
 	m_VectVal.append(StringParts.last().toDouble()/100.0);
 }
 bool BloombergVector::IsValid() const{
-	QRegExp Vigil("^(A \\d{1,2}/\\d{1,2}/\\d{4} ){0,1}\\d*[,.]?\\d+(\\s+\\d+[RS]\\s+\\d*[,.]?\\d+)*$",Qt::CaseInsensitive);
+	QRegExp Vigil("^(A\\s+\\d{1,2}/\\d{1,2}/\\d{4}\\s+){0,1}\\d*[,.]?\\d+(\\s+\\d+[RS]\\s+\\d*[,.]?\\d+)*$",Qt::CaseInsensitive);
 	return Vigil.exactMatch(m_Vector);
 }
 double BloombergVector::GetValue(const QDate& index,int Frequency)const{

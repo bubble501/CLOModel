@@ -24,7 +24,7 @@ AnnuityVector::AnnuityVector(const AnnuityVector& Vec)
 void AnnuityVector::UnpackVector(){
 	m_VectVal.clear();
 	QString TempVec(m_Vector);
-	QRegExp AnchorCheck("^A (\\d{1,2})/(\\d{1,2})/(\\d{4}) (.+)",Qt::CaseInsensitive);
+	QRegExp AnchorCheck("^A\\s+(\\d{1,2})/(\\d{1,2})/(\\d{4})\\s+(.+)",Qt::CaseInsensitive);
 	if(AnchorCheck.exactMatch(TempVec)){
 		QStringList dateVals=AnchorCheck.capturedTexts();
 		m_AnchorDate.setDate(dateVals.at(3).toInt(),dateVals.at(1).toInt(),dateVals.at(2).toInt());
@@ -44,7 +44,7 @@ void AnnuityVector::UnpackVector(){
 	m_VectVal.append(StringParts.last().at(0).toAscii());
 }
 bool AnnuityVector::IsValid() const{
-	QRegExp Vigil("^(A \\d{1,2}/\\d{1,2}/\\d{4} ){0,1}[YN](\\s+\\d+S\\s+[YN])*$",Qt::CaseInsensitive);
+	QRegExp Vigil("^(A\\s+\\d{1,2}/\\d{1,2}/\\d{4}\\s+){0,1}[YN](\\s+\\d+S\\s+[YN])*$",Qt::CaseInsensitive);
 	return Vigil.exactMatch(m_Vector);
 }
 
@@ -55,16 +55,16 @@ char AnnuityVector::GetValue(const QDate& index)const{
 }
 char AnnuityVector::GetValue(int index)const{
 	if(m_VectVal.isEmpty() || index<0) return 0;
-	return m_VectVal.at(qMin(index,m_VectVal.size()));
+	return m_VectVal.at(qMin(index,m_VectVal.size()-1));
 }
 QDataStream& operator<<(QDataStream & stream, const AnnuityVector& flows){
-	stream	<< flows.m_Vector
-		<< flows.m_AnchorDate;
+	stream	<< flows.m_Vector;
+	stream	<< flows.m_AnchorDate;
 	return stream;
 }
 QDataStream& operator>>(QDataStream & stream, AnnuityVector& flows){
-	stream	>> flows.m_Vector
-		>> flows.m_AnchorDate;
+	stream	>> flows.m_Vector;
+	stream	>> flows.m_AnchorDate;
 	flows.UnpackVector();
 	return stream;
 }

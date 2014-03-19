@@ -27,7 +27,7 @@ CentralUnit::CentralUnit(QObject* parent)
 }
 void CentralUnit::SetPoolCutOff(const QDate& a){PoolCutOff=a; if(Stresser) Stresser->SetStartDate(PoolCutOff);}
 void CentralUnit::SetFolderPath(const QString& a){FolderPath=a;}
-void CentralUnit::AddLoan(const QDate& Maturity, double Size,  const QString& Interest, const QString& Annuity, int Freq,double floatBase,int LossMult, int PrepayMult){
+void CentralUnit::AddLoan(const QDate& Maturity, double Size,  const QString& Interest, const QString& Annuity, int Freq,double floatBase,const QString& LossMult, const QString& PrepayMult){
 	Mortgage TempMtg;
 	TempMtg.SetMaturityDate(Maturity);
 	TempMtg.SetSize(Size);
@@ -129,6 +129,7 @@ void CentralUnit::SetupStress(const QString& ConstPar,QList<QString> XSpann,QLis
 	Stresser->SetXVariability(Xvar);
 	Stresser->SetYVariability(Yvar);
 	Stresser->SetStartDate(PoolCutOff);
+	Structure.SetUseCall(StressToCall);
 	Stresser->SetStructure(Structure);
 	for(int i=0;i<LoansCalculator.GetLoans().size();i++)
 		Stresser->AddLoan(*LoansCalculator.GetLoans().at(i));

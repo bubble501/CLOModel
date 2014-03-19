@@ -10,8 +10,8 @@ private:
 	QDate m_MaturityDate;
 	AnnuityVector m_AnnuityVect;
 	double m_Size;
-	int m_LossMultiplier;
-	int m_PrepayMultiplier;
+	BloombergVector m_LossMultiplier;
+	BloombergVector m_PrepayMultiplier;
 	BloombergVector m_InterestVect;
 	MtgCashFlow m_CashFlows;
 	double m_FloatingRateBase;
@@ -28,10 +28,10 @@ public:
 	void setFixedRate(){m_FloatingRateBase=0.0;}
 	const QDate& GetMaturityDate() const {return m_MaturityDate;}
 	void SetMaturityDate(const QDate& a) {m_MaturityDate=a;}
-	int GetLossMultiplier() const {return m_LossMultiplier;}
-	void SetLossMultiplier(int a) {if(a>=0) m_LossMultiplier=a;}
-	int GetPrepayMultiplier() const {return m_PrepayMultiplier;}
-	void SetPrepayMultiplier(int a) {if(a>=0) m_PrepayMultiplier=a;}
+	QString GetLossMultiplier() const {return m_LossMultiplier.GetVector();}
+	void SetLossMultiplier(QString a) {m_LossMultiplier=a;}
+	QString GetPrepayMultiplier() const {return m_PrepayMultiplier.GetVector();}
+	void SetPrepayMultiplier(QString a) {m_PrepayMultiplier=a;}
 	const MtgCashFlow& GetCashFlow() const{return m_CashFlows;}
 	QString GetAnnuity() const {return m_AnnuityVect.GetVector();}
 	void SetAnnuity(const QString& a);

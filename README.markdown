@@ -12,6 +12,8 @@ In addition to those base libraries it makes use of:
 - [Microsoft Office SDK](http://www.microsoft.com/en-us/download/developer-tools.aspx) to handle COM items used to comunicate with excel
 - [KD Chart](http://www.kdab.com/kdab-products/kd-chart/) to display charts
 
+### .Net API
+For the documentation regarding the .Net API for the model please refer to [the documentation page](http://vsronin.github.io/CLOModel/).
 
 ### Linked libraries
 - blpapi3_32.dll

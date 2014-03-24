@@ -13,6 +13,7 @@ private:
 	BloombergVector m_LossMultiplier;
 	BloombergVector m_PrepayMultiplier;
 	BloombergVector m_InterestVect;
+	BloombergVector m_HaircutVector;
 	MtgCashFlow m_CashFlows;
 	double m_FloatingRateBase;
 	int m_PaymentFreq;
@@ -37,6 +38,8 @@ public:
 	void SetAnnuity(const QString& a);
 	QString GetInterest() const {return m_InterestVect.GetVector();}
 	void SetInterest(const QString& a);
+	void SetHaircutVector(const QString& a){m_HaircutVector=a;}
+	QString GetHaircutVector() const {return m_HaircutVector.GetVector();}
 	double GetSize() const{return m_Size;}
 	void SetSize(double a){if(a>=0) m_Size=a;}
 	void CalculateCashFlows(const QString& CPRVecs,const QString& CDRVecs,const QString& LossVecs,const QDate& StartDate);

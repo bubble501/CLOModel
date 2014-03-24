@@ -5,7 +5,7 @@ When the classes are written to or read from a stream they will mark
       will contain the version number of the model ensuring that old versions
       will not be loaded by accident, the 16 leftmost bits represents the class
       identity<br>
-      **The current model version number is: 171** (0000000010101011 in binary)
+      **The current model version number is: 172** (0000000010101100 in binary)
     <table style="text-align: center;" border="1" cellpadding="3">
         <tr>
           <th>Class Name</th>
@@ -16,55 +16,55 @@ When the classes are written to or read from a stream they will mark
         <tr>
           <td>ManMtgCashFlows</td>
           <td>1</td>
-          <td>0000000000000001 0000000010101011</td>
-          <td>65707</td>
+          <td>0000000000000001 0000000010101100</td>
+          <td>65708</td>
         </tr>
         <tr>
           <td>ManWatFalPrior</td>
           <td>2</td>
-          <td>0000000000000010 0000000010101011</td>
-          <td>131243</td>
+          <td>0000000000000010 0000000010101100</td>
+          <td>131244</td>
         </tr>
 		<tr>
           <td>ManMortgage</td>
           <td>3</td>
-          <td>0000000000000011 0000000010101011</td>
-          <td>196779</td>
+          <td>0000000000000011 0000000010101100</td>
+          <td>196780</td>
         </tr>
 		<tr>
           <td>ManReinvestmentTest</td>
           <td>4</td>
-          <td>0000000000000100 0000000010101011</td>
-          <td>262315</td>
+          <td>0000000000000100 0000000010101100</td>
+          <td>262316</td>
         </tr>
 		<tr>
           <td>ManTranche</td>
           <td>5</td>
-          <td>0000000000000101 0000000010101011</td>
-          <td>327851</td>
+          <td>0000000000000101 0000000010101100</td>
+          <td>327852</td>
         </tr>
 		<tr>
           <td>ManTrancheCashFlow</td>
           <td>6</td>
-          <td>0000000000000110 0000000010101011</td>
-          <td>393387</td>
+          <td>0000000000000110 0000000010101100</td>
+          <td>393388</td>
         </tr>
 		<tr>
           <td>ManWaterfall</td>
           <td>7</td>
-          <td>0000000000000111 0000000010101011</td>
-          <td>458923</td>
+          <td>0000000000000111 0000000010101100</td>
+          <td>458924</td>
         </tr>
 		<tr>
           <td>ManBloombergVector</td>
           <td>8</td>
-          <td>0000000000001000 0000000010101011</td>
-          <td>524459</td>
+          <td>0000000000001000 0000000010101100</td>
+          <td>524460</td>
         </tr>
 		<tr>
           <td>ManAnnuityVector</td>
           <td>9</td>
-          <td>0000000000001001 0000000010101011</td>
-          <td>589995</td>
+          <td>0000000000001001 0000000010101100</td>
+          <td>589996</td>
         </tr>
     </table>

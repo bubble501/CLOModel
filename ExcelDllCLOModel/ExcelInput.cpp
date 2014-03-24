@@ -30,7 +30,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		QDate Matur;
 		double sze;
 		QString Intr;
-		QString lossm,prem,Ann;
+		QString lossm,prem,Ann,Hairc;
 		int frq;
 		NumElements=pdFreq++->intVal;
 #ifdef DebuggungInputs
@@ -65,7 +65,11 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 #ifdef DebuggungInputs
 			if(i==0) QMessageBox::information(0,"Loss Multiplier OK",QString("Loss Mult: %1").arg(lossm));
 #endif
-			if(sze>0.0) TempUnit.AddLoan(Matur,sze,Intr,Ann,frq,0.0,lossm,prem);
+			Hairc=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
+#ifdef DebuggungInputs
+			if(i==0) QMessageBox::information(0,"Haircut Vector OK",QString("Haircut: %1").arg(Hairc));
+#endif
+			if(sze>0.0) TempUnit.AddLoan(Matur,sze,Intr,Ann,frq,0.0,lossm,prem,Hairc);
 #ifdef DebuggungInputs
 			if(i==0) QMessageBox::information(0,"Loan OK",QString("Loan %1 Aggiunto").arg(i+1));
 #endif

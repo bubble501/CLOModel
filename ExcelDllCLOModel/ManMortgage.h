@@ -115,6 +115,14 @@ namespace ManagedCLO {
 			void set(String^ a){Unmanaged->SetPrepayMultiplier(String2QString(a));}
 		}
 		/*!
+		\brief The Haircut.
+		\details This vector represents haircuts to apply on the loan in percentage points.<br/>Examples:<ul><li>10 12S 20 will apply a 10% haircut on day 1 and a further 10% after one year.</li><li>0 24R 50 will gradually haircut the loan up to a total of 50% of the original value.</li><li>0 12S 30 12S 10 will cut by 30% the value of the loan after one year and then recover 20% on the second year</li></ul>
+		*/
+		property String^ HaircutVector{
+			String^ get(){return QString2String(Unmanaged->GetHaircutVector());}
+			void set(String^ a){Unmanaged->SetHaircutVector(String2QString(a));}
+		}
+		/*!
 		\brief The loan cash flows
 		\details Gets the calculated cash flows of the loan.<br/>If CalculateCashFlows was never called before, an empty cash flow is returned
 		*/
@@ -186,6 +194,10 @@ namespace ManagedCLO {
 		<tr>
 		<td>Valid Interest Vector</td>
 		<td>Loan Coupon</td>
+		</tr>
+		<tr>
+		<td>Valid Haircut Vector</td>
+		<td>Haircut Vector</td>
 		</tr>
 		<tr>
 		<td>Base interest rate not negative</td>

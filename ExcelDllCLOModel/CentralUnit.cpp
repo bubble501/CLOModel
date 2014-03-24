@@ -27,7 +27,7 @@ CentralUnit::CentralUnit(QObject* parent)
 }
 void CentralUnit::SetPoolCutOff(const QDate& a){PoolCutOff=a; if(Stresser) Stresser->SetStartDate(PoolCutOff);}
 void CentralUnit::SetFolderPath(const QString& a){FolderPath=a;}
-void CentralUnit::AddLoan(const QDate& Maturity, double Size,  const QString& Interest, const QString& Annuity, int Freq,double floatBase,const QString& LossMult, const QString& PrepayMult){
+void CentralUnit::AddLoan(const QDate& Maturity, double Size,  const QString& Interest, const QString& Annuity, int Freq,double floatBase,const QString& LossMult, const QString& PrepayMult, const QString& HaicutVect){
 	Mortgage TempMtg;
 	TempMtg.SetMaturityDate(Maturity);
 	TempMtg.SetSize(Size);
@@ -37,6 +37,7 @@ void CentralUnit::AddLoan(const QDate& Maturity, double Size,  const QString& In
 	TempMtg.SetFloatingRateBase(floatBase);
 	TempMtg.SetPaymentFreq(Freq);
 	TempMtg.SetAnnuity(Annuity);
+	TempMtg.SetHaircutVector(HaicutVect);
 	LoansCalculator.AddLoan(TempMtg);
 	if(Stresser)Stresser->AddLoan(TempMtg);
 }

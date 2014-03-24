@@ -12,7 +12,7 @@ class CentralUnit : public QObject{
 public:
 	~CentralUnit();
 	CentralUnit(QObject* parent=0);
-	void AddLoan(const QDate& Maturity, double Size, const QString& Interest, const QString& Annuity, int Freq=1,double floatBase=0.0, const QString& LossMult="100", const QString& PrepayMult="100");
+	void AddLoan(const QDate& Maturity, double Size, const QString& Interest, const QString& Annuity, int Freq=1,double floatBase=0.0, const QString& LossMult="100", const QString& PrepayMult="100", const QString& HaicutVect="0");
 	void AddTranche(const QString& Name,int ProRataGroup, double MinOC=0.0, double MinIC=0.0, double Price=100.0,double FxRate= 1.0,const QString& BbgExt="Mtge", int DayCount=360);
 	void AddTranche(
 		const QString& Name

@@ -439,6 +439,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{87F5AF67-EBDA-4554-8E03-2F9C974BD216}</ProjectGuid>
     <Keyword>Qt4VSv1.0</Keyword>
+    <ProjectName>CLONetApi</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -468,6 +469,7 @@
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <LinkKeyFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Temp\CriptKey</LinkKeyFile>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

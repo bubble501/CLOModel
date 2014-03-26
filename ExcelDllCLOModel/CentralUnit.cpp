@@ -57,12 +57,13 @@ void CentralUnit::AddTranche(const QString& Name,int ProRataGroup, double MinOC,
 }
 void CentralUnit::AddTranche(
 	const QString& Name
+	,const QString& ISIN
 	,int ProRataGroup
 	,double OrigAmnt
 	,const QString& Crncy
 	,double OutstandingAmt
 	,Tranche::TrancheInterestType IntrTyp
-	,double Coupon
+	,const QString& Coupon
 	,const QString& RefRte
 	,const QDate& LastPayDte
 	,const QString& DefRefRte
@@ -79,6 +80,7 @@ void CentralUnit::AddTranche(
 ){
 	Tranche TempTrnch;
 	TempTrnch.SetTrancheName(Name);
+	TempTrnch.SetISIN(ISIN);
 	TempTrnch.SetProrataGroup(ProRataGroup);
 	TempTrnch.SetOriginalAmount(OrigAmnt);
 	TempTrnch.SetCurrency(Crncy);

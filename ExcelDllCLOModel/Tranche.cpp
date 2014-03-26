@@ -16,7 +16,7 @@ Tranche::Tranche()
 	,ExchangeRate(1.0)
 	,OriginalAmt(0.0)
 	,OutstandingAmt(0.0)
-	,Coupon(0)
+	,Coupon("0")
 	,PaymentFrequency(3)
 	,AccruedInterest(0.0)
 {}
@@ -42,6 +42,7 @@ Tranche::Tranche(const Tranche& a)
 	,CashFlow(a.CashFlow)
 	,AccruedInterest(a.AccruedInterest)
 	,SettlementDate(a.SettlementDate)
+	,ISINcode(a.ISINcode)
 {}
 Tranche& Tranche::operator=(const Tranche& a){
 	DefaultRefRate=a.DefaultRefRate;
@@ -65,6 +66,7 @@ Tranche& Tranche::operator=(const Tranche& a){
 	CashFlow=a.CashFlow;
 	AccruedInterest=a.AccruedInterest;
 	SettlementDate=a.SettlementDate;
+	ISINcode=a.ISINcode;
 	return *this;
 }
 void Tranche::SetOriginalAmount(double a){if(a>=0.0) OriginalAmt=a/ExchangeRate;}
@@ -82,7 +84,13 @@ void Tranche::SetExchangeRate(double a){
 	OutstandingAmt/=ExchangeRate;
 	CashFlow.SetInitialOutstanding(OutstandingAmt);
 }
-double Tranche::GetCoupon() const {
+double Tranche::GetCoupon(const QDate& index) const {
+	QDate Anch=Coupon.GetAnchorDate();
+	if(Anch.isNull()) Anch=LastPaymentDate;
+	if(Anch.isNull()) return GetCoupon(0);
+	return GetCoupon(MonthDiff(index,Anch));
+}
+double Tranche::GetCoupon(int index) const {
 	if(InterestType==FloatingInterest){
 		if(ReferenceRateValue==-1.0){
 			BloombergWorker Bee;
@@ -90,9 +98,18 @@ double Tranche::GetCoupon() const {
 			Bee.AddField("PX_LAST");
 			ReferenceRateValue=Bee.StartRequest().value(ReferenceRate).value("PX_LAST").toDouble()/100.0;
 		}
-		return Coupon+ReferenceRateValue;
+		return (Coupon.GetValue(index)/100.0)+ReferenceRateValue;
 	}
-	return Coupon;
+	return Coupon.GetValue(index)/100.0;
+}
+double Tranche::GetRawCoupon(int index) const {
+	return Coupon.GetValue(index)/100.0;
+}
+double Tranche::GetRawCoupon(const QDate& index) const {
+	QDate Anch=Coupon.GetAnchorDate();
+	if(Anch.isNull()) Anch=LastPaymentDate;
+	if(Anch.isNull()) return GetCoupon(0);
+	return GetRawCoupon(MonthDiff(index,Anch));
 }
 void Tranche::SetBloombergExtension(const QString& a){
 	QString AdjustedString(a.trimmed().toLower());
@@ -114,6 +131,8 @@ void Tranche::GetDataFromBloomberg(){
 	Bee.AddField("CPN_FREQ");
 	Bee.AddField("INT_ACC");
 	Bee.AddField("SETTLE_DT");
+	Bee.AddField("NAME");
+	Bee.AddField("ID_ISIN");
 	QHash<QString,QString> Result(Bee.StartRequest().value(TrancheName));
 	OutstandingAmt=Result.value("AMT_OUTSTANDING").toDouble()/ExchangeRate;
 	CashFlow.SetInitialOutstanding(OutstandingAmt);
@@ -121,15 +140,17 @@ void Tranche::GetDataFromBloomberg(){
 	Currency=Result.value("CRNCY");
 	LastPaymentDate=QDate::fromString(Result.value("START_ACC_DT"),"yyyy-MM-dd");
 	PaymentFrequency=static_cast<int>(12.0/Result.value("CPN_FREQ").toDouble());
+	TrancheName=Result.value("NAME");
+	ISINcode=Result.value("ID_ISIN");
 	if(Result.value("MTG_TYP").contains("FLT")) InterestType=FloatingInterest;
 	else InterestType=FixedInterest;
 	ReferenceRateValue=-1.0;
 	if(InterestType==FloatingInterest){
 		ReferenceRate=Result.value("RESET_IDX");
-		Coupon=Result.value("FLT_SPREAD").toDouble()/10000.0;
+		Coupon=Result.value("FLT_SPREAD");//.toDouble()/10000.0;
 	}
 	else{
-		Coupon=Result.value("CPN").toDouble()/100.0;
+		Coupon=QString("%1").arg(Result.value("CPN").toDouble()*100.0);//Result.value("CPN").toDouble()/100.0;
 		QString DeafultRefRateString;
 		if(Currency=="EUR")DeafultRefRateString="EUR";
 		else if(Currency=="GBP")DeafultRefRateString="BP";
@@ -197,6 +218,7 @@ double Tranche::GetWALife(const QDate& StartDate)const{
 QDataStream& operator<<(QDataStream & stream, const Tranche& flows){
 	stream
 		<< flows.TrancheName
+		<< flows.ISINcode
 		<< flows.OriginalAmt
 		<< flows.Currency
 		<< flows.OutstandingAmt
@@ -224,6 +246,7 @@ QDataStream& operator>>(QDataStream & stream, Tranche& flows){
 	qint32 TempInt;
 	stream
 		>> flows.TrancheName
+		>> flows.ISINcode
 		>> flows.OriginalAmt
 		>> flows.Currency
 		>> flows.OutstandingAmt

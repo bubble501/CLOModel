@@ -16,12 +16,13 @@ public:
 	void AddTranche(const QString& Name,int ProRataGroup, double MinOC=0.0, double MinIC=0.0, double Price=100.0,double FxRate= 1.0,const QString& BbgExt="Mtge", int DayCount=360);
 	void AddTranche(
 		const QString& Name
+		,const QString& ISIN
 		,int ProRataGroup
 		,double OrigAmnt
 		,const QString& Crncy
 		,double OutstandingAmt
 		,Tranche::TrancheInterestType IntrTyp
-		,double Coupon
+		,const QString& Coupon
 		,const QString& RefRte
 		,const QDate& LastPayDte
 		,const QString& DefRefRte

@@ -323,7 +323,7 @@ namespace ManagedCLO {
 		double GetWACostOfCapital(int index){return Unmanaged->GetWACostOfCapital(index);}
 		/*! 
 		\brief Calculates the credit enhancement of the specified tranche
-		\arg Tranchename the ticker (*without* yellow key) of the tranche to consider
+		\arg Tranchename the ticker (*without* yellow key) of the tranche to consider or its ISIN
 		\arg TimeIndex index of time for which the CE should be calculated. Use -1 for the current CE
 		\sa GetCreditEnhancement(int,int)
 		*/
@@ -521,7 +521,7 @@ namespace ManagedCLO {
 		}
 		/*! 
 		\brief Returns the tranche at the specified index 
-		\arg TrancheName The ticker (*without* yellow key) of the tranche. If invalid NULL is returned
+		\arg TrancheName The ticker (*without* yellow key) of the tranche or its ISIN. If invalid NULL is returned
 		*/
 		ManTranche^ GetTranche(String^ TrancheName){
 			const Tranche* Temp=Unmanaged->GetTranche(String2QString(TrancheName));

@@ -27,6 +27,7 @@ StressViewer::StressViewer(QWidget* parent)
 	TypeCombo=new QComboBox(this);
 	TypeCombo->addItem("Loss Rate");
 	TypeCombo->addItem("Discount Margin");
+	TypeCombo->addItem("WA Life");
 	connect(TypeCombo,SIGNAL(currentIndexChanged(int)),this,SLOT(TableTargetChanged(int)));
 
 	TrancheLabel=new QLabel(this);
@@ -158,10 +159,33 @@ void StressViewer::UpdateTable(){
 				PriceSpin->setValue(marginTranche.GetPrice());
 				PriceLabel->show();
 				PriceSpin->show();
+			}else if(TypeTarg==2){
+				Tranche marginTranche=*(StressTarget.GetResults().value(StressTarget.GetXSpann().at(i)).value(StressTarget.GetYSpann().at(j)).GetTranche(TrancheTarg));
+				double currentWAL=marginTranche.GetWALife(marginTranche.GetSettlementDate());
+				if((i==0 && j==0) || currentWAL>MaxDisc) MaxDisc=currentWAL;
+				if((!Minset || currentWAL<MinDisc) && currentWAL>0) {MinDisc=currentWAL; Minset=true;}
+				Table->setItem(i,j,new QTableWidgetItem(Commarize(currentWAL,2)));
+				PriceLabel->hide();
+				PriceSpin->hide();
 			}
 		}
 	}
-	if(TypeTarg==1){
+	if(TypeTarg==2){
+		for(int i=0;i<StressTarget.GetXSpann().size();i++){
+			for(int j=0;j<StressTarget.GetYSpann().size();j++){
+				double CurrentVal=Table->item(i,j)->text().toDouble();
+				if(CurrentVal<=0) Table->item(i,j)->setBackgroundColor(Qt::red);
+				else{
+					if(MaxDisc-MinDisc<1.0) GradientBase.setCurrentTime(100.0);
+					else GradientBase.setCurrentTime(100.0-(100.0*(CurrentVal-MinDisc)/(MaxDisc-MinDisc)));
+					Table->item(i,j)->setBackgroundColor(
+						GradientBase.currentValue().value<QColor>()
+					);
+				}
+			}
+		}
+	}
+	else if(TypeTarg==1){
 		for(int i=0;i<StressTarget.GetXSpann().size();i++){
 			for(int j=0;j<StressTarget.GetYSpann().size();j++){
 				double CurrentVal=Table->item(i,j)->text().toDouble();
@@ -171,7 +195,7 @@ void StressViewer::UpdateTable(){
 					else GradientBase.setCurrentTime(100.0*(CurrentVal-MinDisc)/(MaxDisc-MinDisc));
 					Table->item(i,j)->setBackgroundColor(
 						GradientBase.currentValue().value<QColor>()
-					);
+						);
 				}
 			}
 		}

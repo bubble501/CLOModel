@@ -4,6 +4,7 @@
 #include <QString>
 #include <QObject>
 #include "TrancheCashFlow.h"
+#include "BloombergVector.h"
 class  Tranche {
 public:
 	//! Enum defining what type of coupon the tranche is paying
@@ -12,12 +13,13 @@ public:
 		FloatingInterest /*!< Floating Rate Coupon*/
 	};
 private:
+	QString ISINcode;
 	QString TrancheName;
 	double OriginalAmt;
 	QString Currency;
 	double OutstandingAmt;
 	TrancheInterestType InterestType;
-	double Coupon;
+	BloombergVector Coupon;
 	QString ReferenceRate;
 	mutable double ReferenceRateValue;
 	double Price;
@@ -46,8 +48,10 @@ public:
 	double GetBaseCurrencyOutsanding() const {return OutstandingAmt*ExchangeRate;}
 	double GetBaseCurrencyOriginal() const {return OriginalAmt*ExchangeRate;}
 	TrancheInterestType GetInterestType() const {return InterestType;}
-	double GetCoupon() const;
-	double GetRawCoupon() const{return Coupon;}
+	double GetCoupon(const QDate& index) const;
+	double GetCoupon(int index=0) const;
+	double GetRawCoupon(int index=0) const;
+	double GetRawCoupon(const QDate& index) const;
 	const QString& GetReferenceRate() const{return ReferenceRate;}
 	double GetReferenceRateValue() const {return ReferenceRateValue;}
 	double GetPrice() const {return Price;}
@@ -62,12 +66,14 @@ public:
 	const QString& GetDefaultRefRate() const{return DefaultRefRate;}
 	double GetExchangeRate() const {return ExchangeRate;}
 	int GetPaymentFrequency() const{return PaymentFrequency;}
+	const QString& GetISIN() const {return ISINcode;}
+	void SetISIN(const QString& a){ISINcode=a;}
 	void SetTrancheName(const QString& a){TrancheName=a;}
 	void SetCurrency(const QString& a){Currency=a;}
 	void SetOriginalAmount(double a);
 	void SetOutstandingAmt(double a);
 	void SetInterestType(TrancheInterestType a){InterestType=a;}
-	void SetCoupon(double a){Coupon=a;}
+	void SetCoupon(const QString& a){Coupon=a;}
 	void SetReferenceRate(const QString& a){ReferenceRate=a;}
 	void SetReferenceRateValue(double a){ReferenceRateValue=a;}
 	void SetPrice(double a){if(a>0) Price=a;}

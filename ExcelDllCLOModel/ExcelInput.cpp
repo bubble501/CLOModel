@@ -76,9 +76,9 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		}
 	}
 	{//Tranches
-		QString TrName, Curr, RefRt, BasRt;
+		QString TrName, Curr, RefRt, BasRt ,coup, TrancheISIN;
 		int ProRat,IntrTpe,IPDfrq;
-		double origOut,currOut,coup,RefRtVal,OClim,IClim,Price,Exchan,accruedIntr;
+		double origOut,currOut,RefRtVal,OClim,IClim,Price,Exchan,accruedIntr/*,coup*/;
 		QDate PrevIPD,SettDate;
 		NumElements=pdFreq++->intVal;
 #ifdef DebuggungInputs
@@ -90,6 +90,10 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			TrName=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 #ifdef DebuggungInputs
 			if(i==0) QMessageBox::information(0,"name Ok","Name: "+TrName);
+#endif
+			TrancheISIN=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
+#ifdef DebuggungInputs
+			if(i==0) QMessageBox::information(0,"ISIN Ok","ISIN: "+TrancheISIN);
 #endif
 			ProRat=pdFreq->intVal; pdFreq++;
 #ifdef DebuggungInputs
@@ -111,7 +115,8 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 #ifdef DebuggungInputs
 			if(i==0) QMessageBox::information(0,"Intr Type OK",QString("Intr Type: %1").arg(IntrTpe));
 #endif
-			coup=pdFreq->dblVal;pdFreq++;
+			//coup=pdFreq->dblVal;pdFreq++;
+			coup=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 #ifdef DebuggungInputs
 			if(i==0) QMessageBox::information(0,"Intr OK",QString("Coupon: %1").arg(coup));
 #endif
@@ -159,7 +164,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 #ifdef DebuggungInputs
 			if(i==0) QMessageBox::information(0,"Accrued Interest Ok",QString("Accrued Interest: %1").arg(accruedIntr));
 #endif
-			TempUnit.AddTranche(TrName,ProRat,origOut,Curr,currOut,Tranche::TrancheInterestType(IntrTpe),coup,RefRt,PrevIPD,BasRt,IPDfrq,SettDate,accruedIntr,RefRtVal,OClim,IClim,Price,Exchan);
+			TempUnit.AddTranche(TrName,TrancheISIN,ProRat,origOut,Curr,currOut,Tranche::TrancheInterestType(IntrTpe),coup,RefRt,PrevIPD,BasRt,IPDfrq,SettDate,accruedIntr,RefRtVal,OClim,IClim,Price,Exchan);
 		}
 	}
 	{ //Waterfall Steps

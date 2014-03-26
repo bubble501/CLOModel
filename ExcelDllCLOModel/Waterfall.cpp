@@ -4,6 +4,7 @@
 #include <qmath.h>
 #include "Waterfall.h"
 #include "CommonFunctions.h"
+#include "BloombergWorker.h"
 #include <QMessageBox>
 const WatFalPrior* Waterfall::GetStep(int Index)const {
 	if(Index<0 || Index>=m_WaterfallStesps.size()) return NULL;
@@ -22,6 +23,18 @@ const Tranche* Waterfall::GetTranche(int Index) const{
 const Tranche* Waterfall::GetTranche(const QString& TrancheName) const{
 	for(int i=0;i<m_Tranches.size();i++){
 		if(m_Tranches.at(i)->GetTrancheName().trimmed().toUpper()==TrancheName.trimmed().toUpper()) return GetTranche(i);
+		if(m_Tranches.at(i)->GetISIN().trimmed().toUpper()==TrancheName.trimmed().toUpper()) return GetTranche(i);
+	}
+	BloombergWorker ISINparser;
+	ISINparser.AddSecurity(TrancheName);
+	ISINparser.AddField("NAME");
+	ISINparser.AddField("ID_ISIN");
+	const QHash<QString,QString> TempResults=ISINparser.StartRequest().value(TrancheName);
+	QString AdjTranName(TempResults.value("NAME"));
+	QString AdjISIN(TempResults.value("ID_ISIN"));
+	for(int i=0;i<m_Tranches.size();i++){
+		if(m_Tranches.at(i)->GetTrancheName().trimmed().toUpper()==AdjTranName.trimmed().toUpper()) return GetTranche(i);
+		if(m_Tranches.at(i)->GetISIN().trimmed().toUpper()==AdjISIN.trimmed().toUpper()) return GetTranche(i);
 	}
 	return NULL;
 }
@@ -251,6 +264,7 @@ void Waterfall::FillAllDates(){
 int Waterfall::FindTrancheIndex(const QString& Tranchename)const{
 	for(int j=0;j<m_Tranches.size();j++){
 		if(m_Tranches.at(j)->GetTrancheName()==Tranchename) return j;
+		if(m_Tranches.at(j)->GetISIN()==Tranchename) return j;
 	}
 	return -1;
 }
@@ -375,8 +389,8 @@ double Waterfall::GetWACostOfCapital(int index)const{
 	if(m_Tranches.isEmpty()) return 0.0;
 	if(index<0 || index>=m_Tranches.first()->GetCashFlow().Count()) return 0.0;
 	for (QList<Tranche*>::const_iterator i=m_Tranches.begin();i!=m_Tranches.end();i++){
-		if((*i)->GetCoupon()>0){
-			Result+=((*i)->GetCoupon()) * ((*i)->GetCashFlow().GetAmountOutstanding(index));
+		if((*i)->GetCoupon((*i)->GetCashFlow().GetDate(index))>0){
+			Result+=((*i)->GetCoupon((*i)->GetCashFlow().GetDate(index))) * ((*i)->GetCashFlow().GetAmountOutstanding(index));
 			RunningSum+=(*i)->GetCashFlow().GetAmountOutstanding(index);
 		}
 	}
@@ -535,14 +549,14 @@ if(CurrentDate.year()>=2020 && CurrentDate.month()>=7){
 					for(int h=0;h<m_Tranches.size();h++){
 						if(m_Tranches.at(h)->GetProrataGroup()==SingleStep->GetGroupTarget()){
 							ProRataBonds.enqueue(h);
-							AdjustedCoupon=m_Tranches.at(h)->GetCoupon()*static_cast<double>(RollingLastIPD.daysTo(RollingNextIPD))/360.0;
+							AdjustedCoupon=(m_Tranches.at(h)->GetCoupon(CurrentDate))*static_cast<double>(RollingLastIPD.daysTo(RollingNextIPD))/360.0;
 							Solution=m_Tranches.at(h)->GetCashFlow().GetPreviousDeferred(CurrentDate);
 							TotalPayable+=AdjustedCoupon*(Solution+m_Tranches.at(h)->GetCurrentOutstanding());
 							m_Tranches[h]->AddCashFlow(CurrentDate,Solution,TrancheCashFlow::DeferredFlow);
 						}
 					}
 					while(ProRataBonds.size()>0){
-						AdjustedCoupon=m_Tranches.at(ProRataBonds.head())->GetCoupon()*static_cast<double>(RollingLastIPD.daysTo(RollingNextIPD))/360.0;
+						AdjustedCoupon=(m_Tranches.at(ProRataBonds.head())->GetCoupon(CurrentDate))*static_cast<double>(RollingLastIPD.daysTo(RollingNextIPD))/360.0;
 						Solution=AdjustedCoupon*(m_Tranches.at(ProRataBonds.head())->GetCashFlow().GetPreviousDeferred(CurrentDate)+m_Tranches.at(ProRataBonds.head())->GetCurrentOutstanding());
 						if(AvailableInterest>=TotalPayable){
 							m_Tranches[ProRataBonds.dequeue()]->AddCashFlow(CurrentDate,Solution,TrancheCashFlow::InterestFlow);
@@ -689,7 +703,7 @@ if(CurrentDate.year()>=2020 && CurrentDate.month()>=7){
 					Solution=m_InterestAvailable+m_MortgagesPayments.GetAccruedInterest(i)-((adjSeniorFees+adjSeniorExpenses)*m_MortgagesPayments.GetAmountOut(i));
 					for(int h=0;h<m_Tranches.size();h++){
 						if(m_Tranches.at(h)->GetProrataGroup()<=SingleStep->GetGroupTarget()){
-							AdjustedCoupon=m_Tranches.at(h)->GetCoupon()*static_cast<double>(RollingNextIPD.daysTo(RollingNextIPD.addMonths(m_PaymentFrequency)))/360.0;
+							AdjustedCoupon=(m_Tranches.at(h)->GetCoupon(CurrentDate))*static_cast<double>(RollingNextIPD.daysTo(RollingNextIPD.addMonths(m_PaymentFrequency)))/360.0;
 							TotalPayable+=AdjustedCoupon*(m_Tranches.at(h)->GetCurrentOutstanding()+m_Tranches.at(h)->GetCashFlow().GetDeferred(CurrentDate));
 							if(m_Tranches.at(h)->GetProrataGroup()==SingleStep->GetGroupTarget()) ProRataBonds.enqueue(h);
 						}
@@ -711,7 +725,7 @@ if(CurrentDate.year()>=2020 && CurrentDate.month()>=7){
 							Solution=0.0;
 							for(int h=0;h<m_Tranches.size();h++){
 								if(m_Tranches.at(h)->GetProrataGroup()<=SingleStep->GetGroupTarget() && m_Tranches.at(h)->GetProrataGroup()>=SolutionDegree){
-									AdjustedCoupon=m_Tranches.at(h)->GetCoupon()*static_cast<double>(RollingNextIPD.daysTo(RollingNextIPD.addMonths(m_PaymentFrequency)))/360.0;
+									AdjustedCoupon=(m_Tranches.at(h)->GetCoupon(CurrentDate))*static_cast<double>(RollingNextIPD.daysTo(RollingNextIPD.addMonths(m_PaymentFrequency)))/360.0;
 									Solution+=AdjustedCoupon*(m_Tranches.at(h)->GetCurrentOutstanding()+m_Tranches.at(h)->GetCashFlow().GetDeferred(CurrentDate));
 								}
 							}

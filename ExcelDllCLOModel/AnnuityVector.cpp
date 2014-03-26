@@ -51,7 +51,7 @@ bool AnnuityVector::IsValid() const{
 char AnnuityVector::GetValue(const QDate& index)const{
 	QDate ValidDate(m_AnchorDate);
 	if(m_AnchorDate.isNull()) ValidDate=QDate::currentDate();
-	return GetValue(MonthDiff(ValidDate,index));
+	return GetValue(MonthDiff(index,ValidDate));
 }
 char AnnuityVector::GetValue(int index)const{
 	if(m_VectVal.isEmpty() || index<0) return 0;

@@ -5,7 +5,7 @@
 #include "ManagedCommons.h"
 namespace ManagedCLO {
 	/*!
-	\brief Class used to describe a signle tranche of a deal
+	\brief Class used to describe a single tranche of a deal
 	*/
 	public ref class ManTranche
 	{
@@ -100,6 +100,13 @@ namespace ManagedCLO {
 			void set(String^ a){Unmanaged->SetTrancheName(String2QString(a));}
 		}
 		/*!
+		\brief The ISIN of the tranche
+		*/
+		property String^ TrancheISIN{
+			String^ get(){return QString2String(Unmanaged->GetISIN());}
+			void set(String^ a){Unmanaged->SetISIN(String2QString(a));}
+		}
+		/*!
 		\brief The original issue nominal amount of the tranche
 		\note The input must be in the tranche currency while the output will be in deal currency
 		\sa BaseCurrencyOutsanding
@@ -139,22 +146,42 @@ namespace ManagedCLO {
 			void set(ManTrancheInterestType a){Unmanaged->SetInterestType(static_cast<Tranche::TrancheInterestType>(static_cast<int>(a)));}
 		}
 		/*!
-		\brief The coupon or margin paid by the tranche
-		\details If the tranche is fixed rate this is the interest paid on the note, if the tranche is floating rate this is the margin over the base rate.<br/>Format must be in percentage term (5%=5, 200bps=2)
-		\note If the tranche is floating rate, the output of this property will be the sum of the base interest rate and the margin.
-		\sa RawCoupon
+		\brief Set the coupon or margin paid by the tranche
+		\details If the tranche is fixed rate this is the interest paid on the note, if the tranche is floating rate this is the margin over the base rate.<br/>Accepts Bloomberg vectors. If the anchor date for the vector is not specified, the last payment date will be used.<br/>The format is in basis points 5%=500.
 		*/
-		property double Coupon{
-			double get(){return Unmanaged->GetCoupon();}
-			void set(double a){Unmanaged->SetCoupon(a);}
+		property String^ Coupon{
+			void set(String^ a){Unmanaged->SetCoupon(String2QString(a));}
 		}
 		/*!
-		\brief The coupon or margin paid by the tranche
-		\details For fixed rate tranches this is equivalent to Coupon, for floating rate notes this will return the margin over the base rate
+		\brief The coupon paid by the tranche
+		\arg index The time index for which to retrieve the tranche coupon. 0 corresponds to the Coupon vector anchor date or, if it's missing, the last payment date.
+		\details If the tranche is fixed rate this is the interest paid on the note, if the tranche is floating rate this is the margin over the base rate.
+		\note If the tranche is floating rate, the output of this property will be the sum of the base interest rate and the margin.
+		\sa GetRawCoupon(int)
 		*/
-		property double RawCoupon{
-			double get(){return Unmanaged->GetRawCoupon();}
-		}
+		double GetCoupon(int index){return Unmanaged->GetCoupon(index);}
+		/*!
+		\brief The coupon paid by the tranche
+		\arg index The date for which to retrieve the tranche coupon.
+		\details If the tranche is fixed rate this is the interest paid on the note, if the tranche is floating rate this is the margin over the base rate.
+		\note If the tranche is floating rate, the output of this property will be the sum of the base interest rate and the margin.
+		\sa GetRawCoupon(DateTime)
+		*/
+		double GetCoupon(DateTime index){return Unmanaged->GetCoupon(DateTime2QDate(index));}
+		/*!
+		\brief The coupon or margin paid by the tranche
+		\arg index The time index for which to retrieve the tranche coupon. 0 corresponds to the Coupon vector anchor date or, if it's missing, the last payment date.
+		\details For fixed rate tranches this is equivalent to GetCoupon, for floating rate notes this will return the margin over the base rate.
+		\sa GetCoupon(int)
+		*/
+		double GetRawCoupon(int index){return Unmanaged->GetRawCoupon(index);}
+		/*!
+		\brief The coupon or margin paid by the tranche
+		\arg index The date for which to retrieve the tranche coupon.
+		\details For fixed rate tranches this is equivalent to GetCoupon, for floating rate notes this will return the margin over the base rate.
+		\sa GetCoupon(DateTime)
+		*/
+		double GetRawCoupon(DateTime index){return Unmanaged->GetRawCoupon(DateTime2QDate(index));}
 		/*!
 		\brief The ticker of the base rate of the tranche
 		\details This property contains the bloomberg ticker (*without* yellow key) of the base rate for floating rate tranche.

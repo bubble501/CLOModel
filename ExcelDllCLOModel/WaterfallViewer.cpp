@@ -153,6 +153,17 @@ void WaterfallViewer::AddStep(const WatFalPrior& a){
 			PrincipalTable->setItem(PrincipalTable->rowCount()-1,0,new QTableWidgetItem("Junior Fees"));
 		}
 	break;
+	case WatFalPrior::wst_ReserveReplenish:
+		if(a.GetRedemptionGroup()==1){
+			InterestTable->setRowCount(InterestTable->rowCount()+1);
+			InterestTable->setItem(InterestTable->rowCount()-1,0,new QTableWidgetItem("Reserve Fund Replenishment"));
+			InterestTable->setItem(InterestTable->rowCount()-1,1,new QTableWidgetItem(QString("%1%2 Reserve").arg(a.GetGroupTarget()).arg(a.GetGroupTarget()==1 ?"st":"nd")));
+		}
+		else{
+			PrincipalTable->setRowCount(PrincipalTable->rowCount()+1);
+			PrincipalTable->setItem(PrincipalTable->rowCount()-1,0,new QTableWidgetItem("Reserve Fund Replenishment"));
+		}
+	break;
 	case WatFalPrior::wst_ReinvestmentTest:
 		InterestTable->setRowCount(InterestTable->rowCount()+1);
 		InterestTable->setItem(InterestTable->rowCount()-1,0,new QTableWidgetItem("Reinvestment Test"));

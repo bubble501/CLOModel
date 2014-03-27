@@ -45,6 +45,7 @@ SummaryView::SummaryView(QWidget* parent)
 		<< "Loss"
 	;
 	StructureTable->setRowCount(0);
+	StructureTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	StructureTable->setColumnCount(HeadersStrings.size());
 	StructureTable->setHorizontalHeaderLabels(HeadersStrings);
 	StructureTable->verticalHeader()->setVisible(false);
@@ -97,17 +98,17 @@ SummaryView::SummaryView(QWidget* parent)
 	MainWidget->addTab(CallTranchesWidget,"Call Tranches Results");
 	
 	ExpensesTable=new QTableWidget(this);
-	ExpensesTable->setColumnCount(6);
+	//ExpensesTable->setColumnCount(6);
 	ExpensesTable->setRowCount(0);
 	HeadersStrings.clear();
-	HeadersStrings
+	/*HeadersStrings
 		<< "Date"
 		<< "Senior Expenses"
 		<< "Senior Fees"
 		<< "Junior Fees"
 		<< "Annualized Excess Spread"
 		<< "WA Cost of Funding";
-	ExpensesTable->setHorizontalHeaderLabels(HeadersStrings);
+	ExpensesTable->setHorizontalHeaderLabels(HeadersStrings);*/
 	ExpensesTable->verticalHeader()->setVisible(false);
 	ExpensesTable->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	ExpensesTable->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
@@ -176,7 +177,6 @@ void SummaryView::DisplayStructure(){
 		CallTranchesList->addItem(CallStructure.GetTranche(i)->GetTrancheName());
 	}
 
-	ChartPlotter->ResetCharts();
 	ChartPlotter->PlotStructure(Structure);
 	
 	WatStructView->ResetSteps();
@@ -201,6 +201,14 @@ void SummaryView::DisplayStructure(){
 		ExpensesTable->setRowCount(0);
 		ExpensesTable->setRowCount(Structure.GetTotalSeniorExpenses().Count());
 		ExpensesTable->setColumnCount(6+(TempResFlows[0].Count()>0 ? 1:0)+(TempResFlows[1].Count()>0 ? 1:0));
+		QStringList HeadersStrings;
+		HeadersStrings
+			<< "Date"
+			<< "Senior Expenses"
+			<< "Senior Fees"
+			<< "Junior Fees"
+			<< "Annualized Excess Spread"
+			<< "WA Cost of Funding";	
 		for (int i=0;i<Structure.GetTotalSeniorExpenses().Count();i++){
 			ColumnCount=0;
 			ExpensesTable->setItem(i,ColumnCount++,new QTableWidgetItem(Structure.GetTotalSeniorExpenses().GetDate(i).toString("MMM-yy")));
@@ -210,10 +218,13 @@ void SummaryView::DisplayStructure(){
 			ExpensesTable->setItem(i,ColumnCount++,new QTableWidgetItem(Commarize(100.0*Structure.GetAnnualizedExcess(i),2)+'%'));
 			ExpensesTable->setItem(i,ColumnCount++,new QTableWidgetItem(Commarize(100.0*Structure.GetWACostOfCapital(i),2)+'%'));
 			for (int j=0;j<2;j++){
-				if(TempResFlows[j].Count()>0)
+				if(TempResFlows[j].Count()>0){
+					HeadersStrings << QString("Reserve %1").arg(j+1);
 					ExpensesTable->setItem(i,ColumnCount++,new QTableWidgetItem(Commarize(TempResFlows[j].GetTotalFlow(i))));
+				}
 			}
 		}
+		ExpensesTable->setHorizontalHeaderLabels(HeadersStrings);
 	}
 	ReinvestmentsTable->setRowCount(0);
 	ReinvestmentsTable->setRowCount(Structure.GetReinvested().Count());
@@ -257,21 +268,7 @@ void SummaryView::DisplayStructure(){
 	}
 }
 void SummaryView::SetStructure(const Waterfall& a,const Waterfall& ca){Structure=a; CallStructure=ca; DisplayStructure();}
-/*void SummaryView::AdjustTableSizes(){
-	StructureTable->resizeColumnToContents(0);
-	for(int i=1;i<StructureTable->columnCount();i++){
-		StructureTable->setColumnWidth(i,(StructureTable->width()-StructureTable->verticalScrollBar()->width()-StructureTable->columnWidth(0))/(StructureTable->columnCount()-1));
-	}
-	for(int i=0;i<ReinvestmentsTable->columnCount();i++){
-		ReinvestmentsTable->setColumnWidth(i,(ReinvestmentsTable->width()-ReinvestmentsTable->verticalScrollBar()->width())/ReinvestmentsTable->columnCount());
-	}
-	for(int i=0;i<MtgTable->columnCount();i++){
-		MtgTable->setColumnWidth(i,(MtgTable->width()-MtgTable->verticalScrollBar()->width())/MtgTable->columnCount());
-	}
-	for(int i=0;i<ExpensesTable->columnCount();i++){
-		ExpensesTable->setColumnWidth(i,(ExpensesTable->width()-ExpensesTable->verticalScrollBar()->width())/ExpensesTable->columnCount());
-	}	
-}*/
+
 void SummaryView::ResetPricesLabel(){
 	for(QList<QLineEdit*>::iterator i=PricesLabel.begin();i!=PricesLabel.end();i++)
 		(*i)->deleteLater();

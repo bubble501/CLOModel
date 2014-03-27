@@ -42,6 +42,7 @@ void ChartsWidget::ResetCharts(){
 	ChartsList->clear();
 }
 void ChartsWidget::PlotStructure(const Waterfall& a){
+	ResetCharts();
 	if(a.GetTranchesCount()<1) return;
 	{//Loans
 		QStringList DatesLabels;
@@ -883,6 +884,121 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		plane3->setGridAttributes(Qt::Vertical,ga);
 		ChartsArea->addWidget(Charts.last());
 		ChartsList->addItem("Equity Return");
+	}
+	{//Reserve Funds
+		QStringList DatesLabels;
+		QStringList ReserveLabels;
+		ReserveLabels << "Actual Reserve" << "Target Reserve";
+		TrancheCashFlow CurrentResFlows;
+		for(int ReserveIter=0;ReserveIter<2;ReserveIter++){
+			CurrentResFlows=a.GetReserveFundFlow(ReserveIter);
+			if(CurrentResFlows.Count()==0) continue;
+			DatesLabels.clear();
+			ChartsModels.append(new QStandardItemModel(CurrentResFlows.Count(),2,this));
+			for(int i=0;i<CurrentResFlows.Count();i++){
+				QModelIndex TempIndex=ChartsModels.last()->index(i,0);
+				ChartsModels.last()->setData(TempIndex,CurrentResFlows.GetTotalFlow(i)/1000000.0);
+				ChartsModels.last()->setData(TempIndex,"Reserve Level - Date: "+CurrentResFlows.GetDate(i).toString("MMM-yy")+" - Value: "+Commarize(CurrentResFlows.GetTotalFlow(i)),Qt::ToolTipRole);
+				TempIndex=ChartsModels.last()->index(i,1);
+				ChartsModels.last()->setData(TempIndex,CurrentResFlows.GetDeferred(i)/1000000.0);
+				ChartsModels.last()->setData(TempIndex,"Reserve Target - Date: "+CurrentResFlows.GetDate(i).toString("MMM-yy")+" - Value: "+Commarize(CurrentResFlows.GetDeferred(i)),Qt::ToolTipRole);
+				DatesLabels << CurrentResFlows.GetDate(i).toString("MMM-yy");
+			}
+			ChartsModels.last()->setHorizontalHeaderLabels(ReserveLabels);
+			KDChart::LineDiagram* AnnualizedExcessLine=new KDChart::LineDiagram;
+			AnnualizedExcessLine->setType(KDChart::LineDiagram::Stacked);
+			AnnualizedExcessLine->setModel(ChartsModels.last());
+			
+			ChartsModels.append(new QStandardItemModel(a.GetTranche(0)->GetCashFlow().Count(),1,this));
+			QDate TempCallDate=a.GetCalledPeriod();
+			bool CallDatePlaced=false;
+			for(int i=0;i<a.GetTranche(0)->GetCashFlow().Count();i++){
+				QModelIndex TempIndex=ChartsModels.last()->index(i,0);
+				if(a.GetTranche(0)->GetCashFlow().GetDate(i)>=TempCallDate && !CallDatePlaced){
+					ChartsModels.last()->setData(TempIndex,1.0);
+					ChartsModels.last()->setData(TempIndex,"Call Date",Qt::ToolTipRole);
+					CallDatePlaced=true;
+				}
+				else ChartsModels.last()->setData(TempIndex,0.0);
+			}
+			QStringList TranchesLabels; TranchesLabels << "Call Date";
+			ChartsModels.last()->setHorizontalHeaderLabels(TranchesLabels);
+			KDChart::BarDiagram* CallDiagram=new KDChart::BarDiagram;
+			CallDiagram->setModel(ChartsModels.last());
+			QBrush TmpCallBrush=CallDiagram->brush(0);
+			TmpCallBrush.setColor(Qt::lightGray);
+			TmpCallBrush.setStyle(Qt::DiagCrossPattern);
+			CallDiagram->setBrush(0,TmpCallBrush);
+
+			for(int j=0;j<2;j++){
+				KDChart::LineAttributes HideMissing=AnnualizedExcessLine->lineAttributes(j);
+				HideMissing.setMissingValuesPolicy(KDChart::LineAttributes::MissingValuesHideSegments);
+				HideMissing.setDisplayArea(true);
+				AnnualizedExcessLine->setLineAttributes(j,HideMissing);
+				QPen TempPen(AnnualizedExcessLine->pen(j));
+				TempPen.setStyle(Qt::NoPen);
+				AnnualizedExcessLine->setPen(j,TempPen);
+			}
+			QBrush ActualBrush(AnnualizedExcessLine->brush(0));
+			ActualBrush.setColor(Qt::darkBlue);
+			AnnualizedExcessLine->setBrush(0,ActualBrush);
+			QBrush TargetBrush(AnnualizedExcessLine->brush(1));
+			TargetBrush.setColor(Qt::darkRed);
+			AnnualizedExcessLine->setBrush(1,TargetBrush);
+
+			KDChart::HeaderFooter* ChartTile=new KDChart::HeaderFooter;
+			ChartTile->setText(QString("Reserve %1").arg(ReserveIter+1));
+			ChartTile->setPosition(KDChart::Position::North);
+
+			KDChart::CartesianAxis* XAxis=new KDChart::CartesianAxis(CallDiagram);
+			KDChart::TextAttributes RotatedText(XAxis->textAttributes());
+			RotatedText.setRotation(-90);
+			XAxis->setTextAttributes(RotatedText);
+			XAxis->setLabels(DatesLabels);
+			XAxis->setPosition(KDChart::CartesianAxis::Bottom);
+
+			KDChart::CartesianAxis* YAxis=new KDChart::CartesianAxis(AnnualizedExcessLine);
+			YAxis->setPosition(KDChart::CartesianAxis::Left);
+			YAxis->setTitleText("Reserve Fund (Millions)");
+
+			KDChart::CartesianAxis* YAxis2=new KDChart::CartesianAxis(CallDiagram);
+			YAxis2->setPosition(KDChart::CartesianAxis::Right);
+			KDChart::RulerAttributes tmpRlrAttr(YAxis2->rulerAttributes());
+			tmpRlrAttr.setShowFirstTick(false);
+			tmpRlrAttr.setShowMajorTickMarks(false);
+			tmpRlrAttr.setShowMinorTickMarks(false);
+			tmpRlrAttr.setShowRulerLine(false);
+			YAxis2->setRulerAttributes(tmpRlrAttr);
+
+			AnnualizedExcessLine->addAxis(YAxis);
+			CallDiagram->addAxis(YAxis2);
+			CallDiagram->addAxis(XAxis);
+			Charts.append(new KDChart::Chart(this));
+			KDChart::CartesianCoordinatePlane* plane2 = new KDChart::CartesianCoordinatePlane(Charts.last());
+			Charts.last()->coordinatePlane()->replaceDiagram(AnnualizedExcessLine);
+			plane2->setReferenceCoordinatePlane(Charts.last()->coordinatePlane());
+			plane2->replaceDiagram(CallDiagram);
+			Charts.last()->addCoordinatePlane(plane2);	
+			KDChart::CartesianCoordinatePlane* plane =static_cast <KDChart::CartesianCoordinatePlane*>( AnnualizedExcessLine->coordinatePlane() );
+			KDChart::GridAttributes ga (plane->gridAttributes(Qt::Horizontal));
+			ga.setGridVisible(false);
+			KDChart::GridAttributes gv (plane2->gridAttributes(Qt::Horizontal));
+			gv.setGridVisible(false);
+			plane->setGridAttributes(Qt::Horizontal,ga);
+			plane2->setGridAttributes(Qt::Horizontal,gv);
+			plane2->setGridAttributes(Qt::Vertical,gv);
+			KDChart::Legend* ChartLegend=new KDChart::Legend(AnnualizedExcessLine,Charts.last());
+			ChartLegend->addDiagram(CallDiagram);
+			ChartLegend->setPosition( KDChart::Position::East );
+			ChartLegend->setAlignment( Qt::AlignCenter );
+			ChartLegend->setShowLines( false );
+			ChartLegend->setOrientation( Qt::Vertical );
+			ChartLegend->setBrush(a.GetTranchesCount(),TmpCallBrush);
+			Charts.last()->addLegend(ChartLegend);
+			Charts.last()->addHeaderFooter(ChartTile);
+			ChartsArea->addWidget(Charts.last());
+			ChartsList->addItem(QString("Reserve %1").arg(ReserveIter+1));
+		}
 	}
 
 	

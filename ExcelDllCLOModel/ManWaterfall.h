@@ -107,7 +107,7 @@ namespace ManagedCLO {
 		/*!
 		\brief The cash flows toward the reserve fund
 		\arg index the index of the reserve fund. Currently 2 reserves are modeled so  index can be either 0 or 1 for, respectively, the first and second reserve
-		\details This function will return the cash flows toward the replenishment of the reserve fund.<br/>The interest and principal flows will distinguish whether the reserve fund was replenished using interest or principal proceeds.<br/>Use ManTrancheCashFlow::GetTotalFlow to get the level of the reserve fund in a given period.
+		\details This function will return the cash flows toward the replenishment of the reserve fund.<br/>The interest and principal flows will distinguish whether the reserve fund was replenished using interest or principal proceeds.<br/>Use ManTrancheCashFlow::GetTotalFlow to get the level of the reserve fund in a given period.<br/>Use ManTrancheCashFlow::GetDeferred to get the shortfall in the reserve fund compared to the target level for a given period.
 		\sa SetReserveFund
 		*/
 		ManTrancheCashFlow^ GetReserveFundFlow(int index){return gcnew ManTrancheCashFlow(Unmanaged->GetReserveFundFlow(index));}

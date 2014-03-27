@@ -21,22 +21,7 @@ const Tranche* Waterfall::GetTranche(int Index) const{
 	return m_Tranches.at(Index);
 }
 const Tranche* Waterfall::GetTranche(const QString& TrancheName) const{
-	for(int i=0;i<m_Tranches.size();i++){
-		if(m_Tranches.at(i)->GetTrancheName().trimmed().toUpper()==TrancheName.trimmed().toUpper()) return GetTranche(i);
-		if(m_Tranches.at(i)->GetISIN().trimmed().toUpper()==TrancheName.trimmed().toUpper()) return GetTranche(i);
-	}
-	BloombergWorker ISINparser;
-	ISINparser.AddSecurity(TrancheName);
-	ISINparser.AddField("NAME");
-	ISINparser.AddField("ID_ISIN");
-	const QHash<QString,QString> TempResults=ISINparser.StartRequest().value(TrancheName);
-	QString AdjTranName(TempResults.value("NAME"));
-	QString AdjISIN(TempResults.value("ID_ISIN"));
-	for(int i=0;i<m_Tranches.size();i++){
-		if(m_Tranches.at(i)->GetTrancheName().trimmed().toUpper()==AdjTranName.trimmed().toUpper()) return GetTranche(i);
-		if(m_Tranches.at(i)->GetISIN().trimmed().toUpper()==AdjISIN.trimmed().toUpper()) return GetTranche(i);
-	}
-	return NULL;
+	return GetTranche(FindTrancheIndex(TrancheName));
 }
 void Waterfall::SortByProRataGroup(){
 	qSort(m_Tranches.begin(),m_Tranches.end(),LessThanPoint<Tranche>);
@@ -306,6 +291,17 @@ int Waterfall::FindTrancheIndex(const QString& Tranchename)const{
 		if(m_Tranches.at(j)->GetTrancheName()==Tranchename) return j;
 		if(m_Tranches.at(j)->GetISIN()==Tranchename) return j;
 	}
+	BloombergWorker ISINparser;
+	ISINparser.AddSecurity(Tranchename);
+	ISINparser.AddField("NAME");
+	ISINparser.AddField("ID_ISIN");
+	const QHash<QString,QString> TempResults=ISINparser.StartRequest().value(Tranchename);
+	QString AdjTranName(TempResults.value("NAME"));
+	QString AdjISIN(TempResults.value("ID_ISIN"));
+	for(int i=0;i<m_Tranches.size();i++){
+		if(m_Tranches.at(i)->GetTrancheName().trimmed().toUpper()==AdjTranName.trimmed().toUpper()) return i;
+		if(m_Tranches.at(i)->GetISIN().trimmed().toUpper()==AdjISIN.trimmed().toUpper()) return i;
+	}
 	return -1;
 }
 double Waterfall::GetCreditEnhancement(int TrancheIndex,int TimeIndex)const{
@@ -324,11 +320,11 @@ double Waterfall::GetCreditEnhancement(int TrancheIndex,int TimeIndex)const{
 	}
 	if(Runningsum==0.0) return 1.0;
 	if(TimeIndex>=0){
-		if(m_CalculatedMtgPayments.GetAmountOut(m_Tranches.first()->GetCashFlow().GetDate(TimeIndex))<=0.0) return 0.0;
-		return 1.0-(Runningsum/m_CalculatedMtgPayments.GetAmountOut(m_Tranches.first()->GetCashFlow().GetDate(TimeIndex))); //(m_CalculatedMtgPayments.GetAmountOut(m_Tranches.first()->GetCashFlow().GetDate(TimeIndex))/Runningsum)-1.0;
+		if(m_CalculatedMtgPayments.GetAmountOut(m_Tranches.first()->GetCashFlow().GetDate(TimeIndex))+m_ReserveFundFlows[0].GetTotalFlow(m_ReserveFundFlows->GetDate(TimeIndex))+m_ReserveFundFlows[1].GetTotalFlow(m_ReserveFundFlows->GetDate(TimeIndex))<=0.0) return 0.0;
+		return 1.0-(Runningsum/(m_CalculatedMtgPayments.GetAmountOut(m_Tranches.first()->GetCashFlow().GetDate(TimeIndex)))+m_ReserveFundFlows[0].GetTotalFlow(m_ReserveFundFlows->GetDate(TimeIndex))+m_ReserveFundFlows[1].GetTotalFlow(m_ReserveFundFlows->GetDate(TimeIndex))); //(m_CalculatedMtgPayments.GetAmountOut(m_Tranches.first()->GetCashFlow().GetDate(TimeIndex))/Runningsum)-1.0;
 	}else{
-		if((m_CalculatedMtgPayments.GetAmountOut(0)+m_PrincipalAvailable)<=0.0) return 0.0;
-		return 1.0-(Runningsum/(m_CalculatedMtgPayments.GetAmountOut(0)+m_PrincipalAvailable)); //((m_CalculatedMtgPayments.GetAmountOut(0)+m_PrincipalAvailable)/Runningsum)-1.0;
+		if((m_CalculatedMtgPayments.GetAmountOut(0)+m_PrincipalAvailable+m_ReserveFundCurrent[0]+m_ReserveFundCurrent[1])<=0.0) return 0.0;
+		return 1.0-(Runningsum/(m_CalculatedMtgPayments.GetAmountOut(0)+m_PrincipalAvailable+m_ReserveFundCurrent[0]+m_ReserveFundCurrent[1])); //((m_CalculatedMtgPayments.GetAmountOut(0)+m_PrincipalAvailable)/Runningsum)-1.0;
 	}
 }
 double Waterfall::GroupOutstanding(int GroupTarget)const{
@@ -604,6 +600,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						if(TotalPayable>=0.01){
 							if(SingleStep->GetRedemptionGroup()==1){
 								m_ReserveFundFlows[SingleStep->GetGroupTarget()-1].AddFlow(CurrentDate,qMin(AvailableInterest,TotalPayable),TrancheCashFlow::InterestFlow);
+								m_ReserveFundFlows[SingleStep->GetGroupTarget()-1].AddFlow(CurrentDate,qMax(0.0,TotalPayable-AvailableInterest)-m_ReserveFundFlows[SingleStep->GetGroupTarget()-1].GetDeferred(CurrentDate),TrancheCashFlow::DeferredFlow);
 								m_ReserveFundCurrent[SingleStep->GetGroupTarget()-1]+=qMin(AvailableInterest,TotalPayable);
 								AvailableInterest=qMax(0.0,AvailableInterest-TotalPayable);
 							}
@@ -945,6 +942,15 @@ QDataStream& operator<<(QDataStream & stream, const Waterfall& flows){
 	stream << flows.m_WaterfallStesps.size();
 	foreach(const WatFalPrior* SingleStep,flows.m_WaterfallStesps)
 		stream << (*SingleStep);
+	for(int i=0;i<2;i++){
+		stream
+			<< flows.m_ReserveFundTarget[i]
+			<< flows.m_ReserveFundMultiple[i]
+			<< flows.m_ReserveFundFloor[i]
+			<< flows.m_ReserveFundCurrent[i]
+			<< flows.m_ReserveFundFlows[i]
+		;
+	}
 	return stream;
 }
 QDataStream& operator>>(QDataStream & stream, Waterfall& flows){
@@ -993,6 +999,15 @@ QDataStream& operator>>(QDataStream & stream, Waterfall& flows){
 	for(int i=0;i<TempInt;i++){
 		stream >> TempStep;
 		flows.AddStep(TempStep);
+	}
+	for(int i=0;i<2;i++){
+		stream
+			>> flows.m_ReserveFundTarget[i]
+			>> flows.m_ReserveFundMultiple[i]
+			>> flows.m_ReserveFundFloor[i]
+			>> flows.m_ReserveFundCurrent[i]
+			>> flows.m_ReserveFundFlows[i]
+		;
 	}
 	return stream;
 }

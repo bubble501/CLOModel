@@ -19,6 +19,7 @@ public:
 		wst_ReinvestmentTest, /*!< Reinvestment Test*/
 		wst_Excess, /*!< Excess Spread*/
 		wst_ReinvestPrincipal, /*!< Reinvest all available princiapl during the reinvestment period*/
+		wst_ReserveReplenish /*!< Replenish the reserve fund*/
 	};
 	int GetGroupTarget()const{return GroupTarget;}
 	int GetRedemptionGroup()const{return RedemptionGroup;}

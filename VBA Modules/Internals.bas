@@ -194,10 +194,11 @@ Public Sub StructureFromBloomberg(FieldsLabels As Collection, InputsSheet As Str
         TrancheExtensions(i) = DealName + " " + CStr(BbgResponse(i, 1)) + " " + BloombergExtension
     Next i
     Dim BBgInformations
-    Dim RequestedFields(1 To 3) As String
+    Dim RequestedFields(1 To 4) As String
     RequestedFields(1) = "CRNCY"
     RequestedFields(2) = "MTG_ORIG_AMT"
     RequestedFields(3) = "MTG_TYP"
+    RequestedFields(4) = "ID_ISIN"
     BBgInformations = bdp24(TrancheExtensions, RequestedFields)
     
     Dim BondStart As Range
@@ -212,16 +213,18 @@ Public Sub StructureFromBloomberg(FieldsLabels As Collection, InputsSheet As Str
     Dim FixFloatStart As Range
     Dim PrevIPDCell As Range
     Dim AccrIntrCell As Range
+    Dim ISINCell As Range
     Set BondStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("BondsNamesHeader"), LookAt:=xlWhole, LookIn:=xlValues)
     Set ProRataGroupStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("BondRataGroupHeader"), LookAt:=xlWhole, LookIn:=xlValues)
     Set CurrencyStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("CurrencyHead"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set OriginalAmtStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("OriginalOutHead"), LookAt:=xlWhole, LookIn:=xlValues).Offset(0, -1)
-    Set CurrentAmtStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("CurrentOutHead"), LookAt:=xlWhole, LookIn:=xlValues).Offset(0, -1)
+    Set OriginalAmtStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("OriginalOutHead"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set CurrentAmtStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("CurrentOutHead"), LookAt:=xlWhole, LookIn:=xlValues)
     Set RatingsStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("RatingsHead"), LookAt:=xlWhole, LookIn:=xlValues)
     Set RefRateStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("RefRateHead"), LookAt:=xlWhole, LookIn:=xlValues)
     Set CouponStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("TrancheCouponHead"), LookAt:=xlWhole, LookIn:=xlValues)
     Set FixFloatStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("FixFloatHead"), LookAt:=xlWhole, LookIn:=xlValues)
     Set AccrIntrCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("IntrAccrHead"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set ISINCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("IsinFldsHeader"), LookAt:=xlWhole, LookIn:=xlValues)
     For i = LBound(TrancheExtensions) To UBound(TrancheExtensions)
         TrancheExtensions(i) = CStr(BbgResponse(i, 1))
         'InterestTypeString = CStr(bdp24(DealName + " " + TrancheExtensions(i) + " " + BloombergExtension, "MTG_TYP"))
@@ -234,6 +237,8 @@ Public Sub StructureFromBloomberg(FieldsLabels As Collection, InputsSheet As Str
         OriginalAmtStart.Offset(i - LBound(TrancheExtensions) + 1, 0).Value = _
             BBgInformations(UBound(TrancheExtensions) + 1 + i - LBound(TrancheExtensions))
             '"=IF(" + TickerAddress + "="""","""",BDP(" + TickerAddress + " & "" " + BloombergExtension + """,""MTG_ORIG_AMT""))"
+        ISINCell.Offset(i - LBound(TrancheExtensions) + 1, 0).Value = _
+            BBgInformations((3 * (UBound(TrancheExtensions) + 1)) + i - LBound(TrancheExtensions))
         CurrentAmtStart.Offset(i - LBound(TrancheExtensions) + 1, 0).Formula = _
             "=IF(" + TickerAddress + "="""","""",BDP(" + TickerAddress + " & "" " + BloombergExtension + """,""AMT_OUTSTANDING""))"
         AccrIntrCell.Offset(i - LBound(TrancheExtensions) + 1, 0).Formula = _

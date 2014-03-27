@@ -25,6 +25,7 @@ Public Sub GetInputFromStructure( _
     Dim CouponStart As Range
     Dim OutstandingStart As Range
     Dim AnnuityStart As Range
+    Dim HaircutVecStart As Range
     Dim CPRcell As Range
     Dim CDRcell As Range
     Dim LScell As Range
@@ -79,6 +80,11 @@ Public Sub GetInputFromStructure( _
     Dim CallMultiplierCell As Range
     Dim CallReserveCell As Range
     Dim AccruedIntrStart As Range
+    Dim IsinFldsStart As Range
+    On Error Resume Next
+    Set HaircutVecStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("HaircutVecHeader"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set IsinFldsStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("IsinFldsHeader"), LookAt:=xlWhole, LookIn:=xlValues)
+    On Error GoTo 0
     Set MaturityStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("MaturityHeader"), LookAt:=xlWhole, LookIn:=xlValues)
     Set CouponStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("CouponHeader"), LookAt:=xlWhole, LookIn:=xlValues)
     Set OutstandingStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("OutstandingHeader"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -171,8 +177,13 @@ ReferenceRateFromBBg:
             Call AddInput(AllTheInputs, CStr(CouponStart.Offset(i, 0).Value))
             Call AddInput(AllTheInputs, CStr(AnnuityStart.Offset(i, 0).Value))
             Call AddInput(AllTheInputs, CLng(FrequencyStart.Offset(i, 0).Value))
-            Call AddInput(AllTheInputs, CLng(CPRMultiStart.Offset(i, 0).Value))
-            Call AddInput(AllTheInputs, CLng(LSMultiStart.Offset(i, 0).Value))
+            Call AddInput(AllTheInputs, CStr(CPRMultiStart.Offset(i, 0).Value))
+            Call AddInput(AllTheInputs, CStr(LSMultiStart.Offset(i, 0).Value))
+            If (HaircutVecStart Is Nothing) Then
+                Call AddInput(AllTheInputs, "0")
+            Else
+                Call AddInput(AllTheInputs, CStr(HaircutVecStart.Offset(i, 0).Value))
+            End If
         End If
         i = i + 1
     Loop
@@ -185,12 +196,18 @@ ReferenceRateFromBBg:
     Do While (True)
         If IsEmpty(BondStart.Offset(i, 0)) Then Exit Do
         Call AddInput(AllTheInputs, CStr(BondStart.Offset(i, 0).Value))
+        If (IsinFldsStart Is Nothing) Then
+            Call AddInput(AllTheInputs, "")
+        Else
+            Call AddInput(AllTheInputs, CStr(IsinFldsStart.Offset(i, 0).Value))
+        End If
         Call AddInput(AllTheInputs, CLng(BondRataStart.Offset(i, 0).Value))
         Call AddInput(AllTheInputs, OriginalOutStart.Offset(i, 0).Value)
         Call AddInput(AllTheInputs, CStr(CurrencyStart.Offset(i, 0).Value))
         Call AddInput(AllTheInputs, CurrentOutStart.Offset(i, 0).Value)
         Call AddInput(AllTheInputs, FromStringToInterestType(FixFloatStart.Offset(i, 0).Value))
-        Call AddInput(AllTheInputs, TrancheCouponStart.Offset(i, 0).Value / 10000)
+        'Call AddInput(AllTheInputs, TrancheCouponStart.Offset(i, 0).Value / 10000)
+        Call AddInput(AllTheInputs, CStr(TrancheCouponStart.Offset(i, 0).Value))
         Call AddInput(AllTheInputs, CStr(RefRateStart.Offset(i, 0).Value))
         Call AddInput(AllTheInputs, Format(PrevIPDCell.Offset(0, 1).Value, "yyyy-mm-dd"))
         Call AddInput(AllTheInputs, CStr(InterestBaseCell.Offset(0, 1).Value))
@@ -354,6 +371,7 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
     a.Add "Payment Frequency (in Months)", "FrequencyHeader"
     a.Add "CPR Multiplier", "CPRMultiHead"
     a.Add "Loss Multiplier", "LSMultiHead"
+    a.Add "Haircut", "HaircutVecHeader"
     a.Add "CPR", "CPRfield"
     a.Add "CDR", "CDRfield"
     a.Add "Original Amount", "OriginalOutHead"
@@ -361,6 +379,7 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
     a.Add "Pool cut off date", "CutOffField"
     a.Add "Outstanding Amount", "CurrentOutHead"
     a.Add "Bond", "BondsNamesHeader"
+    a.Add "ISIN", "IsinFldsHeader"
     a.Add "Pro rata group", "BondRataGroupHeader"
     a.Add "Price", "BondPriceHeader"
     a.Add "Fixed/Floating", "FixFloatHead"

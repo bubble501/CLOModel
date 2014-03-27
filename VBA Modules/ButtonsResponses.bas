@@ -217,6 +217,7 @@ Public Sub ImportFromOldVersion()
         DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 13).formula = SourceBook.Sheets("Liabilities + input").Range("A3").Offset(i, 13).formula
         DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 22).formula = SourceBook.Sheets("Liabilities + input").Range("A3").Offset(i, 22).formula
         DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 23).formula = SourceBook.Sheets("Liabilities + input").Range("A3").Offset(i, 23).formula
+        DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 24).formula = "=BDP(" + DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 24).Address + "& "" Mtge"",""INT_ACC"")"
     Next i
     For i = 1 To 47
         If Not ( _

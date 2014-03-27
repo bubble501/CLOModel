@@ -172,6 +172,7 @@ namespace ManagedCLO {
 			wst_ReinvestmentTest, /*!< Reinvestment Test*/
 			wst_Excess, /*!< Excess Spread*/
 			wst_ReinvestPrincipal, /*!< Reinvest all available principal during the reinvestment period*/
+			wst_ReserveReplenish /*!< Replenish the reserve fund*/
 		};
 		/*! 
 		\brief Determines the source of funding for expenses and fees

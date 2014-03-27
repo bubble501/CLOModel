@@ -66,6 +66,21 @@ Public Sub WaterfallStepChanged(TargetAllCell As Range)
                     xlBetween, Formula1:="1", Formula2:="2"
                 TargetCell.Offset(0, 2).Value = 1
                 TargetCell.Offset(0, 2).AddComment "1 if they are payed using interest, 2 if they are payed using principal"
+            Case UCase("Replenish Reserve")
+                TargetCell.Offset(0, 1).Locked = False
+                TargetCell.Offset(0, 2).Locked = False
+                TargetCell.Offset(0, 1).NumberFormat = 0
+                TargetCell.Offset(0, 2).NumberFormat = "[=1]""From Interest"";[=2]""From Principal"""
+                TargetCell.Offset(0, 1).Validation.Delete
+                TargetCell.Offset(0, 2).Validation.Delete
+                TargetCell.Offset(0, 1).Validation.Add Type:=xlValidateWholeNumber, AlertStyle:=xlValidAlertStop, Operator:= _
+                    xlBetween, Formula1:="1", Formula2:="2"
+                TargetCell.Offset(0, 2).Validation.Add Type:=xlValidateWholeNumber, AlertStyle:=xlValidAlertStop, Operator:= _
+                    xlBetween, Formula1:="1", Formula2:="2"
+                TargetCell.Offset(0, 1).Value = 1
+                TargetCell.Offset(0, 2).Value = 1
+                TargetCell.Offset(0, 1).AddComment "Index of the reserve fund to use"
+                TargetCell.Offset(0, 2).AddComment "1 if it's replenished using interest, 2 if it's replenished using principal"
             Case UCase("Reinvestment")
                 TargetCell.Offset(0, 1).ClearContents
                 TargetCell.Offset(0, 1).Locked = True
@@ -97,16 +112,18 @@ Public Sub WaterfallStepChanged(TargetAllCell As Range)
     Next TargetCell
     Application.ScreenUpdating = True
 End Sub
-Private Function ValidBloombergVector(BloombergVector As String) As Boolean
+Public Function ValidBloombergVector(BloombergVector As String) As Boolean
     Dim BloombergVecRegExp As New RegExp
-    BloombergVecRegExp.Pattern = "^[0-9]*[,.]?[0-9]+( \d+[RS] [0-9]*[,.]?[0-9]+)*$"
+    BloombergVecRegExp.Pattern = "^(A\s+\d{1,2}/\d{1,2}/\d{2,4}\s+)?\d*\.?\d+(\s+\d+[RS]\s+\d*\.?\d+)*$"
     ValidBloombergVector = BloombergVecRegExp.Test(UCase(Trim(BloombergVector)))
 End Function
-Private Function UnpackVect(Vect As String, Optional PaymFreq As Long = 1, Optional AdjustFreq As Boolean = True)
+Private Function UnpackVect(ByVal Vect As String, Optional PaymFreq As Long = 1, Optional AdjustFreq As Boolean = True)
     Dim result As New Collection
     Dim ResultVect As Variant
     If Not ValidBloombergVector(Vect) Then Exit Function
-    
+    Dim AnchorRegExp As New RegExp
+    AnchorRegExp.Pattern = "A\s+\d{1,2}/\d{1,2}/\d{2,4}\s+"
+    AnchorRegExp.Replace Vect, ""
     
     Dim StringParts
     StringParts = Split(UCase(Trim(Vect)), " ")

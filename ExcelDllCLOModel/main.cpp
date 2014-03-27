@@ -61,7 +61,6 @@ int main(int argc, char *argv[])
 	out >> TempWtf;
 	out >> TempCallWaterfall;
 	file.close();
-	double checkMe=TempWtf.GetTranche(0)->GetCoupon();
 	TempWtf.CalculateTranchesCashFlows();
 #endif
 }

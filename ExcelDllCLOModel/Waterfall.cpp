@@ -77,6 +77,12 @@ Waterfall::Waterfall()
 	,m_CallMultiple(0.0)
 	,m_CallReserve(0.0)
 {
+	for(int RFindex=0;RFindex<2;RFindex++){
+		m_ReserveFundTarget[RFindex]=0.0;
+		m_ReserveFundMultiple[RFindex]=0.0;
+		m_ReserveFundFloor[RFindex]=0.0;
+		m_ReserveFundCurrent[RFindex]=0.0;
+	}
 }
 Waterfall::Waterfall(const Waterfall& a)
 	:m_SeniorExpenses(a.m_SeniorExpenses)
@@ -113,6 +119,13 @@ Waterfall::Waterfall(const Waterfall& a)
 	}
 	for(QList<WatFalPrior*>::const_iterator i=a.m_WaterfallStesps.constBegin();i!=a.m_WaterfallStesps.constEnd();i++){
 		m_WaterfallStesps.append(new WatFalPrior(**i));
+	}
+	for(int RFindex=0;RFindex<2;RFindex++){
+		m_ReserveFundTarget[RFindex]=a.m_ReserveFundTarget[RFindex];
+		m_ReserveFundMultiple[RFindex]=a.m_ReserveFundMultiple[RFindex];
+		m_ReserveFundFloor[RFindex]=a.m_ReserveFundFloor[RFindex];
+		m_ReserveFundCurrent[RFindex]=a.m_ReserveFundCurrent[RFindex];
+		m_ReserveFundFlows[RFindex]=a.m_ReserveFundFlows[RFindex];
 	}
 }
 Waterfall& Waterfall::operator=(const Waterfall& a){
@@ -151,6 +164,13 @@ Waterfall& Waterfall::operator=(const Waterfall& a){
 	ResetSteps();
 	for(QList<WatFalPrior*>::const_iterator i=a.m_WaterfallStesps.constBegin();i!=a.m_WaterfallStesps.constEnd();i++){
 		m_WaterfallStesps.append(new WatFalPrior(**i));
+	}
+	for(int RFindex=0;RFindex<2;RFindex++){
+		m_ReserveFundTarget[RFindex]=a.m_ReserveFundTarget[RFindex];
+		m_ReserveFundMultiple[RFindex]=a.m_ReserveFundMultiple[RFindex];
+		m_ReserveFundFloor[RFindex]=a.m_ReserveFundFloor[RFindex];
+		m_ReserveFundCurrent[RFindex]=a.m_ReserveFundCurrent[RFindex];
+		m_ReserveFundFlows[RFindex]=a.m_ReserveFundFlows[RFindex];
 	}
 	return *this;
 }
@@ -205,6 +225,17 @@ void Waterfall::FillAllDates(){
 			}
 		}
 	}
+	//dates from reserve funds to all the tranches
+	for(int i=0;i<2;i++){
+		if(m_ReserveFundFlows[i].Count()==0) continue;
+		for(int j=0;j<m_Tranches.size();j++){
+			for(int h=0;h<m_ReserveFundFlows[i].Count();h++){
+				if(m_Tranches.at(j)->GetCashFlow().FindDate(m_ReserveFundFlows[i].GetDate(h)) < 0){
+					m_Tranches[j]->AddCashFlow(m_ReserveFundFlows[i].GetDate(h),0.0,TrancheCashFlow::InterestFlow);
+				}
+			}
+		}
+	}
 	//'dates from senior fees to all the tranches
 	for(int j=0;j<m_Tranches.size();j++){
 		for(int h=0;h<m_TotalSeniorFees.Count();h++){
@@ -229,7 +260,7 @@ void Waterfall::FillAllDates(){
 			}
 		}
 	}
-	//dates from tranches to excess and fees
+	//dates from tranches to excess, fees and reserve
 	for(int i=0;i<m_Tranches.size();i++){
 		for(int h=0;h<m_Tranches.at(i)->GetCashFlow().Count();h++){
 			if (m_ExcessCashFlow.FindDate(m_Tranches.at(i)->GetCashFlow().GetDate(h)) < 0)
@@ -242,6 +273,11 @@ void Waterfall::FillAllDates(){
 				m_TotalSeniorFees.AddFlow(m_Tranches.at(i)->GetCashFlow().GetDate(h),0.0,TrancheCashFlow::InterestFlow);
 			if (m_TotalJuniorFees.FindDate(m_Tranches.at(i)->GetCashFlow().GetDate(h)) < 0)
 				m_TotalJuniorFees.AddFlow(m_Tranches.at(i)->GetCashFlow().GetDate(h),0.0,TrancheCashFlow::InterestFlow);
+			for(int i=0;i<2;i++){
+				if(m_ReserveFundFlows[i].Count()==0) continue;
+				if (m_ReserveFundFlows[i].FindDate(m_Tranches.at(i)->GetCashFlow().GetDate(h)) < 0)
+					m_ReserveFundFlows[i].AddFlow(m_Tranches.at(i)->GetCashFlow().GetDate(h),0.0,TrancheCashFlow::InterestFlow);
+			}
 		}
 	}
 	QDate RollingNextIPD=m_FirstIPDdate;
@@ -257,6 +293,10 @@ void Waterfall::FillAllDates(){
 			m_TotalSeniorExpenses.ReplaceDate(m_CalculatedMtgPayments.GetDate(i),RollingNextIPD);
 			m_TotalSeniorFees.ReplaceDate(m_CalculatedMtgPayments.GetDate(i),RollingNextIPD);
 			m_TotalJuniorFees.ReplaceDate(m_CalculatedMtgPayments.GetDate(i),RollingNextIPD);
+			for(int i=0;i<2;i++){
+				if(m_ReserveFundFlows[i].Count()==0) continue;
+				m_ReserveFundFlows[i].ReplaceDate(m_CalculatedMtgPayments.GetDate(i),RollingNextIPD);
+			}
 			RollingNextIPD=m_FirstIPDdate.addMonths((++Multiplier)*m_PaymentFrequency);
 		}
 	}
@@ -418,6 +458,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		double adjJuniorFees;
 		double OriginalAvailableInterest=m_InterestAvailable;
 		double OriginalAvailablePrincipal=m_PrincipalAvailable;
+		double OriginalReserveLevel[]={m_ReserveFundCurrent[0],m_ReserveFundCurrent[1]};
 		bool IsCallPaymentDate=false;
 		double ActualCallReserveLevel=0.0;
 		QDate CurrentDate;
@@ -430,7 +471,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		bool NullCCCanchor= m_CCCcurve.GetAnchorDate().isNull();
 		if(NullCCCanchor) m_CCCcurve.SetAnchorDate(m_MortgagesPayments.GetDate(0));
 		foreach(Tranche* SingleTranche, m_Tranches) SingleTranche->GetCashFlow().ResetFlows();
-		for(int i=0;i<m_MortgagesPayments.Count();i++){
+		int i; for(i=0;i<m_MortgagesPayments.Count();i++){
 			CurrentDate=m_MortgagesPayments.GetDate(i);
 			m_PrincipalAvailable+=m_MortgagesPayments.GetPrincipal(i);
 			m_InterestAvailable+=m_MortgagesPayments.GetInterest(i);
@@ -443,6 +484,9 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						if(SingleTranche->GetProrataGroup()>=m_CallReserve) ActualCallReserveLevel+=SingleTranche->GetCurrentOutstanding();
 					}
 					if(ActualCallReserveLevel==0.0)ActualCallReserveLevel=m_CallReserve;
+					else {
+						for(int ReservIter=0;ReservIter<2;ReservIter++)	ActualCallReserveLevel+=m_ReserveFundCurrent[ReservIter];
+					}
 					ActualCallReserveLevel*=m_CallMultiple;
 					IsCallPaymentDate=ActualCallReserveLevel>=TotalPayable-m_PrincipalAvailable;
 				}
@@ -473,10 +517,11 @@ bool Waterfall::CalculateTranchesCashFlows(){
 			//This is a Tranche payment date
 			AvailablePrincipal = m_PrincipalAvailable;
 			AvailableInterest = m_InterestAvailable;
+			for(int ReservIter=0;ReservIter<2;ReservIter++){
+				AvailableInterest+=m_ReserveFundCurrent[ReservIter];
+				m_ReserveFundCurrent[ReservIter]=0.0;
+			}
 			if(IsCallPaymentDate) AvailablePrincipal+=m_PoolValueAtCall*m_MortgagesPayments.GetAmountOut(i)/100.0;
-if(CurrentDate.year()>=2020 && CurrentDate.month()>=7){
-	i=i;
-}
 			foreach(WatFalPrior* SingleStep,m_WaterfallStesps){//Cicle through the steps of the waterfall
 				switch(SingleStep->GetPriorityType()){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -542,6 +587,34 @@ if(CurrentDate.year()>=2020 && CurrentDate.month()>=7){
 						}
 					}
 				break;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				case WatFalPrior::wst_ReserveReplenish:
+					if(i<m_MortgagesPayments.Count()-1 && !IsCallPaymentDate){
+						TestTarget=0.0;
+						if(m_ReserveFundTarget[SingleStep->GetGroupTarget()-1]>FindMostJuniorLevel()) TestTarget=m_ReserveFundTarget[SingleStep->GetGroupTarget()-1];
+						else{
+							foreach(Tranche* SingleTranche, m_Tranches){
+								if(SingleTranche->GetProrataGroup()<=m_ReserveFundTarget[SingleStep->GetGroupTarget()-1]) TestTarget+=SingleTranche->GetCurrentOutstanding();
+							}
+						}
+						TotalPayable=qMax(
+							m_ReserveFundFloor[SingleStep->GetGroupTarget()-1],
+							TestTarget*m_ReserveFundMultiple[SingleStep->GetGroupTarget()-1]	
+						)-m_ReserveFundCurrent[SingleStep->GetGroupTarget()-1];
+						if(TotalPayable>=0.01){
+							if(SingleStep->GetRedemptionGroup()==1){
+								m_ReserveFundFlows[SingleStep->GetGroupTarget()-1].AddFlow(CurrentDate,qMin(AvailableInterest,TotalPayable),TrancheCashFlow::InterestFlow);
+								m_ReserveFundCurrent[SingleStep->GetGroupTarget()-1]+=qMin(AvailableInterest,TotalPayable);
+								AvailableInterest=qMax(0.0,AvailableInterest-TotalPayable);
+							}
+							else if(SingleStep->GetRedemptionGroup()==2){
+								m_ReserveFundFlows[SingleStep->GetGroupTarget()-1].AddFlow(CurrentDate,qMin(AvailablePrincipal,TotalPayable),TrancheCashFlow::PrincipalFlow);
+								m_ReserveFundCurrent[SingleStep->GetGroupTarget()-1]+=qMin(AvailablePrincipal,TotalPayable);
+								AvailablePrincipal=qMax(0.0,AvailablePrincipal-TotalPayable);
+							}
+						}
+					}
+					break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				case WatFalPrior::wst_Interest:
 					ProRataBonds.clear();
@@ -816,8 +889,16 @@ if(CurrentDate.year()>=2020 && CurrentDate.month()>=7){
 			m_InterestAvailable=0.0;
 			RollingLastIPD=RollingNextIPD;
 			RollingNextIPD=m_FirstIPDdate.addMonths((++PeriodsCounter)*m_PaymentFrequency);
-			if(IsCallPaymentDate) break;
+			if(IsCallPaymentDate){
+				i++;
+				break;
+			}
 		}//End Cicle in time
+		for(int j=0;j<2;j++){
+// 			if(m_ReserveFundFlows[j].Count()>0)
+// 				m_ReserveFundFlows[j].AddFlow(m_MortgagesPayments.GetDate(i-1),RedeemSequential(m_ReserveFundCurrent[j],i-1)-m_ReserveFundCurrent[j],TrancheCashFlow::PrincipalFlow);
+			m_ReserveFundCurrent[j]=OriginalReserveLevel[j];
+		}
 		m_PrincipalAvailable=OriginalAvailablePrincipal;
 		m_InterestAvailable=OriginalAvailableInterest;
 		m_CalculatedMtgPayments=m_MortgagesPayments;
@@ -1070,4 +1151,24 @@ double Waterfall::GetCallEquityRatio(int index)const{
 	denominator=m_CalculatedMtgPayments.GetAmountOut(index)-denominator;
 	if(denominator>0) return numerator/denominator;
 	else return 0.0;
+}
+void Waterfall::SetReserveFund(int RFindex,double RFtarget,double RFmultiple,double RFfloor,double RFcurrent){
+	if(RFindex<0 || RFindex>1) return;
+	m_ReserveFundTarget[RFindex]=RFtarget;
+	m_ReserveFundMultiple[RFindex]=RFmultiple;
+	m_ReserveFundFloor[RFindex]=RFfloor;
+	m_ReserveFundCurrent[RFindex]=RFcurrent;
+}
+void Waterfall::ResetReserve(int RFindex){
+	if(RFindex==-1){
+		ResetReserve(0);
+		ResetReserve(1);
+		return;
+	}
+	if(RFindex<0 || RFindex>1) return;
+	m_ReserveFundTarget[RFindex]=0.0;
+	m_ReserveFundMultiple[RFindex]=0.0;
+	m_ReserveFundFloor[RFindex]=0.0;
+	m_ReserveFundCurrent[RFindex]=0.0;
+	m_ReserveFundFlows[RFindex].ResetFlows();
 }

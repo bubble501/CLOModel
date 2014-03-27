@@ -77,6 +77,57 @@ namespace ManagedCLO {
 			}
 		}
 		/*!
+		\brief The target amount of the reserve fund
+		\arg index the index of the reserve fund. Currently 2 reserves are modeled so  index can be either 0 or 1 for, respectively, the first and second reserve
+		\details This function will return the value of the target level of the specified reserve fund
+		\sa SetReserveFund
+		*/
+		double GetReserveFundTarget(int index){return Unmanaged->GetReserveFundTarget(index);}
+		/*!
+		\brief The multiple of the target amount of the reserve fund
+		\arg index the index of the reserve fund. Currently 2 reserves are modeled so  index can be either 0 or 1 for, respectively, the first and second reserve
+		\details This function will return the value of the multiple of the target level of the specified reserve fund
+		\sa SetReserveFund
+		*/
+		double GetReserveFundMultiple(int index){return Unmanaged->GetReserveFundMultiple(index);}
+		/*!
+		\brief The floor amount of the reserve fund
+		\arg index the index of the reserve fund. Currently 2 reserves are modeled so  index can be either 0 or 1 for, respectively, the first and second reserve
+		\details This function will return the value of the floor of the specified reserve fund
+		\sa SetReserveFund
+		*/
+		double GetReserveFundFloor(int index){return Unmanaged->GetReserveFundFloor(index);}
+		/*!
+		\brief The current amount of the reserve fund
+		\arg index the index of the reserve fund. Currently 2 reserves are modeled so  index can be either 0 or 1 for, respectively, the first and second reserve
+		\details This function will return the value of the current amount of the specified reserve fund
+		\sa SetReserveFund
+		*/
+		double GetReserveFundCurrent(int index){return Unmanaged->GetReserveFundCurrent(index);}
+		/*!
+		\brief The cash flows toward the reserve fund
+		\arg index the index of the reserve fund. Currently 2 reserves are modeled so  index can be either 0 or 1 for, respectively, the first and second reserve
+		\details This function will return the cash flows toward the replenishment of the reserve fund.<br/>The interest and principal flows will distinguish whether the reserve fund was replenished using interest or principal proceeds.<br/>Use ManTrancheCashFlow::GetTotalFlow to get the level of the reserve fund in a given period.
+		\sa SetReserveFund
+		*/
+		ManTrancheCashFlow^ GetReserveFundFlow(int index){return gcnew ManTrancheCashFlow(Unmanaged->GetReserveFundFlow(index));}
+		/*!
+		\brief Set up a reserve fund
+		\arg RFindex the index of the reserve fund. Currently 2 reserves are modeled so  index can be either 0 or 1 for, respectively, the first and second reserve
+		\arg RFtarget the target level of the reserve fund.
+		\arg RFmultiple the value by which RFtarget will be multiplied.
+		\arg RFfloor the floor level of the reserve fund. For non-amortizing RFs set to 0
+		\arg RFcurrent the current size of the reserve fund
+		\details This function will set up the specified reserve fund according to the supplied parameters.<br/>If RFtarget is a seniority level, the reserve fund target amount will be the sum of all the notes that rank not junior to that level, otherwise the reserve will be a non amortizing.<br/>The target level will then be multiplied by RFmultiple to assess the actual replenishment target.<br/>In any case, the target won't be set below the RFfloor amount.
+		*/
+		void SetReserveFund(int RFindex,double RFtarget,double RFmultiple,double RFfloor,double RFcurrent){Unmanaged->SetReserveFund(RFindex,RFtarget,RFmultiple,RFfloor,RFcurrent);}
+		/*!
+		\brief Removes all the settings for the specified reserve fund
+		\arg index the index of the reserve fund. Currently 2 reserves are modeled so  index can be either 0 or 1 for, respectively, the first and second reserve
+		\details This function will remove all the settings and cash flows relative to the specified reserve fund.
+		*/
+		void ResetReserveFund(int index){Unmanaged->ResetReserve(index);}
+		/*!
 		\brief Share AUM paid as senior expenses
 		\details Formatted as percentage (1% = 1)
 		*/

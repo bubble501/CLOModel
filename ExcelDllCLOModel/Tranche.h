@@ -67,6 +67,7 @@ public:
 	double GetExchangeRate() const {return ExchangeRate;}
 	int GetPaymentFrequency() const{return PaymentFrequency;}
 	const QString& GetISIN() const {return ISINcode;}
+	QString GetCouponVector() const{return Coupon.GetVector();}
 	void SetISIN(const QString& a){ISINcode=a;}
 	void SetTrancheName(const QString& a){TrancheName=a;}
 	void SetCurrency(const QString& a){Currency=a;}

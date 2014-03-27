@@ -194,15 +194,26 @@ void SummaryView::DisplayStructure(){
 		MtgTable->setItem(i,6,new QTableWidgetItem(Commarize(Structure.GetCalculatedMtgPayments().GetLoss(i))));
 		MtgTable->setItem(i,7,new QTableWidgetItem(Commarize(Structure.GetCalculatedMtgPayments().GetLossOnInterest(i))));
 	}
-	ExpensesTable->setRowCount(0);
-	ExpensesTable->setRowCount(Structure.GetTotalSeniorExpenses().Count());
-	for (int i=0;i<Structure.GetTotalSeniorExpenses().Count();i++){
-		ExpensesTable->setItem(i,0,new QTableWidgetItem(Structure.GetTotalSeniorExpenses().GetDate(i).toString("MMM-yy")));
-		ExpensesTable->setItem(i,1,new QTableWidgetItem(Commarize(Structure.GetTotalSeniorExpenses().GetTotalFlow(i))));
-		ExpensesTable->setItem(i,2,new QTableWidgetItem(Commarize(Structure.GetTotalSeniorFees().GetTotalFlow(i))));
-		ExpensesTable->setItem(i,3,new QTableWidgetItem(Commarize(Structure.GetTotalJuniorFees().GetTotalFlow(i))));
-		ExpensesTable->setItem(i,4,new QTableWidgetItem(Commarize(100.0*Structure.GetAnnualizedExcess(i),2)+'%'));
-		ExpensesTable->setItem(i,5,new QTableWidgetItem(Commarize(100.0*Structure.GetWACostOfCapital(i),2)+'%'));
+	{
+		TrancheCashFlow TempResFlows[2];
+		int ColumnCount;
+		for (int i=0;i<2;i++) TempResFlows[i]=Structure.GetReserveFundFlow(i);
+		ExpensesTable->setRowCount(0);
+		ExpensesTable->setRowCount(Structure.GetTotalSeniorExpenses().Count());
+		ExpensesTable->setColumnCount(6+(TempResFlows[0].Count()>0 ? 1:0)+(TempResFlows[1].Count()>0 ? 1:0));
+		for (int i=0;i<Structure.GetTotalSeniorExpenses().Count();i++){
+			ColumnCount=0;
+			ExpensesTable->setItem(i,ColumnCount++,new QTableWidgetItem(Structure.GetTotalSeniorExpenses().GetDate(i).toString("MMM-yy")));
+			ExpensesTable->setItem(i,ColumnCount++,new QTableWidgetItem(Commarize(Structure.GetTotalSeniorExpenses().GetTotalFlow(i))));
+			ExpensesTable->setItem(i,ColumnCount++,new QTableWidgetItem(Commarize(Structure.GetTotalSeniorFees().GetTotalFlow(i))));
+			ExpensesTable->setItem(i,ColumnCount++,new QTableWidgetItem(Commarize(Structure.GetTotalJuniorFees().GetTotalFlow(i))));
+			ExpensesTable->setItem(i,ColumnCount++,new QTableWidgetItem(Commarize(100.0*Structure.GetAnnualizedExcess(i),2)+'%'));
+			ExpensesTable->setItem(i,ColumnCount++,new QTableWidgetItem(Commarize(100.0*Structure.GetWACostOfCapital(i),2)+'%'));
+			for (int j=0;j<2;j++){
+				if(TempResFlows[j].Count()>0)
+					ExpensesTable->setItem(i,ColumnCount++,new QTableWidgetItem(Commarize(TempResFlows[j].GetTotalFlow(i))));
+			}
+		}
 	}
 	ReinvestmentsTable->setRowCount(0);
 	ReinvestmentsTable->setRowCount(Structure.GetReinvested().Count());
@@ -224,7 +235,7 @@ void SummaryView::DisplayStructure(){
 		StructureTable->setItem(i,6,new QTableWidgetItem(Commarize(Structure.GetCreditEnhancement(i)*100.0,2U)+'%'));
 		StructureTable->setItem(i,7,new QTableWidgetItem(Structure.GetTranche(i)->GetInterestType()==Tranche::FloatingInterest ? "Float":"Fixed"));
 		StructureTable->setItem(i,8,new QTableWidgetItem(Structure.GetTranche(i)->GetReferenceRate()));
-		StructureTable->setItem(i,9,new QTableWidgetItem(Commarize(Structure.GetTranche(i)->GetRawCoupon()*100.0)));
+		StructureTable->setItem(i,9,new QTableWidgetItem(Structure.GetTranche(i)->GetCouponVector()));
 		StructureTable->setItem(i,11,new QTableWidgetItem(Structure.GetTranche(i)->GetDiscountMargin()<=0 ? QString("0%"):Commarize(((Structure.GetTranche(i)->GetDiscountMargin()/10000.0)+Structure.GetTranche(i)->GetReferenceRateValue())*100.0,2U)+'%'));
 		StructureTable->setItem(i,12,new QTableWidgetItem(Commarize(Structure.GetTranche(i)->GetWALife(Structure.GetMortgagesPayments().GetDate(0)),2U)));
 		StructureTable->setItem(i,13,new QTableWidgetItem(Commarize(Structure.GetTranche(i)->GetDiscountMargin())));

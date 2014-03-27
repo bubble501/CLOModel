@@ -81,9 +81,25 @@ Public Sub GetInputFromStructure( _
     Dim CallReserveCell As Range
     Dim AccruedIntrStart As Range
     Dim IsinFldsStart As Range
+    Dim FirstResTargCell As Range
+    Dim FirstResMultCell As Range
+    Dim FirstResFloorCell As Range
+    Dim FirstResCurrCell As Range
+    Dim SecondResTargCell As Range
+    Dim SecondResMultCell As Range
+    Dim SecondResFloorCell As Range
+    Dim SecondResCurrCell As Range
     On Error Resume Next
     Set HaircutVecStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("HaircutVecHeader"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set IsinFldsStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("IsinFldsHeader"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set IsinFldsStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("IsinFldsHeader"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set FirstResTargCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("FirstResTargCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set FirstResMultCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("FirstResMultCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set FirstResFloorCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("FirstResFloorCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set FirstResCurrCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("FirstResCurrCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set SecondResTargCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SecondResTargCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set SecondResMultCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SecondResMultCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set SecondResFloorCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SecondResFloorCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set SecondResCurrCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SecondResCurrCell"), LookAt:=xlWhole, LookIn:=xlValues)
     On Error GoTo 0
     Set MaturityStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("MaturityHeader"), LookAt:=xlWhole, LookIn:=xlValues)
     Set CouponStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("CouponHeader"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -268,6 +284,49 @@ DefaultExchange:
     Call AddInput(AllTheInputs, CallMultiplierCell.Offset(0, 1).Value)
     Call AddInput(AllTheInputs, CallReserveCell.Offset(0, 1).Value)
     Call AddInput(AllTheInputs, CallValueCell.Offset(0, 1).Value)
+    ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    'Reserve fund
+    If (FirstResTargCell Is Nothing) Then
+        Call AddInput(AllTheInputs, 0#)
+    Else
+        Call AddInput(AllTheInputs, CDbl(FirstResTargCell.Offset(0, 1).Value))
+    End If
+    If (FirstResMultCell Is Nothing) Then
+        Call AddInput(AllTheInputs, 0#)
+    Else
+        Call AddInput(AllTheInputs, CDbl(FirstResMultCell.Offset(0, 1).Value))
+    End If
+    If (FirstResFloorCell Is Nothing) Then
+        Call AddInput(AllTheInputs, 0#)
+    Else
+        Call AddInput(AllTheInputs, CDbl(FirstResFloorCell.Offset(0, 1).Value))
+    End If
+     If (FirstResCurrCell Is Nothing) Then
+        Call AddInput(AllTheInputs, 0#)
+    Else
+        Call AddInput(AllTheInputs, CDbl(FirstResCurrCell.Offset(0, 1).Value))
+    End If
+    If (SecondResTargCell Is Nothing) Then
+        Call AddInput(AllTheInputs, 0#)
+    Else
+        Call AddInput(AllTheInputs, CDbl(SecondResTargCell.Offset(0, 1).Value))
+    End If
+    If (SecondResMultCell Is Nothing) Then
+        Call AddInput(AllTheInputs, 0#)
+    Else
+        Call AddInput(AllTheInputs, CDbl(SecondResMultCell.Offset(0, 1).Value))
+    End If
+    If (SecondResFloorCell Is Nothing) Then
+        Call AddInput(AllTheInputs, 0#)
+    Else
+        Call AddInput(AllTheInputs, CDbl(SecondResFloorCell.Offset(0, 1).Value))
+    End If
+     If (SecondResCurrCell Is Nothing) Then
+        Call AddInput(AllTheInputs, 0#)
+    Else
+        Call AddInput(AllTheInputs, CDbl(SecondResCurrCell.Offset(0, 1).Value))
+    End If
+    ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     Call AddInput(AllTheInputs, Format(ReinvestPeriodCell.Offset(0, 1).Value, "yyyy-mm-dd"))
     Call AddInput(AllTheInputs, ReinvestLimitCell.Offset(0, 1).Value)
     Call AddInput(AllTheInputs, ReinvestTableCell.Offset(1, 1).Value)
@@ -439,6 +498,14 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
     a.Add 9, "CallToEquityPlotIndex"
     a.Add 7, "EquityReturnPlotIndex"
     a.Add "Accrued Interest", "IntrAccrHead"
+    a.Add "First Fund Target", "FirstResTargCell"
+    a.Add "First Fund Multiple", "FirstResMultCell"
+    a.Add "First Fund Floor", "FirstResFloorCell"
+    a.Add "First Fund Current Amount", "FirstResCurrCell"
+    a.Add "Second Fund Target", "SecondResTargCell"
+    a.Add "Second Fund Multiple", "SecondResMultCell"
+    a.Add "Second Fund Floor", "SecondResFloorCell"
+    a.Add "Second Fund Current Amount", "SecondResCurrCell"
 End Sub
 
 Private Function FromStringToInterestType(a As String) As Long
@@ -480,6 +547,8 @@ Private Function FromStringToPriorty(a As String) As Long
             FromStringToPriorty = 10
         Case UCase("Reinvestment test")
             FromStringToPriorty = 11
+        Case UCase("Replenish Reserve")
+            FromStringToPriorty = 14
         Case Else
             GoTo FromStringToPriorty_Error
     End Select

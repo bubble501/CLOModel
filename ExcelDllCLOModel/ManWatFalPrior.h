@@ -144,6 +144,16 @@ namespace ManagedCLO {
 	<td>Seniority group that will be receiving the excess spread.<br>Leave blank if payed outside the deal</td>
 	<td>Ignored</td>
 	</tr>
+	<tr>
+	<td>Replenishment of Reserve Fund</td>
+	<td>Depending on RedemptionGroup</td>
+	<td>wst_ReserveReplenish</td>
+	<td>The index of the reserve to replenish. Currently 2 reserves are modelled so it can be either 1 or 2</td>
+	<td>SourceOfFunding::sof_Interest to make this step part of the interest waterfall<br>
+	SourceOfFunding::sof_Principal to make this step part of the principal waterfall<br>
+	Any other value will cause the step to be ignored.</td>
+	<td>Ignored</td>
+	</tr>
 	</table>
 	\note Seniority group means a group of tranches that receive interest and principal pro-rata
 	*/

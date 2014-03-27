@@ -566,6 +566,7 @@ Public Sub PlotTranchesDynamic( _
         .Legend.Position = xlLegendPositionRight
         .HasTitle = True
         .Axes(xlValue).HasTitle = False
+        .Axes(xlValue).MinimumScale = 0
         .Axes(xlCategory).HasTitle = False
         .Axes(xlCategory).TickLabels.NumberFormat = "mmm-yy"
         .ChartType = xlAreaStacked
@@ -830,6 +831,7 @@ Public Sub PlotAnnualExcess( _
         .HasLegend = False
         .HasTitle = True
         .Axes(xlValue).HasTitle = False
+        .Axes(xlValue).MinimumScale = 0
         .Axes(xlCategory).HasTitle = False
         .Axes(xlCategory).TickLabels.NumberFormat = "mmm-yy"
         .ChartType = xlLine

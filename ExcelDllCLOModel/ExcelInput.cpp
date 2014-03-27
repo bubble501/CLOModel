@@ -198,6 +198,19 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		TempUnit.SetCallMultiple(pdFreq->dblVal);pdFreq++;
 		TempUnit.SetCallReserve(pdFreq->dblVal);pdFreq++;
 		TempUnit.SetPoolValueAtCall(pdFreq->dblVal);pdFreq++;
+		{//Reserve Fund
+			double RFtarget,RFmultiple,RFfloor,RFcurrent;
+			RFtarget=pdFreq->dblVal; pdFreq++;
+			RFmultiple=pdFreq->dblVal; pdFreq++;
+			RFfloor=pdFreq->dblVal; pdFreq++;
+			RFcurrent=pdFreq->dblVal; pdFreq++;
+			TempUnit.SetReserveFund(0,RFtarget,RFmultiple,RFfloor,RFcurrent);
+			RFtarget=pdFreq->dblVal; pdFreq++;
+			RFmultiple=pdFreq->dblVal; pdFreq++;
+			RFfloor=pdFreq->dblVal; pdFreq++;
+			RFcurrent=pdFreq->dblVal; pdFreq++;
+			TempUnit.SetReserveFund(1,RFtarget,RFmultiple,RFfloor,RFcurrent);
+		}
 		{// Reinvestment Test
 			QDate ReinPer;
 			double ReinvLim,IISha,IRsha,OIsha,ORsha;

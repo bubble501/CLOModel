@@ -117,6 +117,7 @@ void CentralUnit::Reset(){
 	Structure.ResetMtgFlows();
 	Structure.ResetSteps();
 	Structure.ResetTranches();
+	Structure.ResetReserve();
 	if(Stresser){
 		Stresser->deleteLater();
 		Stresser=NULL;
@@ -249,6 +250,7 @@ void CentralUnit::CheckCalculationDone()
 		ExcelOutput::PlotMortgagesFlows(Structure.GetCalculatedMtgPayments(),PlotsSheet,PlotIndexes[0]);
 	}
 	if(!TranchesOutputAddress.isEmpty()){
+		int ClolumnCount=0;
 		QList<double> TempValList;
 		ExcelOutput::PrintMergedCell("Scenario To Maturity",ExcelCommons::CellOffset(TranchesOutputAddress,0,0),1,6+(6*Structure.GetTranchesCount()),QColor(118,147,60));
 		for(int i=0;i<Structure.GetTranchesCount();i++)
@@ -256,46 +258,69 @@ void CentralUnit::CheckCalculationDone()
 		TempTranche.SetTrancheName("Senior Expenses");
 		TempTranche.GetCashFlow().ResetFlows();
 		TempTranche.AddCashFlow(Structure.GetTotalSeniorExpenses());
-		ExcelOutput::PrintTrancheFlow(TempTranche,ExcelCommons::CellOffset(TranchesOutputAddress,1,1+(6*Structure.GetTranchesCount())),Structure.GetTranchesCount()%2==0 ? QColor(235,241,222) : QColor(216,228,188),false,false,false,false,true,false,false,false);
+		ExcelOutput::PrintTrancheFlow(TempTranche,ExcelCommons::CellOffset(TranchesOutputAddress,1,(++ClolumnCount)+(6*Structure.GetTranchesCount())),Structure.GetTranchesCount()%2==0 ? QColor(235,241,222) : QColor(216,228,188),false,false,false,false,true,false,false,false);
 		TempTranche.SetTrancheName("Senior Fees");
 		TempTranche.GetCashFlow().ResetFlows();
 		TempTranche.AddCashFlow(Structure.GetTotalSeniorFees());
-		ExcelOutput::PrintTrancheFlow(TempTranche,ExcelCommons::CellOffset(TranchesOutputAddress,1,2+(6*Structure.GetTranchesCount())),Structure.GetTranchesCount()%2!=0 ? QColor(235,241,222) : QColor(216,228,188),false,false,false,false,true,false,false,false);
+		ExcelOutput::PrintTrancheFlow(TempTranche,ExcelCommons::CellOffset(TranchesOutputAddress,1,(++ClolumnCount)+(6*Structure.GetTranchesCount())),Structure.GetTranchesCount()%2!=0 ? QColor(235,241,222) : QColor(216,228,188),false,false,false,false,true,false,false,false);
 		TempTranche.SetTrancheName("Junior Fees");
 		TempTranche.GetCashFlow().ResetFlows();
 		TempTranche.AddCashFlow(Structure.GetTotalJuniorFees());
-		ExcelOutput::PrintTrancheFlow(TempTranche,ExcelCommons::CellOffset(TranchesOutputAddress,1,3+(6*Structure.GetTranchesCount())),Structure.GetTranchesCount()%2==0 ? QColor(235,241,222) : QColor(216,228,188),false,false,false,false,true,false,false,false);
+		ExcelOutput::PrintTrancheFlow(TempTranche,ExcelCommons::CellOffset(TranchesOutputAddress,1,(++ClolumnCount)+(6*Structure.GetTranchesCount())),Structure.GetTranchesCount()%2==0 ? QColor(235,241,222) : QColor(216,228,188),false,false,false,false,true,false,false,false);
+		TempTranche.SetTrancheName("First Reserve Fund");
+		TempTranche.GetCashFlow().ResetFlows();
+		TempTranche.AddCashFlow(Structure.GetReserveFundFlow(0));
+		if(TempTranche.GetCashFlow().Count()>0)
+			ExcelOutput::PrintTrancheFlow(TempTranche,ExcelCommons::CellOffset(TranchesOutputAddress,1,(++ClolumnCount)+(6*Structure.GetTranchesCount())),(Structure.GetTranchesCount()+ClolumnCount)%2==0 ? QColor(235,241,222) : QColor(216,228,188),false,false,false,false,true,false,false,false);
+		TempTranche.SetTrancheName("Second Reserve Fund");
+		TempTranche.GetCashFlow().ResetFlows();
+		TempTranche.AddCashFlow(Structure.GetReserveFundFlow(1));
+		if(TempTranche.GetCashFlow().Count()>0)
+			ExcelOutput::PrintTrancheFlow(TempTranche,ExcelCommons::CellOffset(TranchesOutputAddress,1,(++ClolumnCount)+(6*Structure.GetTranchesCount())),(Structure.GetTranchesCount()+ClolumnCount)%2==0 ? QColor(235,241,222) : QColor(216,228,188),false,false,false,false,true,false,false,false);
 		TempValList.clear(); for(int i=0;i<Structure.GetTranche(0)->GetCashFlow().Count();i++) TempValList.append(Structure.GetAnnualizedExcess(i));
-		ExcelOutput::PrintColumn("Annualized Excess Spread",TempValList,ExcelCommons::CellOffset(TranchesOutputAddress,2,4+(6*Structure.GetTranchesCount())),"0.00%",Structure.GetTranchesCount()%2!=0 ? QColor(235,241,222) : QColor(216,228,188));
+		ExcelOutput::PrintColumn("Annualized Excess Spread",TempValList,ExcelCommons::CellOffset(TranchesOutputAddress,2,(++ClolumnCount)+(6*Structure.GetTranchesCount())),"0.00%",(Structure.GetTranchesCount()+ClolumnCount)%2==0 ? QColor(235,241,222) : QColor(216,228,188));
 		TempValList.clear(); for(int i=0;i<Structure.GetTranche(0)->GetCashFlow().Count();i++) TempValList.append(Structure.GetWACostOfCapital(i));
-		ExcelOutput::PrintColumn("WA Cost of Funding",TempValList,ExcelCommons::CellOffset(TranchesOutputAddress,2,5+(6*Structure.GetTranchesCount())),"0.00%",Structure.GetTranchesCount()%2==0 ? QColor(235,241,222) : QColor(216,228,188));
+		ExcelOutput::PrintColumn("WA Cost of Funding",TempValList,ExcelCommons::CellOffset(TranchesOutputAddress,2,(++ClolumnCount)+(6*Structure.GetTranchesCount())),"0.00%",(Structure.GetTranchesCount()+ClolumnCount)%2==0 ? QColor(235,241,222) : QColor(216,228,188));
 		TempValList.clear(); for(int i=0;i<Structure.GetTranchesCount();i++) TempValList.append(Structure.GetTranche(i)->GetLossRate());
 		ExcelOutput::PrintDataColumn(TempValList,ExcelCommons::CellOffset(LossOutputAddress),"0.00%");
 		TempValList.clear(); for(int i=0;i<Structure.GetTranchesCount();i++) TempValList.append(Structure.GetCreditEnhancement(i));
 		ExcelOutput::PrintDataColumn(TempValList,ExcelCommons::CellOffset(CreditEnanAddress),"0.00%");
+		ExcelOutput::PrintMergedCell("Scenario To Maturity",ExcelCommons::CellOffset(TranchesOutputAddress,0,0),1,(++ClolumnCount)+(6*Structure.GetTranchesCount()),QColor(118,147,60));
 
 		if(RunCall){
+			ClolumnCount=0;
 			ExcelOutput::PrintMergedCell("Scenario To Call",ExcelCommons::CellOffset(TranchesOutputAddress,3+Structure.GetTranche(0)->GetCashFlow().Count(),0),1,6+(6*Structure.GetTranchesCount()),QColor(118,147,60));
 			for(int i=0;i<CallStructure.GetTranchesCount();i++)
 				ExcelOutput::PrintTrancheFlow(*CallStructure.GetTranche(i),ExcelCommons::CellOffset(TranchesOutputAddress,4+Structure.GetTranche(i)->GetCashFlow().Count(),(i>0 ? 1:0) +(6*i)),i%2==0 ? QColor(235,241,222) : QColor(216,228,188),i==0);
 			TempTranche.SetTrancheName("Senior Expenses");
 			TempTranche.GetCashFlow().ResetFlows();
 			TempTranche.AddCashFlow(CallStructure.GetTotalSeniorExpenses());
-			ExcelOutput::PrintTrancheFlow(TempTranche,ExcelCommons::CellOffset(TranchesOutputAddress,4+Structure.GetTranche(0)->GetCashFlow().Count(),1+(6*CallStructure.GetTranchesCount())),CallStructure.GetTranchesCount()%2==0 ? QColor(235,241,222) : QColor(216,228,188),false,false,false,false,true,false,false,false);
+			ExcelOutput::PrintTrancheFlow(TempTranche,ExcelCommons::CellOffset(TranchesOutputAddress,4+Structure.GetTranche(0)->GetCashFlow().Count(),(++ClolumnCount)+(6*CallStructure.GetTranchesCount())),CallStructure.GetTranchesCount()%2==0 ? QColor(235,241,222) : QColor(216,228,188),false,false,false,false,true,false,false,false);
 			TempTranche.SetTrancheName("Senior Fees");
 			TempTranche.GetCashFlow().ResetFlows();
 			TempTranche.AddCashFlow(CallStructure.GetTotalSeniorFees());
-			ExcelOutput::PrintTrancheFlow(TempTranche,ExcelCommons::CellOffset(TranchesOutputAddress,4+Structure.GetTranche(0)->GetCashFlow().Count(),2+(6*CallStructure.GetTranchesCount())),CallStructure.GetTranchesCount()%2!=0 ? QColor(235,241,222) : QColor(216,228,188),false,false,false,false,true,false,false,false);
+			ExcelOutput::PrintTrancheFlow(TempTranche,ExcelCommons::CellOffset(TranchesOutputAddress,4+Structure.GetTranche(0)->GetCashFlow().Count(),(++ClolumnCount)+(6*CallStructure.GetTranchesCount())),CallStructure.GetTranchesCount()%2!=0 ? QColor(235,241,222) : QColor(216,228,188),false,false,false,false,true,false,false,false);
 			TempTranche.SetTrancheName("Junior Fees");
 			TempTranche.GetCashFlow().ResetFlows();
 			TempTranche.AddCashFlow(CallStructure.GetTotalJuniorFees());
-			ExcelOutput::PrintTrancheFlow(TempTranche,ExcelCommons::CellOffset(TranchesOutputAddress,4+Structure.GetTranche(0)->GetCashFlow().Count(),3+(6*CallStructure.GetTranchesCount())),CallStructure.GetTranchesCount()%2==0 ? QColor(235,241,222) : QColor(216,228,188),false,false,false,false,true,false,false,false);
+			ExcelOutput::PrintTrancheFlow(TempTranche,ExcelCommons::CellOffset(TranchesOutputAddress,4+Structure.GetTranche(0)->GetCashFlow().Count(),(++ClolumnCount)+(6*CallStructure.GetTranchesCount())),CallStructure.GetTranchesCount()%2==0 ? QColor(235,241,222) : QColor(216,228,188),false,false,false,false,true,false,false,false);
+			TempTranche.SetTrancheName("First Reserve Fund");
+			TempTranche.GetCashFlow().ResetFlows();
+			TempTranche.AddCashFlow(CallStructure.GetReserveFundFlow(0));
+			if(TempTranche.GetCashFlow().Count()>0)
+				ExcelOutput::PrintTrancheFlow(TempTranche,ExcelCommons::CellOffset(TranchesOutputAddress,4+Structure.GetTranche(0)->GetCashFlow().Count(),(++ClolumnCount)+(6*Structure.GetTranchesCount())),(CallStructure.GetTranchesCount()+ClolumnCount)%2==0 ? QColor(235,241,222) : QColor(216,228,188),false,false,false,false,true,false,false,false);
+			TempTranche.SetTrancheName("Second Reserve Fund");
+			TempTranche.GetCashFlow().ResetFlows();
+			TempTranche.AddCashFlow(CallStructure.GetReserveFundFlow(1));
+			if(TempTranche.GetCashFlow().Count()>0)
+				ExcelOutput::PrintTrancheFlow(TempTranche,ExcelCommons::CellOffset(TranchesOutputAddress,4+Structure.GetTranche(0)->GetCashFlow().Count(),(++ClolumnCount)+(6*Structure.GetTranchesCount())),(CallStructure.GetTranchesCount()+ClolumnCount)%2==0 ? QColor(235,241,222) : QColor(216,228,188),false,false,false,false,true,false,false,false);
 			TempValList.clear(); for(int i=0;i<CallStructure.GetTranche(0)->GetCashFlow().Count();i++) TempValList.append(CallStructure.GetAnnualizedExcess(i));
-			ExcelOutput::PrintColumn("Annualized Excess Spread",TempValList,ExcelCommons::CellOffset(TranchesOutputAddress,5+Structure.GetTranche(0)->GetCashFlow().Count(),4+(6*CallStructure.GetTranchesCount())),"0.00%",CallStructure.GetTranchesCount()%2!=0 ? QColor(235,241,222) : QColor(216,228,188));
+			ExcelOutput::PrintColumn("Annualized Excess Spread",TempValList,ExcelCommons::CellOffset(TranchesOutputAddress,5+Structure.GetTranche(0)->GetCashFlow().Count(),(++ClolumnCount)+(6*CallStructure.GetTranchesCount())),"0.00%",(CallStructure.GetTranchesCount()+ClolumnCount)%2==0 ? QColor(235,241,222) : QColor(216,228,188));
 			TempValList.clear(); for(int i=0;i<CallStructure.GetTranche(0)->GetCashFlow().Count();i++) TempValList.append(CallStructure.GetWACostOfCapital(i));
-			ExcelOutput::PrintColumn("WA Cost of Funding",TempValList,ExcelCommons::CellOffset(TranchesOutputAddress,5+Structure.GetTranche(0)->GetCashFlow().Count(),5+(6*CallStructure.GetTranchesCount())),"0.00%",CallStructure.GetTranchesCount()%2==0 ? QColor(235,241,222) : QColor(216,228,188));
+			ExcelOutput::PrintColumn("WA Cost of Funding",TempValList,ExcelCommons::CellOffset(TranchesOutputAddress,5+Structure.GetTranche(0)->GetCashFlow().Count(),(++ClolumnCount)+(6*CallStructure.GetTranchesCount())),"0.00%",(CallStructure.GetTranchesCount()+ClolumnCount)%2==0 ? QColor(235,241,222) : QColor(216,228,188));
 			TempValList.clear(); for(int i=0;i<CallStructure.GetTranchesCount();i++) TempValList.append(CallStructure.GetTranche(i)->GetLossRate());
 			ExcelOutput::PrintDataColumn(TempValList,ExcelCommons::CellOffset(LossOnCallOutputAddress),"0.00%");
+			ExcelOutput::PrintMergedCell("Scenario To Call",ExcelCommons::CellOffset(TranchesOutputAddress,3+Structure.GetTranche(0)->GetCashFlow().Count(),0),1,(++ClolumnCount)+(6*Structure.GetTranchesCount()),QColor(118,147,60));
 		}
 	}
 	if(!PlotsSheet.isEmpty() && PlotIndexes[1]>0)

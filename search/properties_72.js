@@ -1,7 +1,6 @@
 var searchData=
 [
   ['rawannualizedexcess',['RawAnnualizedExcess',['../class_managed_c_l_o_1_1_man_waterfall.html#a505ef76cabc65f813471b2d7ed0398dc',1,'ManagedCLO::ManWaterfall']]],
-  ['rawcoupon',['RawCoupon',['../class_managed_c_l_o_1_1_man_tranche.html#a57309874e66127c7ab0803590d0a9585',1,'ManagedCLO::ManTranche']]],
   ['readytocalculate',['ReadyToCalculate',['../class_managed_c_l_o_1_1_man_waterfall.html#ac8cb51afa355e3bc41c6876a479d1439',1,'ManagedCLO::ManWaterfall']]],
   ['redemptiongroup',['RedemptionGroup',['../class_managed_c_l_o_1_1_man_wat_fal_prior.html#ac34b5f2953eebbfaa903f60e0dfafd94',1,'ManagedCLO::ManWatFalPrior']]],
   ['redemptionshare',['RedemptionShare',['../class_managed_c_l_o_1_1_man_wat_fal_prior.html#a05d4b3b612d71762c7a9aa45f4145cfd',1,'ManagedCLO::ManWatFalPrior']]],

@@ -30,7 +30,7 @@
   <td id="projectlogo"><img alt="Logo" src="Logo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CLO Model
-   &#160;<span id="projectnumber">1.71</span>
+   &#160;<span id="projectnumber">1.73</span>
    </div>
    <div id="projectbrief">Collateralised Loan Obligations Cash Flow Model</div>
   </td>
@@ -129,7 +129,8 @@ Public Types</h2></td></tr>
 <a class="el" href="class_managed_c_l_o_1_1_man_wat_fal_prior.html#ae00eb1ac3f09232de560b7a8303951eda74681aaa4791770c712cd1cc0799f220">ManWaterfallStepType::wst_ReinvestmentTest</a>, 
 <br/>
 &#160;&#160;<a class="el" href="class_managed_c_l_o_1_1_man_wat_fal_prior.html#ae00eb1ac3f09232de560b7a8303951eda46679cccb7c20fcc1b9a9e56d2a30160">ManWaterfallStepType::wst_Excess</a>, 
-<a class="el" href="class_managed_c_l_o_1_1_man_wat_fal_prior.html#ae00eb1ac3f09232de560b7a8303951eda39a837a604215d092b9d150b37eb6861">ManWaterfallStepType::wst_ReinvestPrincipal</a>
+<a class="el" href="class_managed_c_l_o_1_1_man_wat_fal_prior.html#ae00eb1ac3f09232de560b7a8303951eda39a837a604215d092b9d150b37eb6861">ManWaterfallStepType::wst_ReinvestPrincipal</a>, 
+<a class="el" href="class_managed_c_l_o_1_1_man_wat_fal_prior.html#ae00eb1ac3f09232de560b7a8303951eda50755628b239b3a61105b3655497f0ed">ManWaterfallStepType::wst_ReserveReplenish</a>
 <br/>
  }</td></tr>
 <tr class="separator:ae00eb1ac3f09232de560b7a8303951ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -214,6 +215,10 @@ Properties</h2></td></tr>
 <tr>
 <td>Excess Spread </td><td>Both </td><td>wst_Excess </td><td>Ignored </td><td>Seniority group that will be receiving the excess spread.<br/>
 Leave blank if payed outside the deal </td><td>Ignored  </td></tr>
+<tr>
+<td>Replenishment of Reserve Fund </td><td>Depending on RedemptionGroup </td><td>wst_ReserveReplenish </td><td>The index of the reserve to replenish. Currently 2 reserves are modelled so it can be either 1 or 2 </td><td><a class="el" href="class_managed_c_l_o_1_1_man_wat_fal_prior.html#abe39eeee54b3b4106414c3250050ca18ab1e643f19355832d228476269b7ed871">SourceOfFunding::sof_Interest</a> to make this step part of the interest waterfall<br/>
+ <a class="el" href="class_managed_c_l_o_1_1_man_wat_fal_prior.html#abe39eeee54b3b4106414c3250050ca18a15b8c8f82e62f6f86479316d3a68d6a1">SourceOfFunding::sof_Principal</a> to make this step part of the principal waterfall<br/>
+ Any other value will cause the step to be ignored. </td><td>Ignored  </td></tr>
 </table>
 <dl class="section note"><dt>Note</dt><dd>Seniority group means a group of tranches that receive interest and principal pro-rata </dd></dl>
 </div><h2 class="groupheader">Member Enumeration Documentation</h2>
@@ -277,6 +282,9 @@ Leave blank if payed outside the deal </td><td>Ignored  </td></tr>
 </td></tr>
 <tr><td class="fieldname"><em><a class="anchor" id="ae00eb1ac3f09232de560b7a8303951eda39a837a604215d092b9d150b37eb6861"></a>wst_ReinvestPrincipal</em>&nbsp;</td><td class="fielddoc">
 <p>Reinvest all available principal during the reinvestment period </p>
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="ae00eb1ac3f09232de560b7a8303951eda50755628b239b3a61105b3655497f0ed"></a>wst_ReserveReplenish</em>&nbsp;</td><td class="fielddoc">
+<p>Replenish the reserve fund </p>
 </td></tr>
 </table>
 
@@ -532,7 +540,7 @@ The complement to 1 of this share will go toward the most senior group. </p>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Mar 19 2014 14:42:57 for CLO Model by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Mar 27 2014 14:34:22 for CLO Model by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>

@@ -30,7 +30,7 @@
   <td id="projectlogo"><img alt="Logo" src="Logo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CLO Model
-   &#160;<span id="projectnumber">1.71</span>
+   &#160;<span id="projectnumber">1.73</span>
    </div>
    <div id="projectbrief">Collateralised Loan Obligations Cash Flow Model</div>
   </td>
@@ -147,6 +147,9 @@ Properties</h2></td></tr>
 <tr class="memitem:af2a72311fbeea4dfe4172bc35216bd15"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_mortgage.html#af2a72311fbeea4dfe4172bc35216bd15">FloatingRateBase</a><code> [get, set]</code></td></tr>
 <tr class="memdesc:af2a72311fbeea4dfe4172bc35216bd15"><td class="mdescLeft">&#160;</td><td class="mdescRight">The value of the base interest rate index. Set to 0 for fixed rate loans.  <a href="#af2a72311fbeea4dfe4172bc35216bd15">More...</a><br/></td></tr>
 <tr class="separator:af2a72311fbeea4dfe4172bc35216bd15"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d9c3b332f790af75f8bd28f7e611291"><td class="memItemLeft" align="right" valign="top">String^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_mortgage.html#a5d9c3b332f790af75f8bd28f7e611291">HaircutVector</a><code> [get, set]</code></td></tr>
+<tr class="memdesc:a5d9c3b332f790af75f8bd28f7e611291"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Haircut.  <a href="#a5d9c3b332f790af75f8bd28f7e611291">More...</a><br/></td></tr>
+<tr class="separator:a5d9c3b332f790af75f8bd28f7e611291"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a149bdbd289f9e50794208cfb4a641bf2"><td class="memItemLeft" align="right" valign="top">String^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_mortgage.html#a149bdbd289f9e50794208cfb4a641bf2">Interest</a><code> [get, set]</code></td></tr>
 <tr class="memdesc:a149bdbd289f9e50794208cfb4a641bf2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Vector defining the coupon rate or margin of the bond.  <a href="#a149bdbd289f9e50794208cfb4a641bf2">More...</a><br/></td></tr>
 <tr class="separator:a149bdbd289f9e50794208cfb4a641bf2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -350,6 +353,8 @@ The cash flows can then be retrieved using CashFlow </p>
 <tr>
 <td>Valid Interest Vector </td><td>Loan Coupon  </td></tr>
 <tr>
+<td>Valid Haircut Vector </td><td>Haircut Vector  </td></tr>
+<tr>
 <td>Base interest rate not negative </td><td>Loan Base Rate  </td></tr>
 <tr>
 <td>Not less than one month between two interest payments </td><td>Loan Payment Frequency  </td></tr>
@@ -518,6 +523,38 @@ If CalculateCashFlows was never called before, an empty cash flow is returned </
 
 </div>
 </div>
+<a class="anchor" id="a5d9c3b332f790af75f8bd28f7e611291"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">String^ ManagedCLO::ManMortgage::HaircutVector</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">get</span><span class="mlabel">set</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The Haircut. </p>
+<p>This vector represents haircuts to apply on the loan in percentage points.<br/>
+Examples:</p>
+<ul>
+<li>
+10 12S 20 will apply a 10% haircut on day 1 and a further 10% after one year.</li>
+<li>
+0 24R 50 will gradually haircut the loan up to a total of 50% of the original value.</li>
+<li>
+0 12S 30 12S 10 will cut by 30% the value of the loan after one year and then recover 20% on the second year</li>
+</ul>
+
+</div>
+</div>
 <a class="anchor" id="a149bdbd289f9e50794208cfb4a641bf2"></a>
 <div class="memitem">
 <div class="memproto">
@@ -665,7 +702,7 @@ Bloomber vectors are accepted </p>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Mar 19 2014 14:42:57 for CLO Model by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Mar 27 2014 14:34:22 for CLO Model by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>

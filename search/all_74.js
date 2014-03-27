@@ -4,6 +4,7 @@ var searchData=
   ['totaljuniorfees',['TotalJuniorFees',['../class_managed_c_l_o_1_1_man_waterfall.html#af1f3c77d0a4f36f431aa3bbce7875637',1,'ManagedCLO::ManWaterfall']]],
   ['totalseniorexpenses',['TotalSeniorExpenses',['../class_managed_c_l_o_1_1_man_waterfall.html#a8a930ef52382744295a8ee529a35b9d1',1,'ManagedCLO::ManWaterfall']]],
   ['totalseniorfees',['TotalSeniorFees',['../class_managed_c_l_o_1_1_man_waterfall.html#af19515135584aad3d2f7f8dd9562174a',1,'ManagedCLO::ManWaterfall']]],
+  ['trancheisin',['TrancheISIN',['../class_managed_c_l_o_1_1_man_tranche.html#aae12346333d8251003d7c03bcb82f9ce',1,'ManagedCLO::ManTranche']]],
   ['tranchename',['TrancheName',['../class_managed_c_l_o_1_1_man_tranche.html#ab8971a81a646f2d73e7ffc2f896de65d',1,'ManagedCLO::ManTranche']]],
   ['tranchescount',['TranchesCount',['../class_managed_c_l_o_1_1_man_waterfall.html#a7f155bfe937843888688756b6159de56',1,'ManagedCLO::ManWaterfall']]]
 ];

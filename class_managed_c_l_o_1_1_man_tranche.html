@@ -30,7 +30,7 @@
   <td id="projectlogo"><img alt="Logo" src="Logo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CLO Model
-   &#160;<span id="projectnumber">1.71</span>
+   &#160;<span id="projectnumber">1.73</span>
    </div>
    <div id="projectbrief">Collateralised Loan Obligations Cash Flow Model</div>
   </td>
@@ -105,7 +105,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>Class used to describe a signle tranche of a deal.  
+<p>Class used to describe a single tranche of a deal.  
  <a href="class_managed_c_l_o_1_1_man_tranche.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_man_tranche_8h_source.html">ManTranche.h</a>&gt;</code></p>
@@ -131,12 +131,24 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a491214494898b3c34cc9e238b743a7eb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a491214494898b3c34cc9e238b743a7eb">AddCashFlow</a> (<a class="el" href="class_managed_c_l_o_1_1_man_tranche_cash_flow.html">ManTrancheCashFlow</a>^ a)</td></tr>
 <tr class="memdesc:a491214494898b3c34cc9e238b743a7eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds the cash flows from another tranche to this one.  <a href="#a491214494898b3c34cc9e238b743a7eb">More...</a><br/></td></tr>
 <tr class="separator:a491214494898b3c34cc9e238b743a7eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25f6a9427062c6f99ca620ddc9919397"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a25f6a9427062c6f99ca620ddc9919397">GetCoupon</a> (int index)</td></tr>
+<tr class="memdesc:a25f6a9427062c6f99ca620ddc9919397"><td class="mdescLeft">&#160;</td><td class="mdescRight">The coupon paid by the tranche.  <a href="#a25f6a9427062c6f99ca620ddc9919397">More...</a><br/></td></tr>
+<tr class="separator:a25f6a9427062c6f99ca620ddc9919397"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa6e0e87bde30d48a2b0c85c328ec3221"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#aa6e0e87bde30d48a2b0c85c328ec3221">GetCoupon</a> (DateTime index)</td></tr>
+<tr class="memdesc:aa6e0e87bde30d48a2b0c85c328ec3221"><td class="mdescLeft">&#160;</td><td class="mdescRight">The coupon paid by the tranche.  <a href="#aa6e0e87bde30d48a2b0c85c328ec3221">More...</a><br/></td></tr>
+<tr class="separator:aa6e0e87bde30d48a2b0c85c328ec3221"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad1c5ea56dee047b58ca3311c36a08b99"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#ad1c5ea56dee047b58ca3311c36a08b99">GetDataFromBloomberg</a> ()</td></tr>
 <tr class="memdesc:ad1c5ea56dee047b58ca3311c36a08b99"><td class="mdescLeft">&#160;</td><td class="mdescRight">Downloads tranche data from Bloomberg.  <a href="#ad1c5ea56dee047b58ca3311c36a08b99">More...</a><br/></td></tr>
 <tr class="separator:ad1c5ea56dee047b58ca3311c36a08b99"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a492a6958c0a6f40d5f9eb899bf2362cd"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a492a6958c0a6f40d5f9eb899bf2362cd">GetDiscountMargin</a> (double NewPrice)</td></tr>
 <tr class="memdesc:a492a6958c0a6f40d5f9eb899bf2362cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the discount margin of the tranche from the cash flows using the specified price.  <a href="#a492a6958c0a6f40d5f9eb899bf2362cd">More...</a><br/></td></tr>
 <tr class="separator:a492a6958c0a6f40d5f9eb899bf2362cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a957e7458102ac5e92e9dfd3d34706bf0"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a957e7458102ac5e92e9dfd3d34706bf0">GetRawCoupon</a> (int index)</td></tr>
+<tr class="memdesc:a957e7458102ac5e92e9dfd3d34706bf0"><td class="mdescLeft">&#160;</td><td class="mdescRight">The coupon or margin paid by the tranche.  <a href="#a957e7458102ac5e92e9dfd3d34706bf0">More...</a><br/></td></tr>
+<tr class="separator:a957e7458102ac5e92e9dfd3d34706bf0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a082fb969194e51d5b78f1c610f9da4de"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a082fb969194e51d5b78f1c610f9da4de">GetRawCoupon</a> (DateTime index)</td></tr>
+<tr class="memdesc:a082fb969194e51d5b78f1c610f9da4de"><td class="mdescLeft">&#160;</td><td class="mdescRight">The coupon or margin paid by the tranche.  <a href="#a082fb969194e51d5b78f1c610f9da4de">More...</a><br/></td></tr>
+<tr class="separator:a082fb969194e51d5b78f1c610f9da4de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4df4624160275519b3230fa0187bd139"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a4df4624160275519b3230fa0187bd139">GetWALife</a> (DateTime StartDate)</td></tr>
 <tr class="memdesc:a4df4624160275519b3230fa0187bd139"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates weighted average life of the notes.  <a href="#a4df4624160275519b3230fa0187bd139">More...</a><br/></td></tr>
 <tr class="separator:a4df4624160275519b3230fa0187bd139"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -176,9 +188,9 @@ Properties</h2></td></tr>
 <tr class="memitem:aa600a53ebc101ed225815f3da6259758"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_managed_c_l_o_1_1_man_tranche_cash_flow.html">ManTrancheCashFlow</a>^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#aa600a53ebc101ed225815f3da6259758">CashFlow</a><code> [get]</code></td></tr>
 <tr class="memdesc:aa600a53ebc101ed225815f3da6259758"><td class="mdescLeft">&#160;</td><td class="mdescRight">The cash flows of the tranche.  <a href="#aa600a53ebc101ed225815f3da6259758">More...</a><br/></td></tr>
 <tr class="separator:aa600a53ebc101ed225815f3da6259758"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abd1b0b9500ce7a8fe092f5d8ca048f1e"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#abd1b0b9500ce7a8fe092f5d8ca048f1e">Coupon</a><code> [get, set]</code></td></tr>
-<tr class="memdesc:abd1b0b9500ce7a8fe092f5d8ca048f1e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The coupon or margin paid by the tranche.  <a href="#abd1b0b9500ce7a8fe092f5d8ca048f1e">More...</a><br/></td></tr>
-<tr class="separator:abd1b0b9500ce7a8fe092f5d8ca048f1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c4372793ba3babd7b74881e345cf696"><td class="memItemLeft" align="right" valign="top">String^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a4c4372793ba3babd7b74881e345cf696">Coupon</a><code> [set]</code></td></tr>
+<tr class="memdesc:a4c4372793ba3babd7b74881e345cf696"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the coupon or margin paid by the tranche.  <a href="#a4c4372793ba3babd7b74881e345cf696">More...</a><br/></td></tr>
+<tr class="separator:a4c4372793ba3babd7b74881e345cf696"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a613d738525c0a62566829c007f7ae07b"><td class="memItemLeft" align="right" valign="top">String^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a613d738525c0a62566829c007f7ae07b">Currency</a><code> [get, set]</code></td></tr>
 <tr class="memdesc:a613d738525c0a62566829c007f7ae07b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The currency code for the tranche denomination.  <a href="#a613d738525c0a62566829c007f7ae07b">More...</a><br/></td></tr>
 <tr class="separator:a613d738525c0a62566829c007f7ae07b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -224,9 +236,6 @@ Properties</h2></td></tr>
 <tr class="memitem:a21da64fd32fc2e3d05e96beed93c37d7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a21da64fd32fc2e3d05e96beed93c37d7">ProrataGroup</a><code> [get, set]</code></td></tr>
 <tr class="memdesc:a21da64fd32fc2e3d05e96beed93c37d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">The seniority group of the tranche.  <a href="#a21da64fd32fc2e3d05e96beed93c37d7">More...</a><br/></td></tr>
 <tr class="separator:a21da64fd32fc2e3d05e96beed93c37d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a57309874e66127c7ab0803590d0a9585"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a57309874e66127c7ab0803590d0a9585">RawCoupon</a><code> [get]</code></td></tr>
-<tr class="memdesc:a57309874e66127c7ab0803590d0a9585"><td class="mdescLeft">&#160;</td><td class="mdescRight">The coupon or margin paid by the tranche.  <a href="#a57309874e66127c7ab0803590d0a9585">More...</a><br/></td></tr>
-<tr class="separator:a57309874e66127c7ab0803590d0a9585"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6aac8ce7f4b67af8d62b41869e4e39e9"><td class="memItemLeft" align="right" valign="top">String^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a6aac8ce7f4b67af8d62b41869e4e39e9">ReferenceRate</a><code> [get, set]</code></td></tr>
 <tr class="memdesc:a6aac8ce7f4b67af8d62b41869e4e39e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">The ticker of the base rate of the tranche.  <a href="#a6aac8ce7f4b67af8d62b41869e4e39e9">More...</a><br/></td></tr>
 <tr class="separator:a6aac8ce7f4b67af8d62b41869e4e39e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -236,12 +245,15 @@ Properties</h2></td></tr>
 <tr class="memitem:a952114b08036756ab472874adda2fa41"><td class="memItemLeft" align="right" valign="top">DateTime&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a952114b08036756ab472874adda2fa41">SettlementDate</a><code> [get, set]</code></td></tr>
 <tr class="memdesc:a952114b08036756ab472874adda2fa41"><td class="mdescLeft">&#160;</td><td class="mdescRight">The tranche settlement date.  <a href="#a952114b08036756ab472874adda2fa41">More...</a><br/></td></tr>
 <tr class="separator:a952114b08036756ab472874adda2fa41"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aae12346333d8251003d7c03bcb82f9ce"><td class="memItemLeft" align="right" valign="top">String^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#aae12346333d8251003d7c03bcb82f9ce">TrancheISIN</a><code> [get, set]</code></td></tr>
+<tr class="memdesc:aae12346333d8251003d7c03bcb82f9ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">The ISIN of the tranche.  <a href="#aae12346333d8251003d7c03bcb82f9ce">More...</a><br/></td></tr>
+<tr class="separator:aae12346333d8251003d7c03bcb82f9ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab8971a81a646f2d73e7ffc2f896de65d"><td class="memItemLeft" align="right" valign="top">String^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#ab8971a81a646f2d73e7ffc2f896de65d">TrancheName</a><code> [get, set]</code></td></tr>
 <tr class="memdesc:ab8971a81a646f2d73e7ffc2f896de65d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The ticker of the tranche.  <a href="#ab8971a81a646f2d73e7ffc2f896de65d">More...</a><br/></td></tr>
 <tr class="separator:ab8971a81a646f2d73e7ffc2f896de65d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Class used to describe a signle tranche of a deal. </p>
+<div class="textblock"><p>Class used to describe a single tranche of a deal. </p>
 </div><h2 class="groupheader">Member Enumeration Documentation</h2>
 <a class="anchor" id="ae4a221d19475d8101e0080e1feef8e60"></a>
 <div class="memitem">
@@ -402,6 +414,70 @@ Properties</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a25f6a9427062c6f99ca620ddc9919397"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double ManagedCLO::ManTranche::GetCoupon </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>index</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The coupon paid by the tranche. </p>
+<ul>
+<li>index The time index for which to retrieve the tranche coupon. 0 corresponds to the Coupon vector anchor date or, if it's missing, the last payment date.</li>
+</ul>
+<p>If the tranche is fixed rate this is the interest paid on the note, if the tranche is floating rate this is the margin over the base rate. </p>
+<dl class="section note"><dt>Note</dt><dd>If the tranche is floating rate, the output of this property will be the sum of the base interest rate and the margin. </dd></dl>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a957e7458102ac5e92e9dfd3d34706bf0" title="The coupon or margin paid by the tranche. ">GetRawCoupon(int)</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="aa6e0e87bde30d48a2b0c85c328ec3221"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double ManagedCLO::ManTranche::GetCoupon </td>
+          <td>(</td>
+          <td class="paramtype">DateTime&#160;</td>
+          <td class="paramname"><em>index</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The coupon paid by the tranche. </p>
+<ul>
+<li>index The date for which to retrieve the tranche coupon.</li>
+</ul>
+<p>If the tranche is fixed rate this is the interest paid on the note, if the tranche is floating rate this is the margin over the base rate. </p>
+<dl class="section note"><dt>Note</dt><dd>If the tranche is floating rate, the output of this property will be the sum of the base interest rate and the margin. </dd></dl>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a082fb969194e51d5b78f1c610f9da4de" title="The coupon or margin paid by the tranche. ">GetRawCoupon(DateTime)</a> </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="ad1c5ea56dee047b58ca3311c36a08b99"></a>
 <div class="memitem">
 <div class="memproto">
@@ -488,6 +564,68 @@ Coupon paid by the note</li>
 <ul>
 <li>NewPrice the price used to calculate the discount margin </li>
 </ul>
+
+</div>
+</div>
+<a class="anchor" id="a957e7458102ac5e92e9dfd3d34706bf0"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double ManagedCLO::ManTranche::GetRawCoupon </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>index</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The coupon or margin paid by the tranche. </p>
+<ul>
+<li>index The time index for which to retrieve the tranche coupon. 0 corresponds to the Coupon vector anchor date or, if it's missing, the last payment date.</li>
+</ul>
+<p>For fixed rate tranches this is equivalent to GetCoupon, for floating rate notes this will return the margin over the base rate. </p>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a25f6a9427062c6f99ca620ddc9919397" title="The coupon paid by the tranche. ">GetCoupon(int)</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a082fb969194e51d5b78f1c610f9da4de"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double ManagedCLO::ManTranche::GetRawCoupon </td>
+          <td>(</td>
+          <td class="paramtype">DateTime&#160;</td>
+          <td class="paramname"><em>index</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The coupon or margin paid by the tranche. </p>
+<ul>
+<li>index The date for which to retrieve the tranche coupon.</li>
+</ul>
+<p>For fixed rate tranches this is equivalent to GetCoupon, for floating rate notes this will return the margin over the base rate. </p>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#aa6e0e87bde30d48a2b0c85c328ec3221" title="The coupon paid by the tranche. ">GetCoupon(DateTime)</a> </dd></dl>
 
 </div>
 </div>
@@ -796,7 +934,7 @@ Coupon paid by the note</li>
 
 </div>
 </div>
-<a class="anchor" id="abd1b0b9500ce7a8fe092f5d8ca048f1e"></a>
+<a class="anchor" id="a4c4372793ba3babd7b74881e345cf696"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -804,21 +942,20 @@ Coupon paid by the note</li>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">double ManagedCLO::ManTranche::Coupon</td>
+          <td class="memname">String^ ManagedCLO::ManTranche::Coupon</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">get</span><span class="mlabel">set</span></span>  </td>
+<span class="mlabels"><span class="mlabel">set</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>The coupon or margin paid by the tranche. </p>
+<p>Set the coupon or margin paid by the tranche. </p>
 <p>If the tranche is fixed rate this is the interest paid on the note, if the tranche is floating rate this is the margin over the base rate.<br/>
-Format must be in percentage term (5%=5, 200bps=2) </p>
-<dl class="section note"><dt>Note</dt><dd>If the tranche is floating rate, the output of this property will be the sum of the base interest rate and the margin. </dd></dl>
-<dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a57309874e66127c7ab0803590d0a9585" title="The coupon or margin paid by the tranche. ">RawCoupon</a> </dd></dl>
+Accepts Bloomberg vectors. If the anchor date for the vector is not specified, the last payment date will be used.<br/>
+The format is in basis points 5%=500. </p>
 
 </div>
 </div>
@@ -1176,29 +1313,6 @@ The most senior tranche should have this value set at 1. </p>
 
 </div>
 </div>
-<a class="anchor" id="a57309874e66127c7ab0803590d0a9585"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">double ManagedCLO::ManTranche::RawCoupon</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">get</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>The coupon or margin paid by the tranche. </p>
-<p>For fixed rate tranches this is equivalent to Coupon, for floating rate notes this will return the margin over the base rate </p>
-
-</div>
-</div>
 <a class="anchor" id="a6aac8ce7f4b67af8d62b41869e4e39e9"></a>
 <div class="memitem">
 <div class="memproto">
@@ -1272,6 +1386,28 @@ Set to -1.0 to have it downloaded from Bloomberg </p>
 
 </div>
 </div>
+<a class="anchor" id="aae12346333d8251003d7c03bcb82f9ce"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">String^ ManagedCLO::ManTranche::TrancheISIN</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">get</span><span class="mlabel">set</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The ISIN of the tranche. </p>
+
+</div>
+</div>
 <a class="anchor" id="ab8971a81a646f2d73e7ffc2f896de65d"></a>
 <div class="memitem">
 <div class="memproto">
@@ -1300,7 +1436,7 @@ Set to -1.0 to have it downloaded from Bloomberg </p>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Mar 19 2014 14:42:57 for CLO Model by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Mar 27 2014 14:34:22 for CLO Model by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>

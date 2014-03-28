@@ -77,7 +77,8 @@ public:
 	void SetStressToCall(bool a){StressToCall=a;}
 	void SetPlotsSheet(const QString& a){PlotsSheet=a;}
 	void SetPlotIndexes(int val,int index){if(index>=0 && index<NumberOfPlots) PlotIndexes[index]=val;}
-	void SetReserveFund(int RFindex,double RFtarget,double RFmultiple,double RFfloor,double RFcurrent){Structure.SetReserveFund(RFindex,RFtarget,RFmultiple,RFfloor,RFcurrent);}
+	void SetReserveFund(int RFindex,double RFtarget,double RFmultiple,double RFfloor,double RFcurrent,int RFfreed){Structure.SetReserveFund(RFindex,RFtarget,RFmultiple,RFfloor,RFcurrent,RFfreed);}
+	void SetCumulativeReserves(bool a){Structure.SetCumulativeReserves(a);}
 private:
 	ProgressWidget* MtgsProgress;
 	WaterfallCalculator* ParallWatFalls;

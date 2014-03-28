@@ -157,7 +157,7 @@ void WaterfallViewer::AddStep(const WatFalPrior& a){
 		if(a.GetRedemptionGroup()==1){
 			InterestTable->setRowCount(InterestTable->rowCount()+1);
 			InterestTable->setItem(InterestTable->rowCount()-1,0,new QTableWidgetItem("Reserve Fund Replenishment"));
-			InterestTable->setItem(InterestTable->rowCount()-1,1,new QTableWidgetItem(QString("%1%2 Reserve").arg(a.GetGroupTarget()).arg(a.GetGroupTarget()==1 ?"st":"nd")));
+			InterestTable->setItem(InterestTable->rowCount()-1,1,new QTableWidgetItem(QString("Reserve %1").arg(a.GetGroupTarget())));
 		}
 		else{
 			PrincipalTable->setRowCount(PrincipalTable->rowCount()+1);

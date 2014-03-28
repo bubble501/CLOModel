@@ -200,16 +200,20 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		TempUnit.SetPoolValueAtCall(pdFreq->dblVal);pdFreq++;
 		{//Reserve Fund
 			double RFtarget,RFmultiple,RFfloor,RFcurrent;
-			RFtarget=pdFreq->dblVal; pdFreq++;
-			RFmultiple=pdFreq->dblVal; pdFreq++;
-			RFfloor=pdFreq->dblVal; pdFreq++;
-			RFcurrent=pdFreq->dblVal; pdFreq++;
-			TempUnit.SetReserveFund(0,RFtarget,RFmultiple,RFfloor,RFcurrent);
-			RFtarget=pdFreq->dblVal; pdFreq++;
-			RFmultiple=pdFreq->dblVal; pdFreq++;
-			RFfloor=pdFreq->dblVal; pdFreq++;
-			RFcurrent=pdFreq->dblVal; pdFreq++;
-			TempUnit.SetReserveFund(1,RFtarget,RFmultiple,RFfloor,RFcurrent);
+			int RFfree;
+			for(int RFiter=0;RFiter<NumReserves;RFiter++){
+				RFtarget=pdFreq->dblVal; pdFreq++;
+				RFmultiple=pdFreq->dblVal; pdFreq++;
+				RFfloor=pdFreq->dblVal; pdFreq++;
+				RFcurrent=pdFreq->dblVal; pdFreq++;
+				RFfree=pdFreq->intVal; pdFreq++;
+#ifdef DebuggungInputs
+				QMessageBox::information(0,QString("Reserve %1").arg(RFiter+1),QString("Target: %1\nMultiple: %2\nFloor: %3\nCurrent: %4\nFree: %5").arg(RFtarget).arg(RFmultiple).arg(RFfloor).arg(RFcurrent).arg(RFfree));
+#endif
+				TempUnit.SetReserveFund(RFiter,RFtarget,RFmultiple,RFfloor,RFcurrent,RFfree);
+			}
+			bool CumRes=pdFreq->boolVal; pdFreq++;
+			TempUnit.SetCumulativeReserves(CumRes);
 		}
 		{// Reinvestment Test
 			QDate ReinPer;
@@ -289,6 +293,14 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		}
 	}
 	SafeArrayUnaccessData(*ArrayData);
+#ifdef _DEBUG
+	QFile file("C:/Temp/UnitaProva");
+	file.open(QIODevice::WriteOnly);
+	QDataStream out(&file);
+	out.setVersion(QDataStream::Qt_4_8);
+	out << TempUnit;
+	file.close();
+#endif
 #ifndef DebuggungInputs
 	if(RunStress) TempUnit.CalculateStress();
 	else TempUnit.Calculate();

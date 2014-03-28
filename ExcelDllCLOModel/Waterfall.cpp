@@ -3,7 +3,6 @@
 #include <QHash>
 #include <qmath.h>
 #include "Waterfall.h"
-#include "CommonFunctions.h"
 #include "BloombergWorker.h"
 #include <QMessageBox>
 const WatFalPrior* Waterfall::GetStep(int Index)const {
@@ -61,12 +60,14 @@ Waterfall::Waterfall()
 	,m_UseCall(false)
 	,m_CallMultiple(0.0)
 	,m_CallReserve(0.0)
+	,m_CumulativeReserves(false)
 {
-	for(int RFindex=0;RFindex<2;RFindex++){
+	for(int RFindex=0;RFindex<NumReserves;RFindex++){
 		m_ReserveFundTarget[RFindex]=0.0;
 		m_ReserveFundMultiple[RFindex]=0.0;
 		m_ReserveFundFloor[RFindex]=0.0;
 		m_ReserveFundCurrent[RFindex]=0.0;
+		m_ReserveFundFreed[RFindex]=0;
 	}
 }
 Waterfall::Waterfall(const Waterfall& a)
@@ -98,6 +99,7 @@ Waterfall::Waterfall(const Waterfall& a)
 	,m_CallReserve(a.m_CallReserve)
 	,m_CalculatedMtgPayments(a.m_CalculatedMtgPayments)
 	,m_EquityIncome(a.m_EquityIncome)
+	,m_CumulativeReserves(a.m_CumulativeReserves)
 {
 	for(QList<Tranche*>::const_iterator i=a.m_Tranches.constBegin();i!=a.m_Tranches.constEnd();i++){
 		m_Tranches.append(new Tranche(**i));
@@ -105,12 +107,13 @@ Waterfall::Waterfall(const Waterfall& a)
 	for(QList<WatFalPrior*>::const_iterator i=a.m_WaterfallStesps.constBegin();i!=a.m_WaterfallStesps.constEnd();i++){
 		m_WaterfallStesps.append(new WatFalPrior(**i));
 	}
-	for(int RFindex=0;RFindex<2;RFindex++){
+	for(int RFindex=0;RFindex<NumReserves;RFindex++){
 		m_ReserveFundTarget[RFindex]=a.m_ReserveFundTarget[RFindex];
 		m_ReserveFundMultiple[RFindex]=a.m_ReserveFundMultiple[RFindex];
 		m_ReserveFundFloor[RFindex]=a.m_ReserveFundFloor[RFindex];
 		m_ReserveFundCurrent[RFindex]=a.m_ReserveFundCurrent[RFindex];
 		m_ReserveFundFlows[RFindex]=a.m_ReserveFundFlows[RFindex];
+		m_ReserveFundFreed[RFindex]=a.m_ReserveFundFreed[RFindex];
 	}
 }
 Waterfall& Waterfall::operator=(const Waterfall& a){
@@ -142,6 +145,7 @@ Waterfall& Waterfall::operator=(const Waterfall& a){
 	m_CallReserve=a.m_CallReserve;
 	m_CalculatedMtgPayments=a.m_CalculatedMtgPayments;
 	m_EquityIncome=a.m_EquityIncome;
+	m_CumulativeReserves=a.m_CumulativeReserves;
 	ResetTranches();
 	for(QList<Tranche*>::const_iterator i=a.m_Tranches.constBegin();i!=a.m_Tranches.constEnd();i++){
 		m_Tranches.append(new Tranche(**i));
@@ -150,12 +154,13 @@ Waterfall& Waterfall::operator=(const Waterfall& a){
 	for(QList<WatFalPrior*>::const_iterator i=a.m_WaterfallStesps.constBegin();i!=a.m_WaterfallStesps.constEnd();i++){
 		m_WaterfallStesps.append(new WatFalPrior(**i));
 	}
-	for(int RFindex=0;RFindex<2;RFindex++){
+	for(int RFindex=0;RFindex<NumReserves;RFindex++){
 		m_ReserveFundTarget[RFindex]=a.m_ReserveFundTarget[RFindex];
 		m_ReserveFundMultiple[RFindex]=a.m_ReserveFundMultiple[RFindex];
 		m_ReserveFundFloor[RFindex]=a.m_ReserveFundFloor[RFindex];
 		m_ReserveFundCurrent[RFindex]=a.m_ReserveFundCurrent[RFindex];
 		m_ReserveFundFlows[RFindex]=a.m_ReserveFundFlows[RFindex];
+		m_ReserveFundFreed[RFindex]=a.m_ReserveFundFreed[RFindex];
 	}
 	return *this;
 }
@@ -211,7 +216,7 @@ void Waterfall::FillAllDates(){
 		}
 	}
 	//dates from reserve funds to all the tranches
-	for(int i=0;i<2;i++){
+	for(int i=0;i<NumReserves;i++){
 		if(m_ReserveFundFlows[i].Count()==0) continue;
 		for(int j=0;j<m_Tranches.size();j++){
 			for(int h=0;h<m_ReserveFundFlows[i].Count();h++){
@@ -258,7 +263,7 @@ void Waterfall::FillAllDates(){
 				m_TotalSeniorFees.AddFlow(m_Tranches.at(i)->GetCashFlow().GetDate(h),0.0,TrancheCashFlow::InterestFlow);
 			if (m_TotalJuniorFees.FindDate(m_Tranches.at(i)->GetCashFlow().GetDate(h)) < 0)
 				m_TotalJuniorFees.AddFlow(m_Tranches.at(i)->GetCashFlow().GetDate(h),0.0,TrancheCashFlow::InterestFlow);
-			for(int ResIter=0;ResIter<2;ResIter++){
+			for(int ResIter=0;ResIter<NumReserves;ResIter++){
 				if(m_ReserveFundFlows[ResIter].Count()==0) continue;
 				if (m_ReserveFundFlows[ResIter].FindDate(m_Tranches.at(i)->GetCashFlow().GetDate(h)) < 0)
 					m_ReserveFundFlows[ResIter].AddFlow(m_Tranches.at(i)->GetCashFlow().GetDate(h),0.0,TrancheCashFlow::InterestFlow);
@@ -278,9 +283,9 @@ void Waterfall::FillAllDates(){
 			m_TotalSeniorExpenses.ReplaceDate(m_CalculatedMtgPayments.GetDate(i),RollingNextIPD);
 			m_TotalSeniorFees.ReplaceDate(m_CalculatedMtgPayments.GetDate(i),RollingNextIPD);
 			m_TotalJuniorFees.ReplaceDate(m_CalculatedMtgPayments.GetDate(i),RollingNextIPD);
-			for(int i=0;i<2;i++){
-				if(m_ReserveFundFlows[i].Count()==0) continue;
-				m_ReserveFundFlows[i].ReplaceDate(m_CalculatedMtgPayments.GetDate(i),RollingNextIPD);
+			for(int ResIter=0;ResIter<NumReserves;ResIter++){
+				if(m_ReserveFundFlows[ResIter].Count()==0) continue;
+				m_ReserveFundFlows[ResIter].ReplaceDate(m_CalculatedMtgPayments.GetDate(i),RollingNextIPD);
 			}
 			RollingNextIPD=m_FirstIPDdate.addMonths((++Multiplier)*m_PaymentFrequency);
 		}
@@ -308,6 +313,7 @@ double Waterfall::GetCreditEnhancement(int TrancheIndex,int TimeIndex)const{
 	if(TrancheIndex<-1 || TrancheIndex>=m_Tranches.size()) return 0.0;
 	int TargetSeniority = m_Tranches.at(TrancheIndex)->GetProrataGroup();
 	double Runningsum=0.0;
+	double ReserveSum;
 	for(int i=0;i<m_Tranches.size();i++){
 		if(m_Tranches.at(i)->GetProrataGroup()<=TargetSeniority){
 			if(TimeIndex>=0){
@@ -320,11 +326,15 @@ double Waterfall::GetCreditEnhancement(int TrancheIndex,int TimeIndex)const{
 	}
 	if(Runningsum==0.0) return 1.0;
 	if(TimeIndex>=0){
-		if(m_CalculatedMtgPayments.GetAmountOut(m_Tranches.first()->GetCashFlow().GetDate(TimeIndex))+m_ReserveFundFlows[0].GetTotalFlow(m_ReserveFundFlows->GetDate(TimeIndex))+m_ReserveFundFlows[1].GetTotalFlow(m_ReserveFundFlows->GetDate(TimeIndex))<=0.0) return 0.0;
-		return 1.0-(Runningsum/(m_CalculatedMtgPayments.GetAmountOut(m_Tranches.first()->GetCashFlow().GetDate(TimeIndex)))+m_ReserveFundFlows[0].GetTotalFlow(m_ReserveFundFlows->GetDate(TimeIndex))+m_ReserveFundFlows[1].GetTotalFlow(m_ReserveFundFlows->GetDate(TimeIndex))); //(m_CalculatedMtgPayments.GetAmountOut(m_Tranches.first()->GetCashFlow().GetDate(TimeIndex))/Runningsum)-1.0;
+		ReserveSum=m_CalculatedMtgPayments.GetAmountOut(m_Tranches.first()->GetCashFlow().GetDate(TimeIndex));
+		for(int ResIter=0;ResIter<NumReserves;ResIter++) ReserveSum+=m_ReserveFundFlows[0].GetTotalFlow(m_ReserveFundFlows->GetDate(TimeIndex));
+		if(ReserveSum<=0.0) return 0.0;
+		return 1.0-(Runningsum/ReserveSum); //(m_CalculatedMtgPayments.GetAmountOut(m_Tranches.first()->GetCashFlow().GetDate(TimeIndex))/Runningsum)-1.0;
 	}else{
-		if((m_CalculatedMtgPayments.GetAmountOut(0)+m_PrincipalAvailable+m_ReserveFundCurrent[0]+m_ReserveFundCurrent[1])<=0.0) return 0.0;
-		return 1.0-(Runningsum/(m_CalculatedMtgPayments.GetAmountOut(0)+m_PrincipalAvailable+m_ReserveFundCurrent[0]+m_ReserveFundCurrent[1])); //((m_CalculatedMtgPayments.GetAmountOut(0)+m_PrincipalAvailable)/Runningsum)-1.0;
+		ReserveSum=m_CalculatedMtgPayments.GetAmountOut(0);
+		for(int ResIter=0;ResIter<NumReserves;ResIter++) ReserveSum+=m_PrincipalAvailable+m_ReserveFundCurrent[0];
+		if(ReserveSum<=0.0) return 0.0;
+		return 1.0-(Runningsum/ReserveSum); //((m_CalculatedMtgPayments.GetAmountOut(0)+m_PrincipalAvailable)/Runningsum)-1.0;
 	}
 }
 double Waterfall::GroupOutstanding(int GroupTarget)const{
@@ -435,7 +445,7 @@ double Waterfall::GetWACostOfCapital(int index)const{
 }
 
 bool Waterfall::CalculateTranchesCashFlows(){
-	if(m_MortgagesPayments.Count()<=0 || m_WaterfallStesps.size()<=0 || m_Tranches.size()<=0)return false; 
+	if(!ReadyToCalculate().isEmpty())return false; 
 		double AvailablePrincipal;
 		double AvailableInterest;
 		double TotalPayable;
@@ -454,7 +464,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		double adjJuniorFees;
 		double OriginalAvailableInterest=m_InterestAvailable;
 		double OriginalAvailablePrincipal=m_PrincipalAvailable;
-		double OriginalReserveLevel[]={m_ReserveFundCurrent[0],m_ReserveFundCurrent[1]};
+		double OriginalReserveLevel[NumReserves];
 		bool IsCallPaymentDate=false;
 		double ActualCallReserveLevel=0.0;
 		QDate CurrentDate;
@@ -467,7 +477,10 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		m_AnnualizedExcess.ResetFlows();
 		m_EquityIncome.ResetFlows();
 		m_Reinvested.ResetFlows();
-		for(int i=0;i<2;i++) m_ReserveFundFlows[i].ResetFlows();
+		for(int i=0;i<NumReserves;i++){
+			m_ReserveFundFlows[i].ResetFlows();
+			OriginalReserveLevel[i]=m_ReserveFundCurrent[i];
+		}
 		bool NullCCCanchor= m_CCCcurve.GetAnchorDate().isNull();
 		if(NullCCCanchor) m_CCCcurve.SetAnchorDate(m_MortgagesPayments.GetDate(0));
 		foreach(Tranche* SingleTranche, m_Tranches) SingleTranche->GetCashFlow().ResetFlows();
@@ -485,7 +498,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					}
 					if(ActualCallReserveLevel==0.0)ActualCallReserveLevel=m_CallReserve;
 					else {
-						for(int ReservIter=0;ReservIter<2;ReservIter++)	ActualCallReserveLevel+=m_ReserveFundCurrent[ReservIter];
+						for(int ReservIter=0;ReservIter<NumReserves;ReservIter++)	ActualCallReserveLevel+=m_ReserveFundCurrent[ReservIter];
 					}
 					ActualCallReserveLevel*=m_CallMultiple;
 					IsCallPaymentDate=ActualCallReserveLevel>=TotalPayable-m_PrincipalAvailable;
@@ -517,7 +530,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 			//This is a Tranche payment date
 			AvailablePrincipal = m_PrincipalAvailable;
 			AvailableInterest = m_InterestAvailable;
-			for(int ReservIter=0;ReservIter<2;ReservIter++){
+			for(int ReservIter=0;ReservIter<NumReserves;ReservIter++){
 				AvailableInterest+=m_ReserveFundCurrent[ReservIter];
 				m_ReserveFundCurrent[ReservIter]=0.0;
 			}
@@ -588,29 +601,49 @@ bool Waterfall::CalculateTranchesCashFlows(){
 				break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				case WatFalPrior::wst_ReserveReplenish:
-					if(i<m_MortgagesPayments.Count()-1 && !IsCallPaymentDate){
-						TestTarget=0.0;
-						if(m_ReserveFundTarget[SingleStep->GetGroupTarget()-1]>FindMostJuniorLevel()) TestTarget=m_ReserveFundTarget[SingleStep->GetGroupTarget()-1];
+					{
+						if(SingleStep->GetGroupTarget()<1 || SingleStep->GetGroupTarget()>NumReserves) return false;
+						double FreedAmnt, StacedRsAmt=0.0;
+						int MostJun=FindMostJuniorLevel();
+						if(m_ReserveFundFreed[SingleStep->GetGroupTarget()-1]==0 || m_ReserveFundFreed[SingleStep->GetGroupTarget()-1]>MostJun)
+							FreedAmnt=1.0;
 						else{
-							foreach(Tranche* SingleTranche, m_Tranches){
-								if(SingleTranche->GetProrataGroup()<=m_ReserveFundTarget[SingleStep->GetGroupTarget()-1]) TestTarget+=SingleTranche->GetCurrentOutstanding();
+							FreedAmnt=0.0;
+							for(int h=0;h<m_Tranches.size();h++){
+								if(m_Tranches.at(h)->GetProrataGroup()<=m_ReserveFundFreed[SingleStep->GetGroupTarget()-1])
+									FreedAmnt+=m_Tranches.at(h)->GetCurrentOutstanding();
 							}
 						}
-						TotalPayable=qMax(
-							m_ReserveFundFloor[SingleStep->GetGroupTarget()-1],
-							TestTarget*m_ReserveFundMultiple[SingleStep->GetGroupTarget()-1]	
-						)-m_ReserveFundCurrent[SingleStep->GetGroupTarget()-1];
-						if(TotalPayable>=0.01){
-							if(SingleStep->GetRedemptionGroup()==1){
-								m_ReserveFundFlows[SingleStep->GetGroupTarget()-1].AddFlow(CurrentDate,qMin(AvailableInterest,TotalPayable),TrancheCashFlow::InterestFlow);
-								m_ReserveFundFlows[SingleStep->GetGroupTarget()-1].AddFlow(CurrentDate,qMax(0.0,TotalPayable-AvailableInterest)-m_ReserveFundFlows[SingleStep->GetGroupTarget()-1].GetDeferred(CurrentDate),TrancheCashFlow::DeferredFlow);
-								m_ReserveFundCurrent[SingleStep->GetGroupTarget()-1]+=qMin(AvailableInterest,TotalPayable);
-								AvailableInterest=qMax(0.0,AvailableInterest-TotalPayable);
+						if(i<m_MortgagesPayments.Count()-1 && !IsCallPaymentDate && FreedAmnt>0.01){
+							TestTarget=0.0;
+							if(m_ReserveFundTarget[SingleStep->GetGroupTarget()-1]>MostJun) TestTarget=m_ReserveFundTarget[SingleStep->GetGroupTarget()-1];
+							else{
+								foreach(Tranche* SingleTranche, m_Tranches){
+									if(SingleTranche->GetProrataGroup()<=m_ReserveFundTarget[SingleStep->GetGroupTarget()-1]) TestTarget+=SingleTranche->GetCurrentOutstanding();
+								}
 							}
-							else if(SingleStep->GetRedemptionGroup()==2){
-								m_ReserveFundFlows[SingleStep->GetGroupTarget()-1].AddFlow(CurrentDate,qMin(AvailablePrincipal,TotalPayable),TrancheCashFlow::PrincipalFlow);
-								m_ReserveFundCurrent[SingleStep->GetGroupTarget()-1]+=qMin(AvailablePrincipal,TotalPayable);
-								AvailablePrincipal=qMax(0.0,AvailablePrincipal-TotalPayable);
+							if(m_CumulativeReserves){
+								for(int ResIter=0;ResIter<SingleStep->GetGroupTarget()-1;ResIter++)
+									StacedRsAmt+=m_ReserveFundCurrent[ResIter];
+							}
+							else StacedRsAmt=m_ReserveFundCurrent[SingleStep->GetGroupTarget()-1];
+							TotalPayable=qMax(
+								m_ReserveFundFloor[SingleStep->GetGroupTarget()-1],
+								TestTarget*m_ReserveFundMultiple[SingleStep->GetGroupTarget()-1]	
+							)-StacedRsAmt;
+
+							if(TotalPayable>=0.01){
+								if(SingleStep->GetRedemptionGroup()==1){
+									m_ReserveFundFlows[SingleStep->GetGroupTarget()-1].AddFlow(CurrentDate,qMin(AvailableInterest,TotalPayable),TrancheCashFlow::InterestFlow);
+									m_ReserveFundFlows[SingleStep->GetGroupTarget()-1].AddFlow(CurrentDate,qMax(0.0,TotalPayable-AvailableInterest)-m_ReserveFundFlows[SingleStep->GetGroupTarget()-1].GetDeferred(CurrentDate),TrancheCashFlow::DeferredFlow);
+									m_ReserveFundCurrent[SingleStep->GetGroupTarget()-1]+=qMin(AvailableInterest,TotalPayable);
+									AvailableInterest=qMax(0.0,AvailableInterest-TotalPayable);
+								}
+								else if(SingleStep->GetRedemptionGroup()==2){
+									m_ReserveFundFlows[SingleStep->GetGroupTarget()-1].AddFlow(CurrentDate,qMin(AvailablePrincipal,TotalPayable),TrancheCashFlow::PrincipalFlow);
+									m_ReserveFundCurrent[SingleStep->GetGroupTarget()-1]+=qMin(AvailablePrincipal,TotalPayable);
+									AvailablePrincipal=qMax(0.0,AvailablePrincipal-TotalPayable);
+								}
 							}
 						}
 					}
@@ -894,9 +927,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 				break;
 			}
 		}//End Cicle in time
-		for(int j=0;j<2;j++){
-// 			if(m_ReserveFundFlows[j].Count()>0)
-// 				m_ReserveFundFlows[j].AddFlow(m_MortgagesPayments.GetDate(i-1),RedeemSequential(m_ReserveFundCurrent[j],i-1)-m_ReserveFundCurrent[j],TrancheCashFlow::PrincipalFlow);
+		for(int j=0;j<NumReserves;j++){
 			m_ReserveFundCurrent[j]=OriginalReserveLevel[j];
 		}
 		m_PrincipalAvailable=OriginalAvailablePrincipal;
@@ -945,13 +976,15 @@ QDataStream& operator<<(QDataStream & stream, const Waterfall& flows){
 	stream << flows.m_WaterfallStesps.size();
 	foreach(const WatFalPrior* SingleStep,flows.m_WaterfallStesps)
 		stream << (*SingleStep);
-	for(int i=0;i<2;i++){
+	stream << flows.m_CumulativeReserves;
+	for(int i=0;i<NumReserves;i++){
 		stream
 			<< flows.m_ReserveFundTarget[i]
 			<< flows.m_ReserveFundMultiple[i]
 			<< flows.m_ReserveFundFloor[i]
 			<< flows.m_ReserveFundCurrent[i]
 			<< flows.m_ReserveFundFlows[i]
+			<< flows.m_ReserveFundFreed[i]
 		;
 	}
 	return stream;
@@ -1003,13 +1036,15 @@ QDataStream& operator>>(QDataStream & stream, Waterfall& flows){
 		stream >> TempStep;
 		flows.AddStep(TempStep);
 	}
-	for(int i=0;i<2;i++){
+	stream >> flows.m_CumulativeReserves;
+	for(int i=0;i<NumReserves;i++){
 		stream
 			>> flows.m_ReserveFundTarget[i]
 			>> flows.m_ReserveFundMultiple[i]
 			>> flows.m_ReserveFundFloor[i]
 			>> flows.m_ReserveFundCurrent[i]
 			>> flows.m_ReserveFundFlows[i]
+			>> flows.m_ReserveFundFreed[i]
 		;
 	}
 	return stream;
@@ -1029,6 +1064,10 @@ QDate Waterfall::GetCalledPeriod() const{
 				if(SingleTranche->GetProrataGroup()>=m_CallReserve) ActualCallReserveLevel+=SingleTranche->GetCashFlow().GetAmountOutstanding(RollingNextIPD);
 			}
 			if(ActualCallReserveLevel==0.0)ActualCallReserveLevel=m_CallReserve;
+			else {
+				for(int ReservIter=0;ReservIter<NumReserves;ReservIter++)
+					ActualCallReserveLevel+=m_ReserveFundFlows[ReservIter].GetTotalFlow(RollingNextIPD);
+			}
 			ActualCallReserveLevel*=m_CallMultiple;
 			IsCallPaymentDate=ActualCallReserveLevel>=TotalPayable-m_PrincipalAvailable;
 		}
@@ -1076,6 +1115,13 @@ QString Waterfall::ReadyToCalculate()const{
 	;
 	if(m_FirstIPDdate<QDate(2000,1,1))Result+="Next IDP\n";
 	if(m_LastIPDdate<QDate(2000,1,1))Result+="Last IDP\n";
+	for(int ResIter=0;ResIter<NumReserves;ResIter++){
+		if(m_ReserveFundTarget[ResIter]<0.0) Result+=QString("Reserve %1 Target Level\n").arg(ResIter+1);
+		if(m_ReserveFundFloor[ResIter]<0.0) Result+=QString("Reserve %1 Floor Level\n").arg(ResIter+1);
+		if(m_ReserveFundFreed[ResIter]<0) Result+=QString("Reserve %1 Freed After Redemption\n").arg(ResIter+1);
+		if(m_ReserveFundCurrent[ResIter]<0.0) Result+=QString("Reserve %1 Current Amount\n").arg(ResIter+1);
+		if(m_ReserveFundMultiple[ResIter]<0.0 || (m_ReserveFundMultiple[ResIter]==0.0 && m_ReserveFundTarget[ResIter]>0)) Result+=QString("Reserve %1 Multiple\n").arg(ResIter+1);
+	}
 	if(!Result.isEmpty()) return Result.left(Result.size()-1);
 	return Result;
 }
@@ -1170,20 +1216,21 @@ double Waterfall::GetCallEquityRatio(int index)const{
 	if(denominator>0) return numerator/denominator;
 	else return 0.0;
 }
-void Waterfall::SetReserveFund(int RFindex,double RFtarget,double RFmultiple,double RFfloor,double RFcurrent){
-	if(RFindex<0 || RFindex>1) return;
+void Waterfall::SetReserveFund(int RFindex,double RFtarget,double RFmultiple,double RFfloor,double RFcurrent,int RFfreed){
+	if(RFindex<0 || RFindex>=NumReserves) return;
 	m_ReserveFundTarget[RFindex]=RFtarget;
 	m_ReserveFundMultiple[RFindex]=RFmultiple;
 	m_ReserveFundFloor[RFindex]=RFfloor;
 	m_ReserveFundCurrent[RFindex]=RFcurrent;
+	m_ReserveFundFreed[RFindex]=RFfreed;
 }
 void Waterfall::ResetReserve(int RFindex){
 	if(RFindex==-1){
-		ResetReserve(0);
-		ResetReserve(1);
+		for(int i=0;i<NumReserves;i++)
+			ResetReserve(i);
 		return;
 	}
-	if(RFindex<0 || RFindex>1) return;
+	if(RFindex<0 || RFindex>=NumReserves) return;
 	m_ReserveFundTarget[RFindex]=0.0;
 	m_ReserveFundMultiple[RFindex]=0.0;
 	m_ReserveFundFloor[RFindex]=0.0;

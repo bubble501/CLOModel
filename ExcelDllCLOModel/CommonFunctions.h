@@ -7,6 +7,7 @@ class QString;
 //! The current Version of the Model
 #define ModelVersionNumber 173
 #define MaximumIRRIterations INT_MAX-1
+#define NumReserves 2
 //#define SaveLoanTape
 int MonthDiff(const QDate& FutureDte,const QDate& PresentDte);
 

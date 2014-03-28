@@ -7,13 +7,16 @@
 #include "MtgCashFlow.h"
 #include "ReinvestmentTest.h"
 #include "BloombergVector.h"
+#include "CommonFunctions.h"
 class Waterfall{
 private:
-	double m_ReserveFundTarget[2];
-	double m_ReserveFundMultiple[2];
-	double m_ReserveFundFloor[2];
-	double m_ReserveFundCurrent[2];
-	TrancheCashFlow m_ReserveFundFlows[2];
+	double m_ReserveFundTarget[NumReserves];
+	double m_ReserveFundMultiple[NumReserves];
+	double m_ReserveFundFloor[NumReserves];
+	double m_ReserveFundCurrent[NumReserves];
+	int m_ReserveFundFreed[NumReserves];
+	TrancheCashFlow m_ReserveFundFlows[NumReserves];
+	bool m_CumulativeReserves;
 	double m_SeniorExpenses;
 	double m_SeniorFees; 
 	double m_JuniorFees; 
@@ -100,12 +103,15 @@ public:
 	int GetTranchesCount()const{return m_Tranches.size();}
 	int GetStepsCount()const{return m_WaterfallStesps.size();}
 	const MtgCashFlow& GetCalculatedMtgPayments() const {return m_CalculatedMtgPayments;}
-	double GetReserveFundTarget(int RFindex)const{if(RFindex<0 || RFindex>1) return 0.0; return m_ReserveFundTarget[RFindex];}
-	double GetReserveFundMultiple(int RFindex)const{if(RFindex<0 || RFindex>1) return 0.0; return m_ReserveFundMultiple[RFindex];}
-	double GetReserveFundFloor(int RFindex)const{if(RFindex<0 || RFindex>1) return 0.0; return m_ReserveFundFloor[RFindex];}
-	double GetReserveFundCurrent(int RFindex)const{if(RFindex<0 || RFindex>1) return 0.0; return m_ReserveFundCurrent[RFindex];}
-	TrancheCashFlow GetReserveFundFlow(int RFindex)const{if(RFindex<0 || RFindex>1) return TrancheCashFlow(); return m_ReserveFundFlows[RFindex];}
+	double GetReserveFundTarget(int RFindex)const{if(RFindex<0 || RFindex>=NumReserves) return 0.0; return m_ReserveFundTarget[RFindex];}
+	double GetReserveFundMultiple(int RFindex)const{if(RFindex<0 || RFindex>=NumReserves) return 0.0; return m_ReserveFundMultiple[RFindex];}
+	double GetReserveFundFloor(int RFindex)const{if(RFindex<0 || RFindex>=NumReserves) return 0.0; return m_ReserveFundFloor[RFindex];}
+	double GetReserveFundCurrent(int RFindex)const{if(RFindex<0 || RFindex>=NumReserves) return 0.0; return m_ReserveFundCurrent[RFindex];}
+	int GetReserveFundFreed(int RFindex)const{if(RFindex<0 || RFindex>=NumReserves) return -1; return m_ReserveFundFreed[RFindex];}
+	TrancheCashFlow GetReserveFundFlow(int RFindex)const{if(RFindex<0 || RFindex>=NumReserves) return TrancheCashFlow(); return m_ReserveFundFlows[RFindex];}
+	bool GetCumulativeReserves() const {return m_CumulativeReserves;}
 	//////////////////////////////////////////////////////////////////////////
+	void SetCumulativeReserves(bool a){m_CumulativeReserves=a;}
 	void SetSeniorExpenses(double a){if(a>0.0) m_SeniorExpenses=a;}
 	void SetSeniorFees(double a){if(a>0.0) m_SeniorFees=a;}
 	void SetJuniorFees(double a){if(a>0.0) m_JuniorFees=a;}
@@ -129,7 +135,7 @@ public:
 	void SetupReinvestmentTest(const QDate& ReinvPer,double TstLvl, double IIshare,double IRshare,double OIshare,double ORshare);
 	void SetupReinvBond(const QString& IntrVec,const QString& CPRVec,const QString& CDRVec,const QString& LSVec,const QString& WALval,int PayFreq=1,const QString& AnnuityVec="N",double FloatingBase=0.0);
 	void AddStep(const WatFalPrior& a){m_WaterfallStesps.append(new WatFalPrior(a));}
-	void SetReserveFund(int RFindex,double RFtarget,double RFmultiple,double RFfloor,double RFcurrent);
+	void SetReserveFund(int RFindex,double RFtarget,double RFmultiple,double RFfloor,double RFcurrent,int RFfreed);
 	void ResetReserve(int RFindex=-1);
 	void ResetSteps();
 	void AddTranche(const Tranche& a){m_Tranches.append(new Tranche(a));}

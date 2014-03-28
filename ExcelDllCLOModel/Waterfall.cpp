@@ -258,10 +258,10 @@ void Waterfall::FillAllDates(){
 				m_TotalSeniorFees.AddFlow(m_Tranches.at(i)->GetCashFlow().GetDate(h),0.0,TrancheCashFlow::InterestFlow);
 			if (m_TotalJuniorFees.FindDate(m_Tranches.at(i)->GetCashFlow().GetDate(h)) < 0)
 				m_TotalJuniorFees.AddFlow(m_Tranches.at(i)->GetCashFlow().GetDate(h),0.0,TrancheCashFlow::InterestFlow);
-			for(int i=0;i<2;i++){
-				if(m_ReserveFundFlows[i].Count()==0) continue;
-				if (m_ReserveFundFlows[i].FindDate(m_Tranches.at(i)->GetCashFlow().GetDate(h)) < 0)
-					m_ReserveFundFlows[i].AddFlow(m_Tranches.at(i)->GetCashFlow().GetDate(h),0.0,TrancheCashFlow::InterestFlow);
+			for(int ResIter=0;ResIter<2;ResIter++){
+				if(m_ReserveFundFlows[ResIter].Count()==0) continue;
+				if (m_ReserveFundFlows[ResIter].FindDate(m_Tranches.at(i)->GetCashFlow().GetDate(h)) < 0)
+					m_ReserveFundFlows[ResIter].AddFlow(m_Tranches.at(i)->GetCashFlow().GetDate(h),0.0,TrancheCashFlow::InterestFlow);
 			}
 		}
 	}
@@ -464,10 +464,14 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		m_TotalSeniorExpenses.ResetFlows();
 		m_TotalSeniorFees.ResetFlows();
 		m_TotalJuniorFees.ResetFlows();
+		m_AnnualizedExcess.ResetFlows();
+		m_EquityIncome.ResetFlows();
+		m_Reinvested.ResetFlows();
+		for(int i=0;i<2;i++) m_ReserveFundFlows[i].ResetFlows();
 		bool NullCCCanchor= m_CCCcurve.GetAnchorDate().isNull();
 		if(NullCCCanchor) m_CCCcurve.SetAnchorDate(m_MortgagesPayments.GetDate(0));
 		foreach(Tranche* SingleTranche, m_Tranches) SingleTranche->GetCashFlow().ResetFlows();
-		int i; for(i=0;i<m_MortgagesPayments.Count();i++){
+		for(int i=0;i<m_MortgagesPayments.Count();i++){
 			CurrentDate=m_MortgagesPayments.GetDate(i);
 			m_PrincipalAvailable+=m_MortgagesPayments.GetPrincipal(i);
 			m_InterestAvailable+=m_MortgagesPayments.GetInterest(i);
@@ -564,23 +568,22 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						-m_TotalJuniorFees.GetPrincipal(CurrentDate)
 						+((1.0+(m_JuniorFeesCoupon*static_cast<double>(RollingLastIPD.daysTo(RollingNextIPD))/360.0))*m_TotalJuniorFees.GetPreviousDeferred(CurrentDate))
 					;
-					if(TotalPayable>=0.01){
-						if(SingleStep->GetRedemptionGroup()==1){
-							m_TotalJuniorFees.AddFlow(CurrentDate,qMin(AvailableInterest,TotalPayable),TrancheCashFlow::InterestFlow);
-							m_AnnualizedExcess.AddFlow(CurrentDate,qMin(AvailableInterest,TotalPayable),TrancheCashFlow::InterestFlow);
-							if(AvailableInterest<TotalPayable){
-								m_TotalJuniorFees.AddFlow(CurrentDate,TotalPayable-AvailableInterest-m_TotalJuniorFees.GetDeferred(CurrentDate),TrancheCashFlow::DeferredFlow);
-							}
-							AvailableInterest=qMax(0.0,AvailableInterest-TotalPayable);
+					TotalPayable=qMax(TotalPayable,0.0);
+					if(SingleStep->GetRedemptionGroup()==1){
+						m_TotalJuniorFees.AddFlow(CurrentDate,qMin(AvailableInterest,TotalPayable),TrancheCashFlow::InterestFlow);
+						m_AnnualizedExcess.AddFlow(CurrentDate,qMin(AvailableInterest,TotalPayable),TrancheCashFlow::InterestFlow);
+						if(AvailableInterest<TotalPayable){
+							m_TotalJuniorFees.AddFlow(CurrentDate,TotalPayable-AvailableInterest-m_TotalJuniorFees.GetDeferred(CurrentDate),TrancheCashFlow::DeferredFlow);
 						}
-						else if(SingleStep->GetRedemptionGroup()==2){
-							m_TotalJuniorFees.AddFlow(CurrentDate,qMin(AvailablePrincipal,TotalPayable),TrancheCashFlow::PrincipalFlow);
-							m_AnnualizedExcess.AddFlow(CurrentDate,qMin(AvailablePrincipal,TotalPayable),TrancheCashFlow::PrincipalFlow);
-							if(AvailablePrincipal<TotalPayable){
-								m_TotalJuniorFees.AddFlow(CurrentDate,TotalPayable-AvailablePrincipal-m_TotalJuniorFees.GetDeferred(CurrentDate),TrancheCashFlow::DeferredFlow);
-							}
-							AvailablePrincipal=qMax(0.0,AvailablePrincipal-TotalPayable);
+						AvailableInterest=qMax(0.0,AvailableInterest-TotalPayable);
+					}
+					else if(SingleStep->GetRedemptionGroup()==2){
+						m_TotalJuniorFees.AddFlow(CurrentDate,qMin(AvailablePrincipal,TotalPayable),TrancheCashFlow::PrincipalFlow);
+						m_AnnualizedExcess.AddFlow(CurrentDate,qMin(AvailablePrincipal,TotalPayable),TrancheCashFlow::PrincipalFlow);
+						if(AvailablePrincipal<TotalPayable){
+							m_TotalJuniorFees.AddFlow(CurrentDate,TotalPayable-AvailablePrincipal-m_TotalJuniorFees.GetDeferred(CurrentDate),TrancheCashFlow::DeferredFlow);
 						}
+						AvailablePrincipal=qMax(0.0,AvailablePrincipal-TotalPayable);
 					}
 				break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

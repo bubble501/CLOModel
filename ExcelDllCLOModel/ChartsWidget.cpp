@@ -55,6 +55,7 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 			else DatesLabels << "";
 		}
 		KDChart::LineDiagram* AnnualizedExcessLine=new KDChart::LineDiagram;
+		AnnualizedExcessLine->setType(KDChart::LineDiagram::Stacked);
 		KDChart::LineAttributes HideMissing=AnnualizedExcessLine->lineAttributes(0);
 		HideMissing.setDisplayArea(true);
 		AnnualizedExcessLine->setLineAttributes(0,HideMissing);

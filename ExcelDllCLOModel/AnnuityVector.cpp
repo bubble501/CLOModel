@@ -23,7 +23,7 @@ AnnuityVector::AnnuityVector(const AnnuityVector& Vec)
 }
 void AnnuityVector::UnpackVector(){
 	m_VectVal.clear();
-	QString TempVec(m_Vector);
+	QString TempVec(m_Vector.trimmed().toUpper());
 	QRegExp AnchorCheck("^A\\s+(\\d{1,2})/(\\d{1,2})/(\\d{4})\\s+(.+)",Qt::CaseInsensitive);
 	if(AnchorCheck.exactMatch(TempVec)){
 		QStringList dateVals=AnchorCheck.capturedTexts();
@@ -45,7 +45,7 @@ void AnnuityVector::UnpackVector(){
 }
 bool AnnuityVector::IsValid() const{
 	QRegExp Vigil("^(A\\s+\\d{1,2}/\\d{1,2}/\\d{4}\\s+){0,1}[YN](\\s+\\d+S\\s+[YN])*$",Qt::CaseInsensitive);
-	return Vigil.exactMatch(m_Vector);
+	return Vigil.exactMatch(m_Vector.trimmed().toUpper());
 }
 
 char AnnuityVector::GetValue(const QDate& index)const{

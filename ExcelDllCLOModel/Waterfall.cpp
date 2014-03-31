@@ -761,8 +761,8 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					}
 					TotalPayable=qMax(TotalPayable,0.000001);
 					//CCC test
-					if(m_CCCcurve.GetValue(CurrentDate,m_PaymentFrequency)>m_CCCTestLimit)
-						Solution=(1.0-((m_CCCcurve.GetValue(CurrentDate,m_PaymentFrequency)-m_CCCTestLimit)*m_CCChaircut))*m_MortgagesPayments.GetAmountOut(i);
+					if(m_CCCcurve.GetValue(CurrentDate/*,m_PaymentFrequency*/)>m_CCCTestLimit)
+						Solution=(1.0-((m_CCCcurve.GetValue(CurrentDate/*,m_PaymentFrequency*/)-m_CCCTestLimit)*m_CCChaircut))*m_MortgagesPayments.GetAmountOut(i);
 					else
 						Solution=m_MortgagesPayments.GetAmountOut(i);
 					Solution+=AvailablePrincipal;

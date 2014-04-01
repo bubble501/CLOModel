@@ -105,6 +105,21 @@ namespace ManagedCLO {
 		*/
 		double GetReserveFundCurrent(int index){return Unmanaged->GetReserveFundCurrent(index);}
 		/*!
+		\brief The seniority level after which the reserve is released
+		\arg index the index of the reserve fund. Currently 2 reserves are modeled so  index can be either 0 or 1 for, respectively, the first and second reserve
+		\details This function will return the seniority level that is used to determine when the reserve fund is released.<br/>After all the notes of this seniority level and any note senior to these have redeemed the reserve will be released in the interest waterfall.<br/>A value of 0 means that the reserve will be release only at maturity.
+		\sa SetReserveFund
+		*/
+		int GetReserveFundFreed(int index){return Unmanaged->GetReserveFundFreed(index);}
+		/*!
+		\brief Whether the reserve funds should be considered stacked
+		\details If the property is set to true, the amount outstanding to the credit of the first reserve fund is deducted when calculating the target amount of the second reserve fund.
+		*/
+		property bool CumulativeReserves{
+			bool get() {return Unmanaged->GetCumulativeReserves();}
+			void set(bool a){Unmanaged->SetCumulativeReserves(a);}
+		}
+		/*!
 		\brief The cash flows toward the reserve fund
 		\arg index the index of the reserve fund. Currently 2 reserves are modeled so  index can be either 0 or 1 for, respectively, the first and second reserve
 		\details This function will return the cash flows toward the replenishment of the reserve fund.<br/>The interest and principal flows will distinguish whether the reserve fund was replenished using interest or principal proceeds.<br/>Use ManTrancheCashFlow::GetTotalFlow to get the level of the reserve fund in a given period.<br/>Use ManTrancheCashFlow::GetDeferred to get the shortfall in the reserve fund compared to the target level for a given period.
@@ -118,12 +133,13 @@ namespace ManagedCLO {
 		\arg RFmultiple the value by which RFtarget will be multiplied.
 		\arg RFfloor the floor level of the reserve fund. For non-amortizing RFs set to 0
 		\arg RFcurrent the current size of the reserve fund
+		\arg RFfreed A seniority level. When all the notes not junior to this seniority level will be redeemed, the RF will be released as excess spread. 0 for freeing it only at maturity
 		\details This function will set up the specified reserve fund according to the supplied parameters.<br/>If RFtarget is a seniority level, the reserve fund target amount will be the sum of all the notes that rank not junior to that level, otherwise the reserve will be a non amortizing.<br/>The target level will then be multiplied by RFmultiple to assess the actual replenishment target.<br/>In any case, the target won't be set below the RFfloor amount.
 		*/
-		void SetReserveFund(int RFindex,double RFtarget,double RFmultiple,double RFfloor,double RFcurrent){Unmanaged->SetReserveFund(RFindex,RFtarget,RFmultiple,RFfloor,RFcurrent);}
+		void SetReserveFund(int RFindex,double RFtarget,double RFmultiple,double RFfloor,double RFcurrent,int RFfreed){Unmanaged->SetReserveFund(RFindex,RFtarget,RFmultiple,RFfloor,RFcurrent,RFfreed);}
 		/*!
 		\brief Removes all the settings for the specified reserve fund
-		\arg index the index of the reserve fund. Currently 2 reserves are modeled so  index can be either 0 or 1 for, respectively, the first and second reserve
+		\arg index the index of the reserve fund. Currently 2 reserves are modeled so  index can be either 0 or 1 for, respectively, the first and second reserve. -1 will reset all the reserves
 		\details This function will remove all the settings and cash flows relative to the specified reserve fund.
 		*/
 		void ResetReserveFund(int index){Unmanaged->ResetReserve(index);}

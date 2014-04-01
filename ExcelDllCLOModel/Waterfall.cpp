@@ -865,8 +865,8 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						}
 						TotalPayable=qMax(TotalPayable,0.000001);
 						//CCC test
-						if(m_CCCcurve.GetValue(CurrentDate,m_PaymentFrequency)>m_CCCTestLimit)
-							Solution=(1.0-((m_CCCcurve.GetValue(CurrentDate,m_PaymentFrequency)-m_CCCTestLimit)*m_CCChaircut))*m_MortgagesPayments.GetAmountOut(i);
+						if(m_CCCcurve.GetValue(CurrentDate)>m_CCCTestLimit)
+							Solution=(1.0-((m_CCCcurve.GetValue(CurrentDate)-m_CCCTestLimit)*m_CCChaircut))*m_MortgagesPayments.GetAmountOut(i);
 						else
 							Solution=m_MortgagesPayments.GetAmountOut(i);
 						if(Solution==0.0) Solution=1.0;
@@ -1235,5 +1235,6 @@ void Waterfall::ResetReserve(int RFindex){
 	m_ReserveFundMultiple[RFindex]=0.0;
 	m_ReserveFundFloor[RFindex]=0.0;
 	m_ReserveFundCurrent[RFindex]=0.0;
+	m_ReserveFundFreed[RFindex]=0;
 	m_ReserveFundFlows[RFindex].ResetFlows();
 }

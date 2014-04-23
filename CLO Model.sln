@@ -16,8 +16,11 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StandaloneViewer", "ExcelDllCLOModel\Standalone Viewer.vcxproj", "{9D32C7A1-865F-4ADD-A04E-EFCC9DB66C31}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "APIUnitTest", "ExcelDllCLOModel\APIUnitTest\APIUnitTest.csproj", "{F51F55B6-0ED8-4AE0-A4DA-970BBCEBDACB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{87F5AF67-EBDA-4554-8E03-2F9C974BD216} = {87F5AF67-EBDA-4554-8E03-2F9C974BD216}
+	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NETapi", "ExcelDllCLOModel\NETapi.vcxproj", "{87F5AF67-EBDA-4554-8E03-2F9C974BD216}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CLONetApi", "ExcelDllCLOModel\NETapi.vcxproj", "{87F5AF67-EBDA-4554-8E03-2F9C974BD216}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DotNETapi", "DotNETapi", "{2A0D22FE-34EC-4192-81A2-63013A5ED4B6}"
 	ProjectSection(SolutionItems) = preProject

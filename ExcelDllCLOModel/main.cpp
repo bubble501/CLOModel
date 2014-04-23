@@ -46,7 +46,6 @@ int main(int argc, char *argv[])
 		file.close();
 	}*/
 	
-	qint32 VesionCheck;
 	Waterfall TempWtf,TempCallWaterfall;
 	QFile file("C:/Temp/.BaseCase.clo");
 	file.open(QIODevice::ReadOnly);
@@ -54,11 +53,13 @@ int main(int argc, char *argv[])
 	QDataStream out(&file);
 	out.setVersion(QDataStream::Qt_4_8);
 	out >> VersionChecker;
-	if(VersionChecker!=qint32(ModelVersionNumber)){
+	if(VersionChecker<qint32(MinimumSupportedVersion)){
 		file.close();
 		return 1;
 	}
+	TempWtf.SetLoadProtocolVersion(VersionChecker);
 	out >> TempWtf;
+	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempCallWaterfall;
 	file.close();
 	TempWtf.CalculateTranchesCashFlows();

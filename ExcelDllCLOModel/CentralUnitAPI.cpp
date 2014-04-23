@@ -142,8 +142,10 @@ bool CentralUnitAPI::LoadBaseCase(const QString& DestPath){
 	QDataStream out(&file);
 	out.setVersion(QDataStream::Qt_4_8);
 	out >> VersionCheck;
-	if(VersionCheck!=ModelVersionNumber) return false;
+	if(VersionCheck<MinimumSupportedVersion) return false;
+	Structure.SetLoadProtocolVersion(VersionCheck);
 	out >> Structure;
+	CallStructure.SetLoadProtocolVersion(VersionCheck);
 	out >> CallStructure;
 	file.close();
 	return true;

@@ -290,19 +290,19 @@ void StressTest::SaveResults(const QString& DestPath)const{
 }
 Waterfall StressTest::GetScenarioFromFile(const QString& DestPath,const QString& XScenario,const QString& YScenario){
 	Waterfall Result;
+	qint32 VesionCheck;
 	if(!QFile::exists(DestPath)) return Result;
 	QuaZip zip(DestPath);
 	if(!zip.open(QuaZip::mdUnzip)) return Result;
 	QuaZipFile TargetFile(&zip);
 	try{
 		if(!zip.setCurrentFile("VersionIdentifier")) throw 1;
-		qint32 VesionCheck;
 		TargetFile.open(QIODevice::ReadOnly);
 		QDataStream out(&TargetFile);
 		out.setVersion(QDataStream::Qt_4_8);
 		out >> VesionCheck;
 		TargetFile.close();
-		if(VesionCheck!=qint32(ModelVersionNumber)) throw 1;
+		if(VesionCheck<qint32(MinimumSupportedVersion)) throw 1;
 	}
 	catch(int ExcCode){
 		if(!QApplication::instance()){
@@ -319,6 +319,7 @@ Waterfall StressTest::GetScenarioFromFile(const QString& DestPath,const QString&
 	TargetFile.open(QIODevice::ReadOnly);
 	QDataStream out(&TargetFile);
 	out.setVersion(QDataStream::Qt_4_8);
+	Result.SetLoadProtocolVersion(VesionCheck);
 	out >> Result;
 	TargetFile.close();
 	return Result;
@@ -326,27 +327,27 @@ Waterfall StressTest::GetScenarioFromFile(const QString& DestPath,const QString&
 bool StressTest::LoadResultsFromFile(const QString& DestPath){
 	XSpann.clear();
 	YSpann.clear();
+	qint32 VesionCheck,Temp32;
 	if(!QFile::exists(DestPath)) return false;
 	QuaZip zip(DestPath);
 	if(!zip.open(QuaZip::mdUnzip)) return false;
 	QuaZipFile TargetFile(&zip);
 	try{
 		if(!zip.setCurrentFile("VersionIdentifier")) throw 1;
-		qint32 VesionCheck;
 		TargetFile.open(QIODevice::ReadOnly);
 		QDataStream out(&TargetFile);
 		out.setVersion(QDataStream::Qt_4_8);
 		out >> VesionCheck;
-		if(VesionCheck!=qint32(ModelVersionNumber)){
+		if(VesionCheck<qint32(MinimumSupportedVersion)){
 			TargetFile.close();
 			throw 1;
 		}
 		out >> ConstantPar;
 		if(!out.atEnd()){
-			out >> VesionCheck;
-			StressDimension[0]=StressVariability(VesionCheck);
-			out >> VesionCheck;
-			StressDimension[1]=StressVariability(VesionCheck);
+			out >> Temp32;
+			StressDimension[0]=StressVariability(Temp32);
+			out >> Temp32;
+			StressDimension[1]=StressVariability(Temp32);
 		}
 		
 		TargetFile.close();
@@ -375,6 +376,7 @@ bool StressTest::LoadResultsFromFile(const QString& DestPath){
 		if(!YSpann.contains(Spanns.at(1))) YSpann.append(Spanns.at(1));
 		QDataStream out(&TargetFile);
 		out.setVersion(QDataStream::Qt_4_8);
+		(Results[Spanns.at(0)][Spanns.at(1)]).SetLoadProtocolVersion(VesionCheck);
 		out >> (Results[Spanns.at(0)][Spanns.at(1)]);
 		TargetFile.close();
 	}

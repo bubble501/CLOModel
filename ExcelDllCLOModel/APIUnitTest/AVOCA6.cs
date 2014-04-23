@@ -54,7 +54,7 @@ namespace APIUnitTest
             TempTranche.OutstandingAmt = 255379093;
             TempTranche.InterestType = ManTranche.ManTrancheInterestType.FloatingInterest;
             TempTranche.Price = 100.0;
-            TempTranche.Coupon = 0.0021;
+            TempTranche.Coupon = "0.0021";
             TempTranche.ReferenceRate = "EUR006M";
             TempTranche.DefaultRefRate = "EUR006M";
             TempTranche.ReferenceRateValue = 0.0038;
@@ -67,7 +67,7 @@ namespace APIUnitTest
             TempTranche.MinOClevel = 1.258;
             TempTranche.OriginalAmount = 64000000;
             TempTranche.OutstandingAmt = 64000000;
-            TempTranche.Coupon = 0.0028;
+            TempTranche.Coupon = "0.0028";
             TempTranche.AccruedInterest = 0.1 / 100.0;
             AvocaStructure.AddTranche(TempTranche);
             TempTranche.TrancheName = "AVOCA VI-X B";
@@ -76,7 +76,7 @@ namespace APIUnitTest
             TempTranche.MinIClevel = 1.2;
             TempTranche.OriginalAmount = 19400000;
             TempTranche.OutstandingAmt = 19400000;
-            TempTranche.Coupon = 0.0035;
+            TempTranche.Coupon = "0.0035";
             TempTranche.AccruedInterest = 0.11 / 100.0;
             AvocaStructure.AddTranche(TempTranche);
             TempTranche.TrancheName = "AVOCA VI-X C";
@@ -85,7 +85,7 @@ namespace APIUnitTest
             TempTranche.MinIClevel = 1.1;
             TempTranche.OriginalAmount = 31500000;
             TempTranche.OutstandingAmt = 31500000;
-            TempTranche.Coupon = 0.0055;
+            TempTranche.Coupon = "0.0055";
             TempTranche.AccruedInterest = 0.14 / 100.0;
             AvocaStructure.AddTranche(TempTranche);
             TempTranche.TrancheName = "AVOCA VI-X D";
@@ -94,7 +94,7 @@ namespace APIUnitTest
             TempTranche.MinIClevel = 1.05;
             TempTranche.OriginalAmount = 20000000;
             TempTranche.OutstandingAmt = 20000000;
-            TempTranche.Coupon = 0.0135;
+            TempTranche.Coupon = "0.0135";
             TempTranche.AccruedInterest = 0.27 / 100.0;
             AvocaStructure.AddTranche(TempTranche);
             TempTranche.TrancheName = "AVOCA VI-X E";
@@ -103,7 +103,7 @@ namespace APIUnitTest
             TempTranche.MinIClevel = 1.025;
             TempTranche.OriginalAmount = 23850000;
             TempTranche.OutstandingAmt = 23850000;
-            TempTranche.Coupon = 0.0335;
+            TempTranche.Coupon = "0.0335";
             TempTranche.AccruedInterest = 0.57 / 100.0;
             AvocaStructure.AddTranche(TempTranche);
             TempTranche.TrancheName = "AVOCA VI-X F";
@@ -112,7 +112,7 @@ namespace APIUnitTest
             TempTranche.MinIClevel = 1.0;
             TempTranche.OriginalAmount = 10000000;
             TempTranche.OutstandingAmt = 10000000;
-            TempTranche.Coupon = 0.0495;
+            TempTranche.Coupon = "0.0495";
             TempTranche.AccruedInterest = 0.82 / 100.0;
             AvocaStructure.AddTranche(TempTranche);
             TempTranche.TrancheName = "AVOCA VI-X M";
@@ -122,7 +122,7 @@ namespace APIUnitTest
             TempTranche.OriginalAmount = 37750000;
             TempTranche.OutstandingAmt = 37750000;
             TempTranche.InterestType = ManTranche.ManTrancheInterestType.FixedInterest;
-            TempTranche.Coupon = 0;
+            TempTranche.Coupon = "0";
             TempTranche.AccruedInterest = 0.0;
             AvocaStructure.AddTranche(TempTranche);
 
@@ -282,8 +282,8 @@ namespace APIUnitTest
                     TempMtg.Interest = SingleParts[0];
                     TempMtg.Annuity = SingleParts[1];
                     TempMtg.PaymentFreq = int.Parse(SingleParts[2]);
-                    TempMtg.PrepayMultiplier = int.Parse(SingleParts[3]);
-                    TempMtg.LossMultiplier = int.Parse(SingleParts[4]);
+                    TempMtg.PrepayMultiplier = SingleParts[3];
+                    TempMtg.LossMultiplier = SingleParts[4];
                     TempMtg.MaturityDate = DateTime.Parse(SingleParts[5]);
                     TempMtg.Size = double.Parse(SingleParts[6]);
                     ModelUnit.AddLoan(TempMtg);
@@ -298,6 +298,14 @@ namespace APIUnitTest
             ModelUnit.Calculate();
             Assert.IsTrue(finished.WaitOne(1000), "Calculation not finished");
             ModelUnit.SaveBaseCase(TestCommons.WorkDir, "AVOCA Base Case");
+            FileStream TmpFstream=File.OpenWrite(TestCommons.WorkDir + "AVOCA Managed File.mclo");
+            ModelUnit.Result.Write(TmpFstream);
+            TmpFstream.Close();
+
+            ManWaterfall TestRead=new ManWaterfall();
+            FileStream TmpFstreamIn = File.OpenRead(TestCommons.WorkDir + "AVOCA Managed File.mclo");
+            TestRead.Read(TmpFstreamIn);
+            TmpFstreamIn.Close();
         }
     }
 }

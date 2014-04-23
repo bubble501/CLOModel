@@ -29,7 +29,6 @@ ipch*/
 [Gg]enerated[Ff]iles*/
 *.lib
 *.sbr
-.*log
 obj/
 [Rr]elease*/
 _ReSharper*/
@@ -38,3 +37,4 @@ ipch*/
 html/
 [Nn]ightly*/
 Documentation/NETapi*/
+*CriptKey

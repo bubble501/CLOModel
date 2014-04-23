@@ -126,11 +126,13 @@ void StandaloneViewer::LoadFile(const QString& fileName){
 		QDataStream out(&file);
 		out.setVersion(QDataStream::Qt_4_8);
 		out >> VersionChecker;
-		if(VersionChecker!=qint32(ModelVersionNumber)){
+		if(VersionChecker<qint32(MinimumSupportedVersion)){
 			QMessageBox::critical(this,"Invalid File Format","The selected file version is not compatible with this viewer");
 			return closeFile();
 		}
+		TempWaterfall.SetLoadProtocolVersion(VersionChecker);
 		out >> TempWaterfall;
+		TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
 		out >> TempCallWaterfall;
 		file.close();
 		TheViewer->SetStructure(TempWaterfall,TempCallWaterfall);

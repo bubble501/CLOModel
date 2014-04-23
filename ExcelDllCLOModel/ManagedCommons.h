@@ -8,7 +8,8 @@ using namespace System::Text;
 #include <vcclr.h>
 #include "CommonFunctions.h"
 namespace ManagedCLO {
-	const quint32 VersionNumber=ModelVersionNumber; //Maximum 255
+	const quint32 VersionNumber=ModelVersionNumber; //Maximum 65535
+	const quint32 MinSupportedVersion=MinimumSupportedVersion;
 	inline DateTime QDate2DateTime(const QDate& a){
 		if(a.isNull()) return DateTime();
 		return DateTime(a.year(),a.month(),a.day());

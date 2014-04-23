@@ -199,12 +199,13 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		TempUnit.SetCallReserve(pdFreq->dblVal);pdFreq++;
 		TempUnit.SetPoolValueAtCall(pdFreq->dblVal);pdFreq++;
 		{//Reserve Fund
-			double RFtarget,RFmultiple,RFfloor,RFcurrent;
+			QString RFtarget,RFmultiple,RFfloor;
+			double RFcurrent;
 			int RFfree;
 			for(int RFiter=0;RFiter<NumReserves;RFiter++){
-				RFtarget=pdFreq->dblVal; pdFreq++;
-				RFmultiple=pdFreq->dblVal; pdFreq++;
-				RFfloor=pdFreq->dblVal; pdFreq++;
+				RFtarget=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
+				RFmultiple=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
+				RFfloor=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 				RFcurrent=pdFreq->dblVal; pdFreq++;
 				RFfree=pdFreq->intVal; pdFreq++;
 #ifdef DebuggungInputs
@@ -347,9 +348,14 @@ double __stdcall CLODiscountMargin(LPSAFEARRAY *ArrayData){
 	QDataStream out(&file);
 	out.setVersion(QDataStream::Qt_4_8);
 	out >> VersionChecker;
-	if(VersionChecker!=qint32(ModelVersionNumber)) return 0.0;
+	//if(VersionChecker!=qint32(ModelVersionNumber)) return 0.0;
+	if(VersionChecker<qint32(MinimumSupportedVersion)) return 0.0;
+	TempWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempWaterfall;
-	if(ToCall) out >> TempWaterfall;
+	if(ToCall){
+		TempWaterfall.SetLoadProtocolVersion(VersionChecker);
+		out >> TempWaterfall;
+	}
 	file.close();
 	const Tranche* TranchPoint=TempWaterfall.GetTranche(TrancheName);
 	if(!TranchPoint){
@@ -383,9 +389,13 @@ double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
 	QDataStream out(&file);
 	out.setVersion(QDataStream::Qt_4_8);
 	out >> VersionChecker;
-	if(VersionChecker!=qint32(ModelVersionNumber)) return 0.0;
+	if(VersionChecker<qint32(MinimumSupportedVersion)) return 0.0;
+	TempWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempWaterfall;
-	if(ToCall) out >> TempWaterfall;
+	if(ToCall){
+		TempWaterfall.SetLoadProtocolVersion(VersionChecker);
+		out >> TempWaterfall;
+	}
 	file.close();
 	const Tranche* TranchPoint=TempWaterfall.GetTranche(TrancheName);
 	if(!TranchPoint) return 0.0;

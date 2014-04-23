@@ -10,9 +10,9 @@
 #include "CommonFunctions.h"
 class Waterfall{
 private:
-	double m_ReserveFundTarget[NumReserves];
-	double m_ReserveFundMultiple[NumReserves];
-	double m_ReserveFundFloor[NumReserves];
+	BloombergVector m_ReserveFundTarget[NumReserves];
+	BloombergVector m_ReserveFundMultiple[NumReserves];
+	BloombergVector m_ReserveFundFloor[NumReserves];
 	double m_ReserveFundCurrent[NumReserves];
 	int m_ReserveFundFreed[NumReserves];
 	TrancheCashFlow m_ReserveFundFlows[NumReserves];
@@ -47,6 +47,7 @@ private:
 	bool m_UseCall; 
 	double m_CallMultiple; 
 	double m_CallReserve;
+	qint32 m_LoadProtocolVersion;
 	int FindMostJuniorLevel() const;
 	void SortByProRataGroup();
 	double GroupOutstanding(int GroupTarget)const;
@@ -56,6 +57,7 @@ private:
 	double RedeemSequential(double AvailableFunds, int PeriodIndex,int MaxGroup=-1);
 	int FindTrancheIndex(const QString& Tranchename)const;
 	void FillAllDates();
+	QDataStream& LoadOldVersion(QDataStream& stream);
 public:
 	Waterfall();
 	Waterfall(const Waterfall& a);
@@ -103,9 +105,9 @@ public:
 	int GetTranchesCount()const{return m_Tranches.size();}
 	int GetStepsCount()const{return m_WaterfallStesps.size();}
 	const MtgCashFlow& GetCalculatedMtgPayments() const {return m_CalculatedMtgPayments;}
-	double GetReserveFundTarget(int RFindex)const{if(RFindex<0 || RFindex>=NumReserves) return 0.0; return m_ReserveFundTarget[RFindex];}
-	double GetReserveFundMultiple(int RFindex)const{if(RFindex<0 || RFindex>=NumReserves) return 0.0; return m_ReserveFundMultiple[RFindex];}
-	double GetReserveFundFloor(int RFindex)const{if(RFindex<0 || RFindex>=NumReserves) return 0.0; return m_ReserveFundFloor[RFindex];}
+	QString GetReserveFundTarget(int RFindex)const{if(RFindex<0 || RFindex>=NumReserves) return ""; return m_ReserveFundTarget[RFindex].GetVector();}
+	QString GetReserveFundMultiple(int RFindex)const{if(RFindex<0 || RFindex>=NumReserves) return ""; return m_ReserveFundMultiple[RFindex].GetVector();}
+	QString GetReserveFundFloor(int RFindex)const{if(RFindex<0 || RFindex>=NumReserves) return ""; return m_ReserveFundFloor[RFindex].GetVector();}
 	double GetReserveFundCurrent(int RFindex)const{if(RFindex<0 || RFindex>=NumReserves) return 0.0; return m_ReserveFundCurrent[RFindex];}
 	int GetReserveFundFreed(int RFindex)const{if(RFindex<0 || RFindex>=NumReserves) return -1; return m_ReserveFundFreed[RFindex];}
 	TrancheCashFlow GetReserveFundFlow(int RFindex)const{if(RFindex<0 || RFindex>=NumReserves) return TrancheCashFlow(); return m_ReserveFundFlows[RFindex];}
@@ -135,13 +137,14 @@ public:
 	void SetupReinvestmentTest(const QDate& ReinvPer,double TstLvl, double IIshare,double IRshare,double OIshare,double ORshare);
 	void SetupReinvBond(const QString& IntrVec,const QString& CPRVec,const QString& CDRVec,const QString& LSVec,const QString& WALval,int PayFreq=1,const QString& AnnuityVec="N",double FloatingBase=0.0);
 	void AddStep(const WatFalPrior& a){m_WaterfallStesps.append(new WatFalPrior(a));}
-	void SetReserveFund(int RFindex,double RFtarget,double RFmultiple,double RFfloor,double RFcurrent,int RFfreed);
+	void SetReserveFund(int RFindex,const QString& RFtarget,const QString& RFmultiple,const QString& RFfloor,double RFcurrent,int RFfreed);
 	void ResetReserve(int RFindex=-1);
 	void ResetSteps();
 	void AddTranche(const Tranche& a){m_Tranches.append(new Tranche(a));}
 	void ResetTranches();
 	bool CalculateTranchesCashFlows();
 	QString ReadyToCalculate() const;
+	void SetLoadProtocolVersion(qint32 VersionNum=ModelVersionNumber){if(VersionNum>=MinimumSupportedVersion) m_LoadProtocolVersion=VersionNum;}
 	friend QDataStream& operator<<(QDataStream & stream, const Waterfall& flows);
 	friend QDataStream& operator>>(QDataStream & stream, Waterfall& flows);
 };

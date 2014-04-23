@@ -59,11 +59,12 @@ namespace ManagedCLO {
 		bool Read(IO::Stream^ Source){
 			if(!Source->CanRead) return false;
 			quint32 BlockSize;
-			quint32 MagicNumber=((ClassIdentity << 16) | VersionNumber);
 			try{
 				IO::BinaryReader SizeReader(Source);
 				BlockSize=SizeReader.ReadUInt32();
-				if(BlockSize!=MagicNumber) return false;
+				//if(BlockSize!=MagicNumber) return false;
+				if(BlockSize >> 16!=ClassIdentity || (BlockSize & 0xFFFF)< MinSupportedVersion) return false;
+				Unmanaged->SetLoadProtocolVersion(BlockSize & 0xffff);
 				BlockSize=SizeReader.ReadUInt32();
 				array<Byte>^ DataBuffer= SizeReader.ReadBytes(BlockSize);
 				QByteArray DataRaw;
@@ -79,24 +80,24 @@ namespace ManagedCLO {
 		/*!
 		\brief The target amount of the reserve fund
 		\arg index the index of the reserve fund. Currently 2 reserves are modeled so  index can be either 0 or 1 for, respectively, the first and second reserve
-		\details This function will return the value of the target level of the specified reserve fund
+		\details This function will return the Bloomberg vector representing the target level of the specified reserve fund
 		\sa SetReserveFund
 		*/
-		double GetReserveFundTarget(int index){return Unmanaged->GetReserveFundTarget(index);}
+		String^ GetReserveFundTarget(int index){return QString2String(Unmanaged->GetReserveFundTarget(index));}
 		/*!
 		\brief The multiple of the target amount of the reserve fund
 		\arg index the index of the reserve fund. Currently 2 reserves are modeled so  index can be either 0 or 1 for, respectively, the first and second reserve
-		\details This function will return the value of the multiple of the target level of the specified reserve fund
+		\details This function will return the Bloomberg vector representing the multiple of the target level of the specified reserve fund
 		\sa SetReserveFund
 		*/
-		double GetReserveFundMultiple(int index){return Unmanaged->GetReserveFundMultiple(index);}
+		String^ GetReserveFundMultiple(int index){return QString2String(Unmanaged->GetReserveFundMultiple(index));}
 		/*!
 		\brief The floor amount of the reserve fund
 		\arg index the index of the reserve fund. Currently 2 reserves are modeled so  index can be either 0 or 1 for, respectively, the first and second reserve
-		\details This function will return the value of the floor of the specified reserve fund
+		\details This function will return the Bloomberg vector representing the floor of the specified reserve fund
 		\sa SetReserveFund
 		*/
-		double GetReserveFundFloor(int index){return Unmanaged->GetReserveFundFloor(index);}
+		String^ GetReserveFundFloor(int index){return QString2String(Unmanaged->GetReserveFundFloor(index));}
 		/*!
 		\brief The current amount of the reserve fund
 		\arg index the index of the reserve fund. Currently 2 reserves are modeled so  index can be either 0 or 1 for, respectively, the first and second reserve
@@ -129,14 +130,14 @@ namespace ManagedCLO {
 		/*!
 		\brief Set up a reserve fund
 		\arg RFindex the index of the reserve fund. Currently 2 reserves are modeled so  index can be either 0 or 1 for, respectively, the first and second reserve
-		\arg RFtarget the target level of the reserve fund.
-		\arg RFmultiple the value by which RFtarget will be multiplied.
-		\arg RFfloor the floor level of the reserve fund. For non-amortizing RFs set to 0
+		\arg RFtarget a Bloomberg vector representing the target level of the reserve fund.
+		\arg RFmultiple a Bloomberg vector representing the value by which RFtarget will be multiplied.
+		\arg RFfloor a Bloomberg vector representing the floor level of the reserve fund. For non-amortizing RFs set to "0"
 		\arg RFcurrent the current size of the reserve fund
 		\arg RFfreed A seniority level. When all the notes not junior to this seniority level will be redeemed, the RF will be released as excess spread. 0 for freeing it only at maturity
 		\details This function will set up the specified reserve fund according to the supplied parameters.<br/>If RFtarget is a seniority level, the reserve fund target amount will be the sum of all the notes that rank not junior to that level, otherwise the reserve will be a non amortizing.<br/>The target level will then be multiplied by RFmultiple to assess the actual replenishment target.<br/>In any case, the target won't be set below the RFfloor amount.
 		*/
-		void SetReserveFund(int RFindex,double RFtarget,double RFmultiple,double RFfloor,double RFcurrent,int RFfreed){Unmanaged->SetReserveFund(RFindex,RFtarget,RFmultiple,RFfloor,RFcurrent,RFfreed);}
+		void SetReserveFund(int RFindex,String^ RFtarget,String^ RFmultiple,String^ RFfloor,double RFcurrent,int RFfreed){Unmanaged->SetReserveFund(RFindex,String2QString(RFtarget),String2QString(RFmultiple),String2QString(RFfloor),RFcurrent,RFfreed);}
 		/*!
 		\brief Removes all the settings for the specified reserve fund
 		\arg index the index of the reserve fund. Currently 2 reserves are modeled so  index can be either 0 or 1 for, respectively, the first and second reserve. -1 will reset all the reserves

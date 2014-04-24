@@ -30,7 +30,7 @@
   <td id="projectlogo"><img alt="Logo" src="Logo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CLO Model
-   &#160;<span id="projectnumber">1.73</span>
+   &#160;<span id="projectnumber">1.74</span>
    </div>
    <div id="projectbrief">Collateralised Loan Obligations Cash Flow Model</div>
   </td>
@@ -288,6 +288,12 @@ If index is invalid null is returned </p>
 <li>DestPath the path to the file to open</li>
 </ul>
 <p>This functions loads the results of the calculation from a .clo file. </p>
+<dl class="section user"><dt>Backward Compatibility Notes</dt><dd>This function can load files written by versions 1.73 and later of the model.<br/>
+According to the version you load the results will change according to the following list:<ol style="list-style:none;">
+<li>
+<span>1.73 - </span>Reserve funds targets, floors and multipliers will be loaded as single value vectors with no anchor date</li>
+</ol>
+</dd></dl>
 <dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_central_unit.html#a65317428abd51dc3080b00d2f27967a9" title="Saves the results to file. ">SaveBaseCase</a> </dd></dl>
 
 </div>
@@ -666,7 +672,7 @@ When the calculation is completed the structure will be populated with the cash 
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 27 2014 14:34:22 for CLO Model by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Apr 24 2014 09:02:25 for CLO Model by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>

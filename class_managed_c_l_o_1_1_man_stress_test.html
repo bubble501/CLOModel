@@ -30,7 +30,7 @@
   <td id="projectlogo"><img alt="Logo" src="Logo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CLO Model
-   &#160;<span id="projectnumber">1.73</span>
+   &#160;<span id="projectnumber">1.74</span>
    </div>
    <div id="projectbrief">Collateralised Loan Obligations Cash Flow Model</div>
   </td>
@@ -522,6 +522,12 @@ If RunStressTest was never called, ResetResults was called or the requested scen
 </ul>
 <p>This function retrieves the results of a specific scenario from a a fcsr format file.<br/>
 If the required scenarios are not available in the model, an empty waterfall is returned. </p>
+<dl class="section user"><dt>Backward Compatibility Notes</dt><dd>This function can load files written by versions 1.73 and later of the model.<br/>
+According to the version you load the results will change according to the following list:<ol style="list-style:none;">
+<li>
+<span>1.73 - </span>Reserve funds targets, floors and multipliers will be loaded as single value vectors with no anchor date</li>
+</ol>
+</dd></dl>
 <dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_stress_test.html#a74368f19036e54ead17d64ed0119ed76" title="Loads the stress results. ">LoadResultsFromFile</a> </dd></dl>
 
 </div>
@@ -553,6 +559,12 @@ If the required scenarios are not available in the model, an empty waterfall is 
 <li>DestPath the path to the results file</li>
 </ul>
 <p>This function loads all the stress results from a a fcsr format file. </p>
+<dl class="section user"><dt>Backward Compatibility Notes</dt><dd>This function can load files written by versions 1.73 and later of the model.<br/>
+According to the version you load the results will change according to the following list:<ol style="list-style:none;">
+<li>
+<span>1.73 - </span>Reserve funds targets, floors and multipliers will be loaded as single value vectors with no anchor date</li>
+</ol>
+</dd></dl>
 <dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_stress_test.html#aef4c1bca99223c4b525f333e2d36f291" title="Saves the stress results. ">SaveResults</a> </dd></dl>
 
 </div>
@@ -1021,7 +1033,7 @@ By default it is set to ChangingLS </p>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 27 2014 14:34:22 for CLO Model by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Apr 24 2014 09:02:25 for CLO Model by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>

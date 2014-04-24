@@ -26,6 +26,7 @@ var searchData=
   ['count',['Count',['../class_managed_c_l_o_1_1_man_mtg_cash_flows.html#a7ec01da378267669b3f1f427394b45c8',1,'ManagedCLO::ManMtgCashFlows::Count()'],['../class_managed_c_l_o_1_1_man_tranche_cash_flow.html#a06a862341f27c79e2065b34ec4726817',1,'ManagedCLO::ManTrancheCashFlow::Count()']]],
   ['coupon',['Coupon',['../class_managed_c_l_o_1_1_man_tranche.html#a4c4372793ba3babd7b74881e345cf696',1,'ManagedCLO::ManTranche']]],
   ['cprassumption',['CPRAssumption',['../class_managed_c_l_o_1_1_man_reinvestment_test.html#a4c2dfe4420132230a7ffcc4e5e4855a9',1,'ManagedCLO::ManReinvestmentTest']]],
+  ['cumulativereserves',['CumulativeReserves',['../class_managed_c_l_o_1_1_man_waterfall.html#ab61114874615e4e916d21904872065c9',1,'ManagedCLO::ManWaterfall']]],
   ['currency',['Currency',['../class_managed_c_l_o_1_1_man_tranche.html#a613d738525c0a62566829c007f7ae07b',1,'ManagedCLO::ManTranche']]],
   ['cutoffdate',['CutOffDate',['../class_managed_c_l_o_1_1_man_central_unit.html#a3f4d48e78d71886caee2ca6038a94afb',1,'ManagedCLO::ManCentralUnit']]]
 ];

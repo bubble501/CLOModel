@@ -85,10 +85,13 @@ Public Sub GetInputFromStructure( _
     Dim FirstResMultCell As Range
     Dim FirstResFloorCell As Range
     Dim FirstResCurrCell As Range
+    Dim FirstResFreedCell As Range
     Dim SecondResTargCell As Range
     Dim SecondResMultCell As Range
     Dim SecondResFloorCell As Range
     Dim SecondResCurrCell As Range
+    Dim SecondResFreedCell As Range
+    Dim UseCumulativeReservesCell As Range
     On Error Resume Next
     Set HaircutVecStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("HaircutVecHeader"), LookAt:=xlWhole, LookIn:=xlValues)
     Set IsinFldsStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("IsinFldsHeader"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -96,10 +99,13 @@ Public Sub GetInputFromStructure( _
     Set FirstResMultCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("FirstResMultCell"), LookAt:=xlWhole, LookIn:=xlValues)
     Set FirstResFloorCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("FirstResFloorCell"), LookAt:=xlWhole, LookIn:=xlValues)
     Set FirstResCurrCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("FirstResCurrCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set FirstResFreedCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("FirstResFreedCell"), LookAt:=xlWhole, LookIn:=xlValues)
     Set SecondResTargCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SecondResTargCell"), LookAt:=xlWhole, LookIn:=xlValues)
     Set SecondResMultCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SecondResMultCell"), LookAt:=xlWhole, LookIn:=xlValues)
     Set SecondResFloorCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SecondResFloorCell"), LookAt:=xlWhole, LookIn:=xlValues)
     Set SecondResCurrCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SecondResCurrCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set SecondResFreedCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SecondResFreedCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set UseCumulativeReservesCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("UseCumulativeReservesCell"), LookAt:=xlWhole, LookIn:=xlValues)
     On Error GoTo 0
     Set MaturityStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("MaturityHeader"), LookAt:=xlWhole, LookIn:=xlValues)
     Set CouponStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("CouponHeader"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -289,42 +295,57 @@ DefaultExchange:
     If (FirstResTargCell Is Nothing) Then
         Call AddInput(AllTheInputs, 0#)
     Else
-        Call AddInput(AllTheInputs, CDbl(FirstResTargCell.Offset(0, 1).Value))
+        Call AddInput(AllTheInputs, CStr(FirstResTargCell.Offset(0, 1).Value))
     End If
     If (FirstResMultCell Is Nothing) Then
         Call AddInput(AllTheInputs, 0#)
     Else
-        Call AddInput(AllTheInputs, CDbl(FirstResMultCell.Offset(0, 1).Value))
+        Call AddInput(AllTheInputs, CStr(FirstResMultCell.Offset(0, 1).Value))
     End If
     If (FirstResFloorCell Is Nothing) Then
         Call AddInput(AllTheInputs, 0#)
     Else
-        Call AddInput(AllTheInputs, CDbl(FirstResFloorCell.Offset(0, 1).Value))
+        Call AddInput(AllTheInputs, CStr(FirstResFloorCell.Offset(0, 1).Value))
     End If
-     If (FirstResCurrCell Is Nothing) Then
+    If (FirstResCurrCell Is Nothing) Then
         Call AddInput(AllTheInputs, 0#)
     Else
         Call AddInput(AllTheInputs, CDbl(FirstResCurrCell.Offset(0, 1).Value))
     End If
+    If (FirstResFreedCell Is Nothing) Then
+        Call AddInput(AllTheInputs, 0)
+    Else
+        Call AddInput(AllTheInputs, CLng(FirstResFreedCell.Offset(0, 1).Value))
+    End If
     If (SecondResTargCell Is Nothing) Then
         Call AddInput(AllTheInputs, 0#)
     Else
-        Call AddInput(AllTheInputs, CDbl(SecondResTargCell.Offset(0, 1).Value))
+        Call AddInput(AllTheInputs, CStr(SecondResTargCell.Offset(0, 1).Value))
     End If
     If (SecondResMultCell Is Nothing) Then
         Call AddInput(AllTheInputs, 0#)
     Else
-        Call AddInput(AllTheInputs, CDbl(SecondResMultCell.Offset(0, 1).Value))
+        Call AddInput(AllTheInputs, CStr(SecondResMultCell.Offset(0, 1).Value))
     End If
     If (SecondResFloorCell Is Nothing) Then
         Call AddInput(AllTheInputs, 0#)
     Else
-        Call AddInput(AllTheInputs, CDbl(SecondResFloorCell.Offset(0, 1).Value))
+        Call AddInput(AllTheInputs, CStr(SecondResFloorCell.Offset(0, 1).Value))
     End If
      If (SecondResCurrCell Is Nothing) Then
         Call AddInput(AllTheInputs, 0#)
     Else
         Call AddInput(AllTheInputs, CDbl(SecondResCurrCell.Offset(0, 1).Value))
+    End If
+    If (SecondResFreedCell Is Nothing) Then
+        Call AddInput(AllTheInputs, 0)
+    Else
+        Call AddInput(AllTheInputs, CLng(SecondResFreedCell.Offset(0, 1).Value))
+    End If
+    If (UseCumulativeReservesCell Is Nothing) Then
+        Call AddInput(AllTheInputs, False)
+    Else
+        Call AddInput(AllTheInputs, CBool(UseCumulativeReservesCell.Offset(0, 1).Value))
     End If
     ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     Call AddInput(AllTheInputs, Format(ReinvestPeriodCell.Offset(0, 1).Value, "yyyy-mm-dd"))
@@ -502,10 +523,13 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
     a.Add "First Fund Multiple", "FirstResMultCell"
     a.Add "First Fund Floor", "FirstResFloorCell"
     a.Add "First Fund Current Amount", "FirstResCurrCell"
+    a.Add "First Fund Free After", "FirstResFreedCell"
     a.Add "Second Fund Target", "SecondResTargCell"
     a.Add "Second Fund Multiple", "SecondResMultCell"
     a.Add "Second Fund Floor", "SecondResFloorCell"
     a.Add "Second Fund Current Amount", "SecondResCurrCell"
+    a.Add "Second Fund Free After", "SecondResFreedCell"
+    a.Add "Cumulative Reserve", "UseCumulativeReservesCell"
 End Sub
 
 Private Function FromStringToInterestType(a As String) As Long

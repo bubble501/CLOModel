@@ -196,6 +196,7 @@ namespace ManagedCLO {
 		\brief Loads the stress results
 		\arg DestPath the path to the results file
 		\details This function loads all the stress results from a a fcsr format file.
+		\backward This function can load files written by versions 1.73 and later of the model.<br>According to the version you load the results will change according to the following list:<ol style="list-style:none;"><li><span>1.73 - </span>Reserve funds targets, floors and multipliers will be loaded as single value vectors with no anchor date</li></ol>
 		\sa SaveResults
 		*/
 		bool LoadResultsFromFile(String^ DestPath){return Unmanaged->LoadResultsFromFile(String2QString(DestPath));}
@@ -205,6 +206,7 @@ namespace ManagedCLO {
 		\arg XScenario The X dimension scenario to retrieve
 		\arg YScenario The Y dimension scenario to retrieve
 		\details This function retrieves the results of a specific scenario from a a fcsr format file.<br/>If the required scenarios are not available in the model, an empty waterfall is returned.
+		\backward This function can load files written by versions 1.73 and later of the model.<br>According to the version you load the results will change according to the following list:<ol style="list-style:none;"><li><span>1.73 - </span>Reserve funds targets, floors and multipliers will be loaded as single value vectors with no anchor date</li></ol>
 		\sa LoadResultsFromFile
 		*/
 		static ManWaterfall^ GetScenarioFromFile(String^ DestPath,String^ XScenario,String^ YScenario){

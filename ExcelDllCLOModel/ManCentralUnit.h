@@ -114,6 +114,7 @@ namespace ManagedCLO {
 		\brief Loads the results from file
 		\arg DestPath the path to the file to open
 		\details This functions loads the results of the calculation from a .clo file.
+		\backward This function can load files written by versions 1.73 and later of the model.<br>According to the version you load the results will change according to the following list:<ol style="list-style:none;"><li><span>1.73 - </span>Reserve funds targets, floors and multipliers will be loaded as single value vectors with no anchor date</li></ol>
 		\sa SaveBaseCase
 		*/
 		bool LoadBaseCase(String^ DestPath){return Unmanaged->LoadBaseCase(String2QString(DestPath));}

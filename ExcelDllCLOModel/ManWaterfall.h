@@ -12,6 +12,7 @@ namespace ManagedCLO {
 	/*!
 	\brief CLO Waterfall 
 	\details This class implements a way of manage and calculate a whole waterfall for a CLO deal.
+	\backward The Read method can load files written by versions 1.73 and later of the model.<br>According to the version you load the results will change according to the following list:<ol style="list-style:none;"><li><span>1.73 - </span>Reserve funds targets, floors and multipliers will be loaded as single value vectors with no anchor date</li></ol>
 	 */
 	public ref class ManWaterfall
 	{

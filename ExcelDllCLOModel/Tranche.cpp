@@ -1,6 +1,6 @@
 #include "Tranche.h"
 #include "BloombergWorker.h"
-#include "CommonFunctions.h"
+
 Tranche::Tranche()
 	:DefaultRefRate("BP0003M")
 	,LastPaymentDate(2000,1,1)
@@ -17,8 +17,9 @@ Tranche::Tranche()
 	,OriginalAmt(0.0)
 	,OutstandingAmt(0.0)
 	,Coupon("0")
-	,PaymentFrequency(3)
+	,PaymentFrequency("3")
 	,AccruedInterest(0.0)
+	,m_LoadProtocolVersion(ModelVersionNumber)
 {}
 Tranche::Tranche(const Tranche& a)
 	:DefaultRefRate(a.DefaultRefRate)
@@ -43,6 +44,7 @@ Tranche::Tranche(const Tranche& a)
 	,AccruedInterest(a.AccruedInterest)
 	,SettlementDate(a.SettlementDate)
 	,ISINcode(a.ISINcode)
+	,m_LoadProtocolVersion(a.m_LoadProtocolVersion)
 {}
 Tranche& Tranche::operator=(const Tranche& a){
 	DefaultRefRate=a.DefaultRefRate;
@@ -67,6 +69,7 @@ Tranche& Tranche::operator=(const Tranche& a){
 	AccruedInterest=a.AccruedInterest;
 	SettlementDate=a.SettlementDate;
 	ISINcode=a.ISINcode;
+	m_LoadProtocolVersion=a.m_LoadProtocolVersion;
 	return *this;
 }
 void Tranche::SetOriginalAmount(double a){if(a>=0.0) OriginalAmt=a/ExchangeRate;}
@@ -139,7 +142,7 @@ void Tranche::GetDataFromBloomberg(){
 	OriginalAmt=Result.value("MTG_ORIG_AMT").toDouble()/ExchangeRate;
 	Currency=Result.value("CRNCY");
 	LastPaymentDate=QDate::fromString(Result.value("START_ACC_DT"),"yyyy-MM-dd");
-	PaymentFrequency=static_cast<int>(12.0/Result.value("CPN_FREQ").toDouble());
+	PaymentFrequency=QString("%1").arg(static_cast<int>(12.0/Result.value("CPN_FREQ").toDouble()));
 	TrancheName=Result.value("NAME");
 	ISINcode=Result.value("ID_ISIN");
 	if(Result.value("MTG_TYP").contains("FLT")) InterestType=FloatingInterest;
@@ -156,7 +159,7 @@ void Tranche::GetDataFromBloomberg(){
 		else if(Currency=="GBP")DeafultRefRateString="BP";
 		else if(Currency=="USD")DeafultRefRateString="US";
 		else return;
-		DeafultRefRateString+=QString("%1M").arg(PaymentFrequency,6-DeafultRefRateString.size(),10,QChar('0'));
+		DeafultRefRateString+=QString("%1M").arg(static_cast<int>(12.0/Result.value("CPN_FREQ").toDouble()),6-DeafultRefRateString.size(),10,QChar('0'));
 		DefaultRefRate=DeafultRefRateString;
 	}
 	AccruedInterest=Result.value("INT_ACC").toDouble()/100.0;
@@ -215,6 +218,15 @@ double Tranche::GetWALife(const QDate& StartDate)const{
 	if (RunningSum<=0) return 0.0;
 	return Result/RunningSum;
 }
+void Tranche::SetPaymentFrequency(const QString& a){
+	BloombergVector TempVect(a);
+	double TmpCheck;
+	for (int i=0;i<TempVect.NumElements();i++){
+		TmpCheck=TempVect.GetValue(i);
+		if(TmpCheck<=0.0 || qAbs(static_cast<double>(static_cast<int>(TmpCheck))-TmpCheck)>=0.0001) return;
+	}
+	PaymentFrequency=TempVect;
+}
 QDataStream& operator<<(QDataStream & stream, const Tranche& flows){
 	stream
 		<< flows.TrancheName
@@ -243,7 +255,8 @@ QDataStream& operator<<(QDataStream & stream, const Tranche& flows){
 	return stream;
 }
 QDataStream& operator>>(QDataStream & stream, Tranche& flows){
-	qint32 TempInt;
+	return flows.LoadOldVersion(stream);
+	/*qint32 TempInt;
 	stream
 		>> flows.TrancheName
 		>> flows.ISINcode
@@ -270,5 +283,43 @@ QDataStream& operator>>(QDataStream & stream, Tranche& flows){
 		>> flows.SettlementDate
 		>> flows.AccruedInterest
 	;
+	return stream;*/
+}
+QDataStream& Tranche::LoadOldVersion(QDataStream& stream){
+	if (m_LoadProtocolVersion<MinimumSupportedVersion || m_LoadProtocolVersion>ModelVersionNumber) return stream;
+	qint32 TempInt;
+	stream
+		>> TrancheName
+		>> ISINcode
+		>> OriginalAmt
+		>> Currency
+		>> OutstandingAmt
+		>> TempInt;
+	InterestType=Tranche::TrancheInterestType(TempInt);
+	stream 
+		>> Coupon
+		>> ReferenceRate
+		>> ReferenceRateValue
+		>> Price
+		>> BloombergExtension
+		>> ProrataGroup
+		>> CashFlow
+		>> MinOClevel
+		>> MinIClevel
+		>> LastPaymentDate
+		>> DayCount
+		>> DefaultRefRate
+		>> ExchangeRate;
+	if(m_LoadProtocolVersion<=174){
+		stream >> TempInt;
+		PaymentFrequency=QString("%1").arg(TempInt);
+	}
+	else
+		stream >> PaymentFrequency;
+	stream
+		>> SettlementDate
+		>> AccruedInterest
+		;
+	m_LoadProtocolVersion=ModelVersionNumber;
 	return stream;
 }

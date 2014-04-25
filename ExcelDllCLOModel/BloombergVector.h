@@ -17,6 +17,7 @@ public:
 	BloombergVector(const QString& Vec,const QDate& Anchor);
 	double GetValue(const QDate& index,int Frequency=12) const;
 	double GetValue(int index,int Frequency=12) const;
+	int NumElements() const {return m_VectVal.size();}
 	BloombergVector& operator=(const QString& a){AbstarctBbgVect::operator=(a); return *this;}
 	friend QDataStream& operator<<(QDataStream & stream, const BloombergVector& flows);
 	friend QDataStream& operator>>(QDataStream & stream, BloombergVector& flows);

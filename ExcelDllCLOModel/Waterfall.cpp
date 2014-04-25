@@ -10,11 +10,6 @@ const WatFalPrior* Waterfall::GetStep(int Index)const {
 	return m_WaterfallStesps.at(Index);
 }
 void Waterfall::SetCCCcurve(const QString& a){m_CCCcurve=a;}
-void Waterfall::SetPaymentFrequency(int a){
-	if(a>0){
-		m_PaymentFrequency=a;
-	}
-}
 const Tranche* Waterfall::GetTranche(int Index) const{
 	if(Index<0 || Index>=m_Tranches.size()) return NULL;
 	return m_Tranches.at(Index);
@@ -32,23 +27,25 @@ QDate Waterfall::GetStructureMaturity()const{
 }
 double Waterfall::GetAnnualizedExcess(int index, bool AsShareOfLoans)const{
 	if(index<0 || index>=m_AnnualizedExcess.Count()) return 0.0;
+	BloombergVector AdjPaymentFreq(m_PaymentFrequency);
+	if(m_PaymentFrequency.GetAnchorDate().isNull()) AdjPaymentFreq.SetAnchorDate(m_MortgagesPayments.GetDate(0));
 	if(AsShareOfLoans){
 		if(m_CalculatedMtgPayments.GetAmountOut(m_AnnualizedExcess.GetDate(index))<0.01) return -1.0;
 		return qPow((1.0+(m_AnnualizedExcess.GetInterest(index)/
-			m_CalculatedMtgPayments.GetAmountOut(m_AnnualizedExcess.GetDate(index)))),12.0/static_cast<double>(m_PaymentFrequency))-1.0;
+			m_CalculatedMtgPayments.GetAmountOut(m_AnnualizedExcess.GetDate(index)))),12.0/(AdjPaymentFreq.GetValue(m_AnnualizedExcess.GetDate(index))*100.0))-1.0;
 	}
 	double RunningSum=0.0;
 	for (int i=0;i<m_Tranches.size();i++){
 		RunningSum+=m_Tranches.at(i)->GetCashFlow().GetAmountOutstanding(index);
 	}
 	if(RunningSum<0.01) return -1.0;
-	return qPow(1.0+(m_AnnualizedExcess.GetInterest(index)/RunningSum),12.0/static_cast<double>(m_PaymentFrequency))-1.0;
+	return qPow(1.0+(m_AnnualizedExcess.GetInterest(index)/RunningSum),12.0/(AdjPaymentFreq.GetValue(m_AnnualizedExcess.GetDate(index))*100.0))-1.0;
 }
 Waterfall::Waterfall()
 	:m_SeniorExpenses(0.0)
 	,m_SeniorFees(0.0)
 	,m_JuniorFees(0.0)
-	,m_PaymentFrequency(1)
+	,m_PaymentFrequency("1")
 	,m_CCCTestLimit(1.0)
 	,m_CCCcurve("0")
 	,m_CCChaircut(0.0)
@@ -189,6 +186,8 @@ int Waterfall::FindMostJuniorLevel()const{
 	return Result;
 }
 void Waterfall::FillAllDates(){
+	bool AnchorDateNull=m_PaymentFrequency.GetAnchorDate().isNull();
+	if (AnchorDateNull) m_PaymentFrequency.SetAnchorDate(m_MortgagesPayments.GetDate(0));
 	//All the dates in all the tranches
 	for(int i=0;i<m_Tranches.size()-1;i++){
 		for(int j=i+1;j<m_Tranches.size();j++){
@@ -271,7 +270,6 @@ void Waterfall::FillAllDates(){
 		}
 	}
 	QDate RollingNextIPD=m_FirstIPDdate;
-	int Multiplier=0;
 	
 	for (int i=0;i<m_CalculatedMtgPayments.Count();i++){
 		if(m_CalculatedMtgPayments.GetDate(i).year() > RollingNextIPD.year() || (m_CalculatedMtgPayments.GetDate(i).year() == RollingNextIPD.year() && m_CalculatedMtgPayments.GetDate(i).month() >= RollingNextIPD.month()) || i >= m_CalculatedMtgPayments.Count()-1){
@@ -287,9 +285,10 @@ void Waterfall::FillAllDates(){
 				if(m_ReserveFundFlows[ResIter].Count()==0) continue;
 				m_ReserveFundFlows[ResIter].ReplaceDate(m_CalculatedMtgPayments.GetDate(i),RollingNextIPD);
 			}
-			RollingNextIPD=m_FirstIPDdate.addMonths((++Multiplier)*m_PaymentFrequency);
+			RollingNextIPD=RollingNextIPD.addMonths(qRound(m_PaymentFrequency.GetValue(RollingNextIPD)*100.0));
 		}
 	}
+	if (AnchorDateNull) m_PaymentFrequency.RemoveAnchorDate();
 }
 int Waterfall::FindTrancheIndex(const QString& Tranchename)const{
 	for(int j=0;j<m_Tranches.size();j++){
@@ -488,8 +487,9 @@ bool Waterfall::CalculateTranchesCashFlows(){
 			NullReservesAnchor[i][2]=m_ReserveFundFloor[i].GetAnchorDate().isNull();
 			if(NullReservesAnchor[i][2]) m_ReserveFundFloor[i].SetAnchorDate(m_MortgagesPayments.GetDate(0));
 		}
-		bool NullCCCanchor= m_CCCcurve.GetAnchorDate().isNull();
-		if(NullCCCanchor) m_CCCcurve.SetAnchorDate(m_MortgagesPayments.GetDate(0));
+		bool NullCCCanchor[]={m_CCCcurve.GetAnchorDate().isNull(),m_PaymentFrequency.GetAnchorDate().isNull()};
+		if(NullCCCanchor[0]) m_CCCcurve.SetAnchorDate(m_MortgagesPayments.GetDate(0));
+		if(NullCCCanchor[1]) m_PaymentFrequency.SetAnchorDate(m_MortgagesPayments.GetDate(0));
 		foreach(Tranche* SingleTranche, m_Tranches) SingleTranche->GetCashFlow().ResetFlows();
 		for(int i=0;i<m_MortgagesPayments.Count();i++){
 			CurrentDate=m_MortgagesPayments.GetDate(i);
@@ -768,8 +768,8 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					}
 					TotalPayable=qMax(TotalPayable,0.000001);
 					//CCC test
-					if(m_CCCcurve.GetValue(CurrentDate/*,m_PaymentFrequency*/)>m_CCCTestLimit)
-						Solution=(1.0-((m_CCCcurve.GetValue(CurrentDate/*,m_PaymentFrequency*/)-m_CCCTestLimit)*m_CCChaircut))*m_MortgagesPayments.GetAmountOut(i);
+					if(m_CCCcurve.GetValue(CurrentDate)>m_CCCTestLimit)
+						Solution=(1.0-((m_CCCcurve.GetValue(CurrentDate)-m_CCCTestLimit)*m_CCChaircut))*m_MortgagesPayments.GetAmountOut(i);
 					else
 						Solution=m_MortgagesPayments.GetAmountOut(i);
 					Solution+=AvailablePrincipal;
@@ -809,14 +809,14 @@ bool Waterfall::CalculateTranchesCashFlows(){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				case WatFalPrior::wst_ICTest:
 				case WatFalPrior::wst_ICTestPrinc:
-					adjSeniorExpenses=m_SeniorExpenses*static_cast<double>(RollingNextIPD.daysTo(RollingNextIPD.addMonths(m_PaymentFrequency)))/360.0;
-					adjSeniorFees=m_SeniorFees*static_cast<double>(RollingNextIPD.daysTo(RollingNextIPD.addMonths(m_PaymentFrequency)))/360.0;
+					adjSeniorExpenses=m_SeniorExpenses*static_cast<double>(RollingNextIPD.daysTo(RollingNextIPD.addMonths(qRound(m_PaymentFrequency.GetValue(RollingNextIPD)*100.0))))/360.0;
+					adjSeniorFees=m_SeniorFees*static_cast<double>(RollingNextIPD.daysTo(RollingNextIPD.addMonths(qRound(m_PaymentFrequency.GetValue(RollingNextIPD)*100.0))))/360.0;
 					ProRataBonds.clear();
 					TotalPayable=0.0;
 					Solution=m_InterestAvailable+m_MortgagesPayments.GetAccruedInterest(i)-((adjSeniorFees+adjSeniorExpenses)*m_MortgagesPayments.GetAmountOut(i));
 					for(int h=0;h<m_Tranches.size();h++){
 						if(m_Tranches.at(h)->GetProrataGroup()<=SingleStep->GetGroupTarget()){
-							AdjustedCoupon=(m_Tranches.at(h)->GetCoupon(CurrentDate))*static_cast<double>(RollingNextIPD.daysTo(RollingNextIPD.addMonths(m_PaymentFrequency)))/360.0;
+							AdjustedCoupon=(m_Tranches.at(h)->GetCoupon(CurrentDate))*static_cast<double>(RollingNextIPD.daysTo(RollingNextIPD.addMonths(qRound(m_PaymentFrequency.GetValue(RollingNextIPD)*100.0))))/360.0;
 							TotalPayable+=AdjustedCoupon*(m_Tranches.at(h)->GetCurrentOutstanding()+m_Tranches.at(h)->GetCashFlow().GetDeferred(CurrentDate));
 							if(m_Tranches.at(h)->GetProrataGroup()==SingleStep->GetGroupTarget()) ProRataBonds.enqueue(h);
 						}
@@ -838,7 +838,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 							Solution=0.0;
 							for(int h=0;h<m_Tranches.size();h++){
 								if(m_Tranches.at(h)->GetProrataGroup()<=SingleStep->GetGroupTarget() && m_Tranches.at(h)->GetProrataGroup()>=SolutionDegree){
-									AdjustedCoupon=(m_Tranches.at(h)->GetCoupon(CurrentDate))*static_cast<double>(RollingNextIPD.daysTo(RollingNextIPD.addMonths(m_PaymentFrequency)))/360.0;
+									AdjustedCoupon=(m_Tranches.at(h)->GetCoupon(CurrentDate))*static_cast<double>(RollingNextIPD.daysTo(RollingNextIPD.addMonths(qRound(m_PaymentFrequency.GetValue(RollingNextIPD)*100.0))))/360.0;
 									Solution+=AdjustedCoupon*(m_Tranches.at(h)->GetCurrentOutstanding()+m_Tranches.at(h)->GetCashFlow().GetDeferred(CurrentDate));
 								}
 							}
@@ -928,7 +928,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 			m_PrincipalAvailable=0.0;
 			m_InterestAvailable=0.0;
 			RollingLastIPD=RollingNextIPD;
-			RollingNextIPD=m_FirstIPDdate.addMonths((++PeriodsCounter)*m_PaymentFrequency);
+			RollingNextIPD=RollingNextIPD.addMonths(qRound(m_PaymentFrequency.GetValue(RollingNextIPD)*100.0));
 			if(IsCallPaymentDate){
 				i++;
 				break;
@@ -945,7 +945,8 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		m_CalculatedMtgPayments=m_MortgagesPayments;
 		m_MortgagesPayments=OriginalMtgFlows;
 		FillAllDates();
-		if(NullCCCanchor) m_CCCcurve.RemoveAnchorDate();
+		if(NullCCCanchor[0]) m_CCCcurve.RemoveAnchorDate();
+		if(NullCCCanchor[1]) m_PaymentFrequency.RemoveAnchorDate();
 		return true;
 }
 
@@ -1061,6 +1062,7 @@ QDataStream& operator>>(QDataStream & stream, Waterfall& flows){
 	return stream;*/
 }
 QDataStream& Waterfall::LoadOldVersion(QDataStream& stream){
+	if(m_LoadProtocolVersion<MinimumSupportedVersion || m_LoadProtocolVersion>ModelVersionNumber) return stream;
 	double TempDouble;
 	QString TempString;
 	int TempInt;
@@ -1072,7 +1074,14 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream){
 		>> m_JuniorFees
 		>> m_MortgagesPayments
 		>> m_CalculatedMtgPayments
-		>> m_PaymentFrequency
+	;
+	if(m_LoadProtocolVersion<=174){
+		stream >> TempInt;
+		m_PaymentFrequency = QString("%1").arg(TempInt);
+	}
+	else
+		stream >> m_PaymentFrequency;
+	stream
 		>> m_ExcessCashFlow
 		>> m_TotalSeniorExpenses
 		>> m_TotalSeniorFees
@@ -1099,6 +1108,7 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream){
 		;
 	ResetTranches();
 	for(int i=0;i<TempInt;i++){
+		TempTranche.SetLoadProtocolVersion(m_LoadProtocolVersion);
 		stream >> TempTranche;
 		AddTranche(TempTranche);
 	}
@@ -1110,7 +1120,7 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream){
 	}
 	stream >> m_CumulativeReserves;
 	for(int i=0;i<NumReserves;i++){
-		if(m_LoadProtocolVersion==173){
+		if(m_LoadProtocolVersion<=173){
 			stream >> TempDouble;
 			m_ReserveFundTarget[i].SetVector(QString("%1").arg(TempDouble));
 			m_ReserveFundTarget[i].RemoveAnchorDate();
@@ -1171,7 +1181,7 @@ QString Waterfall::ReadyToCalculate()const{
 	if(m_Tranches.isEmpty()) Result+="Tranches\n";
 	if(m_WaterfallStesps.isEmpty()) Result+="Waterfall Steps\n";
 	if(m_MortgagesPayments.Count()==0) Result+="Loans Payments\n";
-	if(m_PaymentFrequency<1) Result+="IDP Frequency\n";
+	if(m_PaymentFrequency.GetVector().isEmpty()) Result+="IDP Frequency\n";
 	if(m_ReinvestmentTest.GetCDRAssumption().isEmpty())Result+="CDR\n";
 	if(m_ReinvestmentTest.GetCPRAssumption().isEmpty())Result+="CPR\n";
 	if(m_ReinvestmentTest.GetLSAssumption().isEmpty())Result+="LS\n";
@@ -1214,6 +1224,8 @@ QString Waterfall::ReadyToCalculate()const{
 	return Result;
 }
 double Waterfall::GetEquityReturn(int index)const{
+	BloombergVector AdjPaymentFreq(m_PaymentFrequency);
+	if(m_PaymentFrequency.GetAnchorDate().isNull()) AdjPaymentFreq.SetAnchorDate(m_MortgagesPayments.GetDate(0));
 	if(index<0 || index>=m_EquityIncome.Count()) return 0.0;
 	int EquityTranche;
 	foreach(WatFalPrior* SingleStep,m_WaterfallStesps){
@@ -1227,7 +1239,7 @@ double Waterfall::GetEquityReturn(int index)const{
 		foreach(Tranche* SingleTranche, m_Tranches){
 			if(SingleTranche->GetProrataGroup()==EquityTranche) denominator+=SingleTranche->GetOriginalAmount();
 		}
-		if(denominator>0) return qPow(1.0+(m_EquityIncome.GetTotalFlow(index)/denominator),12.0/static_cast<double>(m_PaymentFrequency))-1.0;
+		if(denominator>0) return qPow(1.0+(m_EquityIncome.GetTotalFlow(index)/denominator),12.0/(AdjPaymentFreq.GetValue(m_EquityIncome.GetDate(index))))-1.0;
 		else return 0.0;
 	}
 	denominator=0.0;
@@ -1235,7 +1247,7 @@ double Waterfall::GetEquityReturn(int index)const{
 		denominator+=SingleTranche->GetOriginalAmount();
 	}
 	denominator=m_CalculatedMtgPayments.GetAmountOut(0)-denominator;
-	if(denominator>0) return qPow(1.0+(m_EquityIncome.GetTotalFlow(index)/denominator),12.0/static_cast<double>(m_PaymentFrequency))-1.0;
+	if(denominator>0) return qPow(1.0+(m_EquityIncome.GetTotalFlow(index)/denominator),12.0/(AdjPaymentFreq.GetValue(m_EquityIncome.GetDate(index))))-1.0;
 	else return 0.0;
 
 }
@@ -1325,4 +1337,13 @@ void Waterfall::ResetReserve(int RFindex){
 	m_ReserveFundCurrent[RFindex]=0.0;
 	m_ReserveFundFreed[RFindex]=0;
 	m_ReserveFundFlows[RFindex].ResetFlows();
+}
+void Waterfall::SetPaymentFrequency(const QString& a){
+	BloombergVector TempVect(a);
+	double TmpCheck;
+	for (int i=0;i<TempVect.NumElements();i++){
+		TmpCheck=TempVect.GetValue(i);
+		if(TmpCheck<=0.0) return;
+	}
+	m_PaymentFrequency=TempVect;
 }

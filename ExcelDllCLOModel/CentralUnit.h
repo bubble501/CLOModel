@@ -26,7 +26,7 @@ public:
 		,const QString& RefRte
 		,const QDate& LastPayDte
 		,const QString& DefRefRte
-		,int PayFreq
+		,const QString& PayFreq
 		,const QDate& SettlementDate
 		,double AccruedInterest=0.0
 		,double RefRteValue=-1.0
@@ -41,7 +41,7 @@ public:
 	void SetSeniorExpenses(double a){Structure.SetSeniorExpenses(a);}
 	void SetSeniorFees(double a){Structure.SetSeniorFees(a);}
 	void SetJuniorFees(double a){Structure.SetJuniorFees(a);}
-	void SetPaymentFrequency(int a){Structure.SetPaymentFrequency(a);}
+	void SetPaymentFrequency(const QString& a){Structure.SetPaymentFrequency(a);}
 	void SetCCCTestLimit(double a){Structure.SetCCCTestLimit(a);}
 	void SetCCChaircut(double a){Structure.SetCCChaircut(a);}
 	void SetUseTurbo(bool a){Structure.SetUseTurbo(a);}

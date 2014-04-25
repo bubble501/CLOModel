@@ -5,7 +5,7 @@ class QDate;
 class QString;
 #include <QList>
 //! The current Version of the Model
-#define ModelVersionNumber 174
+#define ModelVersionNumber 175
 #define MinimumSupportedVersion 173
 #define MaximumIRRIterations INT_MAX-1
 #define NumReserves 2

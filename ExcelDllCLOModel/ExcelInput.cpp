@@ -76,8 +76,8 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		}
 	}
 	{//Tranches
-		QString TrName, Curr, RefRt, BasRt ,coup, TrancheISIN;
-		int ProRat,IntrTpe,IPDfrq;
+		QString TrName, Curr, RefRt, BasRt ,coup, TrancheISIN,IPDfrq;
+		int ProRat,IntrTpe;
 		double origOut,currOut,RefRtVal,OClim,IClim,Price,Exchan,accruedIntr/*,coup*/;
 		QDate PrevIPD,SettDate;
 		NumElements=pdFreq++->intVal;
@@ -132,7 +132,8 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 #ifdef DebuggungInputs
 			if(i==0) QMessageBox::information(0,"Base rate Ok","Base rate: "+BasRt);
 #endif
-			IPDfrq=pdFreq->intVal; pdFreq++;
+			//IPDfrq=pdFreq->intVal; pdFreq++;
+			IPDfrq=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 #ifdef DebuggungInputs
 			if(i==0) QMessageBox::information(0,"IPD Frequ Ok",QString("IPD Frequ: %1").arg(IPDfrq));
 #endif
@@ -187,7 +188,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		TempUnit.SetSeniorFees(pdFreq->dblVal);pdFreq++;
 		TempUnit.SetJuniorFees(pdFreq->dblVal);pdFreq++;
 		TempUnit.SetJuniorFeesCoupon(pdFreq->dblVal);pdFreq++;
-		TempUnit.SetPaymentFrequency(pdFreq->intVal);pdFreq++;
+		TempUnit.SetPaymentFrequency(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
 		TempUnit.SetFirstIPDdate(QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd"));pdFreq++;
 		TempUnit.SetLastIPDdate(QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd"));pdFreq++;
 		TempUnit.SetUseTurbo(pdFreq->boolVal);pdFreq++;
@@ -349,7 +350,7 @@ double __stdcall CLODiscountMargin(LPSAFEARRAY *ArrayData){
 	out.setVersion(QDataStream::Qt_4_8);
 	out >> VersionChecker;
 	//if(VersionChecker!=qint32(ModelVersionNumber)) return 0.0;
-	if(VersionChecker<qint32(MinimumSupportedVersion)) return 0.0;
+	if(VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) return 0.0;
 	TempWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempWaterfall;
 	if(ToCall){
@@ -389,7 +390,7 @@ double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
 	QDataStream out(&file);
 	out.setVersion(QDataStream::Qt_4_8);
 	out >> VersionChecker;
-	if(VersionChecker<qint32(MinimumSupportedVersion)) return 0.0;
+	if(VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) return 0.0;
 	TempWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempWaterfall;
 	if(ToCall){

@@ -5,6 +5,7 @@
 #include <QObject>
 #include "TrancheCashFlow.h"
 #include "BloombergVector.h"
+#include "CommonFunctions.h"
 class  Tranche {
 public:
 	//! Enum defining what type of coupon the tranche is paying
@@ -32,9 +33,11 @@ private:
 	int DayCount;
 	QString DefaultRefRate;
 	double ExchangeRate;
-	int PaymentFrequency;
+	BloombergVector PaymentFrequency;
 	QDate SettlementDate;
 	double AccruedInterest;
+	qint32 m_LoadProtocolVersion;
+	QDataStream& LoadOldVersion(QDataStream& stream);
 public:
 	Tranche();
 	Tranche(const Tranche& a);
@@ -65,7 +68,7 @@ public:
 	int GetDayCount() const{return DayCount;}
 	const QString& GetDefaultRefRate() const{return DefaultRefRate;}
 	double GetExchangeRate() const {return ExchangeRate;}
-	int GetPaymentFrequency() const{return PaymentFrequency;}
+	QString GetPaymentFrequency() const{return PaymentFrequency.GetVector();}
 	const QString& GetISIN() const {return ISINcode;}
 	QString GetCouponVector() const{return Coupon.GetVector();}
 	void SetISIN(const QString& a){ISINcode=a;}
@@ -87,7 +90,7 @@ public:
 	void SetDayCount(int a){DayCount=a;}
 	void SetDefaultRefRate(const QString& a){DefaultRefRate=a;}
 	void SetExchangeRate(double a);
-	void SetPaymentFrequency(int a){if(a>1) PaymentFrequency=a;}
+	void SetPaymentFrequency(const QString& a);
 	void AddCashFlow(QDate Dte,double Amt, TrancheCashFlow::ThrancheFlowType FlwTpe){CashFlow.AddFlow(Dte,Amt,FlwTpe);}
 	void AddCashFlow(const TrancheCashFlow& a){CashFlow.AddFlow(a);}
 	double GetBondFactor() const {return OutstandingAmt/OriginalAmt;}
@@ -101,6 +104,7 @@ public:
 	const QDate& GetSettlementDate() const{return SettlementDate;}
 	void SetAccruedInterest(double a) {if(a>=0.0) AccruedInterest=a;}
 	void SetSettlementDate(const QDate& a){SettlementDate=a;}
+	void SetLoadProtocolVersion(qint32 VersionNum=ModelVersionNumber){if(VersionNum>=MinimumSupportedVersion && VersionNum>ModelVersionNumber) m_LoadProtocolVersion=VersionNum;}
 	friend QDataStream& operator<<(QDataStream & stream, const Tranche& flows);
 	friend QDataStream& operator>>(QDataStream & stream, Tranche& flows);
 };

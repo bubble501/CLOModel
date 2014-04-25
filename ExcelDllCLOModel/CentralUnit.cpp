@@ -67,7 +67,7 @@ void CentralUnit::AddTranche(
 	,const QString& RefRte
 	,const QDate& LastPayDte
 	,const QString& DefRefRte
-	,int PayFreq
+	,const QString& PayFreq
 	,const QDate& SettlementDate
 	,double AccruedInterest
 	,double RefRteValue

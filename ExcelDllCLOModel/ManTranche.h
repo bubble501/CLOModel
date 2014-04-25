@@ -6,6 +6,9 @@
 namespace ManagedCLO {
 	/*!
 	\brief Class used to describe a single tranche of a deal
+	\backward The Read method can load files written by versions 1.73 and later of the model.<br>According to the version you load the results will change according to the following list:<ol style="list-style:none;">
+	<li><span>1.74 - </span>Payment frequency will be loaded as a single value vector with no anchor date</li>
+	</ol>
 	*/
 	public ref class ManTranche
 	{
@@ -59,11 +62,11 @@ namespace ManagedCLO {
 		bool Read(IO::Stream^ Source){
 			if(!Source->CanRead) return false;
 			quint32 BlockSize;
-			quint32 MagicNumber=((ClassIdentity << 16) | VersionNumber);
 			try{
 				IO::BinaryReader SizeReader(Source);
 				BlockSize=SizeReader.ReadUInt32();
-				if(BlockSize!=MagicNumber) return false;
+				if(BlockSize >> 16!=ClassIdentity || (BlockSize & 0xFFFF)< MinSupportedVersion) return false;
+				Unmanaged->SetLoadProtocolVersion(BlockSize & 0xffff);
 				BlockSize=SizeReader.ReadUInt32();
 				array<Byte>^ DataBuffer= SizeReader.ReadBytes(BlockSize);
 				QByteArray DataRaw;
@@ -279,10 +282,11 @@ namespace ManagedCLO {
 		}
 		/*!
 		\brief The number of months between two IPDs
+		\details A Bloomberg vector representing the the number of months between two payment dates
 		*/
-		property int PaymentFrequency{
-			int get(){return Unmanaged->GetPaymentFrequency();}
-			void set(int a){Unmanaged->SetPaymentFrequency(a);}
+		property String^ PaymentFrequency{
+			String^ get(){return QString2String(Unmanaged->GetPaymentFrequency());}
+			void set(String^ a){Unmanaged->SetPaymentFrequency(String2QString(a));}
 		}
 		/*!
 		\brief Add a cash flow to the tranche

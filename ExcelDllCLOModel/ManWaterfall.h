@@ -12,7 +12,10 @@ namespace ManagedCLO {
 	/*!
 	\brief CLO Waterfall 
 	\details This class implements a way of manage and calculate a whole waterfall for a CLO deal.
-	\backward The Read method can load files written by versions 1.73 and later of the model.<br>According to the version you load the results will change according to the following list:<ol style="list-style:none;"><li><span>1.73 - </span>Reserve funds targets, floors and multipliers will be loaded as single value vectors with no anchor date</li></ol>
+	\backward The Read method can load files written by versions 1.73 and later of the model.<br>According to the version you load the results will change according to the following list:<ol style="list-style:none;">
+	<li><span>1.73 - </span>Reserve funds targets, floors and multipliers will be loaded as single value vectors with no anchor date</li>
+	<li><span>1.74 - </span>Payment frequency will be loaded as a single value vector with no anchor date</li>
+	</ol>
 	 */
 	public ref class ManWaterfall
 	{
@@ -171,10 +174,11 @@ namespace ManagedCLO {
 		}
 		/*!
 		\brief Number of months between two IPDs
+		\details A Bloomberg vector representing the the number of months between two payment dates
 		*/
-		property int PaymentFrequency{
-			int get(){return Unmanaged->GetPaymentFrequency();}
-			void set(int a){Unmanaged->SetPaymentFrequency(a);}
+		property String^ PaymentFrequency{
+			String^ get(){return QString2String(Unmanaged->GetPaymentFrequency());}
+			void set(String^ a){Unmanaged->SetPaymentFrequency(String2QString(a));}
 		}
 		/*!
 		\brief CCC test limit

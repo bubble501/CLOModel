@@ -302,7 +302,7 @@ Waterfall StressTest::GetScenarioFromFile(const QString& DestPath,const QString&
 		out.setVersion(QDataStream::Qt_4_8);
 		out >> VesionCheck;
 		TargetFile.close();
-		if(VesionCheck<qint32(MinimumSupportedVersion)) throw 1;
+		if(VesionCheck<qint32(MinimumSupportedVersion) || VesionCheck>qint32(ModelVersionNumber)) throw 1;
 	}
 	catch(int ExcCode){
 		if(!QApplication::instance()){
@@ -338,7 +338,7 @@ bool StressTest::LoadResultsFromFile(const QString& DestPath){
 		QDataStream out(&TargetFile);
 		out.setVersion(QDataStream::Qt_4_8);
 		out >> VesionCheck;
-		if(VesionCheck<qint32(MinimumSupportedVersion)){
+		if(VesionCheck<qint32(MinimumSupportedVersion) || VesionCheck>qint32(ModelVersionNumber)){
 			TargetFile.close();
 			throw 1;
 		}

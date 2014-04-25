@@ -62,6 +62,7 @@ int main(int argc, char *argv[])
 	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempCallWaterfall;
 	file.close();
+	TempWtf.SetPaymentFrequency("3 47S 6");
 	TempWtf.CalculateTranchesCashFlows();
 
 

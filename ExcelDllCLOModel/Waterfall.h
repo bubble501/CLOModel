@@ -24,7 +24,7 @@ private:
 	QList<WatFalPrior*>	m_WaterfallStesps;
 	MtgCashFlow m_MortgagesPayments; 
 	MtgCashFlow m_CalculatedMtgPayments;
-	int m_PaymentFrequency;
+	BloombergVector m_PaymentFrequency;
 	TrancheCashFlow m_ExcessCashFlow; 
 	TrancheCashFlow m_TotalSeniorExpenses; 
 	TrancheCashFlow m_TotalSeniorFees; 
@@ -66,7 +66,7 @@ public:
 	double GetSeniorExpenses() const {return m_SeniorExpenses;}
 	double GetSeniorFees() const {return m_SeniorFees;} 
 	double GetJuniorFees() const {return m_JuniorFees;}
-	int GetPaymentFrequency() const {return m_PaymentFrequency;}
+	QString GetPaymentFrequency() const {return m_PaymentFrequency.GetVector();}
 	double GetCCCTestLimit() const {return m_CCCTestLimit;} 
 	double GetCCChaircut() const {return m_CCChaircut;} 
 	bool GetUseTurbo() const {return m_UseTurbo;} 
@@ -117,7 +117,7 @@ public:
 	void SetSeniorExpenses(double a){if(a>0.0) m_SeniorExpenses=a;}
 	void SetSeniorFees(double a){if(a>0.0) m_SeniorFees=a;}
 	void SetJuniorFees(double a){if(a>0.0) m_JuniorFees=a;}
-	void SetPaymentFrequency(int a);
+	void SetPaymentFrequency(const QString& a);
 	void SetCCCTestLimit(double a){if(a>=0.0 && a<=1.0) m_CCCTestLimit=a;}
 	void SetCCChaircut(double a){if(a>=0.0 && a<=1.0) m_CCChaircut=a;}
 	void SetUseTurbo(bool a){m_UseTurbo=a;}
@@ -144,7 +144,7 @@ public:
 	void ResetTranches();
 	bool CalculateTranchesCashFlows();
 	QString ReadyToCalculate() const;
-	void SetLoadProtocolVersion(qint32 VersionNum=ModelVersionNumber){if(VersionNum>=MinimumSupportedVersion) m_LoadProtocolVersion=VersionNum;}
+	void SetLoadProtocolVersion(qint32 VersionNum=ModelVersionNumber){if(VersionNum>=MinimumSupportedVersion && VersionNum<=ModelVersionNumber) m_LoadProtocolVersion=VersionNum;}
 	friend QDataStream& operator<<(QDataStream & stream, const Waterfall& flows);
 	friend QDataStream& operator>>(QDataStream & stream, Waterfall& flows);
 };

@@ -17,6 +17,7 @@ public:
 	AnnuityVector(const QString& Vec,const QDate& Anchor);
 	char GetValue(const QDate& index) const;
 	char GetValue(int index) const;
+	int NumElements() const {return m_VectVal.size();}
 	AnnuityVector& operator=(const QString& a){AbstarctBbgVect::operator=(a); return *this;}
 	friend QDataStream& operator<<(QDataStream & stream, const AnnuityVector& flows);
 	friend QDataStream& operator>>(QDataStream & stream, AnnuityVector& flows);

@@ -19,9 +19,6 @@
       <Extensions>moc;h;cpp</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
-    <Filter Include="quazip">
-      <UniqueIdentifier>{2b3799d2-9dc8-4009-bef0-abf08b74fba3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Generated Files\Debug">
       <UniqueIdentifier>{26a8c928-e0bc-4b93-ad7e-8890dc02649f}</UniqueIdentifier>
       <Extensions>cpp;moc</Extensions>
@@ -37,114 +34,5 @@
     <ClCompile Include="NetApiConsoleTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="quazip\unzip.c">
-      <Filter>quazip</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\zip.c">
-      <Filter>quazip</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_quagzipfile.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_quagzipfile.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_quaziodevice.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_quaziodevice.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_quazipfile.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_quazipfile.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\JlCompress.cpp">
-      <Filter>quazip</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\qioapi.cpp">
-      <Filter>quazip</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\quaadler32.cpp">
-      <Filter>quazip</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\quacrc32.cpp">
-      <Filter>quazip</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\quagzipfile.cpp">
-      <Filter>quazip</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\quaziodevice.cpp">
-      <Filter>quazip</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\quazip.cpp">
-      <Filter>quazip</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\quazipdir.cpp">
-      <Filter>quazip</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\quazipfile.cpp">
-      <Filter>quazip</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\quazipfileinfo.cpp">
-      <Filter>quazip</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\quazipnewinfo.cpp">
-      <Filter>quazip</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="quazip\crypt.h">
-      <Filter>quazip</Filter>
-    </ClInclude>
-    <ClInclude Include="quazip\ioapi.h">
-      <Filter>quazip</Filter>
-    </ClInclude>
-    <ClInclude Include="quazip\JlCompress.h">
-      <Filter>quazip</Filter>
-    </ClInclude>
-    <ClInclude Include="quazip\quaadler32.h">
-      <Filter>quazip</Filter>
-    </ClInclude>
-    <ClInclude Include="quazip\quachecksum32.h">
-      <Filter>quazip</Filter>
-    </ClInclude>
-    <ClInclude Include="quazip\quacrc32.h">
-      <Filter>quazip</Filter>
-    </ClInclude>
-    <ClInclude Include="quazip\quazip.h">
-      <Filter>quazip</Filter>
-    </ClInclude>
-    <ClInclude Include="quazip\quazip_global.h">
-      <Filter>quazip</Filter>
-    </ClInclude>
-    <ClInclude Include="quazip\quazipdir.h">
-      <Filter>quazip</Filter>
-    </ClInclude>
-    <ClInclude Include="quazip\quazipfileinfo.h">
-      <Filter>quazip</Filter>
-    </ClInclude>
-    <ClInclude Include="quazip\quazipnewinfo.h">
-      <Filter>quazip</Filter>
-    </ClInclude>
-    <ClInclude Include="quazip\unzip.h">
-      <Filter>quazip</Filter>
-    </ClInclude>
-    <ClInclude Include="quazip\zip.h">
-      <Filter>quazip</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="quazip\quagzipfile.h">
-      <Filter>quazip</Filter>
-    </CustomBuild>
-    <CustomBuild Include="quazip\quaziodevice.h">
-      <Filter>quazip</Filter>
-    </CustomBuild>
-    <CustomBuild Include="quazip\quazipfile.h">
-      <Filter>quazip</Filter>
-    </CustomBuild>
   </ItemGroup>
 </Project>

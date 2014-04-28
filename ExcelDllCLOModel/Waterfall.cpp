@@ -32,14 +32,14 @@ double Waterfall::GetAnnualizedExcess(int index, bool AsShareOfLoans)const{
 	if(AsShareOfLoans){
 		if(m_CalculatedMtgPayments.GetAmountOut(m_AnnualizedExcess.GetDate(index))<0.01) return -1.0;
 		return qPow((1.0+(m_AnnualizedExcess.GetInterest(index)/
-			m_CalculatedMtgPayments.GetAmountOut(m_AnnualizedExcess.GetDate(index)))),12.0/(AdjPaymentFreq.GetValue(m_AnnualizedExcess.GetDate(index))*100.0))-1.0;
+			m_CalculatedMtgPayments.GetAmountOut(m_AnnualizedExcess.GetDate(index)))),12.0/(qRound(AdjPaymentFreq.GetValue(m_AnnualizedExcess.GetDate(index))*100.0)))-1.0;
 	}
 	double RunningSum=0.0;
 	for (int i=0;i<m_Tranches.size();i++){
 		RunningSum+=m_Tranches.at(i)->GetCashFlow().GetAmountOutstanding(index);
 	}
 	if(RunningSum<0.01) return -1.0;
-	return qPow(1.0+(m_AnnualizedExcess.GetInterest(index)/RunningSum),12.0/(AdjPaymentFreq.GetValue(m_AnnualizedExcess.GetDate(index))*100.0))-1.0;
+	return qPow(1.0+(m_AnnualizedExcess.GetInterest(index)/RunningSum),12.0/(qRound(AdjPaymentFreq.GetValue(m_AnnualizedExcess.GetDate(index))*100.0)))-1.0;
 }
 Waterfall::Waterfall()
 	:m_SeniorExpenses(0.0)
@@ -1153,7 +1153,7 @@ QDate Waterfall::GetCalledPeriod() const{
 	double TotalPayable;
 	bool IsCallPaymentDate=false;
 	for(int PeriodsCounter=0;!IsCallPaymentDate;PeriodsCounter++){
-		RollingNextIPD=RollingNextIPD=m_Tranches.first()->GetCashFlow().GetDate(PeriodsCounter);
+		RollingNextIPD=m_Tranches.first()->GetCashFlow().GetDate(PeriodsCounter);
 		ActualCallReserveLevel=0.0;
 		TotalPayable=0.0;
 		if(m_CallReserve>0 && m_CallMultiple>0){
@@ -1239,7 +1239,7 @@ double Waterfall::GetEquityReturn(int index)const{
 		foreach(Tranche* SingleTranche, m_Tranches){
 			if(SingleTranche->GetProrataGroup()==EquityTranche) denominator+=SingleTranche->GetOriginalAmount();
 		}
-		if(denominator>0) return qPow(1.0+(m_EquityIncome.GetTotalFlow(index)/denominator),12.0/(AdjPaymentFreq.GetValue(m_EquityIncome.GetDate(index))))-1.0;
+		if(denominator>0) return qPow(1.0+(m_EquityIncome.GetTotalFlow(index)/denominator),12.0/(qRound(100.0*AdjPaymentFreq.GetValue(m_EquityIncome.GetDate(index)))))-1.0;
 		else return 0.0;
 	}
 	denominator=0.0;
@@ -1247,7 +1247,7 @@ double Waterfall::GetEquityReturn(int index)const{
 		denominator+=SingleTranche->GetOriginalAmount();
 	}
 	denominator=m_CalculatedMtgPayments.GetAmountOut(0)-denominator;
-	if(denominator>0) return qPow(1.0+(m_EquityIncome.GetTotalFlow(index)/denominator),12.0/(AdjPaymentFreq.GetValue(m_EquityIncome.GetDate(index))))-1.0;
+	if(denominator>0) return qPow(1.0+(m_EquityIncome.GetTotalFlow(index)/denominator),12.0/(qRound(100.0*AdjPaymentFreq.GetValue(m_EquityIncome.GetDate(index)))))-1.0;
 	else return 0.0;
 
 }

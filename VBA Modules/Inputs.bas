@@ -233,7 +233,7 @@ ReferenceRateFromBBg:
         Call AddInput(AllTheInputs, CStr(RefRateStart.Offset(i, 0).Value))
         Call AddInput(AllTheInputs, Format(PrevIPDCell.Offset(0, 1).Value, "yyyy-mm-dd"))
         Call AddInput(AllTheInputs, CStr(InterestBaseCell.Offset(0, 1).Value))
-        Call AddInput(AllTheInputs, CLng(IPDfrequencyCell.Offset(0, 1)))
+        Call AddInput(AllTheInputs, CStr(IPDfrequencyCell.Offset(0, 1)))
         On Error GoTo SpreadFromBBg
             If (IsEmpty(RefRateStart.Offset(i, 0)) Or RefRateStart.Offset(i, 0) = "") Then
                 Call AddInput(AllTheInputs, Application.WorksheetFunction.VLookup(InterestBaseCell.Offset(0, 1).Value, Range(BaseIndexesStart, BaseIndexesStart.End(xlDown).Offset(0, 1)), 2, False))
@@ -279,7 +279,7 @@ DefaultExchange:
     Call AddInput(AllTheInputs, SeniorFeesCell.Offset(0, 1).Value)
     Call AddInput(AllTheInputs, JuniorFeesCell.Offset(0, 1).Value)
     Call AddInput(AllTheInputs, JuniorFeesCouponCell.Offset(0, 1).Value)
-    Call AddInput(AllTheInputs, CLng(IPDfrequencyCell.Offset(0, 1)))
+    Call AddInput(AllTheInputs, CStr(IPDfrequencyCell.Offset(0, 1)))
     Call AddInput(AllTheInputs, Format(FirstIPDcell.Offset(0, 1), "yyyy-mm-dd"))
     Call AddInput(AllTheInputs, Format(PrevIPDCell.Offset(0, 1), "yyyy-mm-dd"))
     Call AddInput(AllTheInputs, UseTurboCell.Offset(0, 1).Value)

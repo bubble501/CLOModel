@@ -31,6 +31,7 @@ void BloombergVector::UnpackVector(){
 		m_AnchorDate.setDate(dateVals.at(3).toInt(),dateVals.at(1).toInt(),dateVals.at(2).toInt());
 		TempVec=dateVals.at(4);
 	}
+	m_Vector=TempVec;
 	QStringList StringParts=TempVec.trimmed().toUpper().split(QRegExp("\\s"),QString::SkipEmptyParts);
 	int StepLen;
 	QString TempStr;

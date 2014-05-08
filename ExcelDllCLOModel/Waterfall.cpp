@@ -191,6 +191,7 @@ int Waterfall::FindMostJuniorLevel()const{
 void Waterfall::FillAllDates(){
 	bool AnchorDateNull=m_PaymentFrequency.GetAnchorDate().isNull();
 	if (AnchorDateNull) m_PaymentFrequency.SetAnchorDate(m_MortgagesPayments.GetDate(0));
+	bool ExcessIsEmpty=m_ExcessCashFlow.Count()==0;
 	//All the dates in all the tranches
 	for(int i=0;i<m_Tranches.size()-1;i++){
 		for(int j=i+1;j<m_Tranches.size();j++){
@@ -202,10 +203,12 @@ void Waterfall::FillAllDates(){
 		}
 	}
 	//dates from excess to all the tranches
-	for(int j=0;j<m_Tranches.size();j++){
-		for(int h=0;h<m_ExcessCashFlow.Count();h++){
-			if(m_Tranches.at(j)->GetCashFlow().FindDate(m_ExcessCashFlow.GetDate(h)) < 0){
-				m_Tranches[j]->AddCashFlow(m_ExcessCashFlow.GetDate(h),0.0,TrancheCashFlow::InterestFlow);
+	if(!ExcessIsEmpty){
+		for(int j=0;j<m_Tranches.size();j++){
+			for(int h=0;h<m_ExcessCashFlow.Count();h++){
+				if(m_Tranches.at(j)->GetCashFlow().FindDate(m_ExcessCashFlow.GetDate(h)) < 0){
+					m_Tranches[j]->AddCashFlow(m_ExcessCashFlow.GetDate(h),0.0,TrancheCashFlow::InterestFlow);
+				}
 			}
 		}
 	}
@@ -228,7 +231,7 @@ void Waterfall::FillAllDates(){
 			}
 		}
 	}
-	//'dates from senior fees to all the tranches
+	//dates from senior fees to all the tranches
 	for(int j=0;j<m_Tranches.size();j++){
 		for(int h=0;h<m_TotalSeniorFees.Count();h++){
 			if(m_Tranches.at(j)->GetCashFlow().FindDate(m_TotalSeniorFees.GetDate(h)) < 0){
@@ -255,8 +258,10 @@ void Waterfall::FillAllDates(){
 	//dates from tranches to excess, fees and reserve
 	for(int i=0;i<m_Tranches.size();i++){
 		for(int h=0;h<m_Tranches.at(i)->GetCashFlow().Count();h++){
-			if (m_ExcessCashFlow.FindDate(m_Tranches.at(i)->GetCashFlow().GetDate(h)) < 0)
-				m_ExcessCashFlow.AddFlow(m_Tranches.at(i)->GetCashFlow().GetDate(h),0.0,TrancheCashFlow::InterestFlow);
+			if(!ExcessIsEmpty){
+				if (m_ExcessCashFlow.FindDate(m_Tranches.at(i)->GetCashFlow().GetDate(h)) < 0)
+					m_ExcessCashFlow.AddFlow(m_Tranches.at(i)->GetCashFlow().GetDate(h),0.0,TrancheCashFlow::InterestFlow);
+			}
 			if (m_AnnualizedExcess.FindDate(m_Tranches.at(i)->GetCashFlow().GetDate(h)) < 0)
 				m_AnnualizedExcess.AddFlow(m_Tranches.at(i)->GetCashFlow().GetDate(h),0.0,TrancheCashFlow::InterestFlow);
 			if (m_TotalSeniorExpenses.FindDate(m_Tranches.at(i)->GetCashFlow().GetDate(h)) < 0)

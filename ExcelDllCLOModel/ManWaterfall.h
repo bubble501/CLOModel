@@ -132,6 +132,13 @@ namespace ManagedCLO {
 		*/
 		ManTrancheCashFlow^ GetReserveFundFlow(int index){return gcnew ManTrancheCashFlow(Unmanaged->GetReserveFundFlow(index));}
 		/*!
+		\brief Whether the reserve will fund the interest or principal waterfall
+		\arg index the index of the reserve fund. Currently 2 reserves are modeled so  index can be either 0 or 1 for, respectively, the first and second reserve
+		\details This function will return true if the reserve fund will be part of interest proceeds and false if it will form part of principal proceeds or index is invalid.
+		\sa SetReserveFund
+		*/
+		bool GetReserveToInterest(int RFindex){return Unmanaged->GetReserveToInterest(RFindex);}
+		/*!
 		\brief Set up a reserve fund
 		\arg RFindex the index of the reserve fund. Currently 2 reserves are modeled so  index can be either 0 or 1 for, respectively, the first and second reserve
 		\arg RFtarget a Bloomberg vector representing the target level of the reserve fund.
@@ -139,9 +146,10 @@ namespace ManagedCLO {
 		\arg RFfloor a Bloomberg vector representing the floor level of the reserve fund. For non-amortizing RFs set to "0"
 		\arg RFcurrent the current size of the reserve fund
 		\arg RFfreed A seniority level. When all the notes not junior to this seniority level will be redeemed, the RF will be released as excess spread. 0 for freeing it only at maturity
+		\arg RFtoInterest Set to true if the reserve fund will be part of interest proceeds when calculating the waterfall, set to false if it's part of principal proceeds.
 		\details This function will set up the specified reserve fund according to the supplied parameters.<br/>If RFtarget is a seniority level, the reserve fund target amount will be the sum of all the notes that rank not junior to that level, otherwise the reserve will be a non amortizing.<br/>The target level will then be multiplied by RFmultiple to assess the actual replenishment target.<br/>In any case, the target won't be set below the RFfloor amount.
 		*/
-		void SetReserveFund(int RFindex,String^ RFtarget,String^ RFmultiple,String^ RFfloor,double RFcurrent,int RFfreed){Unmanaged->SetReserveFund(RFindex,String2QString(RFtarget),String2QString(RFmultiple),String2QString(RFfloor),RFcurrent,RFfreed);}
+		void SetReserveFund(int RFindex,String^ RFtarget,String^ RFmultiple,String^ RFfloor,double RFcurrent,int RFfreed,bool RFtoInterest){Unmanaged->SetReserveFund(RFindex,String2QString(RFtarget),String2QString(RFmultiple),String2QString(RFfloor),RFcurrent,RFfreed,RFtoInterest);}
 		/*!
 		\brief Removes all the settings for the specified reserve fund
 		\arg index the index of the reserve fund. Currently 2 reserves are modeled so  index can be either 0 or 1 for, respectively, the first and second reserve. -1 will reset all the reserves

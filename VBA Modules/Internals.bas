@@ -121,12 +121,13 @@ Private Function UnpackVect(ByVal Vect As String, Optional PaymFreq As Long = 1,
     Dim result As New Collection
     Dim ResultVect As Variant
     If Not ValidBloombergVector(Vect) Then Exit Function
+    Vect = UCase(Trim(Vect))
     Dim AnchorRegExp As New RegExp
     AnchorRegExp.Pattern = "A\s+\d{1,2}/\d{1,2}/\d{2,4}\s+"
-    AnchorRegExp.Replace Vect, ""
+    Vect = AnchorRegExp.Replace(Vect, "")
     
     Dim StringParts
-    StringParts = Split(UCase(Trim(Vect)), " ")
+    StringParts = Split(Vect, " ")
     Dim i As Long, j As Long, StepLen As Long
     i = 2
     While (i <= UBound(StringParts))

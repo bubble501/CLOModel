@@ -65,6 +65,7 @@ Waterfall::Waterfall()
 		m_ReserveFundFloor[RFindex]="0";
 		m_ReserveFundCurrent[RFindex]=0.0;
 		m_ReserveFundFreed[RFindex]=0;
+		m_ReserveToInterest[RFindex]=true;
 	}
 }
 Waterfall::Waterfall(const Waterfall& a)
@@ -111,6 +112,7 @@ Waterfall::Waterfall(const Waterfall& a)
 		m_ReserveFundCurrent[RFindex]=a.m_ReserveFundCurrent[RFindex];
 		m_ReserveFundFlows[RFindex]=a.m_ReserveFundFlows[RFindex];
 		m_ReserveFundFreed[RFindex]=a.m_ReserveFundFreed[RFindex];
+		m_ReserveToInterest[RFindex]=a.m_ReserveToInterest[RFindex];
 	}
 }
 Waterfall& Waterfall::operator=(const Waterfall& a){
@@ -158,6 +160,7 @@ Waterfall& Waterfall::operator=(const Waterfall& a){
 		m_ReserveFundCurrent[RFindex]=a.m_ReserveFundCurrent[RFindex];
 		m_ReserveFundFlows[RFindex]=a.m_ReserveFundFlows[RFindex];
 		m_ReserveFundFreed[RFindex]=a.m_ReserveFundFreed[RFindex];
+		m_ReserveToInterest[RFindex]=a.m_ReserveToInterest[RFindex];
 	}
 	return *this;
 }
@@ -538,11 +541,14 @@ bool Waterfall::CalculateTranchesCashFlows(){
 			AvailablePrincipal = m_PrincipalAvailable;
 			AvailableInterest = m_InterestAvailable;
 			for(int ReservIter=0;ReservIter<NumReserves;ReservIter++){
-				AvailableInterest+=m_ReserveFundCurrent[ReservIter];
+				if(m_ReserveToInterest[ReservIter])
+					AvailableInterest+=m_ReserveFundCurrent[ReservIter];
+				else
+					AvailablePrincipal+=m_ReserveFundCurrent[ReservIter];
 				m_ReserveFundCurrent[ReservIter]=0.0;
 			}
 			if(IsCallPaymentDate) AvailablePrincipal+=m_PoolValueAtCall*m_MortgagesPayments.GetAmountOut(i)/100.0;
-			foreach(WatFalPrior* SingleStep,m_WaterfallStesps){//Cicle through the steps of the waterfall
+			foreach(WatFalPrior* SingleStep,m_WaterfallStesps){//Cycle through the steps of the waterfall
 				switch(SingleStep->GetPriorityType()){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				case WatFalPrior::wst_SeniorExpenses:
@@ -623,10 +629,10 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						}
 						if(i<m_MortgagesPayments.Count()-1 && !IsCallPaymentDate && FreedAmnt>0.01){
 							TestTarget=0.0;
-							if(m_ReserveFundTarget[SingleStep->GetGroupTarget()-1].GetValue(CurrentDate)*100.0>MostJun) TestTarget=m_ReserveFundTarget[SingleStep->GetGroupTarget()-1].GetValue(CurrentDate)*100.0;
+							if(qRound(m_ReserveFundTarget[SingleStep->GetGroupTarget()-1].GetValue(CurrentDate)*100.0)>MostJun) TestTarget=m_ReserveFundTarget[SingleStep->GetGroupTarget()-1].GetValue(CurrentDate)*100.0;
 							else{
 								foreach(Tranche* SingleTranche, m_Tranches){
-									if(SingleTranche->GetProrataGroup()<=m_ReserveFundTarget[SingleStep->GetGroupTarget()-1].GetValue(CurrentDate)*100.0) TestTarget+=SingleTranche->GetCurrentOutstanding();
+									if(SingleTranche->GetProrataGroup()<=qRound(m_ReserveFundTarget[SingleStep->GetGroupTarget()-1].GetValue(CurrentDate)*100.0)) TestTarget+=SingleTranche->GetCurrentOutstanding();
 								}
 							}
 							if(m_CumulativeReserves){
@@ -648,6 +654,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 								}
 								else if(SingleStep->GetRedemptionGroup()==2){
 									m_ReserveFundFlows[SingleStep->GetGroupTarget()-1].AddFlow(CurrentDate,qMin(AvailablePrincipal,TotalPayable),TrancheCashFlow::PrincipalFlow);
+									m_ReserveFundFlows[SingleStep->GetGroupTarget()-1].AddFlow(CurrentDate,qMax(0.0,TotalPayable-AvailablePrincipal)-m_ReserveFundFlows[SingleStep->GetGroupTarget()-1].GetDeferred(CurrentDate),TrancheCashFlow::DeferredFlow);
 									m_ReserveFundCurrent[SingleStep->GetGroupTarget()-1]+=qMin(AvailablePrincipal,TotalPayable);
 									AvailablePrincipal=qMax(0.0,AvailablePrincipal-TotalPayable);
 								}
@@ -996,6 +1003,7 @@ QDataStream& operator<<(QDataStream & stream, const Waterfall& flows){
 			<< flows.m_ReserveFundCurrent[i]
 			<< flows.m_ReserveFundFlows[i]
 			<< flows.m_ReserveFundFreed[i]
+			<< flows.m_ReserveToInterest[i]
 		;
 	}
 	return stream;
@@ -1141,8 +1149,9 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream){
 		stream
 			>> m_ReserveFundCurrent[i]
 			>> m_ReserveFundFlows[i]
-			>> m_ReserveFundFreed[i]
-		;
+			>> m_ReserveFundFreed[i];
+			if(m_LoadProtocolVersion<=175) m_ReserveToInterest[i]=true;
+			else stream >> m_ReserveToInterest[i];
 	}
 	m_LoadProtocolVersion=ModelVersionNumber;
 	return stream;
@@ -1316,13 +1325,14 @@ double Waterfall::GetCallEquityRatio(int index)const{
 	if(denominator>0) return numerator/denominator;
 	else return 0.0;
 }
-void Waterfall::SetReserveFund(int RFindex,const QString& RFtarget,const QString& RFmultiple,const QString& RFfloor,double RFcurrent,int RFfreed){
+void Waterfall::SetReserveFund(int RFindex,const QString& RFtarget,const QString& RFmultiple,const QString& RFfloor,double RFcurrent,int RFfreed,bool RFtoInterest){
 	if(RFindex<0 || RFindex>=NumReserves) return;
 	m_ReserveFundTarget[RFindex]=RFtarget;
 	m_ReserveFundMultiple[RFindex]=RFmultiple;
 	m_ReserveFundFloor[RFindex]=RFfloor;
 	m_ReserveFundCurrent[RFindex]=RFcurrent;
 	m_ReserveFundFreed[RFindex]=RFfreed;
+	m_ReserveToInterest[RFindex]=RFtoInterest;
 }
 void Waterfall::ResetReserve(int RFindex){
 	if(RFindex==-1){
@@ -1337,6 +1347,7 @@ void Waterfall::ResetReserve(int RFindex){
 	m_ReserveFundCurrent[RFindex]=0.0;
 	m_ReserveFundFreed[RFindex]=0;
 	m_ReserveFundFlows[RFindex].ResetFlows();
+	m_ReserveToInterest[RFindex]=true;
 }
 void Waterfall::SetPaymentFrequency(const QString& a){
 	BloombergVector TempVect(a);

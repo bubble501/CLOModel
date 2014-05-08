@@ -162,6 +162,7 @@ void WaterfallViewer::AddStep(const WatFalPrior& a){
 		else{
 			PrincipalTable->setRowCount(PrincipalTable->rowCount()+1);
 			PrincipalTable->setItem(PrincipalTable->rowCount()-1,0,new QTableWidgetItem("Reserve Fund Replenishment"));
+			PrincipalTable->setItem(PrincipalTable->rowCount()-1,1,new QTableWidgetItem(QString("Reserve %1").arg(a.GetGroupTarget())));
 		}
 	break;
 	case WatFalPrior::wst_ReinvestmentTest:

@@ -203,16 +203,18 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			QString RFtarget,RFmultiple,RFfloor;
 			double RFcurrent;
 			int RFfree;
+			bool RFtoIntres;
 			for(int RFiter=0;RFiter<NumReserves;RFiter++){
 				RFtarget=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 				RFmultiple=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 				RFfloor=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 				RFcurrent=pdFreq->dblVal; pdFreq++;
 				RFfree=pdFreq->intVal; pdFreq++;
+				RFtoIntres=pdFreq->boolVal; pdFreq++;
 #ifdef DebuggungInputs
-				QMessageBox::information(0,QString("Reserve %1").arg(RFiter+1),QString("Target: %1\nMultiple: %2\nFloor: %3\nCurrent: %4\nFree: %5").arg(RFtarget).arg(RFmultiple).arg(RFfloor).arg(RFcurrent).arg(RFfree));
+				QMessageBox::information(0,QString("Reserve %1").arg(RFiter+1),QString("Target: %1\nMultiple: %2\nFloor: %3\nCurrent: %4\nFree: %5\nTo Interest: %6").arg(RFtarget).arg(RFmultiple).arg(RFfloor).arg(RFcurrent).arg(RFfree).arg(RFtoIntres));
 #endif
-				TempUnit.SetReserveFund(RFiter,RFtarget,RFmultiple,RFfloor,RFcurrent,RFfree);
+				TempUnit.SetReserveFund(RFiter,RFtarget,RFmultiple,RFfloor,RFcurrent,RFfree,RFtoIntres);
 			}
 			bool CumRes=pdFreq->boolVal; pdFreq++;
 			TempUnit.SetCumulativeReserves(CumRes);

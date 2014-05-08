@@ -16,6 +16,7 @@ private:
 	double m_ReserveFundCurrent[NumReserves];
 	int m_ReserveFundFreed[NumReserves];
 	TrancheCashFlow m_ReserveFundFlows[NumReserves];
+	bool m_ReserveToInterest[NumReserves];
 	bool m_CumulativeReserves;
 	double m_SeniorExpenses;
 	double m_SeniorFees; 
@@ -111,6 +112,7 @@ public:
 	double GetReserveFundCurrent(int RFindex)const{if(RFindex<0 || RFindex>=NumReserves) return 0.0; return m_ReserveFundCurrent[RFindex];}
 	int GetReserveFundFreed(int RFindex)const{if(RFindex<0 || RFindex>=NumReserves) return -1; return m_ReserveFundFreed[RFindex];}
 	TrancheCashFlow GetReserveFundFlow(int RFindex)const{if(RFindex<0 || RFindex>=NumReserves) return TrancheCashFlow(); return m_ReserveFundFlows[RFindex];}
+	bool GetReserveToInterest(int RFindex)const{if(RFindex<0 || RFindex>=NumReserves) return false; return m_ReserveToInterest[RFindex];}
 	bool GetCumulativeReserves() const {return m_CumulativeReserves;}
 	//////////////////////////////////////////////////////////////////////////
 	void SetCumulativeReserves(bool a){m_CumulativeReserves=a;}
@@ -137,7 +139,7 @@ public:
 	void SetupReinvestmentTest(const QDate& ReinvPer,double TstLvl, double IIshare,double IRshare,double OIshare,double ORshare);
 	void SetupReinvBond(const QString& IntrVec,const QString& CPRVec,const QString& CDRVec,const QString& LSVec,const QString& WALval,int PayFreq=1,const QString& AnnuityVec="N",double FloatingBase=0.0);
 	void AddStep(const WatFalPrior& a){m_WaterfallStesps.append(new WatFalPrior(a));}
-	void SetReserveFund(int RFindex,const QString& RFtarget,const QString& RFmultiple,const QString& RFfloor,double RFcurrent,int RFfreed);
+	void SetReserveFund(int RFindex,const QString& RFtarget,const QString& RFmultiple,const QString& RFfloor,double RFcurrent,int RFfreed,bool RFtoInterest=true);
 	void ResetReserve(int RFindex=-1);
 	void ResetSteps();
 	void AddTranche(const Tranche& a){m_Tranches.append(new Tranche(a));}

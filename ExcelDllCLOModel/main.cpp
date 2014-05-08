@@ -6,6 +6,7 @@
 #include "CommonFunctions.h"
 #include "Waterfall.h"
 #include "StressTest.h"
+#include "ExcelOutput.h"
 #endif
 int main(int argc, char *argv[])
 {
@@ -46,7 +47,7 @@ int main(int argc, char *argv[])
 		file.close();
 	}*/
 	
-	Waterfall TempWtf,TempCallWaterfall;
+	/*Waterfall TempWtf,TempCallWaterfall;
 	QFile file("C:/Temp/.BaseCase.clo");
 	file.open(QIODevice::ReadOnly);
 	qint32 VersionChecker;
@@ -62,10 +63,11 @@ int main(int argc, char *argv[])
 	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempCallWaterfall;
 	file.close();
-	TempCallWaterfall.GetEquityReturn(10);
-	TempWtf.SetPaymentFrequency("3 47S 6");
-	TempWtf.CalculateTranchesCashFlows();
+	TempWtf.CalculateTranchesCashFlows();*/
 
+	StressTest TempStress;
+	TempStress.LoadResultsFromFile("C:\\Temp\\.StressResult01.fcsr");
+	ExcelOutput::PrintStressTest(TempStress,"CGMSE 2013-1X E1","Stress Test!C3");
 
 #endif
 }

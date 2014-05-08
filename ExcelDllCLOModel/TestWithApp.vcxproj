@@ -84,6 +84,8 @@
     <ClCompile Include="BloombergVector.cpp" />
     <ClCompile Include="BloombergWorker.cpp" />
     <ClCompile Include="CommonFunctions.cpp" />
+    <ClCompile Include="ExcelCommons.cpp" />
+    <ClCompile Include="ExcelOutput.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_MtgCalculator.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
@@ -199,6 +201,8 @@
     <ClInclude Include="BloombergVector.h" />
     <ClInclude Include="BloombergWorker.h" />
     <ClInclude Include="CommonFunctions.h" />
+    <ClInclude Include="ExcelCommons.h" />
+    <ClInclude Include="ExcelOutput.h" />
     <ClInclude Include="Mortgage.h" />
     <ClInclude Include="MtgCashFlow.h" />
     <CustomBuild Include="StandaloneStress.h">

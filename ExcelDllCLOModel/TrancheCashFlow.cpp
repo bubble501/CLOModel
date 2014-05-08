@@ -65,12 +65,14 @@ double TrancheCashFlow::GetAmountOutstanding(int index)const{
 	if(OutstandingAmt>0){
 		Result=OutstandingAmt;
 		for (int i=0;i<=index;i++) Result-=Principal.at(i);
+		if (qAbs(Result)<0.01) return 0.0;
 		return Result;
 	}
 	for (int i=index;i<FlowDates.size();i++) Result+=Principal.at(i);
 	return Result;
 }
-void TrancheCashFlow::AddFlow(QDate Dte,double Amt, ThrancheFlowType FlwTpe){
+void TrancheCashFlow::AddFlow(const QDate& Dte,double Amt, ThrancheFlowType FlwTpe){
+	if(qAbs(Amt)<0.01) Amt=0.0;
 	int DateIndex = FlowDates.indexOf(Dte);
 	bool NeedSorting = false;
 	if(DateIndex<0){

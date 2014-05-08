@@ -41,7 +41,7 @@ public:
 	double GetTotalFlow(const QDate& a)const{return GetInterest(a)+GetPrincipal(a);}
 	double GetAmountOutstanding(const QDate& a)const{return GetAmountOutstanding(FindDate(a));}
 	void SetInitialOutstanding(double a){OutstandingAmt=a;}
-	void AddFlow(QDate Dte,double Amt, ThrancheFlowType FlwTpe);
+	void AddFlow(const QDate& Dte,double Amt, ThrancheFlowType FlwTpe);
 	void AddFlow(const TrancheCashFlow& a);
 	TrancheCashFlow& operator+=(const TrancheCashFlow& a){AddFlow(a); return *this;}
 	void ResetFlows();

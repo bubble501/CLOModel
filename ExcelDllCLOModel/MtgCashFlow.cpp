@@ -61,6 +61,7 @@ int  MtgCashFlow::FindDate(const QDate& a) const{
 	return m_FlowDates.indexOf(a);
 }
 void MtgCashFlow::AddFlow(const QDate& Dte, double Amt, MtgFlowType FlowTpe){
+	if(qAbs(Amt)<0.01) Amt=0.0;
 	int DateIndex = m_FlowDates.indexOf(Dte);
 	bool NeedSorting = false;
 	if(DateIndex<0){

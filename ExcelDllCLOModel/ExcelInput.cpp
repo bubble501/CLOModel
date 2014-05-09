@@ -32,7 +32,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		QString Intr;
 		QString lossm,prem,Ann,Hairc;
 		int frq;
-		NumElements=pdFreq++->intVal;
+		NumElements=pdFreq->intVal;pdFreq++;
 #ifdef DebuggungInputs
 		QMessageBox::information(0,"Mutui",QString("Numero Mutui: %1").arg(NumElements));
 #endif
@@ -76,9 +76,9 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		}
 	}
 	{//Tranches
-		QString TrName, Curr, RefRt, BasRt ,coup, TrancheISIN,IPDfrq;
+		QString TrName, Curr, RefRt, BasRt ,coup, TrancheISIN,IPDfrq/*,RefRtVal*/;
 		int ProRat,IntrTpe;
-		double origOut,currOut,RefRtVal,OClim,IClim,Price,Exchan,accruedIntr/*,coup*/;
+		double origOut,currOut,OClim,IClim,Price,Exchan,accruedIntr/*,coup*/;
 		QDate PrevIPD,SettDate;
 		NumElements=pdFreq++->intVal;
 #ifdef DebuggungInputs
@@ -132,15 +132,15 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 #ifdef DebuggungInputs
 			if(i==0) QMessageBox::information(0,"Base rate Ok","Base rate: "+BasRt);
 #endif
-			//IPDfrq=pdFreq->intVal; pdFreq++;
 			IPDfrq=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 #ifdef DebuggungInputs
 			if(i==0) QMessageBox::information(0,"IPD Frequ Ok",QString("IPD Frequ: %1").arg(IPDfrq));
 #endif
-			RefRtVal=pdFreq->dblVal;pdFreq++;
+/*
+			RefRtVal=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 #ifdef DebuggungInputs
 			if(i==0) QMessageBox::information(0,"Ref Rate Val Ok",QString("Ref Rate Val: %1").arg(RefRtVal));
-#endif
+#endif*/
 			OClim=pdFreq->dblVal;pdFreq++;
 #ifdef DebuggungInputs
 			if(i==0) QMessageBox::information(0,"OClim Ok",QString("OClim: %1").arg(OClim));
@@ -165,8 +165,20 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 #ifdef DebuggungInputs
 			if(i==0) QMessageBox::information(0,"Accrued Interest Ok",QString("Accrued Interest: %1").arg(accruedIntr));
 #endif
-			TempUnit.AddTranche(TrName,TrancheISIN,ProRat,origOut,Curr,currOut,Tranche::TrancheInterestType(IntrTpe),coup,RefRt,PrevIPD,BasRt,IPDfrq,SettDate,accruedIntr,RefRtVal,OClim,IClim,Price,Exchan);
+			TempUnit.AddTranche(TrName,TrancheISIN,ProRat,origOut,Curr,currOut,Tranche::TrancheInterestType(IntrTpe),coup,RefRt,PrevIPD,BasRt,IPDfrq,SettDate,accruedIntr,""/*RefRtVal*/,OClim,IClim,Price,Exchan);
 		}
+	}
+	{//Base Rates Compilation
+		int NumOfBaseRates=pdFreq->intVal;pdFreq++;
+		QString BaseName;
+		double BaseVal;
+		QHash<QString,double> CompilationTable;
+		for(int i=0;i<NumOfBaseRates;i++){
+			BaseName=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
+			BaseVal=pdFreq->dblVal;pdFreq++;
+			CompilationTable.insert(BaseName.trimmed().toUpper(),BaseVal);
+		}
+		TempUnit.CompileBaseRates(CompilationTable);
 	}
 	{ //Waterfall Steps
 		int Prior,GrpTg, RedTg;

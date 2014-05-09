@@ -2,7 +2,6 @@
 #define AbstarctBbgVect_h__
 #include <QString>
 #include <QDate>
-
 class AbstarctBbgVect
 {
 protected:

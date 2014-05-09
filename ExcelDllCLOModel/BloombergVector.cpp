@@ -10,17 +10,73 @@ BloombergVector::BloombergVector(const QString& Vec)
 	else m_Vector="";
 }
 BloombergVector::BloombergVector(const BloombergVector& Vec)
+	:m_VectVal(Vec.m_VectVal)
+{
+	m_Vector=Vec.m_Vector;
+	m_AnchorDate=Vec.m_AnchorDate;
+}
+BloombergVector& BloombergVector::operator=(const BloombergVector& Vec)
 {
 	m_Vector=Vec.m_Vector;
 	m_AnchorDate=Vec.m_AnchorDate;
 	m_VectVal=Vec.m_VectVal;
+	return *this;
 }
+BloombergVector BloombergVector::operator+(const BloombergVector& Vec) const{
+	BloombergVector Result;
+	QList<double> ResultVector;
+	if(m_AnchorDate.isNull() || Vec.m_AnchorDate.isNull() || m_AnchorDate==Vec.m_AnchorDate){
+		int MaxLen=qMax(m_VectVal.size(),Vec.m_VectVal.size());
+		for(int i=0;i<MaxLen;i++){
+			ResultVector.append(
+				m_VectVal.at(qMin(m_VectVal.size()-1,i))
+				+
+				Vec.m_VectVal.at(qMin(Vec.m_VectVal.size()-1,i))
+			);
+		}
+		if(!Vec.m_AnchorDate.isNull()) Result.m_AnchorDate=Vec.m_AnchorDate;
+		else Result.m_AnchorDate=m_AnchorDate;
+	}
+	else{
+		// The part of the vector up to the most recent anchor date will be discarded
+		QDate MaxAnchor=qMax(m_AnchorDate,Vec.m_AnchorDate);
+		QDate MaxEnd=qMax(m_AnchorDate.addMonths(m_VectVal.size()),Vec.m_AnchorDate.addMonths(Vec.m_VectVal.size()));
+		for(QDate i=MaxAnchor;i<=MaxEnd;i.addMonths(1)){
+			ResultVector.append(
+				GetValue(i)
+				+
+				Vec.GetValue(i)
+				);
+		}
+		Result.m_AnchorDate=MaxAnchor;
+	}
+	Result.m_VectVal=ResultVector;
+	Result.RepackVector();
+	return Result;
+}
+BloombergVector BloombergVector::operator+(double a) const{
+	BloombergVector ResultVector(*this);
+	for(int i=0;i<m_VectVal.size();i++){
+		ResultVector.m_VectVal[i]+=a;
+	}
+	ResultVector.RepackVector();
+	return ResultVector;
+}
+
 BloombergVector::BloombergVector(const QString& Vec,const QDate& Anchor)
 	:AbstarctBbgVect(Vec)
 {
 	if(IsValid()) UnpackVector();
 	else m_Vector="";
 	m_AnchorDate=Anchor;
+}
+void BloombergVector::RepackVector(){
+	QString NewVector("");
+	if(!m_AnchorDate.isNull()) NewVector="A "+m_AnchorDate.toString("MM/dd/yyyy") + ' ';
+	for(int i=0;i<m_VectVal.size();i++){
+		NewVector+=QString("%1").arg(m_VectVal.at(i)*100.0);
+		if(i>0) NewVector+=" 1S ";
+	}
 }
 void BloombergVector::UnpackVector(){
 	m_VectVal.clear();

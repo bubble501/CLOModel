@@ -238,18 +238,18 @@ ReferenceRateFromBBg:
         Call AddInput(AllTheInputs, Format(PrevIPDCell.Offset(0, 1).Value, "yyyy-mm-dd"))
         Call AddInput(AllTheInputs, CStr(InterestBaseCell.Offset(0, 1).Value))
         Call AddInput(AllTheInputs, CStr(IPDfrequencyCell.Offset(0, 1)))
-        On Error GoTo SpreadFromBBg
-            If (IsEmpty(RefRateStart.Offset(i, 0)) Or RefRateStart.Offset(i, 0) = "") Then
-                Call AddInput(AllTheInputs, Application.WorksheetFunction.VLookup(InterestBaseCell.Offset(0, 1).Value, Range(BaseIndexesStart, BaseIndexesStart.End(xlDown).Offset(0, 1)), 2, False))
-            Else
-                Call AddInput(AllTheInputs, Application.WorksheetFunction.VLookup(RefRateStart.Offset(i, 0).Value, Range(BaseIndexesStart, BaseIndexesStart.End(xlDown).Offset(0, 1)), 2, False))
-            End If
-        If False Then
-SpreadFromBBg:
-            Call AddInput(AllTheInputs, -1#)
-            Resume Next
-        End If
-        On Error GoTo 0
+'        On Error GoTo SpreadFromBBg
+'            If (IsEmpty(RefRateStart.Offset(i, 0)) Or RefRateStart.Offset(i, 0) = "") Then
+'                Call AddInput(AllTheInputs, Application.WorksheetFunction.VLookup(InterestBaseCell.Offset(0, 1).Value, Range(BaseIndexesStart, BaseIndexesStart.End(xlDown).Offset(0, 1)), 2, False))
+'            Else
+'                Call AddInput(AllTheInputs, Application.WorksheetFunction.VLookup(RefRateStart.Offset(i, 0).Value, Range(BaseIndexesStart, BaseIndexesStart.End(xlDown).Offset(0, 1)), 2, False))
+'            End If
+'        If False Then
+'SpreadFromBBg:
+'            Call AddInput(AllTheInputs, -1#)
+'            Resume Next
+'        End If
+'        On Error GoTo 0
         Call AddInput(AllTheInputs, OCLimitStart.Offset(i, 0).Value)
         Call AddInput(AllTheInputs, ICLimitStart.Offset(i, 0).Value)
         Call AddInput(AllTheInputs, CDbl(BondPriceStart.Offset(i, 0).Value))
@@ -265,6 +265,13 @@ DefaultExchange:
         Call AddInput(AllTheInputs, AccruedIntrStart.Offset(i, 0).Value)
         i = i + 1
     Loop
+    Dim NumBases As Long
+    NumBases = Range(BaseIndexesStart, BaseIndexesStart.End(xlDown)).Count - 1
+    Call AddInput(AllTheInputs, NumBases)
+    For i = 1 To NumBases
+        Call AddInput(AllTheInputs, CStr(BaseIndexesStart.Offset(i, 0).Value))
+        Call AddInput(AllTheInputs, BaseIndexesStart.Offset(i, 1).Value)
+    Next i
     If (IsEmpty(WaterfallStart.Offset(2, 0))) Then
         Call AddInput(AllTheInputs, CLng(0))
     Else

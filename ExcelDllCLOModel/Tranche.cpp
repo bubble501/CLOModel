@@ -10,7 +10,6 @@ Tranche::Tranche()
 	,BloombergExtension("Mtge")
 	,InterestType(FloatingInterest)
 	,ProrataGroup(1)
-	,ReferenceRateValue(-1.0)
 	,MinIClevel(-1.0)
 	,MinOClevel(-1.0)
 	,ExchangeRate(1.0)
@@ -87,21 +86,56 @@ void Tranche::SetExchangeRate(double a){
 	OutstandingAmt/=ExchangeRate;
 	CashFlow.SetInitialOutstanding(OutstandingAmt);
 }
+void Tranche::GetRefRateValueFromBloomberg()const{
+	QStringList RatesToDownload;
+	const BaseRateVector& ApplicableRate = (ReferenceRate.IsEmpty() ? DefaultRefRate : ReferenceRate);
+	for(int i=0;i<ApplicableRate.NumElements();i++){
+		if(!RatesToDownload.contains(ApplicableRate.GetValueString(i))) RatesToDownload.append(ApplicableRate.GetValueString(i));
+	}
+	BloombergWorker Bee;
+	foreach(const QString& SingleRate,RatesToDownload)
+		Bee.AddSecurity(SingleRate,"Index");
+	Bee.AddField("PX_LAST");
+	QHash<QString, QHash<QString,QString> > ReturnedValues=Bee.StartRequest();
+	QString ResultingVector;
+	for(int i=0;i<ApplicableRate.NumElements();i++){
+		ResultingVector+=ReturnedValues.value(ApplicableRate.GetValueString(i)).value("PX_LAST");
+		if(i>0) ResultingVector+=" 1S ";
+	}
+	ReferenceRateValue=ResultingVector;
+	ReferenceRateValue.SetAnchorDate(ApplicableRate.GetAnchorDate());
+}
+void Tranche::CompileReferenceRateValue(const QHash<QString,double>& Values) const{
+	const BaseRateVector& ApplicableRate= (ReferenceRate.IsEmpty()? DefaultRefRate:ReferenceRate);
+	if(ApplicableRate.IsEmpty())return;
+	QString ResultingVector("");
+	for(int i=0;i<ApplicableRate.NumElements();i++){
+		if(!Values.contains(ApplicableRate.GetValueString(i))) return GetRefRateValueFromBloomberg();
+		ResultingVector+=QString("%1").arg(100.0*Values.value(ApplicableRate.GetValueString(i)));
+		if(i>0) ResultingVector+=" 1S ";
+	}
+	ReferenceRateValue=ResultingVector;
+	ReferenceRateValue.SetAnchorDate(ApplicableRate.GetAnchorDate());
+}
 double Tranche::GetCoupon(const QDate& index) const {
-	QDate Anch=Coupon.GetAnchorDate();
-	if(Anch.isNull()) Anch=LastPaymentDate;
-	if(Anch.isNull()) return GetCoupon(0);
-	return GetCoupon(MonthDiff(index,Anch));
+	BloombergVector TempCoupon=Coupon;
+	if(TempCoupon.GetAnchorDate().isNull()) TempCoupon.SetAnchorDate(LastPaymentDate);
+	if(TempCoupon.GetAnchorDate().isNull()) return GetCoupon(0);
+	if(InterestType==FloatingInterest){
+		if(ReferenceRateValue.IsEmpty()) GetRefRateValueFromBloomberg();
+		bool NullReferenceRateAnch=ReferenceRateValue.GetAnchorDate().isNull();
+		if(NullReferenceRateAnch) ReferenceRateValue.SetAnchorDate(LastPaymentDate);
+		double Result=(TempCoupon.GetValue(index)/100.0)+ReferenceRateValue.GetValue(index);
+		if(NullReferenceRateAnch) ReferenceRateValue.RemoveAnchorDate();
+		return Result;		 
+	}
+	return TempCoupon.GetValue(index)/100.0;
+	//return GetCoupon(MonthDiff(index,Anch));
 }
 double Tranche::GetCoupon(int index) const {
 	if(InterestType==FloatingInterest){
-		if(ReferenceRateValue==-1.0){
-			BloombergWorker Bee;
-			Bee.AddSecurity(ReferenceRate,"Index");
-			Bee.AddField("PX_LAST");
-			ReferenceRateValue=Bee.StartRequest().value(ReferenceRate).value("PX_LAST").toDouble()/100.0;
-		}
-		return (Coupon.GetValue(index)/100.0)+ReferenceRateValue;
+		if(ReferenceRateValue.IsEmpty()) GetRefRateValueFromBloomberg();
+		return (Coupon.GetValue(index)/100.0)+ReferenceRateValue.GetValue(index);
 	}
 	return Coupon.GetValue(index)/100.0;
 }
@@ -147,7 +181,7 @@ void Tranche::GetDataFromBloomberg(){
 	ISINcode=Result.value("ID_ISIN");
 	if(Result.value("MTG_TYP").contains("FLT")) InterestType=FloatingInterest;
 	else InterestType=FixedInterest;
-	ReferenceRateValue=-1.0;
+	ReferenceRateValue="";
 	if(InterestType==FloatingInterest){
 		ReferenceRate=Result.value("RESET_IDX");
 		Coupon=Result.value("FLT_SPREAD");//.toDouble()/10000.0;
@@ -186,14 +220,21 @@ double Tranche::GetDiscountMargin(double NewPrice)const{
 		FlowsDates.append(CashFlow.GetDate(i));
 		FlowsValues.append(CashFlow.GetTotalFlow(i));
 	}
-	if(ReferenceRateValue==-1.0){
-		QString ApplicableRate=(ReferenceRate.isEmpty() ? DefaultRefRate:ReferenceRate);
-		BloombergWorker Bee;
-		Bee.AddSecurity(ApplicableRate,"Index");
-		Bee.AddField("PX_LAST");
-		ReferenceRateValue=Bee.StartRequest().value(ApplicableRate).value("PX_LAST").toDouble()/100.0;
-	}
+	if(ReferenceRateValue.IsEmpty()) GetRefRateValueFromBloomberg();
 	return qMax(0.0,CalculateDM(FlowsDates,FlowsValues,ReferenceRateValue,DayCount));
+}
+double Tranche::GetIRR() const {return GetIRR(Price);}
+double Tranche::GetIRR(double NewPrice)const{
+	if(/*GetLossRate()>0.0000 ||*/ OutstandingAmt<0.01) return 0.0;
+	QList<QDate> FlowsDates;
+	QList<double> FlowsValues;
+	FlowsDates.append(SettlementDate);
+	FlowsValues.append(-OutstandingAmt*((NewPrice/100.0)+AccruedInterest));
+	for (int i=0;i<CashFlow.Count();i++){
+		FlowsDates.append(CashFlow.GetDate(i));
+		FlowsValues.append(CashFlow.GetTotalFlow(i));
+	}
+	return qMax(0.0,CalculateIRR(FlowsDates,FlowsValues,DayCount));
 }
 bool Tranche::operator>(const Tranche& a) const {
 	return ProrataGroup>a.ProrataGroup;
@@ -296,10 +337,20 @@ QDataStream& Tranche::LoadOldVersion(QDataStream& stream){
 		>> OutstandingAmt
 		>> TempInt;
 	InterestType=Tranche::TrancheInterestType(TempInt);
-	stream 
-		>> Coupon
-		>> ReferenceRate
-		>> ReferenceRateValue
+	stream >> Coupon;
+	if(m_LoadProtocolVersion<=176){
+		QString TmpStr;
+		stream >> TmpStr;
+		ReferenceRate=TmpStr;
+		double TmpDbl;
+		stream >> TmpDbl;
+		ReferenceRateValue=QString("%1").arg(TmpDbl);
+	}
+	else{
+		stream >> ReferenceRate
+		>> ReferenceRateValue;
+	}
+	stream
 		>> Price
 		>> BloombergExtension
 		>> ProrataGroup
@@ -307,9 +358,14 @@ QDataStream& Tranche::LoadOldVersion(QDataStream& stream){
 		>> MinOClevel
 		>> MinIClevel
 		>> LastPaymentDate
-		>> DayCount
-		>> DefaultRefRate
-		>> ExchangeRate;
+		>> DayCount;
+		if(m_LoadProtocolVersion<=176){
+			QString TmpStr;
+			stream >> TmpStr;
+			DefaultRefRate=TmpStr;
+		}
+		else stream >> DefaultRefRate;
+		stream >> ExchangeRate;
 	if(m_LoadProtocolVersion<=174){
 		stream >> TempInt;
 		PaymentFrequency=QString("%1").arg(TempInt);

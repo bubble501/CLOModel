@@ -247,7 +247,7 @@ void SummaryView::DisplayStructure(){
 		StructureTable->setItem(i,7,new QTableWidgetItem(Structure.GetTranche(i)->GetInterestType()==Tranche::FloatingInterest ? "Float":"Fixed"));
 		StructureTable->setItem(i,8,new QTableWidgetItem(Structure.GetTranche(i)->GetReferenceRate()));
 		StructureTable->setItem(i,9,new QTableWidgetItem(Structure.GetTranche(i)->GetCouponVector()));
-		StructureTable->setItem(i,11,new QTableWidgetItem(Structure.GetTranche(i)->GetDiscountMargin()<=0 ? QString("0%"):Commarize(((Structure.GetTranche(i)->GetDiscountMargin()/10000.0)+Structure.GetTranche(i)->GetReferenceRateValue())*100.0,2U)+'%'));
+		StructureTable->setItem(i,11,new QTableWidgetItem(Commarize(Structure.GetTranche(i)->GetIRR()*100.0,2U)+'%'));
 		StructureTable->setItem(i,12,new QTableWidgetItem(Commarize(Structure.GetTranche(i)->GetWALife(Structure.GetMortgagesPayments().GetDate(0)),2U)));
 		StructureTable->setItem(i,13,new QTableWidgetItem(Commarize(Structure.GetTranche(i)->GetDiscountMargin())));
 		StructureTable->setItem(i,14,new QTableWidgetItem(Commarize(Structure.GetTranche(i)->GetLossRate()*100.0,2U)+'%'));
@@ -281,7 +281,7 @@ void SummaryView::PriceChanged(){
 	TempTranche.SetPrice(static_cast<QLineEdit*>(sender())->text().toDouble());
 	StructureTable->item(RowToChange,11)->setText(
 		TempTranche.GetDiscountMargin()<=0 ? QString("0%"):
-		Commarize(((TempTranche.GetDiscountMargin()/10000.0)+TempTranche.GetReferenceRateValue())*100.0,2U)+'%'
+		Commarize(TempTranche.GetIRR()*100.0,2U)+'%'
 	);
 	StructureTable->item(RowToChange,13)->setText(Commarize(((TempTranche.GetDiscountMargin()))));
 }

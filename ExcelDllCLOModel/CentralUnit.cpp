@@ -70,7 +70,7 @@ void CentralUnit::AddTranche(
 	,const QString& PayFreq
 	,const QDate& SettlementDate
 	,double AccruedInterest
-	,double RefRteValue
+	,const QString& RefRteValue
 	,double MinOC
 	,double MinIC
 	,double Price
@@ -349,6 +349,11 @@ void CentralUnit::StressFinished(){
 }
 CentralUnit::~CentralUnit(){
 	if(MtgsProgress) MtgsProgress->deleteLater();
+}
+void CentralUnit::CompileBaseRates(const QHash<QString,double>& Values){
+	for(int i=0;i<Structure.GetTranchesCount();i++){
+		Structure.GetTranche(i)->CompileReferenceRateValue(Values);
+	}
 }
 
 #ifdef _DEBUG

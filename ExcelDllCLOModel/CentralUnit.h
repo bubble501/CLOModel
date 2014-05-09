@@ -1,6 +1,7 @@
 #ifndef CentralUnit_h__
 #define CentralUnit_h__
 #include <QObject>
+#include <QHash>
 #include "MtgCalculator.h"
 #include "Waterfall.h"
 #include "StressTest.h"
@@ -29,7 +30,7 @@ public:
 		,const QString& PayFreq
 		,const QDate& SettlementDate
 		,double AccruedInterest=0.0
-		,double RefRteValue=-1.0
+		,const QString& RefRteValue=""
 		,double MinOC=0.0
 		,double MinIC=0.0
 		,double Price=100.0
@@ -79,6 +80,7 @@ public:
 	void SetPlotIndexes(int val,int index){if(index>=0 && index<NumberOfPlots) PlotIndexes[index]=val;}
 	void SetReserveFund(int RFindex,const QString& RFtarget,const QString& RFmultiple,const QString& RFfloor,double RFcurrent,int RFfreed,bool RFtoInterest=true){Structure.SetReserveFund(RFindex,RFtarget,RFmultiple,RFfloor,RFcurrent,RFfreed,RFtoInterest);}
 	void SetCumulativeReserves(bool a){Structure.SetCumulativeReserves(a);}
+	void CompileBaseRates(const QHash<QString,double>& Values);
 private:
 	ProgressWidget* MtgsProgress;
 	WaterfallCalculator* ParallWatFalls;

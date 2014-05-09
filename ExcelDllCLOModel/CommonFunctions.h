@@ -5,13 +5,13 @@ class QDate;
 class QString;
 #include <QList>
 //! The current Version of the Model
-#define ModelVersionNumber 176
+#define ModelVersionNumber 177
 #define MinimumSupportedVersion 173
 #define MaximumIRRIterations INT_MAX-1
 #define NumReserves 2
 //#define SaveLoanTape
 int MonthDiff(const QDate& FutureDte,const QDate& PresentDte);
-
+class BloombergVector;
 /*
 bool ValidAnnuityVector(const QString& AnnVect);
 bool ValidBloombergVector(const QString& BloombergVector);
@@ -23,7 +23,11 @@ template<class T> bool LessThanPoint(T* a,T* b){return (*a)<(*b);}
 QString Commarize(double num,unsigned int precision=0);
 double CalculateIRR(const QList<QDate>& Dte, const QList<double>& Flws, int Daycount=360, double Guess=0.05,int precision=3);
 double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, double Interest, int Daycount=360);
+double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, const BloombergVector& Interest, int Daycount=360);
+double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, const QString& Interest, int Daycount=360);
 double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, double BaseRate,int Daycount=360, double Guess=0.05,int precision=3);
+double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const BloombergVector& BaseRate,int Daycount=360, double Guess=0.05,int precision=3);
+double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const QString& BaseRate,int Daycount=360, double Guess=0.05,int precision=3);
 double CalculateIRRSimple(const QList<QDate>& Dte, const QList<double>& Flws, int Daycount=360, double Guess=0.05,int precision=3);
 double CalculateNPVSimple(const QList<QDate>& Dte, const QList<double>& Flws, double Interest, int Daycount=360);
 double CalculateDMSimple(const QList<QDate>& Dte, const QList<double>& Flws, double BaseRate,int Daycount=360, double Guess=0.05,int precision=3);

@@ -224,6 +224,15 @@
     <ClCompile Include="ExcelOutput.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BaseRateVect.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_BaseRateVect.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_BaseRateVect.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="quazip\crypt.h">
@@ -349,6 +358,9 @@
       <Filter>Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="StandaloneStress.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="BaseRateVect.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>

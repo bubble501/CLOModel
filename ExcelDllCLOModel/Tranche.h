@@ -6,6 +6,8 @@
 #include "TrancheCashFlow.h"
 #include "BloombergVector.h"
 #include "CommonFunctions.h"
+#include "BaseRateVect.h"
+#include <QHash>
 class  Tranche {
 public:
 	//! Enum defining what type of coupon the tranche is paying
@@ -21,8 +23,8 @@ private:
 	double OutstandingAmt;
 	TrancheInterestType InterestType;
 	BloombergVector Coupon;
-	QString ReferenceRate;
-	mutable double ReferenceRateValue;
+	BaseRateVector ReferenceRate;
+	mutable BloombergVector ReferenceRateValue;
 	double Price;
 	QString BloombergExtension;
 	int ProrataGroup;
@@ -31,13 +33,14 @@ private:
 	double MinIClevel;
 	QDate LastPaymentDate;
 	int DayCount;
-	QString DefaultRefRate;
+	BaseRateVector DefaultRefRate;
 	double ExchangeRate;
 	BloombergVector PaymentFrequency;
 	QDate SettlementDate;
 	double AccruedInterest;
 	qint32 m_LoadProtocolVersion;
 	QDataStream& LoadOldVersion(QDataStream& stream);
+	void GetRefRateValueFromBloomberg() const;
 public:
 	Tranche();
 	Tranche(const Tranche& a);
@@ -55,8 +58,10 @@ public:
 	double GetCoupon(int index=0) const;
 	double GetRawCoupon(int index=0) const;
 	double GetRawCoupon(const QDate& index) const;
-	const QString& GetReferenceRate() const{return ReferenceRate;}
-	double GetReferenceRateValue() const {return ReferenceRateValue;}
+	QString GetReferenceRate() const{return ReferenceRate.GetVector();}
+	const BloombergVector& GetReferenceRateValue() const {return ReferenceRateValue;}
+	double GetReferenceRateValue(int index) const {return ReferenceRateValue.GetValue(index);}
+	double GetReferenceRateValue(const QDate& index) const {return ReferenceRateValue.GetValue(index);}
 	double GetPrice() const {return Price;}
 	const QString& GetBloombergExtension() const{return BloombergExtension;}
 	int GetProrataGroup() const{return ProrataGroup;}
@@ -66,7 +71,7 @@ public:
 	double GetMinIClevel() const {return MinIClevel;}
 	const QDate& GetLastPaymentDate() const {return LastPaymentDate;}
 	int GetDayCount() const{return DayCount;}
-	const QString& GetDefaultRefRate() const{return DefaultRefRate;}
+	QString GetDefaultRefRate() const{return DefaultRefRate.GetVector();}
 	double GetExchangeRate() const {return ExchangeRate;}
 	QString GetPaymentFrequency() const{return PaymentFrequency.GetVector();}
 	const QString& GetISIN() const {return ISINcode;}
@@ -79,7 +84,9 @@ public:
 	void SetInterestType(TrancheInterestType a){InterestType=a;}
 	void SetCoupon(const QString& a){Coupon=a;}
 	void SetReferenceRate(const QString& a){ReferenceRate=a;}
-	void SetReferenceRateValue(double a){ReferenceRateValue=a;}
+	void SetReferenceRateValue(const QString& a){ReferenceRateValue=a;}
+	void SetReferenceRateValue(const BloombergVector& a){ReferenceRateValue=a;}
+	void CompileReferenceRateValue(const QHash<QString,double>& Values)const;
 	void SetPrice(double a){if(a>0) Price=a;}
 	void SetBloombergExtension(const QString& a);
 	void SetProrataGroup(int a){if(a>0) ProrataGroup=a;}
@@ -98,6 +105,8 @@ public:
 	double GetLossRate() const;
 	double GetDiscountMargin() const;
 	double GetDiscountMargin(double NewPrice) const;
+	double GetIRR() const;
+	double GetIRR(double NewPrice) const;
 	double GetCurrentOutstanding() const;
 	double GetWALife(const QDate& StartDate) const;
 	double GetAccruedInterest() const{return AccruedInterest;}

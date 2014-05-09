@@ -82,6 +82,12 @@
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
+    <Filter Include="Header Files\Vectors">
+      <UniqueIdentifier>{1917a213-38f2-42ee-be18-fa625b8dc14a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Vectors">
+      <UniqueIdentifier>{b064be08-1b62-429c-ba9f-c87243686404}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommonFunctions.h">
@@ -159,14 +165,11 @@
     <ClInclude Include="DistributionsGenerators.h">
       <Filter>Header Files\Probabilistic</Filter>
     </ClInclude>
-    <ClInclude Include="BloombergVector.h">
-      <Filter>Header Files\Bloomberg</Filter>
-    </ClInclude>
-    <ClInclude Include="AbstarctBbgVect.h">
-      <Filter>Header Files\Bloomberg</Filter>
-    </ClInclude>
     <ClInclude Include="AnnuityVector.h">
-      <Filter>Header Files\Bloomberg</Filter>
+      <Filter>Header Files\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="BloombergVector.h">
+      <Filter>Header Files\Vectors</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -220,6 +223,12 @@
     </CustomBuild>
     <CustomBuild Include="ChartsWidget.h">
       <Filter>Header Files\Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="BaseRateVect.h">
+      <Filter>Header Files\Vectors</Filter>
+    </CustomBuild>
+    <CustomBuild Include="AbstarctBbgVect.h">
+      <Filter>Header Files\Vectors</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -487,14 +496,17 @@
     <ClCompile Include="GeneratedFiles\Nightly\moc_CentralUnit.cpp">
       <Filter>Generated Files\Nightly</Filter>
     </ClCompile>
-    <ClCompile Include="BloombergVector.cpp">
-      <Filter>Source Files\Bloomberg</Filter>
-    </ClCompile>
     <ClCompile Include="AbstarctBbgVect.cpp">
-      <Filter>Source Files\Bloomberg</Filter>
+      <Filter>Source Files\Vectors</Filter>
     </ClCompile>
     <ClCompile Include="AnnuityVector.cpp">
-      <Filter>Source Files\Bloomberg</Filter>
+      <Filter>Source Files\Vectors</Filter>
+    </ClCompile>
+    <ClCompile Include="BloombergVector.cpp">
+      <Filter>Source Files\Vectors</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseRateVect.cpp">
+      <Filter>Source Files\Vectors</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

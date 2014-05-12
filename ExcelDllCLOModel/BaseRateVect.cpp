@@ -123,10 +123,11 @@ bool BaseRateVector::IsValid() const{
 		"^(A\\s+\\d{1,2}/\\d{1,2}/\\d{4}\\s+){0,1}"
 		+ PossibleRatesPattern +
 		"(\\s+\\d+S\\s+"+PossibleRatesPattern+"+)*$",Qt::CaseInsensitive);
-	return Vigil.exactMatch(m_Vector.trimmed().toUpper());
+	return Vigil.exactMatch(m_Vector.trimmed().toUpper()) || m_Vector.isEmpty();
 }
 void BaseRateVector::UnpackVector(){
 	m_VectVal.clear();
+	if(m_Vector.isEmpty()) return;
 	QString TempVec(m_Vector.trimmed().toUpper());
 	QRegExp AnchorCheck("^A\\s+(\\d{1,2})/(\\d{1,2})/(\\d{4})\\s+(.+)",Qt::CaseInsensitive);
 	if(AnchorCheck.exactMatch(TempVec)){

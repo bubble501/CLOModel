@@ -22,3 +22,6 @@ For the documentation regarding the .Net API for the model please refer to [the 
 - QtGui4.dll
 - QtSvg4.dll
 - zlib1.dll
+
+### Third party code 
+This project uses [QuaZIP](https://sourceforge.net/projects/quazip/) under the [LGPLv2 License](https://www.gnu.org/licenses/old-licenses/lgpl-2.0.html)

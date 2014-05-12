@@ -99,8 +99,8 @@ void Tranche::GetRefRateValueFromBloomberg()const{
 	QHash<QString, QHash<QString,QString> > ReturnedValues=Bee.StartRequest();
 	QString ResultingVector;
 	for(int i=0;i<ApplicableRate.NumElements();i++){
-		ResultingVector+=ReturnedValues.value(ApplicableRate.GetValueString(i)).value("PX_LAST");
 		if(i>0) ResultingVector+=" 1S ";
+		ResultingVector+=ReturnedValues.value(ApplicableRate.GetValueString(i)).value("PX_LAST");
 	}
 	ReferenceRateValue=ResultingVector;
 	ReferenceRateValue.SetAnchorDate(ApplicableRate.GetAnchorDate());
@@ -111,8 +111,8 @@ void Tranche::CompileReferenceRateValue(const QHash<QString,double>& Values) con
 	QString ResultingVector("");
 	for(int i=0;i<ApplicableRate.NumElements();i++){
 		if(!Values.contains(ApplicableRate.GetValueString(i))) return GetRefRateValueFromBloomberg();
-		ResultingVector+=QString("%1").arg(100.0*Values.value(ApplicableRate.GetValueString(i)));
 		if(i>0) ResultingVector+=" 1S ";
+		ResultingVector+=QString("%1").arg(100.0*Values.value(ApplicableRate.GetValueString(i)));
 	}
 	ReferenceRateValue=ResultingVector;
 	ReferenceRateValue.SetAnchorDate(ApplicableRate.GetAnchorDate());

@@ -80,6 +80,7 @@
   <ItemGroup>
     <ClCompile Include="AbstarctBbgVect.cpp" />
     <ClCompile Include="AnnuityVector.cpp" />
+    <ClCompile Include="BaseRateVect.cpp" />
     <ClCompile Include="BloombergVector.cpp" />
     <ClCompile Include="BloombergWorker.cpp" />
     <ClCompile Include="ChartsWidget.cpp" />
@@ -230,6 +231,7 @@
   <ItemGroup>
     <ClInclude Include="AbstarctBbgVect.h" />
     <ClInclude Include="AnnuityVector.h" />
+    <ClInclude Include="BaseRateVect.h" />
     <ClInclude Include="BloombergVector.h" />
     <ClInclude Include="BloombergWorker.h" />
     <ClInclude Include="CommonFunctions.h" />

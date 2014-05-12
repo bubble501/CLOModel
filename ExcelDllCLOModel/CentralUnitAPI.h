@@ -31,6 +31,7 @@ public:
 	bool LoadLoanPool(const QString& DestPath);
 	void SetSequentialComputation(bool a);
 	bool GetSequentialComputation()const {return SequentialComputation;}
+	void CompileBaseRates(const QHash<QString,double>& Values);
 private:
 	ProgressWidget* MtgsProgress;
 	WaterfallCalculator* ParallWatFalls;

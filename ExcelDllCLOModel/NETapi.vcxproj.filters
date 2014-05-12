@@ -158,6 +158,12 @@
     <ClInclude Include="ManAnnuityVector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BaseRateVect.h">
+      <Filter>Header Files\Unmanaged</Filter>
+    </ClInclude>
+    <ClInclude Include="ManBaseRateVector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="CentralUnitAPI.h">
@@ -409,6 +415,9 @@
       <Filter>Source Files\Unmanaged</Filter>
     </ClCompile>
     <ClCompile Include="BloombergVector.cpp">
+      <Filter>Source Files\Unmanaged</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseRateVect.cpp">
       <Filter>Source Files\Unmanaged</Filter>
     </ClCompile>
   </ItemGroup>

@@ -64,6 +64,10 @@ int main(int argc, char *argv[])
 	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempCallWaterfall;
 	file.close();
+	for (int i=0;i<TempWtf.GetTranchesCount()-1;i++){
+		TempWtf.GetTranche(i)->SetReferenceRate("EUR003M 48S EUR006M");
+		TempWtf.GetTranche(i)->CompileReferenceRateValue(QHash<QString,double>());
+	}
 	TempWtf.CalculateTranchesCashFlows();
 
 	/*StressTest TempStress;

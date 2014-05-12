@@ -10,3 +10,4 @@
 #include "ManUtilities.h"
 #include "ManBloombergVector.h"
 #include "ManAnnuityVector.h"
+#include "ManBaseRateVector.h"

@@ -354,6 +354,9 @@ void CentralUnit::CompileBaseRates(const QHash<QString,double>& Values){
 	for(int i=0;i<Structure.GetTranchesCount();i++){
 		Structure.GetTranche(i)->CompileReferenceRateValue(Values);
 	}
+	for(int i=0;i<CallStructure.GetTranchesCount();i++){
+		CallStructure.GetTranche(i)->CompileReferenceRateValue(Values);
+	}
 }
 
 #ifdef _DEBUG

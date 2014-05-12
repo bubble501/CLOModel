@@ -7,8 +7,8 @@
 using namespace System;
 namespace ManagedCLO {
 	/*!
-	\brief Cash Flows from a Loan or a Pool of Loans
-	\details This class implements a way of manage cash flows from a pool of loans.<br/>The flows will always be sorted by date.
+	\brief Bloomberg scenarios vector
+	\details This class manages vector that follow the convention of Bloomberg scenarios vector as in the SCEN <GO> screen.<br/>The values in the vector will be considered as percentages
 	 */
 	public ref class ManBloombergVector
 	{
@@ -158,10 +158,32 @@ namespace ManagedCLO {
 		*/
 		DateTime GetAnchorDate() {return QDate2DateTime(Unmanaged->GetAnchorDate());}
 		/*! 
+		\brief Number of elements in the vector
+		\details This will return the number of monthly elements in the vector. It will be 1 plus the number of steps and ramps in the vector.<br/>e.g.:
+		<ul>
+		<li>5 has 1 step</li>
+		<li>5 12S 6 has 13 step</li>
+		<li>5 12S 6 12R 7 has 25 step</li>
+		</ul>
+		*/
+		int NumElements() {return Unmanaged->NumElements();}
+		/*! 
 		\brief Asserts either the vector is empty or not
 		*/
 		bool IsEmpty(){return Unmanaged->IsEmpty();}
-
+		/*! 
+		\brief Creates a vector that is the sum of the two.
+		\details Creates a ManBloombergVector whose values are the sum of the values of the two vectors.<br/>If the vectors have different anchor dates, the values in the period between the two dates are dropped and the anchor date of the resulting vector is set to the most recent of the two.
+		*/
+		ManBloombergVector^ operator+(ManBloombergVector^ Vec){return gcnew ManBloombergVector(Unmanaged->operator+(*(Vec->Unmanaged)));}
+		/*! 
+		\brief Creates a vector that is the original one shifted upward by the specified value
+		*/
+		ManBloombergVector^ operator+(double a) {return gcnew ManBloombergVector(Unmanaged->operator+(a));}
+		/*! 
+		\brief Creates a vector that is the original one shifted donward by the specified value
+		*/
+		ManBloombergVector^ operator-(double a) {return gcnew ManBloombergVector(Unmanaged->operator-(a));}
 		!ManBloombergVector()
 		{
 			if (Unmanaged){

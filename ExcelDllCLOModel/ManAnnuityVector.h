@@ -5,8 +5,8 @@
 using namespace System;
 namespace ManagedCLO {
 	/*!
-	\brief Cash Flows from a Loan or a Pool of Loans
-	\details This class implements a way of manage cash flows from a pool of loans.<br/>The flows will always be sorted by date.
+	\brief Boolean scenario vector.
+	\details This class handles vectors that follow the Bloomberg conventions in SCEN <GO> but accepting 'Y' and 'N' as levels instead of numbers.<br/>Given the nature of the data, ramps are not allowed.
 	 */
 	public ref class ManAnnuityVector
 	{
@@ -138,6 +138,15 @@ namespace ManagedCLO {
 		\brief Asserts either the vector is empty or not
 		*/
 		bool IsEmpty(){return Unmanaged->IsEmpty();}
+		/*! 
+		\brief Number of elements in the vector
+		\details This will return the number of monthly elements in the vector. It will be 1 plus the number of steps in the vector.<br/>e.g.:
+		<ul>
+		<li>Y has 1 step</li>
+		<li>Y 12S N has 13 step</li>
+		</ul>
+		*/
+		int NumElements() {return Unmanaged->NumElements();}
 
 		!ManAnnuityVector()
 		{

@@ -10,7 +10,11 @@ const WatFalPrior* Waterfall::GetStep(int Index)const {
 	return m_WaterfallStesps.at(Index);
 }
 void Waterfall::SetCCCcurve(const QString& a){m_CCCcurve=a;}
+#ifdef _DEBUG
+Tranche* Waterfall::GetTranche(int Index) const{
+#else
 const Tranche* Waterfall::GetTranche(int Index) const{
+#endif
 	if(Index<0 || Index>=m_Tranches.size()) return NULL;
 	return m_Tranches.at(Index);
 }

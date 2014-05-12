@@ -98,7 +98,11 @@ public:
 	QDate GetCalledPeriod() const;
 	QDate GetStructureMaturity() const;
 	const WatFalPrior* GetStep(int Index) const;
+#ifndef _DEBUG
 	const Tranche* GetTranche(int Index) const;
+#else 
+	Tranche* GetTranche(int Index) const;
+#endif
 	const Tranche* GetTranche(const QString& TrancheName) const;
 	double GetWACostOfCapital(int index)const;
 	double GetCreditEnhancement(const QString& Tranchename,int TimeIndex=-1)const{return GetCreditEnhancement(FindTrancheIndex(Tranchename),TimeIndex);}

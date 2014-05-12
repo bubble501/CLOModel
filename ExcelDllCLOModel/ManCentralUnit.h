@@ -33,6 +33,14 @@ namespace ManagedCLO {
 			void set(ManWaterfall^ a){Unmanaged->SetStructure(*(a->Unmanaged));}
 		}
 		/*!
+		\brief Uses the supplied base rates dictionary to fill in the base rate values
+		\arg Values a dictionary containing the Bloomberg tickers (without yellow keys) of the relevant base index as key and it's value as as value.
+		\details This function will use the values supplied in the dictionary as the values for the relevant base index rates.<br/>If a base index is required by the model but not supplied it will be downloaded from Bloomberg.
+		*/
+		void CompileBaseRates(Dictionary<String^,double>^ Values){
+			Unmanaged->CompileBaseRates(Values);
+		}
+		/*!
 		\brief Add a loan to the loan pool
 		*/
 		void AddLoan(ManMortgage^ a){Unmanaged->AddLoan(*(a->Unmanaged));}

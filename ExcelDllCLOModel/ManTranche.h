@@ -3,6 +3,7 @@
 #include "Tranche.h"
 #include "ManTrancheCashFlow.h"
 #include "ManagedCommons.h"
+#include "ManBloombergVector.h"
 namespace ManagedCLO {
 	/*!
 	\brief Class used to describe a single tranche of a deal
@@ -200,9 +201,9 @@ namespace ManagedCLO {
 		\sa ReferenceRate
 		\sa DefaultRefRate
 		*/
-		property double ReferenceRateValue{
-			double get(){return Unmanaged->GetReferenceRateValue();}
-			void set(double a){Unmanaged->SetReferenceRateValue(a);}
+		property ManBloombergVector^ ReferenceRateValue{
+			ManBloombergVector^ get(){return gcnew ManBloombergVector(Unmanaged->GetReferenceRateValue());}
+			void set(ManBloombergVector^ a){Unmanaged->SetReferenceRateValue(String2QString(a->GetVector()));}
 		}
 		/*!
 		\brief The price of the tranche

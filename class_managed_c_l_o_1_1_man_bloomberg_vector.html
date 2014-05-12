@@ -30,7 +30,7 @@
   <td id="projectlogo"><img alt="Logo" src="Logo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CLO Model
-   &#160;<span id="projectnumber">1.74</span>
+   &#160;<span id="projectnumber">1.77</span>
    </div>
    <div id="projectbrief">Collateralised Loan Obligations Cash Flow Model</div>
   </td>
@@ -103,7 +103,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>Cash Flows from a Loan or a Pool of Loans.  
+<p>Bloomberg scenarios vector.  
  <a href="class_managed_c_l_o_1_1_man_bloomberg_vector.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_man_bloomberg_vector_8h_source.html">ManBloombergVector.h</a>&gt;</code></p>
@@ -143,6 +143,18 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aabd5695a36788a7dd6ba7a9afa705578"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_bloomberg_vector.html#aabd5695a36788a7dd6ba7a9afa705578">IsEmpty</a> ()</td></tr>
 <tr class="memdesc:aabd5695a36788a7dd6ba7a9afa705578"><td class="mdescLeft">&#160;</td><td class="mdescRight">Asserts either the vector is empty or not.  <a href="#aabd5695a36788a7dd6ba7a9afa705578">More...</a><br/></td></tr>
 <tr class="separator:aabd5695a36788a7dd6ba7a9afa705578"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a841a66c7e045a057559bb0aa198c2cfa"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_bloomberg_vector.html#a841a66c7e045a057559bb0aa198c2cfa">NumElements</a> ()</td></tr>
+<tr class="memdesc:a841a66c7e045a057559bb0aa198c2cfa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of elements in the vector.  <a href="#a841a66c7e045a057559bb0aa198c2cfa">More...</a><br/></td></tr>
+<tr class="separator:a841a66c7e045a057559bb0aa198c2cfa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad6b741a706e41315994d17f0b0d8d7e5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_managed_c_l_o_1_1_man_bloomberg_vector.html">ManBloombergVector</a>^&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_bloomberg_vector.html#ad6b741a706e41315994d17f0b0d8d7e5">operator+</a> (<a class="el" href="class_managed_c_l_o_1_1_man_bloomberg_vector.html">ManBloombergVector</a>^ Vec)</td></tr>
+<tr class="memdesc:ad6b741a706e41315994d17f0b0d8d7e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a vector that is the sum of the two.  <a href="#ad6b741a706e41315994d17f0b0d8d7e5">More...</a><br/></td></tr>
+<tr class="separator:ad6b741a706e41315994d17f0b0d8d7e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a39e4c3598166b3c06aed45c367febf45"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_managed_c_l_o_1_1_man_bloomberg_vector.html">ManBloombergVector</a>^&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_bloomberg_vector.html#a39e4c3598166b3c06aed45c367febf45">operator+</a> (double a)</td></tr>
+<tr class="memdesc:a39e4c3598166b3c06aed45c367febf45"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a vector that is the original one shifted upward by the specified value.  <a href="#a39e4c3598166b3c06aed45c367febf45">More...</a><br/></td></tr>
+<tr class="separator:a39e4c3598166b3c06aed45c367febf45"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7bbbb30a71d3103de2e7bdc5c326e181"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_managed_c_l_o_1_1_man_bloomberg_vector.html">ManBloombergVector</a>^&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_bloomberg_vector.html#a7bbbb30a71d3103de2e7bdc5c326e181">operator-</a> (double a)</td></tr>
+<tr class="memdesc:a7bbbb30a71d3103de2e7bdc5c326e181"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a vector that is the original one shifted donward by the specified value.  <a href="#a7bbbb30a71d3103de2e7bdc5c326e181">More...</a><br/></td></tr>
+<tr class="separator:a7bbbb30a71d3103de2e7bdc5c326e181"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae3d80dc6a49a25d9a135fd0305f03749"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_bloomberg_vector.html#ae3d80dc6a49a25d9a135fd0305f03749">Read</a> (IO::Stream^ Source)</td></tr>
 <tr class="memdesc:ae3d80dc6a49a25d9a135fd0305f03749"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read class from stream.  <a href="#ae3d80dc6a49a25d9a135fd0305f03749">More...</a><br/></td></tr>
 <tr class="separator:ae3d80dc6a49a25d9a135fd0305f03749"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -160,9 +172,9 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ab1b467647248985637604c6e7102b1a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Cash Flows from a Loan or a Pool of Loans. </p>
-<p>This class implements a way of manage cash flows from a pool of loans.<br/>
-The flows will always be sorted by date. </p>
+<div class="textblock"><p>Bloomberg scenarios vector. </p>
+<p>This class manages vector that follow the convention of Bloomberg scenarios vector as in the SCEN &lt;GO&gt; screen.<br/>
+The values in the vector will be considered as percentages </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a974eebf7938f2ae2ff646a6f6e96ca63"></a>
 <div class="memitem">
@@ -526,6 +538,121 @@ If the vector is empty or the index supplied is negative, 0 is returned. </p>
 
 </div>
 </div>
+<a class="anchor" id="a841a66c7e045a057559bb0aa198c2cfa"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int ManagedCLO::ManBloombergVector::NumElements </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Number of elements in the vector. </p>
+<p>This will return the number of monthly elements in the vector. It will be 1 plus the number of steps and ramps in the vector.<br/>
+e.g.: </p>
+<ul>
+<li>
+5 has 1 step </li>
+<li>
+5 12S 6 has 13 step </li>
+<li>
+5 12S 6 12R 7 has 25 step </li>
+</ul>
+
+</div>
+</div>
+<a class="anchor" id="ad6b741a706e41315994d17f0b0d8d7e5"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_managed_c_l_o_1_1_man_bloomberg_vector.html">ManBloombergVector</a> ^ ManagedCLO::ManBloombergVector::operator+ </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_managed_c_l_o_1_1_man_bloomberg_vector.html">ManBloombergVector</a>^&#160;</td>
+          <td class="paramname"><em>Vec</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a vector that is the sum of the two. </p>
+<p>Creates a <a class="el" href="class_managed_c_l_o_1_1_man_bloomberg_vector.html" title="Bloomberg scenarios vector. ">ManBloombergVector</a> whose values are the sum of the values of the two vectors.<br/>
+If the vectors have different anchor dates, the values in the period between the two dates are dropped and the anchor date of the resulting vector is set to the most recent of the two. </p>
+
+</div>
+</div>
+<a class="anchor" id="a39e4c3598166b3c06aed45c367febf45"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_managed_c_l_o_1_1_man_bloomberg_vector.html">ManBloombergVector</a> ^ ManagedCLO::ManBloombergVector::operator+ </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>a</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a vector that is the original one shifted upward by the specified value. </p>
+
+</div>
+</div>
+<a class="anchor" id="a7bbbb30a71d3103de2e7bdc5c326e181"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_managed_c_l_o_1_1_man_bloomberg_vector.html">ManBloombergVector</a> ^ ManagedCLO::ManBloombergVector::operator- </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>a</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a vector that is the original one shifted donward by the specified value. </p>
+
+</div>
+</div>
 <a class="anchor" id="ae3d80dc6a49a25d9a135fd0305f03749"></a>
 <div class="memitem">
 <div class="memproto">
@@ -681,7 +808,7 @@ This function will try to set the vector to represent the supplied string, if it
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Apr 24 2014 09:02:25 for CLO Model by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 12 2014 20:58:09 for CLO Model by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>

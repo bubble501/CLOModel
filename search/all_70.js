@@ -1,7 +1,7 @@
 var searchData=
 [
   ['paymentfreq',['PaymentFreq',['../class_managed_c_l_o_1_1_man_mortgage.html#a5476c85bacbb481bb83013d5d396868d',1,'ManagedCLO::ManMortgage']]],
-  ['paymentfrequency',['PaymentFrequency',['../class_managed_c_l_o_1_1_man_tranche.html#ad373fcf6d1d7c04a44e56fd82a3a03db',1,'ManagedCLO::ManTranche::PaymentFrequency()'],['../class_managed_c_l_o_1_1_man_waterfall.html#adb52e6d79495a30be04ceb4a20d0d2dc',1,'ManagedCLO::ManWaterfall::PaymentFrequency()']]],
+  ['paymentfrequency',['PaymentFrequency',['../class_managed_c_l_o_1_1_man_tranche.html#a799e82d536adec269a9b49bf01c0d6bc',1,'ManagedCLO::ManTranche::PaymentFrequency()'],['../class_managed_c_l_o_1_1_man_waterfall.html#a214b8925e173f7bd99871d9122e83151',1,'ManagedCLO::ManWaterfall::PaymentFrequency()']]],
   ['pmt',['pmt',['../class_a_b_s_utilities.html#af3bfa59ab20b63ca9528d6f1174b4669',1,'ABSUtilities']]],
   ['poolvalueatcall',['PoolValueAtCall',['../class_managed_c_l_o_1_1_man_waterfall.html#a7b12a7ebfeda075d9cebdea28e7c3c6e',1,'ManagedCLO::ManWaterfall']]],
   ['prepaymentflow',['PrepaymentFlow',['../class_managed_c_l_o_1_1_man_mtg_cash_flows.html#a5c6a490e7195143ae52e1abe16c97e58a8885891787e6cc0654496acf88a8a7d0',1,'ManagedCLO::ManMtgCashFlows']]],

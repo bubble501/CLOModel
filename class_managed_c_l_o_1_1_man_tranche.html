@@ -30,7 +30,7 @@
   <td id="projectlogo"><img alt="Logo" src="Logo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CLO Model
-   &#160;<span id="projectnumber">1.74</span>
+   &#160;<span id="projectnumber">1.77</span>
    </div>
    <div id="projectbrief">Collateralised Loan Obligations Cash Flow Model</div>
   </td>
@@ -131,6 +131,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a491214494898b3c34cc9e238b743a7eb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a491214494898b3c34cc9e238b743a7eb">AddCashFlow</a> (<a class="el" href="class_managed_c_l_o_1_1_man_tranche_cash_flow.html">ManTrancheCashFlow</a>^ a)</td></tr>
 <tr class="memdesc:a491214494898b3c34cc9e238b743a7eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds the cash flows from another tranche to this one.  <a href="#a491214494898b3c34cc9e238b743a7eb">More...</a><br/></td></tr>
 <tr class="separator:a491214494898b3c34cc9e238b743a7eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acdeb82d4124d38e9ca2d9bb9cebee5d0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#acdeb82d4124d38e9ca2d9bb9cebee5d0">CompileBaseRates</a> (Collections::Generic::Dictionary&lt; String^ , double &gt;^Values)</td></tr>
+<tr class="memdesc:acdeb82d4124d38e9ca2d9bb9cebee5d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Uses the supplied base rates dictionary to fill in the base rate values.  <a href="#acdeb82d4124d38e9ca2d9bb9cebee5d0">More...</a><br/></td></tr>
+<tr class="separator:acdeb82d4124d38e9ca2d9bb9cebee5d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a25f6a9427062c6f99ca620ddc9919397"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a25f6a9427062c6f99ca620ddc9919397">GetCoupon</a> (int index)</td></tr>
 <tr class="memdesc:a25f6a9427062c6f99ca620ddc9919397"><td class="mdescLeft">&#160;</td><td class="mdescRight">The coupon paid by the tranche.  <a href="#a25f6a9427062c6f99ca620ddc9919397">More...</a><br/></td></tr>
 <tr class="separator:a25f6a9427062c6f99ca620ddc9919397"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -143,12 +146,21 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a492a6958c0a6f40d5f9eb899bf2362cd"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a492a6958c0a6f40d5f9eb899bf2362cd">GetDiscountMargin</a> (double NewPrice)</td></tr>
 <tr class="memdesc:a492a6958c0a6f40d5f9eb899bf2362cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the discount margin of the tranche from the cash flows using the specified price.  <a href="#a492a6958c0a6f40d5f9eb899bf2362cd">More...</a><br/></td></tr>
 <tr class="separator:a492a6958c0a6f40d5f9eb899bf2362cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0ff87e0c1f37f01a99cccfb4e196d6e"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#ad0ff87e0c1f37f01a99cccfb4e196d6e">GetIRR</a> (double NewPrice)</td></tr>
+<tr class="memdesc:ad0ff87e0c1f37f01a99cccfb4e196d6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the internal rate of return of the tranche from the cash flows using the specified price.  <a href="#ad0ff87e0c1f37f01a99cccfb4e196d6e">More...</a><br/></td></tr>
+<tr class="separator:ad0ff87e0c1f37f01a99cccfb4e196d6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a957e7458102ac5e92e9dfd3d34706bf0"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a957e7458102ac5e92e9dfd3d34706bf0">GetRawCoupon</a> (int index)</td></tr>
 <tr class="memdesc:a957e7458102ac5e92e9dfd3d34706bf0"><td class="mdescLeft">&#160;</td><td class="mdescRight">The coupon or margin paid by the tranche.  <a href="#a957e7458102ac5e92e9dfd3d34706bf0">More...</a><br/></td></tr>
 <tr class="separator:a957e7458102ac5e92e9dfd3d34706bf0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a082fb969194e51d5b78f1c610f9da4de"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a082fb969194e51d5b78f1c610f9da4de">GetRawCoupon</a> (DateTime index)</td></tr>
 <tr class="memdesc:a082fb969194e51d5b78f1c610f9da4de"><td class="mdescLeft">&#160;</td><td class="mdescRight">The coupon or margin paid by the tranche.  <a href="#a082fb969194e51d5b78f1c610f9da4de">More...</a><br/></td></tr>
 <tr class="separator:a082fb969194e51d5b78f1c610f9da4de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae4bea85b1f174cc1b9966d956ae8798e"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#ae4bea85b1f174cc1b9966d956ae8798e">GetReferenceRateValue</a> (int index)</td></tr>
+<tr class="memdesc:ae4bea85b1f174cc1b9966d956ae8798e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The value of the base rate for the tranche at the specified index.  <a href="#ae4bea85b1f174cc1b9966d956ae8798e">More...</a><br/></td></tr>
+<tr class="separator:ae4bea85b1f174cc1b9966d956ae8798e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23d5cc7c859f3933c4cc5d07991763b1"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a23d5cc7c859f3933c4cc5d07991763b1">GetReferenceRateValue</a> (DateTime index)</td></tr>
+<tr class="memdesc:a23d5cc7c859f3933c4cc5d07991763b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">The value of the base rate for the tranche at the specified index.  <a href="#a23d5cc7c859f3933c4cc5d07991763b1">More...</a><br/></td></tr>
+<tr class="separator:a23d5cc7c859f3933c4cc5d07991763b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4df4624160275519b3230fa0187bd139"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a4df4624160275519b3230fa0187bd139">GetWALife</a> (DateTime StartDate)</td></tr>
 <tr class="memdesc:a4df4624160275519b3230fa0187bd139"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates weighted average life of the notes.  <a href="#a4df4624160275519b3230fa0187bd139">More...</a><br/></td></tr>
 <tr class="separator:a4df4624160275519b3230fa0187bd139"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -209,6 +221,9 @@ Properties</h2></td></tr>
 <tr class="memitem:af17d561e6f8f0fcba996a30364a84b57"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#ae4a221d19475d8101e0080e1feef8e60">ManTrancheInterestType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#af17d561e6f8f0fcba996a30364a84b57">InterestType</a><code> [get, set]</code></td></tr>
 <tr class="memdesc:af17d561e6f8f0fcba996a30364a84b57"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of interest of the tranche (fixed or floating)  <a href="#af17d561e6f8f0fcba996a30364a84b57">More...</a><br/></td></tr>
 <tr class="separator:af17d561e6f8f0fcba996a30364a84b57"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a305d533936c96a6cce97521bdf2c04d8"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a305d533936c96a6cce97521bdf2c04d8">IRR</a><code> [get]</code></td></tr>
+<tr class="memdesc:a305d533936c96a6cce97521bdf2c04d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">The internal rate of return of the tranche calculated from the cash flows.  <a href="#a305d533936c96a6cce97521bdf2c04d8">More...</a><br/></td></tr>
+<tr class="separator:a305d533936c96a6cce97521bdf2c04d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a49b368bbc0079ef27351f4c66ca140ae"><td class="memItemLeft" align="right" valign="top">DateTime&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a49b368bbc0079ef27351f4c66ca140ae">LastPaymentDate</a><code> [get, set]</code></td></tr>
 <tr class="memdesc:a49b368bbc0079ef27351f4c66ca140ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">The previous IPD of the tranche.  <a href="#a49b368bbc0079ef27351f4c66ca140ae">More...</a><br/></td></tr>
 <tr class="separator:a49b368bbc0079ef27351f4c66ca140ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -227,9 +242,9 @@ Properties</h2></td></tr>
 <tr class="memitem:a31501c57eae5f7c4c1b2c1a51960ad44"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a31501c57eae5f7c4c1b2c1a51960ad44">OutstandingAmt</a><code> [get, set]</code></td></tr>
 <tr class="memdesc:a31501c57eae5f7c4c1b2c1a51960ad44"><td class="mdescLeft">&#160;</td><td class="mdescRight">The current outstanding amount of the tranche.  <a href="#a31501c57eae5f7c4c1b2c1a51960ad44">More...</a><br/></td></tr>
 <tr class="separator:a31501c57eae5f7c4c1b2c1a51960ad44"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad373fcf6d1d7c04a44e56fd82a3a03db"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#ad373fcf6d1d7c04a44e56fd82a3a03db">PaymentFrequency</a><code> [get, set]</code></td></tr>
-<tr class="memdesc:ad373fcf6d1d7c04a44e56fd82a3a03db"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of months between two IPDs.  <a href="#ad373fcf6d1d7c04a44e56fd82a3a03db">More...</a><br/></td></tr>
-<tr class="separator:ad373fcf6d1d7c04a44e56fd82a3a03db"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a799e82d536adec269a9b49bf01c0d6bc"><td class="memItemLeft" align="right" valign="top">String^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a799e82d536adec269a9b49bf01c0d6bc">PaymentFrequency</a><code> [get, set]</code></td></tr>
+<tr class="memdesc:a799e82d536adec269a9b49bf01c0d6bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of months between two IPDs.  <a href="#a799e82d536adec269a9b49bf01c0d6bc">More...</a><br/></td></tr>
+<tr class="separator:a799e82d536adec269a9b49bf01c0d6bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a50da38d2b96b92730c62bcc080a2ec8b"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a50da38d2b96b92730c62bcc080a2ec8b">Price</a><code> [get, set]</code></td></tr>
 <tr class="memdesc:a50da38d2b96b92730c62bcc080a2ec8b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The price of the tranche.  <a href="#a50da38d2b96b92730c62bcc080a2ec8b">More...</a><br/></td></tr>
 <tr class="separator:a50da38d2b96b92730c62bcc080a2ec8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -239,9 +254,9 @@ Properties</h2></td></tr>
 <tr class="memitem:a6aac8ce7f4b67af8d62b41869e4e39e9"><td class="memItemLeft" align="right" valign="top">String^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a6aac8ce7f4b67af8d62b41869e4e39e9">ReferenceRate</a><code> [get, set]</code></td></tr>
 <tr class="memdesc:a6aac8ce7f4b67af8d62b41869e4e39e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">The ticker of the base rate of the tranche.  <a href="#a6aac8ce7f4b67af8d62b41869e4e39e9">More...</a><br/></td></tr>
 <tr class="separator:a6aac8ce7f4b67af8d62b41869e4e39e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a91b645e5c2b57f0175afa9d7468ffa0a"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a91b645e5c2b57f0175afa9d7468ffa0a">ReferenceRateValue</a><code> [get, set]</code></td></tr>
-<tr class="memdesc:a91b645e5c2b57f0175afa9d7468ffa0a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The value of the base rate for the tranche.  <a href="#a91b645e5c2b57f0175afa9d7468ffa0a">More...</a><br/></td></tr>
-<tr class="separator:a91b645e5c2b57f0175afa9d7468ffa0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5e9e1e8f96f09db67158704d9564d423"><td class="memItemLeft" align="right" valign="top">String^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a5e9e1e8f96f09db67158704d9564d423">ReferenceRateValue</a><code> [get, set]</code></td></tr>
+<tr class="memdesc:a5e9e1e8f96f09db67158704d9564d423"><td class="mdescLeft">&#160;</td><td class="mdescRight">The value of the base rate for the tranche.  <a href="#a5e9e1e8f96f09db67158704d9564d423">More...</a><br/></td></tr>
+<tr class="separator:a5e9e1e8f96f09db67158704d9564d423"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a952114b08036756ab472874adda2fa41"><td class="memItemLeft" align="right" valign="top">DateTime&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a952114b08036756ab472874adda2fa41">SettlementDate</a><code> [get, set]</code></td></tr>
 <tr class="memdesc:a952114b08036756ab472874adda2fa41"><td class="mdescLeft">&#160;</td><td class="mdescRight">The tranche settlement date.  <a href="#a952114b08036756ab472874adda2fa41">More...</a><br/></td></tr>
 <tr class="separator:a952114b08036756ab472874adda2fa41"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -254,6 +269,12 @@ Properties</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class used to describe a single tranche of a deal. </p>
+<dl class="section user"><dt>Backward Compatibility Notes</dt><dd>The Read method can load files written by versions 1.73 and later of the model.<br/>
+According to the version you load the results will change according to the following list:<ol style="list-style:none;">
+<li>
+<span>1.74 - </span>Payment frequency will be loaded as a single value vector with no anchor date </li>
+</ol>
+</dd></dl>
 </div><h2 class="groupheader">Member Enumeration Documentation</h2>
 <a class="anchor" id="ae4a221d19475d8101e0080e1feef8e60"></a>
 <div class="memitem">
@@ -414,6 +435,37 @@ Properties</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="acdeb82d4124d38e9ca2d9bb9cebee5d0"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ManagedCLO::ManTranche::CompileBaseRates </td>
+          <td>(</td>
+          <td class="paramtype">Collections::Generic::Dictionary&lt; String^ , double &gt;^&#160;</td>
+          <td class="paramname"><em>Values</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Uses the supplied base rates dictionary to fill in the base rate values. </p>
+<ul>
+<li>Values a dictionary containing the Bloomberg tickers (without yellow keys) of the relevant base index as key and it's value as as value.</li>
+</ul>
+<p>This function will use the values supplied in the dictionary as the values for the relevant base index rates.<br/>
+If a base index is required by the model but not supplied it will be downloaded from Bloomberg. </p>
+
+</div>
+</div>
 <a class="anchor" id="a25f6a9427062c6f99ca620ddc9919397"></a>
 <div class="memitem">
 <div class="memproto">
@@ -567,6 +619,35 @@ Coupon paid by the note</li>
 
 </div>
 </div>
+<a class="anchor" id="ad0ff87e0c1f37f01a99cccfb4e196d6e"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double ManagedCLO::ManTranche::GetIRR </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>NewPrice</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Calculates the internal rate of return of the tranche from the cash flows using the specified price. </p>
+<ul>
+<li>NewPrice the price used to calculate the internal rate of return </li>
+</ul>
+
+</div>
+</div>
 <a class="anchor" id="a957e7458102ac5e92e9dfd3d34706bf0"></a>
 <div class="memitem">
 <div class="memproto">
@@ -626,6 +707,72 @@ Coupon paid by the note</li>
 </ul>
 <p>For fixed rate tranches this is equivalent to GetCoupon, for floating rate notes this will return the margin over the base rate. </p>
 <dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#aa6e0e87bde30d48a2b0c85c328ec3221" title="The coupon paid by the tranche. ">GetCoupon(DateTime)</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ae4bea85b1f174cc1b9966d956ae8798e"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double ManagedCLO::ManTranche::GetReferenceRateValue </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>index</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The value of the base rate for the tranche at the specified index. </p>
+<ul>
+<li>index The time index for which to retrieve the index value. 0 corresponds to the vector anchor date or, if it's missing, the last payment date.</li>
+</ul>
+<p>For floating rate tranches this represents the value of the base rate and for fixed rate notes the value for the base rate used when calculating the discount margin. </p>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a5e9e1e8f96f09db67158704d9564d423" title="The value of the base rate for the tranche. ">ReferenceRateValue</a> </dd>
+<dd>
+GetReferenceRateValue(Datetime) </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a23d5cc7c859f3933c4cc5d07991763b1"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double ManagedCLO::ManTranche::GetReferenceRateValue </td>
+          <td>(</td>
+          <td class="paramtype">DateTime&#160;</td>
+          <td class="paramname"><em>index</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The value of the base rate for the tranche at the specified index. </p>
+<ul>
+<li>index The date for which to retrieve the index value.</li>
+</ul>
+<p>For floating rate tranches this represents the value of the base rate and for fixed rate notes the value for the base rate used when calculating the discount margin. </p>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a5e9e1e8f96f09db67158704d9564d423" title="The value of the base rate for the tranche. ">ReferenceRateValue</a> </dd>
+<dd>
+<a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#ae4bea85b1f174cc1b9966d956ae8798e" title="The value of the base rate for the tranche at the specified index. ">GetReferenceRateValue(int)</a> </dd></dl>
 
 </div>
 </div>
@@ -1036,7 +1183,7 @@ Aussie Dollar &rarr; AUD</li>
 
 <p>The ticker of the default base rate. </p>
 <p>Used only for fixed rate tranches, this property contains the bloomberg ticker (<em>without</em> yellow key) of the base rate to use when calculating the discount margin on fixed rate tranches. </p>
-<dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a91b645e5c2b57f0175afa9d7468ffa0a" title="The value of the base rate for the tranche. ">ReferenceRateValue</a> </dd></dl>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a5e9e1e8f96f09db67158704d9564d423" title="The value of the base rate for the tranche. ">ReferenceRateValue</a> </dd></dl>
 
 </div>
 </div>
@@ -1105,6 +1252,28 @@ If the tranche is already in deal currency set this to 1 </p>
 </div><div class="memdoc">
 
 <p>The type of interest of the tranche (fixed or floating) </p>
+
+</div>
+</div>
+<a class="anchor" id="a305d533936c96a6cce97521bdf2c04d8"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double ManagedCLO::ManTranche::IRR</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">get</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The internal rate of return of the tranche calculated from the cash flows. </p>
 
 </div>
 </div>
@@ -1244,7 +1413,7 @@ If the tranche is already in deal currency set this to 1 </p>
 
 </div>
 </div>
-<a class="anchor" id="ad373fcf6d1d7c04a44e56fd82a3a03db"></a>
+<a class="anchor" id="a799e82d536adec269a9b49bf01c0d6bc"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1252,7 +1421,7 @@ If the tranche is already in deal currency set this to 1 </p>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">int ManagedCLO::ManTranche::PaymentFrequency</td>
+          <td class="memname">String^ ManagedCLO::ManTranche::PaymentFrequency</td>
         </tr>
       </table>
   </td>
@@ -1263,6 +1432,7 @@ If the tranche is already in deal currency set this to 1 </p>
 </div><div class="memdoc">
 
 <p>The number of months between two IPDs. </p>
+<p>A Bloomberg vector representing the the number of months between two payment dates </p>
 
 </div>
 </div>
@@ -1333,11 +1503,11 @@ The most senior tranche should have this value set at 1. </p>
 
 <p>The ticker of the base rate of the tranche. </p>
 <p>This property contains the bloomberg ticker (<em>without</em> yellow key) of the base rate for floating rate tranche. </p>
-<dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a91b645e5c2b57f0175afa9d7468ffa0a" title="The value of the base rate for the tranche. ">ReferenceRateValue</a> </dd></dl>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a5e9e1e8f96f09db67158704d9564d423" title="The value of the base rate for the tranche. ">ReferenceRateValue</a> </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="a91b645e5c2b57f0175afa9d7468ffa0a"></a>
+<a class="anchor" id="a5e9e1e8f96f09db67158704d9564d423"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1345,7 +1515,7 @@ The most senior tranche should have this value set at 1. </p>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">double ManagedCLO::ManTranche::ReferenceRateValue</td>
+          <td class="memname">String^ ManagedCLO::ManTranche::ReferenceRateValue</td>
         </tr>
       </table>
   </td>
@@ -1357,10 +1527,14 @@ The most senior tranche should have this value set at 1. </p>
 
 <p>The value of the base rate for the tranche. </p>
 <p>For floating rate tranches this property holds the value of the base rate and for fixed rate notes the value for the base rate used when calculating the discount margin<br/>
-Set to -1.0 to have it downloaded from Bloomberg </p>
+Set to an empty string to have it downloaded from Bloomberg </p>
 <dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a6aac8ce7f4b67af8d62b41869e4e39e9" title="The ticker of the base rate of the tranche. ">ReferenceRate</a> </dd>
 <dd>
-<a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a6bcbe601219d429a9205f9919be38694" title="The ticker of the default base rate. ">DefaultRefRate</a> </dd></dl>
+<a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#a6bcbe601219d429a9205f9919be38694" title="The ticker of the default base rate. ">DefaultRefRate</a> </dd>
+<dd>
+<a class="el" href="class_managed_c_l_o_1_1_man_tranche.html#ae4bea85b1f174cc1b9966d956ae8798e" title="The value of the base rate for the tranche at the specified index. ">GetReferenceRateValue(int)</a> </dd>
+<dd>
+GetReferenceRateValue(Datetime) </dd></dl>
 
 </div>
 </div>
@@ -1436,7 +1610,7 @@ Set to -1.0 to have it downloaded from Bloomberg </p>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Apr 24 2014 09:02:25 for CLO Model by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 12 2014 20:58:10 for CLO Model by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>

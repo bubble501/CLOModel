@@ -30,7 +30,7 @@
   <td id="projectlogo"><img alt="Logo" src="Logo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CLO Model
-   &#160;<span id="projectnumber">1.74</span>
+   &#160;<span id="projectnumber">1.77</span>
    </div>
    <div id="projectbrief">Collateralised Loan Obligations Cash Flow Model</div>
   </td>
@@ -168,6 +168,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a6f69c318ad4e54de229252b0b4822736"><td class="memItemLeft" align="right" valign="top">String^&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a6f69c318ad4e54de229252b0b4822736">GetReserveFundTarget</a> (int index)</td></tr>
 <tr class="memdesc:a6f69c318ad4e54de229252b0b4822736"><td class="mdescLeft">&#160;</td><td class="mdescRight">The target amount of the reserve fund.  <a href="#a6f69c318ad4e54de229252b0b4822736">More...</a><br/></td></tr>
 <tr class="separator:a6f69c318ad4e54de229252b0b4822736"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3627247b714a3727348676dcae825335"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a3627247b714a3727348676dcae825335">GetReserveToInterest</a> (int RFindex)</td></tr>
+<tr class="memdesc:a3627247b714a3727348676dcae825335"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether the reserve will fund the interest or principal waterfall.  <a href="#a3627247b714a3727348676dcae825335">More...</a><br/></td></tr>
+<tr class="separator:a3627247b714a3727348676dcae825335"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a91d97fb3f9d8468d341ad54e7d535d3b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_managed_c_l_o_1_1_man_wat_fal_prior.html">ManWatFalPrior</a>^&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a91d97fb3f9d8468d341ad54e7d535d3b">GetStep</a> (int Index)</td></tr>
 <tr class="memdesc:a91d97fb3f9d8468d341ad54e7d535d3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the Index-th step in the waterfall.  <a href="#a91d97fb3f9d8468d341ad54e7d535d3b">More...</a><br/></td></tr>
 <tr class="separator:a91d97fb3f9d8468d341ad54e7d535d3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -195,9 +198,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a933d902cacc147b0753bbb7b7d4fad91"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a933d902cacc147b0753bbb7b7d4fad91">ResetTranches</a> ()</td></tr>
 <tr class="memdesc:a933d902cacc147b0753bbb7b7d4fad91"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes all tranches from the structure.  <a href="#a933d902cacc147b0753bbb7b7d4fad91">More...</a><br/></td></tr>
 <tr class="separator:a933d902cacc147b0753bbb7b7d4fad91"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4a06916a4b308d9115b477342f408b72"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a4a06916a4b308d9115b477342f408b72">SetReserveFund</a> (int RFindex, String^ RFtarget, String^ RFmultiple, String^ RFfloor, double RFcurrent, int RFfreed)</td></tr>
-<tr class="memdesc:a4a06916a4b308d9115b477342f408b72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up a reserve fund.  <a href="#a4a06916a4b308d9115b477342f408b72">More...</a><br/></td></tr>
-<tr class="separator:a4a06916a4b308d9115b477342f408b72"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6d2439d4c32316d47c2bc8524d8738e2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a6d2439d4c32316d47c2bc8524d8738e2">SetReserveFund</a> (int RFindex, String^ RFtarget, String^ RFmultiple, String^ RFfloor, double RFcurrent, int RFfreed, bool RFtoInterest)</td></tr>
+<tr class="memdesc:a6d2439d4c32316d47c2bc8524d8738e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up a reserve fund.  <a href="#a6d2439d4c32316d47c2bc8524d8738e2">More...</a><br/></td></tr>
+<tr class="separator:a6d2439d4c32316d47c2bc8524d8738e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6a6b1f1b87075a8014872294d5dff36a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a6a6b1f1b87075a8014872294d5dff36a">SetupReinvBond</a> (String^ IntrVec, String^ CPRVec, String^ CDRVec, String^ LSVec, String^ WALval, int PayFreq, String^ AnnuityVec, double FloatingBase)</td></tr>
 <tr class="memdesc:a6a6b1f1b87075a8014872294d5dff36a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define the characteristics of the bond bought using the reinvestment funds.  <a href="#a6a6b1f1b87075a8014872294d5dff36a">More...</a><br/></td></tr>
 <tr class="separator:a6a6b1f1b87075a8014872294d5dff36a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -258,9 +261,9 @@ Properties</h2></td></tr>
 <tr class="memitem:a1bbbb27794f9f170c9c80753ddb9ceab"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_managed_c_l_o_1_1_man_mtg_cash_flows.html">ManMtgCashFlows</a>^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a1bbbb27794f9f170c9c80753ddb9ceab">MortgagesPayments</a><code> [get]</code></td></tr>
 <tr class="memdesc:a1bbbb27794f9f170c9c80753ddb9ceab"><td class="mdescLeft">&#160;</td><td class="mdescRight">The cash flows of the loans.  <a href="#a1bbbb27794f9f170c9c80753ddb9ceab">More...</a><br/></td></tr>
 <tr class="separator:a1bbbb27794f9f170c9c80753ddb9ceab"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adb52e6d79495a30be04ceb4a20d0d2dc"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#adb52e6d79495a30be04ceb4a20d0d2dc">PaymentFrequency</a><code> [get, set]</code></td></tr>
-<tr class="memdesc:adb52e6d79495a30be04ceb4a20d0d2dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of months between two IPDs.  <a href="#adb52e6d79495a30be04ceb4a20d0d2dc">More...</a><br/></td></tr>
-<tr class="separator:adb52e6d79495a30be04ceb4a20d0d2dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a214b8925e173f7bd99871d9122e83151"><td class="memItemLeft" align="right" valign="top">String^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a214b8925e173f7bd99871d9122e83151">PaymentFrequency</a><code> [get, set]</code></td></tr>
+<tr class="memdesc:a214b8925e173f7bd99871d9122e83151"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of months between two IPDs.  <a href="#a214b8925e173f7bd99871d9122e83151">More...</a><br/></td></tr>
+<tr class="separator:a214b8925e173f7bd99871d9122e83151"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7b12a7ebfeda075d9cebdea28e7c3c6e"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a7b12a7ebfeda075d9cebdea28e7c3c6e">PoolValueAtCall</a><code> [get, set]</code></td></tr>
 <tr class="memdesc:a7b12a7ebfeda075d9cebdea28e7c3c6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Price of the pool upon call.  <a href="#a7b12a7ebfeda075d9cebdea28e7c3c6e">More...</a><br/></td></tr>
 <tr class="separator:a7b12a7ebfeda075d9cebdea28e7c3c6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -316,7 +319,9 @@ Properties</h2></td></tr>
 <dl class="section user"><dt>Backward Compatibility Notes</dt><dd>The Read method can load files written by versions 1.73 and later of the model.<br/>
 According to the version you load the results will change according to the following list:<ol style="list-style:none;">
 <li>
-<span>1.73 - </span>Reserve funds targets, floors and multipliers will be loaded as single value vectors with no anchor date</li>
+<span>1.73 - </span>Reserve funds targets, floors and multipliers will be loaded as single value vectors with no anchor date </li>
+<li>
+<span>1.74 - </span>Payment frequency will be loaded as a single value vector with no anchor date </li>
 </ol>
 </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
@@ -757,7 +762,7 @@ According to the version you load the results will change according to the follo
 <li>index the index of the reserve fund. Currently 2 reserves are modeled so index can be either 0 or 1 for, respectively, the first and second reserve</li>
 </ul>
 <p>This function will return the value of the current amount of the specified reserve fund </p>
-<dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a4a06916a4b308d9115b477342f408b72" title="Set up a reserve fund. ">SetReserveFund</a> </dd></dl>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a6d2439d4c32316d47c2bc8524d8738e2" title="Set up a reserve fund. ">SetReserveFund</a> </dd></dl>
 
 </div>
 </div>
@@ -788,7 +793,7 @@ According to the version you load the results will change according to the follo
 <li>index the index of the reserve fund. Currently 2 reserves are modeled so index can be either 0 or 1 for, respectively, the first and second reserve</li>
 </ul>
 <p>This function will return the Bloomberg vector representing the floor of the specified reserve fund </p>
-<dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a4a06916a4b308d9115b477342f408b72" title="Set up a reserve fund. ">SetReserveFund</a> </dd></dl>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a6d2439d4c32316d47c2bc8524d8738e2" title="Set up a reserve fund. ">SetReserveFund</a> </dd></dl>
 
 </div>
 </div>
@@ -822,7 +827,7 @@ According to the version you load the results will change according to the follo
 The interest and principal flows will distinguish whether the reserve fund was replenished using interest or principal proceeds.<br/>
 Use <a class="el" href="class_managed_c_l_o_1_1_man_tranche_cash_flow.html#a5c5691a7911ed8d4e949e1110fcda981" title="Gets the total cash flow. ">ManTrancheCashFlow::GetTotalFlow</a> to get the level of the reserve fund in a given period.<br/>
 Use <a class="el" href="class_managed_c_l_o_1_1_man_tranche_cash_flow.html#a9821f26b6d08ee6844304227aa45d31d" title="Gets the cumulative deferred interest of the tranche. ">ManTrancheCashFlow::GetDeferred</a> to get the shortfall in the reserve fund compared to the target level for a given period. </p>
-<dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a4a06916a4b308d9115b477342f408b72" title="Set up a reserve fund. ">SetReserveFund</a> </dd></dl>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a6d2439d4c32316d47c2bc8524d8738e2" title="Set up a reserve fund. ">SetReserveFund</a> </dd></dl>
 
 </div>
 </div>
@@ -855,7 +860,7 @@ Use <a class="el" href="class_managed_c_l_o_1_1_man_tranche_cash_flow.html#a9821
 <p>This function will return the seniority level that is used to determine when the reserve fund is released.<br/>
 After all the notes of this seniority level and any note senior to these have redeemed the reserve will be released in the interest waterfall.<br/>
 A value of 0 means that the reserve will be release only at maturity. </p>
-<dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a4a06916a4b308d9115b477342f408b72" title="Set up a reserve fund. ">SetReserveFund</a> </dd></dl>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a6d2439d4c32316d47c2bc8524d8738e2" title="Set up a reserve fund. ">SetReserveFund</a> </dd></dl>
 
 </div>
 </div>
@@ -886,7 +891,7 @@ A value of 0 means that the reserve will be release only at maturity. </p>
 <li>index the index of the reserve fund. Currently 2 reserves are modeled so index can be either 0 or 1 for, respectively, the first and second reserve</li>
 </ul>
 <p>This function will return the Bloomberg vector representing the multiple of the target level of the specified reserve fund </p>
-<dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a4a06916a4b308d9115b477342f408b72" title="Set up a reserve fund. ">SetReserveFund</a> </dd></dl>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a6d2439d4c32316d47c2bc8524d8738e2" title="Set up a reserve fund. ">SetReserveFund</a> </dd></dl>
 
 </div>
 </div>
@@ -917,7 +922,38 @@ A value of 0 means that the reserve will be release only at maturity. </p>
 <li>index the index of the reserve fund. Currently 2 reserves are modeled so index can be either 0 or 1 for, respectively, the first and second reserve</li>
 </ul>
 <p>This function will return the Bloomberg vector representing the target level of the specified reserve fund </p>
-<dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a4a06916a4b308d9115b477342f408b72" title="Set up a reserve fund. ">SetReserveFund</a> </dd></dl>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a6d2439d4c32316d47c2bc8524d8738e2" title="Set up a reserve fund. ">SetReserveFund</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a3627247b714a3727348676dcae825335"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool ManagedCLO::ManWaterfall::GetReserveToInterest </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>RFindex</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Whether the reserve will fund the interest or principal waterfall. </p>
+<ul>
+<li>index the index of the reserve fund. Currently 2 reserves are modeled so index can be either 0 or 1 for, respectively, the first and second reserve</li>
+</ul>
+<p>This function will return true if the reserve fund will be part of interest proceeds and false if it will form part of principal proceeds or index is invalid. </p>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a6d2439d4c32316d47c2bc8524d8738e2" title="Set up a reserve fund. ">SetReserveFund</a> </dd></dl>
 
 </div>
 </div>
@@ -1171,7 +1207,7 @@ A value of 0 means that the reserve will be release only at maturity. </p>
 
 </div>
 </div>
-<a class="anchor" id="a4a06916a4b308d9115b477342f408b72"></a>
+<a class="anchor" id="a6d2439d4c32316d47c2bc8524d8738e2"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1212,7 +1248,13 @@ A value of 0 means that the reserve will be release only at maturity. </p>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>RFfreed</em>&#160;</td>
+          <td class="paramname"><em>RFfreed</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>RFtoInterest</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1234,7 +1276,8 @@ A value of 0 means that the reserve will be release only at maturity. </p>
 <li>RFmultiple a Bloomberg vector representing the value by which RFtarget will be multiplied. </li>
 <li>RFfloor a Bloomberg vector representing the floor level of the reserve fund. For non-amortizing RFs set to "0" </li>
 <li>RFcurrent the current size of the reserve fund </li>
-<li>RFfreed A seniority level. When all the notes not junior to this seniority level will be redeemed, the RF will be released as excess spread. 0 for freeing it only at maturity</li>
+<li>RFfreed A seniority level. When all the notes not junior to this seniority level will be redeemed, the RF will be released as excess spread. 0 for freeing it only at maturity </li>
+<li>RFtoInterest Set to true if the reserve fund will be part of interest proceeds when calculating the waterfall, set to false if it's part of principal proceeds.</li>
 </ul>
 <p>This function will set up the specified reserve fund according to the supplied parameters.<br/>
 If RFtarget is a seniority level, the reserve fund target amount will be the sum of all the notes that rank not junior to that level, otherwise the reserve will be a non amortizing.<br/>
@@ -1800,7 +1843,7 @@ The deal will be called when the residual outstanding of the notes does not exce
 
 </div>
 </div>
-<a class="anchor" id="adb52e6d79495a30be04ceb4a20d0d2dc"></a>
+<a class="anchor" id="a214b8925e173f7bd99871d9122e83151"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1808,7 +1851,7 @@ The deal will be called when the residual outstanding of the notes does not exce
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">int ManagedCLO::ManWaterfall::PaymentFrequency</td>
+          <td class="memname">String^ ManagedCLO::ManWaterfall::PaymentFrequency</td>
         </tr>
       </table>
   </td>
@@ -1819,6 +1862,7 @@ The deal will be called when the residual outstanding of the notes does not exce
 </div><div class="memdoc">
 
 <p>Number of months between two IPDs. </p>
+<p>A Bloomberg vector representing the the number of months between two payment dates </p>
 
 </div>
 </div>
@@ -2237,7 +2281,7 @@ The deal will be called when the residual outstanding of the notes does not exce
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Apr 24 2014 09:02:25 for CLO Model by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 12 2014 20:58:10 for CLO Model by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>

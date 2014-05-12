@@ -30,7 +30,7 @@
   <td id="projectlogo"><img alt="Logo" src="Logo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CLO Model
-   &#160;<span id="projectnumber">1.74</span>
+   &#160;<span id="projectnumber">1.77</span>
    </div>
    <div id="projectbrief">Collateralised Loan Obligations Cash Flow Model</div>
   </td>
@@ -103,7 +103,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>Cash Flows from a Loan or a Pool of Loans.  
+<p>Boolean scenario vector.  
  <a href="class_managed_c_l_o_1_1_man_annuity_vector.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_man_annuity_vector_8h_source.html">ManAnnuityVector.h</a>&gt;</code></p>
@@ -137,6 +137,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a94bac638ba745f1581009bd4a4c8843a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_annuity_vector.html#a94bac638ba745f1581009bd4a4c8843a">IsEmpty</a> ()</td></tr>
 <tr class="memdesc:a94bac638ba745f1581009bd4a4c8843a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Asserts either the vector is empty or not.  <a href="#a94bac638ba745f1581009bd4a4c8843a">More...</a><br/></td></tr>
 <tr class="separator:a94bac638ba745f1581009bd4a4c8843a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab5b329f6ce960fb5b92641bf06185ff3"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_annuity_vector.html#ab5b329f6ce960fb5b92641bf06185ff3">NumElements</a> ()</td></tr>
+<tr class="memdesc:ab5b329f6ce960fb5b92641bf06185ff3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of elements in the vector.  <a href="#ab5b329f6ce960fb5b92641bf06185ff3">More...</a><br/></td></tr>
+<tr class="separator:ab5b329f6ce960fb5b92641bf06185ff3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5227dafeec30bb96c7a6329e36e13d89"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_annuity_vector.html#a5227dafeec30bb96c7a6329e36e13d89">Read</a> (IO::Stream^ Source)</td></tr>
 <tr class="memdesc:a5227dafeec30bb96c7a6329e36e13d89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read class from stream.  <a href="#a5227dafeec30bb96c7a6329e36e13d89">More...</a><br/></td></tr>
 <tr class="separator:a5227dafeec30bb96c7a6329e36e13d89"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -154,9 +157,9 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ac6d4bf2bef8feca48336acab8edca73c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Cash Flows from a Loan or a Pool of Loans. </p>
-<p>This class implements a way of manage cash flows from a pool of loans.<br/>
-The flows will always be sorted by date. </p>
+<div class="textblock"><p>Boolean scenario vector. </p>
+<p>This class handles vectors that follow the Bloomberg conventions in SCEN &lt;GO&gt; but accepting 'Y' and 'N' as levels instead of numbers.<br/>
+Given the nature of the data, ramps are not allowed. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a162fa8121bf64e46edccf1b218f60619"></a>
 <div class="memitem">
@@ -417,6 +420,39 @@ If the vector is empty or the index supplied is negative, 0 is returned. <dl cla
 
 </div>
 </div>
+<a class="anchor" id="ab5b329f6ce960fb5b92641bf06185ff3"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int ManagedCLO::ManAnnuityVector::NumElements </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Number of elements in the vector. </p>
+<p>This will return the number of monthly elements in the vector. It will be 1 plus the number of steps in the vector.<br/>
+e.g.: </p>
+<ul>
+<li>
+Y has 1 step </li>
+<li>
+Y 12S N has 13 step </li>
+</ul>
+
+</div>
+</div>
 <a class="anchor" id="a5227dafeec30bb96c7a6329e36e13d89"></a>
 <div class="memitem">
 <div class="memproto">
@@ -572,7 +608,7 @@ This function will try to set the vector to represent the supplied string, if it
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Apr 24 2014 09:02:25 for CLO Model by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 12 2014 20:58:09 for CLO Model by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>

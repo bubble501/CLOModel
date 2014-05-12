@@ -1,6 +1,7 @@
 var searchData=
 [
   ['manannuityvector',['ManAnnuityVector',['../class_managed_c_l_o_1_1_man_annuity_vector.html',1,'ManagedCLO']]],
+  ['manbaseratevector',['ManBaseRateVector',['../class_managed_c_l_o_1_1_man_base_rate_vector.html',1,'ManagedCLO']]],
   ['manbloombergvector',['ManBloombergVector',['../class_managed_c_l_o_1_1_man_bloomberg_vector.html',1,'ManagedCLO']]],
   ['mancentralunit',['ManCentralUnit',['../class_managed_c_l_o_1_1_man_central_unit.html',1,'ManagedCLO']]],
   ['manmortgage',['ManMortgage',['../class_managed_c_l_o_1_1_man_mortgage.html',1,'ManagedCLO']]],

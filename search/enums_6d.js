@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['manavailablerates',['ManAvailableRates',['../class_managed_c_l_o_1_1_man_base_rate_vector.html#aba174a59dfc969434bf6d50d980415d8',1,'ManagedCLO::ManBaseRateVector']]],
   ['manmtgflowtype',['ManMtgFlowType',['../class_managed_c_l_o_1_1_man_mtg_cash_flows.html#a5c6a490e7195143ae52e1abe16c97e58',1,'ManagedCLO::ManMtgCashFlows']]],
   ['mansharetype',['ManShareType',['../class_managed_c_l_o_1_1_man_reinvestment_test.html#a488f49d6fe19a5efb43afdfea1120592',1,'ManagedCLO::ManReinvestmentTest']]],
   ['manstressvariability',['ManStressVariability',['../class_managed_c_l_o_1_1_man_stress_test.html#a7c118b5bd5c82542515688ec86885b7f',1,'ManagedCLO::ManStressTest']]],

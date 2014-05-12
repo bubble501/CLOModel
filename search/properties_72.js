@@ -5,7 +5,7 @@ var searchData=
   ['redemptiongroup',['RedemptionGroup',['../class_managed_c_l_o_1_1_man_wat_fal_prior.html#ac34b5f2953eebbfaa903f60e0dfafd94',1,'ManagedCLO::ManWatFalPrior']]],
   ['redemptionshare',['RedemptionShare',['../class_managed_c_l_o_1_1_man_wat_fal_prior.html#a05d4b3b612d71762c7a9aa45f4145cfd',1,'ManagedCLO::ManWatFalPrior']]],
   ['referencerate',['ReferenceRate',['../class_managed_c_l_o_1_1_man_tranche.html#a6aac8ce7f4b67af8d62b41869e4e39e9',1,'ManagedCLO::ManTranche']]],
-  ['referenceratevalue',['ReferenceRateValue',['../class_managed_c_l_o_1_1_man_tranche.html#a91b645e5c2b57f0175afa9d7468ffa0a',1,'ManagedCLO::ManTranche']]],
+  ['referenceratevalue',['ReferenceRateValue',['../class_managed_c_l_o_1_1_man_tranche.html#a5e9e1e8f96f09db67158704d9564d423',1,'ManagedCLO::ManTranche']]],
   ['reinvested',['Reinvested',['../class_managed_c_l_o_1_1_man_waterfall.html#ad86d8041b34192055db26b1a66ab4f7f',1,'ManagedCLO::ManWaterfall']]],
   ['reinvestmentbond',['ReinvestmentBond',['../class_managed_c_l_o_1_1_man_reinvestment_test.html#a15413db25b2a089083796ee31cf159e3',1,'ManagedCLO::ManReinvestmentTest']]],
   ['reinvestmentperiod',['ReinvestmentPeriod',['../class_managed_c_l_o_1_1_man_reinvestment_test.html#a6c0d88b962cdd9bb4578b8f60ca6158d',1,'ManagedCLO::ManReinvestmentTest']]],

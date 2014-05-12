@@ -10,7 +10,7 @@ namespace ManagedCLO {
 		Q_OBJECT
 	public:
 		CentralUnitOverlay(ManCentralUnit^ ManVer,QObject* parent=0);
-		void CompileBaseRates(Dictionary<String^,double>^ Values);
+		void CompileBaseRates(Collections::Generic::Dictionary<String^,double>^ Values);
 	private:
 		gcroot<ManCentralUnit^> m_ManagedVersion;
 	private slots:

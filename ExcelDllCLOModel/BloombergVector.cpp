@@ -77,6 +77,7 @@ void BloombergVector::RepackVector(){
 		if(i>0) NewVector+=" 1S ";
 		NewVector+=QString("%1").arg(m_VectVal.at(i)*100.0);
 	}
+	m_Vector=NewVector;
 }
 void BloombergVector::UnpackVector(){
 	m_VectVal.clear();

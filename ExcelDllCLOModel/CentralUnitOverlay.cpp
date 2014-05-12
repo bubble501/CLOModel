@@ -15,13 +15,6 @@ void CentralUnitOverlay::CalculationFinishedCallBack(){
 void CentralUnitOverlay::ProgressUpdateCallBack(double prog){
 	m_ManagedVersion->ProgressUpdateCallBack(prog);
 }
-void CentralUnitOverlay::CompileBaseRates(Dictionary<String^,double>^ Values){
-	QHash<QString,double> ConvertDict;
-	for each(DictionaryEntry^ entry in Values){
-		ConvertDict.insert(
-			String2QString(entry->Key)
-			,entry->Value
-			);
-	}
-	CentralUnitAPI::CompileBaseRates(ConvertDict);
+void CentralUnitOverlay::CompileBaseRates(Collections::Generic::Dictionary<String^,double>^ Values){
+	CentralUnitAPI::CompileBaseRates(Dictionary2QHash(Values));
 }

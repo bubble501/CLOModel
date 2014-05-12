@@ -2,6 +2,7 @@
 #include <QRegExp>
 #include <QStringList>
 #include "CommonFunctions.h"
+#include "BloombergWorker.h"
 QString BaseRateVector::AvailableRatesToString(int a) const{
 	/*
 	To amend paste the enum value and then find and replace.
@@ -168,4 +169,61 @@ BaseRateVector::AvailableRates BaseRateVector::GetValue(const QDate& index)const
 BaseRateVector::AvailableRates BaseRateVector::GetValue(int index)const{
 	if(m_VectVal.isEmpty() || index<0) return Invalid;
 	return m_VectVal.at(qMin(index,m_VectVal.size()-1));
+}
+BloombergVector BaseRateVector::CompileReferenceRateValue(const QHash<QString,double>& Values) const{
+	if(IsEmpty())return BloombergVector();
+	QString ResultingVector("");
+	int StepCounter;
+	double PreviousVal,TempValue;
+	for(int i=0;i<m_VectVal.size();i++){
+		if(!Values.contains(GetValueString(i))) return GetRefRateValueFromBloomberg();
+		if(i>0){
+			TempValue=Values.value(GetValueString(i));
+			if(TempValue==PreviousVal) StepCounter++;
+			else{
+				ResultingVector+=QString(" %1S %2").arg(StepCounter).arg(100.0*TempValue);
+				PreviousVal=TempValue;
+				StepCounter=1;
+			}
+			
+		}
+		else{
+			PreviousVal=Values.value(GetValueString(i));
+			ResultingVector+=QString("%1").arg(100.0*PreviousVal);
+			StepCounter=1;
+		}
+		
+	}
+	return BloombergVector(ResultingVector,m_AnchorDate);
+}
+BloombergVector BaseRateVector::GetRefRateValueFromBloomberg()const{
+	if(IsEmpty())return BloombergVector();
+	QStringList RatesToDownload;
+	for(int i=0;i<m_VectVal.size();i++){
+		if(!RatesToDownload.contains(GetValueString(i))) RatesToDownload.append(GetValueString(i));
+	}
+	BloombergWorker Bee;
+	foreach(const QString& SingleRate,RatesToDownload)
+		Bee.AddSecurity(SingleRate,"Index");
+	Bee.AddField("PX_LAST");
+	QHash<QString, QHash<QString,QString> > ReturnedValues=Bee.StartRequest();
+	QString ResultingVector;
+	int StepCounter;
+	AvailableRates PreviousVal;
+	for(int i=0;i<m_VectVal.size();i++){
+		if(i>0){
+			if(PreviousVal==m_VectVal.at(i)) StepCounter++;
+			else{
+				PreviousVal=m_VectVal.at(i);
+				ResultingVector+=QString(" %1S ").arg(StepCounter) + ReturnedValues.value(GetValueString(i)).value("PX_LAST");
+				StepCounter=1;
+			}
+		}
+		else{
+			PreviousVal=m_VectVal.at(i);
+			ResultingVector+=ReturnedValues.value(GetValueString(i)).value("PX_LAST");
+			StepCounter=1;
+		}
+	}
+	return BloombergVector(ResultingVector,m_AnchorDate);
 }

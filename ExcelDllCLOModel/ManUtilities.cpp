@@ -63,13 +63,13 @@ double ABSUtilities::DiscountMargin(List<DateTime>^ Dte, List<double>^ Flws, dou
 	double AdjYeld= (System::Math::Pow(1.0+Yld,1.0/Freq)-1.0)*Freq;
 	return (AdjYeld-BaseRate)*10000.0;
 }
-double CalculateNPV(List<DateTime>^ Dte, List<double>^ Flws, ManBloombergVector^ Interest, int Daycount){
+double ABSUtilities::NPV(List<DateTime>^ Dte, List<double>^ Flws, ManBloombergVector^ Interest, int Daycount){
 	if(Dte->Count!=Flws->Count || Dte->Count<2) return 0.0;
 	ManBloombergVector^ AdjInterest=gcnew ManBloombergVector(Interest);
-	if(AdjInterest->GetAnchorDate().isNull()) AdjInterest->SetAnchorDate(Dte.at(1));
+	if(DateTime2QDate(AdjInterest->GetAnchorDate()).isNull()) AdjInterest->SetAnchorDate(Dte[1]);
 	double Result=Flws[0];
 	double DiscountFactor=1.0;
-	for(int i=1;i<Dte.size();i++){
+	for(int i=1;i<Dte->Count;i++){
 		DiscountFactor*=System::Math::Pow(1.0+AdjInterest->GetValue(Dte[i]),static_cast<double>(Dte[i].ToOADate()-Dte[i-1].ToOADate())/static_cast<double>(Daycount));
 		Result+=Flws[i]/DiscountFactor;
 	}
@@ -81,14 +81,14 @@ double ABSUtilities::DiscountMargin(List<DateTime>^ Dte, List<double>^ Flws, Man
 	double Result=Guess;
 	double PreviuousGuess=Guess+0.01;
 	double CurrentGuess=Guess;
-	double PreviousNPV=CalculateNPV(Dte,Flws,BaseRate+PreviuousGuess,Daycount);
-	double CurrentNPV=CalculateNPV(Dte,Flws,BaseRate+Result,Daycount);
-	while(qAbs(CurrentNPV)>qPow(10.0,-static_cast<double>(precision))){
+	double PreviousNPV=NPV(Dte,Flws,BaseRate+PreviuousGuess,Daycount);
+	double CurrentNPV=NPV(Dte,Flws,BaseRate+Result,Daycount);
+	while(System::Math::Abs(CurrentNPV)>System::Math::Pow(10.0,-static_cast<double>(precision))){
 		Result-=CurrentNPV*(Result-PreviuousGuess)/(CurrentNPV-PreviousNPV);
 		PreviousNPV=CurrentNPV;
 		PreviuousGuess=CurrentGuess;
 		CurrentGuess=Result;
-		CurrentNPV=CalculateNPV(Dte,Flws,BaseRate+Result,Daycount);
+		CurrentNPV=NPV(Dte,Flws,BaseRate+Result,Daycount);
 		if(++CurrentIterations>=MaximumIRRIterations) return 0.0;
 	}
 	return Result*10000.0;

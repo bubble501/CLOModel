@@ -4,6 +4,7 @@
 #include <QList>
 #include <QString>
 #include <QHash>
+#include "BloombergVector.h"
 class BaseRateVector : public AbstarctBbgVect{
 public:
 	enum AvailableRates{ //Do NOT assign values to entries
@@ -61,6 +62,8 @@ public:
 	AvailableRates GetValue(int index) const;
 	QString GetValueString(const QDate& index) const{return AvailableRatesToString(GetValue(index));}
 	QString GetValueString(int index) const{return AvailableRatesToString(GetValue(index));}
+	BloombergVector CompileReferenceRateValue(const QHash<QString,double>& Values) const;
+	BloombergVector GetRefRateValueFromBloomberg()const;
 	BaseRateVector& operator=(const QString& a){AbstarctBbgVect::operator=(a); return *this;}
 	friend QDataStream& operator<<(QDataStream & stream, const BaseRateVector& flows);
 	friend QDataStream& operator>>(QDataStream & stream, BaseRateVector& flows);

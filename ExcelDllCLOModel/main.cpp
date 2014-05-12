@@ -8,6 +8,7 @@
 #include "StressTest.h"
 #include "ExcelOutput.h"
 #include "BloombergVector.h"
+#include "BaseRateVect.h"
 #endif
 int main(int argc, char *argv[])
 {
@@ -49,7 +50,7 @@ int main(int argc, char *argv[])
 	}*/
 	
 	Waterfall TempWtf,TempCallWaterfall;
-	QFile file("C:/Temp/.BaseCase.clo");
+	QFile file("Z:/24AM/ABS Trade Folders/CLO/AVOCA XI/.BaseCase.clo");
 	file.open(QIODevice::ReadOnly);
 	qint32 VersionChecker;
 	QDataStream out(&file);
@@ -64,15 +65,12 @@ int main(int argc, char *argv[])
 	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempCallWaterfall;
 	file.close();
-	for (int i=0;i<TempWtf.GetTranchesCount()-1;i++){
-		TempWtf.GetTranche(i)->SetReferenceRate("EUR003M 48S EUR006M");
-		TempWtf.GetTranche(i)->CompileReferenceRateValue(QHash<QString,double>());
-	}
 	TempWtf.CalculateTranchesCashFlows();
 
 	/*StressTest TempStress;
 	TempStress.LoadResultsFromFile("C:\\Temp\\.StressResult01.fcsr");
 	ExcelOutput::PrintStressTest(TempStress,"CGMSE 2013-1X E1","Stress Test!C3");
 */
+
 #endif
 }

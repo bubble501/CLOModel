@@ -87,35 +87,12 @@ void Tranche::SetExchangeRate(double a){
 	CashFlow.SetInitialOutstanding(OutstandingAmt);
 }
 void Tranche::GetRefRateValueFromBloomberg()const{
-	QStringList RatesToDownload;
 	const BaseRateVector& ApplicableRate = (ReferenceRate.IsEmpty() ? DefaultRefRate : ReferenceRate);
-	for(int i=0;i<ApplicableRate.NumElements();i++){
-		if(!RatesToDownload.contains(ApplicableRate.GetValueString(i))) RatesToDownload.append(ApplicableRate.GetValueString(i));
-	}
-	BloombergWorker Bee;
-	foreach(const QString& SingleRate,RatesToDownload)
-		Bee.AddSecurity(SingleRate,"Index");
-	Bee.AddField("PX_LAST");
-	QHash<QString, QHash<QString,QString> > ReturnedValues=Bee.StartRequest();
-	QString ResultingVector;
-	for(int i=0;i<ApplicableRate.NumElements();i++){
-		if(i>0) ResultingVector+=" 1S ";
-		ResultingVector+=ReturnedValues.value(ApplicableRate.GetValueString(i)).value("PX_LAST");
-	}
-	ReferenceRateValue=ResultingVector;
-	ReferenceRateValue.SetAnchorDate(ApplicableRate.GetAnchorDate());
+	ReferenceRateValue=ApplicableRate.GetRefRateValueFromBloomberg();
 }
 void Tranche::CompileReferenceRateValue(const QHash<QString,double>& Values) const{
 	const BaseRateVector& ApplicableRate= (ReferenceRate.IsEmpty()? DefaultRefRate:ReferenceRate);
-	if(ApplicableRate.IsEmpty())return;
-	QString ResultingVector("");
-	for(int i=0;i<ApplicableRate.NumElements();i++){
-		if(!Values.contains(ApplicableRate.GetValueString(i))) return GetRefRateValueFromBloomberg();
-		if(i>0) ResultingVector+=" 1S ";
-		ResultingVector+=QString("%1").arg(100.0*Values.value(ApplicableRate.GetValueString(i)));
-	}
-	ReferenceRateValue=ResultingVector;
-	ReferenceRateValue.SetAnchorDate(ApplicableRate.GetAnchorDate());
+	ReferenceRateValue=ApplicableRate.CompileReferenceRateValue(Values);
 }
 double Tranche::GetCoupon(const QDate& index) const {
 	BloombergVector TempCoupon=Coupon;

@@ -197,14 +197,38 @@ namespace ManagedCLO {
 		}
 		/*!
 		\brief The value of the base rate for the tranche
-		\details For floating rate tranches this property holds the value of the base rate and for fixed rate notes the value for the base rate used when calculating the discount margin<br/>Set to -1.0 to have it downloaded from Bloomberg
+		\details For floating rate tranches this property holds the value of the base rate and for fixed rate notes the value for the base rate used when calculating the discount margin<br/>Set to an empty string to have it downloaded from Bloomberg
 		\sa ReferenceRate
 		\sa DefaultRefRate
+		\sa GetReferenceRateValue(int)
+		\sa GetReferenceRateValue(Datetime)
 		*/
-		property ManBloombergVector^ ReferenceRateValue{
-			ManBloombergVector^ get(){return gcnew ManBloombergVector(Unmanaged->GetReferenceRateValue());}
-			void set(ManBloombergVector^ a){Unmanaged->SetReferenceRateValue(String2QString(a->GetVector()));}
+		property String^ ReferenceRateValue{
+			String^ get(){return QString2String(Unmanaged->GetReferenceRateValue().GetVector());}
+			void set(String^ a){Unmanaged->SetReferenceRateValue(String2QString(a));}
 		}
+		/*!
+		\brief The value of the base rate for the tranche at the specified index
+		\arg index The time index for which to retrieve the index value. 0 corresponds to the vector anchor date or, if it's missing, the last payment date.
+		\details For floating rate tranches this represents the value of the base rate and for fixed rate notes the value for the base rate used when calculating the discount margin.
+		\sa ReferenceRateValue
+		\sa GetReferenceRateValue(Datetime)
+		*/
+		double GetReferenceRateValue(int index) {return Unmanaged->GetReferenceRateValue(index);}
+		/*!
+		\brief The value of the base rate for the tranche at the specified index
+		\arg index The date for which to retrieve the index value.
+		\details For floating rate tranches this represents the value of the base rate and for fixed rate notes the value for the base rate used when calculating the discount margin.
+		\sa ReferenceRateValue
+		\sa GetReferenceRateValue(int)
+		*/
+		double GetReferenceRateValue(DateTime index) {return Unmanaged->GetReferenceRateValue(DateTime2QDate(index));}
+		/*!
+		\brief Uses the supplied base rates dictionary to fill in the base rate values
+		\arg Values a dictionary containing the Bloomberg tickers (without yellow keys) of the relevant base index as key and it's value as as value.
+		\details This function will use the values supplied in the dictionary as the values for the relevant base index rates.<br/>If a base index is required by the model but not supplied it will be downloaded from Bloomberg.
+		*/
+		void CompileBaseRates(Collections::Generic::Dictionary<String^,double>^ Values){Unmanaged->CompileReferenceRateValue(Dictionary2QHash(Values));}
 		/*!
 		\brief The price of the tranche
 		*/
@@ -350,6 +374,17 @@ namespace ManagedCLO {
 		\arg NewPrice the price used to calculate the discount margin
 		*/
 		double GetDiscountMargin(double NewPrice){return Unmanaged->GetDiscountMargin(NewPrice);}
+		/*!
+		\brief The internal rate of return of the tranche calculated from the cash flows
+		*/
+		property double IRR{
+			double get(){return Unmanaged->GetIRR();}
+		}
+		/*!
+		\brief Calculates the internal rate of return of the tranche from the cash flows using the specified price
+		\arg NewPrice the price used to calculate the internal rate of return
+		*/
+		double GetIRR(double NewPrice){return Unmanaged->GetIRR(NewPrice);}
 		/*!
 		\brief Calculates weighted average life of the notes
 		\arg The date from which to calculate the WAL

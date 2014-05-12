@@ -119,10 +119,12 @@ QString Commarize(double num,unsigned int precision){
 }
 
 double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, double Interest, int Daycount){
-	if(Dte.size()!=Flws.size() || Dte.size()==0) return 0.0;
+	if(Dte.size()!=Flws.size() || Dte.size()==0 || Dte.size()<2) return 0.0;
 	double Result=Flws.at(0);
+	double DiscountFactor=1.0;
 	for(int i=1;i<Dte.size();i++){
-		Result+=Flws.at(i)/qPow(1.0+Interest,static_cast<double>(Dte.at(0).daysTo(Dte.at(i)))/static_cast<double>(Daycount));
+		DiscountFactor*=qPow(1.0+Interest,static_cast<double>(Dte.at(i-1).daysTo(Dte.at(i)))/static_cast<double>(Daycount));
+		Result+=Flws.at(i)/DiscountFactor;//qPow(1.0+Interest,static_cast<double>(Dte.at(0).daysTo(Dte.at(i)))/static_cast<double>(Daycount));
 	}
 	return Result;
 }
@@ -133,7 +135,8 @@ double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, const Bl
 	double Result=Flws.at(0);
 	double DiscountFactor=1.0;
 	for(int i=1;i<Dte.size();i++){
-		DiscountFactor*=qPow(1.0+AdjInterest.GetValue(Dte.at(i)),static_cast<double>(Dte.at(i-1).daysTo(Dte.at(i)))/static_cast<double>(Daycount));
+		//DiscountFactor*=qPow(1.0+AdjInterest.GetValue(Dte.at(i)),static_cast<double>(Dte.at(i-1).daysTo(Dte.at(i)))/static_cast<double>(Daycount));
+		DiscountFactor*=1+(AdjInterest.GetValue(Dte.at(i))*static_cast<double>(Dte.at(i-1).daysTo(Dte.at(i)))/static_cast<double>(Daycount));
 		Result+=Flws.at(i)/DiscountFactor;
 	}
 	return Result;

@@ -323,6 +323,69 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 #endif
 }
 
+double __stdcall CLOReturnRate(LPSAFEARRAY *ArrayData){
+	VARIANT HUGEP *pdFreq;
+	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
+	if (!SUCCEEDED(hr)) return 0.0;
+	QString FolderPath=QString::fromStdWString(pdFreq->bstrVal);pdFreq++;
+	QString TrancheName=QString::fromStdWString(pdFreq->bstrVal);pdFreq++;
+	bool ToCall=pdFreq->boolVal;pdFreq++;
+	double NewPrice=pdFreq->dblVal;pdFreq++;
+	SafeArrayUnaccessData(*ArrayData);
+#ifdef DebuggungInputs
+	char *argv[] = {"NoArgumnets"};
+	int argc = sizeof(argv) / sizeof(char*) - 1;
+	QApplication ComputationLoop(argc,argv);
+	QMessageBox::information(0,"Arguments OK","Arguments are right");
+#endif
+	Waterfall TempWaterfall;
+	QString Filename=FolderPath+"\\.BaseCase.clo";
+	QFile file(Filename);
+	if(!file.exists()){
+#ifdef DebuggungInputs
+		QMessageBox::information(0,"File Non Esiste",QString("Il File "+ Filename +" Non Esiste"));
+#endif
+		return 0.0;
+	}
+#ifdef DebuggungInputs
+	QMessageBox::information(0,"File Esiste",QString("Il File "+ Filename +" Esiste"));
+#endif
+	if (!file.open(QIODevice::ReadOnly)){
+#ifdef DebuggungInputs
+		QMessageBox::information(0,"Impossibile Aprire",QString("Il File "+ Filename +" Non puo' essere aperto"));
+#endif
+		return 0.0;
+	}
+#ifdef DebuggungInputs
+	QMessageBox::information(0,"Aperto",QString("Il File "+ Filename +" e' stato aperto"));
+#endif
+	qint32 VersionChecker;
+	QDataStream out(&file);
+	out.setVersion(QDataStream::Qt_4_8);
+	out >> VersionChecker;
+	//if(VersionChecker!=qint32(ModelVersionNumber)) return 0.0;
+	if(VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) return 0.0;
+	TempWaterfall.SetLoadProtocolVersion(VersionChecker);
+	out >> TempWaterfall;
+	if(ToCall){
+		TempWaterfall.SetLoadProtocolVersion(VersionChecker);
+		out >> TempWaterfall;
+	}
+	file.close();
+	const Tranche* TranchPoint=TempWaterfall.GetTranche(TrancheName);
+	if(!TranchPoint){
+#ifdef DebuggungInputs
+		QString TranchesNames;
+		for(int i=0;i<TempWaterfall.GetTranchesCount();i++) TranchesNames+='\n'+TempWaterfall.GetTranche(i)->GetTrancheName();
+		QMessageBox::information(0,"Tranche non Trovata",QString("La Tranche "+TrancheName+" non e' Stata Trovata\nTranches Disponibili:"+TranchesNames));
+#endif
+		return 0.0;
+	}
+#ifdef DebuggungInputs
+	QMessageBox::information(0,"Tranche Trovata",QString("La Tranche "+TrancheName+" e' Stata Trovata"));
+#endif
+	return TranchPoint->GetIRR(NewPrice);
+}
 double __stdcall CLODiscountMargin(LPSAFEARRAY *ArrayData){
 	VARIANT HUGEP *pdFreq;
 	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);

@@ -120,7 +120,7 @@ namespace ManagedCLO {
 		\sa GetValueString(DateTime)
 		\sa GetValueString(int)
 		*/
-		ManAvailableRates GetValue(DateTime index) const {return static_cast<ManAvailableRates>(static_cast<int>(Unmanaged->GetValue(DateTime2QDate(index))));}
+		ManAvailableRates GetValue(DateTime index) {return static_cast<ManAvailableRates>(static_cast<int>(Unmanaged->GetValue(DateTime2QDate(index))));}
 		/*! 
 		\brief Gets the vector value for the specified index
 		\arg index The number of months after the start of the vector for which the value is retrieved
@@ -129,7 +129,7 @@ namespace ManagedCLO {
 		\sa GetValueString(DateTime)
 		\sa GetValueString(int)
 		*/
-		ManAvailableRates GetValue(int index) const {return static_cast<ManAvailableRates>(static_cast<int>(Unmanaged->GetValue(index)));}
+		ManAvailableRates GetValue(int index) {return static_cast<ManAvailableRates>(static_cast<int>(Unmanaged->GetValue(index)));}
 		/*! 
 		\brief Gets the string representation of the vector value for the specified date
 		\arg index the date for which to get the value of the vector
@@ -138,7 +138,7 @@ namespace ManagedCLO {
 		\sa GetValue(int)
 		\sa GetValue(DateTime)
 		*/
-		QString GetValueString(DateTime index) const{return static_cast<ManAvailableRates>(static_cast<int>(Unmanaged->GetValueString(DateTime2QDate(index))));}
+		String^ GetValueString(DateTime index){return QString2String(Unmanaged->GetValueString(DateTime2QDate(index)));}
 		/*! 
 		\brief Gets the string representation of the vector value for the specified index
 		\arg index The number of months after the start of the vector for which the value is retrieved
@@ -147,7 +147,23 @@ namespace ManagedCLO {
 		\sa GetValue(DateTime)
 		\sa GetValue(int)
 		*/
-		QString GetValueString(int index) const{return static_cast<ManAvailableRates>(static_cast<int>(Unmanaged->GetValueString(index)));}
+		String^ GetValueString(int index){return QString2String(Unmanaged->GetValueString(index));}
+		/*! 
+		\brief Returns a Bloomberg vector containing the value of the base indexes represented in this vector using Values as a source
+		\arg Values a dictionary containing the Bloomberg tickers (without yellow keys) of the relevant base index as key and it's value as as value.
+		\details This function will use the values supplied in the dictionary as the values for the relevant base index rates.<br/>If a base index is required by the model but not supplied it will be downloaded from Bloomberg using GetRefRateValueFromBloomberg.
+		\sa GetRefRateValueFromBloomberg
+		*/
+		ManBloombergVector^ CompileReferenceRateValue(Collections::Generic::Dictionary<String^,double>^ Values){
+			return gcnew ManBloombergVector(Unmanaged->CompileReferenceRateValue(Dictionary2QHash(Values)));
+		}
+		/*! 
+		\brief Returns a Bloomberg vector containing the value of the base indexes represented in this vector using Bloomberg as a source
+		\details This function will use Bloomberg to fetch the values of the Indexes represented in the vector.
+		\sa CompileReferenceRateValue
+		*/
+		ManBloombergVector^ GetRefRateValueFromBloomberg(){return gcnew ManBloombergVector(Unmanaged->GetRefRateValueFromBloomberg());}
+
 
 		ManBaseRateVector(){Unmanaged=new BaseRateVector();}
 		//! Copy constructor

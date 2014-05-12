@@ -3,6 +3,7 @@
 #include "Mortgage.h"
 #include "CommonFunctions.h"
 #include "ManagedCommons.h"
+#include "ManBloombergVector.h"
 using namespace ManagedCLO;
 using namespace System::Collections::Generic;
 /*!

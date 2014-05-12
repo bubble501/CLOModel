@@ -5,6 +5,7 @@ using namespace System::Text;
 #include <QDate>
 #include <QString>
 #include <QList>
+#include <QHash>
 #include <vcclr.h>
 #include "CommonFunctions.h"
 namespace ManagedCLO {
@@ -45,6 +46,17 @@ namespace ManagedCLO {
 			Result.append(String2QString(SinlgeStr));
 		return Result;
 	}
+	inline QHash<QString,double> Dictionary2QHash(Collections::Generic::Dictionary<String^,double>^ Values){
+		QHash<QString,double> ConvertDict;
+		for each(Collections::Generic::KeyValuePair<String^,double>^ entry in Values){
+			ConvertDict.insert(
+				String2QString(entry->Key)
+				,entry->Value
+				);
+		}
+		return ConvertDict;
+	}
 }
 #endif // ManagedCommons_h__
+
 

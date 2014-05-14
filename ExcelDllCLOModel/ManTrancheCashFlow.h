@@ -150,7 +150,7 @@ namespace ManagedCLO {
 		\details Returns the cumulative deferred interest of the tranche at position index in the series.
 		\sa GetDeferred(DateTime)
 		*/
-		double GetDeferred(int index){return Unmanaged->GetInterest(index);}
+		double GetDeferred(int index){return Unmanaged->GetDeferred(index);}
 		/*!
 		\brief Gets the interest cash flow.
 		\arg index The date for which the interest must be retrieved.

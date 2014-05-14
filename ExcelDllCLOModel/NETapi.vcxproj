@@ -517,6 +517,12 @@
     <PostBuildEvent>
       <Message>Re-Sign Assembly</Message>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>if not exist "$(ProjectDir)StrongNameKey.snk" (
+sn.exe -k "$(ProjectDir)StrongNameKey.snk"
+)</Command>
+      <Message>Createing Strong Name Key</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -23,6 +23,7 @@ photothumb.db
 *.log
 *.sdf
 *.opensdf
+*.snk
 [Bb]in*/
 ipch*/
 [Dd]ebug*/
@@ -37,4 +38,3 @@ ipch*/
 html/
 [Nn]ightly*/
 Documentation/NETapi*/
-*CriptKey

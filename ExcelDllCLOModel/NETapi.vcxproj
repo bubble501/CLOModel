@@ -472,7 +472,10 @@
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <LinkKeyFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Temp\CriptKey</LinkKeyFile>
+    <LinkKeyFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Visual Studio Projects\CLOModel\ExcelDllCLOModel\StrongNameKey.snk</LinkKeyFile>
+    <LinkDelaySign Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkDelaySign>
+    <CustomBuildAfterTargets Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    </CustomBuildAfterTargets>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -508,6 +511,12 @@
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <AdditionalDependencies>qtmain.lib;QtCore4.lib;QtGui4.lib;blpapi3_32.lib;zdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>sn.exe -R "$(SolutionDir)$(Platform)\$(Configuration)\$(ProjectName).dll" "$(ProjectDir)StrongNameKey.snk"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Re-Sign Assembly</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

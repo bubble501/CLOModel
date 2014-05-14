@@ -70,7 +70,7 @@ double ABSUtilities::NPV(List<DateTime>^ Dte, List<double>^ Flws, ManBloombergVe
 	double Result=Flws[0];
 	double DiscountFactor=1.0;
 	for(int i=1;i<Dte->Count;i++){
-		DiscountFactor*=1.0+(AdjInterest->GetValue(Dte[i])*static_cast<double>(Dte[i].ToOADate()-Dte[i-1].ToOADate())/static_cast<double>(Daycount))
+		DiscountFactor*=1.0+(AdjInterest->GetValue(Dte[i])*static_cast<double>(Dte[i].ToOADate()-Dte[i-1].ToOADate())/static_cast<double>(Daycount));
 		//DiscountFactor*=System::Math::Pow(1.0+AdjInterest->GetValue(Dte[i]),static_cast<double>(Dte[i].ToOADate()-Dte[i-1].ToOADate())/static_cast<double>(Daycount));
 		Result+=Flws[i]/DiscountFactor;
 	}

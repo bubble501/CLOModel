@@ -120,6 +120,16 @@ namespace ManagedCLO {
 			return nullptr;
 		}
 		/*!
+		\brief Overwrites a loan in the pool
+		\arg index The index of the loan to overwrite (the first loan has index 0).
+		\arg source The loan that will overwrite the current one
+		\details This function will overwrite the loan at the specified index in the pool.<br/>If the index is out of range the function will do nothing.
+		*/
+		void SetLoan(int index, ManMortgage^ source){
+			Mortgage* Temp=Unmanaged->GetLoans(index);
+			if(Temp) (*Temp)=*(source->Unmanaged);
+		}
+		/*!
 		\brief The base Waterfall of the deal
 		\details This property holds the waterfall structure of the deal.
 		*/

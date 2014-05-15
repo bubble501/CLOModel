@@ -34,6 +34,7 @@ public:
 	QString GetPrepayMultiplier() const {return m_PrepayMultiplier.GetVector();}
 	void SetPrepayMultiplier(QString a) {m_PrepayMultiplier=a;}
 	const MtgCashFlow& GetCashFlow() const{return m_CashFlows;}
+	MtgCashFlow& GetCashFlow(){return m_CashFlows;}
 	QString GetAnnuity() const {return m_AnnuityVect.GetVector();}
 	void SetAnnuity(const QString& a);
 	QString GetInterest() const {return m_InterestVect.GetVector();}

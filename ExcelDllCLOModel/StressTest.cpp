@@ -36,6 +36,10 @@ const Mortgage* StressTest::GetLoans(int index)const{
 	if(index<0 || index>=Loans.size()) return NULL;
 	return Loans.at(index);
 }
+Mortgage* StressTest::GetLoans(int index){
+	if(index<0 || index>=Loans.size()) return NULL;
+	return Loans[index];
+}
 void StressTest::SetXSpann(const QList<QString>& a){
 	XSpann.clear();
 	AddXSpann(a);

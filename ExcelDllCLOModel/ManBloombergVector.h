@@ -8,7 +8,7 @@ using namespace System;
 namespace ManagedCLO {
 	/*!
 	\brief Bloomberg scenarios vector
-	\details This class manages vector that follow the convention of Bloomberg scenarios vector as in the SCEN <GO> screen.<br/>The values in the vector will be considered as percentages
+	\details This class manages vector that follow the convention of Bloomberg scenarios vector as in the SCEN \<GO\> screen.<br/>The values in the vector will be considered as percentages
 	 */
 	public ref class ManBloombergVector
 	{

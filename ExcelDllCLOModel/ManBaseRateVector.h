@@ -8,7 +8,7 @@ using namespace System;
 namespace ManagedCLO {
 	/*!
 	\brief Base rate scenario vector.
-	\details This class handles vectors that follow the Bloomberg conventions in SCEN <GO> but accepting index rates as levels instead of numbers.<br/>Given the nature of the data, ramps are not allowed.<br/>Supported base rates are described in the ManAvailableRates enumerator.
+	\details This class handles vectors that follow the Bloomberg conventions in SCEN \<GO\> but accepting index rates as levels instead of numbers.<br/>Given the nature of the data, ramps are not allowed.<br/>Supported base rates are described in the ManAvailableRates enumerator.
 	 */
 	public ref class ManBaseRateVector
 	{

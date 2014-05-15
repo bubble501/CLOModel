@@ -212,6 +212,7 @@ namespace ManagedCLO {
 		*/
 		property double InitialOutstanding{
 			void set(double a){Unmanaged->SetInitialOutstanding(a);}
+			double get(){return Unmanaged->GetInitialOutstanding();}
 		}
 		/*!
 		\brief Adds a flow to the series.

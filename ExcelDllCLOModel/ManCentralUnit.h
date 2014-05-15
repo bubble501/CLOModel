@@ -65,6 +65,16 @@ namespace ManagedCLO {
 			return nullptr;
 		}
 		/*!
+		\brief Overwrites a loan in the pool
+		\arg index The index of the loan to overwrite (the first loan has index 0).
+		\arg source The loan that will overwrite the current one
+		\details This function will overwrite the loan at the specified index in the pool.<br/>If the index is out of range the function will do nothing.
+		*/
+		void SetLoan(int index,ManMortgage^ source){
+			Mortgage* Temp=Unmanaged->GetLoan(index);
+			if(Temp) (*Temp)=*(source->Unmanaged);
+		}
+		/*!
 		\brief Runs the calculation of the waterfall
 		\details This function starts the calculation of the loan pool cash flows and the tranches cash flows. The function will return almost immediately.<br/>ProgressUpdateEvent will be emitted any time the computation progresses. When the calculation is completed CalculationFinishedEvent is emitted. 
 		*/
@@ -101,6 +111,7 @@ namespace ManagedCLO {
 		*/
 		property ManWaterfall^ Result{
 			ManWaterfall^ get(){return gcnew ManWaterfall(Unmanaged->GetResult());}
+			void set(ManWaterfall^ source){Unmanaged->GetResult()=*(source->Unmanaged);}
 		}
 		/*!
 		\brief The results of the calculation of the call scenario 
@@ -109,6 +120,7 @@ namespace ManagedCLO {
 		*/
 		property ManWaterfall^ CallResult{
 			ManWaterfall^ get(){return gcnew ManWaterfall(Unmanaged->GetCallResult());}
+			void set(ManWaterfall^ source){Unmanaged->GetCallResult()=*(source->Unmanaged);}
 		}
 		/*!
 		\brief Saves the results to file

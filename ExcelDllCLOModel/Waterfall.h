@@ -84,38 +84,46 @@ public:
 	const TrancheCashFlow& GetTotalSeniorFees() const {return m_TotalSeniorFees;} 
 	const TrancheCashFlow& GetTotalJuniorFees() const {return m_TotalJuniorFees;} 
 	const ReinvestmentTest& GetReinvestmentTest() const {return m_ReinvestmentTest;}
+	MtgCashFlow& GetMortgagesPayments() {return m_MortgagesPayments;}
+	TrancheCashFlow& GetExcessCashFlow() {return m_ExcessCashFlow;} 
+	TrancheCashFlow& GetTotalSeniorExpenses() {return m_TotalSeniorExpenses;} 
+	TrancheCashFlow& GetTotalSeniorFees() {return m_TotalSeniorFees;} 
+	TrancheCashFlow& GetTotalJuniorFees() {return m_TotalJuniorFees;} 
 	ReinvestmentTest& GetReinvestmentTest() {return m_ReinvestmentTest;}
 	QString GetCCCcurve() const {return m_CCCcurve.GetVector();}
 	const TrancheCashFlow& GetRawAnnualizedExcess() const {return m_AnnualizedExcess;}
+	TrancheCashFlow& GetRawAnnualizedExcess(){return m_AnnualizedExcess;}
 	double GetAnnualizedExcess(int index, bool AsShareOfLoans=false)const;
 	double GetEquityReturn(int index)const;
 	double GetCumulativeEquityReturn(int index)const;
 	double GetCallEquityRatio(int index)const;
 	const QDate& GetFirstIPDdate() const {return m_FirstIPDdate;}
 	const TrancheCashFlow& GetReinvested() const {return m_Reinvested;} 
+	TrancheCashFlow& GetReinvested() {return m_Reinvested;} 
 	const QDate& GetLastIPDdate() const {return m_LastIPDdate;} 
 	const QDate& GetCallDate() const {return m_CallDate;}
 	QDate GetCalledPeriod() const;
 	QDate GetStructureMaturity() const;
 	const WatFalPrior* GetStep(int Index) const;
-#ifndef _DEBUG
-	const Tranche* GetTranche(int Index) const;
-#else 
-	Tranche* GetTranche(int Index) const;
-#endif
+	WatFalPrior* GetStep(int Index);
+	Tranche* GetTranche(const QString& TrancheName);
 	const Tranche* GetTranche(const QString& TrancheName) const;
+	Tranche* GetTranche(int Index);
+	const Tranche* GetTranche(int Index) const;
 	double GetWACostOfCapital(int index)const;
 	double GetCreditEnhancement(const QString& Tranchename,int TimeIndex=-1)const{return GetCreditEnhancement(FindTrancheIndex(Tranchename),TimeIndex);}
 	double GetCreditEnhancement(int TrancheIndex,int TimeIndex=-1)const;
 	int GetTranchesCount()const{return m_Tranches.size();}
 	int GetStepsCount()const{return m_WaterfallStesps.size();}
 	const MtgCashFlow& GetCalculatedMtgPayments() const {return m_CalculatedMtgPayments;}
+	MtgCashFlow& GetCalculatedMtgPayments() {return m_CalculatedMtgPayments;}
 	QString GetReserveFundTarget(int RFindex)const{if(RFindex<0 || RFindex>=NumReserves) return ""; return m_ReserveFundTarget[RFindex].GetVector();}
 	QString GetReserveFundMultiple(int RFindex)const{if(RFindex<0 || RFindex>=NumReserves) return ""; return m_ReserveFundMultiple[RFindex].GetVector();}
 	QString GetReserveFundFloor(int RFindex)const{if(RFindex<0 || RFindex>=NumReserves) return ""; return m_ReserveFundFloor[RFindex].GetVector();}
 	double GetReserveFundCurrent(int RFindex)const{if(RFindex<0 || RFindex>=NumReserves) return 0.0; return m_ReserveFundCurrent[RFindex];}
 	int GetReserveFundFreed(int RFindex)const{if(RFindex<0 || RFindex>=NumReserves) return -1; return m_ReserveFundFreed[RFindex];}
 	TrancheCashFlow GetReserveFundFlow(int RFindex)const{if(RFindex<0 || RFindex>=NumReserves) return TrancheCashFlow(); return m_ReserveFundFlows[RFindex];}
+	void SetReserveFundFlow(int RFindex, const TrancheCashFlow& source){if(RFindex<0 || RFindex>=NumReserves) return; m_ReserveFundFlows[RFindex]=source;}
 	bool GetReserveToInterest(int RFindex)const{if(RFindex<0 || RFindex>=NumReserves) return false; return m_ReserveToInterest[RFindex];}
 	bool GetCumulativeReserves() const {return m_CumulativeReserves;}
 	//////////////////////////////////////////////////////////////////////////

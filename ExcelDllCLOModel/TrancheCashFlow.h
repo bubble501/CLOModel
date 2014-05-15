@@ -40,6 +40,7 @@ public:
 	double GetDeferred(const QDate& a)const{return GetDeferred(FindDate(a));}
 	double GetTotalFlow(const QDate& a)const{return GetInterest(a)+GetPrincipal(a);}
 	double GetAmountOutstanding(const QDate& a)const{return GetAmountOutstanding(FindDate(a));}
+	double GetInitialOutstanding()const{return OutstandingAmt;}
 	void SetInitialOutstanding(double a){OutstandingAmt=a;}
 	void AddFlow(const QDate& Dte,double Amt, ThrancheFlowType FlwTpe);
 	void AddFlow(const TrancheCashFlow& a);

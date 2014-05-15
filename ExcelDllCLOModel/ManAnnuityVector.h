@@ -6,7 +6,7 @@ using namespace System;
 namespace ManagedCLO {
 	/*!
 	\brief Boolean scenario vector.
-	\details This class handles vectors that follow the Bloomberg conventions in SCEN <GO> but accepting 'Y' and 'N' as levels instead of numbers.<br/>Given the nature of the data, ramps are not allowed.
+	\details This class handles vectors that follow the Bloomberg conventions in SCEN \<GO\> but accepting 'Y' and 'N' as levels instead of numbers.<br/>Given the nature of the data, ramps are not allowed.
 	 */
 	public ref class ManAnnuityVector
 	{

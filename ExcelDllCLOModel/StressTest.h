@@ -47,6 +47,7 @@ public:
 	const QString& GetConstantPar()const{return ConstantPar;}
 	const QList<Mortgage*>& GetLoans()const{return Loans;}
 	const Mortgage* GetLoans(int index)const;
+	Mortgage* GetLoans(int index);
 	const Waterfall& GetStructure()const{return Structure;}
 	const QDate& GetStartDate()const{return StartDate;}
 	const QHash<QString,QHash<QString,Waterfall> > & GetResults() const{return Results;}

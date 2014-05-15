@@ -30,9 +30,13 @@ void CentralUnitAPI::SetSequentialComputation(bool a){
 	ParallWatFalls->SetSequentialComputation(a);
 	SequentialComputation=a;
 }
-const Mortgage* CentralUnitAPI::GetLoan(int index){
+const Mortgage* CentralUnitAPI::GetLoan(int index)const{
 	if(index<0 || index>=LoansCount()) return NULL;
 	return LoansCalculator.GetLoans().at(index);
+}
+Mortgage* CentralUnitAPI::GetLoan(int index){
+	if(index<0 || index>=LoansCount()) return NULL;
+	return LoansCalculator.GetLoans()[index];
 }
 void CentralUnitAPI::Calculate(){
 	char *argv[] = {"NoArgumnets"};

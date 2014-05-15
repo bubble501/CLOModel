@@ -126,11 +126,21 @@ namespace ManagedCLO {
 		}
 		/*!
 		\brief The cash flows toward the reserve fund
-		\arg index the index of the reserve fund. Currently 2 reserves are modeled so  index can be either 0 or 1 for, respectively, the first and second reserve
+		\arg index the index of the reserve fund. Currently 2 reserves are modeled so  index can be either 0 or 1 for, respectively, the first and second reserve. If index is out of range the function will return an empty cash flow.
 		\details This function will return the cash flows toward the replenishment of the reserve fund.<br/>The interest and principal flows will distinguish whether the reserve fund was replenished using interest or principal proceeds.<br/>Use ManTrancheCashFlow::GetTotalFlow to get the level of the reserve fund in a given period.<br/>Use ManTrancheCashFlow::GetDeferred to get the shortfall in the reserve fund compared to the target level for a given period.
 		\sa SetReserveFund
+		\sa SetReserveFundFlow
 		*/
 		ManTrancheCashFlow^ GetReserveFundFlow(int index){return gcnew ManTrancheCashFlow(Unmanaged->GetReserveFundFlow(index));}
+		/*!
+		\brief Overwrite the cash flows toward the reserve fund
+		\arg index the index of the reserve fund. Currently 2 reserves are modeled so  index can be either 0 or 1 for, respectively, the first and second reserve. If index is out of range the function will do nothing
+		\arg source The new cash flows that should replace the current ones
+		\details This function will overwrite the cash flows toward the reserve fund.<br/>The interest and principal flows will distinguish whether the reserve fund was replenished using interest or principal proceeds.
+		\sa SetReserveFund
+		\sa GetReserveFundFlow
+		*/
+		void SetReserveFundFlow(int index, ManTrancheCashFlow^ source){Unmanaged->SetReserveFundFlow(index,*(source->Unmanaged));}
 		/*!
 		\brief Whether the reserve will fund the interest or principal waterfall
 		\arg index the index of the reserve fund. Currently 2 reserves are modeled so  index can be either 0 or 1 for, respectively, the first and second reserve
@@ -271,6 +281,7 @@ namespace ManagedCLO {
 		*/
 		property ManMtgCashFlows^ MortgagesPayments{
 			ManMtgCashFlows^ get(){return gcnew ManMtgCashFlows(Unmanaged->GetMortgagesPayments());}
+			void set(ManMtgCashFlows^ source){Unmanaged->GetMortgagesPayments()=*(source->Unmanaged);}
 		}
 		/*! 
 		\brief The cash flows of the loans
@@ -279,6 +290,7 @@ namespace ManagedCLO {
 		*/
 		property ManMtgCashFlows^ CalculatedMtgPayments{
 			ManMtgCashFlows^ get(){return gcnew ManMtgCashFlows(Unmanaged->GetCalculatedMtgPayments());}
+			void set(ManMtgCashFlows^ source){Unmanaged->GetCalculatedMtgPayments()=*(source->Unmanaged);}
 		}
 		/*! 
 		\brief Cash flows to excess spread
@@ -286,36 +298,42 @@ namespace ManagedCLO {
 		*/
 		property ManTrancheCashFlow^ ExcessCashFlow{
 			ManTrancheCashFlow^ get() {return gcnew ManTrancheCashFlow(Unmanaged->GetExcessCashFlow());}
+			void set(ManTrancheCashFlow^ source){Unmanaged->GetExcessCashFlow()=*(source->Unmanaged);}
 		}
 		/*! 
 		\brief Cash flows toward satisfaction of senior expenses
 		*/
 		property ManTrancheCashFlow^ TotalSeniorExpenses{
 			ManTrancheCashFlow^ get() {return gcnew ManTrancheCashFlow(Unmanaged->GetTotalSeniorExpenses());}
+			void set(ManTrancheCashFlow^ source){Unmanaged->GetTotalSeniorExpenses()=*(source->Unmanaged);}
 		}
 		/*! 
 		\brief Cash flows toward satisfaction of senior fees
 		*/
 		property ManTrancheCashFlow^ TotalSeniorFees{
 			ManTrancheCashFlow^ get() {return gcnew ManTrancheCashFlow(Unmanaged->GetTotalSeniorFees());}
+			void set(ManTrancheCashFlow^ source){Unmanaged->GetTotalSeniorFees()=*(source->Unmanaged);}
 		}
 		/*! 
 		\brief Cash flows toward satisfaction of junior fees
 		*/
 		property ManTrancheCashFlow^ TotalJuniorFees{
 			ManTrancheCashFlow^ get() {return gcnew ManTrancheCashFlow(Unmanaged->GetTotalJuniorFees());}
+			void set(ManTrancheCashFlow^ source){Unmanaged->GetTotalJuniorFees()=*(source->Unmanaged);}
 		}
 		/*! 
 		\brief Cash flows toward junior fees and excess spread
 		*/
 		property ManTrancheCashFlow^ RawAnnualizedExcess{
 			ManTrancheCashFlow^ get() {return gcnew ManTrancheCashFlow(Unmanaged->GetRawAnnualizedExcess());}
+			void set(ManTrancheCashFlow^ source){Unmanaged->GetRawAnnualizedExcess()=*(source->Unmanaged);}
 		}
 		/*! 
 		\brief Cash flows toward reinvestments
 		*/
 		property ManTrancheCashFlow^ Reinvested{
 			ManTrancheCashFlow^ get() {return gcnew ManTrancheCashFlow(Unmanaged->GetReinvested());}
+			void set(ManTrancheCashFlow^ source){Unmanaged->GetReinvested()=*(source->Unmanaged);}
 		}
 		/*! 
 		\brief Vector representing the share of CCC assets in the pool
@@ -572,12 +590,21 @@ namespace ManagedCLO {
 		}
 		/*! 
 		\brief Returns the Index-th step in the waterfall
-		\arg Index The index of the step of the waterfall (first is 0). If invalid an  is returned
+		\arg Index The index of the step of the waterfall (first is 0). If invalid a null pointer is returned
 		*/
 		ManWatFalPrior^ GetStep(int Index){
 			const WatFalPrior* Temp=Unmanaged->GetStep(Index);
-			if(Temp) return gcnew ManWatFalPrior(Temp);
+			if(Temp) return gcnew ManWatFalPrior(*Temp);
 			return nullptr;
+		}
+		/*! 
+		\brief Overwrites a step in the waterfall
+		\arg Index The index of the step of the waterfall (first is 0). If out of range the function will do nothing.
+		\arg source The step that will overwrite the current one.
+		*/
+		void SetStep(int Index,ManWatFalPrior^ source){
+			WatFalPrior* Temp=Unmanaged->GetStep(Index);
+			if(Temp) (*Temp)=*(source->Unmanaged);
 		}
 		/*! 
 		\brief Adds a step to the waterfall
@@ -601,7 +628,7 @@ namespace ManagedCLO {
 			return nullptr;
 		}
 		/*! 
-		\brief Returns the tranche at the specified index 
+		\brief Returns the tranche with the specified name or ISIN
 		\arg TrancheName The ticker (*without* yellow key) of the tranche or its ISIN. If invalid NULL is returned
 		*/
 		ManTranche^ GetTranche(String^ TrancheName){
@@ -609,8 +636,24 @@ namespace ManagedCLO {
 			if(Temp) return gcnew ManTranche(*Temp);
 			return nullptr;
 		}
-	
-
+		/*! 
+		\brief Overwrites the tranche at the specified index
+		\arg Index the index of the tranche (first is 0). If index is out of range the function will do nothing.
+		\arg source The tranche that will overwrite the current one
+		*/
+		void SetTranche(int Index,ManTranche^ source){
+			Tranche* Temp=Unmanaged->GetTranche(Index);
+			if(Temp) (*Temp)=*(source->Unmanaged);
+		}
+		/*! 
+		\brief Overwrites the tranche with the specified name or ISIN
+		\arg Index the index of the tranche (first is 0). If index is out of range the function will do nothing.
+		\arg source The tranche that will overwrite the current one
+		*/
+		void SetTranche(String^ TrancheName,ManTranche^ source){
+			Tranche* Temp=Unmanaged->GetTranche(String2QString(TrancheName));
+			if(Temp) (*Temp)=*(source->Unmanaged);
+		}
 		/*! 
 		\brief Add a tranche to the structure
 		\arg a Tranche to add

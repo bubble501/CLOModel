@@ -24,6 +24,7 @@ public:
 	QString GetCLR() const {return LSass.GetVector();}
 	const QDate& GetStartDate()const {return StartDate;}
 	const QList<Mortgage*>& GetLoans() const {return Loans;}
+	QList<Mortgage*>& GetLoans() {return Loans;}
 	const MtgCashFlow& GetResult()const{return Result;}
 	void Reset();
 	QString ReadyToCalculate()const;

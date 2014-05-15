@@ -257,7 +257,7 @@ namespace ManagedCLO {
 		*/
 		property ManTrancheCashFlow^ CashFlow{
 			ManTrancheCashFlow^ get(){return gcnew ManTrancheCashFlow(Unmanaged->GetCashFlow());}
-			//void set(ManTrancheCashFlow^ a){Unmanaged->SetCashFlow(*(a->Unmanaged));}
+			void set(ManTrancheCashFlow^ a){Unmanaged->SetCashFlow(*(a->Unmanaged));}
 		}
 		/*!
 		\brief The OC test trigger for the tranche

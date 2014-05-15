@@ -128,6 +128,7 @@ namespace ManagedCLO {
 		*/
 		property ManMtgCashFlows^ CashFlow{
 			 ManMtgCashFlows^ get(){return gcnew ManMtgCashFlows(Unmanaged->GetCashFlow());}
+			 void set(ManMtgCashFlows^ source){Unmanaged->GetCashFlow()=*(source->Unmanaged);}
 		}
 		/*!
 		\brief Vector defining if a loan is annuity or interest only

@@ -9,16 +9,24 @@ const WatFalPrior* Waterfall::GetStep(int Index)const {
 	if(Index<0 || Index>=m_WaterfallStesps.size()) return NULL;
 	return m_WaterfallStesps.at(Index);
 }
+WatFalPrior* Waterfall::GetStep(int Index){
+	if(Index<0 || Index>=m_WaterfallStesps.size()) return NULL;
+	return m_WaterfallStesps[Index];
+}
 void Waterfall::SetCCCcurve(const QString& a){m_CCCcurve=a;}
-#ifdef _DEBUG
-Tranche* Waterfall::GetTranche(int Index) const{
-#else
+
 const Tranche* Waterfall::GetTranche(int Index) const{
-#endif
 	if(Index<0 || Index>=m_Tranches.size()) return NULL;
 	return m_Tranches.at(Index);
 }
+Tranche* Waterfall::GetTranche(int Index){
+	if(Index<0 || Index>=m_Tranches.size()) return NULL;
+	return m_Tranches[Index];
+}
 const Tranche* Waterfall::GetTranche(const QString& TrancheName) const{
+	return GetTranche(FindTrancheIndex(TrancheName));
+}
+Tranche* Waterfall::GetTranche(const QString& TrancheName){
 	return GetTranche(FindTrancheIndex(TrancheName));
 }
 void Waterfall::SortByProRataGroup(){

@@ -512,7 +512,10 @@
       <AdditionalDependencies>qtmain.lib;QtCore4.lib;QtGui4.lib;blpapi3_32.lib;zdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>sn.exe -R "$(SolutionDir)$(Platform)\$(Configuration)\$(ProjectName).dll" "$(ProjectDir)StrongNameKey.snk"</Command>
+      <Command>sn.exe -R "$(SolutionDir)$(Platform)\$(Configuration)\$(ProjectName).dll" "$(ProjectDir)StrongNameKey.snk"
+if exist "$(ProjectDir)StrongNameKey.snk" (
+del "$(ProjectDir)StrongNameKey.snk"
+)</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Re-Sign Assembly</Message>

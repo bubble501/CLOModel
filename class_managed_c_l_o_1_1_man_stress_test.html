@@ -168,6 +168,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aef4c1bca99223c4b525f333e2d36f291"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_stress_test.html#aef4c1bca99223c4b525f333e2d36f291">SaveResults</a> (String^ DestPath)</td></tr>
 <tr class="memdesc:aef4c1bca99223c4b525f333e2d36f291"><td class="mdescLeft">&#160;</td><td class="mdescRight">Saves the stress results.  <a href="#aef4c1bca99223c4b525f333e2d36f291">More...</a><br/></td></tr>
 <tr class="separator:aef4c1bca99223c4b525f333e2d36f291"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac143edd04c725ff3d57b603694218e47"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_stress_test.html#ac143edd04c725ff3d57b603694218e47">SetLoan</a> (int index, <a class="el" href="class_managed_c_l_o_1_1_man_mortgage.html">ManMortgage</a>^ source)</td></tr>
+<tr class="memdesc:ac143edd04c725ff3d57b603694218e47"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overwrites a loan in the pool.  <a href="#ac143edd04c725ff3d57b603694218e47">More...</a><br/></td></tr>
+<tr class="separator:ac143edd04c725ff3d57b603694218e47"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -764,6 +767,48 @@ The fcsr format is a compressed file containing the different scenarios and a fi
 
 </div>
 </div>
+<a class="anchor" id="ac143edd04c725ff3d57b603694218e47"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ManagedCLO::ManStressTest::SetLoan </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="class_managed_c_l_o_1_1_man_mortgage.html">ManMortgage</a>^&#160;</td>
+          <td class="paramname"><em>source</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overwrites a loan in the pool. </p>
+<ul>
+<li>index The index of the loan to overwrite (the first loan has index 0). </li>
+<li>source The loan that will overwrite the current one</li>
+</ul>
+<p>This function will overwrite the loan at the specified index in the pool.<br/>
+If the index is out of range the function will do nothing. </p>
+
+</div>
+</div>
 <h2 class="groupheader">Property Documentation</h2>
 <a class="anchor" id="ae2ebe7a62b02d7c3cc50d51abdfac99c"></a>
 <div class="memitem">
@@ -1037,7 +1082,7 @@ By default it is set to ChangingLS </p>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon May 12 2014 20:58:10 for CLO Model by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu May 15 2014 11:59:02 for CLO Model by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>

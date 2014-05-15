@@ -178,7 +178,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a7806dc2ff63e4e2a1f06fe97ca84123c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the tranche at the specified index.  <a href="#a7806dc2ff63e4e2a1f06fe97ca84123c">More...</a><br/></td></tr>
 <tr class="separator:a7806dc2ff63e4e2a1f06fe97ca84123c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7b3d2e230755ebd236da9edf58f5f74e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html">ManTranche</a>^&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a7b3d2e230755ebd236da9edf58f5f74e">GetTranche</a> (String^ TrancheName)</td></tr>
-<tr class="memdesc:a7b3d2e230755ebd236da9edf58f5f74e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the tranche at the specified index.  <a href="#a7b3d2e230755ebd236da9edf58f5f74e">More...</a><br/></td></tr>
+<tr class="memdesc:a7b3d2e230755ebd236da9edf58f5f74e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the tranche with the specified name or ISIN.  <a href="#a7b3d2e230755ebd236da9edf58f5f74e">More...</a><br/></td></tr>
 <tr class="separator:a7b3d2e230755ebd236da9edf58f5f74e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1fa4536023d200b74208abc1271fd83d"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a1fa4536023d200b74208abc1271fd83d">GetWACostOfCapital</a> (int index)</td></tr>
 <tr class="memdesc:a1fa4536023d200b74208abc1271fd83d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the weighted average cost of capital of the deal.  <a href="#a1fa4536023d200b74208abc1271fd83d">More...</a><br/></td></tr>
@@ -201,6 +201,18 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a6d2439d4c32316d47c2bc8524d8738e2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a6d2439d4c32316d47c2bc8524d8738e2">SetReserveFund</a> (int RFindex, String^ RFtarget, String^ RFmultiple, String^ RFfloor, double RFcurrent, int RFfreed, bool RFtoInterest)</td></tr>
 <tr class="memdesc:a6d2439d4c32316d47c2bc8524d8738e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up a reserve fund.  <a href="#a6d2439d4c32316d47c2bc8524d8738e2">More...</a><br/></td></tr>
 <tr class="separator:a6d2439d4c32316d47c2bc8524d8738e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a84c24f37b238c4722a2ab7c3b838580e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a84c24f37b238c4722a2ab7c3b838580e">SetReserveFundFlow</a> (int index, <a class="el" href="class_managed_c_l_o_1_1_man_tranche_cash_flow.html">ManTrancheCashFlow</a>^ source)</td></tr>
+<tr class="memdesc:a84c24f37b238c4722a2ab7c3b838580e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overwrite the cash flows toward the reserve fund.  <a href="#a84c24f37b238c4722a2ab7c3b838580e">More...</a><br/></td></tr>
+<tr class="separator:a84c24f37b238c4722a2ab7c3b838580e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5cdae435c425d5441e8029357e75051"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#ad5cdae435c425d5441e8029357e75051">SetStep</a> (int Index, <a class="el" href="class_managed_c_l_o_1_1_man_wat_fal_prior.html">ManWatFalPrior</a>^ source)</td></tr>
+<tr class="memdesc:ad5cdae435c425d5441e8029357e75051"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overwrites a step in the waterfall.  <a href="#ad5cdae435c425d5441e8029357e75051">More...</a><br/></td></tr>
+<tr class="separator:ad5cdae435c425d5441e8029357e75051"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6ce77bfb72a337f7b97c8e4f6b14c2bc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a6ce77bfb72a337f7b97c8e4f6b14c2bc">SetTranche</a> (int Index, <a class="el" href="class_managed_c_l_o_1_1_man_tranche.html">ManTranche</a>^ source)</td></tr>
+<tr class="memdesc:a6ce77bfb72a337f7b97c8e4f6b14c2bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overwrites the tranche at the specified index.  <a href="#a6ce77bfb72a337f7b97c8e4f6b14c2bc">More...</a><br/></td></tr>
+<tr class="separator:a6ce77bfb72a337f7b97c8e4f6b14c2bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac9a92adb9f7d0adb67a5b4ef869f4bf1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#ac9a92adb9f7d0adb67a5b4ef869f4bf1">SetTranche</a> (String^ TrancheName, <a class="el" href="class_managed_c_l_o_1_1_man_tranche.html">ManTranche</a>^ source)</td></tr>
+<tr class="memdesc:ac9a92adb9f7d0adb67a5b4ef869f4bf1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overwrites the tranche with the specified name or ISIN.  <a href="#ac9a92adb9f7d0adb67a5b4ef869f4bf1">More...</a><br/></td></tr>
+<tr class="separator:ac9a92adb9f7d0adb67a5b4ef869f4bf1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6a6b1f1b87075a8014872294d5dff36a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a6a6b1f1b87075a8014872294d5dff36a">SetupReinvBond</a> (String^ IntrVec, String^ CPRVec, String^ CDRVec, String^ LSVec, String^ WALval, int PayFreq, String^ AnnuityVec, double FloatingBase)</td></tr>
 <tr class="memdesc:a6a6b1f1b87075a8014872294d5dff36a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define the characteristics of the bond bought using the reinvestment funds.  <a href="#a6a6b1f1b87075a8014872294d5dff36a">More...</a><br/></td></tr>
 <tr class="separator:a6a6b1f1b87075a8014872294d5dff36a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -213,7 +225,7 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="properties"></a>
 Properties</h2></td></tr>
-<tr class="memitem:a09da963cf3d3a563e83ade393e962c4d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_managed_c_l_o_1_1_man_mtg_cash_flows.html">ManMtgCashFlows</a>^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a09da963cf3d3a563e83ade393e962c4d">CalculatedMtgPayments</a><code> [get]</code></td></tr>
+<tr class="memitem:a09da963cf3d3a563e83ade393e962c4d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_managed_c_l_o_1_1_man_mtg_cash_flows.html">ManMtgCashFlows</a>^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a09da963cf3d3a563e83ade393e962c4d">CalculatedMtgPayments</a><code> [get, set]</code></td></tr>
 <tr class="memdesc:a09da963cf3d3a563e83ade393e962c4d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The cash flows of the loans.  <a href="#a09da963cf3d3a563e83ade393e962c4d">More...</a><br/></td></tr>
 <tr class="separator:a09da963cf3d3a563e83ade393e962c4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a403af81086b0f1e1eb489e43f83d60a5"><td class="memItemLeft" align="right" valign="top">DateTime&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a403af81086b0f1e1eb489e43f83d60a5">CallDate</a><code> [get, set]</code></td></tr>
@@ -240,7 +252,7 @@ Properties</h2></td></tr>
 <tr class="memitem:ab61114874615e4e916d21904872065c9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#ab61114874615e4e916d21904872065c9">CumulativeReserves</a><code> [get, set]</code></td></tr>
 <tr class="memdesc:ab61114874615e4e916d21904872065c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether the reserve funds should be considered stacked.  <a href="#ab61114874615e4e916d21904872065c9">More...</a><br/></td></tr>
 <tr class="separator:ab61114874615e4e916d21904872065c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a948465cfe7b4551bb419ef7986531740"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_managed_c_l_o_1_1_man_tranche_cash_flow.html">ManTrancheCashFlow</a>^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a948465cfe7b4551bb419ef7986531740">ExcessCashFlow</a><code> [get]</code></td></tr>
+<tr class="memitem:a948465cfe7b4551bb419ef7986531740"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_managed_c_l_o_1_1_man_tranche_cash_flow.html">ManTrancheCashFlow</a>^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a948465cfe7b4551bb419ef7986531740">ExcessCashFlow</a><code> [get, set]</code></td></tr>
 <tr class="memdesc:a948465cfe7b4551bb419ef7986531740"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cash flows to excess spread.  <a href="#a948465cfe7b4551bb419ef7986531740">More...</a><br/></td></tr>
 <tr class="separator:a948465cfe7b4551bb419ef7986531740"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a547f9e7894dd0cbfdd84777a0547b351"><td class="memItemLeft" align="right" valign="top">DateTime&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a547f9e7894dd0cbfdd84777a0547b351">FirstIPDdate</a><code> [get, set]</code></td></tr>
@@ -258,7 +270,7 @@ Properties</h2></td></tr>
 <tr class="memitem:a4104a3f0d93e98f8b7e920d43044c82e"><td class="memItemLeft" align="right" valign="top">DateTime&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a4104a3f0d93e98f8b7e920d43044c82e">LastIPDdate</a><code> [get, set]</code></td></tr>
 <tr class="memdesc:a4104a3f0d93e98f8b7e920d43044c82e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Latest IPD.  <a href="#a4104a3f0d93e98f8b7e920d43044c82e">More...</a><br/></td></tr>
 <tr class="separator:a4104a3f0d93e98f8b7e920d43044c82e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1bbbb27794f9f170c9c80753ddb9ceab"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_managed_c_l_o_1_1_man_mtg_cash_flows.html">ManMtgCashFlows</a>^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a1bbbb27794f9f170c9c80753ddb9ceab">MortgagesPayments</a><code> [get]</code></td></tr>
+<tr class="memitem:a1bbbb27794f9f170c9c80753ddb9ceab"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_managed_c_l_o_1_1_man_mtg_cash_flows.html">ManMtgCashFlows</a>^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a1bbbb27794f9f170c9c80753ddb9ceab">MortgagesPayments</a><code> [get, set]</code></td></tr>
 <tr class="memdesc:a1bbbb27794f9f170c9c80753ddb9ceab"><td class="mdescLeft">&#160;</td><td class="mdescRight">The cash flows of the loans.  <a href="#a1bbbb27794f9f170c9c80753ddb9ceab">More...</a><br/></td></tr>
 <tr class="separator:a1bbbb27794f9f170c9c80753ddb9ceab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a214b8925e173f7bd99871d9122e83151"><td class="memItemLeft" align="right" valign="top">String^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a214b8925e173f7bd99871d9122e83151">PaymentFrequency</a><code> [get, set]</code></td></tr>
@@ -270,13 +282,13 @@ Properties</h2></td></tr>
 <tr class="memitem:a5a0c4c886bddff94013cb536e4da8476"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a5a0c4c886bddff94013cb536e4da8476">PrincipalAvailable</a><code> [get, set]</code></td></tr>
 <tr class="memdesc:a5a0c4c886bddff94013cb536e4da8476"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cash in the principal collection account.  <a href="#a5a0c4c886bddff94013cb536e4da8476">More...</a><br/></td></tr>
 <tr class="separator:a5a0c4c886bddff94013cb536e4da8476"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a505ef76cabc65f813471b2d7ed0398dc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_managed_c_l_o_1_1_man_tranche_cash_flow.html">ManTrancheCashFlow</a>^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a505ef76cabc65f813471b2d7ed0398dc">RawAnnualizedExcess</a><code> [get]</code></td></tr>
+<tr class="memitem:a505ef76cabc65f813471b2d7ed0398dc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_managed_c_l_o_1_1_man_tranche_cash_flow.html">ManTrancheCashFlow</a>^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a505ef76cabc65f813471b2d7ed0398dc">RawAnnualizedExcess</a><code> [get, set]</code></td></tr>
 <tr class="memdesc:a505ef76cabc65f813471b2d7ed0398dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cash flows toward junior fees and excess spread.  <a href="#a505ef76cabc65f813471b2d7ed0398dc">More...</a><br/></td></tr>
 <tr class="separator:a505ef76cabc65f813471b2d7ed0398dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac8cb51afa355e3bc41c6876a479d1439"><td class="memItemLeft" align="right" valign="top">String^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#ac8cb51afa355e3bc41c6876a479d1439">ReadyToCalculate</a><code> [get]</code></td></tr>
 <tr class="memdesc:ac8cb51afa355e3bc41c6876a479d1439"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determines if all the parameters needed for the cash flow calculation are correct.  <a href="#ac8cb51afa355e3bc41c6876a479d1439">More...</a><br/></td></tr>
 <tr class="separator:ac8cb51afa355e3bc41c6876a479d1439"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad86d8041b34192055db26b1a66ab4f7f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_managed_c_l_o_1_1_man_tranche_cash_flow.html">ManTrancheCashFlow</a>^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#ad86d8041b34192055db26b1a66ab4f7f">Reinvested</a><code> [get]</code></td></tr>
+<tr class="memitem:ad86d8041b34192055db26b1a66ab4f7f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_managed_c_l_o_1_1_man_tranche_cash_flow.html">ManTrancheCashFlow</a>^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#ad86d8041b34192055db26b1a66ab4f7f">Reinvested</a><code> [get, set]</code></td></tr>
 <tr class="memdesc:ad86d8041b34192055db26b1a66ab4f7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cash flows toward reinvestments.  <a href="#ad86d8041b34192055db26b1a66ab4f7f">More...</a><br/></td></tr>
 <tr class="separator:ad86d8041b34192055db26b1a66ab4f7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad8791f71563f3cb5f5efc709428479f6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_managed_c_l_o_1_1_man_reinvestment_test.html">ManReinvestmentTest</a>^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#ad8791f71563f3cb5f5efc709428479f6">reinvestmentTest</a><code> [get]</code></td></tr>
@@ -294,13 +306,13 @@ Properties</h2></td></tr>
 <tr class="memitem:a011aad5e4178667f33eb9241956d9485"><td class="memItemLeft" align="right" valign="top">DateTime&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a011aad5e4178667f33eb9241956d9485">StructureMaturity</a><code> [get]</code></td></tr>
 <tr class="memdesc:a011aad5e4178667f33eb9241956d9485"><td class="mdescLeft">&#160;</td><td class="mdescRight">Estimated maturity of the deal.  <a href="#a011aad5e4178667f33eb9241956d9485">More...</a><br/></td></tr>
 <tr class="separator:a011aad5e4178667f33eb9241956d9485"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af1f3c77d0a4f36f431aa3bbce7875637"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_managed_c_l_o_1_1_man_tranche_cash_flow.html">ManTrancheCashFlow</a>^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#af1f3c77d0a4f36f431aa3bbce7875637">TotalJuniorFees</a><code> [get]</code></td></tr>
+<tr class="memitem:af1f3c77d0a4f36f431aa3bbce7875637"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_managed_c_l_o_1_1_man_tranche_cash_flow.html">ManTrancheCashFlow</a>^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#af1f3c77d0a4f36f431aa3bbce7875637">TotalJuniorFees</a><code> [get, set]</code></td></tr>
 <tr class="memdesc:af1f3c77d0a4f36f431aa3bbce7875637"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cash flows toward satisfaction of junior fees.  <a href="#af1f3c77d0a4f36f431aa3bbce7875637">More...</a><br/></td></tr>
 <tr class="separator:af1f3c77d0a4f36f431aa3bbce7875637"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8a930ef52382744295a8ee529a35b9d1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_managed_c_l_o_1_1_man_tranche_cash_flow.html">ManTrancheCashFlow</a>^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a8a930ef52382744295a8ee529a35b9d1">TotalSeniorExpenses</a><code> [get]</code></td></tr>
+<tr class="memitem:a8a930ef52382744295a8ee529a35b9d1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_managed_c_l_o_1_1_man_tranche_cash_flow.html">ManTrancheCashFlow</a>^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a8a930ef52382744295a8ee529a35b9d1">TotalSeniorExpenses</a><code> [get, set]</code></td></tr>
 <tr class="memdesc:a8a930ef52382744295a8ee529a35b9d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cash flows toward satisfaction of senior expenses.  <a href="#a8a930ef52382744295a8ee529a35b9d1">More...</a><br/></td></tr>
 <tr class="separator:a8a930ef52382744295a8ee529a35b9d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af19515135584aad3d2f7f8dd9562174a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_managed_c_l_o_1_1_man_tranche_cash_flow.html">ManTrancheCashFlow</a>^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#af19515135584aad3d2f7f8dd9562174a">TotalSeniorFees</a><code> [get]</code></td></tr>
+<tr class="memitem:af19515135584aad3d2f7f8dd9562174a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_managed_c_l_o_1_1_man_tranche_cash_flow.html">ManTrancheCashFlow</a>^ &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#af19515135584aad3d2f7f8dd9562174a">TotalSeniorFees</a><code> [get, set]</code></td></tr>
 <tr class="memdesc:af19515135584aad3d2f7f8dd9562174a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cash flows toward satisfaction of senior fees.  <a href="#af19515135584aad3d2f7f8dd9562174a">More...</a><br/></td></tr>
 <tr class="separator:af19515135584aad3d2f7f8dd9562174a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7f155bfe937843888688756b6159de56"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a7f155bfe937843888688756b6159de56">TranchesCount</a><code> [get]</code></td></tr>
@@ -821,13 +833,15 @@ According to the version you load the results will change according to the follo
 
 <p>The cash flows toward the reserve fund. </p>
 <ul>
-<li>index the index of the reserve fund. Currently 2 reserves are modeled so index can be either 0 or 1 for, respectively, the first and second reserve</li>
+<li>index the index of the reserve fund. Currently 2 reserves are modeled so index can be either 0 or 1 for, respectively, the first and second reserve. If index is out of range the function will return an empty cash flow.</li>
 </ul>
 <p>This function will return the cash flows toward the replenishment of the reserve fund.<br/>
 The interest and principal flows will distinguish whether the reserve fund was replenished using interest or principal proceeds.<br/>
 Use <a class="el" href="class_managed_c_l_o_1_1_man_tranche_cash_flow.html#a5c5691a7911ed8d4e949e1110fcda981" title="Gets the total cash flow. ">ManTrancheCashFlow::GetTotalFlow</a> to get the level of the reserve fund in a given period.<br/>
 Use <a class="el" href="class_managed_c_l_o_1_1_man_tranche_cash_flow.html#a9821f26b6d08ee6844304227aa45d31d" title="Gets the cumulative deferred interest of the tranche. ">ManTrancheCashFlow::GetDeferred</a> to get the shortfall in the reserve fund compared to the target level for a given period. </p>
-<dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a6d2439d4c32316d47c2bc8524d8738e2" title="Set up a reserve fund. ">SetReserveFund</a> </dd></dl>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a6d2439d4c32316d47c2bc8524d8738e2" title="Set up a reserve fund. ">SetReserveFund</a> </dd>
+<dd>
+<a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a84c24f37b238c4722a2ab7c3b838580e" title="Overwrite the cash flows toward the reserve fund. ">SetReserveFundFlow</a> </dd></dl>
 
 </div>
 </div>
@@ -981,7 +995,7 @@ A value of 0 means that the reserve will be release only at maturity. </p>
 
 <p>Returns the Index-th step in the waterfall. </p>
 <ul>
-<li>Index The index of the step of the waterfall (first is 0). If invalid an is returned </li>
+<li>Index The index of the step of the waterfall (first is 0). If invalid a null pointer is returned </li>
 </ul>
 
 </div>
@@ -1037,7 +1051,7 @@ A value of 0 means that the reserve will be release only at maturity. </p>
 </table>
 </div><div class="memdoc">
 
-<p>Returns the tranche at the specified index. </p>
+<p>Returns the tranche with the specified name or ISIN. </p>
 <ul>
 <li>TrancheName The ticker (<em>without</em> yellow key) of the tranche or its ISIN. If invalid NULL is returned </li>
 </ul>
@@ -1286,6 +1300,171 @@ In any case, the target won't be set below the RFfloor amount. </p>
 
 </div>
 </div>
+<a class="anchor" id="a84c24f37b238c4722a2ab7c3b838580e"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ManagedCLO::ManWaterfall::SetReserveFundFlow </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="class_managed_c_l_o_1_1_man_tranche_cash_flow.html">ManTrancheCashFlow</a>^&#160;</td>
+          <td class="paramname"><em>source</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overwrite the cash flows toward the reserve fund. </p>
+<ul>
+<li>index the index of the reserve fund. Currently 2 reserves are modeled so index can be either 0 or 1 for, respectively, the first and second reserve. If index is out of range the function will do nothing </li>
+<li>source The new cash flows that should replace the current ones</li>
+</ul>
+<p>This function will overwrite the cash flows toward the reserve fund.<br/>
+The interest and principal flows will distinguish whether the reserve fund was replenished using interest or principal proceeds. </p>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a6d2439d4c32316d47c2bc8524d8738e2" title="Set up a reserve fund. ">SetReserveFund</a> </dd>
+<dd>
+<a class="el" href="class_managed_c_l_o_1_1_man_waterfall.html#a5f26bf024e05b6f9eefca5c6f20633dc" title="The cash flows toward the reserve fund. ">GetReserveFundFlow</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ad5cdae435c425d5441e8029357e75051"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ManagedCLO::ManWaterfall::SetStep </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>Index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="class_managed_c_l_o_1_1_man_wat_fal_prior.html">ManWatFalPrior</a>^&#160;</td>
+          <td class="paramname"><em>source</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overwrites a step in the waterfall. </p>
+<ul>
+<li>Index The index of the step of the waterfall (first is 0). If out of range the function will do nothing. </li>
+<li>source The step that will overwrite the current one. </li>
+</ul>
+
+</div>
+</div>
+<a class="anchor" id="a6ce77bfb72a337f7b97c8e4f6b14c2bc"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ManagedCLO::ManWaterfall::SetTranche </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>Index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html">ManTranche</a>^&#160;</td>
+          <td class="paramname"><em>source</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overwrites the tranche at the specified index. </p>
+<ul>
+<li>Index the index of the tranche (first is 0). If index is out of range the function will do nothing. </li>
+<li>source The tranche that will overwrite the current one </li>
+</ul>
+
+</div>
+</div>
+<a class="anchor" id="ac9a92adb9f7d0adb67a5b4ef869f4bf1"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ManagedCLO::ManWaterfall::SetTranche </td>
+          <td>(</td>
+          <td class="paramtype">String^&#160;</td>
+          <td class="paramname"><em>TrancheName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="class_managed_c_l_o_1_1_man_tranche.html">ManTranche</a>^&#160;</td>
+          <td class="paramname"><em>source</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overwrites the tranche with the specified name or ISIN. </p>
+<ul>
+<li>Index the index of the tranche (first is 0). If index is out of range the function will do nothing. </li>
+<li>source The tranche that will overwrite the current one </li>
+</ul>
+
+</div>
+</div>
 <a class="anchor" id="a6a6b1f1b87075a8014872294d5dff36a"></a>
 <div class="memitem">
 <div class="memproto">
@@ -1489,7 +1668,7 @@ N 24R Y<br/>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">get</span></span>  </td>
+<span class="mlabels"><span class="mlabel">get</span><span class="mlabel">set</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -1698,7 +1877,7 @@ The deal will be called when the residual outstanding of the notes does not exce
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">get</span></span>  </td>
+<span class="mlabels"><span class="mlabel">get</span><span class="mlabel">set</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -1832,7 +2011,7 @@ The deal will be called when the residual outstanding of the notes does not exce
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">get</span></span>  </td>
+<span class="mlabels"><span class="mlabel">get</span><span class="mlabel">set</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -1923,7 +2102,7 @@ The deal will be called when the residual outstanding of the notes does not exce
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">get</span></span>  </td>
+<span class="mlabels"><span class="mlabel">get</span><span class="mlabel">set</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -2020,7 +2199,7 @@ The deal will be called when the residual outstanding of the notes does not exce
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">get</span></span>  </td>
+<span class="mlabels"><span class="mlabel">get</span><span class="mlabel">set</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -2154,7 +2333,7 @@ The deal will be called when the residual outstanding of the notes does not exce
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">get</span></span>  </td>
+<span class="mlabels"><span class="mlabel">get</span><span class="mlabel">set</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -2176,7 +2355,7 @@ The deal will be called when the residual outstanding of the notes does not exce
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">get</span></span>  </td>
+<span class="mlabels"><span class="mlabel">get</span><span class="mlabel">set</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -2198,7 +2377,7 @@ The deal will be called when the residual outstanding of the notes does not exce
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">get</span></span>  </td>
+<span class="mlabels"><span class="mlabel">get</span><span class="mlabel">set</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -2281,7 +2460,7 @@ The deal will be called when the residual outstanding of the notes does not exce
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon May 12 2014 20:58:10 for CLO Model by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu May 15 2014 11:59:02 for CLO Model by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>

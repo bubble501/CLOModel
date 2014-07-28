@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="*" Name="CLO Model 2"  Language="1033" Version="1.7.7.0" Manufacturer="TwentyFour Asset Management" UpgradeCode="c91c11ba-bc0b-41af-880a-1c7c03e2727f">
+		<Package Id="*" InstallerVersion="405" Compressed="yes" InstallScope="perMachine" Platform="x86"/>
+		<Condition Message="You need to be an administrator to install this product.">
+		  Privileged
+		</Condition>
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+		<MediaTemplate EmbedCab="yes" />
+
+		<Property Id="FOUNDQT4CORE">
+			<DirectorySearch Id="CheckQtCore4Dir" Path="[System16Dir]" Depth="0">
+				<FileSearch Id="CheckQtCore" Name="QtCore4.dll" />
+			</DirectorySearch>
+		</Property>
+		<Property Id="FOUNDQT4GUI">
+			<DirectorySearch Id="CheckQtGui4Dir" Path="[System16Dir]" Depth="0">
+				<FileSearch Id="CheckQtGui" Name="QtGui4.dll" />
+			</DirectorySearch>
+		</Property>
+		<Property Id="FOUNDQT4SVG">
+			<DirectorySearch Id="CheckQtSvg4Dir" Path="[System16Dir]" Depth="0">
+				<FileSearch Id="CheckQtSvg" Name="QtSvg4.dll" />
+			</DirectorySearch>
+		</Property>
+		<Property Id="FOUNDBBGAPI">
+			<DirectorySearch Id="CheckBbgAPIDir" Path="[System16Dir]" Depth="0">
+				<FileSearch Id="CheckBbgAPI" Name="blpapi3_32.dll" />
+			</DirectorySearch>
+		</Property>
+		<Property Id="FOUNDKDCHART">
+			<DirectorySearch Id="CheckKDChartDir" Path="[System16Dir]" Depth="0">
+				<FileSearch Id="CheckKDChart" Name="kdchart2.dll" />
+			</DirectorySearch>
+		</Property>
+		<Property Id="FOUNDZLIB">
+			<DirectorySearch Id="CheckzlibDir" Path="[System16Dir]" Depth="0">
+				<FileSearch Id="Checkzlib" Name="zlib1.dll" />
+			</DirectorySearch>
+		</Property>
+		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+		<Property Id="ARPPRODUCTICON" Value="TwentyFourIcon.ico" />
+		<Feature Id="ModelSetup" Title="CLO Model 2.0 Setup" Level="1" Description="Installs the new components" ConfigurableDirectory="INSTALLFOLDER">
+			<ComponentGroupRef Id="RequiredLibraries" />
+			<ComponentGroupRef Id="RequiredPlugins" />
+			<ComponentGroupRef Id="FileAssociation" />
+			<ComponentRef Id='SetEnviromnment' />
+			<ComponentRef Id='INSTALLFOLDER'/>
+		</Feature>
+		<Feature Id='APImanual' Title='.Net API Manual' Level='5' Description='Installs the manual for the .Net API' ConfigurableDirectory='MANUALSDIR'>
+			<ComponentGroupRef Id="Manuals" />
+		</Feature>
+		<Feature Id='DelQt4Core' Title='Remove old Qt4 Core Library' Level='1' Display='hidden'>
+			<ComponentRef Id ='RemoveOldQtCore'/>
+			<Condition Level='1'>FOUNDQT4CORE</Condition>
+		</Feature>
+		<Feature Id='DelQt4Gui' Title='Remove old Qt4 Gui Library' Level='1' Display='hidden'>
+			<ComponentRef Id ='RemoveOldQtGui'/>
+			<Condition Level='1'>FOUNDQT4GUI</Condition>
+		</Feature>
+		<Feature Id='DelQt4Svg' Title='Remove old Qt4 Svg Library' Level='1' Display='hidden'>
+			<ComponentRef Id ='RemoveOldQtSvg'/>
+			<Condition Level='1'>FOUNDQT4SVG</Condition>
+		</Feature>
+		<Feature Id='DelBbg' Title='Remove old bloomberg Library' Level='1' Display='hidden'>
+			<ComponentRef Id ='RemoveOldBBG'/>
+			<Condition Level='1'>FOUNDBBGAPI</Condition>
+		</Feature>
+		<Feature Id='DelKdchart' Title='Remove old KD Chart Library' Level='1' Display='hidden'>
+			<ComponentRef Id ='RemoveOldKDChart'/>
+			<Condition Level='1'>FOUNDKDCHART</Condition>
+		</Feature>
+		<Feature Id='Delzlib' Title='Remove old zlib Library' Level='1' Display='hidden'>
+			<ComponentRef Id ='RemoveOldzlib'/>
+			<Condition Level='1'>FOUNDZLIB</Condition>
+		</Feature>
+		<Feature Id="VCRedist" Title="Visual C++ 12.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
+			<MergeRef Id="VCRedist"/>
+		</Feature>
+
+		<UIRef Id="WixUI_Mondo" />
+		<UIRef Id="WixUI_ErrorProgressText" />
+		<WixVariable Id="WixUILicenseRtf" Value="..\Documentation\License.rtf"/>
+		<Icon Id='TwentyFourIcon.ico' SourceFile='..\CLOModelV2\Resources\Logo.ico'/>
+	</Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="WindowsDir" Name="Windows">
+					<Directory Id="System16Dir" Name="system" />
+			</Directory>
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLFOLDER" Name="CLO Model 2.0">
+					<Directory Id="PLUGINSDIR" Name="platforms" />
+					<Directory Id="MANUALSDIR" Name="Manual" />
+				</Directory>
+			</Directory>
+		</Directory>
+		<DirectoryRef Id="TARGETDIR">
+			<Merge Id="VCRedist" SourceFile="C:\Program Files (x86)\Common Files\Merge Modules\Microsoft_VC120_CRT_x86.msm" DiskId="1" Language="0"/>
+		</DirectoryRef>
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="RequiredLibraries" Directory="INSTALLFOLDER">
+			<Component Id="QtCore" Guid="3AE3A96D-B75C-4729-BEDB-7462D29BF0D3">
+				<File Id="Qt5Core" Name="Qt5Core.dll" Source="C:\Qt5\5.3\msvc2013\bin\Qt5Core.dll" KeyPath="yes" />
+			</Component>
+			<Component Id="QtGui" Guid="E245E23F-66CE-42D6-9DC2-CA977FA6E93C">
+				<File Id="Qt5Gui" Name="Qt5Gui.dll" Source="C:\Qt5\5.3\msvc2013\bin\Qt5Gui.dll" KeyPath="yes" />
+			</Component>
+			<Component Id="QtWidgets" Guid="DB5F2E55-EEF3-48F0-BAFB-8202945A481B">
+				<File Id="Qt5Widgets" Name="Qt5Widgets.dll" Source="C:\Qt5\5.3\msvc2013\bin\Qt5Widgets.dll" KeyPath="yes" />
+			</Component>
+			<Component Id="QtSvg" Guid="E1B6F958-9979-44F3-94B0-7AC0AB3E2AF3">
+				<File Id="Qt5Svg" Name="Qt5Svg.dll" Source="C:\Qt5\5.3\msvc2013\bin\Qt5Svg.dll" KeyPath="yes" />
+			</Component>
+			<Component Id="QtSql" Guid="D53EC043-2887-464F-85A5-9B0ED3A23E3E">
+				<File Id="Qt5Sql" Name="Qt5Sql.dll" Source="C:\Qt5\5.3\msvc2013\bin\Qt5Sql.dll" KeyPath="yes" />
+			</Component>
+			<Component Id="QtPrintSupport" Guid="387A664F-73E8-423F-A8CF-5C491E1ACFAD">
+				<File Id="Qt5PrintSupport" Name="Qt5PrintSupport.dll" Source="C:\Qt5\5.3\msvc2013\bin\Qt5PrintSupport.dll" KeyPath="yes" />
+			</Component>
+			<Component Id="icudt" Guid="9E3B7C4F-BF32-4E80-9404-4716251AC8ED">
+				<File Id="icudt52" Name="icudt52.dll" Source="C:\Qt5\5.3\msvc2013\bin\icudt52.dll" KeyPath="yes" />
+			</Component>
+			<Component Id="icuin" Guid="26E9C49C-6E1A-4DA5-A717-B7C3C0C500EA">
+				<File Id="icuin52" Name="icuin52.dll" Source="C:\Qt5\5.3\msvc2013\bin\icuin52.dll" KeyPath="yes" />
+			</Component>
+			<Component Id="icuuc" Guid="CB2405C6-B6A6-4EE7-96CA-E72A011E1263">
+				<File Id="icuuc52" Name="icuuc52.dll" Source="C:\Qt5\5.3\msvc2013\bin\icuuc52.dll" KeyPath="yes" />
+			</Component>
+			<Component Id="libEGL" Guid="725196F9-811B-4031-9AF9-8268F1981017">
+				<File Id="libEGL" Name="libEGL.dll" Source="C:\Qt5\5.3\msvc2013\bin\libEGL.dll" KeyPath="yes" />
+			</Component>
+			<Component Id="libGLES" Guid="A67474DE-4AE3-4DC6-9461-115909466491">
+				<File Id="libGLES2" Name="libGLESv2.dll" Source="C:\Qt5\5.3\msvc2013\bin\libGLESv2.dll" KeyPath="yes" />
+			</Component>
+			<Component Id="KDChart" Guid="EB590C5E-102B-411C-BCFE-8DAB468B279E">
+				<File Id="KDChartLib" Name="kdchart2.dll" Source="C:\KDAB\KDChart-2.5.1\lib\kdchart2.dll" KeyPath="yes" />
+			</Component>
+			<Component Id="ZLib" Guid="D8D49DFE-5B0F-427F-932B-34FABC1B107F">
+				<File Id="ZlibLib" Name="zlib1.dll" Source="C:\Zlib\zlib1.dll" KeyPath="yes" />
+			</Component>
+			<Component Id="BloombergAPI" Guid="1D169B22-9620-49D9-A620-0C3FFB61C551">
+				<File Id="BloombergLib" Name="blpapi3_32.dll" Source="C:\blp\API\APIv3\C++API\v3.6.2.0\bin\blpapi3_32.dll" KeyPath="yes" />
+			</Component>
+		</ComponentGroup>
+		<ComponentGroup Id="RequiredPlugins" Directory="PLUGINSDIR">
+			<Component Id="QtWindows" Guid="1A642659-CEC0-487F-9E4A-173A3D6B2262">
+				<File Id="WindowsPlugin" Name="qwindows.dll" Source="C:\Qt5\5.3\msvc2013\plugins\platforms\qwindows.dll" KeyPath="yes" />
+			</Component>
+		</ComponentGroup>
+		<ComponentGroup Id="FileAssociation" Directory="INSTALLFOLDER">
+			<Component Id="BaseCases" Guid="92A982A3-368D-40EB-9D93-C91647879B8C">
+				<RegistryKey Id="BaseCasesKey" Root="HKCU" Key="SOFTWARE\Classes\.clo" ForceCreateOnInstall="yes">
+					<RegistryValue Type='string' Value='CLO.BaseCase' />
+				</RegistryKey>
+				<RegistryKey Id="BaseCasesKeyShell" Root="HKCU" Key="SOFTWARE\Classes\.clo\ShellNew" ForceCreateOnInstall="yes">
+					<RegistryValue Type='string' Name='NullFile' Value='' />
+				</RegistryKey>
+			</Component>
+			<Component Id="StressTests" Guid="28ADF31C-6E47-437D-8C5B-E4880D0B4599">
+				<RegistryKey Id="StressTestsKey" Root="HKCU" Key="SOFTWARE\Classes\.fcsr" ForceCreateOnInstall="yes">
+					<RegistryValue Type='string' Value='CLO.BaseCase' />
+				</RegistryKey>
+				<RegistryKey Id="StressTestsKeyShell" Root="HKCU" Key="SOFTWARE\Classes\.fcsr\ShellNew" ForceCreateOnInstall="yes">
+					<RegistryValue Type='string' Name='NullFile' Value='' />
+				</RegistryKey>
+			</Component>
+			<Component Id="ApplicationReg" Guid="2389C1EE-097D-4F4A-9D07-70863DFC5765">
+				<RegistryKey Id="ApplicationRegKey" Root="HKCU" Key="SOFTWARE\Classes\CLO.BaseCase" ForceCreateOnInstall="yes">
+					<RegistryValue Type='string' Value='CLO Viewer' />
+				</RegistryKey>
+				<RegistryKey Id="ApplicationRegIcon" Root="HKCU" Key="SOFTWARE\Classes\CLO.BaseCase\DefaultIcon" ForceCreateOnInstall="yes">
+					<RegistryValue Type='string' Value='"\\SYNSERVER2\Company Share\24AM\Analytics\CLO Model\LogoIcon.ico"' />
+				</RegistryKey>
+				<RegistryKey Id="ApplicationRegComand" Root="HKCU" Key="SOFTWARE\Classes\CLO.BaseCase\shell\Open\command" ForceCreateOnInstall="yes">
+					<RegistryValue Type='string' Value='"\\SYNSERVER2\Company Share\24AM\Analytics\CLO Model\CLO Viewer.exe" "%1"' />
+				</RegistryKey>
+			</Component>
+		</ComponentGroup>
+		<Component Id="SetEnviromnment" Guid="7281FFFC-D416-4047-8168-F1CCB80F7112" Directory="INSTALLFOLDER">
+			<CreateFolder />
+			<Environment Id="LibrariesPath" Action="set" Name="PATH" Permanent="no" Part="last" System="yes" Value="[INSTALLFOLDER]"/>
+			<Environment Id="PlatformsPath" Action="set" Name="QT_QPA_PLATFORM_PLUGIN_PATH" Permanent="no" Part="last" System="yes" Value="[PLUGINSDIR]"/>
+		</Component>
+		<Component Id="RemoveOldQtCore" Directory="System16Dir" Guid="5BEE9902-7DF2-4625-93BF-1FC951DE5B5A">
+			<RemoveFile Id="RemoveQtCore" Directory="System16Dir" Name="QtCore4.dll" On="install"/>
+		</Component>
+		<Component Id="RemoveOldQtGui" Directory="System16Dir" Guid="9A5BBA21-20EA-4E93-9164-4595B78222DC">
+			<RemoveFile Id="RemoveQtGui" Directory="System16Dir" Name="QtGui4.dll" On="install"/>
+		</Component>
+		<Component Id="RemoveOldQtSvg" Directory="System16Dir" Guid="8DB93B8B-EAAF-479A-AD07-465CED1A0797">
+			<RemoveFile Id="RemoveQtSvg" Directory="System16Dir" Name="QtSvg4.dll" On="install"/>
+		</Component>
+		<Component Id="RemoveOldBBG" Directory="System16Dir" Guid="B99C6AD2-01D8-4D17-94BE-F652E96D7511">
+			<RemoveFile Id="RemoveBBG" Directory="System16Dir" Name="blpapi3_32.dll" On="install"/>
+		</Component>
+		<Component Id="RemoveOldKDChart" Directory="System16Dir" Guid="0106B0C0-B49E-4A0D-9AD6-0076AA9BCF12">
+			<RemoveFile Id="RemoveKDChart" Directory="System16Dir" Name="kdchart2.dll" On="install"/>
+		</Component>
+		<Component Id="RemoveOldzlib" Directory="System16Dir" Guid="D22372A0-7F24-491D-B00A-A6BAE81DEF9B">
+			<RemoveFile Id="Removezlib" Directory="System16Dir" Name="zlib1.dll" On="install"/>
+		</Component>
+		<ComponentGroup Id="Manuals" Directory="MANUALSDIR">
+			<Component Id="PDFmanual" Guid="DF61D867-07CB-4F30-9322-47B8DFAB1C66">
+				<File Id="PDFmanualFile" Name="Manual.pdf" Source="..\Documentation\NETapi\latex\refman.pdf" KeyPath="yes"/>
+			</Component>
+		</ComponentGroup>
+		<Component Id="INSTALLFOLDER" Directory="INSTALLFOLDER" Guid="8EC4DE0C-8452-4D77-AD0F-4FF38395EC2C">
+			<RemoveFolder Id='INSTALLFOLDER' On='uninstall' />
+		</Component>
+	</Fragment>
+</Wix>

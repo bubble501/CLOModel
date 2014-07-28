@@ -1,12 +1,13 @@
 Attribute VB_Name = "Inputs"
 Option Explicit
-Declare Sub RunModel Lib "Z:\24AM\Analytics\CLO Model\ExcelDllCLOModel.dll" (ArrayData() As Variant)
+Declare Sub RunModel Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
 'Declare Sub RunModel Lib "Z:\24AM\Analytics\CLO Model\ExcelDllCLOModelLoanTape.dll" (ArrayData() As Variant) 'This will also save the loan pool file
-Declare Function CLODiscountMargin Lib "Z:\24AM\Analytics\CLO Model\ExcelDllCLOModel.dll" (ArrayData() As Variant) As Double
-Declare Function CLOWALife Lib "Z:\24AM\Analytics\CLO Model\ExcelDllCLOModel.dll" (ArrayData() As Variant) As Double
-Declare Sub StressTargetChanged Lib "Z:\24AM\Analytics\CLO Model\ExcelDllCLOModel.dll" (ArrayData() As Variant)
-Declare Sub InspectStress Lib "Z:\24AM\Analytics\CLO Model\ExcelDllCLOModel.dll" (ArrayData() As Variant)
-Declare Sub InspectWaterfall Lib "Z:\24AM\Analytics\CLO Model\ExcelDllCLOModel.dll" (ArrayData() As Variant)
+Declare Function CLODiscountMargin Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
+Declare Function CLOWALife Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
+Declare Function CLOReturnRate Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
+Declare Sub StressTargetChanged Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
+Declare Sub InspectStress Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
+Declare Sub InspectWaterfall Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
 Public Sub GetInputFromStructure( _
     MortgagesSheet As String, _
     InputsSheet As String, _
@@ -39,6 +40,9 @@ Public Sub GetInputFromStructure( _
     Dim SeniorExpensesCell As Range
     Dim SeniorFeesCell As Range
     Dim JuniorFeesCell As Range
+    Dim SeniorExpensesFixedCell As Range
+    Dim SeniorFeesFixedCell As Range
+    Dim JuniorFeesFixedCell As Range
     Dim UseTurboCell As Range
     Dim CCCcurveCell As Range
     Dim CCCvalueCell As Range
@@ -84,33 +88,60 @@ Public Sub GetInputFromStructure( _
     Dim FirstResTargCell As Range
     Dim FirstResMultCell As Range
     Dim FirstResFloorCell As Range
+    Dim FirstResCapCell As Range
     Dim FirstResCurrCell As Range
     Dim FirstResFreedCell As Range
     Dim FirstResDestinationCell As Range
     Dim SecondResTargCell As Range
     Dim SecondResMultCell As Range
     Dim SecondResFloorCell As Range
+    Dim SecondResCapCell As Range
     Dim SecondResCurrCell As Range
     Dim SecondResFreedCell As Range
     Dim SecondResDestinationCell As Range
     Dim UseCumulativeReservesCell As Range
+    Dim DealNameCell As Range
+    Dim ReinvestmentDelayCell As Range
+    Dim ReinvestmentPriceCell As Range
+    Dim UseFastStressCell As Range
+    Dim BaseIndexHead As Range
+    Dim ReinvRepayCell As Range
+    Dim RecovLagCell As Range
+    Dim DelinqCell As Range
+    Dim DelinqLagCell As Range
+    Dim CurrentDeferredCell As Range
     On Error Resume Next
     Set HaircutVecStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("HaircutVecHeader"), LookAt:=xlWhole, LookIn:=xlValues)
     Set IsinFldsStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("IsinFldsHeader"), LookAt:=xlWhole, LookIn:=xlValues)
     Set FirstResTargCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("FirstResTargCell"), LookAt:=xlWhole, LookIn:=xlValues)
     Set FirstResMultCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("FirstResMultCell"), LookAt:=xlWhole, LookIn:=xlValues)
     Set FirstResFloorCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("FirstResFloorCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set FirstResCapCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("FirstResCapCell"), LookAt:=xlWhole, LookIn:=xlValues)
     Set FirstResCurrCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("FirstResCurrCell"), LookAt:=xlWhole, LookIn:=xlValues)
     Set FirstResFreedCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("FirstResFreedCell"), LookAt:=xlWhole, LookIn:=xlValues)
     Set FirstResDestinationCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("FirstResDestinationCell"), LookAt:=xlWhole, LookIn:=xlValues)
     Set SecondResTargCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SecondResTargCell"), LookAt:=xlWhole, LookIn:=xlValues)
     Set SecondResMultCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SecondResMultCell"), LookAt:=xlWhole, LookIn:=xlValues)
     Set SecondResFloorCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SecondResFloorCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set SecondResCapCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SecondResCapCell"), LookAt:=xlWhole, LookIn:=xlValues)
     Set SecondResCurrCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SecondResCurrCell"), LookAt:=xlWhole, LookIn:=xlValues)
     Set SecondResFreedCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SecondResFreedCell"), LookAt:=xlWhole, LookIn:=xlValues)
     Set SecondResDestinationCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SecondResDestinationCell"), LookAt:=xlWhole, LookIn:=xlValues)
     Set UseCumulativeReservesCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("UseCumulativeReservesCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set ReinvestmentDelayCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("ReinvestmentDelayCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set ReinvestmentPriceCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("ReinvestmentPriceCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set DealNameCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("DealNameCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set UseFastStressCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("UseFastStressCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set SeniorExpensesFixedCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SeniorExpensesFieldFixed"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set SeniorFeesFixedCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SeniorFeesFieldFixed"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set JuniorFeesFixedCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("JuniorFeesFieldFixed"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set ReinvRepayCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("ReinvRepayCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set RecovLagCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("RecovLagCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set DelinqCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("DelinqCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set DelinqLagCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("DelinqLagCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set CurrentDeferredCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("CurrentDeferredCell"), LookAt:=xlWhole, LookIn:=xlValues)
     On Error GoTo 0
+    Set BaseIndexHead = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("BaseIndexHead"), LookAt:=xlWhole, LookIn:=xlValues)
     Set MaturityStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("MaturityHeader"), LookAt:=xlWhole, LookIn:=xlValues)
     Set CouponStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("CouponHeader"), LookAt:=xlWhole, LookIn:=xlValues)
     Set OutstandingStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("OutstandingHeader"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -180,7 +211,7 @@ Public Sub GetInputFromStructure( _
         tempReferenceRate = Application.WorksheetFunction.VLookup(InterestBaseCell.Offset(0, 1).Value, Range(BaseIndexesStart, BaseIndexesStart.End(xlDown).Offset(0, 1)), 2, False)
         If False Then
 ReferenceRateFromBBg:
-            tempReferenceRate = bdp24(UCase(InterestBaseCell.Offset(0, 1).Value) + " Index", "PX_LAST") / 100
+            'tempReferenceRate = bdp24(UCase(InterestBaseCell.Offset(0, 1).Value) + " Index", "PX_LAST") / 100
             Resume Next
         End If
     On Error GoTo 0
@@ -201,8 +232,9 @@ ReferenceRateFromBBg:
             Call AddInput(AllTheInputs, Format(MaturityStart.Offset(i, 0).Value, "yyyy-mm-dd"))
             Call AddInput(AllTheInputs, OutstandingStart.Offset(i, 0).Value)
             Call AddInput(AllTheInputs, CStr(CouponStart.Offset(i, 0).Value))
+            Call AddInput(AllTheInputs, CStr(BaseIndexHead.Offset(i, 0).Value))
             Call AddInput(AllTheInputs, CStr(AnnuityStart.Offset(i, 0).Value))
-            Call AddInput(AllTheInputs, CLng(FrequencyStart.Offset(i, 0).Value))
+            Call AddInput(AllTheInputs, CStr(FrequencyStart.Offset(i, 0).Value))
             Call AddInput(AllTheInputs, CStr(CPRMultiStart.Offset(i, 0).Value))
             Call AddInput(AllTheInputs, CStr(LSMultiStart.Offset(i, 0).Value))
             If (HaircutVecStart Is Nothing) Then
@@ -263,15 +295,21 @@ DefaultExchange:
         On Error GoTo 0
         Call AddInput(AllTheInputs, Format(SettleDateCell.Offset(0, 1).Value, "yyyy-mm-dd"))
         Call AddInput(AllTheInputs, AccruedIntrStart.Offset(i, 0).Value)
+        If (CurrentDeferredCell Is Nothing) Then
+            Call AddInput(AllTheInputs, 0#)
+        Else
+            Call AddInput(AllTheInputs, CurrentDeferredCell.Offset(i, 0).Value)
+        End If
+        
         i = i + 1
     Loop
-    Dim NumBases As Long
-    NumBases = Range(BaseIndexesStart, BaseIndexesStart.End(xlDown)).Count - 1
-    Call AddInput(AllTheInputs, NumBases)
-    For i = 1 To NumBases
-        Call AddInput(AllTheInputs, CStr(BaseIndexesStart.Offset(i, 0).Value))
-        Call AddInput(AllTheInputs, BaseIndexesStart.Offset(i, 1).Value)
-    Next i
+'    Dim NumBases As Long
+'    NumBases = Range(BaseIndexesStart, BaseIndexesStart.End(xlDown)).Count - 1
+'    Call AddInput(AllTheInputs, NumBases)
+'    For i = 1 To NumBases
+'        Call AddInput(AllTheInputs, CStr(BaseIndexesStart.Offset(i, 0).Value))
+'        Call AddInput(AllTheInputs, BaseIndexesStart.Offset(i, 1).Value)
+'    Next i
     If (IsEmpty(WaterfallStart.Offset(2, 0))) Then
         Call AddInput(AllTheInputs, CLng(0))
     Else
@@ -286,9 +324,29 @@ DefaultExchange:
         Call AddInput(AllTheInputs, WaterfallStart.Offset(i + 1, 3).Value)
         i = i + 1
     Loop
-    Call AddInput(AllTheInputs, SeniorExpensesCell.Offset(0, 1).Value)
-    Call AddInput(AllTheInputs, SeniorFeesCell.Offset(0, 1).Value)
-    Call AddInput(AllTheInputs, JuniorFeesCell.Offset(0, 1).Value)
+        If (DealNameCell Is Nothing) Then
+        Call AddInput(AllTheInputs, "")
+        Else
+                Call AddInput(AllTheInputs, CStr(DealNameCell.Offset(0, 1).Value))
+    End If
+    Call AddInput(AllTheInputs, CStr(SeniorExpensesCell.Offset(0, 1).Value))
+    Call AddInput(AllTheInputs, CStr(SeniorFeesCell.Offset(0, 1).Value))
+    Call AddInput(AllTheInputs, CStr(JuniorFeesCell.Offset(0, 1).Value))
+    If (SeniorExpensesFixedCell Is Nothing) Then
+        Call AddInput(AllTheInputs, "0")
+    Else
+        Call AddInput(AllTheInputs, CStr(SeniorExpensesFixedCell.Offset(0, 1).Value))
+    End If
+    If (SeniorFeesFixedCell Is Nothing) Then
+        Call AddInput(AllTheInputs, "0")
+    Else
+        Call AddInput(AllTheInputs, CStr(SeniorFeesFixedCell.Offset(0, 1).Value))
+    End If
+    If (JuniorFeesFixedCell Is Nothing) Then
+        Call AddInput(AllTheInputs, "0")
+    Else
+        Call AddInput(AllTheInputs, CStr(JuniorFeesFixedCell.Offset(0, 1).Value))
+    End If
     Call AddInput(AllTheInputs, JuniorFeesCouponCell.Offset(0, 1).Value)
     Call AddInput(AllTheInputs, CStr(IPDfrequencyCell.Offset(0, 1)))
     Call AddInput(AllTheInputs, Format(FirstIPDcell.Offset(0, 1), "yyyy-mm-dd"))
@@ -303,20 +361,26 @@ DefaultExchange:
     Call AddInput(AllTheInputs, CallValueCell.Offset(0, 1).Value)
     ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     'Reserve fund
+    Call AddInput(AllTheInputs, CLng(2))
     If (FirstResTargCell Is Nothing) Then
-        Call AddInput(AllTheInputs, 0#)
+        Call AddInput(AllTheInputs, "0")
     Else
         Call AddInput(AllTheInputs, CStr(FirstResTargCell.Offset(0, 1).Value))
     End If
     If (FirstResMultCell Is Nothing) Then
-        Call AddInput(AllTheInputs, 0#)
+        Call AddInput(AllTheInputs, "0")
     Else
         Call AddInput(AllTheInputs, CStr(FirstResMultCell.Offset(0, 1).Value))
     End If
     If (FirstResFloorCell Is Nothing) Then
-        Call AddInput(AllTheInputs, 0#)
+        Call AddInput(AllTheInputs, "0")
     Else
         Call AddInput(AllTheInputs, CStr(FirstResFloorCell.Offset(0, 1).Value))
+    End If
+    If (FirstResCapCell Is Nothing) Then
+        Call AddInput(AllTheInputs, "0")
+    Else
+        Call AddInput(AllTheInputs, CStr(FirstResCapCell.Offset(0, 1).Value))
     End If
     If (FirstResCurrCell Is Nothing) Then
         Call AddInput(AllTheInputs, 0#)
@@ -334,19 +398,24 @@ DefaultExchange:
         Call AddInput(AllTheInputs, 1 = FirstResDestinationCell.Offset(0, 1).Value)
     End If
     If (SecondResTargCell Is Nothing) Then
-        Call AddInput(AllTheInputs, 0#)
+        Call AddInput(AllTheInputs, "0")
     Else
         Call AddInput(AllTheInputs, CStr(SecondResTargCell.Offset(0, 1).Value))
     End If
     If (SecondResMultCell Is Nothing) Then
-        Call AddInput(AllTheInputs, 0#)
+        Call AddInput(AllTheInputs, "0")
     Else
         Call AddInput(AllTheInputs, CStr(SecondResMultCell.Offset(0, 1).Value))
     End If
     If (SecondResFloorCell Is Nothing) Then
-        Call AddInput(AllTheInputs, 0#)
+        Call AddInput(AllTheInputs, "0")
     Else
         Call AddInput(AllTheInputs, CStr(SecondResFloorCell.Offset(0, 1).Value))
+    End If
+    If (SecondResCapCell Is Nothing) Then
+        Call AddInput(AllTheInputs, "0")
+    Else
+        Call AddInput(AllTheInputs, CStr(SecondResCapCell.Offset(0, 1).Value))
     End If
      If (SecondResCurrCell Is Nothing) Then
         Call AddInput(AllTheInputs, 0#)
@@ -380,8 +449,38 @@ DefaultExchange:
     Call AddInput(AllTheInputs, CStr(CDRcell.Offset(0, 1).Value))
     Call AddInput(AllTheInputs, CStr(LScell.Offset(0, 1).Value))
     Call AddInput(AllTheInputs, CStr(ReinvestWALCell.Offset(0, 1).Value))
-    Call AddInput(AllTheInputs, CLng(ReinvPaymFreqCell.Offset(0, 1).Value))
-    Call AddInput(AllTheInputs, tempReferenceRate)
+    If (ReinvestmentDelayCell Is Nothing) Then
+        Call AddInput(AllTheInputs, "0")
+    Else
+        Call AddInput(AllTheInputs, CStr(ReinvestmentDelayCell.Offset(0, 1).Value))
+    End If
+    If (ReinvestmentPriceCell Is Nothing) Then
+        Call AddInput(AllTheInputs, "100")
+    Else
+        Call AddInput(AllTheInputs, CStr(ReinvestmentPriceCell.Offset(0, 1).Value))
+    End If
+    Call AddInput(AllTheInputs, CStr(ReinvPaymFreqCell.Offset(0, 1).Value))
+    Call AddInput(AllTheInputs, CStr(InterestBaseCell.Offset(0, 1).Value))
+    If (ReinvRepayCell Is Nothing) Then
+        Call AddInput(AllTheInputs, "I")
+    Else
+        Call AddInput(AllTheInputs, CStr(ReinvRepayCell.Offset(0, 1).Value))
+    End If
+    If (RecovLagCell Is Nothing) Then
+        Call AddInput(AllTheInputs, "0")
+    Else
+        Call AddInput(AllTheInputs, CStr(RecovLagCell.Offset(0, 1).Value))
+    End If
+    If (DelinqCell Is Nothing) Then
+        Call AddInput(AllTheInputs, "0")
+    Else
+        Call AddInput(AllTheInputs, CStr(DelinqCell.Offset(0, 1).Value))
+    End If
+    If (DelinqLagCell Is Nothing) Then
+        Call AddInput(AllTheInputs, "0")
+    Else
+        Call AddInput(AllTheInputs, CStr(DelinqLagCell.Offset(0, 1).Value))
+    End If
     Call AddInput(AllTheInputs, AvailPrincCell.Offset(0, 1).Value)
     Call AddInput(AllTheInputs, AvailIntrCell.Offset(0, 1).Value)
     Call AddInput(AllTheInputs, Format(CutOffcell.Offset(0, 1).Value, "yyyy-mm-dd"))
@@ -436,6 +535,11 @@ DefaultExchange:
             i = i + 1
         Loop
         Call AddInput(AllTheInputs, UseCallStressCell.Offset(0, 1).Value)
+        If (UseFastStressCell Is Nothing) Then
+            Call AddInput(AllTheInputs, False)
+        Else
+            Call AddInput(AllTheInputs, UseFastStressCell.Offset(0, 1).Value)
+        End If
     End If
     Dim result() As Variant
     ReDim result(0 To AllTheInputs.Count - 1)
@@ -491,6 +595,9 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
     a.Add "Senior expenses rate", "SeniorExpensesField"
     a.Add "Senior management fees rate", "SeniorFeesField"
     a.Add "Junior management fees rate", "JuniorFeesField"
+    a.Add "Senior expenses fixed", "SeniorExpensesFieldFixed"
+    a.Add "Senior management fees fixed", "SeniorFeesFieldFixed"
+    a.Add "Junior management fees fixed", "JuniorFeesFieldFixed"
     a.Add "Junior fees deferred coupon", "JuniorFeesCouponField"
     a.Add "Use Turbo feature", "UseTurboField"
     a.Add "CCC curve", "CCCcurveField"
@@ -543,16 +650,29 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
     a.Add "First Fund Target", "FirstResTargCell"
     a.Add "First Fund Multiple", "FirstResMultCell"
     a.Add "First Fund Floor", "FirstResFloorCell"
+    a.Add "First Fund Cap", "FirstResCapCell"
     a.Add "First Fund Current Amount", "FirstResCurrCell"
     a.Add "First Fund Free After", "FirstResFreedCell"
     a.Add "First Fund In Waterfall", "FirstResDestinationCell"
     a.Add "Second Fund Target", "SecondResTargCell"
     a.Add "Second Fund Multiple", "SecondResMultCell"
     a.Add "Second Fund Floor", "SecondResFloorCell"
+    a.Add "Second Fund Cap", "SecondResCapCell"
     a.Add "Second Fund Current Amount", "SecondResCurrCell"
     a.Add "Second Fund Free After", "SecondResFreedCell"
     a.Add "Second Fund In Waterfall", "SecondResDestinationCell"
     a.Add "Cumulative Reserve", "UseCumulativeReservesCell"
+    a.Add "Deal Name", "DealNameCell"
+    a.Add "Reinvestment Delay", "ReinvestmentDelayCell"
+    a.Add "Reinvestment Price", "ReinvestmentPriceCell"
+    a.Add "Use Fast Stress", "UseFastStressCell"
+    a.Add "Base Index", "BaseIndexHead"
+    a.Add "Reinvestment Repayment", "ReinvRepayCell"
+    a.Add "Recovery Lag", "RecovLagCell"
+    a.Add "Delinquency", "DelinqCell"
+    a.Add "Delinquency Lag", "DelinqLagCell"
+    a.Add "Current Deferred", "CurrentDeferredCell"
+    
 End Sub
 
 Private Function FromStringToInterestType(a As String) As Long
@@ -616,6 +736,14 @@ Public Function GetDM(TrancheName As String, Price As Double, Optional ToCall As
     result(2) = ToCall
     result(3) = Price
     GetDM = CLODiscountMargin(result)
+End Function
+Public Function GetIRR(TrancheName As String, Price As Double, Optional ToCall As Boolean = False)
+    Dim result(0 To 3) As Variant
+    result(0) = Left(ActiveWorkbook.FullName, InStrRev(ActiveWorkbook.FullName, "\"))
+    result(1) = TrancheName
+    result(2) = ToCall
+    result(3) = Price
+    GetIRR = CLOReturnRate(result)
 End Function
 Public Function GetWAL(TrancheName As String, CutOffDate As Date, Price As Double, Optional ToCall As Boolean = False)
     Dim result(0 To 4) As Variant

@@ -5,6 +5,7 @@
 #include "WaterfallCalculator.h"
 #include <QFile>
 #include <QDir>
+#include <QSettings>
 #ifdef Q_WS_WIN
 #include <Windows.h>
 #endif
@@ -187,6 +188,11 @@ bool CentralUnitAPI::LoadLoanPool(const QString& DestPath){
 	file.close();
 	return true;
 }
+void CentralUnitAPI::SaveModel(const QString& ModelFileName) {
+	QSettings ConfigIni(":/Configs/GlobalConfigs.ini", QSettings::IniFormat);
+	ConfigIni.beginGroup("Folders");
+	SaveModel(ConfigIni.value("UnifiedResultsFolder", "\\\\synserver2\\Company Share\\24AM\\Monitoring\\Model Results").toString(), ModelFileName);
+}
 void CentralUnitAPI::SaveModel(const QString& FolderPath, const QString& ModelFileName) {
 	QDir TempDir(FolderPath);
 	QString Filename = TempDir.absoluteFilePath(ModelFileName);
@@ -194,7 +200,7 @@ void CentralUnitAPI::SaveModel(const QString& FolderPath, const QString& ModelFi
 	if (file.open(QIODevice::WriteOnly)) {
 		QDataStream out(&file);
 		out.setVersion(QDataStream::Qt_5_3);
-		out << qint32(ModelVersionNumber) << Structure << CallStructure << LoansCalculator;
+		out << qint32(ModelVersionNumber) << LiborUpdateDate << Structure << CallStructure << LoansCalculator;
 		file.close();
 	}
 }
@@ -207,6 +213,7 @@ bool CentralUnitAPI::LoadModel(const QString& DestPath) {
 	out.setVersion(QDataStream::Qt_5_3);
 	out >> VersionCheck;
 	if (VersionCheck < MinimumSupportedVersion) return false;
+	out >> LiborUpdateDate;
 	Structure.SetLoadProtocolVersion(VersionCheck);
 	out >> Structure;
 	CallStructure.SetLoadProtocolVersion(VersionCheck);
@@ -231,6 +238,7 @@ void CentralUnitAPI::CompileBaseRates(ForwardBaseRateTable& Values)const {
 		CallStructure.GetTranche(i)->CompileReferenceRateValue(Values);
 	}
 	LoansCalculator.CompileReferenceRateValue(Values);
+	LiborUpdateDate = Values.GetUpdateDate();
 }
 void CentralUnitAPI::CompileBaseRates(ConstantBaseRateTable& Values)const {
 	for (int i = 0; i < Structure.GetTranchesCount(); i++) {
@@ -240,6 +248,7 @@ void CentralUnitAPI::CompileBaseRates(ConstantBaseRateTable& Values)const {
 		CallStructure.GetTranche(i)->CompileReferenceRateValue(Values);
 	}
 	LoansCalculator.CompileReferenceRateValue(Values);
+	LiborUpdateDate = Values.GetUpdateDate();
 }
 #ifndef NO_DATABASE
 void CentralUnitAPI::GetBaseRatesDatabase(ConstantBaseRateTable& Values)const {
@@ -250,6 +259,7 @@ void CentralUnitAPI::GetBaseRatesDatabase(ConstantBaseRateTable& Values)const {
 		CallStructure.GetTranche(i)->GetBaseRatesDatabase(Values);
 	}
 	LoansCalculator.GetBaseRatesDatabase(Values);
+	LiborUpdateDate = Values.GetUpdateDate();
 }
 void CentralUnitAPI::GetBaseRatesDatabase(ForwardBaseRateTable& Values)const {
 	for (int i = 0; i < Structure.GetTranchesCount(); i++) {
@@ -259,5 +269,6 @@ void CentralUnitAPI::GetBaseRatesDatabase(ForwardBaseRateTable& Values)const {
 		CallStructure.GetTranche(i)->GetBaseRatesDatabase(Values);
 	}
 	LoansCalculator.GetBaseRatesDatabase(Values);
+	LiborUpdateDate = Values.GetUpdateDate();
 }
 #endif

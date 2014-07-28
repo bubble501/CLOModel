@@ -208,6 +208,12 @@ namespace ManagedCLO {
 			bool get(){return Unmanaged->GetSequentialComputation();}
 			void set(bool a){Unmanaged->SetSequentialComputation(a);}
 		}
+		/*!
+		\brief Date of the last update of base rates in the model
+		*/
+		property DateTime BaseRatesUpdateDate{
+			DateTime get() { return QDate2DateTime(Unmanaged->GetLiborUpdateDate()); }
+		}
 		ManCentralUnit(){Unmanaged=new CentralUnitOverlay(this);}
 		ManCentralUnit::~ManCentralUnit()
 		{

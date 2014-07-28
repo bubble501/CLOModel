@@ -35,9 +35,11 @@ public:
 	void SaveLoanPool(const QString& FolderPath,const QString& LoanPoolFileName);
 	bool LoadLoanPool(const QString& DestPath);
 	void SaveModel(const QString& FolderPath, const QString& ModelFileName);
+	void SaveModel(const QString& ModelFileName);
 	bool LoadModel(const QString& DestPath);
 	void SetSequentialComputation(bool a);
 	bool GetSequentialComputation()const {return SequentialComputation;}
+	const  QDate& GetLiborUpdateDate() const { return LiborUpdateDate; }
 	void CompileBaseRates(ForwardBaseRateTable& Values)const;
 	void CompileBaseRates(ConstantBaseRateTable& Values)const;
 #ifndef NO_DATABASE
@@ -54,6 +56,7 @@ private:
 	bool RunCall;
 	bool ShowProgress;
 	bool SequentialComputation;
+	mutable QDate LiborUpdateDate;
 signals:
 	void LoopStarted();
 	void ProgressUpdate(double);

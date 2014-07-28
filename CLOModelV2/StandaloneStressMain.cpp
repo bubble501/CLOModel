@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
 	file.close();
 	ConstantBaseRateTable ResultingValues;
 	for (int i = 0; i < TempWtf.GetTranchesCount();i++) {
-		TempWtf.GetTranche(i)->GetBaseRatesDatabase(ResultingValues);
+		TempWtf.GetTranche(i)->CompileReferenceRateValue(ResultingValues);
 	}
 
 	/*Tranche TempTrnch;

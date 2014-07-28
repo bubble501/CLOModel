@@ -106,6 +106,7 @@ public:
 	void SetReserveFund(int RFindex, const QString& RFtarget, const QString& RFmultiple, const QString& RFfloor, const QString& RFfcap, double RFcurrent, int RFfreed, bool RFtoInterest = true) { Structure.SetReserveFund(RFindex, RFtarget, RFmultiple, RFfloor, RFfcap, RFcurrent, RFfreed, RFtoInterest); }
 	void AddReserveFund(const QString& RFtarget, const QString& RFmultiple, const QString& RFfloor, const QString& RFfcap, double RFcurrent, int RFfreed, bool RFtoInterest = true) { Structure.AddReserveFund(RFtarget, RFmultiple, RFfloor, RFfcap,RFcurrent, RFfreed, RFtoInterest); }
 	void SetCumulativeReserves(bool a){Structure.SetCumulativeReserves(a);}
+	const  QDate& GetLiborUpdateDate() const { return LiborUpdateDate; }
 	void CompileBaseRates(ConstantBaseRateTable& Values)const;
 	void CompileBaseRates(ForwardBaseRateTable& Values)const;
 #ifndef NO_DATABASE
@@ -134,6 +135,7 @@ private:
 	QString FolderPath;
 	QString PlotsSheet;
 	int PlotIndexes[NumberOfPlots];
+	mutable QDate LiborUpdateDate;
 signals:
 	void LoopStarted();
 	void StressLoopStarted();

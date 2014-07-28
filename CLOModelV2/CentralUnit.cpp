@@ -10,6 +10,7 @@
 #include "ProgressWidget.h"
 #include "ExcelCommons.h"
 #include "ExcelOutput.h"
+#include <QSettings>
 CentralUnit::CentralUnit(QObject* parent)
 	:QObject(parent)
 	,Stresser(NULL)
@@ -257,7 +258,9 @@ void CentralUnit::CheckCalculationDone()
 		file.close();
 	}
 	{
-		QDir UnifiedDir("\\\\synserver2\\Company Share\\24AM\\Monitoring\\Model Results");
+		QSettings ConfigIni(":/Configs/GlobalConfigs.ini", QSettings::IniFormat);
+		ConfigIni.beginGroup("Folders");
+		QDir UnifiedDir(ConfigIni.value("UnifiedResultsFolder","\\\\synserver2\\Company Share\\24AM\\Monitoring\\Model Results").toString());
 		if (UnifiedDir.exists()) {
 			QString AdjDealName = Structure.GetDealName();
 			if (AdjDealName.isEmpty() && Structure.GetTranchesCount() > 0) {
@@ -267,7 +270,7 @@ void CentralUnit::CheckCalculationDone()
 			if (UnifiedFile.open(QIODevice::WriteOnly)) {
 				QDataStream out(&UnifiedFile);
 				out.setVersion(QDataStream::Qt_5_3);
-				out << qint32(ModelVersionNumber) << Structure << CallStructure << LoansCalculator;
+				out << qint32(ModelVersionNumber) << LiborUpdateDate << Structure << CallStructure << LoansCalculator;
 				UnifiedFile.close();
 			}
 		}
@@ -387,6 +390,7 @@ void CentralUnit::CompileBaseRates(ConstantBaseRateTable& Values)const {
 		CallStructure.GetTranche(i)->CompileReferenceRateValue(Values);
 	}
 	LoansCalculator.CompileReferenceRateValue(Values);
+	LiborUpdateDate = Values.GetUpdateDate();
 }
 void CentralUnit::CompileBaseRates(ForwardBaseRateTable& Values)const {
 	for (int i = 0; i < Structure.GetTranchesCount(); i++) {
@@ -396,6 +400,7 @@ void CentralUnit::CompileBaseRates(ForwardBaseRateTable& Values)const {
 		CallStructure.GetTranche(i)->CompileReferenceRateValue(Values);
 	}
 	LoansCalculator.CompileReferenceRateValue(Values);
+	LiborUpdateDate = Values.GetUpdateDate();
 }
 #ifndef NO_DATABASE
 void CentralUnit::GetBaseRatesDatabase(ConstantBaseRateTable& Values) const {
@@ -406,6 +411,7 @@ void CentralUnit::GetBaseRatesDatabase(ConstantBaseRateTable& Values) const {
 		CallStructure.GetTranche(i)->GetBaseRatesDatabase(Values);
 	}
 	LoansCalculator.GetBaseRatesDatabase(Values);
+	LiborUpdateDate = Values.GetUpdateDate();
 }
 void CentralUnit::GetBaseRatesDatabase(ForwardBaseRateTable& Values) const {
 	for (int i = 0; i < Structure.GetTranchesCount(); i++) {
@@ -415,5 +421,6 @@ void CentralUnit::GetBaseRatesDatabase(ForwardBaseRateTable& Values) const {
 		CallStructure.GetTranche(i)->GetBaseRatesDatabase(Values);
 	}
 	LoansCalculator.GetBaseRatesDatabase(Values);
+	LiborUpdateDate = Values.GetUpdateDate();
 }
 #endif

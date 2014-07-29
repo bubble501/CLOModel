@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClInclude Include="AbstarctBbgVect.h" />
     <ClInclude Include="BaseRateTable.h" />
+    <ClInclude Include="BloombergResult.h" />
     <ClInclude Include="BoolVector.h" />
     <ClInclude Include="BackwardCompatibilityInterface.h" />
     <ClInclude Include="BaseRateVect.h" />
@@ -218,6 +219,7 @@
   <ItemGroup>
     <ClCompile Include="AbstarctBbgVect.cpp" />
     <ClCompile Include="BaseRateTable.cpp" />
+    <ClCompile Include="BloombergResult.cpp" />
     <ClCompile Include="BoolVector.cpp" />
     <ClCompile Include="BaseRateVect.cpp" />
     <ClCompile Include="BloombergVector.cpp" />

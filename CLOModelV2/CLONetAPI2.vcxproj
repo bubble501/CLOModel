@@ -14,6 +14,7 @@
     <ClCompile Include="AbstarctBbgVect.cpp" />
     <ClCompile Include="BaseRateTable.cpp" />
     <ClCompile Include="BaseRateVect.cpp" />
+    <ClCompile Include="BloombergResult.cpp" />
     <ClCompile Include="BloombergVector.cpp" />
     <ClCompile Include="BloombergWorker.cpp" />
     <ClCompile Include="BoolVector.cpp" />
@@ -216,6 +217,7 @@
     <ClInclude Include="BackwardCompatibilityInterface.h" />
     <ClInclude Include="BaseRateTable.h" />
     <ClInclude Include="BaseRateVect.h" />
+    <ClInclude Include="BloombergResult.h" />
     <ClInclude Include="BloombergVector.h" />
     <ClInclude Include="BloombergWorker.h" />
     <ClInclude Include="BoolVector.h" />

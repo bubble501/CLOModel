@@ -319,12 +319,12 @@ int Waterfall::FindTrancheIndex(const QString& Tranchename)const{
 	ISINparser.AddSecurity(Tranchename);
 	ISINparser.AddField("NAME");
 	ISINparser.AddField("ID_ISIN");
-	const QHash<QString, QString> TempResults = ISINparser.StartRequest().value(Tranchename);
-	QString AdjTranName(TempResults.value("NAME"));
-	QString AdjISIN(TempResults.value("ID_ISIN"));
+	BloombergResult TempResults = ISINparser.StartRequest();
+	QString AdjTranName(TempResults.GetValue(Tranchename, "NAME").trimmed().toUpper());
+	QString AdjISIN(TempResults.GetValue(Tranchename, "ID_ISIN").trimmed().toUpper());
 	for (int i = 0; i < m_Tranches.size(); i++) {
-		if (m_Tranches.at(i)->GetTrancheName().trimmed().toUpper() == AdjTranName.trimmed().toUpper()) return i;
-		if (m_Tranches.at(i)->GetISIN().trimmed().toUpper() == AdjISIN.trimmed().toUpper()) return i;
+		if (!AdjTranName.isEmpty() && m_Tranches.at(i)->GetTrancheName().trimmed().toUpper() == AdjTranName) return i;
+		if (!AdjISIN.isEmpty() && m_Tranches.at(i)->GetISIN().trimmed().toUpper() == AdjISIN) return i;
 	}
 #endif 
 	return -1;

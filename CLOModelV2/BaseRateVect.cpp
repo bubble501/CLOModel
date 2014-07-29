@@ -259,19 +259,26 @@ BloombergVector BaseRateVector::GetRefRateValueFromBloomberg(ConstantBaseRateTab
 	}
 	if (!RatesToDownload.isEmpty()) {
 		BloombergWorker Bee;
+		QString CurrentResult;
 		QDate MinUpdateDate, CurrentUpdateDate;
 		foreach(const QString& SingleRate, RatesToDownload)
 			Bee.AddSecurity(SingleRate, "Index");
 		Bee.AddField("PX_LAST");
 		Bee.AddField("PX_SETTLE_LAST_DT");
-		QHash<QString, QHash<QString, QString> > ReturnedValues = Bee.StartRequest();
+		BloombergResult ReturnedValues = Bee.StartRequest();
 		for (int i = 0; i < m_VectVal.size(); i++) {
-			Values.GetValues().insert(
-				GetValueString(i),
-				ReturnedValues.value(GetValueString(i)).value("PX_LAST", "0").toDouble() / 100.0
-			);
-			CurrentUpdateDate = QDate::fromString(ReturnedValues.value(GetValueString(i)).value("PX_SETTLE_LAST_DT", "0"), "yyyy-MM-dd");
-			if (MinUpdateDate.isNull() || MinUpdateDate > CurrentUpdateDate) MinUpdateDate = CurrentUpdateDate;
+			CurrentResult = ReturnedValues.GetValue(GetValueString(i), "PX_LAST");
+			if (!CurrentResult.isEmpty()) {
+				Values.GetValues().insert(
+					GetValueString(i),
+					CurrentResult.toDouble() / 100.0
+					);
+				CurrentResult = ReturnedValues.GetValue(GetValueString(i), "PX_SETTLE_LAST_DT");
+				if (!CurrentResult.isEmpty()) {
+					CurrentUpdateDate = QDate::fromString(CurrentResult, "yyyy-MM-dd");
+					if (MinUpdateDate.isNull() || MinUpdateDate > CurrentUpdateDate) MinUpdateDate = CurrentUpdateDate;
+				}
+			}
 		}
 		Values.SetUpdateDate(MinUpdateDate);
 	}

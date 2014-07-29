@@ -180,34 +180,35 @@ void Tranche::GetDataFromBloomberg(){
 	Bee.AddField("SETTLE_DT");
 	Bee.AddField("NAME");
 	Bee.AddField("ID_ISIN");
-	QHash<QString,QString> Result(Bee.StartRequest().value(TrancheName));
-	OutstandingAmt=Result.value("AMT_OUTSTANDING").toDouble()/ExchangeRate;
+	BloombergResult Result=Bee.StartRequest();
+	if (Result.HasErrors()) return;
+	OutstandingAmt=Result.GetValue(TrancheName,"AMT_OUTSTANDING").toDouble()/ExchangeRate;
 	CashFlow.SetInitialOutstanding(OutstandingAmt);
-	OriginalAmt=Result.value("MTG_ORIG_AMT").toDouble()/ExchangeRate;
-	Currency=Result.value("CRNCY");
-	LastPaymentDate=QDate::fromString(Result.value("START_ACC_DT"),"yyyy-MM-dd");
-	PaymentFrequency=QString("%1").arg(static_cast<int>(12.0/Result.value("CPN_FREQ").toDouble()));
-	TrancheName=Result.value("NAME");
-	ISINcode=Result.value("ID_ISIN");
-	if(Result.value("MTG_TYP").contains("FLT")) InterestType=FloatingInterest;
+	OriginalAmt = Result.GetValue(TrancheName, "MTG_ORIG_AMT").toDouble() / ExchangeRate;
+	Currency = Result.GetValue(TrancheName, "CRNCY");
+	LastPaymentDate = QDate::fromString(Result.GetValue(TrancheName, "START_ACC_DT"), "yyyy-MM-dd");
+	PaymentFrequency = QString("%1").arg(static_cast<int>(12.0 / Result.GetValue(TrancheName, "CPN_FREQ").toDouble()));
+	TrancheName = Result.GetValue(TrancheName, "NAME");
+	ISINcode = Result.GetValue(TrancheName, "ID_ISIN");
+	if (Result.GetValue(TrancheName, "MTG_TYP").contains("FLT")) InterestType = FloatingInterest;
 	else InterestType=FixedInterest;
 	ReferenceRateValue="";
 	if(InterestType==FloatingInterest){
-		ReferenceRate=Result.value("RESET_IDX");
-		Coupon=Result.value("FLT_SPREAD");//.toDouble()/10000.0;
+		ReferenceRate = Result.GetValue(TrancheName, "RESET_IDX");
+		Coupon = Result.GetValue(TrancheName, "FLT_SPREAD");//.toDouble()/10000.0;
 	}
 	else{
-		Coupon=QString("%1").arg(Result.value("CPN").toDouble()*100.0);//Result.value("CPN").toDouble()/100.0;
+		Coupon = QString("%1").arg(Result.GetValue(TrancheName, "CPN").toDouble()*100.0);//Result.value("CPN").toDouble()/100.0;
 		QString DeafultRefRateString;
 		if(Currency=="EUR")DeafultRefRateString="EUR";
 		else if(Currency=="GBP")DeafultRefRateString="BP";
 		else if(Currency=="USD")DeafultRefRateString="US";
 		else return;
-		DeafultRefRateString+=QString("%1M").arg(static_cast<int>(12.0/Result.value("CPN_FREQ").toDouble()),6-DeafultRefRateString.size(),10,QChar('0'));
+		DeafultRefRateString += QString("%1M").arg(static_cast<int>(12.0 / Result.GetValue(TrancheName, "CPN_FREQ").toDouble()), 6 - DeafultRefRateString.size(), 10, QChar('0'));
 		DefaultRefRate=DeafultRefRateString;
 	}
-	AccruedInterest=Result.value("INT_ACC").toDouble()/100.0;
-	SettlementDate=QDate::fromString(Result.value("SETTLE_DT"),"yyyy-MM-dd");
+	AccruedInterest = Result.GetValue(TrancheName, "INT_ACC").toDouble() / 100.0;
+	SettlementDate = QDate::fromString(Result.GetValue(TrancheName, "SETTLE_DT"), "yyyy-MM-dd");
 }
 #endif
 double Tranche::GetLossRate() const{

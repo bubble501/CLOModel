@@ -20,35 +20,31 @@ void BloombergWorker::AddSecurity(const QString& Secur, const QString& Extension
 	AsjExt[0]=AsjExt[0].toUpper();
 	SecExt.append(AsjExt);
 }
-QHash<QString, QHash<QString,QString> > BloombergWorker::handleResponseEvent(const Event& event)const{
+BloombergResult BloombergWorker::handleResponseEvent(const Event& event)const {
 	MessageIterator iter(event);
-	QHash<QString, QHash<QString,QString> > Result;
+	BloombergResult Result;
 	int NumVals;
 	while (iter.next()) {
 		Message message = iter.message();
 		if(RequestID==message.correlationId().asInteger()){
 			if(message.hasElement("responseError")){
-				QHash<QString,QString> Temp;
-				Temp.insert("Error","#N/A N/A");
-				Result.insert("Error",Temp);
+				Result.SetErrorCode(BloombergResult::ResponseError);
 				return Result;
 			}
 			QString Tem=message.messageType().string();
 			if(QString(message.messageType().string())=="ReferenceDataResponse"){
 				NumVals=message.getElement("securityData").numValues();
-				QHash<QString,QString> Temp;
 				for(int i=0;i<NumVals;i++){
-					Temp.clear();
 					if(message.getElement("securityData").getValueAsElement(i).hasElement("securityError")){
-						for (int j=0;j<RequiredField.size();j++)
-							Temp.insert(RequiredField.at(j),"#N/A Security Error");
-						Result.insert(RequiredSecurity.at(i),Temp);
+						for (int j = 0; j < RequiredField.size(); j++)
+						{
+							Result.SetErrorCode(BloombergResult::SecurityError);
+						}
 					}
 					else{
 						for (int j=0;j<RequiredField.size();j++){
 							if(message.getElement("securityData").getValueAsElement(i).getElement("fieldData").hasElement(RequiredField.at(j).toLocal8Bit().data())){
-								Temp.insert(RequiredField.at(j),message.getElement("securityData").getValueAsElement(i).getElement("fieldData").getElementAsString(RequiredField.at(j).toLocal8Bit().data()));
-								Result.insert(RequiredSecurity.at(i),Temp);
+								Result.SetResult(RequiredSecurity.at(i), RequiredField.at(j), message.getElement("securityData").getValueAsElement(i).getElement("fieldData").getElementAsString(RequiredField.at(j).toLocal8Bit().data()));
 							}
 						}
 					}
@@ -58,12 +54,10 @@ QHash<QString, QHash<QString,QString> > BloombergWorker::handleResponseEvent(con
 	}
 	return Result;
 }
-QHash<QString, QHash<QString,QString> > BloombergWorker::StartRequest()const{
-	QHash<QString, QHash<QString,QString> > Result;
+BloombergResult BloombergWorker::StartRequest()const {
+	BloombergResult Result;
 	if (!IsValid()) {
-		QHash<QString,QString> Temp;
-		Temp.insert("Error","#N/A Invalid Inputs");
-		Result.insert("Error",Temp);
+		Result.SetErrorCode(BloombergResult::InvalidInputs);
 		return Result;
 	}
 	bool Valid;
@@ -73,16 +67,12 @@ QHash<QString, QHash<QString,QString> > BloombergWorker::StartRequest()const{
 	Session session(sessionOptions);
 	Valid=session.start();
 	if(!Valid) {
-		QHash<QString,QString> Temp;
-		Temp.insert("Error","#N/A Can't start Bloomberg session.");
-		Result.insert("Error",Temp);
+		Result.SetErrorCode(BloombergResult::SessionError);
 		return Result;
 	}
 	Valid=session.openService("//blp/refdata");
 	if(!Valid) {
-		QHash<QString,QString> Temp;
-		Temp.insert("Error","#N/A Can't open Bloomberg service.");
-		Result.insert("Error",Temp);
+		Result.SetErrorCode(BloombergResult::ServiceError);
 		return Result;
 	}
 	CorrelationId requestId(RequestID);

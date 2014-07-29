@@ -18,6 +18,7 @@ Tranche::Tranche()
 	,PaymentFrequency("3")
 	,AccruedInterest(0.0)
 	, m_optimObjective(0.0)
+	, m_UseForwardCurve(false)
 {
 	Coupon.SetDivisor(10000.0);
 }
@@ -45,6 +46,7 @@ Tranche::Tranche(const Tranche& a)
 	,SettlementDate(a.SettlementDate)
 	,ISINcode(a.ISINcode)
 	, m_optimObjective(a.m_optimObjective)
+	, m_UseForwardCurve(a.m_UseForwardCurve)
 {
 	m_LoadProtocolVersion = a.m_LoadProtocolVersion;
 }
@@ -73,6 +75,7 @@ Tranche& Tranche::operator=(const Tranche& a){
 	ISINcode=a.ISINcode;
 	m_LoadProtocolVersion=a.m_LoadProtocolVersion;
 	m_optimObjective = a.m_optimObjective;
+	m_UseForwardCurve = a.m_UseForwardCurve;
 	
 	return *this;
 }
@@ -95,24 +98,29 @@ void Tranche::SetExchangeRate(double a){
 void Tranche::GetRefRateValueFromBloomberg()const{
 	const BaseRateVector& ApplicableRate = (ReferenceRate.IsEmpty() ? DefaultRefRate : ReferenceRate);
 	ReferenceRateValue = ApplicableRate.GetRefRateValueFromBloomberg(ConstantBaseRateTable());
+	m_UseForwardCurve = false;
 }
 #endif
 void Tranche::CompileReferenceRateValue(ConstantBaseRateTable& Values) const {
 	const BaseRateVector& ApplicableRate= (ReferenceRate.IsEmpty()? DefaultRefRate:ReferenceRate);
 	ReferenceRateValue=ApplicableRate.CompileReferenceRateValue(Values);
+	m_UseForwardCurve = false;
 }
 void Tranche::CompileReferenceRateValue(ForwardBaseRateTable& Values) const {
 	const BaseRateVector& ApplicableRate = (ReferenceRate.IsEmpty() ? DefaultRefRate : ReferenceRate);
 	ReferenceRateValue = ApplicableRate.CompileReferenceRateValue(Values);
+	m_UseForwardCurve = true;
 }
 #ifndef NO_DATABASE
-void Tranche::GetBaseRatesDatabase(ConstantBaseRateTable& Values) const {
+void Tranche::GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll) const {
 	const BaseRateVector& ApplicableRate = (ReferenceRate.IsEmpty() ? DefaultRefRate : ReferenceRate);
-	ReferenceRateValue = ApplicableRate.GetBaseRatesDatabase(Values);
+	ReferenceRateValue = ApplicableRate.GetBaseRatesDatabase(Values, DownloadAll);
+	m_UseForwardCurve = false;
 }
-void Tranche::GetBaseRatesDatabase(ForwardBaseRateTable& Values) const {
+void Tranche::GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll) const {
 	const BaseRateVector& ApplicableRate = (ReferenceRate.IsEmpty() ? DefaultRefRate : ReferenceRate);
-	ReferenceRateValue = ApplicableRate.GetBaseRatesDatabase(Values);
+	ReferenceRateValue = ApplicableRate.GetBaseRatesDatabase(Values, DownloadAll);
+	m_UseForwardCurve = true;
 }
 #endif
 double Tranche::GetCoupon(const QDate& index, int Frequency) const {
@@ -295,6 +303,7 @@ QDataStream& operator<<(QDataStream & stream, const Tranche& flows){
 		<< flows.PaymentFrequency
 		<< flows.SettlementDate
 		<< flows.AccruedInterest
+		<< flows.m_UseForwardCurve
 	;
 	return stream;
 }
@@ -326,6 +335,7 @@ QDataStream& Tranche::LoadOldVersion(QDataStream& stream){
 	PaymentFrequency.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> PaymentFrequency;
 	stream >> SettlementDate;
 	stream >> AccruedInterest;
+	stream >> m_UseForwardCurve;
 	ResetProtocolVersion();
 	return stream;
 }

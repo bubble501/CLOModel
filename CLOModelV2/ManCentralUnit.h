@@ -33,6 +33,12 @@ namespace ManagedCLO {
 			void set(ManWaterfall^ a){Unmanaged->SetStructure(*(a->Unmanaged));}
 		}
 		/*!
+		\brief Whether the model uses forward curves for the base rates or not
+		*/
+		property bool UseForwardCurve{
+			bool get() { return Unmanaged->GetUseForwardCurve(); }
+		}
+		/*!
 		\brief Uses the supplied base rates table to fill in the base rate values
 		\arg Values A table containing the spot rates for the relevant base rates
 		\details This function will use the values supplied in the table as the values for the relevant base index rates.<br/>If a base index is required by the model but not supplied it will be downloaded from Bloomberg and added to the Values table.
@@ -54,22 +60,24 @@ namespace ManagedCLO {
 		/*!
 		\brief Downloads the necessary base rates from the database
 		\arg Values A table of overrides for specific indexes.
+		\arg DownloadAll If set to true it will download all rates from the database instead of just the needed ones. Normally set to false. If Values is used for more than one model using true may result in more efficiency
 		\details This function will download the base rates values from the database.<br/>The Values table can be used to override specific base rates.<br/>If a base index is required by the model but not supplied it will be downloaded from Bloomberg.<br/>All downloaded values will be added to the Values table.
 		\note If NO_DATABASE is defined at compile time this method will be unavailable
 		\sa CompileBaseRates
 		*/
-		void GetBaseRatesDatabase(ManConstBaseRateTable^ Values) {
-			Unmanaged->GetBaseRatesDatabase(Values);
+		void GetBaseRatesDatabase(ManConstBaseRateTable^ Values, bool DownloadAll) {
+			Unmanaged->GetBaseRatesDatabase(Values, DownloadAll);
 		}
 		/*!
 		\brief Downloads the necessary base rates from the database
 		\arg Values A table of overrides for specific indexes.
+		\arg DownloadAll If set to true it will download all rates from the database instead of just the needed ones. Normally set to false. If Values is used for more than one model using true may result in more efficiency
 		\details This function will download the base rates forward curves from the database.<br/>The Values table can be used to override specific base rates.<br/>If a base index is required by the model but not supplied its spot rate will be downloaded from Bloomberg and used as constant.<br/>All downloaded values will be added to the Values table.
 		\note If NO_DATABASE is defined at compile time this method will be unavailable
 		\sa CompileBaseRates
 		*/
-		void GetBaseRatesDatabase(ManForwBaseRateTable^ Values) {
-			Unmanaged->GetBaseRatesDatabase(Values);
+		void GetBaseRatesDatabase(ManForwBaseRateTable^ Values, bool DownloadAll) {
+			Unmanaged->GetBaseRatesDatabase(Values, DownloadAll);
 		}
 #endif 
 		/*!

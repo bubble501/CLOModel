@@ -27,14 +27,14 @@ void CentralUnitOverlay::CompileBaseRates(ManForwBaseRateTable^ Values) {
 	Values = gcnew ManForwBaseRateTable(FillValues);
 }
 #ifndef NO_DATABASE
-void CentralUnitOverlay::GetBaseRatesDatabase(ManConstBaseRateTable^ Values) {
+void CentralUnitOverlay::GetBaseRatesDatabase(ManConstBaseRateTable^ Values, bool DownloadAll) {
 	ConstantBaseRateTable FillValues = *(Values->Unmanaged);
-	CentralUnitAPI::GetBaseRatesDatabase(FillValues);
+	CentralUnitAPI::GetBaseRatesDatabase(FillValues, DownloadAll);
 	Values = gcnew ManConstBaseRateTable(FillValues);
 }
-void CentralUnitOverlay::GetBaseRatesDatabase(ManForwBaseRateTable^ Values) {
+void CentralUnitOverlay::GetBaseRatesDatabase(ManForwBaseRateTable^ Values, bool DownloadAll) {
 	ForwardBaseRateTable FillValues = *(Values->Unmanaged);
-	CentralUnitAPI::GetBaseRatesDatabase(FillValues);
+	CentralUnitAPI::GetBaseRatesDatabase(FillValues, DownloadAll);
 	Values = gcnew ManForwBaseRateTable(FillValues);
 }
 #endif

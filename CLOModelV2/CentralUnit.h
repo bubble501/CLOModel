@@ -107,11 +107,12 @@ public:
 	void AddReserveFund(const QString& RFtarget, const QString& RFmultiple, const QString& RFfloor, const QString& RFfcap, double RFcurrent, int RFfreed, bool RFtoInterest = true) { Structure.AddReserveFund(RFtarget, RFmultiple, RFfloor, RFfcap,RFcurrent, RFfreed, RFtoInterest); }
 	void SetCumulativeReserves(bool a){Structure.SetCumulativeReserves(a);}
 	const  QDate& GetLiborUpdateDate() const { return LiborUpdateDate; }
+	bool GetUseForwardCurve() const { return m_UseForwardCurve; }
 	void CompileBaseRates(ConstantBaseRateTable& Values)const;
 	void CompileBaseRates(ForwardBaseRateTable& Values)const;
 #ifndef NO_DATABASE
-	void GetBaseRatesDatabase(ConstantBaseRateTable& Values)const;
-	void GetBaseRatesDatabase(ForwardBaseRateTable& Values)const;
+	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll=false)const;
+	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll=false)const;
 #endif
 	void SetDealName(const QString& a) {Structure.SetDealName(a);}
 private:
@@ -136,6 +137,7 @@ private:
 	QString PlotsSheet;
 	int PlotIndexes[NumberOfPlots];
 	mutable QDate LiborUpdateDate;
+	mutable bool m_UseForwardCurve;
 signals:
 	void LoopStarted();
 	void StressLoopStarted();

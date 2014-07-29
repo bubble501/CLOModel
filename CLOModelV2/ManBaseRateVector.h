@@ -179,28 +179,30 @@ namespace ManagedCLO {
 		/*!
 		\brief Returns a Bloomberg vector containing the value of the base indexes represented in this vector using the database as a source
 		\arg Values A dictionary of overrides for specific indexes. It must contain the Bloomberg tickers (without yellow keys) of the relevant base index as key and it's value as as value.
+		\arg DownloadAll If set to true it will download all rates from the database instead of just the needed ones. Normally set to false. If Values is used for more than one model using true may result in more efficiency
 		\details This function will download the base rates values from the database.<br/>The Values table can be used to override specific base rates.<br/>If a base index is required by the model but not supplied it will be downloaded from Bloomberg.<br/>All downloaded values will be added to the Values table.
 		\note This function will not be available if the NO_DATABASE symbol is defined at compile time
 		\sa GetRefRateValueFromBloomberg
 		\sa CompileReferenceRateValue
 		*/
-		ManBloombergVector^ GetBaseRatesDatabase(ManConstBaseRateTable^ Values) {
+		ManBloombergVector^ GetBaseRatesDatabase(ManConstBaseRateTable^ Values, bool DownloadAll) {
 			ConstantBaseRateTable FillValues = *(Values->Unmanaged);
-			ManBloombergVector^ Result = gcnew ManBloombergVector(Unmanaged->GetBaseRatesDatabase(FillValues));
+			ManBloombergVector^ Result = gcnew ManBloombergVector(Unmanaged->GetBaseRatesDatabase(FillValues, DownloadAll));
 			Values = gcnew ManConstBaseRateTable(FillValues);
 			return Result;
 		}
 		/*!
 		\brief Returns a Bloomberg vector containing the value of the base indexes represented in this vector using the database as a source
 		\arg Values A table of overrides for specific indexes.
+		\arg DownloadAll If set to true it will download all rates from the database instead of just the needed ones. Normally set to false. If Values is used for more than one model using true may result in more efficiency
 		\details This function will download the base rates forward curves from the database.<br/>The Values table can be used to override specific base rates.<br/>If a base index is required by the model but not supplied, its spot rate will be downloaded from Bloomberg.<br/>All downloaded values will be added to the Values table.
 		\note This function will not be available if the NO_DATABASE symbol is defined at compile time
 		\sa GetRefRateValueFromBloomberg
 		\sa CompileReferenceRateValue
 		*/
-		ManBloombergVector^ GetBaseRatesDatabase(ManForwBaseRateTable^ Values) {
+		ManBloombergVector^ GetBaseRatesDatabase(ManForwBaseRateTable^ Values, bool DownloadAll) {
 			ForwardBaseRateTable FillValues = *(Values->Unmanaged);
-			ManBloombergVector^ Result = gcnew ManBloombergVector(Unmanaged->GetBaseRatesDatabase(FillValues));
+			ManBloombergVector^ Result = gcnew ManBloombergVector(Unmanaged->GetBaseRatesDatabase(FillValues, DownloadAll));
 			Values = gcnew ManForwBaseRateTable(FillValues);
 			return Result;
 		}

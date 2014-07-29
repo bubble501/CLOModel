@@ -15,6 +15,7 @@ CentralUnitAPI::CentralUnitAPI(QObject* parent)
 	,RunCall(false)
 	,ShowProgress(true)
 	,SequentialComputation(false)
+	, m_UseForwardCurve(false)
 {
 	if(!QMetaType::isRegistered(qMetaTypeId<Waterfall>()))
 		qRegisterMetaType<Waterfall>("Waterfall");
@@ -200,7 +201,7 @@ void CentralUnitAPI::SaveModel(const QString& FolderPath, const QString& ModelFi
 	if (file.open(QIODevice::WriteOnly)) {
 		QDataStream out(&file);
 		out.setVersion(QDataStream::Qt_5_3);
-		out << qint32(ModelVersionNumber) << LiborUpdateDate << Structure << CallStructure << LoansCalculator;
+		out << qint32(ModelVersionNumber) << LiborUpdateDate << m_UseForwardCurve << Structure << CallStructure << LoansCalculator;
 		file.close();
 	}
 }
@@ -213,7 +214,7 @@ bool CentralUnitAPI::LoadModel(const QString& DestPath) {
 	out.setVersion(QDataStream::Qt_5_3);
 	out >> VersionCheck;
 	if (VersionCheck < MinimumSupportedVersion) return false;
-	out >> LiborUpdateDate;
+	out >> LiborUpdateDate >> m_UseForwardCurve;
 	Structure.SetLoadProtocolVersion(VersionCheck);
 	out >> Structure;
 	CallStructure.SetLoadProtocolVersion(VersionCheck);
@@ -239,6 +240,7 @@ void CentralUnitAPI::CompileBaseRates(ForwardBaseRateTable& Values)const {
 	}
 	LoansCalculator.CompileReferenceRateValue(Values);
 	LiborUpdateDate = Values.GetUpdateDate();
+	m_UseForwardCurve = true;
 }
 void CentralUnitAPI::CompileBaseRates(ConstantBaseRateTable& Values)const {
 	for (int i = 0; i < Structure.GetTranchesCount(); i++) {
@@ -249,26 +251,29 @@ void CentralUnitAPI::CompileBaseRates(ConstantBaseRateTable& Values)const {
 	}
 	LoansCalculator.CompileReferenceRateValue(Values);
 	LiborUpdateDate = Values.GetUpdateDate();
+	m_UseForwardCurve = false;
 }
 #ifndef NO_DATABASE
-void CentralUnitAPI::GetBaseRatesDatabase(ConstantBaseRateTable& Values)const {
+void CentralUnitAPI::GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll)const {
 	for (int i = 0; i < Structure.GetTranchesCount(); i++) {
-		Structure.GetTranche(i)->GetBaseRatesDatabase(Values);
+		Structure.GetTranche(i)->GetBaseRatesDatabase(Values, DownloadAll);
 	}
 	for (int i = 0; i < CallStructure.GetTranchesCount(); i++) {
-		CallStructure.GetTranche(i)->GetBaseRatesDatabase(Values);
+		CallStructure.GetTranche(i)->GetBaseRatesDatabase(Values, DownloadAll);
 	}
-	LoansCalculator.GetBaseRatesDatabase(Values);
+	LoansCalculator.GetBaseRatesDatabase(Values, DownloadAll);
 	LiborUpdateDate = Values.GetUpdateDate();
+	m_UseForwardCurve = false;
 }
-void CentralUnitAPI::GetBaseRatesDatabase(ForwardBaseRateTable& Values)const {
+void CentralUnitAPI::GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll)const {
 	for (int i = 0; i < Structure.GetTranchesCount(); i++) {
-		Structure.GetTranche(i)->GetBaseRatesDatabase(Values);
+		Structure.GetTranche(i)->GetBaseRatesDatabase(Values, DownloadAll);
 	}
 	for (int i = 0; i < CallStructure.GetTranchesCount(); i++) {
-		CallStructure.GetTranche(i)->GetBaseRatesDatabase(Values);
+		CallStructure.GetTranche(i)->GetBaseRatesDatabase(Values, DownloadAll);
 	}
-	LoansCalculator.GetBaseRatesDatabase(Values);
+	LoansCalculator.GetBaseRatesDatabase(Values, DownloadAll);
 	LiborUpdateDate = Values.GetUpdateDate();
+	m_UseForwardCurve = true;
 }
 #endif

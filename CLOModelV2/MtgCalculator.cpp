@@ -134,13 +134,13 @@ void MtgCalculator::CompileReferenceRateValue(ConstantBaseRateTable& Values)cons
 		(*i)->CompileReferenceRateValue(Values);
 }
 #ifndef NO_DATABASE
-void MtgCalculator::GetBaseRatesDatabase(ConstantBaseRateTable& Values)const {
+void MtgCalculator::GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll)const {
 	for (QList<Mortgage*>::const_iterator i = Loans.begin(); i != Loans.end(); i++)
-		(*i)->GetBaseRatesDatabase(Values);
+		(*i)->GetBaseRatesDatabase(Values, DownloadAll);
 }
-void MtgCalculator::GetBaseRatesDatabase(ForwardBaseRateTable& Values)const {
+void MtgCalculator::GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll)const {
 	for (QList<Mortgage*>::const_iterator i = Loans.begin(); i != Loans.end(); i++)
-		(*i)->GetBaseRatesDatabase(Values);
+		(*i)->GetBaseRatesDatabase(Values, DownloadAll);
 }
 #endif
 QDataStream& operator>>(QDataStream & stream, MtgCalculator& flows) {

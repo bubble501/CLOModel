@@ -88,6 +88,12 @@ namespace ManagedCLO {
 			void set(String^ a) { Unmanaged->SetFloatingRateBase(String2QString(a)); }
 		}
 		/*!
+		\brief Whether the loan uses forward curves for the base rates or not
+		*/
+		property bool UseForwardCurve{
+			bool get() { return Unmanaged->GetUseForwardCurve(); }
+		}
+		/*!
 		\brief Uses the supplied base rates table to fill in the base rate values
 		\arg Values a base rate table that contains the relevant base rates spot values
 		\details This function will use the values supplied in the table as the values for the relevant base index rates.<br/>If a base index is required by the model but not supplied it will be downloaded from Bloomberg.
@@ -111,25 +117,27 @@ namespace ManagedCLO {
 		/*!
 		\brief Downloads the necessary base rates from the database
 		\arg Values A dictionary of overrides for specific indexes. It must contain the Bloomberg tickers (without yellow keys) of the relevant base index as key and it's value as as value.
+		\arg DownloadAll If set to true it will download all rates from the database instead of just the needed ones. Normally set to false. If Values is used for more than one model using true may result in more efficiency
 		\details This function will download the base rates values from the database.<br/>The Values dictionary can be used to override specific base rates.<br/>If a base index is required by the model but not supplied it will be downloaded from Bloomberg.<br/>All downloaded values will be added to the Values database.
 		\note If NO_DATABASE is defined at compile time this method will be unavailable
 		\sa CompileBaseRates
 		*/
-		void GetBaseRatesDatabase(ManConstBaseRateTable^ Values) {
+		void GetBaseRatesDatabase(ManConstBaseRateTable^ Values, bool DownloadAll) {
 			ConstantBaseRateTable FillValues = *(Values->Unmanaged);
-			Unmanaged->GetBaseRatesDatabase(FillValues);
+			Unmanaged->GetBaseRatesDatabase(FillValues, DownloadAll);
 			Values = gcnew ManConstBaseRateTable(FillValues);
 		}
 		/*!
 		\brief Downloads the necessary base rates from the database
 		\arg Values A table of overrides for specific indexes.
+		\arg DownloadAll If set to true it will download all rates from the database instead of just the needed ones. Normally set to false. If Values is used for more than one model using true may result in more efficiency
 		\details This function will download the base rates fowrad curves from the database.<br/>The Values table can be used to override specific base rates.<br/>If a base index is required by the model but not supplied its spot rate will be downloaded from Bloomberg and used as constant.<br/>All downloaded values will be added to the Values table.
 		\note If NO_DATABASE is defined at compile time this method will be unavailable
 		\sa CompileBaseRates
 		*/
-		void GetBaseRatesDatabase(ManForwBaseRateTable^ Values) {
+		void GetBaseRatesDatabase(ManForwBaseRateTable^ Values, bool DownloadAll) {
 			ForwardBaseRateTable FillValues = *(Values->Unmanaged);
-			Unmanaged->GetBaseRatesDatabase(FillValues);
+			Unmanaged->GetBaseRatesDatabase(FillValues, DownloadAll);
 			Values = gcnew ManForwBaseRateTable(FillValues);
 		}
 #endif

@@ -41,7 +41,7 @@ private:
 	IntegerVector PaymentFrequency;
 	QDate SettlementDate;
 	double AccruedInterest;
-	
+	mutable bool m_UseForwardCurve;
 #ifndef NO_BLOOMBERG
 	void GetRefRateValueFromBloomberg() const;
 #endif
@@ -95,13 +95,14 @@ public:
 	void SetInterestType(TrancheInterestType a){InterestType=a;}
 	void SetCoupon(const QString& a){Coupon=a;}
 	void SetReferenceRate(const QString& a){ReferenceRate=a;}
-	void SetReferenceRateValue(const QString& a){ReferenceRateValue=a;}
-	void SetReferenceRateValue(const BloombergVector& a){ReferenceRateValue=a;}
+	//void SetReferenceRateValue(const QString& a){ReferenceRateValue=a;}
+	//void SetReferenceRateValue(const BloombergVector& a){ReferenceRateValue=a;}
+	bool GetUseForwardCurve() const { return m_UseForwardCurve; }
 	void CompileReferenceRateValue(ConstantBaseRateTable& Values)const;
 	void CompileReferenceRateValue(ForwardBaseRateTable& Values)const;
 #ifndef NO_DATABASE
-	void GetBaseRatesDatabase(ConstantBaseRateTable& Values)const;
-	void GetBaseRatesDatabase(ForwardBaseRateTable& Values)const;
+	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll=false)const;
+	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll=false)const;
 #endif
 	void SetPrice(double a){if(a>0) Price=a;}
 	void SetBloombergExtension(const QString& a);

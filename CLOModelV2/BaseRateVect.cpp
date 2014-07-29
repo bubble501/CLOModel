@@ -286,7 +286,7 @@ BloombergVector BaseRateVector::GetRefRateValueFromBloomberg(ForwardBaseRateTabl
 }
 #endif
 #ifndef NO_DATABASE
-BloombergVector BaseRateVector::GetBaseRatesDatabase(ConstantBaseRateTable& ReferencesValues) const {
+BloombergVector BaseRateVector::GetBaseRatesDatabase(ConstantBaseRateTable& ReferencesValues, bool DownloadAll) const {
 	if (IsEmpty()) return BloombergVector();
 	bool AllRefFound = true;
 	for (int i = 0; i < m_VectVal.size() && AllRefFound; i++) {
@@ -310,7 +310,7 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ConstantBaseRateTable& Refe
 			while (query.next()) {
 				if (
 					!ReferencesValues.GetValues().contains(query.value(0).toString())
-					&& m_VectVal.contains(StringToAvailableRates(query.value(0).toString()))
+					&& (DownloadAll || m_VectVal.contains(StringToAvailableRates(query.value(0).toString())))
 					) {
 					ReferencesValues.GetValues().insert(query.value(0).toString(), query.value(1).toDouble());
 					if (MinUpdateDate.isNull() || query.value(2).toDateTime().date() < MinUpdateDate) MinUpdateDate = query.value(2).toDateTime().date();
@@ -325,7 +325,7 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ConstantBaseRateTable& Refe
 	}
 	return BloombergVector();
 }
-BloombergVector BaseRateVector::GetBaseRatesDatabase(ForwardBaseRateTable& ReferencesValues) const {
+BloombergVector BaseRateVector::GetBaseRatesDatabase(ForwardBaseRateTable& ReferencesValues, bool DownloadAll) const {
 	if (IsEmpty()) return BloombergVector();
 	bool AllRefFound = true;
 	for (int i = 0; i < m_VectVal.size() && AllRefFound; i++) {
@@ -350,7 +350,7 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ForwardBaseRateTable& Refer
 			while (query.next()) {
 				if (
 					!ReferencesValues.GetValues().contains(query.value(0).toString())
-					&& m_VectVal.contains(StringToAvailableRates(query.value(0).toString()))
+					&& (DownloadAll || m_VectVal.contains(StringToAvailableRates(query.value(0).toString())))
 				) {
 					QueryResults[query.value(0).toString()][query.value(1).toDateTime().date()] = query.value(2).toDouble();
 					if (MinUpdateDate.isNull() || query.value(3).toDateTime().date() < MinUpdateDate) MinUpdateDate = query.value(3).toDateTime().date();

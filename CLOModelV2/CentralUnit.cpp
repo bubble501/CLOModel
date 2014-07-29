@@ -17,6 +17,7 @@ CentralUnit::CentralUnit(QObject* parent)
 	,MtgsProgress(NULL)
 	,RunCall(false)
 	,UseFastStress(false)
+	, m_UseForwardCurve(false)
 {
 	for(int i=0;i<NumberOfPlots;i++) PlotIndexes[i]=0;
 	if(!QMetaType::isRegistered(qMetaTypeId<Waterfall>()))
@@ -270,7 +271,7 @@ void CentralUnit::CheckCalculationDone()
 			if (UnifiedFile.open(QIODevice::WriteOnly)) {
 				QDataStream out(&UnifiedFile);
 				out.setVersion(QDataStream::Qt_5_3);
-				out << qint32(ModelVersionNumber) << LiborUpdateDate << Structure << CallStructure << LoansCalculator;
+				out << qint32(ModelVersionNumber) << LiborUpdateDate << m_UseForwardCurve << Structure << CallStructure << LoansCalculator;
 				UnifiedFile.close();
 			}
 		}
@@ -391,6 +392,7 @@ void CentralUnit::CompileBaseRates(ConstantBaseRateTable& Values)const {
 	}
 	LoansCalculator.CompileReferenceRateValue(Values);
 	LiborUpdateDate = Values.GetUpdateDate();
+	m_UseForwardCurve = false;
 }
 void CentralUnit::CompileBaseRates(ForwardBaseRateTable& Values)const {
 	for (int i = 0; i < Structure.GetTranchesCount(); i++) {
@@ -401,26 +403,29 @@ void CentralUnit::CompileBaseRates(ForwardBaseRateTable& Values)const {
 	}
 	LoansCalculator.CompileReferenceRateValue(Values);
 	LiborUpdateDate = Values.GetUpdateDate();
+	m_UseForwardCurve = true;
 }
 #ifndef NO_DATABASE
-void CentralUnit::GetBaseRatesDatabase(ConstantBaseRateTable& Values) const {
+void CentralUnit::GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll) const {
 	for (int i = 0; i < Structure.GetTranchesCount(); i++) {
-		Structure.GetTranche(i)->GetBaseRatesDatabase(Values);
+		Structure.GetTranche(i)->GetBaseRatesDatabase(Values, DownloadAll);
 	}
 	for (int i = 0; i < CallStructure.GetTranchesCount(); i++) {
-		CallStructure.GetTranche(i)->GetBaseRatesDatabase(Values);
+		CallStructure.GetTranche(i)->GetBaseRatesDatabase(Values, DownloadAll);
 	}
-	LoansCalculator.GetBaseRatesDatabase(Values);
+	LoansCalculator.GetBaseRatesDatabase(Values, DownloadAll);
 	LiborUpdateDate = Values.GetUpdateDate();
+	m_UseForwardCurve = false;
 }
-void CentralUnit::GetBaseRatesDatabase(ForwardBaseRateTable& Values) const {
+void CentralUnit::GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll) const {
 	for (int i = 0; i < Structure.GetTranchesCount(); i++) {
-		Structure.GetTranche(i)->GetBaseRatesDatabase(Values);
+		Structure.GetTranche(i)->GetBaseRatesDatabase(Values, DownloadAll);
 	}
 	for (int i = 0; i < CallStructure.GetTranchesCount(); i++) {
-		CallStructure.GetTranche(i)->GetBaseRatesDatabase(Values);
+		CallStructure.GetTranche(i)->GetBaseRatesDatabase(Values, DownloadAll);
 	}
-	LoansCalculator.GetBaseRatesDatabase(Values);
+	LoansCalculator.GetBaseRatesDatabase(Values, DownloadAll);
 	LiborUpdateDate = Values.GetUpdateDate();
+	m_UseForwardCurve = true;
 }
 #endif

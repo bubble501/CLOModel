@@ -40,11 +40,12 @@ public:
 	void SetSequentialComputation(bool a);
 	bool GetSequentialComputation()const {return SequentialComputation;}
 	const  QDate& GetLiborUpdateDate() const { return LiborUpdateDate; }
+	bool GetUseForwardCurve() const { return m_UseForwardCurve; }
 	void CompileBaseRates(ForwardBaseRateTable& Values)const;
 	void CompileBaseRates(ConstantBaseRateTable& Values)const;
 #ifndef NO_DATABASE
-	void GetBaseRatesDatabase(ConstantBaseRateTable& Values)const;
-	void GetBaseRatesDatabase(ForwardBaseRateTable& Values)const;
+	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll=false)const;
+	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll=false)const;
 #endif
 private:
 	ProgressWidget* MtgsProgress;
@@ -57,6 +58,7 @@ private:
 	bool ShowProgress;
 	bool SequentialComputation;
 	mutable QDate LiborUpdateDate;
+	mutable bool m_UseForwardCurve;
 signals:
 	void LoopStarted();
 	void ProgressUpdate(double);

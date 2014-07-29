@@ -213,7 +213,7 @@ namespace ManagedCLO {
 		}
 		/*!
 		\brief The value of the base rate for the tranche
-		\details For floating rate tranches this property holds the value of the base rate and for fixed rate notes the value for the base rate used when calculating the discount margin<br/>Set to an empty string to have it downloaded from Bloomberg
+		\details For floating rate tranches this property holds the value of the base rate and for fixed rate notes the value for the base rate used when calculating the discount margin.<br/>Use CompileBaseRates or GetBaseRatesDatabase to set the value for this property.
 		\sa ReferenceRate
 		\sa DefaultRefRate
 		\sa GetReferenceRateValue(int)
@@ -221,7 +221,13 @@ namespace ManagedCLO {
 		*/
 		property String^ ReferenceRateValue{
 			String^ get(){return QString2String(Unmanaged->GetReferenceRateValue().GetVector());}
-			void set(String^ a){Unmanaged->SetReferenceRateValue(String2QString(a));}
+			//void set(String^ a){Unmanaged->SetReferenceRateValue(String2QString(a));}
+		}
+		/*!
+		\brief Whether the tranches uses forward curves for the base rates or not
+		*/
+		property bool UseForwardCurve{
+			bool get() { return Unmanaged->GetUseForwardCurve(); }
 		}
 		/*!
 		\brief The value of the base rate for the tranche at the specified index
@@ -266,11 +272,12 @@ namespace ManagedCLO {
 		/*!
 		\brief Downloads the necessary base rates from the database
 		\arg Values A table of overrides for specific indexes.
+		\arg DownloadAll If set to true it will download all rates from the database instead of just the needed ones. Normally set to false. If Values is used for more than one model using true may result in more efficiency
 		\details This function will download the base rates values from the database.<br/>The Values table can be used to override specific base rates.<br/>If a base index is required by the model but not supplied it will be downloaded from Bloomberg.<br/>All downloaded values will be added to the Values table.
 		\note If NO_DATABASE is defined at compile time this method will be unavailable
 		\sa CompileBaseRates
 		*/
-		void GetBaseRatesDatabase(ManConstBaseRateTable^ Values) {
+		void GetBaseRatesDatabase(ManConstBaseRateTable^ Values, bool DownloadAll) {
 			ConstantBaseRateTable FillValues = *(Values->Unmanaged);
 			Unmanaged->GetBaseRatesDatabase(FillValues);
 			Values = gcnew ManConstBaseRateTable(FillValues);
@@ -278,11 +285,12 @@ namespace ManagedCLO {
 		/*!
 		\brief Downloads the necessary base rates from the database
 		\arg Values A table of overrides for specific indexes.
+		\arg DownloadAll If set to true it will download all rates from the database instead of just the needed ones. Normally set to false. If Values is used for more than one model using true may result in more efficiency
 		\details This function will download the base rates values from the database.<br/>The Values table can be used to override specific base rates.<br/>If a base index is required by the model but not supplied its spot rate will be downloaded from Bloomberg and used as constant.<br/>All downloaded values will be added to the Values table.
 		\note If NO_DATABASE is defined at compile time this method will be unavailable
 		\sa CompileBaseRates
 		*/
-		void GetBaseRatesDatabase(ManForwBaseRateTable^ Values) {
+		void GetBaseRatesDatabase(ManForwBaseRateTable^ Values, bool DownloadAll) {
 			ForwardBaseRateTable FillValues = *(Values->Unmanaged);
 			Unmanaged->GetBaseRatesDatabase(FillValues);
 			Values = gcnew ManForwBaseRateTable(FillValues);

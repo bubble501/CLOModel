@@ -21,6 +21,7 @@ private:
 	BaseRateVector m_FloatRateBase;
 	mutable BloombergVector m_FloatingRateBaseValue;
 	IntegerVector m_PaymentFreq;
+	mutable bool m_UseForwardCurve;
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream);
 	double GetInterest(const QDate& a, int frequency=12);
@@ -35,11 +36,12 @@ public:
 
 	const BaseRateVector& GetFloatingRateBase() const { return m_FloatRateBase; }
 	const BloombergVector& GetFloatingRateValue() const { return m_FloatingRateBaseValue; }
-	void CompileReferenceRateValue(ForwardBaseRateTable& Values)const { m_FloatingRateBaseValue = m_FloatRateBase.CompileReferenceRateValue(Values); }
-	void CompileReferenceRateValue(ConstantBaseRateTable& Values)const { m_FloatingRateBaseValue = m_FloatRateBase.CompileReferenceRateValue(Values); }
+	bool GetUseForwardCurve() const { return m_UseForwardCurve; }
+	void CompileReferenceRateValue(ForwardBaseRateTable& Values)const { m_FloatingRateBaseValue = m_FloatRateBase.CompileReferenceRateValue(Values); m_UseForwardCurve = true; }
+	void CompileReferenceRateValue(ConstantBaseRateTable& Values)const { m_FloatingRateBaseValue = m_FloatRateBase.CompileReferenceRateValue(Values); m_UseForwardCurve = false; }
 #ifndef NO_DATABASE
-	void GetBaseRatesDatabase(ConstantBaseRateTable& Values)const { m_FloatingRateBaseValue = m_FloatRateBase.GetBaseRatesDatabase(Values); }
-	void GetBaseRatesDatabase(ForwardBaseRateTable& Values)const { m_FloatingRateBaseValue = m_FloatRateBase.GetBaseRatesDatabase(Values); }
+	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll = false)const { m_FloatingRateBaseValue = m_FloatRateBase.GetBaseRatesDatabase(Values, DownloadAll); m_UseForwardCurve = false; }
+	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll = false)const { m_FloatingRateBaseValue = m_FloatRateBase.GetBaseRatesDatabase(Values, DownloadAll); m_UseForwardCurve = true; }
 #endif
 
 	void SetFloatingRateBase(const BaseRateVector& a) { m_FloatRateBase = a; }

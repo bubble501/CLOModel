@@ -110,6 +110,7 @@ Public Sub GetInputFromStructure( _
     Dim DelinqCell As Range
     Dim DelinqLagCell As Range
     Dim CurrentDeferredCell As Range
+    Dim UseForwardCell As Range
     On Error Resume Next
     Set HaircutVecStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("HaircutVecHeader"), LookAt:=xlWhole, LookIn:=xlValues)
     Set IsinFldsStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("IsinFldsHeader"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -140,6 +141,7 @@ Public Sub GetInputFromStructure( _
     Set DelinqCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("DelinqCell"), LookAt:=xlWhole, LookIn:=xlValues)
     Set DelinqLagCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("DelinqLagCell"), LookAt:=xlWhole, LookIn:=xlValues)
     Set CurrentDeferredCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("CurrentDeferredCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set UseForwardCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("UseForwardCell"), LookAt:=xlWhole, LookIn:=xlValues)
     On Error GoTo 0
     Set BaseIndexHead = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("BaseIndexHead"), LookAt:=xlWhole, LookIn:=xlValues)
     Set MaturityStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("MaturityHeader"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -310,6 +312,12 @@ DefaultExchange:
 '        Call AddInput(AllTheInputs, CStr(BaseIndexesStart.Offset(i, 0).Value))
 '        Call AddInput(AllTheInputs, BaseIndexesStart.Offset(i, 1).Value)
 '    Next i
+
+    If (UseForwardCell Is Nothing) Then
+        Call AddInput(AllTheInputs, False)
+    Else
+        Call AddInput(AllTheInputs, CBool(UseForwardCell.Offset(0, 1).Value))
+    End If
     If (IsEmpty(WaterfallStart.Offset(2, 0))) Then
         Call AddInput(AllTheInputs, CLng(0))
     Else
@@ -672,7 +680,7 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
     a.Add "Delinquency", "DelinqCell"
     a.Add "Delinquency Lag", "DelinqLagCell"
     a.Add "Current Deferred", "CurrentDeferredCell"
-    
+    a.Add "Use Forward Curves", "UseForwardCell"
 End Sub
 
 Private Function FromStringToInterestType(a As String) As Long

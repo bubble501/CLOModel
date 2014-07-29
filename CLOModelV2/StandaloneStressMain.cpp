@@ -14,6 +14,50 @@
 #include "BaseRateVect.h"
 #include "BaseRateTable.h"
 #endif
+
+
+QString TempFunc(int a) {
+	switch (a) {
+	case BaseRateVector::EUR001W: return "EUR001W";
+	case BaseRateVector::EUR002W: return "EUR002W";
+	case BaseRateVector::EUR003W: return "EUR003W";
+	case BaseRateVector::EUR001M: return "EUR001M";
+	case BaseRateVector::EUR002M: return "EUR002M";
+	case BaseRateVector::EUR003M: return "EUR003M";
+	case BaseRateVector::EUR004M: return "EUR004M";
+	case BaseRateVector::EUR005M: return "EUR005M";
+	case BaseRateVector::EUR006M: return "EUR006M";
+	case BaseRateVector::EUR007M: return "EUR007M";
+	case BaseRateVector::EUR008M: return "EUR008M";
+	case BaseRateVector::EUR009M: return "EUR009M";
+	case BaseRateVector::EUR010M: return "EUR010M";
+	case BaseRateVector::EUR011M: return "EUR011M";
+	case BaseRateVector::EUR012M: return "EUR012M";
+	case BaseRateVector::BP00ON: return "BP00ON";
+	case BaseRateVector::BP0001W: return "BP0001W";
+	case BaseRateVector::BP0001M: return "BP0001M";
+	case BaseRateVector::BP0002M: return "BP0002M";
+	case BaseRateVector::BP0003M: return "BP0003M";
+	case BaseRateVector::BP0006M: return "BP0006M";
+	case BaseRateVector::BP0012M: return "BP0012M";
+	case BaseRateVector::US00ON: return "US00ON";
+	case BaseRateVector::US0001W: return "US0001W";
+	case BaseRateVector::US0001M: return "US0001M";
+	case BaseRateVector::US0002M: return "US0002M";
+	case BaseRateVector::US0003M: return "US0003M";
+	case BaseRateVector::US0006M: return "US0006M";
+	case BaseRateVector::US0012M: return "US0012M";
+	case BaseRateVector::LIBOR01W: return "LIBOR01W";
+	case BaseRateVector::LIBOR01M: return "LIBOR01M";
+	case BaseRateVector::LIBOR02M: return "LIBOR02M";
+	case BaseRateVector::LIBOR03M: return "LIBOR03M";
+	case BaseRateVector::LIBOR06M: return "LIBOR06M";
+	case BaseRateVector::LIBOR12M: return "LIBOR12M";
+	case BaseRateVector::ZeroFlat: return "ZERO";
+	default: return "";
+	}
+}
+
 int main(int argc, char *argv[]) {
 
 
@@ -68,8 +112,9 @@ int main(int argc, char *argv[]) {
 	file.close();
 	ConstantBaseRateTable ResultingValues;
 	for (int i = 0; i < TempWtf.GetTranchesCount();i++) {
-		TempWtf.GetTranche(i)->CompileReferenceRateValue(ResultingValues);
+		TempWtf.GetTranche(i)->GetBaseRatesDatabase(ResultingValues,true);
 	}
+	
 
 	/*Tranche TempTrnch;
 	TempTrnch.SetSettlementDate(QDate(2014, 6, 1));

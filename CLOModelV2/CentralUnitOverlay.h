@@ -14,8 +14,8 @@ namespace ManagedCLO {
 		void CompileBaseRates(ManConstBaseRateTable^ Values);
 		void CompileBaseRates(ManForwBaseRateTable^ Values);
 #ifndef NO_DATABASE
-		void GetBaseRatesDatabase(ManConstBaseRateTable^ Values);
-		void GetBaseRatesDatabase(ManForwBaseRateTable^ Values);
+		void GetBaseRatesDatabase(ManConstBaseRateTable^ Values, bool DownloadAll);
+		void GetBaseRatesDatabase(ManForwBaseRateTable^ Values, bool DownloadAll);
 #endif
 	private:
 		gcroot<ManCentralUnit^> m_ManagedVersion;

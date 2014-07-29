@@ -11,6 +11,7 @@ Mortgage::Mortgage()
 	, m_FloatRateBase("ZERO")
 	, m_FloatingRateBaseValue("0")
 	,m_Size(0.0)
+	, m_UseForwardCurve(false)
 {}
 void Mortgage::SetAnnuity(const QString& a){
 	m_AnnuityVect=a;
@@ -30,6 +31,7 @@ void Mortgage::SetInterest(const QString& a){
 	 ,m_MaturityDate(a.m_MaturityDate)
 	 ,m_CashFlows(a.m_CashFlows)
 	 ,m_HaircutVector(a.m_HaircutVector)
+	 , m_UseForwardCurve(a.m_UseForwardCurve)
  {}
  const Mortgage& Mortgage::operator=(const Mortgage& a){
 	 m_LossMultiplier=a.m_LossMultiplier;
@@ -43,6 +45,7 @@ void Mortgage::SetInterest(const QString& a){
 	 m_MaturityDate=a.m_MaturityDate;
 	 m_CashFlows=a.m_CashFlows;
 	 m_HaircutVector=a.m_HaircutVector;
+	 m_UseForwardCurve = a.m_UseForwardCurve;
 	 return *this;
  }
  bool Mortgage::CalculateCashFlows(const QDate& StartDate, const QString& CPRVecs, const QString& CDRVecs, const QString& LossVecs, const QString& RecoveryLag, const QString& Delinquency, const QString& DelinquencyLag) {
@@ -253,6 +256,7 @@ void Mortgage::SetInterest(const QString& a){
 		 << flows.m_FloatingRateBaseValue
 		 << flows.m_PaymentFreq
 		 << flows.m_HaircutVector
+		 << flows.m_UseForwardCurve
 	;
 	 return stream;
  }
@@ -268,6 +272,7 @@ void Mortgage::SetInterest(const QString& a){
 	 m_FloatingRateBaseValue.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_FloatingRateBaseValue;
 	 m_PaymentFreq.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_PaymentFreq;
 	 m_HaircutVector.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_HaircutVector;
+	 stream >> m_UseForwardCurve;
 	 ResetProtocolVersion();
 	 return stream;
  }
@@ -292,12 +297,14 @@ void Mortgage::SetInterest(const QString& a){
 	 if (m_FloatRateBase.IsEmpty()) //Fixed rate
 		 return m_InterestVect.GetValue(a, frequency);
 	 else {
-		 if (m_FloatingRateBaseValue.IsEmpty())
+		 if (m_FloatingRateBaseValue.IsEmpty()) {
 #ifdef NO_BLOOMBERG
 			 m_FloatingRateBaseValue="0";
 #else
 			 m_FloatingRateBaseValue = m_FloatRateBase.GetRefRateValueFromBloomberg(ConstantBaseRateTable());
+			 m_UseForwardCurve = false;
 #endif
+		 }
 		 return m_InterestVect.GetValue(a, frequency) + m_FloatingRateBaseValue.GetValue(a, frequency);
 	 }
  }
@@ -305,12 +312,14 @@ void Mortgage::SetInterest(const QString& a){
 	 if (m_FloatRateBase.IsEmpty()) //Fixed rate
 		 return m_InterestVect.GetValue(a, frequency);
 	 else {
-		 if (m_FloatingRateBaseValue.IsEmpty()) 
+		 if (m_FloatingRateBaseValue.IsEmpty()) {
 #ifdef NO_BLOOMBERG
 			 m_FloatingRateBaseValue = "0";
 #else
 			 m_FloatingRateBaseValue = m_FloatRateBase.GetRefRateValueFromBloomberg(ConstantBaseRateTable());
+			 m_UseForwardCurve = false;
 #endif
+		 }
 		 return m_InterestVect.GetValue(a, frequency) + m_FloatingRateBaseValue.GetValue(a, frequency);
 	 }
  }

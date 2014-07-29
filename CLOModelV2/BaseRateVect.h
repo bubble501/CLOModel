@@ -74,8 +74,8 @@ public:
 	BloombergVector GetRefRateValueFromBloomberg(ForwardBaseRateTable& Values)const;
 #endif
 #ifndef NO_DATABASE
-	BloombergVector GetBaseRatesDatabase(ConstantBaseRateTable& ReferencesValues) const;
-	BloombergVector GetBaseRatesDatabase(ForwardBaseRateTable& ReferencesValues) const;
+	BloombergVector GetBaseRatesDatabase(ConstantBaseRateTable& ReferencesValues, bool DownloadAll=false) const;
+	BloombergVector GetBaseRatesDatabase(ForwardBaseRateTable& ReferencesValues, bool DownloadAll=false) const;
 #endif 
 	BaseRateVector& operator=(const QString& a){AbstarctBbgVect::operator=(a); return *this;}
 	friend QDataStream& operator<<(QDataStream & stream, const BaseRateVector& flows);

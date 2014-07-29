@@ -77,24 +77,47 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		}
 	}
 	{//Base Rates Compilation
-		ConstantBaseRateTable CompilationTable;
+		bool UseForwardRates = pdFreq->boolVal; pdFreq++;
+		if (UseForwardRates) {
+			ForwardBaseRateTable CompilationTable;
 #ifndef NO_DATABASE
-		TempUnit.GetBaseRatesDatabase(CompilationTable);
+			TempUnit.GetBaseRatesDatabase(CompilationTable);
 #else
-	#ifndef NO_BLOOMBERG
-		TempUnit.CompileBaseRates(CompilationTable);
-	#else
-		int NumOfBaseRates = pdFreq->intVal; pdFreq++;
-		QString BaseName;
-		double BaseVal;
-		for (int i = 0; i < NumOfBaseRates; i++) {
-			BaseName = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
-			BaseVal = pdFreq->dblVal; pdFreq++;
-			CompilationTable.insert(BaseName.trimmed().toUpper(), BaseVal);
-		}
-		TempUnit.CompileBaseRates(CompilationTable);
-	#endif // NO_BLOOMBERG
+#ifndef NO_BLOOMBERG
+			TempUnit.CompileBaseRates(CompilationTable);
+#else
+			int NumOfBaseRates = pdFreq->intVal; pdFreq++;
+			QString BaseName;
+			double BaseVal;
+			for (int i = 0; i < NumOfBaseRates; i++) {
+				BaseName = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+				BaseVal = pdFreq->dblVal; pdFreq++;
+				CompilationTable.insert(BaseName.trimmed().toUpper(), BaseVal);
+			}
+			TempUnit.CompileBaseRates(CompilationTable);
+#endif // NO_BLOOMBERG
 #endif // NO_DATABASE
+		}
+		else{
+			ConstantBaseRateTable CompilationTable;
+#ifndef NO_DATABASE
+			TempUnit.GetBaseRatesDatabase(CompilationTable);
+#else
+#ifndef NO_BLOOMBERG
+			TempUnit.CompileBaseRates(CompilationTable);
+#else
+			int NumOfBaseRates = pdFreq->intVal; pdFreq++;
+			QString BaseName;
+			double BaseVal;
+			for (int i = 0; i < NumOfBaseRates; i++) {
+				BaseName = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+				BaseVal = pdFreq->dblVal; pdFreq++;
+				CompilationTable.insert(BaseName.trimmed().toUpper(), BaseVal);
+			}
+			TempUnit.CompileBaseRates(CompilationTable);
+#endif // NO_BLOOMBERG
+#endif // NO_DATABASE
+		}
 	}
 	{ //Waterfall Steps
 		int Prior,GrpTg, RedTg;

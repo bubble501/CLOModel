@@ -32,8 +32,8 @@ public:
 	void CompileReferenceRateValue(ForwardBaseRateTable& Values)const;
 	void CompileReferenceRateValue(ConstantBaseRateTable& Values)const;
 #ifndef NO_DATABASE
-	void GetBaseRatesDatabase(ConstantBaseRateTable& Values)const;
-	void GetBaseRatesDatabase(ForwardBaseRateTable& Values)const;
+	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll=false)const;
+	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll=false)const;
 #endif
 
 	const QDate& GetStartDate()const {return StartDate;}

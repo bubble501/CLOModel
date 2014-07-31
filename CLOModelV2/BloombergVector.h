@@ -21,6 +21,12 @@ public:
 	BloombergVector(const QString& Vec);
 	BloombergVector(const BloombergVector& Vec);
 	BloombergVector(const QString& Vec,const QDate& Anchor);
+	BloombergVector(const QList<double>& Values, const QDate& Anchor = QDate());
+	BloombergVector(const QList<QDate>& Dates, const QList<double>& Values);
+	using::AbstarctBbgVect::SetVector;
+	bool SetVector(const QList<double>& Values, const QDate& Anchor);
+	bool SetVector(const QList<double>& Values);
+	bool SetVector(const QList<QDate>& Dates, const QList<double>& Values);
 	virtual double GetValue(const QDate& index,int Frequency=12) const;
 	virtual double GetValue(int index,int Frequency=12) const;
 	virtual double GetSMM(const QDate& index, int Frequency = 12) const;

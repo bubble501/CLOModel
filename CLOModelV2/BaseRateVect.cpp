@@ -351,15 +351,16 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ForwardBaseRateTable& Refer
 	if (db.open()) {
 		QSqlQuery query;
 		query.setForwardOnly(true);
-		query.prepare("{CALL " + ConfigIni.value("ForwardBaseRatesStoredProc", "getForwardIndexPrices" /*TODO Change me*/).toString() + "}");
+		query.prepare("{CALL " + ConfigIni.value("ForwardBaseRatesStoredProc", "getForwardCurveMatrix").toString() + "}");
 		if (query.exec()) {
-			QHash < QString, QMap<QDate, double> > QueryResults;
+			//QHash < QString, QMap<QDate, double> > QueryResults;
+			QHash < QString, QHash<QDate, double> > QueryResults;
 			while (query.next()) {
 				if (
-					!ReferencesValues.GetValues().contains(query.value(0).toString())
+					!ReferencesValues.GetValues().contains(query.value(0).toString().trimmed().toUpper())
 					&& (DownloadAll || m_VectVal.contains(StringToAvailableRates(query.value(0).toString())))
 				) {
-					QueryResults[query.value(0).toString()][query.value(1).toDateTime().date()] = query.value(2).toDouble();
+					QueryResults[query.value(0).toString().trimmed().toUpper()][query.value(1).toDateTime().date()] = query.value(2).toDouble();
 					if (MinUpdateDate.isNull() || query.value(3).toDateTime().date() < MinUpdateDate) MinUpdateDate = query.value(3).toDateTime().date();
 				}
 					
@@ -368,12 +369,13 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ForwardBaseRateTable& Refer
 			ConfigIni.endGroup();
 			const QList<QString> ReferencesList = QueryResults.keys();
 			for (QList<QString>::ConstIterator i = ReferencesList.constBegin(); i != ReferencesList.constEnd(); i++) {
-				const QMap<QDate, double> CurentCurve = QueryResults.value(*i);
+				/*const QMap<QDate, double> CurentCurve = QueryResults.value(*i);
 				QString CurveVector = QString("%1").arg(100.0*CurentCurve.first());
 				for (QMap<QDate, double>::ConstIterator CurveIter = CurentCurve.constBegin()+1; CurveIter != CurentCurve.constEnd(); CurveIter++) {
 					CurveVector += QString(" %1R %2").arg(MonthDiff(CurveIter.key(), (CurveIter - 1).key())).arg(100.0*CurveIter.value());
 				}
-				ReferencesValues.GetValues().insert(*i, BloombergVector(CurveVector, CurentCurve.firstKey()));
+				ReferencesValues.GetValues().insert(*i, BloombergVector(CurveVector, CurentCurve.firstKey()));*/
+				ReferencesValues.GetValues().insert(*i, BloombergVector(QueryResults.value(*i).keys(), QueryResults.value(*i).values()));
 			}
 			ReferencesValues.SetUpdateDate(MinUpdateDate);
 			return CompileReferenceRateValue(ReferencesValues);

@@ -94,6 +94,7 @@ int main(int argc, char *argv[]) {
 	}*/
 
 
+/*
 	Waterfall TempWtf, TempCallWaterfall;
 	QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/.BaseCase.clo");
 	file.open(QIODevice::ReadOnly);
@@ -113,7 +114,7 @@ int main(int argc, char *argv[]) {
 	ConstantBaseRateTable ResultingValues;
 	for (int i = 0; i < TempWtf.GetTranchesCount();i++) {
 		TempWtf.GetTranche(i)->GetBaseRatesDatabase(ResultingValues,true);
-	}
+	}*/
 	
 
 	/*Tranche TempTrnch;
@@ -269,6 +270,9 @@ int main(int argc, char *argv[]) {
 		QApplication a(argc, argv);
 		QMessageBox::information(0,"Success", "Cash Flows are identical");		
 	}*/
+ForwardBaseRateTable Curves;
+BaseRateVector BaseVec("EUR003M");
+BloombergVector Downloaded = BaseVec.GetBaseRatesDatabase(Curves);
 
 #endif
 }

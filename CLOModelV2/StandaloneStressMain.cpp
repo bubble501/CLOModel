@@ -15,6 +15,7 @@
 #include "BaseRateTable.h"
 #include "BloombergRequest.h"
 #include "SyncBloombergWorker.h"
+#include "AsyncBloombergWorker.h"
 #endif
 
 
@@ -230,6 +231,7 @@ int main(int argc, char *argv[]) {
 		QApplication a(argc, argv);
 		QMessageBox::information(0,"Success", "Cash Flows are identical");		
 	}*/
+QApplication a(argc, argv);
 BloombergRequest TestReq;
 QMap<QString, QString> Ovr;
 Ovr.insert("MTG_PREPAY_SPEED", "90");
@@ -237,7 +239,8 @@ Ovr.insert("MTG_PREPAY_TYP", "CPR");
 TestReq.AddRequest("XS1071274531", "MTG_CASH_FLOW", Ovr);
 Ovr["MTG_PREPAY_SPEED"] = "2";
 TestReq.AddRequest("XS1071274531", "MTG_CASH_FLOW", Ovr);
-SyncBloombergWorker TempWorker;
+AsyncBloombergWorker TempWorker;
 TempWorker.StartRequest(TestReq);
+return a.exec();
 #endif
 }

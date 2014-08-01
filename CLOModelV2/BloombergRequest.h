@@ -7,6 +7,8 @@
 #include "BackwardCompatibilityInterface.h"
 class SyncBloombergWorker;
 class SingleBbgRequest;
+class AsyncBloombergWorker;
+class AsyncEventHandler;
 class BloombergRequest : public BackwardInterface {
 public:
 	enum YellowKeys {
@@ -30,6 +32,7 @@ public:
 		,SessionError=8
 		,ServiceError=16
 		,FieldError=32
+		,UnknownError=64
 	};
 	static QString YellowKey2String(YellowKeys a);
 	static YellowKeys String2YellowKey(const QString& a);
@@ -68,7 +71,9 @@ protected:
 	friend QDataStream& operator<<(QDataStream & stream, const BloombergRequest& flows);
 	friend QDataStream& operator>>(QDataStream & stream, BloombergRequest& flows);
 	friend SyncBloombergWorker;
+	friend AsyncBloombergWorker;
 	friend SingleBbgRequest;
+	friend AsyncEventHandler;
 };
 
 QDataStream& operator<<(QDataStream & stream, const BloombergRequest& flows);

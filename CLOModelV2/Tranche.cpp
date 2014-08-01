@@ -184,7 +184,7 @@ void Tranche::GetDataFromBloomberg(){
 	TempReq.AddRequest(13, IdentityCode, "ID_ISIN", BloombergRequest::String2YellowKey(BloombergExtension));
 
 
-	const BloombergRequest& Result = Bee.StartRequest(TempReq);
+	const BloombergRequest& Result = Bee.GetResults(TempReq);
 	if (Result.HasErrors()) return;
 
 	if (Result.GetRequest(1)->HasErrors()) OriginalAmt = 0.0;

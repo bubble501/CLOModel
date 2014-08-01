@@ -322,7 +322,7 @@ int Waterfall::FindTrancheIndex(const QString& Tranchename)const{
 	ISINRequest.AddRequest(Tranchename, "ID_CUSIP");
 	ISINRequest.AddRequest(Tranchename, "ID_BB_GLOBAL");
 	ISINRequest.AddRequest(Tranchename, "ID_BB_UNIQU");
-	const BloombergRequest& TempResults = ISINparser.StartRequest(ISINRequest);
+	const BloombergRequest& TempResults = ISINparser.GetResults(ISINRequest);
 	if (!TempResults.HasErrors()) {
 		for (int RespIter = 0; RespIter < TempResults.NumRequests(); RespIter++) {
 			if (!TempResults.GetRequest(RespIter)->HasErrors()) {

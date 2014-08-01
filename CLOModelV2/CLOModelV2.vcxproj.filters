@@ -194,6 +194,9 @@
     <ClInclude Include="SyncBloombergWorker.h">
       <Filter>Header Files\Bloomberg</Filter>
     </ClInclude>
+    <ClInclude Include="AbstractBbgWorker.h">
+      <Filter>Header Files\Bloomberg</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="CentralUnit.h">
@@ -249,6 +252,12 @@
     </CustomBuild>
     <CustomBuild Include="WaterfallViewer.h">
       <Filter>Header Files\Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="AsyncEventHandler.h">
+      <Filter>Header Files\Bloomberg</Filter>
+    </CustomBuild>
+    <CustomBuild Include="AsyncBloombergWorker.h">
+      <Filter>Header Files\Bloomberg</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -506,6 +515,27 @@
     </ClCompile>
     <ClCompile Include="SyncBloombergWorker.cpp">
       <Filter>Source Files\Bloomberg</Filter>
+    </ClCompile>
+    <ClCompile Include="AbstractBbgWorker.cpp">
+      <Filter>Source Files\Bloomberg</Filter>
+    </ClCompile>
+    <ClCompile Include="AsyncBloombergWorker.cpp">
+      <Filter>Source Files\Bloomberg</Filter>
+    </ClCompile>
+    <ClCompile Include="AsyncEventHandler.cpp">
+      <Filter>Source Files\Bloomberg</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_AsyncEventHandler.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_AsyncBloombergWorker.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_AsyncEventHandler.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_AsyncBloombergWorker.cpp">
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

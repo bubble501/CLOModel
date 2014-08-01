@@ -256,7 +256,7 @@ BloombergVector BaseRateVector::GetRefRateValueFromBloomberg(ConstantBaseRateTab
 			//BbgReq.AddRequest(SingleRate, "PX_SETTLE_LAST_DT", "Index");
 			BbgReq.AddRequest(SingleRate, "LAST_UPDATE", BloombergRequest::Index);
 		}
-		const BloombergRequest& ReturnedValues = Bee.StartRequest(BbgReq);
+		const BloombergRequest& ReturnedValues = Bee.GetResults(BbgReq);
 		if (!ReturnedValues.HasErrors()) {
 			for (int i = 0; i < ReturnedValues.NumRequests(); i++) {
 				if (!ReturnedValues.GetRequest(i)->HasErrors()) {

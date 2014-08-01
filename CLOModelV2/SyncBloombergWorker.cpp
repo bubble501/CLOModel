@@ -9,8 +9,7 @@
 using namespace BloombergLP;
 using namespace blpapi;
 SyncBloombergWorker::SyncBloombergWorker()
-	:ServerAddress("localhost")
-	, ServerPort(8194)
+	:AbstractBbgWorker()
 {}
 void SyncBloombergWorker::handleResponseEvent(const Event& event) {
 	MessageIterator iter(event);
@@ -82,13 +81,13 @@ void SyncBloombergWorker::handleResponseEvent(const Event& event) {
 		}
 	}
 }
-const BloombergRequest& SyncBloombergWorker::StartRequest() {
+void SyncBloombergWorker::StartRequest() {
 	m_Requests.SetErrorCode(BloombergRequest::NoErrors);
 	m_Requests.ClearResults();
 
 	if (!m_Requests.IsValidReq()) {
 		m_Requests.SetErrorCode(BloombergRequest::InvalidInputs);
-		return m_Requests;
+		return;
 	}
 	SessionOptions sessionOptions;
 	sessionOptions.setServerHost(ServerAddress.toLatin1().data());
@@ -96,11 +95,11 @@ const BloombergRequest& SyncBloombergWorker::StartRequest() {
 	Session session(sessionOptions);
 	if (!session.start()) {
 		m_Requests.SetErrorCode(BloombergRequest::SessionError);
-		return m_Requests;
+		return;
 	}
 	if (!session.openService("//blp/refdata")) {
 		m_Requests.SetErrorCode(BloombergRequest::ServiceError);
-		return m_Requests;
+		return;
 	}
 	Groups = m_Requests.RequestGroups();
 	QList<QString> UsedSecur;
@@ -141,6 +140,5 @@ const BloombergRequest& SyncBloombergWorker::StartRequest() {
 		}
 	}
 	session.stop();
-	return m_Requests;
 }
 #endif

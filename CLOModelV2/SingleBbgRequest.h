@@ -7,6 +7,8 @@
 #include "BackwardCompatibilityInterface.h"
 #include "BloombergRequest.h"
 #include "BloombergResult.h"
+class AsyncBloombergWorker;
+class AsyncEventHandler;
 class SingleBbgRequest : public BackwardInterface {
 public:
 	SingleBbgRequest();
@@ -51,6 +53,8 @@ protected:
 	friend QDataStream& operator<<(QDataStream & stream, const SingleBbgRequest& flows);
 	friend QDataStream& operator>>(QDataStream & stream, SingleBbgRequest& flows);
 	friend SyncBloombergWorker;
+	friend AsyncBloombergWorker;
+	friend AsyncEventHandler;
 	friend BloombergRequest;
 };
 QDataStream& operator<<(QDataStream & stream, const SingleBbgRequest& flows);

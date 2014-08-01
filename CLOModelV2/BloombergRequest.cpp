@@ -1,0 +1,203 @@
+#ifndef NO_BLOOMBERG
+#include "BloombergRequest.h"
+#include "SingleBbgRequest.h"
+#include <QtAlgorithms>
+#include <QStringList>
+void BloombergRequest::ClearResults() {
+	for (QList<SingleBbgRequest*>::iterator i = ResultTable.begin(); i != ResultTable.end(); i++) {
+		(*i)->SetValue("");
+		(*i)->SetErrorCode(NoErrors);
+	}
+}
+void BloombergRequest::SetErrorCode(BbgErrorCodes val) {
+	if (val == NoErrors) m_ErrorCode = NoErrors;
+	else m_ErrorCode = m_ErrorCode | static_cast<int>(val);
+}
+BloombergRequest::~BloombergRequest() {
+	ClearRequests();
+}
+BloombergRequest::BloombergRequest(const BloombergRequest& a) 
+	:MaxID(a.MaxID)
+	, m_ErrorCode(a.m_ErrorCode)
+{
+	foreach(const SingleBbgRequest* SigleReq, a.ResultTable) {
+		ResultTable.append(new SingleBbgRequest(*SigleReq));
+	}
+}
+BloombergRequest& BloombergRequest::operator = (const BloombergRequest& a) {
+	MaxID = a.MaxID;
+	m_ErrorCode = a.m_ErrorCode;
+	foreach(const SingleBbgRequest* SigleReq, a.ResultTable) {
+		ResultTable.append(new SingleBbgRequest(*SigleReq));
+	}
+	return *this;
+}
+void BloombergRequest::ClearRequests() {
+	while (!ResultTable.isEmpty()) 
+		delete ResultTable.takeFirst();;	
+}
+QDataStream& operator<<(QDataStream & stream, const BloombergRequest& flows) {
+	stream 
+		<< static_cast<qint32>(flows.m_ErrorCode) 
+		<< static_cast<qint32>(flows.ResultTable.size())
+	;
+	foreach(const SingleBbgRequest* SingleReq, flows.ResultTable)
+		stream << (*SingleReq);
+	return stream;
+}
+QDataStream& operator>>(QDataStream & stream, BloombergRequest& flows) { return flows.LoadOldVersion(stream); }
+QDataStream& BloombergRequest::LoadOldVersion(QDataStream& stream) {
+	qint32 TempError, ListSize;
+	stream >> TempError >> ListSize;
+	m_ErrorCode = static_cast<BloombergRequest::BbgErrorCodes>(TempError);
+	SingleBbgRequest TempReq;
+	for (qint32 i = 0; i < ListSize; i++) {
+		stream >> TempReq;
+		ResultTable.append(new SingleBbgRequest(TempReq));
+	}
+	ResetProtocolVersion();
+	return stream;
+}
+void BloombergRequest::AddRequest(const SingleBbgRequest& a) {
+	foreach(const SingleBbgRequest* SingleRequ, ResultTable) {
+		if (SingleRequ->GetResultID() == a.GetResultID()) return;
+	}
+	ResultTable.append(new SingleBbgRequest(a));
+	if(ResultTable.last()->GetResultID() < 1)
+		ResultTable.last()->SetResultID(qMax(1i64, ++MaxID));
+	if (ResultTable.last()->GetResultID()>MaxID) 
+		MaxID = ResultTable.last()->GetResultID();
+	
+}
+const SingleBbgRequest* BloombergRequest::FindRequest(qint64 ID) const {
+	foreach(const SingleBbgRequest* SingleRequ, ResultTable) {
+		if (SingleRequ->GetResultID() == ID) return SingleRequ;
+	}
+	return NULL;
+}
+const SingleBbgRequest* BloombergRequest::GetRequest(int Index) const {
+	if (Index<0 || Index>ResultTable.size()) return NULL;
+	return ResultTable.at(Index);
+}
+SingleBbgRequest* BloombergRequest::GetRequest(int Index) {
+	if (Index<0 || Index>ResultTable.size()) return NULL;
+	return ResultTable.at(Index);
+}
+SingleBbgRequest* BloombergRequest::FindRequest(qint64 ID) {
+	foreach(SingleBbgRequest* SingleRequ, ResultTable) {
+		if (SingleRequ->GetResultID() == ID) return SingleRequ;
+	}
+	return NULL;
+}
+bool BloombergRequest::IsValidReq() const {
+	foreach(const SingleBbgRequest* SingleRequ, ResultTable) {
+		if (!SingleRequ->IsValidReq()) return false;
+	}
+	return true;
+}
+QList<qint64> BloombergRequest::FindSecurity(const QString& Secur)const {
+	QList<qint64> Result;
+	foreach(const SingleBbgRequest* SingleRequ, ResultTable) {
+		if (SingleRequ->GetSecurity() == Secur.trimmed().toUpper()) Result.append(SingleRequ->GetResultID());
+	}
+	return Result;
+}
+QList<qint64> BloombergRequest::FindField(const QString& Field)const {
+	QList<qint64> Result;
+	foreach(const SingleBbgRequest* SingleRequ, ResultTable) {
+		if (SingleRequ->GetField() == Field.trimmed().toUpper()) Result.append(SingleRequ->GetResultID());
+	}
+	return Result;
+}
+QList<qint64> BloombergRequest::FindSecurityField(const QString& Secur, const QString& Field)const {
+	QList<qint64> Result;
+	foreach(const SingleBbgRequest* SingleRequ, ResultTable) {
+		if (SingleRequ->GetField() == Field.trimmed().toUpper() && SingleRequ->GetSecurity() == Secur.trimmed().toUpper()) Result.append(SingleRequ->GetResultID());
+	}
+	return Result;
+}
+QList<qint64> BloombergRequest::IdList() const {
+	QList<qint64> Result;
+	foreach(const SingleBbgRequest* SingleRequ, ResultTable) {
+		Result.append(SingleRequ->GetResultID());
+	}
+	return Result;
+}
+void BloombergRequest::AddRequest(qint64 ID, const QString& Secur, const QString& Field, YellowKeys YellowKey) {
+	SingleBbgRequest Temp;
+	Temp.SetField(Field);
+	Temp.SetSecurity(Secur);
+	Temp.SetResultID(ID);
+	Temp.SetExtension(YellowKey);
+	AddRequest(Temp);
+}
+void BloombergRequest::AddRequest(const QString& Secur, const QString& Field, YellowKeys YellowKey) { AddRequest(++MaxID, Secur, Field, YellowKey); }
+void BloombergRequest::AddRequest(qint64 ID, const QString& Secur, const QString& Field, const QMap<QString, QString>& Overrides, YellowKeys YellowKey) {
+	SingleBbgRequest Temp;
+	Temp.SetField(Field);
+	Temp.SetSecurity(Secur);
+	Temp.SetResultID(ID);
+	Temp.SetOverrides(Overrides);
+	Temp.SetExtension(YellowKey);
+	AddRequest(Temp);
+}
+void BloombergRequest::AddRequest(const QString& Secur, const QString& Field, const QMap<QString, QString>& Overrides, YellowKeys YellowKey) { AddRequest(++MaxID, Secur, Field, Overrides, YellowKey); }
+QHash<qint64, QList<qint64> >  BloombergRequest::RequestGroups(qint64 StartingID)const {
+	QHash<qint64, QList<qint64> > Result;
+	QList<qint64> UsedIDs;
+	QStringList UsedFields;
+	for (QList<SingleBbgRequest*>::const_iterator MainIter = ResultTable.constBegin(); MainIter != ResultTable.constEnd(); MainIter++) {
+		if (UsedIDs.contains((*MainIter)->GetResultID())) continue;
+		UsedIDs.append((*MainIter)->GetResultID());
+		UsedFields.append((*MainIter)->GetField());
+		Result.insert(StartingID, QList<qint64>());
+		Result[StartingID].append((*MainIter)->GetResultID());
+		for (QList<SingleBbgRequest*>::const_iterator SecondIter = MainIter + 1; SecondIter != ResultTable.constEnd(); SecondIter++) {
+			if ((*MainIter)->SameOverrides(**SecondIter)) {
+				if ((*MainIter)->GetSecurity() != (*SecondIter)->GetSecurity()) {
+					if (UsedFields.contains((*SecondIter)->GetField())) {
+						UsedIDs.append((*SecondIter)->GetResultID());
+						Result[StartingID].append((*SecondIter)->GetResultID());
+					}
+				}
+				else {
+					UsedIDs.append((*SecondIter)->GetResultID());
+					Result[StartingID].append((*SecondIter)->GetResultID());
+					UsedFields.append((*SecondIter)->GetField());
+				}
+				
+			}
+		}
+		StartingID++;
+	}
+	return Result;
+}
+QString BloombergRequest::YellowKey2String(YellowKeys a) {
+		switch (a) {
+		case Govt: return "Govt";
+		case Corp: return "Corp";
+		case Mtge: return "Mtge";
+		case MMkt: return "MMkt";
+		case Muni: return "Muni";
+		case Pfd: return "Pfd";
+		case Equity: return "Equity";
+		case Comdty: return "Comdty";
+		case Index: return "Index";
+		case Curncy: return "Curncy";
+		default: return "";
+		}
+}
+BloombergRequest::YellowKeys BloombergRequest::String2YellowKey(const QString& a) {
+	if (a.compare("Govt", Qt::CaseInsensitive) == 0) return Govt;
+	else if (a.compare("Corp", Qt::CaseInsensitive) == 0) return Corp;
+	else if (a.compare("Mtge", Qt::CaseInsensitive) == 0) return Mtge;
+	else if (a.compare("MMkt", Qt::CaseInsensitive) == 0) return MMkt;
+	else if (a.compare("Muni", Qt::CaseInsensitive) == 0) return Muni;
+	else if (a.compare("Pfd", Qt::CaseInsensitive) == 0) return Pfd;
+	else if (a.compare("Equity", Qt::CaseInsensitive) == 0) return Equity;
+	else if (a.compare("Comdty", Qt::CaseInsensitive) == 0) return Comdty;
+	else if (a.compare("Index", Qt::CaseInsensitive) == 0) return Index;
+	else if (a.compare("Curncy", Qt::CaseInsensitive) == 0) return Curncy;
+	else return Invalid;
+}
+#endif

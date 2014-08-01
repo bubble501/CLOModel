@@ -31,7 +31,7 @@ bool AbstarctBbgVect::ValidAnchorDate() const {
 bool AbstarctBbgVect::IsValid(const QString& ValidInputs, bool AllowRamps) const {
 	QString PatternString = "^(A\\s+\\d{1,2}/\\d{1,2}/\\d{4}\\s+){0,1}" + ValidInputs + "(\\s+[1-9][0-9]*";
 	if (AllowRamps) PatternString += "[RS]";
-	else PatternString += "S";
+	else PatternString += 'S';
 	PatternString += "\\s+" + ValidInputs + ")*$";
 	QRegExp Vigil(PatternString, Qt::CaseInsensitive);
 	return (Vigil.exactMatch(m_Vector.trimmed().toUpper()) && ValidAnchorDate()) || m_Vector.isEmpty();
@@ -50,4 +50,9 @@ bool AbstarctBbgVect::ExtractAnchorDate() {
 	}
 	m_AnchorDate = QDate();
 	return false;
+}
+void AbstarctBbgVect::Clear() {
+	m_AnchorDate = QDate();
+	m_Vector = "";
+	UnpackVector();
 }

@@ -2,7 +2,8 @@
 #include <QRegExp>
 #include <QStringList>
 #include "CommonFunctions.h"
-#include "BloombergWorker.h"
+#include "SyncBloombergWorker.h"
+#include "SingleBbgRequest.h"
 #ifndef NO_DATABASE
 #include <QSqlDatabase>
 #include <QSqlError>
@@ -219,33 +220,21 @@ BloombergVector BaseRateVector::CompileReferenceRateValue(ForwardBaseRateTable& 
 BloombergVector BaseRateVector::CompileReferenceRateValue(ConstantBaseRateTable& Values) const {
 	if (IsEmpty())return BloombergVector();
 	QString ResultingVector("");
-	int StepCounter;
-	double PreviousVal, TempValue;
 	for (int i = 0; i < m_VectVal.size(); i++) {
-		if (!Values.GetValues().contains(GetValueString(m_VectVal.at(i))))
+		if (!Values.Contains(GetValueString(i))) {
 #ifdef NO_BLOOMBERG
-		return BloombergVector();
+			return BloombergVector();
 #else
-		return GetRefRateValueFromBloomberg(Values);
+			return GetRefRateValueFromBloomberg(Values);
 #endif
-		if (i > 0) {
-			TempValue = Values.GetValues().value(GetValueString(m_VectVal.at(i)), 0.0);
-			if (TempValue == PreviousVal) StepCounter++;
-			else {
-				ResultingVector += QString(" %1S %2").arg(StepCounter).arg(100.0*TempValue);
-				PreviousVal = TempValue;
-				StepCounter = 1;
-			}
-
 		}
-		else {
-			PreviousVal = Values.GetValues().value(GetValueString(m_VectVal.at(i)), 0.0);
-			ResultingVector += QString("%1").arg(100.0*PreviousVal);
-			StepCounter = 1;
-		}
-
 	}
-	return BloombergVector(ResultingVector, m_AnchorDate);
+	const QHash<QString, double>& Sobstitutes = Values.GetValues();
+	QString NewVector = m_Vector;
+	for (QHash<QString, double>::const_iterator i = Sobstitutes.constBegin(); i != Sobstitutes.constEnd(); i++) {
+		NewVector.replace(i.key(), QString("%1").arg(i.value()*100.0));
+	}
+	return BloombergVector(NewVector, m_AnchorDate);
 }
 #ifndef NO_BLOOMBERG
 BloombergVector BaseRateVector::GetRefRateValueFromBloomberg(ConstantBaseRateTable& Values)const {
@@ -258,29 +247,37 @@ BloombergVector BaseRateVector::GetRefRateValueFromBloomberg(ConstantBaseRateTab
 		) RatesToDownload.append(GetValueString(i));
 	}
 	if (!RatesToDownload.isEmpty()) {
-		BloombergWorker Bee;
+		SyncBloombergWorker Bee;
 		QString CurrentResult;
 		QDate MinUpdateDate, CurrentUpdateDate;
-		foreach(const QString& SingleRate, RatesToDownload)
-			Bee.AddSecurity(SingleRate, "Index");
-		Bee.AddField("PX_LAST");
-		Bee.AddField("PX_SETTLE_LAST_DT");
-		BloombergResult ReturnedValues = Bee.StartRequest();
-		for (int i = 0; i < m_VectVal.size(); i++) {
-			CurrentResult = ReturnedValues.GetValue(GetValueString(i), "PX_LAST");
-			if (!CurrentResult.isEmpty()) {
-				Values.GetValues().insert(
-					GetValueString(i),
-					CurrentResult.toDouble() / 100.0
-					);
-				CurrentResult = ReturnedValues.GetValue(GetValueString(i), "PX_SETTLE_LAST_DT");
-				if (!CurrentResult.isEmpty()) {
-					CurrentUpdateDate = QDate::fromString(CurrentResult, "yyyy-MM-dd");
-					if (MinUpdateDate.isNull() || MinUpdateDate > CurrentUpdateDate) MinUpdateDate = CurrentUpdateDate;
+		BloombergRequest BbgReq;
+		foreach(const QString& SingleRate, RatesToDownload) {
+			BbgReq.AddRequest(SingleRate, "PX_LAST", BloombergRequest::Index);
+			//BbgReq.AddRequest(SingleRate, "PX_SETTLE_LAST_DT", "Index");
+			BbgReq.AddRequest(SingleRate, "LAST_UPDATE", BloombergRequest::Index);
+		}
+		const BloombergRequest& ReturnedValues = Bee.StartRequest(BbgReq);
+		if (!ReturnedValues.HasErrors()) {
+			for (int i = 0; i < ReturnedValues.NumRequests(); i++) {
+				if (!ReturnedValues.GetRequest(i)->HasErrors()) {
+					if (ReturnedValues.GetRequest(i)->GetField() == "PX_LAST") {
+						Values.GetValues().insert(
+							ReturnedValues.GetRequest(i)->GetSecurity(),
+							ReturnedValues.GetRequest(i)->GetValue().GetDouble() / 100.0
+							);
+					}
+					else {
+						CurrentUpdateDate = ReturnedValues.GetRequest(i)->GetValue().GetDate();
+						if (MinUpdateDate.isNull() || MinUpdateDate > CurrentUpdateDate) MinUpdateDate = CurrentUpdateDate;
+					}
 				}
 			}
+			Values.SetUpdateDate(MinUpdateDate);
 		}
-		Values.SetUpdateDate(MinUpdateDate);
+	}
+	for (QStringList::const_iterator i = RatesToDownload.constBegin(); i != RatesToDownload.constEnd(); i++) {
+		//Avoid infinite loop if download is unsuccessful
+		if (!Values.Contains(*i)) return BloombergVector();
 	}
 	return CompileReferenceRateValue(Values);
 }
@@ -353,7 +350,6 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ForwardBaseRateTable& Refer
 		query.setForwardOnly(true);
 		query.prepare("{CALL " + ConfigIni.value("ForwardBaseRatesStoredProc", "getForwardCurveMatrix").toString() + "}");
 		if (query.exec()) {
-			//QHash < QString, QMap<QDate, double> > QueryResults;
 			QHash < QString, QHash<QDate, double> > QueryResults;
 			while (query.next()) {
 				if (
@@ -369,13 +365,8 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ForwardBaseRateTable& Refer
 			ConfigIni.endGroup();
 			const QList<QString> ReferencesList = QueryResults.keys();
 			for (QList<QString>::ConstIterator i = ReferencesList.constBegin(); i != ReferencesList.constEnd(); i++) {
-				/*const QMap<QDate, double> CurentCurve = QueryResults.value(*i);
-				QString CurveVector = QString("%1").arg(100.0*CurentCurve.first());
-				for (QMap<QDate, double>::ConstIterator CurveIter = CurentCurve.constBegin()+1; CurveIter != CurentCurve.constEnd(); CurveIter++) {
-					CurveVector += QString(" %1R %2").arg(MonthDiff(CurveIter.key(), (CurveIter - 1).key())).arg(100.0*CurveIter.value());
-				}
-				ReferencesValues.GetValues().insert(*i, BloombergVector(CurveVector, CurentCurve.firstKey()));*/
-				ReferencesValues.GetValues().insert(*i, BloombergVector(QueryResults.value(*i).keys(), QueryResults.value(*i).values()));
+				QHash<QDate, double> CurrentResult = QueryResults.value(*i);
+				ReferencesValues.GetValues().insert(*i, BloombergVector(CurrentResult.keys(), CurrentResult.values()));
 			}
 			ReferencesValues.SetUpdateDate(MinUpdateDate);
 			return CompileReferenceRateValue(ReferencesValues);

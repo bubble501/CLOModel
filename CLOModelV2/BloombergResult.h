@@ -1,38 +1,42 @@
 #ifndef NO_BLOOMBERG
 #ifndef BloombergResult_h__
 #define BloombergResult_h__
-#include <QHash>
 #include <QStringList>
-#include <QDataStream>
+#include <QDate>
 #include "BackwardCompatibilityInterface.h"
-class BloombergWorker;
-class BloombergResult : public BackwardInterface {
+class SingleBbgRequest;
+class BloombergResult :public BackwardInterface  {
 public:
-	enum BbgErrorCodes {
-		NoErrors=0
-		,ResponseError=1
-		,SecurityError=2
-		,InvalidInputs=4
-		,SessionError=8
-		,ServiceError=16
-	};
-	BloombergResult() : m_ErrorCode(NoErrors) {}
-	QStringList AvailableSecurities() const { return ResultTable.keys(); }
-	QStringList AvailableFields(const QString& Security);
-	QString GetValue(const QString& Security, const QString& Field);
-	BbgErrorCodes GetErrorCode() const { return m_ErrorCode; }
-	bool HasErrors() const { return m_ErrorCode == NoErrors; }
+	BloombergResult();
+	BloombergResult(const BloombergResult& a);
+	BloombergResult& operator= (const BloombergResult& a);
+	~BloombergResult();
+	bool IsEmpty() const { return !HasString() && !HasTable(); }
+	bool HasString() const { return !m_StringValue; }
+	bool HasDate() const { return !m_DateValue; }
+	bool HasDouble() const { return !m_DoubleValue; }
+	bool HasTable() const { return (!m_TableResultRows.isEmpty()) && TableResultCols > 0; }
+	const QString& GetHeader()const { return m_Header; }
+	QString GetString()const { if (m_StringValue) return *m_StringValue; else return QString(); }
+	QDate GetDate() const { if (m_DateValue) return *m_DateValue; else return QDate(); }
+	double GetDouble()const { if (m_DoubleValue) return *m_DoubleValue; else return 0.0; }
+private:
+	QString m_Header;
+	QString* m_StringValue;
+	QDate* m_DateValue;
+	double* m_DoubleValue;
+	QList<BloombergResult*> m_TableResultRows;
+	int TableResultCols;
 protected:
-	BbgErrorCodes m_ErrorCode;
-	void SetErrorCode(BbgErrorCodes ErrCd = NoErrors);
-	QHash<QString, QHash<QString, QString> > ResultTable;
-	void SetResult(const QString& Security, const QString& Field, const QString& Value);
+	void Clear();
+	void SetValue(const QString& val, const QString& Header="");
+	void AddValueRow(const QStringList& val, const QStringList& Headers = QStringList());
 	virtual QDataStream& LoadOldVersion(QDataStream& stream);
-	friend BloombergWorker;
 	friend QDataStream& operator<<(QDataStream & stream, const BloombergResult& flows);
 	friend QDataStream& operator>>(QDataStream & stream, BloombergResult& flows);
+	friend SingleBbgRequest;
 };
 QDataStream& operator<<(QDataStream & stream, const BloombergResult& flows);
 QDataStream& operator>>(QDataStream & stream, BloombergResult& flows);
 #endif // BloombergResult_h__
-#endif // NO_BLOOMBERG
+#endif

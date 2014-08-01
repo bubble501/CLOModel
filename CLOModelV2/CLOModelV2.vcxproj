@@ -13,12 +13,13 @@
   <ItemGroup>
     <ClInclude Include="AbstarctBbgVect.h" />
     <ClInclude Include="BaseRateTable.h" />
+    <ClInclude Include="BloombergRequest.h" />
     <ClInclude Include="BloombergResult.h" />
     <ClInclude Include="BoolVector.h" />
     <ClInclude Include="BackwardCompatibilityInterface.h" />
     <ClInclude Include="BaseRateVect.h" />
     <ClInclude Include="BloombergVector.h" />
-    <ClInclude Include="BloombergWorker.h" />
+    <ClInclude Include="SyncBloombergWorker.h" />
     <ClInclude Include="CommonFunctions.h" />
     <ClInclude Include="ExcelCommons.h" />
     <ClInclude Include="ExcelOutput.h" />
@@ -71,6 +72,7 @@
     <ClInclude Include="ReinvestmentTest.h" />
     <ClInclude Include="RepaymentVector.h" />
     <ClInclude Include="ReserveFund.h" />
+    <ClInclude Include="SingleBbgRequest.h" />
     <ClInclude Include="Tranche.h" />
     <ClInclude Include="TrancheCashFlow.h" />
     <ClInclude Include="Waterfall.h" />
@@ -219,11 +221,12 @@
   <ItemGroup>
     <ClCompile Include="AbstarctBbgVect.cpp" />
     <ClCompile Include="BaseRateTable.cpp" />
+    <ClCompile Include="BloombergRequest.cpp" />
     <ClCompile Include="BloombergResult.cpp" />
     <ClCompile Include="BoolVector.cpp" />
     <ClCompile Include="BaseRateVect.cpp" />
     <ClCompile Include="BloombergVector.cpp" />
-    <ClCompile Include="BloombergWorker.cpp" />
+    <ClCompile Include="SyncBloombergWorker.cpp" />
     <ClCompile Include="CentralUnit.cpp" />
     <ClCompile Include="ChartsWidget.cpp" />
     <ClCompile Include="CommonFunctions.cpp" />
@@ -360,6 +363,7 @@
     <ClCompile Include="ReinvestmentTest.cpp" />
     <ClCompile Include="RepaymentVector.cpp" />
     <ClCompile Include="ReserveFund.cpp" />
+    <ClCompile Include="SingleBbgRequest.cpp" />
     <ClCompile Include="StressTest.cpp" />
     <ClCompile Include="StressThread.cpp" />
     <ClCompile Include="StressViewer.cpp" />

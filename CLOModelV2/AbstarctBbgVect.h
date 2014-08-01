@@ -15,6 +15,7 @@ protected:
 	virtual bool ValidAnchorDate() const;
 	virtual bool ExtractAnchorDate();
 public:
+	virtual void Clear();
 	virtual bool SetVector(const QString& Vec);
 	AbstarctBbgVect(){}
 	AbstarctBbgVect(const QString& Vec);

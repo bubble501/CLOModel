@@ -26,10 +26,21 @@ BloombergVector::BloombergVector(const QList<double>& Values, const QDate& Ancho
 	: m_VectVal(Values) 
 	, m_Divisor(100.0)
 {
+	foreach(double SingleVal, Values) {
+		if (SingleVal < 0.0) {
+			m_VectVal.clear();
+			m_Vector = "";
+			return;
+		}
+	}
 	m_AnchorDate = Anchor;
 	RepackVector(); 
 }
 bool BloombergVector::SetVector(const QList<double>& Values, const QDate& Anchor) {
+	if (Values.isEmpty()) return false;
+	foreach(double SingleVal, Values) {
+		if (SingleVal < 0.0) return false;
+	}
 	m_VectVal = Values;
 	m_AnchorDate = Anchor;
 	RepackVector();
@@ -37,6 +48,9 @@ bool BloombergVector::SetVector(const QList<double>& Values, const QDate& Anchor
 }
 bool BloombergVector::SetVector(const QList<double>& Values) {
 	if (Values.isEmpty()) return false;
+	foreach(double SingleVal, Values) {
+		if (SingleVal < 0.0) return false;
+	}
 	m_VectVal = Values;
 	RepackVector();
 	return true;
@@ -51,6 +65,7 @@ bool BloombergVector::SetVector(const QList<QDate>& Dates, const QList<double>& 
 	QMap<QDate, double> SortedValues;
 	for (int i = 0; i <Dates.size(); i++) {
 		if (Dates.at(i).isNull()) return false;
+		if (Values.at(i)<0.0) return false;
 		SortedValues.insert(Dates.at(i), Values.at(i));
 	}
 	m_AnchorDate = SortedValues.firstKey();
@@ -289,7 +304,7 @@ bool BloombergVector::IsEmpty(double Lbound, double Ubound) const{
 	return false;
 }
 
-QString BloombergVector::BloombergSafeVector(QDate CurrentDate/*=QDate::currentDate()*/) const {
+QString BloombergVector::BloombergSafeVector(QDate CurrentDate) const {
 	if (m_AnchorDate.isNull()) return m_Vector;
 	if (m_AnchorDate > CurrentDate) return "";
 	BloombergVector Shorter(*this);

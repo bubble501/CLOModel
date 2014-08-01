@@ -260,9 +260,6 @@
     <ClCompile Include="BloombergVector.cpp">
       <Filter>Source Files\Vectors</Filter>
     </ClCompile>
-    <ClCompile Include="BloombergWorker.cpp">
-      <Filter>Source Files\Bloomberg</Filter>
-    </ClCompile>
     <ClCompile Include="BoolVector.cpp">
       <Filter>Source Files\Vectors</Filter>
     </ClCompile>
@@ -347,7 +344,16 @@
     <ClCompile Include="BaseRateTable.cpp">
       <Filter>Source Files\Vectors</Filter>
     </ClCompile>
+    <ClCompile Include="BloombergRequest.cpp">
+      <Filter>Source Files\Bloomberg</Filter>
+    </ClCompile>
+    <ClCompile Include="SyncBloombergWorker.cpp">
+      <Filter>Source Files\Bloomberg</Filter>
+    </ClCompile>
     <ClCompile Include="BloombergResult.cpp">
+      <Filter>Source Files\Bloomberg</Filter>
+    </ClCompile>
+    <ClCompile Include="SingleBbgRequest.cpp">
       <Filter>Source Files\Bloomberg</Filter>
     </ClCompile>
   </ItemGroup>
@@ -481,9 +487,6 @@
     <ClInclude Include="MtgCashFlow.h">
       <Filter>Header Files\Loans</Filter>
     </ClInclude>
-    <ClInclude Include="BloombergWorker.h">
-      <Filter>Header Files\Bloomberg</Filter>
-    </ClInclude>
     <ClInclude Include="ReserveFund.h">
       <Filter>Header Files\Deal Structure</Filter>
     </ClInclude>
@@ -499,7 +502,16 @@
     <ClInclude Include="ManBaseRateTable.h">
       <Filter>Header Files\Managed</Filter>
     </ClInclude>
+    <ClInclude Include="BloombergRequest.h">
+      <Filter>Header Files\Bloomberg</Filter>
+    </ClInclude>
+    <ClInclude Include="SyncBloombergWorker.h">
+      <Filter>Header Files\Bloomberg</Filter>
+    </ClInclude>
     <ClInclude Include="BloombergResult.h">
+      <Filter>Header Files\Bloomberg</Filter>
+    </ClInclude>
+    <ClInclude Include="SingleBbgRequest.h">
       <Filter>Header Files\Bloomberg</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,5 +1,6 @@
 #include "Tranche.h"
-#include "BloombergWorker.h"
+#include "SyncBloombergWorker.h"
+#include "SingleBbgRequest.h"
 Tranche::Tranche()
 	:DefaultRefRate("BP0003M")
 	,LastPaymentDate(2000,1,1)
@@ -165,50 +166,98 @@ void Tranche::SetBloombergExtension(const QString& a){
 }
 #ifndef NO_BLOOMBERG
 void Tranche::GetDataFromBloomberg(){
-	BloombergWorker Bee;
-	Bee.AddSecurity(TrancheName,BloombergExtension);
-	Bee.AddField("MTG_ORIG_AMT");
-	Bee.AddField("AMT_OUTSTANDING");
-	Bee.AddField("CRNCY");
-	Bee.AddField("START_ACC_DT");
-	Bee.AddField("MTG_TYP");
-	Bee.AddField("FLT_SPREAD");
-	Bee.AddField("RESET_IDX");
-	Bee.AddField("CPN");
-	Bee.AddField("CPN_FREQ");
-	Bee.AddField("INT_ACC");
-	Bee.AddField("SETTLE_DT");
-	Bee.AddField("NAME");
-	Bee.AddField("ID_ISIN");
-	BloombergResult Result=Bee.StartRequest();
+	SyncBloombergWorker Bee;
+	BloombergRequest TempReq;
+	QString IdentityCode = (TrancheName.isEmpty() ? ISINcode : TrancheName);
+	TempReq.AddRequest(1,IdentityCode, "MTG_ORIG_AMT", BloombergRequest::String2YellowKey(BloombergExtension));
+	TempReq.AddRequest(2,IdentityCode, "AMT_OUTSTANDING", BloombergRequest::String2YellowKey(BloombergExtension));
+	TempReq.AddRequest(3, IdentityCode, "CRNCY", BloombergRequest::String2YellowKey(BloombergExtension));
+	TempReq.AddRequest(4, IdentityCode, "START_ACC_DT", BloombergRequest::String2YellowKey(BloombergExtension));
+	TempReq.AddRequest(5, IdentityCode, "MTG_TYP", BloombergRequest::String2YellowKey(BloombergExtension));
+	TempReq.AddRequest(6, IdentityCode, "FLT_SPREAD", BloombergRequest::String2YellowKey(BloombergExtension));
+	TempReq.AddRequest(7, IdentityCode, "RESET_IDX", BloombergRequest::String2YellowKey(BloombergExtension));
+	TempReq.AddRequest(8, IdentityCode, "CPN", BloombergRequest::String2YellowKey(BloombergExtension));
+	TempReq.AddRequest(9, IdentityCode, "CPN_FREQ", BloombergRequest::String2YellowKey(BloombergExtension));
+	TempReq.AddRequest(10, IdentityCode, "INT_ACC", BloombergRequest::String2YellowKey(BloombergExtension));
+	TempReq.AddRequest(11, IdentityCode, "SETTLE_DT", BloombergRequest::String2YellowKey(BloombergExtension));
+	TempReq.AddRequest(12, IdentityCode, "NAME", BloombergRequest::String2YellowKey(BloombergExtension));
+	TempReq.AddRequest(13, IdentityCode, "ID_ISIN", BloombergRequest::String2YellowKey(BloombergExtension));
+
+
+	const BloombergRequest& Result = Bee.StartRequest(TempReq);
 	if (Result.HasErrors()) return;
-	OutstandingAmt=Result.GetValue(TrancheName,"AMT_OUTSTANDING").toDouble()/ExchangeRate;
+
+	if (Result.GetRequest(1)->HasErrors()) OriginalAmt = 0.0;
+	else OutstandingAmt = Result.GetRequest(1)->GetValue().GetDouble() / ExchangeRate;
+
+	if (Result.GetRequest(2)->HasErrors()) OutstandingAmt = 0.0;
+	else OutstandingAmt = Result.GetRequest(2)->GetValue().GetDouble() / ExchangeRate;
 	CashFlow.SetInitialOutstanding(OutstandingAmt);
-	OriginalAmt = Result.GetValue(TrancheName, "MTG_ORIG_AMT").toDouble() / ExchangeRate;
-	Currency = Result.GetValue(TrancheName, "CRNCY");
-	LastPaymentDate = QDate::fromString(Result.GetValue(TrancheName, "START_ACC_DT"), "yyyy-MM-dd");
-	PaymentFrequency = QString("%1").arg(static_cast<int>(12.0 / Result.GetValue(TrancheName, "CPN_FREQ").toDouble()));
-	TrancheName = Result.GetValue(TrancheName, "NAME");
-	ISINcode = Result.GetValue(TrancheName, "ID_ISIN");
-	if (Result.GetValue(TrancheName, "MTG_TYP").contains("FLT")) InterestType = FloatingInterest;
-	else InterestType=FixedInterest;
-	ReferenceRateValue="";
-	if(InterestType==FloatingInterest){
-		ReferenceRate = Result.GetValue(TrancheName, "RESET_IDX");
-		Coupon = Result.GetValue(TrancheName, "FLT_SPREAD");//.toDouble()/10000.0;
+
+	if (Result.GetRequest(3)->HasErrors()) Currency = "EUR";
+	else Currency = Result.GetRequest(3)->GetValue().GetString();
+	
+	if (Result.GetRequest(4)->HasErrors()) LastPaymentDate = QDate();
+	else LastPaymentDate = Result.GetRequest(4)->GetValue().GetDate();
+
+	if (Result.GetRequest(5)->GetValue().GetString().contains("FLT")) InterestType = FloatingInterest;
+	else InterestType = FixedInterest;
+
+	if (InterestType == FloatingInterest) {
+		if (Result.GetRequest(6)->HasErrors()) Coupon = "";
+		else Coupon = Result.GetRequest(6)->GetValue().GetString();
+
+		if (Result.GetRequest(7)->HasErrors()) ReferenceRate = "";
+		else {
+			ReferenceRate = Result.GetRequest(7)->GetValue().GetString();
+			DefaultRefRate = ReferenceRate;
+		}
 	}
-	else{
-		Coupon = QString("%1").arg(Result.GetValue(TrancheName, "CPN").toDouble()*100.0);//Result.value("CPN").toDouble()/100.0;
+	else {
+		if (Result.GetRequest(8)->HasErrors()) Coupon = "";
+		else Coupon = QString("%1").arg(Result.GetRequest(8)->GetValue().GetDouble()*100.0);
+
+
 		QString DeafultRefRateString;
-		if(Currency=="EUR")DeafultRefRateString="EUR";
-		else if(Currency=="GBP")DeafultRefRateString="BP";
-		else if(Currency=="USD")DeafultRefRateString="US";
-		else return;
-		DeafultRefRateString += QString("%1M").arg(static_cast<int>(12.0 / Result.GetValue(TrancheName, "CPN_FREQ").toDouble()), 6 - DeafultRefRateString.size(), 10, QChar('0'));
-		DefaultRefRate=DeafultRefRateString;
+		if (!Result.GetRequest(9)->HasErrors()) {
+			if (Currency == "EUR")DeafultRefRateString = "EUR";
+			else if (Currency == "GBP")DeafultRefRateString = "BP";
+			else if (Currency == "USD")DeafultRefRateString = "US";
+			if (!DeafultRefRateString.isEmpty())
+				DeafultRefRateString +=
+				QString("%1M")
+				.arg(static_cast<int>(12.0 / Result.GetRequest(9)->GetValue().GetDouble()), 6 - DeafultRefRateString.size(), 10, QChar('0'));
+		}
+
+		DefaultRefRate = DeafultRefRateString;
 	}
-	AccruedInterest = Result.GetValue(TrancheName, "INT_ACC").toDouble() / 100.0;
-	SettlementDate = QDate::fromString(Result.GetValue(TrancheName, "SETTLE_DT"), "yyyy-MM-dd");
+
+	if (Result.GetRequest(9)->HasErrors()) PaymentFrequency = "";
+	else PaymentFrequency = QString("%1").arg(static_cast<int>(12.0/Result.GetRequest(9)->GetValue().GetDouble()));
+
+	if (Result.GetRequest(10)->HasErrors()) AccruedInterest = 0.0;
+	else AccruedInterest = Result.GetRequest(10)->GetValue().GetDouble() / 100.0;
+
+	if (Result.GetRequest(11)->HasErrors()) SettlementDate = QDate();
+	else SettlementDate = Result.GetRequest(11)->GetValue().GetDate();
+
+	if (Result.GetRequest(12)->HasErrors()) TrancheName = "";
+	else TrancheName = Result.GetRequest(12)->GetValue().GetString();
+
+	if (Result.GetRequest(13)->HasErrors()) ISINcode = "";
+	else ISINcode = Result.GetRequest(13)->GetValue().GetString();
+
+	ReferenceRateValue="";
+#ifndef NO_DATABASE
+	if (m_UseForwardCurve) {
+		ForwardBaseRateTable BaseTab;
+		ReferenceRateValue = DefaultRefRate.GetBaseRatesDatabase(BaseTab);
+	}
+	else {
+		ConstantBaseRateTable BaseTab;
+		ReferenceRateValue = DefaultRefRate.GetBaseRatesDatabase(BaseTab);
+	}
+#endif
 }
 #endif
 double Tranche::GetLossRate() const{

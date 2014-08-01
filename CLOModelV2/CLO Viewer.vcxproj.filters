@@ -203,9 +203,6 @@
     <ClCompile Include="BloombergVector.cpp">
       <Filter>Source Files\Core Files</Filter>
     </ClCompile>
-    <ClCompile Include="BloombergWorker.cpp">
-      <Filter>Source Files\Core Files</Filter>
-    </ClCompile>
     <ClCompile Include="CentralUnit.cpp">
       <Filter>Source Files\Core Files</Filter>
     </ClCompile>
@@ -302,7 +299,16 @@
     <ClCompile Include="BaseRateTable.cpp">
       <Filter>Source Files\Core Files</Filter>
     </ClCompile>
+    <ClCompile Include="BloombergRequest.cpp">
+      <Filter>Source Files\Core Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SyncBloombergWorker.cpp">
+      <Filter>Source Files\Core Files</Filter>
+    </ClCompile>
     <ClCompile Include="BloombergResult.cpp">
+      <Filter>Source Files\Core Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SingleBbgRequest.cpp">
       <Filter>Source Files\Core Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -353,9 +359,6 @@
       <Filter>Header Files\Core Files</Filter>
     </ClInclude>
     <ClInclude Include="BloombergVector.h">
-      <Filter>Header Files\Core Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BloombergWorker.h">
       <Filter>Header Files\Core Files</Filter>
     </ClInclude>
     <ClInclude Include="CommonFunctions.h">
@@ -409,7 +412,16 @@
     <ClInclude Include="BaseRateTable.h">
       <Filter>Header Files\Core Files</Filter>
     </ClInclude>
+    <ClInclude Include="BloombergRequest.h">
+      <Filter>Header Files\Core Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SyncBloombergWorker.h">
+      <Filter>Header Files\Core Files</Filter>
+    </ClInclude>
     <ClInclude Include="BloombergResult.h">
+      <Filter>Header Files\Core Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SingleBbgRequest.h">
       <Filter>Header Files\Core Files</Filter>
     </ClInclude>
   </ItemGroup>

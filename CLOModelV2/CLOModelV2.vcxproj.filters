@@ -128,9 +128,6 @@
     <ClInclude Include="quazip\zip.h">
       <Filter>QuaZIP</Filter>
     </ClInclude>
-    <ClInclude Include="BloombergWorker.h">
-      <Filter>Header Files\Bloomberg</Filter>
-    </ClInclude>
     <ClInclude Include="ReinvestmentTest.h">
       <Filter>Header Files\DealStructure</Filter>
     </ClInclude>
@@ -185,7 +182,16 @@
     <ClInclude Include="BaseRateTable.h">
       <Filter>Header Files\Vectors</Filter>
     </ClInclude>
+    <ClInclude Include="BloombergRequest.h">
+      <Filter>Header Files\Bloomberg</Filter>
+    </ClInclude>
+    <ClInclude Include="SingleBbgRequest.h">
+      <Filter>Header Files\Bloomberg</Filter>
+    </ClInclude>
     <ClInclude Include="BloombergResult.h">
+      <Filter>Header Files\Bloomberg</Filter>
+    </ClInclude>
+    <ClInclude Include="SyncBloombergWorker.h">
       <Filter>Header Files\Bloomberg</Filter>
     </ClInclude>
   </ItemGroup>
@@ -405,9 +411,6 @@
     <ClCompile Include="BloombergVector.cpp">
       <Filter>Source Files\Vectors</Filter>
     </ClCompile>
-    <ClCompile Include="BloombergWorker.cpp">
-      <Filter>Source Files\Bloomberg</Filter>
-    </ClCompile>
     <ClCompile Include="ChartsWidget.cpp">
       <Filter>Source Files\Widgets</Filter>
     </ClCompile>
@@ -492,7 +495,16 @@
     <ClCompile Include="BaseRateTable.cpp">
       <Filter>Source Files\Vectors</Filter>
     </ClCompile>
+    <ClCompile Include="BloombergRequest.cpp">
+      <Filter>Source Files\Bloomberg</Filter>
+    </ClCompile>
+    <ClCompile Include="SingleBbgRequest.cpp">
+      <Filter>Source Files\Bloomberg</Filter>
+    </ClCompile>
     <ClCompile Include="BloombergResult.cpp">
+      <Filter>Source Files\Bloomberg</Filter>
+    </ClCompile>
+    <ClCompile Include="SyncBloombergWorker.cpp">
       <Filter>Source Files\Bloomberg</Filter>
     </ClCompile>
   </ItemGroup>

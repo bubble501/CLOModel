@@ -3,8 +3,8 @@
 #include <QHash>
 #include <qmath.h>
 #include "Waterfall.h"
-#include "BloombergWorker.h"
-
+#include "SyncBloombergWorker.h"
+#include "SingleBbgRequest.h"
 const WatFalPrior* Waterfall::GetStep(int Index)const {
 	if(Index<0 || Index>=m_WaterfallStesps.size()) return NULL;
 	return m_WaterfallStesps.at(Index);
@@ -315,16 +315,26 @@ int Waterfall::FindTrancheIndex(const QString& Tranchename)const{
 		if(m_Tranches.at(j)->GetISIN()==Tranchename) return j;
 	}
 #ifndef NO_BLOOMBERG
-	BloombergWorker ISINparser;
-	ISINparser.AddSecurity(Tranchename);
-	ISINparser.AddField("NAME");
-	ISINparser.AddField("ID_ISIN");
-	BloombergResult TempResults = ISINparser.StartRequest();
-	QString AdjTranName(TempResults.GetValue(Tranchename, "NAME").trimmed().toUpper());
-	QString AdjISIN(TempResults.GetValue(Tranchename, "ID_ISIN").trimmed().toUpper());
-	for (int i = 0; i < m_Tranches.size(); i++) {
-		if (!AdjTranName.isEmpty() && m_Tranches.at(i)->GetTrancheName().trimmed().toUpper() == AdjTranName) return i;
-		if (!AdjISIN.isEmpty() && m_Tranches.at(i)->GetISIN().trimmed().toUpper() == AdjISIN) return i;
+	SyncBloombergWorker ISINparser;
+	BloombergRequest ISINRequest;
+	ISINRequest.AddRequest(Tranchename, "NAME");
+	ISINRequest.AddRequest(Tranchename, "ID_ISIN");
+	ISINRequest.AddRequest(Tranchename, "ID_CUSIP");
+	ISINRequest.AddRequest(Tranchename, "ID_BB_GLOBAL");
+	ISINRequest.AddRequest(Tranchename, "ID_BB_UNIQU");
+	const BloombergRequest& TempResults = ISINparser.StartRequest(ISINRequest);
+	if (!TempResults.HasErrors()) {
+		for (int RespIter = 0; RespIter < TempResults.NumRequests(); RespIter++) {
+			if (!TempResults.GetRequest(RespIter)->HasErrors()) {
+				const BloombergResult& CurrentResult = TempResults.GetRequest(RespIter)->GetValue();
+				for (int i = 0; i < m_Tranches.size(); i++) {
+					if (
+						CurrentResult.GetString().compare(m_Tranches.at(i)->GetTrancheName().trimmed(), Qt::CaseInsensitive) == 0
+						|| CurrentResult.GetString().compare(m_Tranches.at(i)->GetISIN().trimmed(), Qt::CaseInsensitive) == 0
+					) return i;
+				}
+			}
+		}
 	}
 #endif 
 	return -1;

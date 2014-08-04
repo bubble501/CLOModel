@@ -13,13 +13,94 @@ SyncBloombergWorker::SyncBloombergWorker()
 {}
 void SyncBloombergWorker::handleResponseEvent(const Event& event) {
 	MessageIterator iter(event);
+	int NumVals, NumFieldExep;
+	while (iter.next()) {
+		Message message = iter.message();
+		if (Groups.contains(message.correlationId().asInteger())) {
+			QList<qint64> CurrentGroup = Groups.value(message.correlationId().asInteger());
+			if (message.hasElement("responseError")) {
+				foreach(qint64 SingleReq, CurrentGroup) {
+					m_Requests.FindRequest(SingleReq)->SetErrorCode(BloombergRequest::ResponseError);
+				}
+				return;
+			}
+			if (QString(message.messageType().string()) == "ReferenceDataResponse") {
+				NumVals = message.getElement("securityData").numValues();
+				for (int i = 0; i < NumVals; i++) {
+					NumFieldExep = message.getElement("securityData").getValueAsElement(i).getElement("fieldExceptions").numValues();
+					for (int j = 0; j < NumFieldExep; j++) {
+						foreach(qint64 SingleReq, CurrentGroup) {
+							SingleBbgRequest* FoundRequ = m_Requests.FindRequest(SingleReq);
+							QString CurrentSecurity = message.getElement("securityData").getValueAsElement(i).getElementAsString("security");
+							QString CurrentField = message.getElement("securityData").getValueAsElement(i).getElement("fieldExceptions").getValueAsElement(j).getElementAsString("fieldId");
+							if (
+								FoundRequ->GetFullSecurity() == CurrentSecurity
+								&& FoundRequ->GetField() == CurrentField
+								) {
+								FoundRequ->SetErrorCode(BloombergRequest::FieldError);
+							}
+						}
+					}
+					if (message.getElement("securityData").getValueAsElement(i).hasElement("securityError")) {
+						QString CurrentSecurity = message.getElement("securityData").getValueAsElement(i).getElementAsString("security");
+						foreach(qint64 SingleReq, CurrentGroup) {
+							SingleBbgRequest* FoundRequ = m_Requests.FindRequest(SingleReq);
+							if ((FoundRequ->GetFullSecurity()) == CurrentSecurity) {
+								FoundRequ->SetErrorCode(BloombergRequest::SecurityError);
+							}
+						}
+					}
+					else {
+						QString CurrentSecurity = message.getElement("securityData").getValueAsElement(i).getElementAsString("security");
+						foreach(qint64 SingleReq, CurrentGroup) {
+							SingleBbgRequest* FoundRequ = m_Requests.FindRequest(SingleReq);
+							if ((FoundRequ->GetFullSecurity()) == CurrentSecurity) {
+								if (!message.getElement("securityData").getValueAsElement(i).getElement("fieldData").isNull()) {
+									if (message.getElement("securityData").getValueAsElement(i).getElement("fieldData").hasElement(FoundRequ->GetField().toLatin1().data())) {
+										if (!message.getElement("securityData").getValueAsElement(i).getElement("fieldData").getElement(FoundRequ->GetField().toLatin1().data()).isArray()) {
+											FoundRequ->SetValue(message.getElement("securityData").getValueAsElement(i).getElement("fieldData").getElementAsString(FoundRequ->GetField().toLatin1().data()), FoundRequ->GetField());
+										}
+										else {
+											QStringList CurrentRow, CurrentHead;
+											const int NumResults =
+												message.getElement("securityData").getValueAsElement(i).getElement("fieldData").getElement(FoundRequ->GetField().toLatin1().data()).numValues();
+											const int NumCols =
+												message.getElement("securityData").getValueAsElement(i).getElement("fieldData").getElement(FoundRequ->GetField().toLatin1().data()).getValueAsElement(0).numElements();
+											for (int TableIter = 0; TableIter < NumResults; TableIter++) {
+												CurrentRow.clear(); CurrentHead.clear();
+												for (int ColIter = 0; ColIter < NumCols; ColIter++) {
+													CurrentRow << message.getElement("securityData").getValueAsElement(i).getElement("fieldData").getElement(FoundRequ->GetField().toLatin1().data()).getValueAsElement(TableIter).getElement(ColIter).getValueAsString();
+													CurrentHead << message.getElement("securityData").getValueAsElement(i).getElement("fieldData").getElement(FoundRequ->GetField().toLatin1().data()).getValueAsElement(TableIter).getElement(ColIter).name().string();
+												}
+												FoundRequ->AddValueRow(CurrentRow, CurrentHead);
+											}
+										}
+									}
+								}
+								else {
+									FoundRequ->SetErrorCode(BloombergRequest::NoData);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+
+
+/*
+
+void SyncBloombergWorker::handleResponseEvent(const Event& event) {
+	MessageIterator iter(event);
 	int NumVals,NumFieldExep;
 	while (iter.next()) {
 		Message message = iter.message();
 		if (Groups.contains(message.correlationId().asInteger())) {
 			QList<qint64> CurrentGroup = Groups.value(message.correlationId().asInteger());
 			if(message.hasElement("responseError")){
-				m_Requests.SetErrorCode(BloombergRequest::ResponseError);
 				foreach(qint64 SingleReq, CurrentGroup) {
 					m_Requests.FindRequest(SingleReq)->SetErrorCode(BloombergRequest::ResponseError);
 				}
@@ -80,7 +161,7 @@ void SyncBloombergWorker::handleResponseEvent(const Event& event) {
 			}
 		}
 	}
-}
+}*/
 void SyncBloombergWorker::StartRequest() {
 	m_Requests.SetErrorCode(BloombergRequest::NoErrors);
 	m_Requests.ClearResults();
@@ -133,8 +214,8 @@ void SyncBloombergWorker::StartRequest() {
 		continueToLoop = true;
 		while (continueToLoop) {
 			Event event = session.nextEvent();
-			if (event.eventType() == Event::RESPONSE) {
-				continueToLoop = false;
+			if (event.eventType() == Event::RESPONSE || event.eventType() == Event::PARTIAL_RESPONSE) {
+				continueToLoop = (event.eventType() == Event::RESPONSE);
 				handleResponseEvent(event);
 			}
 		}

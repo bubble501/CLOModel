@@ -14,7 +14,7 @@ using namespace blpapi;
 class AsyncEventHandler;
 class AbstractBbgWorker {
 public:
-	AbstractBbgWorker();
+	AbstractBbgWorker():ServerAddress("localhost"), ServerPort(8194){}
 	const QString& GetServerAddress() const { return ServerAddress; }
 	void SetServerAddress(const QString& val) { ServerAddress = val.trimmed(); }
 	quint16 GetServerPort() const { return ServerPort; }

@@ -121,6 +121,12 @@ QDataStream& BloombergResult::LoadOldVersion(QDataStream& stream) {
 	return stream;
 }
 
+const BloombergResult* BloombergResult::GetTableResult(int r, int c) const {
+	if (r < 0 || r >= m_TableResultRows.size() || c < 0 || c >= TableResultCols)
+		return NULL;
+	return (m_TableResultRows.at(r) + c);
+}
+
 QDataStream& operator<<(QDataStream & stream, const BloombergResult& flows) {
 	stream << flows.HasString()
 		<< flows.HasDate()

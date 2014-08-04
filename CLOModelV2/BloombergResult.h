@@ -20,6 +20,9 @@ public:
 	QString GetString()const { if (m_StringValue) return *m_StringValue; else return QString(); }
 	QDate GetDate() const { if (m_DateValue) return *m_DateValue; else return QDate(); }
 	double GetDouble()const { if (m_DoubleValue) return *m_DoubleValue; else return 0.0; }
+	int GetNumRows() const{ return m_TableResultRows.size(); }
+	int GetNumCols() const { return TableResultCols; }
+	const BloombergResult* GetTableResult(int r, int c) const;
 private:
 	QString m_Header;
 	QString* m_StringValue;

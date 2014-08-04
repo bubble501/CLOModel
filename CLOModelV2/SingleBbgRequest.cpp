@@ -15,6 +15,17 @@ SingleBbgRequest::SingleBbgRequest(const SingleBbgRequest& a)
 	, m_Overrides(a.m_Overrides)
 	, m_AutoConstantRates(a.m_AutoConstantRates)
 	, m_Extension(a.m_Extension) {}
+SingleBbgRequest& SingleBbgRequest::operator=(const SingleBbgRequest& a) {
+	m_ResultID = a.m_ResultID;
+	m_Security = a.m_Security;
+	m_Field = a.m_Field;
+	m_ErrorCode = a.m_ErrorCode;
+	m_Value = a.m_Value;
+	m_Overrides = a.m_Overrides;
+	m_AutoConstantRates = a.m_AutoConstantRates;
+	m_Extension = a.m_Extension;
+	return *this;
+}
 void SingleBbgRequest::SetExtension(const QString& val) {
 	m_Extension =  BloombergRequest::String2YellowKey( val.trimmed());
 }
@@ -22,6 +33,7 @@ void SingleBbgRequest::SetExtension(const QString& val) {
 void SingleBbgRequest::SetOverrides(const QMap<QString, QString>& Overrides) {
 	ClearOverrides();
 	for (QMap<QString, QString>::const_iterator i = Overrides.constBegin(); i != Overrides.constEnd(); i++) {
+		if (i.value().isEmpty()) continue;
 		QString Temp = i.key();
 		m_Overrides.insert(Temp.replace(' ', '_').trimmed().toUpper(), i.value().trimmed().toUpper());
 	}
@@ -89,4 +101,14 @@ void SingleBbgRequest::SetErrorCode(BloombergRequest::BbgErrorCodes val) {
 	if (val == BloombergRequest::NoErrors) m_ErrorCode = BloombergRequest::NoErrors;
 	else m_ErrorCode = m_ErrorCode | static_cast<int>(val);
 }
+
+bool SingleBbgRequest::operator==(const SingleBbgRequest& a) const{
+	if (m_Security != a.m_Security) return false;
+	if (m_Field != a.m_Field) return false;
+	if (m_Extension != a.m_Extension) return false;
+	return m_Overrides == m_Overrides;
+}
+
+
+
 #endif

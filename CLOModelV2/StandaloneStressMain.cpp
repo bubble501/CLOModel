@@ -16,6 +16,10 @@
 #include "BloombergRequest.h"
 #include "SyncBloombergWorker.h"
 #include "AsyncBloombergWorker.h"
+#include <QProgressBar>
+#include <QTextEdit>
+#include <QVBoxLayout>
+#include <QTime>
 #endif
 
 
@@ -231,16 +235,42 @@ int main(int argc, char *argv[]) {
 		QApplication a(argc, argv);
 		QMessageBox::information(0,"Success", "Cash Flows are identical");		
 	}*/
+
 QApplication a(argc, argv);
+QWidget BaseW;
 BloombergRequest TestReq;
 QMap<QString, QString> Ovr;
-Ovr.insert("MTG_PREPAY_SPEED", "90");
-Ovr.insert("MTG_PREPAY_TYP", "CPR");
-TestReq.AddRequest("XS1071274531", "MTG_CASH_FLOW", Ovr);
-Ovr["MTG_PREPAY_SPEED"] = "2";
-TestReq.AddRequest("XS1071274531", "MTG_CASH_FLOW", Ovr);
-AsyncBloombergWorker TempWorker;
-TempWorker.StartRequest(TestReq);
+QFile TestBbgFile("C:\\Temp\\TestBbg.csv");
+int counter=0;
+if (TestBbgFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+	QTextStream in(&TestBbgFile);
+	QString Headline = in.readLine();
+	QStringList Headfields = Headline.split(",");
+	while (!in.atEnd() && counter++<100) {
+		QString line = in.readLine();
+		QStringList fields = line.split(",");
+		Ovr.clear();
+		for (int i = 1; i < fields.size() - 1; i++) {
+			Ovr.insert(Headfields.at(i), fields.at(i));
+		}
+		TestReq.AddRequest(fields.first(), "MTG_CASH_FLOW", Ovr);
+		//TestReq.AddRequest(fields.first(), "name");
+	}
+	TestBbgFile.close();
+}
+TestReq.SetAutoConstantRates(true);
+AsyncBloombergWorker* TempWorker = new AsyncBloombergWorker(&BaseW);
+QVBoxLayout* MainLay = new QVBoxLayout(&BaseW);
+QProgressBar* ProgressShow = new QProgressBar(&BaseW);
+ProgressShow->setRange(0, 100);
+QObject::connect(TempWorker, &AsyncBloombergWorker::UpdateProgress, ProgressShow, &QProgressBar::setValue);
+QTextEdit* ResultsEdit = new QTextEdit(&BaseW);
+QObject::connect(TempWorker, &AsyncBloombergWorker::DataRecievedString, ResultsEdit, &QTextEdit::append);
+MainLay->addWidget(ProgressShow);
+MainLay->addWidget(ResultsEdit);
+BaseW.show();
+TempWorker->StartRequest(TestReq);
 return a.exec();
+
 #endif
 }

@@ -19,14 +19,16 @@ BloombergRequest::~BloombergRequest() {
 BloombergRequest::BloombergRequest(const BloombergRequest& a) 
 	:MaxID(a.MaxID)
 	, m_ErrorCode(a.m_ErrorCode)
+	, m_AutoConstantRates(a.m_AutoConstantRates)
 {
 	foreach(const SingleBbgRequest* SigleReq, a.ResultTable) {
 		ResultTable.append(new SingleBbgRequest(*SigleReq));
 	}
 }
-BloombergRequest& BloombergRequest::operator = (const BloombergRequest& a) {
+BloombergRequest& BloombergRequest::operator= (const BloombergRequest& a) {
 	MaxID = a.MaxID;
 	m_ErrorCode = a.m_ErrorCode;
+	m_AutoConstantRates = a.m_AutoConstantRates;
 	foreach(const SingleBbgRequest* SigleReq, a.ResultTable) {
 		ResultTable.append(new SingleBbgRequest(*SigleReq));
 	}
@@ -38,8 +40,9 @@ void BloombergRequest::ClearRequests() {
 }
 QDataStream& operator<<(QDataStream & stream, const BloombergRequest& flows) {
 	stream 
-		<< static_cast<qint32>(flows.m_ErrorCode) 
+		<< flows.m_ErrorCode
 		<< static_cast<qint32>(flows.ResultTable.size())
+		<< flows.m_AutoConstantRates
 	;
 	foreach(const SingleBbgRequest* SingleReq, flows.ResultTable)
 		stream << (*SingleReq);
@@ -47,9 +50,8 @@ QDataStream& operator<<(QDataStream & stream, const BloombergRequest& flows) {
 }
 QDataStream& operator>>(QDataStream & stream, BloombergRequest& flows) { return flows.LoadOldVersion(stream); }
 QDataStream& BloombergRequest::LoadOldVersion(QDataStream& stream) {
-	qint32 TempError, ListSize;
-	stream >> TempError >> ListSize;
-	m_ErrorCode = static_cast<BloombergRequest::BbgErrorCodes>(TempError);
+	qint32 ListSize;
+	stream >> m_ErrorCode >> ListSize >> m_AutoConstantRates;
 	SingleBbgRequest TempReq;
 	for (qint32 i = 0; i < ListSize; i++) {
 		stream >> TempReq;
@@ -61,8 +63,12 @@ QDataStream& BloombergRequest::LoadOldVersion(QDataStream& stream) {
 void BloombergRequest::AddRequest(const SingleBbgRequest& a) {
 	foreach(const SingleBbgRequest* SingleRequ, ResultTable) {
 		if (SingleRequ->GetResultID() == a.GetResultID()) return;
+		if (SingleRequ->operator==(a)) return;
 	}
 	ResultTable.append(new SingleBbgRequest(a));
+	if (m_AutoConstantRates) {
+		ResultTable.last()->SetAutoConstantRates(true);
+	}
 	if(ResultTable.last()->GetResultID() < 1)
 		ResultTable.last()->SetResultID(qMax(1i64, ++MaxID));
 	if (ResultTable.last()->GetResultID()>MaxID) 
@@ -200,4 +206,12 @@ BloombergRequest::YellowKeys BloombergRequest::String2YellowKey(const QString& a
 	else if (a.compare("Curncy", Qt::CaseInsensitive) == 0) return Curncy;
 	else return Invalid;
 }
+
+void BloombergRequest::SetAutoConstantRates(bool val) {
+	for (QList<SingleBbgRequest*>::iterator i = ResultTable.begin(); i != ResultTable.end(); i++) {
+		(*i)->SetAutoConstantRates(val);
+	}
+	m_AutoConstantRates = val;
+}
+
 #endif

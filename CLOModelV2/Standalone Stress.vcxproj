@@ -240,7 +240,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AbstarctBbgVect.cpp" />
-    <ClCompile Include="AbstractBbgWorker.cpp" />
     <ClCompile Include="AsyncBloombergWorker.cpp" />
     <ClCompile Include="AsyncEventHandler.cpp" />
     <ClCompile Include="BaseRateTable.cpp" />

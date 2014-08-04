@@ -2,6 +2,7 @@
 #ifndef AsyncEventHandler_h__
 #define AsyncEventHandler_h__
 #include <QObject>
+#include <QStringList>
 #include "BloombergRequest.h"
 #include <blpapi_correlationid.h>
 #include <blpapi_event.h>
@@ -19,11 +20,12 @@ private:
 	void handleResponseEvent(const Event& event);
 	bool processEvent(const Event& event, Session *session);
 signals:
-	void ErrorOccurred(qint64, BloombergRequest::BbgErrorCodes);
-	void DataRecieved(qint64);
-
-	
-
+	void SessionTerminated();
+	void Started();
+	void ErrorOccurred(qint64 GroupID, qint64 RequestID, qint32 ErrorID);
+	void DataRecieved(qint64 GroupID, qint64 RequestID, QString Value, QString Header);
+	void DataRecieved(qint64 GroupID, qint64 RequestID);
+	void DataRowRecieved(qint64 GroupID, qint64 RequestID, QStringList Value, QStringList Header);
 };
 #endif // AsyncEventHandler_h__
 #endif

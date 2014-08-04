@@ -33,6 +33,8 @@ public:
 		,ServiceError=16
 		,FieldError=32
 		,UnknownError=64
+		,SessionStopped=128
+		,NoData=256
 	};
 	static QString YellowKey2String(YellowKeys a);
 	static YellowKeys String2YellowKey(const QString& a);
@@ -56,10 +58,13 @@ public:
 	bool HasErrors() const { return m_ErrorCode != NoErrors; }
 	QHash<qint64, QList<qint64> > RequestGroups(qint64 StartingID=1)const;
 	bool IsValidReq() const;
+	void SetAutoConstantRates(bool val);
+	bool GetAutoConstantRates() const { return m_AutoConstantRates; }
 private:
 	qint64 MaxID;
 protected:
 	int m_ErrorCode;
+	bool m_AutoConstantRates;
 	QList<SingleBbgRequest*>  ResultTable;
 	SingleBbgRequest* GetRequest(int Index);
 	SingleBbgRequest* FindRequest(qint64 ID);

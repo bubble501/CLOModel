@@ -13,6 +13,8 @@ class SingleBbgRequest : public BackwardInterface {
 public:
 	SingleBbgRequest();
 	SingleBbgRequest(const SingleBbgRequest& a);
+	bool operator==(const SingleBbgRequest& a) const;
+	SingleBbgRequest& operator=(const SingleBbgRequest& a);
 	qint64 GetResultID() const { return m_ResultID; }
 	const QString& GetSecurity() const { return m_Security; }
 	const QString& GetField() const { return m_Field; }

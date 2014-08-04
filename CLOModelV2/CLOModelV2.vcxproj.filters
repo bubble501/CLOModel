@@ -516,9 +516,6 @@
     <ClCompile Include="SyncBloombergWorker.cpp">
       <Filter>Source Files\Bloomberg</Filter>
     </ClCompile>
-    <ClCompile Include="AbstractBbgWorker.cpp">
-      <Filter>Source Files\Bloomberg</Filter>
-    </ClCompile>
     <ClCompile Include="AsyncBloombergWorker.cpp">
       <Filter>Source Files\Bloomberg</Filter>
     </ClCompile>

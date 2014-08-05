@@ -26,15 +26,15 @@ public:
 	};
 	enum BbgErrorCodes {
 		NoErrors=0
-		,ResponseError=1
-		,SecurityError=2
-		,InvalidInputs=4
-		,SessionError=8
-		,ServiceError=16
-		,FieldError=32
-		,UnknownError=64
-		,SessionStopped=128
-		,NoData=256
+		,ResponseError=0x1
+		,SecurityError=0x2
+		,InvalidInputs=0x4
+		, SessionError = 0x8
+		, ServiceError = 0x10
+		, FieldError = 0x20
+		, UnknownError = 0x40
+		, SessionStopped = 0x80
+		, NoData = 0x100
 	};
 	static QString YellowKey2String(YellowKeys a);
 	static YellowKeys String2YellowKey(const QString& a);
@@ -65,7 +65,7 @@ private:
 protected:
 	int m_ErrorCode;
 	bool m_AutoConstantRates;
-	QList<SingleBbgRequest*>  ResultTable;
+	QHash<qint64, SingleBbgRequest*>  ResultTable;
 	SingleBbgRequest* GetRequest(int Index);
 	SingleBbgRequest* FindRequest(qint64 ID);
 	void ClearResults();

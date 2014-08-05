@@ -127,6 +127,13 @@ const BloombergResult* BloombergResult::GetTableResult(int r, int c) const {
 	return (m_TableResultRows.at(r) + c);
 }
 
+QVariant BloombergResult::GetValue() const {
+	if (!HasString()) return QVariant();
+	if (HasDate()) return QVariant(*m_DateValue);
+	if (HasDouble())return QVariant(*m_DoubleValue);
+	return QVariant(*m_StringValue);
+}
+
 QDataStream& operator<<(QDataStream & stream, const BloombergResult& flows) {
 	stream << flows.HasString()
 		<< flows.HasDate()

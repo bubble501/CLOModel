@@ -82,27 +82,6 @@ void AsyncBloombergWorker::DataRecievedInHadle(qint64 GroupID, qint64 RequestID)
 	RecievedGroups.append(RequestID);
 	emit Recieved(RequestID);
 	emit UpdateProgress(100 * RecievedGroups.size() / m_Requests.NumRequests());
-
-	/*const SingleBbgRequest* CurrentReq = m_Requests.FindRequest(RequestID);
-	if (CurrentReq->HasErrors()) {
-		emit DataRecievedString(
-			QString("%1 - ").arg(CurrentReq->GetResultID()) +
-			CurrentReq->GetSecurity() + " - " + CurrentReq->GetField() + QString(": Error %1").arg(CurrentReq->GetError())
-			);
-	}
-	else{
-		if (CurrentReq->GetValue().HasTable()) 
-			emit DataRecievedString(
-			QString("%1 - ").arg(CurrentReq->GetResultID()) +
-			CurrentReq->GetSecurity() + " - " + CurrentReq->GetField() + QString(": Table %1 Rows, %2 Columns").arg(CurrentReq->GetValue().GetNumRows()).arg(CurrentReq->GetValue().GetNumCols())
-			);
-		else
-			emit DataRecievedString(
-			QString("%1 - ").arg(CurrentReq->GetResultID()) +
-			CurrentReq->GetSecurity() + " - " + CurrentReq->GetField() + ": " + CurrentReq->GetValue().GetString()
-			);
-	}*/
-
 	if (RecievedGroups.size() == m_Requests.NumRequests()) {
 		emit Finished();
 		session->stopAsync();

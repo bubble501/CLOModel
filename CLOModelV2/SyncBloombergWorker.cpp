@@ -76,6 +76,9 @@ void SyncBloombergWorker::handleResponseEvent(const Event& event) {
 											}
 										}
 									}
+									else {
+										FoundRequ->SetErrorCode(BloombergRequest::NoData);
+									}
 								}
 								else {
 									FoundRequ->SetErrorCode(BloombergRequest::NoData);
@@ -215,7 +218,7 @@ void SyncBloombergWorker::StartRequest() {
 		while (continueToLoop) {
 			Event event = session.nextEvent();
 			if (event.eventType() == Event::RESPONSE || event.eventType() == Event::PARTIAL_RESPONSE) {
-				continueToLoop = (event.eventType() == Event::RESPONSE);
+				continueToLoop = (event.eventType() != Event::RESPONSE);
 				handleResponseEvent(event);
 			}
 		}

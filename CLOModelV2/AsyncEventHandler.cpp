@@ -126,7 +126,7 @@ void AsyncEventHandler::handleResponseEvent(const Event& event) {
 						foreach(qint64 SingleReq, CurrentGroup) {
 							const SingleBbgRequest* FoundRequ = AdjParent->m_Requests.FindRequest(SingleReq);
 							if ((FoundRequ->GetFullSecurity()) == CurrentSecurity) {
-								if (!message.getElement("securityData").getValueAsElement(i).getElement("fieldData").isNull()) {
+								if (message.getElement("securityData").getValueAsElement(i).getElement("fieldData").numElements()!=0) {
 									if (message.getElement("securityData").getValueAsElement(i).getElement("fieldData").hasElement(FoundRequ->GetField().toLatin1().data())) {
 										if (!message.getElement("securityData").getValueAsElement(i).getElement("fieldData").getElement(FoundRequ->GetField().toLatin1().data()).isArray()) {
 											emit DataRecieved(message.correlationId().asInteger(), SingleReq
@@ -150,6 +150,9 @@ void AsyncEventHandler::handleResponseEvent(const Event& event) {
 											}
 											emit DataRecieved(message.correlationId().asInteger(), SingleReq);
 										}
+									}
+									else {
+										emit ErrorOccurred(message.correlationId().asInteger(), SingleReq, BloombergRequest::NoData);
 									}
 								}
 								else {

@@ -4,7 +4,7 @@
 #include <QtAlgorithms>
 #include <QStringList>
 void BloombergRequest::ClearResults() {
-	for (QList<SingleBbgRequest*>::iterator i = ResultTable.begin(); i != ResultTable.end(); i++) {
+	for (QHash<qint64, SingleBbgRequest*>::iterator i = ResultTable.begin(); i != ResultTable.end(); i++) {
 		(*i)->SetValue("");
 		(*i)->SetErrorCode(NoErrors);
 	}
@@ -22,7 +22,7 @@ BloombergRequest::BloombergRequest(const BloombergRequest& a)
 	, m_AutoConstantRates(a.m_AutoConstantRates)
 {
 	foreach(const SingleBbgRequest* SigleReq, a.ResultTable) {
-		ResultTable.append(new SingleBbgRequest(*SigleReq));
+		ResultTable.insert(SigleReq->GetResultID(),new SingleBbgRequest(*SigleReq));
 	}
 }
 BloombergRequest& BloombergRequest::operator= (const BloombergRequest& a) {
@@ -30,13 +30,15 @@ BloombergRequest& BloombergRequest::operator= (const BloombergRequest& a) {
 	m_ErrorCode = a.m_ErrorCode;
 	m_AutoConstantRates = a.m_AutoConstantRates;
 	foreach(const SingleBbgRequest* SigleReq, a.ResultTable) {
-		ResultTable.append(new SingleBbgRequest(*SigleReq));
+		ResultTable.insert(SigleReq->GetResultID(), new SingleBbgRequest(*SigleReq));
 	}
 	return *this;
 }
 void BloombergRequest::ClearRequests() {
-	while (!ResultTable.isEmpty()) 
-		delete ResultTable.takeFirst();;	
+	for (QHash<qint64, SingleBbgRequest*>::iterator i = ResultTable.begin(); i != ResultTable.end(); i++) {
+		delete (*i);
+	}
+	ResultTable.clear();
 }
 QDataStream& operator<<(QDataStream & stream, const BloombergRequest& flows) {
 	stream 
@@ -55,45 +57,40 @@ QDataStream& BloombergRequest::LoadOldVersion(QDataStream& stream) {
 	SingleBbgRequest TempReq;
 	for (qint32 i = 0; i < ListSize; i++) {
 		stream >> TempReq;
-		ResultTable.append(new SingleBbgRequest(TempReq));
+		ResultTable.insert(TempReq.GetResultID(),new SingleBbgRequest(TempReq));
 	}
 	ResetProtocolVersion();
 	return stream;
 }
 void BloombergRequest::AddRequest(const SingleBbgRequest& a) {
+	if (ResultTable.contains(a.GetResultID())) return;
 	foreach(const SingleBbgRequest* SingleRequ, ResultTable) {
-		if (SingleRequ->GetResultID() == a.GetResultID()) return;
 		if (SingleRequ->operator==(a)) return;
 	}
-	ResultTable.append(new SingleBbgRequest(a));
+	QHash<qint64, SingleBbgRequest*>::iterator CurrentResult = ResultTable.insert(a.GetResultID(), new SingleBbgRequest(a));
 	if (m_AutoConstantRates) {
-		ResultTable.last()->SetAutoConstantRates(true);
+		(*CurrentResult)->SetAutoConstantRates(true);
 	}
-	if(ResultTable.last()->GetResultID() < 1)
-		ResultTable.last()->SetResultID(qMax(1i64, ++MaxID));
-	if (ResultTable.last()->GetResultID()>MaxID) 
-		MaxID = ResultTable.last()->GetResultID();
+	if ((*CurrentResult)->GetResultID() < 1)
+		(*CurrentResult)->SetResultID(qMax(1i64, ++MaxID));
+	if ((*CurrentResult)->GetResultID()>MaxID)
+		MaxID = (*CurrentResult)->GetResultID();
 	
 }
 const SingleBbgRequest* BloombergRequest::FindRequest(qint64 ID) const {
-	foreach(const SingleBbgRequest* SingleRequ, ResultTable) {
-		if (SingleRequ->GetResultID() == ID) return SingleRequ;
-	}
-	return NULL;
+	return ResultTable.value(ID, NULL);
 }
 const SingleBbgRequest* BloombergRequest::GetRequest(int Index) const {
 	if (Index<0 || Index>ResultTable.size()) return NULL;
-	return ResultTable.at(Index);
+	return *(ResultTable.constBegin()+Index);
 }
 SingleBbgRequest* BloombergRequest::GetRequest(int Index) {
 	if (Index<0 || Index>ResultTable.size()) return NULL;
-	return ResultTable.at(Index);
+	return *(ResultTable.begin() + Index);
 }
 SingleBbgRequest* BloombergRequest::FindRequest(qint64 ID) {
-	foreach(SingleBbgRequest* SingleRequ, ResultTable) {
-		if (SingleRequ->GetResultID() == ID) return SingleRequ;
-	}
-	return NULL;
+	if (!ResultTable.contains(ID)) return NULL;
+	return ResultTable[ID];
 }
 bool BloombergRequest::IsValidReq() const {
 	foreach(const SingleBbgRequest* SingleRequ, ResultTable) {
@@ -123,11 +120,7 @@ QList<qint64> BloombergRequest::FindSecurityField(const QString& Secur, const QS
 	return Result;
 }
 QList<qint64> BloombergRequest::IdList() const {
-	QList<qint64> Result;
-	foreach(const SingleBbgRequest* SingleRequ, ResultTable) {
-		Result.append(SingleRequ->GetResultID());
-	}
-	return Result;
+	return ResultTable.keys();
 }
 void BloombergRequest::AddRequest(qint64 ID, const QString& Secur, const QString& Field, YellowKeys YellowKey) {
 	SingleBbgRequest Temp;
@@ -152,27 +145,31 @@ QHash<qint64, QList<qint64> >  BloombergRequest::RequestGroups(qint64 StartingID
 	QHash<qint64, QList<qint64> > Result;
 	QList<qint64> UsedIDs;
 	QStringList UsedFields;
-	for (QList<SingleBbgRequest*>::const_iterator MainIter = ResultTable.constBegin(); MainIter != ResultTable.constEnd(); MainIter++) {
-		if (UsedIDs.contains((*MainIter)->GetResultID())) continue;
-		UsedIDs.append((*MainIter)->GetResultID());
-		UsedFields.append((*MainIter)->GetField());
+	for (QHash<qint64, SingleBbgRequest*>::const_iterator MainIter = ResultTable.constBegin(); MainIter != ResultTable.constEnd(); MainIter++) {
+		if (UsedIDs.contains(MainIter.key())) continue;
+		UsedIDs.append(MainIter.key());
+		UsedFields.clear();
+		UsedFields.append(MainIter.value()->GetField());
 		Result.insert(StartingID, QList<qint64>());
-		Result[StartingID].append((*MainIter)->GetResultID());
-		for (QList<SingleBbgRequest*>::const_iterator SecondIter = MainIter + 1; SecondIter != ResultTable.constEnd(); SecondIter++) {
-			if ((*MainIter)->SameOverrides(**SecondIter)) {
-				if ((*MainIter)->GetSecurity() != (*SecondIter)->GetSecurity()) {
-					if (UsedFields.contains((*SecondIter)->GetField())) {
-						UsedIDs.append((*SecondIter)->GetResultID());
-						Result[StartingID].append((*SecondIter)->GetResultID());
+		Result[StartingID].append(MainIter.value()->GetResultID());
+		for (QHash<qint64, SingleBbgRequest*>::const_iterator SecondIter = MainIter + 1; SecondIter != ResultTable.constEnd(); SecondIter++) {
+			if (MainIter.value()->GetFullSecurity() == SecondIter.value()->GetFullSecurity()) {
+				if (MainIter.value()->SameOverrides(*SecondIter.value())) {
+					UsedIDs.append(SecondIter.value()->GetResultID());
+					Result[StartingID].append(SecondIter.value()->GetResultID());
+					UsedFields.append(SecondIter.value()->GetField());
+				}
+			}
+		}
+		for (QHash<qint64, SingleBbgRequest*>::const_iterator SecondIter = MainIter + 1; SecondIter != ResultTable.constEnd(); SecondIter++) {
+			if (MainIter.value()->GetSecurity() != SecondIter.value()->GetSecurity()) {
+				if (UsedFields.contains(SecondIter.value()->GetField())) {
+					if (MainIter.value()->SameOverrides(*SecondIter.value())) {
+						UsedIDs.append(SecondIter.value()->GetResultID());
+						Result[StartingID].append(SecondIter.value()->GetResultID());
 					}
 				}
-				else {
-					UsedIDs.append((*SecondIter)->GetResultID());
-					Result[StartingID].append((*SecondIter)->GetResultID());
-					UsedFields.append((*SecondIter)->GetField());
-				}
-				
-			}
+			}	
 		}
 		StartingID++;
 	}
@@ -208,7 +205,7 @@ BloombergRequest::YellowKeys BloombergRequest::String2YellowKey(const QString& a
 }
 
 void BloombergRequest::SetAutoConstantRates(bool val) {
-	for (QList<SingleBbgRequest*>::iterator i = ResultTable.begin(); i != ResultTable.end(); i++) {
+	for (QHash<qint64, SingleBbgRequest*>::iterator i = ResultTable.begin(); i != ResultTable.end(); i++) {
 		(*i)->SetAutoConstantRates(val);
 	}
 	m_AutoConstantRates = val;

@@ -6,10 +6,10 @@ class RepaymentVector : public AbstarctBbgVect {
 public:
 	enum RepaymentMethods {
 		Invalid=-1
-		,InterestOnly = 1
-		,Annuity = 2
-		,Linear = 4
-		,Capitalization=8
+		, InterestOnly = 0x1
+		, Annuity = 0x2
+		, Linear = 0x4
+		, Capitalization = 0x8
 	};
 protected:
 	QList<RepaymentMethods> m_VectVal;

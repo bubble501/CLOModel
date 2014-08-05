@@ -30,7 +30,6 @@ signals:
 	void Started();
 	void Stopped();
 	void Finished();
-	//void DataRecievedString(QString);
 };
 #endif // AsyncBloombergWorker_h__
 

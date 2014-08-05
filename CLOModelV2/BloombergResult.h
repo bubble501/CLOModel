@@ -3,6 +3,7 @@
 #define BloombergResult_h__
 #include <QStringList>
 #include <QDate>
+#include <QVariant>
 #include "BackwardCompatibilityInterface.h"
 class SingleBbgRequest;
 class BloombergResult :public BackwardInterface  {
@@ -12,14 +13,16 @@ public:
 	BloombergResult& operator= (const BloombergResult& a);
 	~BloombergResult();
 	bool IsEmpty() const { return !HasString() && !HasTable(); }
-	bool HasString() const { return !m_StringValue; }
-	bool HasDate() const { return !m_DateValue; }
-	bool HasDouble() const { return !m_DoubleValue; }
+	bool HasString() const { return m_StringValue!=NULL; }
+	bool HasDate() const { return m_DateValue != NULL; }
+	bool HasDouble() const { return m_DoubleValue != NULL; }
 	bool HasTable() const { return (!m_TableResultRows.isEmpty()) && TableResultCols > 0; }
+	bool HasValue()const { return HasString(); }
 	const QString& GetHeader()const { return m_Header; }
 	QString GetString()const { if (m_StringValue) return *m_StringValue; else return QString(); }
 	QDate GetDate() const { if (m_DateValue) return *m_DateValue; else return QDate(); }
 	double GetDouble()const { if (m_DoubleValue) return *m_DoubleValue; else return 0.0; }
+	QVariant GetValue() const;
 	int GetNumRows() const{ return m_TableResultRows.size(); }
 	int GetNumCols() const { return TableResultCols; }
 	const BloombergResult* GetTableResult(int r, int c) const;

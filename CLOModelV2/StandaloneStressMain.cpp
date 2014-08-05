@@ -236,17 +236,18 @@ int main(int argc, char *argv[]) {
 		QMessageBox::information(0,"Success", "Cash Flows are identical");		
 	}*/
 
+/*
 QApplication a(argc, argv);
 QWidget BaseW;
 BloombergRequest TestReq;
 QMap<QString, QString> Ovr;
+int counter = 0;
 QFile TestBbgFile("C:\\Temp\\TestBbg.csv");
-int counter=0;
 if (TestBbgFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
 	QTextStream in(&TestBbgFile);
 	QString Headline = in.readLine();
 	QStringList Headfields = Headline.split(",");
-	while (!in.atEnd() && counter++<100) {
+	while (!in.atEnd()) {
 		QString line = in.readLine();
 		QStringList fields = line.split(",");
 		Ovr.clear();
@@ -254,7 +255,8 @@ if (TestBbgFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
 			Ovr.insert(Headfields.at(i), fields.at(i));
 		}
 		TestReq.AddRequest(fields.first(), "MTG_CASH_FLOW", Ovr);
-		//TestReq.AddRequest(fields.first(), "name");
+		TestReq.AddRequest(fields.first(), "name");
+
 	}
 	TestBbgFile.close();
 }
@@ -264,13 +266,10 @@ QVBoxLayout* MainLay = new QVBoxLayout(&BaseW);
 QProgressBar* ProgressShow = new QProgressBar(&BaseW);
 ProgressShow->setRange(0, 100);
 QObject::connect(TempWorker, &AsyncBloombergWorker::UpdateProgress, ProgressShow, &QProgressBar::setValue);
-QTextEdit* ResultsEdit = new QTextEdit(&BaseW);
-QObject::connect(TempWorker, &AsyncBloombergWorker::DataRecievedString, ResultsEdit, &QTextEdit::append);
 MainLay->addWidget(ProgressShow);
-MainLay->addWidget(ResultsEdit);
 BaseW.show();
 TempWorker->StartRequest(TestReq);
-return a.exec();
+return a.exec();*/
 
 #endif
 }

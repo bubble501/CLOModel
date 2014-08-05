@@ -1,7 +1,7 @@
 #ifndef NO_BLOOMBERG
 #include "SingleBbgRequest.h"
 SingleBbgRequest::SingleBbgRequest()
-	:m_ResultID(-1)
+	:m_ResultID(-1i64)
 	, m_ErrorCode(BloombergRequest::NoErrors)
 	, m_AutoConstantRates(false)
 	, m_Extension(BloombergRequest::Mtge) 
@@ -14,7 +14,8 @@ SingleBbgRequest::SingleBbgRequest(const SingleBbgRequest& a)
 	, m_Value(a.m_Value)
 	, m_Overrides(a.m_Overrides)
 	, m_AutoConstantRates(a.m_AutoConstantRates)
-	, m_Extension(a.m_Extension) {}
+	, m_Extension(a.m_Extension)
+{}
 SingleBbgRequest& SingleBbgRequest::operator=(const SingleBbgRequest& a) {
 	m_ResultID = a.m_ResultID;
 	m_Security = a.m_Security;

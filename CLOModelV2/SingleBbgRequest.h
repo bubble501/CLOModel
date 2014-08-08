@@ -1,7 +1,6 @@
 #ifndef NO_BLOOMBERG
 #ifndef SingleBbgRequest_h__
 #define SingleBbgRequest_h__
-#include <QMap>
 #include <QHash>
 #include <QDataStream>
 #include "BackwardCompatibilityInterface.h"
@@ -28,8 +27,8 @@ public:
 	void SetSecurity(const QString& val) { m_Security = val.trimmed().toUpper(); }
 	void SetField(const QString& val) { m_Field = val.trimmed().toUpper();  m_Field.replace(' ', '_'); }
 	void SetErrorCode(BloombergRequest::BbgErrorCodes val);
-	const QMap<QString, QString>& GetOverrides() const { return m_Overrides; }
-	void SetOverrides(const QMap<QString, QString>& Overrides);
+	const QHash<QString, QString>& GetOverrides() const { return m_Overrides; }
+	void SetOverrides(const QHash<QString, QString>& Overrides);
 	void SetOverride(QString Name, const QString& Value);
 	void ClearOverrides();
 	bool IsValidReq() const;
@@ -45,7 +44,7 @@ private:
 	QString m_Field;
 	int m_ErrorCode;
 	BloombergResult m_Value;
-	QMap<QString, QString> m_Overrides;
+	QHash<QString, QString> m_Overrides;
 	bool m_AutoConstantRates;
 protected:
 	bool SameOverrides(const SingleBbgRequest& a)const;

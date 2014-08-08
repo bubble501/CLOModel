@@ -4,6 +4,7 @@
 #include "SingleBbgRequest.h"
 void AsyncBloombergWorker::StartRequest() {
 	if (session) return;
+	m_SessionFinished = false;
 	RecievedGroups.clear();
 	m_Requests.SetErrorCode(BloombergRequest::NoErrors);
 	m_Requests.ClearResults();
@@ -27,6 +28,7 @@ AsyncBloombergWorker::AsyncBloombergWorker(QObject* parent)
 	:QObject(parent)
 	, AbstractBbgWorker()
 	, session(NULL)
+	, m_SessionFinished(false)
 {
 	Hive = new AsyncEventHandler(this);
 	connect(Hive, SIGNAL(DataRecieved(qint64, qint64, QString, QString)), this, SLOT(DataRecievedInHadle(qint64, qint64, QString, QString)));
@@ -40,24 +42,32 @@ void AsyncBloombergWorker::SessionTerminated() {
 	if (!session) return;
 	delete session;
 	session = NULL;
-	if (m_Requests.GetErrorCode() | static_cast<qint32>(BloombergRequest::SessionStopped)) emit Stopped();
+	m_SessionFinished = false;
+	if (m_Requests.GetErrorCode() & static_cast<qint32>(BloombergRequest::SessionStopped)) emit Stopped();
 }
 
 void AsyncBloombergWorker::StopRequest() {
+	if (m_SessionFinished) return;
 	if (session) {
+		m_SessionFinished = true;
 		m_Requests.SetErrorCode(BloombergRequest::SessionStopped);
 		session->stopAsync();
 	}
 }
 void AsyncBloombergWorker::ErrorOccurredInHadle(qint64 GroupID, qint64 RequestID, qint32 ErrorID) {
 	if (GroupID == -1i64) {
-		m_Requests.SetErrorCode(static_cast<BloombergRequest::BbgErrorCodes>(ErrorID));
-		emit UpdateProgress(100);
-		emit Finished();
-		return session->stopAsync();
+		if (session && !(m_Requests.GetErrorCode() & static_cast<qint32>(BloombergRequest::SessionStopped))) {
+			m_Requests.SetErrorCode(static_cast<BloombergRequest::BbgErrorCodes>(ErrorID));
+			m_SessionFinished = true;
+			emit UpdateProgress(100);
+			emit Finished();
+			session->stopAsync();
+		}
 	}
-	m_Requests.FindRequest(RequestID)->SetErrorCode(static_cast<BloombergRequest::BbgErrorCodes>(ErrorID));
-	DataRecievedInHadle(GroupID, RequestID);
+	else {
+		m_Requests.FindRequest(RequestID)->SetErrorCode(static_cast<BloombergRequest::BbgErrorCodes>(ErrorID));
+		DataRecievedInHadle(GroupID, RequestID);
+	}
 }
 void AsyncBloombergWorker::DataRecievedInHadle(qint64 GroupID, qint64 RequestID, const QString& Value, const QString& Header) {
 	SingleBbgRequest* CurrentResult = m_Requests.FindRequest(RequestID);
@@ -83,6 +93,7 @@ void AsyncBloombergWorker::DataRecievedInHadle(qint64 GroupID, qint64 RequestID)
 	emit Recieved(RequestID);
 	emit UpdateProgress(100 * RecievedGroups.size() / m_Requests.NumRequests());
 	if (RecievedGroups.size() == m_Requests.NumRequests()) {
+		m_SessionFinished = true;
 		emit Finished();
 		session->stopAsync();
 	}

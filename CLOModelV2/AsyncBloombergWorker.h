@@ -13,10 +13,12 @@ public:
 	using AbstractBbgWorker::StartRequest;
 	virtual void StartRequest();
 	void StopRequest();
+	bool isRunning() const { return session && !m_SessionFinished; }
 private:
 	AsyncEventHandler* Hive;
 	Session* session;
 	QList<qint64> RecievedGroups;
+	bool m_SessionFinished;
 	friend AsyncEventHandler;
 private slots:
 	void ErrorOccurredInHadle(qint64 GroupID, qint64 RequestID, qint32 ErrorID);

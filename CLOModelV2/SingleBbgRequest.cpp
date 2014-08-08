@@ -31,16 +31,17 @@ void SingleBbgRequest::SetExtension(const QString& val) {
 	m_Extension =  BloombergRequest::String2YellowKey( val.trimmed());
 }
 
-void SingleBbgRequest::SetOverrides(const QMap<QString, QString>& Overrides) {
+void SingleBbgRequest::SetOverrides(const QHash<QString, QString>& Overrides) {
 	ClearOverrides();
-	for (QMap<QString, QString>::const_iterator i = Overrides.constBegin(); i != Overrides.constEnd(); i++) {
+	for (QHash<QString, QString>::const_iterator i = Overrides.constBegin(); i != Overrides.constEnd(); i++) {
 		if (i.value().isEmpty()) continue;
-		QString Temp = i.key();
-		m_Overrides.insert(Temp.replace(' ', '_').trimmed().toUpper(), i.value().trimmed().toUpper());
+		QString Temp = i.key().trimmed().toUpper();
+		m_Overrides.insert(Temp.replace(' ', '_'), i.value().trimmed().toUpper());
 	}
 }
 void SingleBbgRequest::SetOverride(QString Name, const QString& Value) {
-	Name = Name.replace(' ', '_').trimmed().toUpper();
+	Name = Name.trimmed().toUpper();
+	Name = Name.replace(' ', '_');
 	m_Overrides[Name] = Value;
 }
 void SingleBbgRequest::ClearOverrides() {
@@ -107,7 +108,7 @@ bool SingleBbgRequest::operator==(const SingleBbgRequest& a) const{
 	if (m_Security != a.m_Security) return false;
 	if (m_Field != a.m_Field) return false;
 	if (m_Extension != a.m_Extension) return false;
-	return m_Overrides == m_Overrides;
+	return m_Overrides == a.m_Overrides;
 }
 
 

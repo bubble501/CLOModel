@@ -131,7 +131,7 @@ void BloombergRequest::AddRequest(qint64 ID, const QString& Secur, const QString
 	AddRequest(Temp);
 }
 void BloombergRequest::AddRequest(const QString& Secur, const QString& Field, YellowKeys YellowKey) { AddRequest(++MaxID, Secur, Field, YellowKey); }
-void BloombergRequest::AddRequest(qint64 ID, const QString& Secur, const QString& Field, const QMap<QString, QString>& Overrides, YellowKeys YellowKey) {
+void BloombergRequest::AddRequest(qint64 ID, const QString& Secur, const QString& Field, const QHash<QString, QString>& Overrides, YellowKeys YellowKey) {
 	SingleBbgRequest Temp;
 	Temp.SetField(Field);
 	Temp.SetSecurity(Secur);
@@ -140,7 +140,7 @@ void BloombergRequest::AddRequest(qint64 ID, const QString& Secur, const QString
 	Temp.SetExtension(YellowKey);
 	AddRequest(Temp);
 }
-void BloombergRequest::AddRequest(const QString& Secur, const QString& Field, const QMap<QString, QString>& Overrides, YellowKeys YellowKey) { AddRequest(++MaxID, Secur, Field, Overrides, YellowKey); }
+void BloombergRequest::AddRequest(const QString& Secur, const QString& Field, const QHash<QString, QString>& Overrides, YellowKeys YellowKey) { AddRequest(++MaxID, Secur, Field, Overrides, YellowKey); }
 QHash<qint64, QList<qint64> >  BloombergRequest::RequestGroups(qint64 StartingID)const {
 	QHash<qint64, QList<qint64> > Result;
 	QList<qint64> UsedIDs;

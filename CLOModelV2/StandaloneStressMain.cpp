@@ -236,7 +236,7 @@ int main(int argc, char *argv[]) {
 		QMessageBox::information(0,"Success", "Cash Flows are identical");		
 	}*/
 
-/*
+
 QApplication a(argc, argv);
 QWidget BaseW;
 BloombergRequest TestReq;
@@ -269,7 +269,7 @@ QObject::connect(TempWorker, &AsyncBloombergWorker::UpdateProgress, ProgressShow
 MainLay->addWidget(ProgressShow);
 BaseW.show();
 TempWorker->StartRequest(TestReq);
-return a.exec();*/
+return a.exec();
 
 #endif
 }

@@ -1,7 +1,6 @@
 #ifndef NO_BLOOMBERG
 #ifndef BloombergRequest_h__
 #define BloombergRequest_h__
-#include <QMap>
 #include <QHash>
 #include <QDataStream>
 #include "BackwardCompatibilityInterface.h"
@@ -52,14 +51,15 @@ public:
 	void AddRequest(const SingleBbgRequest& a);
 	void AddRequest(qint64 ID, const QString& Secur, const QString& Field, YellowKeys YellowKey = Mtge);
 	void AddRequest(const QString& Secur, const QString& Field, YellowKeys YellowKey = Mtge);
-	void AddRequest(qint64 ID, const QString& Secur, const QString& Field, const QMap<QString, QString>& Overrides, YellowKeys YellowKey = Mtge);
-	void AddRequest(const QString& Secur, const QString& Field, const QMap<QString, QString>& Overrides, YellowKeys YellowKey = Mtge);
+	void AddRequest(qint64 ID, const QString& Secur, const QString& Field, const QHash<QString, QString>& Overrides, YellowKeys YellowKey = Mtge);
+	void AddRequest(const QString& Secur, const QString& Field, const QHash<QString, QString>& Overrides, YellowKeys YellowKey = Mtge);
 	int GetErrorCode() const { return m_ErrorCode; }
 	bool HasErrors() const { return m_ErrorCode != NoErrors; }
 	QHash<qint64, QList<qint64> > RequestGroups(qint64 StartingID=1)const;
 	bool IsValidReq() const;
 	void SetAutoConstantRates(bool val);
 	bool GetAutoConstantRates() const { return m_AutoConstantRates; }
+	void ClearRequests();
 private:
 	qint64 MaxID;
 protected:
@@ -69,7 +69,6 @@ protected:
 	SingleBbgRequest* GetRequest(int Index);
 	SingleBbgRequest* FindRequest(qint64 ID);
 	void ClearResults();
-	void ClearRequests();
 	void SetErrorCode(BbgErrorCodes ErrCd = NoErrors);
 	void SetResult(qint64 ID, const QString& Value);
 	virtual QDataStream& LoadOldVersion(QDataStream& stream);

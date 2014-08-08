@@ -347,32 +347,20 @@
     <ClCompile Include="BloombergRequest.cpp">
       <Filter>Source Files\Bloomberg</Filter>
     </ClCompile>
-    <ClCompile Include="SyncBloombergWorker.cpp">
-      <Filter>Source Files\Bloomberg</Filter>
-    </ClCompile>
     <ClCompile Include="BloombergResult.cpp">
       <Filter>Source Files\Bloomberg</Filter>
     </ClCompile>
     <ClCompile Include="SingleBbgRequest.cpp">
       <Filter>Source Files\Bloomberg</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_AsyncBloombergWorker.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_AsyncBloombergWorker.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_AsyncEventHandler.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_AsyncEventHandler.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="AsyncBloombergWorker.cpp">
+    <ClCompile Include="BloombergWorker.cpp">
       <Filter>Source Files\Bloomberg</Filter>
     </ClCompile>
-    <ClCompile Include="AsyncEventHandler.cpp">
-      <Filter>Source Files\Bloomberg</Filter>
+    <ClCompile Include="GeneratedFiles\Debug\moc_BloombergWorker.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_BloombergWorker.cpp">
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -523,16 +511,10 @@
     <ClInclude Include="BloombergRequest.h">
       <Filter>Header Files\Bloomberg</Filter>
     </ClInclude>
-    <ClInclude Include="SyncBloombergWorker.h">
-      <Filter>Header Files\Bloomberg</Filter>
-    </ClInclude>
     <ClInclude Include="BloombergResult.h">
       <Filter>Header Files\Bloomberg</Filter>
     </ClInclude>
     <ClInclude Include="SingleBbgRequest.h">
-      <Filter>Header Files\Bloomberg</Filter>
-    </ClInclude>
-    <ClInclude Include="AbstractBbgWorker.h">
       <Filter>Header Files\Bloomberg</Filter>
     </ClInclude>
   </ItemGroup>
@@ -597,10 +579,7 @@
     <CustomBuild Include="StressViewer.h">
       <Filter>Header Files\Widgets</Filter>
     </CustomBuild>
-    <CustomBuild Include="AsyncBloombergWorker.h">
-      <Filter>Header Files\Bloomberg</Filter>
-    </CustomBuild>
-    <CustomBuild Include="AsyncEventHandler.h">
+    <CustomBuild Include="BloombergWorker.h">
       <Filter>Header Files\Bloomberg</Filter>
     </CustomBuild>
   </ItemGroup>

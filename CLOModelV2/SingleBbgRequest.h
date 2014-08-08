@@ -4,10 +4,9 @@
 #include <QHash>
 #include <QDataStream>
 #include "BackwardCompatibilityInterface.h"
-#include "BloombergRequest.h"
 #include "BloombergResult.h"
-class AsyncBloombergWorker;
-class AsyncEventHandler;
+#include "BloombergRequest.h"
+class BloombergWorker;
 class SingleBbgRequest : public BackwardInterface {
 public:
 	SingleBbgRequest();
@@ -26,7 +25,6 @@ public:
 	void SetResultID(qint64 val) { m_ResultID = val; }
 	void SetSecurity(const QString& val) { m_Security = val.trimmed().toUpper(); }
 	void SetField(const QString& val) { m_Field = val.trimmed().toUpper();  m_Field.replace(' ', '_'); }
-	void SetErrorCode(BloombergRequest::BbgErrorCodes val);
 	const QHash<QString, QString>& GetOverrides() const { return m_Overrides; }
 	void SetOverrides(const QHash<QString, QString>& Overrides);
 	void SetOverride(QString Name, const QString& Value);
@@ -47,15 +45,13 @@ private:
 	QHash<QString, QString> m_Overrides;
 	bool m_AutoConstantRates;
 protected:
+	void SetErrorCode(BloombergRequest::BbgErrorCodes val);
 	bool SameOverrides(const SingleBbgRequest& a)const;
 	void SetValue(const QString& val, const QString& Header = "") { m_Value.SetValue(val,Header); }
 	void AddValueRow(const QStringList& val, const QStringList& Headers = QStringList()) { m_Value.AddValueRow(val, Headers); }
 	virtual QDataStream& LoadOldVersion(QDataStream& stream);
 	friend QDataStream& operator<<(QDataStream & stream, const SingleBbgRequest& flows);
 	friend QDataStream& operator>>(QDataStream & stream, SingleBbgRequest& flows);
-	friend SyncBloombergWorker;
-	friend AsyncBloombergWorker;
-	friend AsyncEventHandler;
 	friend BloombergRequest;
 };
 QDataStream& operator<<(QDataStream & stream, const SingleBbgRequest& flows);

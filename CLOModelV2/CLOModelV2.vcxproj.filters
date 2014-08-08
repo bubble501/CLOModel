@@ -191,12 +191,6 @@
     <ClInclude Include="BloombergResult.h">
       <Filter>Header Files\Bloomberg</Filter>
     </ClInclude>
-    <ClInclude Include="SyncBloombergWorker.h">
-      <Filter>Header Files\Bloomberg</Filter>
-    </ClInclude>
-    <ClInclude Include="AbstractBbgWorker.h">
-      <Filter>Header Files\Bloomberg</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="CentralUnit.h">
@@ -253,10 +247,7 @@
     <CustomBuild Include="WaterfallViewer.h">
       <Filter>Header Files\Widgets</Filter>
     </CustomBuild>
-    <CustomBuild Include="AsyncEventHandler.h">
-      <Filter>Header Files\Bloomberg</Filter>
-    </CustomBuild>
-    <CustomBuild Include="AsyncBloombergWorker.h">
+    <CustomBuild Include="BloombergWorker.h">
       <Filter>Header Files\Bloomberg</Filter>
     </CustomBuild>
   </ItemGroup>
@@ -513,25 +504,13 @@
     <ClCompile Include="BloombergResult.cpp">
       <Filter>Source Files\Bloomberg</Filter>
     </ClCompile>
-    <ClCompile Include="SyncBloombergWorker.cpp">
+    <ClCompile Include="BloombergWorker.cpp">
       <Filter>Source Files\Bloomberg</Filter>
     </ClCompile>
-    <ClCompile Include="AsyncBloombergWorker.cpp">
-      <Filter>Source Files\Bloomberg</Filter>
-    </ClCompile>
-    <ClCompile Include="AsyncEventHandler.cpp">
-      <Filter>Source Files\Bloomberg</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_AsyncEventHandler.cpp">
+    <ClCompile Include="GeneratedFiles\Debug\moc_BloombergWorker.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_AsyncBloombergWorker.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_AsyncEventHandler.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_AsyncBloombergWorker.cpp">
+    <ClCompile Include="GeneratedFiles\Release\moc_BloombergWorker.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
   </ItemGroup>

@@ -3,7 +3,7 @@
 #include <QHash>
 #include <qmath.h>
 #include "Waterfall.h"
-#include "SyncBloombergWorker.h"
+#include "BloombergWorker.h"
 #include "SingleBbgRequest.h"
 const WatFalPrior* Waterfall::GetStep(int Index)const {
 	if(Index<0 || Index>=m_WaterfallStesps.size()) return NULL;
@@ -315,14 +315,14 @@ int Waterfall::FindTrancheIndex(const QString& Tranchename)const{
 		if(m_Tranches.at(j)->GetISIN()==Tranchename) return j;
 	}
 #ifndef NO_BLOOMBERG
-	SyncBloombergWorker ISINparser;
+	BloombergWorker ISINparser;
 	BloombergRequest ISINRequest;
 	ISINRequest.AddRequest(Tranchename, "NAME");
 	ISINRequest.AddRequest(Tranchename, "ID_ISIN");
 	ISINRequest.AddRequest(Tranchename, "ID_CUSIP");
 	ISINRequest.AddRequest(Tranchename, "ID_BB_GLOBAL");
 	ISINRequest.AddRequest(Tranchename, "ID_BB_UNIQU");
-	const BloombergRequest& TempResults = ISINparser.GetResults(ISINRequest);
+	const BloombergRequest& TempResults = ISINparser.StartRequestSync(ISINRequest);
 	if (!TempResults.HasErrors()) {
 		for (int RespIter = 0; RespIter < TempResults.NumRequests(); RespIter++) {
 			if (!TempResults.GetRequest(RespIter)->HasErrors()) {

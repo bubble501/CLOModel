@@ -1,5 +1,5 @@
 #include "Tranche.h"
-#include "SyncBloombergWorker.h"
+#include "BloombergWorker.h"
 #include "SingleBbgRequest.h"
 Tranche::Tranche()
 	:DefaultRefRate("BP0003M")
@@ -166,7 +166,7 @@ void Tranche::SetBloombergExtension(const QString& a){
 }
 #ifndef NO_BLOOMBERG
 void Tranche::GetDataFromBloomberg(){
-	SyncBloombergWorker Bee;
+	BloombergWorker Bee;
 	BloombergRequest TempReq;
 	QString IdentityCode = (TrancheName.isEmpty() ? ISINcode : TrancheName);
 	TempReq.AddRequest(1,IdentityCode, "MTG_ORIG_AMT", BloombergRequest::String2YellowKey(BloombergExtension));
@@ -184,7 +184,7 @@ void Tranche::GetDataFromBloomberg(){
 	TempReq.AddRequest(13, IdentityCode, "ID_ISIN", BloombergRequest::String2YellowKey(BloombergExtension));
 
 
-	const BloombergRequest& Result = Bee.GetResults(TempReq);
+	const BloombergRequest& Result = Bee.StartRequestSync(TempReq);
 	if (Result.HasErrors()) return;
 
 	if (Result.GetRequest(1)->HasErrors()) OriginalAmt = 0.0;

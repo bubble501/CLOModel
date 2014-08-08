@@ -211,4 +211,22 @@ void BloombergRequest::SetAutoConstantRates(bool val) {
 	m_AutoConstantRates = val;
 }
 
+void BloombergRequest::SetResult(qint64 ID, const QString& Value, const QString& Header) {
+	SingleBbgRequest* const ReqToChange = ResultTable.value(ID, NULL);
+	if (ReqToChange)
+		ReqToChange->SetValue(Value, Header);
+}
+
+void BloombergRequest::SetResultRow(qint64 ID, const QStringList& Value, const QStringList& Header) {
+	SingleBbgRequest* const ReqToChange = ResultTable.value(ID, NULL);
+	if (ReqToChange)
+		ReqToChange->AddValueRow(Value, Header);
+}
+
+void BloombergRequest::SetResultError(qint64 ID, BbgErrorCodes ErrCd) {
+	SingleBbgRequest* const ReqToChange = ResultTable.value(ID, NULL);
+	if (ReqToChange)
+		ReqToChange->SetErrorCode(ErrCd);
+}
+
 #endif

@@ -4,10 +4,8 @@
 #include <QHash>
 #include <QDataStream>
 #include "BackwardCompatibilityInterface.h"
-class SyncBloombergWorker;
+class BloombergWorker;
 class SingleBbgRequest;
-class AsyncBloombergWorker;
-class AsyncEventHandler;
 class BloombergRequest : public BackwardInterface {
 public:
 	enum YellowKeys {
@@ -70,14 +68,13 @@ protected:
 	SingleBbgRequest* FindRequest(qint64 ID);
 	void ClearResults();
 	void SetErrorCode(BbgErrorCodes ErrCd = NoErrors);
-	void SetResult(qint64 ID, const QString& Value);
+	void SetResultError(qint64 ID, BbgErrorCodes ErrCd);
+	void SetResult(qint64 ID, const QString& Value, const QString& Header);
+	void SetResultRow(qint64 ID, const QStringList& Value, const QStringList& Header);
 	virtual QDataStream& LoadOldVersion(QDataStream& stream);
 	friend QDataStream& operator<<(QDataStream & stream, const BloombergRequest& flows);
 	friend QDataStream& operator>>(QDataStream & stream, BloombergRequest& flows);
-	friend SyncBloombergWorker;
-	friend AsyncBloombergWorker;
-	friend SingleBbgRequest;
-	friend AsyncEventHandler;
+	friend BloombergWorker;
 };
 
 QDataStream& operator<<(QDataStream & stream, const BloombergRequest& flows);

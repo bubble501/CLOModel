@@ -688,7 +688,7 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		ChartsModels.append(new QStandardItemModel(a.GetCalculatedMtgPayments().Count(),1,this));
 		for(int i=0;i<a.GetCalculatedMtgPayments().Count();i++){
 			QModelIndex TempIndex=ChartsModels.last()->index(i,0);
-			TempValue=qPow(1.0+(a.GetCalculatedMtgPayments().GetLoss(i)/(a.GetCalculatedMtgPayments().GetAmountOut(i-1)-a.GetCalculatedMtgPayments().GetScheduled(i))),12.0)-1.0;
+			TempValue=1.0-qPow(1.0-(a.GetCalculatedMtgPayments().GetLoss(i)/(a.GetCalculatedMtgPayments().GetAmountOut(i-1)-a.GetCalculatedMtgPayments().GetScheduled(i))),12.0);
 			ChartsModels.last()->setData(TempIndex,TempValue*100.0);
 			ChartsModels.last()->setData(TempIndex,"Date: "+a.GetCalculatedMtgPayments().GetDate(i).toString("MMM-yy")+" - Value: "+QString::number(TempValue*100.0,'f',2)+'%',Qt::ToolTipRole);
 			if(i%3==0) DatesLabels << a.GetCalculatedMtgPayments().GetDate(i).toString("MMM-yy");
@@ -701,7 +701,7 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		ChartsModels.append(new QStandardItemModel(a.GetCalculatedMtgPayments().Count(),1,this));
 		for(int i=0;i<a.GetCalculatedMtgPayments().Count();i++){
 			QModelIndex TempIndex=ChartsModels.last()->index(i,0);
-			TempValue=qPow(1.0+(a.GetCalculatedMtgPayments().GetPrepay(i)/(a.GetCalculatedMtgPayments().GetAmountOut(i-1)-a.GetCalculatedMtgPayments().GetScheduled(i))),12.0)-1.0;
+			TempValue=1.0-qPow(1.0-(a.GetCalculatedMtgPayments().GetPrepay(i)/(a.GetCalculatedMtgPayments().GetAmountOut(i-1)-a.GetCalculatedMtgPayments().GetScheduled(i))),12.0);
 			ChartsModels.last()->setData(TempIndex,TempValue*100.0);
 			ChartsModels.last()->setData(TempIndex,"Date: "+a.GetCalculatedMtgPayments().GetDate(i).toString("MMM-yy")+" - Value: "+QString::number(TempValue*100.0,'f',2)+'%',Qt::ToolTipRole);
 		}

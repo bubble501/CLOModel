@@ -890,7 +890,7 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		QStringList DatesLabels;
 		QStringList ReserveLabels;
 		ReserveLabels << "Actual Reserve" << "Target Reserve";
-		TrancheCashFlow CurrentResFlows;
+		GenericCashFlow CurrentResFlows;
 		for(int ReserveIter=0;ReserveIter<a.GetNumReserves();ReserveIter++){
 			CurrentResFlows = a.GetReserveFund(ReserveIter)->GetReserveFundFlow();
 			if(CurrentResFlows.Count()==0) continue;
@@ -898,11 +898,11 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 			ChartsModels.append(new QStandardItemModel(CurrentResFlows.Count(),2,this));
 			for(int i=0;i<CurrentResFlows.Count();i++){
 				QModelIndex TempIndex=ChartsModels.last()->index(i,0);
-				ChartsModels.last()->setData(TempIndex,CurrentResFlows.GetTotalFlow(i)/1000000.0);
-				ChartsModels.last()->setData(TempIndex,"Reserve Level - Date: "+CurrentResFlows.GetDate(i).toString("MMM-yy")+" - Value: "+Commarize(CurrentResFlows.GetTotalFlow(i)),Qt::ToolTipRole);
+				ChartsModels.last()->setData(TempIndex, (CurrentResFlows.GetFlow(i, ReserveFund::ReplenishFromInterest) + CurrentResFlows.GetFlow(i, ReserveFund::ReplenishFromPrincipal)) / 1000000.0);
+				ChartsModels.last()->setData(TempIndex, "Reserve Level - Date: " + CurrentResFlows.GetDate(i).toString("MMM-yy") + " - Value: " + Commarize((CurrentResFlows.GetFlow(i, ReserveFund::ReplenishFromInterest) + CurrentResFlows.GetFlow(i, ReserveFund::ReplenishFromPrincipal))), Qt::ToolTipRole);
 				TempIndex=ChartsModels.last()->index(i,1);
-				ChartsModels.last()->setData(TempIndex,CurrentResFlows.GetDeferred(i)/1000000.0);
-				ChartsModels.last()->setData(TempIndex,"Reserve Target - Date: "+CurrentResFlows.GetDate(i).toString("MMM-yy")+" - Value: "+Commarize(CurrentResFlows.GetDeferred(i)),Qt::ToolTipRole);
+				ChartsModels.last()->setData(TempIndex, CurrentResFlows.GetFlow(i, ReserveFund::ShortFall) / 1000000.0);
+				ChartsModels.last()->setData(TempIndex,"Reserve Target - Date: "+CurrentResFlows.GetDate(i).toString("MMM-yy")+" - Value: "+Commarize(CurrentResFlows.GetFlow(i,ReserveFund::ShortFall)),Qt::ToolTipRole);
 				DatesLabels << CurrentResFlows.GetDate(i).toString("MMM-yy");
 			}
 			ChartsModels.last()->setHorizontalHeaderLabels(ReserveLabels);

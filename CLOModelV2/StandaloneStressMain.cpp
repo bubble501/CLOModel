@@ -13,8 +13,8 @@
 #include "BloombergVector.h"
 #include "BaseRateVect.h"
 #include "BaseRateTable.h"
-#include "QBloombergLib::QBbgRequest.h"
-#include "QBloombergLib::QBbgWorker.h"
+#include "QBbgRequest.h"
+#include "QBbgWorker.h"
 #include <QProgressBar>
 #include <QTextEdit>
 #include <QVBoxLayout>
@@ -135,17 +135,17 @@ int main(int argc, char *argv[]) {
 
 
 
-	/*Mortgage TempMtg;
+	Mortgage TempMtg;
 	TempMtg.SetAnnuity("I");
 	TempMtg.SetInterest("5");
 	TempMtg.SetPaymentFreq("3");
 	TempMtg.SetMaturityDate(QDate(2020, 5, 30));
 	TempMtg.SetSize(1000000.0);
-	//TempMtg.SetHaircutVector("0 24S 50");
+	TempMtg.SetHaircutVector("0 24S 50");
 	TempMtg.CalculateCashFlows(QDate(2014, 5, 30), "0", "0", "0");
 	MtgCashFlow BaseFlows = TempMtg.GetCashFlow();
-	MtgCashFlow LegacyFlows = BaseFlows.ApplyScenario("10", "40", "50");
-	TempMtg.CalculateCashFlows(QDate(2014, 5, 30), "10", "40", "50");
+	MtgCashFlow LegacyFlows = BaseFlows.ApplyScenario("10", "0", "50");
+	TempMtg.CalculateCashFlows(QDate(2014, 5, 30), "10", "0", "50");
 // 	MtgCashFlow LegacyFlows = BaseFlows.ApplyScenario("0", "0 4S 50 0", "100");
 // 	TempMtg.CalculateCashFlows(QDate(2014, 5, 30), "0", "0 4S 50 0", "100");
 	bool Testing =  TempMtg.GetCashFlow() == LegacyFlows;
@@ -233,42 +233,8 @@ int main(int argc, char *argv[]) {
 		if (file3.exists()) file3.remove();
 		QApplication a(argc, argv);
 		QMessageBox::information(0,"Success", "Cash Flows are identical");		
-	}*/
-
-
-QApplication a(argc, argv);
-QWidget BaseW;
-QBloombergLib::QBbgRequest TestReq;
-QHash<QString, QString> Ovr;
-int counter = 0;
-QFile TestBbgFile("C:\\Temp\\TestBbg.csv");
-if (TestBbgFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-	QTextStream in(&TestBbgFile);
-	QString Headline = in.readLine();
-	QStringList Headfields = Headline.split(",");
-	while (!in.atEnd()) {
-		QString line = in.readLine();
-		QStringList fields = line.split(",");
-		Ovr.clear();
-		for (int i = 1; i < fields.size() - 1; i++) {
-			Ovr.insert(Headfields.at(i), fields.at(i));
-		}
-		TestReq.AddRequest(fields.first(), "MTG_CASH_FLOW", Ovr);
-		TestReq.AddRequest(fields.first(), "name");
-
 	}
-	TestBbgFile.close();
-}
-TestReq.SetAutoConstantRates(true);
-QBloombergLib::QBbgWorker* TempWorker = new QBloombergLib::QBbgWorker(&BaseW);
-QVBoxLayout* MainLay = new QVBoxLayout(&BaseW);
-QProgressBar* ProgressShow = new QProgressBar(&BaseW);
-ProgressShow->setRange(0, 100);
-QObject::connect(TempWorker, &QBloombergLib::QBbgWorker::UpdateProgress, ProgressShow, &QProgressBar::setValue);
-MainLay->addWidget(ProgressShow);
-BaseW.show();
-TempWorker->StartRequestAsync(TestReq);
-return a.exec();
+
 
 #endif
 }

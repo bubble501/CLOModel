@@ -3,10 +3,15 @@
 
 #include "BackwardCompatibilityInterface.h"
 #include "BloombergVector.h"
-#include "TrancheCashFlow.h"
+#include "GenericCashFlow.h"
 #include <QDataStream>
 class ReserveFund :public BackwardInterface {
 public:
+	enum ReserveFlowsType{
+		ReplenishFromInterest = 0
+		, ReplenishFromPrincipal =1
+		, ShortFall=13
+	};
 	ReserveFund();
 	ReserveFund(const ReserveFund& a);
 	ReserveFund& operator=(const ReserveFund& a);
@@ -32,8 +37,12 @@ public:
 	void SetReserveFundCap(const BloombergVector& val) { m_ReserveVects[ResCap] = val; OriginallyNullAnchor[ResCap] = m_ReserveVects[ResCap].GetAnchorDate().isNull(); }
 
 	double GetReserveFundCurrent()const { return m_ReserveFundCurrent; }
-	double GetReserveFundCurrent(const QDate& RepDate)const { return m_ReserveFundFlows.GetTotalFlow(RepDate); }
+	double GetReserveFundCurrent(const QDate& RepDate)const { return m_ReserveFundFlows.GetFlow(RepDate, ReplenishFromInterest) + m_ReserveFundFlows.GetFlow(RepDate, ReplenishFromPrincipal); }
+	double GetReserveFundCurrent(int a)const { return m_ReserveFundFlows.GetFlow(a, ReplenishFromInterest) + m_ReserveFundFlows.GetFlow(a, ReplenishFromPrincipal); }
 	void SetReserveFundCurrent(double a) { m_ReserveFundCurrent = a; }
+
+	double GetShortfall(const QDate& RepDate)const { return m_ReserveFundFlows.GetFlow(RepDate, ShortFall); }
+	double GetShortfall(int a)const { return m_ReserveFundFlows.GetFlow(a, ShortFall); }
 
 	const double& GetStartingReserve() const { return m_StartingReserve; }
 	void SetStartingReserve(const double& val) { m_StartingReserve = val; }
@@ -41,9 +50,9 @@ public:
 	int GetReserveFundFreed()const { return m_ReserveFundFreed; }
 	void SetReserveFundFreed(int a) { m_ReserveFundFreed = a; }
 
-	const TrancheCashFlow& GetReserveFundFlow()const { return m_ReserveFundFlows; }
-	TrancheCashFlow& GetReserveFundFlow() { return m_ReserveFundFlows; }
-	void SetReserveFundFlow(const TrancheCashFlow& source) { m_ReserveFundFlows = source; }
+	const GenericCashFlow& GetReserveFundFlow()const { return m_ReserveFundFlows; }
+	GenericCashFlow& GetReserveFundFlow() { return m_ReserveFundFlows; }
+	void SetReserveFundFlow(const GenericCashFlow& source) { m_ReserveFundFlows = source; }
 
 	bool GetReserveToInterest()const { return m_ReserveToInterest; }
 	void SetReserveToInterest(bool a) { m_ReserveToInterest = a; }
@@ -71,7 +80,7 @@ private:
 	double m_StartingReserve;
 	double m_ReserveFundCurrent;
 	int m_ReserveFundFreed;
-	TrancheCashFlow m_ReserveFundFlows;
+	GenericCashFlow m_ReserveFundFlows;
 	bool m_ReserveToInterest;
 	friend QDataStream& operator<<(QDataStream & stream, const ReserveFund& flows);
 	friend QDataStream& operator>>(QDataStream & stream, ReserveFund& flows);

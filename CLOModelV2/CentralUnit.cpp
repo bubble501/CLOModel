@@ -303,7 +303,9 @@ void CentralUnit::CheckCalculationDone()
 		for (int ResIter = 0; ResIter<Structure.GetNumReserves(); ResIter++) {
 			TempTranche.SetTrancheName(QString("Reserve Fund %1").arg(ResIter+1));
 			TempTranche.GetCashFlow().ResetFlows();
-			TempTranche.AddCashFlow(Structure.GetReserveFund(ResIter)->GetReserveFundFlow());
+			TrancheCashFlow TempTrancheFlow;
+			TempTrancheFlow.AddFlow(Structure.GetReserveFund(ResIter)->GetReserveFundFlow());
+			TempTranche.AddCashFlow(TempTrancheFlow);
 			if(TempTranche.GetCashFlow().Count()>0)
 				ExcelOutput::PrintTrancheFlow(TempTranche,ExcelCommons::CellOffset(TranchesOutputAddress,1,(++ClolumnCount)+(6*Structure.GetTranchesCount())),(Structure.GetTranchesCount()+ClolumnCount)%2==0 ? QColor(235,241,222) : QColor(216,228,188),false,false,false,false,true,false,false,false);
 		}
@@ -341,7 +343,9 @@ void CentralUnit::CheckCalculationDone()
 			for (int ResIter = 0; ResIter<CallStructure.GetNumReserves(); ResIter++) {
 				TempTranche.SetTrancheName(QString("Reserve Fund").arg(ResIter+1));
 				TempTranche.GetCashFlow().ResetFlows();
-				TempTranche.AddCashFlow(CallStructure.GetReserveFund(ResIter)->GetReserveFundFlow());
+				TrancheCashFlow TempTrancheFlow;
+				TempTrancheFlow.AddFlow(CallStructure.GetReserveFund(ResIter)->GetReserveFundFlow());
+				TempTranche.AddCashFlow(TempTrancheFlow);
 				if(TempTranche.GetCashFlow().Count()>0)
 					ExcelOutput::PrintTrancheFlow(TempTranche,ExcelCommons::CellOffset(TranchesOutputAddress,4+Structure.GetTranche(0)->GetCashFlow().Count(),(++ClolumnCount)+(6*Structure.GetTranchesCount())),(CallStructure.GetTranchesCount()+ClolumnCount)%2==0 ? QColor(235,241,222) : QColor(216,228,188),false,false,false,false,true,false,false,false);
 			}

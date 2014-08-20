@@ -358,7 +358,7 @@ double Waterfall::GetCreditEnhancement(int TrancheIndex,int TimeIndex)const{
 		ReserveSum=m_CalculatedMtgPayments.GetAmountOut(m_Tranches.first()->GetCashFlow().GetDate(TimeIndex));
 		for (QList<ReserveFund*>::const_iterator ResIter = m_Reserves.constBegin(); ResIter != m_Reserves.constEnd(); ResIter++) {
 			if ((*ResIter)->GetReserveFundFlow().Count() > 0 && TrancheIndex <= (*ResIter)->GetReserveFundFreed())
-				ReserveSum += (*ResIter)->GetReserveFundFlow().GetTotalFlow((*ResIter)->GetReserveFundFlow().GetDate(TimeIndex));
+				ReserveSum += (*ResIter)->GetReserveFundCurrent((*ResIter)->GetReserveFundFlow().GetDate(TimeIndex));
 		}
 		if(ReserveSum<=0.0) return 0.0;
 		return 1.0-(Runningsum/ReserveSum); //(m_CalculatedMtgPayments.GetAmountOut(m_Tranches.first()->GetCashFlow().GetDate(TimeIndex))/Runningsum)-1.0;
@@ -720,15 +720,15 @@ bool Waterfall::CalculateTranchesCashFlows(){
 
 							if(TotalPayable>=0.01){
 								if(SingleStep->GetRedemptionGroup()==1){
-									m_Reserves[SingleStep->GetGroupTarget() - 1]->GetReserveFundFlow().AddFlow(CurrentDate,qMin(AvailableInterest,TotalPayable),TrancheCashFlow::InterestFlow);
-									m_Reserves[SingleStep->GetGroupTarget() - 1]->GetReserveFundFlow().AddFlow(CurrentDate, qMax(0.0, TotalPayable - AvailableInterest) - m_Reserves.at(SingleStep->GetGroupTarget() - 1)->GetReserveFundFlow().GetDeferred(CurrentDate), TrancheCashFlow::DeferredFlow);
+									m_Reserves[SingleStep->GetGroupTarget() - 1]->GetReserveFundFlow().AddFlow(CurrentDate,qMin(AvailableInterest,TotalPayable),ReserveFund::ReplenishFromInterest);
+									m_Reserves[SingleStep->GetGroupTarget() - 1]->GetReserveFundFlow().AddFlow(CurrentDate, qMax(0.0, TotalPayable - AvailableInterest) - m_Reserves.at(SingleStep->GetGroupTarget() - 1)->GetReserveFundFlow().GetFlow(CurrentDate, ReserveFund::ShortFall), ReserveFund::ShortFall);
 									m_Reserves[SingleStep->GetGroupTarget() - 1]->SetReserveFundCurrent(m_Reserves.at(SingleStep->GetGroupTarget() - 1)->GetReserveFundCurrent() + qMin(AvailableInterest, TotalPayable));
 									AvailableInterest=qMax(0.0,AvailableInterest-TotalPayable);
 								}
 								else if(SingleStep->GetRedemptionGroup()==2){
 
 									m_Reserves[SingleStep->GetGroupTarget() - 1]->GetReserveFundFlow().AddFlow(CurrentDate, qMin(AvailablePrincipal, TotalPayable), TrancheCashFlow::PrincipalFlow);
-									m_Reserves[SingleStep->GetGroupTarget() - 1]->GetReserveFundFlow().AddFlow(CurrentDate, qMax(0.0, TotalPayable - AvailablePrincipal) - m_Reserves.at(SingleStep->GetGroupTarget() - 1)->GetReserveFundFlow().GetDeferred(CurrentDate), TrancheCashFlow::DeferredFlow);
+									m_Reserves[SingleStep->GetGroupTarget() - 1]->GetReserveFundFlow().AddFlow(CurrentDate, qMax(0.0, TotalPayable - AvailablePrincipal) - m_Reserves.at(SingleStep->GetGroupTarget() - 1)->GetReserveFundFlow().GetFlow(CurrentDate, ReserveFund::ShortFall), ReserveFund::ShortFall);
 									m_Reserves[SingleStep->GetGroupTarget() - 1]->SetReserveFundCurrent(m_Reserves.at(SingleStep->GetGroupTarget() - 1)->GetReserveFundCurrent() + qMin(AvailablePrincipal, TotalPayable));
 									AvailablePrincipal=qMax(0.0,AvailablePrincipal-TotalPayable);
 								}
@@ -1175,7 +1175,7 @@ QDate Waterfall::GetCalledPeriod() const{
 			if(ActualCallReserveLevel==0.0)ActualCallReserveLevel=m_CallReserve;
 			else {
 				for (QList<ReserveFund*>::const_iterator ResIter = m_Reserves.constBegin(); ResIter != m_Reserves.constEnd(); ResIter++)
-					ActualCallReserveLevel += (*ResIter)->GetReserveFundFlow().GetTotalFlow(RollingNextIPD);
+					ActualCallReserveLevel += (*ResIter)->GetReserveFundCurrent(RollingNextIPD);
 			}
 			ActualCallReserveLevel*=m_CallMultiple;
 			IsCallPaymentDate=ActualCallReserveLevel>=TotalPayable;

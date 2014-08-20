@@ -224,7 +224,7 @@ void SummaryView::DisplayStructure(){
 			ExpensesTable->setItem(i,ColumnCount++,new QTableWidgetItem(Commarize(100.0*Structure.GetWACostOfCapital(i),2)+'%'));
 			for (int j = 0; j<NumRes; j++) {
 				if (Structure.GetReserveFund(j)->GetReserveFundFlow().Count()>0) {
-					ExpensesTable->setItem(i, ColumnCount++, new QTableWidgetItem(Commarize(Structure.GetReserveFund(j)->GetReserveFundFlow().GetTotalFlow(i))));
+					ExpensesTable->setItem(i, ColumnCount++, new QTableWidgetItem(Commarize(Structure.GetReserveFund(j)->GetReserveFundCurrent(i))));
 				}
 			}
 		}

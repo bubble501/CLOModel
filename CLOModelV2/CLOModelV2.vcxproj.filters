@@ -197,6 +197,9 @@
     <ClInclude Include="QSingleBbgResult.h">
       <Filter>Header Files\Bloomberg</Filter>
     </ClInclude>
+    <ClInclude Include="GenericCashFlow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="CentralUnit.h">
@@ -521,6 +524,9 @@
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_QBbgWorker.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GenericCashFlow.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

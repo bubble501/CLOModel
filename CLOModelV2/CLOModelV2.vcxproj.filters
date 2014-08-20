@@ -182,13 +182,19 @@
     <ClInclude Include="BaseRateTable.h">
       <Filter>Header Files\Vectors</Filter>
     </ClInclude>
-    <ClInclude Include="BloombergRequest.h">
+    <ClInclude Include="QBbgRequest.h">
       <Filter>Header Files\Bloomberg</Filter>
     </ClInclude>
-    <ClInclude Include="SingleBbgRequest.h">
+    <ClInclude Include="QBbgResultsIterator.h">
       <Filter>Header Files\Bloomberg</Filter>
     </ClInclude>
-    <ClInclude Include="BloombergResult.h">
+    <ClInclude Include="QProjectGlobals.h">
+      <Filter>Header Files\Bloomberg</Filter>
+    </ClInclude>
+    <ClInclude Include="QSingleBbgRequest.h">
+      <Filter>Header Files\Bloomberg</Filter>
+    </ClInclude>
+    <ClInclude Include="QSingleBbgResult.h">
       <Filter>Header Files\Bloomberg</Filter>
     </ClInclude>
   </ItemGroup>
@@ -247,7 +253,7 @@
     <CustomBuild Include="WaterfallViewer.h">
       <Filter>Header Files\Widgets</Filter>
     </CustomBuild>
-    <CustomBuild Include="BloombergWorker.h">
+    <CustomBuild Include="QBbgWorker.h">
       <Filter>Header Files\Bloomberg</Filter>
     </CustomBuild>
   </ItemGroup>
@@ -495,22 +501,25 @@
     <ClCompile Include="BaseRateTable.cpp">
       <Filter>Source Files\Vectors</Filter>
     </ClCompile>
-    <ClCompile Include="BloombergRequest.cpp">
+    <ClCompile Include="QBbgRequest.cpp">
       <Filter>Source Files\Bloomberg</Filter>
     </ClCompile>
-    <ClCompile Include="SingleBbgRequest.cpp">
+    <ClCompile Include="QBbgResultsIterator.cpp">
       <Filter>Source Files\Bloomberg</Filter>
     </ClCompile>
-    <ClCompile Include="BloombergResult.cpp">
+    <ClCompile Include="QBbgWorker.cpp">
       <Filter>Source Files\Bloomberg</Filter>
     </ClCompile>
-    <ClCompile Include="BloombergWorker.cpp">
+    <ClCompile Include="QSingleBbgRequest.cpp">
       <Filter>Source Files\Bloomberg</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_BloombergWorker.cpp">
+    <ClCompile Include="QSingleBbgResult.cpp">
+      <Filter>Source Files\Bloomberg</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_QBbgWorker.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_BloombergWorker.cpp">
+    <ClCompile Include="GeneratedFiles\Release\moc_QBbgWorker.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
   </ItemGroup>

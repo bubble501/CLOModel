@@ -2,8 +2,8 @@
 #include <QRegExp>
 #include <QStringList>
 #include "CommonFunctions.h"
-#include "BloombergWorker.h"
-#include "SingleBbgRequest.h"
+#include "QBbgWorker.h"
+#include "QSingleBbgRequest.h"
 #ifndef NO_DATABASE
 #include <QSqlDatabase>
 #include <QSqlError>
@@ -247,27 +247,28 @@ BloombergVector BaseRateVector::GetRefRateValueFromBloomberg(ConstantBaseRateTab
 		) RatesToDownload.append(GetValueString(i));
 	}
 	if (!RatesToDownload.isEmpty()) {
-		BloombergWorker Bee;
+		QBloombergLib::QBbgWorker Bee;
 		QString CurrentResult;
 		QDate MinUpdateDate, CurrentUpdateDate;
-		BloombergRequest BbgReq;
+		QBloombergLib::QBbgRequest BbgReq;
 		foreach(const QString& SingleRate, RatesToDownload) {
-			BbgReq.AddRequest(SingleRate, "PX_LAST", BloombergRequest::Index);
+			BbgReq.AddRequest(SingleRate, "PX_LAST", QBloombergLib::QBbgRequest::Index);
 			//BbgReq.AddRequest(SingleRate, "PX_SETTLE_LAST_DT", "Index");
-			BbgReq.AddRequest(SingleRate, "LAST_UPDATE", BloombergRequest::Index);
+			BbgReq.AddRequest(SingleRate, "LAST_UPDATE", QBloombergLib::QBbgRequest::Index);
 		}
-		const BloombergRequest& ReturnedValues = Bee.StartRequestSync(BbgReq);
-		if (!ReturnedValues.HasErrors()) {
-			for (int i = 0; i < ReturnedValues.NumRequests(); i++) {
-				if (!ReturnedValues.GetRequest(i)->HasErrors()) {
-					if (ReturnedValues.GetRequest(i)->GetField() == "PX_LAST") {
+		Bee.StartRequestSync(BbgReq);
+		if (!Bee.GetRequest().HasErrors()) {
+			for (QBloombergLib::QBbgResultsIterator i = Bee.GetResultIterator(); i.IsValid(); ++i) {
+				if (!i->HasErrors()) {
+					const QBloombergLib::QSingleBbgRequest* Temp = Bee.GetRequest().FindRequest(i.ResultID());
+					if (Temp->GetField() == "PX_LAST") {
 						Values.GetValues().insert(
-							ReturnedValues.GetRequest(i)->GetSecurity(),
-							ReturnedValues.GetRequest(i)->GetValue().GetDouble() / 100.0
+							Temp->GetSecurity(),
+							i->GetDouble() / 100.0
 							);
 					}
 					else {
-						CurrentUpdateDate = ReturnedValues.GetRequest(i)->GetValue().GetDate();
+						CurrentUpdateDate = i->GetDate();
 						if (MinUpdateDate.isNull() || MinUpdateDate > CurrentUpdateDate) MinUpdateDate = CurrentUpdateDate;
 					}
 				}

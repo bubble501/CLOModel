@@ -5,7 +5,7 @@
 #include <QList>
 #include <QHash>
 #include <vcclr.h>
-#include "CommonFunctions.h"
+#include "BackwardCompatibilityInterface.h"
 using namespace System;
 using namespace System::Text;
 namespace ManagedCLO {

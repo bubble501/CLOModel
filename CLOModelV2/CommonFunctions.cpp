@@ -2,6 +2,7 @@
 #include <QDate>
 #include <QRegExp>
 #include <QStringList>
+#include <QList>
 #include <qmath.h>
 #include <QDir>
 #include "BloombergVector.h"

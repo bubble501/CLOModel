@@ -1,6 +1,11 @@
 #ifndef BackwardCompatibilityInterface_h__
 #define BackwardCompatibilityInterface_h__
 #include "CommonFunctions.h"
+#include <QtGlobal>
+//! The current Version of the Model
+#define ModelVersionNumber 180
+#define MinimumSupportedVersion 180
+
 class BackwardInterface {
 public:
 	BackwardInterface() : m_LoadProtocolVersion(ModelVersionNumber) {}

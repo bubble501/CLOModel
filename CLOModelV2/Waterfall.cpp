@@ -3,8 +3,8 @@
 #include <QHash>
 #include <qmath.h>
 #include "Waterfall.h"
-#include "BloombergWorker.h"
-#include "SingleBbgRequest.h"
+#include "QBbgWorker.h"
+//#include "QSingleBbgRequest.h"
 const WatFalPrior* Waterfall::GetStep(int Index)const {
 	if(Index<0 || Index>=m_WaterfallStesps.size()) return NULL;
 	return m_WaterfallStesps.at(Index);
@@ -315,22 +315,21 @@ int Waterfall::FindTrancheIndex(const QString& Tranchename)const{
 		if(m_Tranches.at(j)->GetISIN()==Tranchename) return j;
 	}
 #ifndef NO_BLOOMBERG
-	BloombergWorker ISINparser;
-	BloombergRequest ISINRequest;
+	QBloombergLib::QBbgWorker ISINparser;
+	QBloombergLib::QBbgRequest ISINRequest;
 	ISINRequest.AddRequest(Tranchename, "NAME");
 	ISINRequest.AddRequest(Tranchename, "ID_ISIN");
 	ISINRequest.AddRequest(Tranchename, "ID_CUSIP");
 	ISINRequest.AddRequest(Tranchename, "ID_BB_GLOBAL");
 	ISINRequest.AddRequest(Tranchename, "ID_BB_UNIQU");
-	const BloombergRequest& TempResults = ISINparser.StartRequestSync(ISINRequest);
-	if (!TempResults.HasErrors()) {
-		for (int RespIter = 0; RespIter < TempResults.NumRequests(); RespIter++) {
-			if (!TempResults.GetRequest(RespIter)->HasErrors()) {
-				const BloombergResult& CurrentResult = TempResults.GetRequest(RespIter)->GetValue();
+	ISINparser.StartRequestSync(ISINRequest);
+	if (!ISINparser.GetRequest().HasErrors()) {
+		for (QBloombergLib::QBbgResultsIterator RespIter = ISINparser.GetResultIterator(); RespIter.IsValid(); ++RespIter) {
+			if (!RespIter->HasErrors()) {
 				for (int i = 0; i < m_Tranches.size(); i++) {
 					if (
-						CurrentResult.GetString().compare(m_Tranches.at(i)->GetTrancheName().trimmed(), Qt::CaseInsensitive) == 0
-						|| CurrentResult.GetString().compare(m_Tranches.at(i)->GetISIN().trimmed(), Qt::CaseInsensitive) == 0
+						RespIter->GetString().compare(m_Tranches.at(i)->GetTrancheName().trimmed(), Qt::CaseInsensitive) == 0
+						|| RespIter->GetString().compare(m_Tranches.at(i)->GetISIN().trimmed(), Qt::CaseInsensitive) == 0
 					) return i;
 				}
 			}

@@ -13,8 +13,8 @@
 #include "BloombergVector.h"
 #include "BaseRateVect.h"
 #include "BaseRateTable.h"
-#include "BloombergRequest.h"
-#include "BloombergWorker.h"
+#include "QBloombergLib::QBbgRequest.h"
+#include "QBloombergLib::QBbgWorker.h"
 #include <QProgressBar>
 #include <QTextEdit>
 #include <QVBoxLayout>
@@ -238,7 +238,7 @@ int main(int argc, char *argv[]) {
 
 QApplication a(argc, argv);
 QWidget BaseW;
-BloombergRequest TestReq;
+QBloombergLib::QBbgRequest TestReq;
 QHash<QString, QString> Ovr;
 int counter = 0;
 QFile TestBbgFile("C:\\Temp\\TestBbg.csv");
@@ -260,11 +260,11 @@ if (TestBbgFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
 	TestBbgFile.close();
 }
 TestReq.SetAutoConstantRates(true);
-BloombergWorker* TempWorker = new BloombergWorker(&BaseW);
+QBloombergLib::QBbgWorker* TempWorker = new QBloombergLib::QBbgWorker(&BaseW);
 QVBoxLayout* MainLay = new QVBoxLayout(&BaseW);
 QProgressBar* ProgressShow = new QProgressBar(&BaseW);
 ProgressShow->setRange(0, 100);
-QObject::connect(TempWorker, &BloombergWorker::UpdateProgress, ProgressShow, &QProgressBar::setValue);
+QObject::connect(TempWorker, &QBloombergLib::QBbgWorker::UpdateProgress, ProgressShow, &QProgressBar::setValue);
 MainLay->addWidget(ProgressShow);
 BaseW.show();
 TempWorker->StartRequestAsync(TestReq);

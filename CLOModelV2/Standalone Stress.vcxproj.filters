@@ -137,13 +137,19 @@
     <ClInclude Include="BaseRateTable.h">
       <Filter>Header Files\Core Files</Filter>
     </ClInclude>
-    <ClInclude Include="BloombergRequest.h">
+    <ClInclude Include="QSingleBbgResult.h">
       <Filter>Header Files\Core Files</Filter>
     </ClInclude>
-    <ClInclude Include="SingleBbgRequest.h">
+    <ClInclude Include="QSingleBbgRequest.h">
       <Filter>Header Files\Core Files</Filter>
     </ClInclude>
-    <ClInclude Include="BloombergResult.h">
+    <ClInclude Include="QProjectGlobals.h">
+      <Filter>Header Files\Core Files</Filter>
+    </ClInclude>
+    <ClInclude Include="QBbgResultsIterator.h">
+      <Filter>Header Files\Core Files</Filter>
+    </ClInclude>
+    <ClInclude Include="QBbgRequest.h">
       <Filter>Header Files\Core Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -202,7 +208,7 @@
     <CustomBuild Include="quazip\quazipfile.h">
       <Filter>QuaZIP</Filter>
     </CustomBuild>
-    <CustomBuild Include="BloombergWorker.h">
+    <CustomBuild Include="QBbgWorker.h">
       <Filter>Header Files\Core Files</Filter>
     </CustomBuild>
   </ItemGroup>
@@ -444,22 +450,25 @@
     <ClCompile Include="BaseRateTable.cpp">
       <Filter>Source Files\Core Files</Filter>
     </ClCompile>
-    <ClCompile Include="BloombergRequest.cpp">
-      <Filter>Source Files\Core Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SingleBbgRequest.cpp">
-      <Filter>Source Files\Core Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BloombergResult.cpp">
-      <Filter>Source Files\Core Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_BloombergWorker.cpp">
+    <ClCompile Include="GeneratedFiles\Debug\moc_QBbgWorker.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_BloombergWorker.cpp">
+    <ClCompile Include="GeneratedFiles\Release\moc_QBbgWorker.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="BloombergWorker.cpp">
+    <ClCompile Include="QBbgRequest.cpp">
+      <Filter>Source Files\Core Files</Filter>
+    </ClCompile>
+    <ClCompile Include="QBbgResultsIterator.cpp">
+      <Filter>Source Files\Core Files</Filter>
+    </ClCompile>
+    <ClCompile Include="QBbgWorker.cpp">
+      <Filter>Source Files\Core Files</Filter>
+    </ClCompile>
+    <ClCompile Include="QSingleBbgRequest.cpp">
+      <Filter>Source Files\Core Files</Filter>
+    </ClCompile>
+    <ClCompile Include="QSingleBbgResult.cpp">
       <Filter>Source Files\Core Files</Filter>
     </ClCompile>
   </ItemGroup>

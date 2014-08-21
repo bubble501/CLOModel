@@ -135,37 +135,52 @@ int main(int argc, char *argv[]) {
 
 
 
-	Mortgage TempMtg;
-	TempMtg.SetAnnuity("I");
-	TempMtg.SetInterest("5");
-	TempMtg.SetPaymentFreq("3");
-	TempMtg.SetMaturityDate(QDate(2020, 5, 30));
-	TempMtg.SetSize(1000000.0);
-	TempMtg.SetHaircutVector("0 24S 50");
-	TempMtg.CalculateCashFlows(QDate(2014, 5, 30), "0", "0", "0");
-	MtgCashFlow BaseFlows = TempMtg.GetCashFlow();
+	Mortgage TempMtg1;
+	TempMtg1.SetAnnuity("I");
+	TempMtg1.SetInterest("5");
+	TempMtg1.SetPaymentFreq("1");
+	TempMtg1.SetMaturityDate(QDate(2020, 5, 30));
+	TempMtg1.SetSize(1000000.0);
+	TempMtg1.SetHaircutVector("0 24S 50");
+	TempMtg1.CalculateCashFlows(QDate(2014, 5, 30), "0", "0", "0");
+
+	Mortgage TempMtg2;
+	TempMtg2.SetAnnuity("A");
+	TempMtg2.SetInterest("2.5");
+	TempMtg2.SetPaymentFreq("6");
+	TempMtg2.SetMaturityDate(QDate(2018, 5, 30));
+	TempMtg2.SetSize(500000.0);
+	//TempMtg2.SetPrepayMultiplier("50");
+	TempMtg2.CalculateCashFlows(QDate(2014, 5, 30), "0", "0", "0");
+
+	MtgCashFlow BaseFlows = TempMtg1.GetCashFlow();
+	BaseFlows += TempMtg2.GetCashFlow();
+
 	MtgCashFlow LegacyFlows = BaseFlows.ApplyScenario("10", "0", "50");
-	TempMtg.CalculateCashFlows(QDate(2014, 5, 30), "10", "0", "50");
-// 	MtgCashFlow LegacyFlows = BaseFlows.ApplyScenario("0", "0 4S 50 0", "100");
-// 	TempMtg.CalculateCashFlows(QDate(2014, 5, 30), "0", "0 4S 50 0", "100");
-	bool Testing =  TempMtg.GetCashFlow() == LegacyFlows;
-	if (!Testing) {
-		
-				
+	//LegacyFlows.Aggregate(GenericCashFlow::Quarterly);
+	TempMtg1.CalculateCashFlows(QDate(2014, 5, 30), "10", "0", "50");
+	TempMtg2.CalculateCashFlows(QDate(2014, 5, 30), "10", "0", "50");
+
+	MtgCashFlow TempMtgsFlows = TempMtg1.GetCashFlow();
+	TempMtgsFlows += TempMtg2.GetCashFlow();
+	bool Testing = TempMtgsFlows == LegacyFlows;
+	if (true) {
 		QString ResultString("");
-		for (int i = 0; i < TempMtg.GetCashFlow().Count(); i++) {
-			ResultString += QString("%1\t%2\t%3\t%4\t%5\t%6\t%7\t%8\t%9\t%10\t%11\n")
-				.arg(TempMtg.GetCashFlow().GetAmountOut(i))
-				.arg(TempMtg.GetCashFlow().GetCoupTimeOut(i))
-				.arg(TempMtg.GetCashFlow().GetAccruedInterest(i))
-				.arg(TempMtg.GetCashFlow().GetInterest(i))
-				.arg(TempMtg.GetCashFlow().GetScheduled(i))
-				.arg(TempMtg.GetCashFlow().GetPrepay(i))
-				.arg(TempMtg.GetCashFlow().GetDefaults(i))
-				.arg(TempMtg.GetCashFlow().GetLoss(i))
-				.arg(TempMtg.GetCashFlow().GetRecoveries(i))
-				.arg(TempMtg.GetCashFlow().GetLossOnInterest(i))
-				.arg(TempMtg.GetCashFlow().GetInterestRecoveries(i))
+		for (int i = 0; i < TempMtgsFlows.Count(); i++) {
+			ResultString += QString("%1\t%2\t%3\t%4\t%5\t%6\t%7\t%8\t%9\t%10\t%11\t%12\t%13\n")
+				.arg(TempMtgsFlows.GetAmountOut(i))
+				.arg(TempMtgsFlows.GetCoupTimeOut(i))
+				.arg(TempMtgsFlows.GetFlow(i,MtgCashFlow::WAPrepayMult))
+				.arg(TempMtgsFlows.GetFlow(i, MtgCashFlow::WALossMult))
+				.arg(TempMtgsFlows.GetAccruedInterest(i))
+				.arg(TempMtgsFlows.GetInterest(i))
+				.arg(TempMtgsFlows.GetScheduled(i))
+				.arg(TempMtgsFlows.GetPrepay(i))
+				.arg(TempMtgsFlows.GetDefaults(i))
+				.arg(TempMtgsFlows.GetLoss(i))
+				.arg(TempMtgsFlows.GetRecoveries(i))
+				.arg(TempMtgsFlows.GetLossOnInterest(i))
+				.arg(TempMtgsFlows.GetInterestRecoveries(i))
 				;
 		}
 		{
@@ -178,9 +193,11 @@ int main(int argc, char *argv[]) {
 
 		ResultString="";
 		for (int i = 0; i < LegacyFlows.Count(); i++) {
-			ResultString += QString("%1\t%2\t%3\t%4\t%5\t%6\t%7\t%8\t%9\t%10\t%11\n")
+			ResultString += QString("%1\t%2\t%3\t%4\t%5\t%6\t%7\t%8\t%9\t%10\t%11\t%12\t%13\n")
 				.arg(LegacyFlows.GetAmountOut(i))
 				.arg(LegacyFlows.GetCoupTimeOut(i))
+				.arg(LegacyFlows.GetFlow(i, MtgCashFlow::WAPrepayMult))
+				.arg(LegacyFlows.GetFlow(i, MtgCashFlow::WALossMult))
 				.arg(LegacyFlows.GetAccruedInterest(i))
 				.arg(LegacyFlows.GetInterest(i))
 				.arg(LegacyFlows.GetScheduled(i))
@@ -201,9 +218,11 @@ int main(int argc, char *argv[]) {
 		}
 		ResultString = "";
 		for (int i = 0; i < BaseFlows.Count(); i++) {
-			ResultString += QString("%1\t%2\t%3\t%4\t%5\t%6\t%7\t%8\t%9\t%10\t%11\n")
+			ResultString += QString("%1\t%2\t%3\t%4\t%5\t%6\t%7\t%8\t%9\t%10\t%11\t%12\t%13\n")
 				.arg(BaseFlows.GetAmountOut(i))
 				.arg(BaseFlows.GetCoupTimeOut(i))
+				.arg(BaseFlows.GetFlow(i, MtgCashFlow::WAPrepayMult))
+				.arg(BaseFlows.GetFlow(i, MtgCashFlow::WALossMult))
 				.arg(BaseFlows.GetAccruedInterest(i))
 				.arg(BaseFlows.GetInterest(i))
 				.arg(BaseFlows.GetScheduled(i))

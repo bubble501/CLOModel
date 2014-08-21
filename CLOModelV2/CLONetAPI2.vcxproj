@@ -163,6 +163,7 @@
     <ClCompile Include="GeneratedFiles\Release\moc_WaterfallViewer.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="GenericCashFlow.cpp" />
     <ClCompile Include="IncludeAll.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</CompileAsManaged>
       <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExceptionHandling>
@@ -233,8 +234,10 @@
     <ClInclude Include="BloombergVector.h" />
     <ClInclude Include="BoolVector.h" />
     <ClInclude Include="CommonFunctions.h" />
+    <ClInclude Include="GenericCashFlow.h" />
     <ClInclude Include="IntegerVector.h" />
     <ClInclude Include="ManBaseRateTable.h" />
+    <ClInclude Include="ManGenericCashFlow.h" />
     <ClInclude Include="ManIntegerVector.h" />
     <ClInclude Include="ManQBbg.h" />
     <ClInclude Include="ManRepaymentVector.h" />

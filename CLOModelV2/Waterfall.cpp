@@ -521,13 +521,13 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		QDate CurrentDate;
 		int PeriodsCounter=0;
 		MtgCashFlow OriginalMtgFlows=m_MortgagesPayments;
-		m_ExcessCashFlow.ResetFlows();
-		m_TotalSeniorExpenses.ResetFlows();
-		m_TotalSeniorFees.ResetFlows();
-		m_TotalJuniorFees.ResetFlows();
-		m_AnnualizedExcess.ResetFlows();
-		m_EquityIncome.ResetFlows();
-		m_Reinvested.ResetFlows();
+		m_ExcessCashFlow.Clear();
+		m_TotalSeniorExpenses.Clear();
+		m_TotalSeniorFees.Clear();
+		m_TotalJuniorFees.Clear();
+		m_AnnualizedExcess.Clear();
+		m_EquityIncome.Clear();
+		m_Reinvested.Clear();
 		bool NullCCCanchor[]={
 			m_CCCcurve.GetAnchorDate().isNull()
 			,m_PaymentFrequency.GetAnchorDate().isNull()
@@ -547,7 +547,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		if (NullCCCanchor[6]) m_SeniorFeesFixed.SetAnchorDate(m_MortgagesPayments.GetDate(0));
 		if (NullCCCanchor[7]) m_JuniorFeesFixed.SetAnchorDate(m_MortgagesPayments.GetDate(0));
 		foreach(Tranche* SingleTranche, m_Tranches) {
-			SingleTranche->GetCashFlow().ResetFlows();
+			SingleTranche->GetCashFlow().Clear();
 			/*if (SingleTranche->GetStartingDeferredInterest() > 0)
 				SingleTranche->AddCashFlow(m_LastIPDdate, SingleTranche->GetStartingDeferredInterest(), TrancheCashFlow::DeferredFlow);*/
 		}

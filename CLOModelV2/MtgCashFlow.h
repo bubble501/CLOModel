@@ -23,6 +23,8 @@ public:
 		PrincipalDefault=7,
 		PrincipalRecovered=8,
 		InterestRecovered=9,
+		WAPrepayMult=129,
+		WALossMult = 130,
 		LossFlow=10 //Keep this last
 	};
 	virtual MtgCashFlow ApplyScenario(BloombergVector CPRv, BloombergVector CDRv, BloombergVector LSv) const;
@@ -38,6 +40,8 @@ public:
 	double GetAccruedInterest(int index) const { return GenericCashFlow::GetFlow(index, AccruedInterestFlow); }
 	double GetLossOnInterest(int index) const { return GenericCashFlow::GetFlow(index, LossOnInterestFlow); }
 	double GetWAcoupon(int index) const;
+	double GetWAprepayMult(int index) const;
+	double GetWAlossMult(int index) const;
 	double GetDefaults(int index) const { return GenericCashFlow::GetFlow(index, PrincipalDefault); }
 	double GetRecoveries(int index) const { return GenericCashFlow::GetFlow(index, PrincipalRecovered); }
 	double GetInterestRecoveries(int index) const { return GenericCashFlow::GetFlow(index, InterestRecovered); }
@@ -50,16 +54,19 @@ public:
 	double GetAccruedInterest(const QDate& index) const { return GenericCashFlow::GetFlow(index, AccruedInterestFlow); }
 	double GetLossOnInterest(const QDate& index) const { return GenericCashFlow::GetFlow(index, LossOnInterestFlow); }
 	double GetWAcoupon(const QDate& index) const;
+	double GetWAprepayMult(const QDate& index) const;
+	double GetWAlossMult(const QDate& index) const;
 	double GetDefaults(const QDate& index) const { return GenericCashFlow::GetFlow(index, PrincipalDefault); }
 	double GetRecoveries(const QDate& index) const { return GenericCashFlow::GetFlow(index, PrincipalRecovered); }
 	double GetInterestRecoveries(const QDate& index) const { return GenericCashFlow::GetFlow(index, InterestRecovered); }
+	
 
 
 
 	virtual void AddFlow(const QDate& Dte, double Amt, MtgFlowType FlowTpe) { GenericCashFlow::AddFlow(Dte, Amt, static_cast<qint32>(FlowTpe)); }
 	using GenericCashFlow::AddFlow;
-	MtgCashFlow(const MtgCashFlow& a) { Aggregate(Monthly); AddFlow(a); }
-	MtgCashFlow() { Aggregate(Monthly); }
+	MtgCashFlow(const MtgCashFlow& a);
+	MtgCashFlow();
 	//friend QDataStream& operator<<(QDataStream & stream, const MtgCashFlow& flows);
 	//friend QDataStream& operator>>(QDataStream & stream, MtgCashFlow& flows);
 };

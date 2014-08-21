@@ -72,7 +72,7 @@ void ReserveFund::ResetReserve() {
 	m_ReserveFundCurrent = 0.0;
 	m_ReserveFundFreed = 0;
 	m_StartingReserve = 0.0;
-	m_ReserveFundFlows.ResetFlows();
+	m_ReserveFundFlows.Clear();
 	m_ReserveToInterest = true;
 }
 void ReserveFund::FillMissingAnchors(const QDate& NewAnchor) {

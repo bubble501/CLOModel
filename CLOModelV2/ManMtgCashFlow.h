@@ -4,6 +4,7 @@
 #include <QByteArray>
 #include <QDataStream>
 #include "ManagedCommons.h"
+#include "ManGenericCashFlow.h"
 #include "ManBloombergVector.h"
 using namespace System;
 //! Namespace containing all the classes of the CLO model
@@ -12,7 +13,7 @@ namespace ManagedCLO {
 	\brief Cash Flows from a Loan or a Pool of Loans
 	\details This class implements a way of manage cash flows from a pool of loans.<br/>The flows will always be sorted by date.
 	 */
-	public ref class ManMtgCashFlows
+	public ref class ManMtgCashFlows : ManGenericCashFlow
 	{
 	private:
 		static const unsigned int ClassIdentity=1;
@@ -89,13 +90,6 @@ namespace ManagedCLO {
 				return false;
 			}
 		}
-		/*!
-		\brief Gets the date of a cash flow.
-		\arg index The index of the cash flow for which the date must be retrieved.<br/>The first flow will be at index 0
-		\return A DateTime object containing the relevant date.<br/>If index is out of range, a default DateTime is returned
-		\details Returns the date of the cash flow at position index in the series.
-		*/
-		DateTime GetDate(int index){return QDate2DateTime(Unmanaged->GetDate(index));}
 		/*!
 		\brief Gets the interest cash flow.
 		\arg index The index of the cash flow for which the interest must be retrieved.<br/>The first flow will be at index 0
@@ -241,20 +235,6 @@ namespace ManagedCLO {
 		*/
 		double GetWAcoupon(DateTime index) {return Unmanaged->GetWAcoupon(DateTime2QDate(index));}
 		/*!
-		\brief The number of flows in the series.
-		\details Read only property that returns the number of flows in the series
-		*/
-		property int Count{
-			int get() {return Unmanaged->Count();}
-		}
-		/*!
-		\brief Finds the index corresponding to a certain date.
-		\arg a The date to search
-		\return An integer representing the index of the flow in the series.<br/>If the date is not found -1 is returned
-		\details Returns the index that represents the position of a date in the series.
-		*/
-		int FindDate(DateTime a) {return Unmanaged->FindDate(DateTime2QDate(a));}
-		/*!
 		\brief Adds a flow to the series.
 		\arg Dte The date of the flow.
 		\arg Amt The amount of the flow.
@@ -263,7 +243,6 @@ namespace ManagedCLO {
 		\sa AddFlow(ManMtgCashFlows^)
 		*/
 		void AddFlow(DateTime Dte, double Amt, ManMtgFlowType FlowTpe){Unmanaged->AddFlow(DateTime2QDate(Dte),Amt,static_cast<MtgCashFlow::MtgFlowType>(static_cast<int>(FlowTpe)));}
-
 		/*!
 		\brief Adds flows to the series.
 		\arg a A reference to the source of the flows
@@ -272,15 +251,12 @@ namespace ManagedCLO {
 		*/
 		void AddFlow(ManMtgCashFlows^ a){Unmanaged->AddFlow(*(a->Unmanaged));}
 		/*!
-		\brief Deletes all the flows in the series.
-		*/
-		void RemoveAllFlows(){Unmanaged->RemoveAllFlows();}
-		/*!
 		\brief Applies a stress scenario to a series of cash flows
 		\arg CPRVec The vector describing the CPR to apply to the cash flows
 		\arg CDRVec The vector describing the CDR to apply to the cash flows
 		\arg LossVec The vector describing the Loss Severity to apply to the cash flows
 		\details This function is designed to apply a stress scenario to a series of base cash flow.<br/>To obtain the right result the base should be a cash flow with no prepayments and no losses.
+		\warning If the original loans run different prepayments or losses multipliers, the results will only be an approximation.
 		\code{.cpp}
 
 		// Example Usage:

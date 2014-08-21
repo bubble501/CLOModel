@@ -1,7 +1,7 @@
 #ifndef ManReserveFund_h__
 #define ManReserveFund_h__
 #include "ManagedCommons.h"
-#include "ManTrancheCashFlow.h"
+#include "ManGenericCashFlow.h"
 #include "ReserveFund.h"
 using namespace System;
 namespace ManagedCLO {
@@ -132,9 +132,9 @@ namespace ManagedCLO {
 		\details This property will hold the cash flows toward the replenishment of the reserve fund.<br/>The interest and principal flows will distinguish whether the reserve fund was replenished using interest or principal proceeds.<br/>Use ManTrancheCashFlow::GetTotalFlow to get the level of the reserve fund in a given period.<br/>Use ManTrancheCashFlow::GetDeferred to get the shortfall in the reserve fund compared to the target level for a given period.
 		\sa SetReserveFund
 		*/
-		property ManTrancheCashFlow^ ReserveFundFlow {
-			ManTrancheCashFlow^ get(){ return gcnew ManTrancheCashFlow(Unmanaged->GetReserveFundFlow()); }
-			void set(ManTrancheCashFlow^ source) { Unmanaged->SetReserveFundFlow(*(source->Unmanaged)); }
+		property ManGenericCashFlow^ ReserveFundFlow {
+			ManGenericCashFlow^ get() { return gcnew ManGenericCashFlow(Unmanaged->GetReserveFundFlow()); }
+			void set(ManGenericCashFlow^ source) { Unmanaged->SetReserveFundFlow(*(source->Unmanaged)); }
 		}
 		/*!
 		\brief Whether the reserve will fund the interest or principal waterfall

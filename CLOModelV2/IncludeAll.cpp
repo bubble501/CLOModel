@@ -14,3 +14,4 @@
 #include "ManIntegerVector.h"
 #include "ManRepaymentVector.h"
 #include "ManReserveFund.h"
+#include "ManGenericCashFlow.h"

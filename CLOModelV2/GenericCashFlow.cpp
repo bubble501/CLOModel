@@ -1,9 +1,8 @@
 #include "GenericCashFlow.h"
 #include <QDataStream>
-GenericCashFlow::GenericCashFlow(): m_AggregationLevel(NoAggregation) {}
-GenericCashFlow::GenericCashFlow(const GenericCashFlow& a) 
-	: m_AggregationLevel(a.m_AggregationLevel) 
-{
+GenericCashFlow::GenericCashFlow() : m_AggregationLevel(NoAggregation) {}
+GenericCashFlow::GenericCashFlow(const GenericCashFlow& a)
+	: m_AggregationLevel(a.m_AggregationLevel) {
 	AddFlow(a);
 }
 
@@ -12,27 +11,24 @@ GenericCashFlow::~GenericCashFlow() {
 }
 void GenericCashFlow::AddFlow(const QDate& Dte, double Amt, qint32 FlowTpe) {
 	if (Dte.isNull()) return;
-	if (qAbs(Amt) < 0.01) Amt = 0.0;
-
-	if (!m_UsedFlowsTypes.contains(FlowTpe)) {
-		for (QMap<QDate, QHash<qint32, double>* >::iterator i = m_CashFlows.begin(); i != m_CashFlows.end(); i++) {
-			i.value()->operator[](FlowTpe) = 0.0;
-		}
-		m_UsedFlowsTypes.insert(FlowTpe);
-	}
-	QMap<QDate, QHash<qint32, double>* >::const_iterator index = m_CashFlows.constBegin();
-	for (; index != m_CashFlows.constEnd(); ++index) {
+	QMap<QDate, QHash<qint32, double>* >::iterator index = m_CashFlows.begin();
+	for (; index != m_CashFlows.end(); ++index) {
 		if (SamePeriod(Dte, index.key(), m_AggregationLevel)) break;
 	}
-	if (index != m_CashFlows.constEnd()) {
-		m_CashFlows[index.key()]->operator[](FlowTpe) += Amt;
+	if (index != m_CashFlows.end()) {
+		if (qAbs(Amt) < 0.01) return;
+		if (index.value()->contains(FlowTpe)) {
+			/*if (IsStock(FlowTpe))
+				index.value()->operator[](FlowTpe) = Amt;
+			else*/
+				index.value()->operator[](FlowTpe) += Amt;
+		}
+		else
+			index.value()->insert(FlowTpe, Amt);
 	}
 	else {
 		m_CashFlows.insert(Dte, new QHash<qint32, double>());
-		foreach(qint32 SinglFlowType, m_UsedFlowsTypes) {
-			m_CashFlows[Dte]->operator[](SinglFlowType) = 0.0;
-		}
-		m_CashFlows[Dte]->operator[](FlowTpe) += Amt;
+		if (qAbs(Amt) >= 0.01) m_CashFlows[Dte]->insert(FlowTpe,Amt);
 	}
 }
 
@@ -50,11 +46,10 @@ void GenericCashFlow::Clear() {
 		delete (i.value());
 	}
 	m_CashFlows.clear();
-	m_UsedFlowsTypes.clear();
 }
 
 QDate GenericCashFlow::GetDate(int index) const {
-	if (index<0 || index>=m_CashFlows.size()) return QDate();
+	if (index < 0 || index >= m_CashFlows.size()) return QDate();
 	return (m_CashFlows.constBegin() + index).key();
 }
 
@@ -65,14 +60,14 @@ double GenericCashFlow::GetFlow(const QDate& index, qint32 FlowTpe) const {
 }
 
 double GenericCashFlow::GetFlow(int index, qint32 FlowTpe) const {
-	if (index<0 || index>=m_CashFlows.size()) return 0.0;
+	if (index < 0 || index >= m_CashFlows.size()) return 0.0;
 	if (!(m_CashFlows.constBegin() + index).value()->contains(FlowTpe))  return 0.0;
 	return (m_CashFlows.constBegin() + index).value()->value(FlowTpe);
 }
 double GenericCashFlow::GetPreviousFlow(int index, qint32 FlowTpe) const {
-	if (m_CashFlows.isEmpty() || index<0) return 0.0;
+	if (m_CashFlows.isEmpty() || index < 0) return 0.0;
 	const QHash<qint32, double>* TempFlows;
-	if (index<1 || index>=m_CashFlows.size())  TempFlows = (m_CashFlows.constEnd() - 1).value();
+	if (index < 1 || index >= m_CashFlows.size())  TempFlows = (m_CashFlows.constEnd() - 1).value();
 	else  TempFlows = (m_CashFlows.constBegin() + index - 1).value();
 	if (!TempFlows->contains(FlowTpe))  return 0.0;
 	return TempFlows->value(FlowTpe);
@@ -88,12 +83,6 @@ double GenericCashFlow::GetPreviousFlow(const QDate& index, qint32 FlowTpe) cons
 	return TempFlows->value(FlowTpe);
 }
 
-int GenericCashFlow::GetPaymentFrequency() const {
-	if (m_CashFlows.size() > 1)
-		return qAbs(MonthDiff((m_CashFlows.end() - 1).key(), (m_CashFlows.end() - 2).key()));
-	else
-		return 0;
-}
 
 int GenericCashFlow::FindDate(const QDate& a) const {
 	QMap<QDate, QHash<qint32, double>*	>::const_iterator TempFind = m_CashFlows.find(a);
@@ -117,12 +106,16 @@ void GenericCashFlow::Aggregate(CashFlowAggregation Freq) {
 	if (Freq == NoAggregation) return;
 	for (QMap<QDate, QHash<qint32, double>* >::iterator MainIter = m_CashFlows.begin(); MainIter != m_CashFlows.end(); ++MainIter) {
 		for (QMap<QDate, QHash<qint32, double>* >::iterator SecondIter = MainIter + 1; SecondIter != m_CashFlows.end();) {
-			if (SamePeriod(MainIter.key(), SecondIter.key(),Freq)) {
+			if (SamePeriod(MainIter.key(), SecondIter.key(), Freq)) {
 				QHash<qint32, double>* TempMain = MainIter.value();
 				const QHash<qint32, double>* TempSecond = SecondIter.value();
 				for (QHash<qint32, double>::const_iterator i = TempSecond->constBegin(); i != TempSecond->constEnd(); ++i) {
-					if (!TempMain->contains(i.key())) TempMain->insert(i.key(), 0.0); //Should never happen but just to be safe
-					TempMain->operator[](i.key()) += i.value();
+					if (!TempMain->contains(i.key())) 
+						TempMain->insert(i.key(), 0.0); //Should never happen but just to be safe
+					if (IsStock(i.key()))
+						TempMain->operator[](i.key()) = i.value();
+					else
+						TempMain->operator[](i.key()) += i.value();
 				}
 				delete (SecondIter.value());
 				SecondIter = m_CashFlows.erase(SecondIter);
@@ -141,7 +134,7 @@ bool GenericCashFlow::SamePeriod(const QDate& a, const QDate& b, CashFlowAggrega
 	case Annually:
 		return a.year() == b.year();
 	case SemiAnnually:
-		return a.year() == b.year() && (a.month()-1) / 6 == (b.month()-1) / 6;
+		return a.year() == b.year() && (a.month() - 1) / 6 == (b.month() - 1) / 6;
 	case Quarterly:
 		return a.year() == b.year() && (a.month() - 1) / 3 == (b.month() - 1) / 3;
 	case Monthly:
@@ -155,7 +148,6 @@ bool GenericCashFlow::SamePeriod(const QDate& a, const QDate& b, CashFlowAggrega
 	}
 }
 QDataStream& operator<<(QDataStream & stream, const GenericCashFlow& flows) {
-	stream << flows.m_UsedFlowsTypes;
 	stream << quint32(flows.m_CashFlows.size());
 	for (QMap<QDate, QHash<qint32, double>* >::const_iterator MainIter = flows.m_CashFlows.constBegin(); MainIter != flows.m_CashFlows.constEnd(); ++MainIter) {
 		const QHash<qint32, double>* TempMain = MainIter.value();
@@ -168,7 +160,7 @@ QDataStream& GenericCashFlow::LoadOldVersion(QDataStream& stream) {
 	quint32 TempSize;
 	QDate TempDate;
 	QHash<qint32, double> TempMain;
-	stream >> m_UsedFlowsTypes >> TempSize;
+	stream >> TempSize;
 	for (quint32 i = 0; i < TempSize; i++) {
 		stream >> TempDate >> TempMain;
 		m_CashFlows.insert(TempDate, new QHash<qint32, double>(TempMain));
@@ -196,8 +188,44 @@ bool GenericCashFlow::operator==(const GenericCashFlow& a) const {
 		if (TempMain->size() != TempSec->size()) return false;
 		for (QHash<qint32, double>::const_iterator SecIter = TempMain->constBegin(); SecIter != TempMain->constEnd(); ++SecIter) {
 			if (!TempSec->contains(SecIter.key())) return false;
-			if (qAbs(TempSec->value(SecIter.key()) - SecIter.value())>=0.01) return false;
+			if (qAbs(TempSec->value(SecIter.key()) - SecIter.value()) >= 0.01) return false;
 		}
 	}
 	return true;
 }
+GenericCashFlow GenericCashFlow::operator+(const GenericCashFlow& a) const {
+	GenericCashFlow Result(*this); Result.AddFlow(a); return Result;
+}
+void GenericCashFlow::SetStock(qint32 FlowTpe, bool IsStock) {
+	if (IsStock)
+		m_Stocks.insert(FlowTpe);
+	else
+		m_Stocks.remove(FlowTpe);
+}
+#ifdef _DEBUG
+
+QString GenericCashFlow::ToString() const {
+	QSet<qint32> FlowsTypes;
+	for (QMap<QDate, QHash<qint32, double>* >::const_iterator MainIter = m_CashFlows.constBegin(); MainIter != m_CashFlows.constEnd(); ++MainIter) {
+		FlowsTypes.unite(MainIter.value()->keys().toSet());
+	}
+	QString Result("Date");
+	QList<qint32> FlowsTypesList = FlowsTypes.toList();
+	qSort(FlowsTypesList);
+	for (QList<qint32>::const_iterator SecIter = FlowsTypesList.constBegin(); SecIter != FlowsTypesList.constEnd(); ++SecIter) {
+		Result += QString("\tFlow %1").arg(*SecIter);
+	}
+	for (QMap<QDate, QHash<qint32, double>* >::const_iterator MainIter = m_CashFlows.constBegin(); MainIter != m_CashFlows.constEnd(); ++MainIter) {
+		Result += '\n' + MainIter.key().toString("dd-MM-yyyy");
+		for (QList<qint32>::const_iterator SecIter = FlowsTypesList.constBegin(); SecIter != FlowsTypesList.constEnd(); ++SecIter) {
+			Result += '\t' + QString::number(GetFlow(MainIter.key(), *SecIter), 'f', 2);
+		}
+	}
+	return Result;
+}
+
+
+
+
+
+#endif

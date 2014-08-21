@@ -124,15 +124,6 @@ public:
 		if (RFindex < 0 || RFindex >= m_Reserves.size()) return NULL;
 		return m_Reserves.at(RFindex);
 	}
-/*
-	QString GetReserveFundTarget(int RFindex)const { if (RFindex<0 || RFindex >= m_Reserves.size()) return ""; return m_Reserves.at(RFindex)->GetReserveFundTargetString(); }
-	QString GetReserveFundMultiple(int RFindex)const { if (RFindex<0 || RFindex >= m_Reserves.size()) return ""; return m_Reserves.at(RFindex)->GetReserveFundMultipleString(); }
-	QString GetReserveFundFloor(int RFindex)const { if (RFindex<0 || RFindex >= m_Reserves.size()) return ""; return m_Reserves.at(RFindex)->GetReserveFundFloorString(); }
-	double GetReserveFundCurrent(int RFindex)const { if (RFindex<0 || RFindex >= m_Reserves.size()) return 0.0; return m_Reserves.at(RFindex)->GetReserveFundCurrent(); }
-	int GetReserveFundFreed(int RFindex)const { if (RFindex<0 || RFindex >= m_Reserves.size()) return -1; return m_Reserves.at(RFindex)->GetReserveFundFreed(); }
-	TrancheCashFlow GetReserveFundFlow(int RFindex)const { if (RFindex < 0 || RFindex >= m_Reserves.size()) return TrancheCashFlow(); return m_Reserves.at(RFindex)->GetReserveFundFlow(); }
-	void SetReserveFundFlow(int RFindex, const TrancheCashFlow& source) { if (RFindex<0 || RFindex >= m_Reserves.size()) return; m_Reserves[RFindex]->SetReserveFundFlow(source); }
-	bool GetReserveToInterest(int RFindex)const { if (RFindex<0 || RFindex >= m_Reserves.size()) return false; return m_Reserves.at(RFindex)->GetReserveToInterest(); }*/
 	bool GetCumulativeReserves() const {return m_CumulativeReserves;}
 	int GetNumReserves()const { return m_Reserves.size(); }
 	const QString& GetDealName() const { return m_DealName; }
@@ -157,7 +148,7 @@ public:
 	void SetCallMultiple(double a){if(a>=0.0) m_CallMultiple=a;}
 	void SetCallReserve(double a){if(a>=0.0) m_CallReserve=a;} 
 	void AddMortgagesFlows(const MtgCashFlow& a){m_MortgagesPayments+=a;}
-	void ResetMtgFlows(){m_MortgagesPayments.RemoveAllFlows();}
+	void ResetMtgFlows(){m_MortgagesPayments.Clear();}
 	void SetCCCcurve(const QString& a);
 	void SetFirstIPDdate(const QDate& a){m_FirstIPDdate=a;}
 	void SetLastIPDdate(const QDate& a){m_LastIPDdate=a;}

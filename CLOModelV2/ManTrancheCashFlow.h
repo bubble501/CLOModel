@@ -1,6 +1,6 @@
 #ifndef ManTrancheCashFlow_h__
 #define ManTrancheCashFlow_h__
-
+#include "ManGenericCashFlow.h"
 #include "TrancheCashFlow.h"
 #include "ManagedCommons.h"
 using namespace System;
@@ -9,7 +9,7 @@ namespace ManagedCLO {
 	\brief Cash Flows from a tranche of a CLO
 	\details This class implements a way of manage cash flows from a tranche of a CLO.<br/>The flows will always be sorted by date.
 	 */
-	public ref class ManTrancheCashFlow
+	public ref class ManTrancheCashFlow : public ManGenericCashFlow
 	{
 	private:
 		static const unsigned int ClassIdentity=6;
@@ -80,21 +80,6 @@ namespace ManagedCLO {
 				return false;
 			}
 		}
-		/*!
-		\brief Number of flows in the series
-		*/
-		property int Count{int get(){return Unmanaged->Count();}}
-		/*!
-		\brief Get the date of a flow in the series
-		\arg index the index of the flow for which to retrieve the date (0 is the first)
-		*/
-		DateTime GetDate(int index){return QDate2DateTime(Unmanaged->GetDate(index));}
-		/*!
-		\brief Get the index of the flow happening at a certain date
-		\arg a the date of the flow to search
-		\return the index of the flow or -1 if not found
-		*/
-		int FindDate(DateTime a){return Unmanaged->FindDate(DateTime2QDate(a));}
 		/*!
 		\brief Gets the interest cash flow.
 		\arg index The index of the cash flow for which the interest must be retrieved.<br/>The first flow will be at index 0
@@ -266,20 +251,9 @@ namespace ManagedCLO {
 		*/
 		void AddFlow(ManTrancheCashFlow^ a){Unmanaged->AddFlow(*(a->Unmanaged));}
 		/*!
-		\brief Deletes all the flows in the series.
-		*/
-		void ResetFlows(){Unmanaged->ResetFlows();}
-		/*!
 		\brief Copy another ManTrancheCashFlow
 		*/
 		void Copy(ManTrancheCashFlow^ a){Unmanaged->operator=(*(a->Unmanaged));}
-		/*!
-		\brief Replace a date in the series
-		\arg OriginalDate date to find
-		\arg NewDate date to replace with
-		\details If there is a flow happening in date OriginalDate the date will be replaced with NewDate<br/>If OriginalDate is not in the series nothing gets done.
-		*/
-		void ReplaceDate(DateTime OriginalDate, DateTime NewDate){Unmanaged->ReplaceDate(DateTime2QDate(OriginalDate),DateTime2QDate(NewDate));}
 
 		ManTrancheCashFlow(){Unmanaged=new TrancheCashFlow();}
 		//! Copy constructor

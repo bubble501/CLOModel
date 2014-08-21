@@ -368,6 +368,9 @@
     <ClCompile Include="ManQBbg.cpp">
       <Filter>Source Files\Managed</Filter>
     </ClCompile>
+    <ClCompile Include="GenericCashFlow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="quazip\crypt.h">
@@ -531,6 +534,12 @@
     </ClInclude>
     <ClInclude Include="ManQBbg.h">
       <Filter>Header Files\Managed</Filter>
+    </ClInclude>
+    <ClInclude Include="ManGenericCashFlow.h">
+      <Filter>Header Files\Managed</Filter>
+    </ClInclude>
+    <ClInclude Include="GenericCashFlow.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

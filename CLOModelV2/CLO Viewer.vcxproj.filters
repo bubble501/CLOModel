@@ -320,6 +320,9 @@
     <ClCompile Include="QSingleBbgResult.cpp">
       <Filter>Source Files\Core Files</Filter>
     </ClCompile>
+    <ClCompile Include="GenericCashFlow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="quazip\crypt.h">
@@ -435,6 +438,9 @@
     </ClInclude>
     <ClInclude Include="QSingleBbgResult.h">
       <Filter>Header Files\Core Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GenericCashFlow.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

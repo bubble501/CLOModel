@@ -6,6 +6,9 @@ TrancheCashFlow::TrancheCashFlow(double ThrancheOutstanding)
 	, StartingDeferredInterest(0.0)
 {
 	m_AggregationLevel = Monthly;
+	SetStock(OCFlow);
+	SetStock(ICFlow);
+	SetStock(DeferredFlow);
 }
 
 double TrancheCashFlow::GetAmountOutstanding(int index)const{

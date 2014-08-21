@@ -1,10 +1,12 @@
 #ifndef AbstractCashFlow_h__
 #define AbstractCashFlow_h__
 #include "BackwardCompatibilityInterface.h"
+#include "IntegerVector.h"
 #include <QHash>
 #include <QMap>
-#include <QSet>
 #include <QDate>
+#include <QList>
+#include <QSet>
 class GenericCashFlow : public BackwardInterface {
 public:
 	enum CashFlowAggregation {
@@ -21,6 +23,7 @@ public:
 	GenericCashFlow(const GenericCashFlow& a);
 	virtual GenericCashFlow& operator=(const GenericCashFlow& a);
 	virtual GenericCashFlow& operator+=(const GenericCashFlow& a) { AddFlow(a); return *this; }
+	virtual GenericCashFlow operator+(const GenericCashFlow& a) const;
 	virtual bool operator==(const GenericCashFlow& a) const;
 	virtual void AddFlow(const QDate& Dte, double Amt, qint32 FlowTpe);
 	virtual void AddFlow(const GenericCashFlow& a);
@@ -32,17 +35,21 @@ public:
 	virtual void Clear();
 	virtual void RemoveAllFlows() { Clear(); }
 	virtual void ResetFlows() { Clear(); }
-	virtual int GetPaymentFrequency() const;
 	virtual QDate MaturityDate() const;
 	virtual int Count() const { return m_CashFlows.size(); }
 	virtual int FindDate(const QDate& a) const;
 	virtual void ReplaceDate(const QDate& OriginalDate, const QDate& NewDate);
 	virtual void Aggregate(CashFlowAggregation Freq);
+	virtual void SetStock(qint32 FlowTpe, bool IsStock = true);
+	virtual bool IsStock(qint32 FlowTpe) const { return false;/* m_Stocks.contains(FlowTpe);*/ }
+#ifdef _DEBUG
+	virtual QString ToString() const;
+#endif // _DEBUG
 
 protected:
 	static bool SamePeriod(const QDate& a, const QDate& b, CashFlowAggregation Freq);
-	QSet<qint32> m_UsedFlowsTypes;
 	QMap<QDate, QHash<qint32, double>*	> m_CashFlows;
+	QSet<qint32> m_Stocks;
 	CashFlowAggregation m_AggregationLevel;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream);
 	friend QDataStream& operator<<(QDataStream & stream, const GenericCashFlow& flows);

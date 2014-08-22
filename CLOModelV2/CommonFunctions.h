@@ -17,15 +17,12 @@ QList<QString> UnpackAnnuityVect(QString Vect);*/
 double RoundUp(double a);
 template<class T> bool LessThanPoint(T* a,T* b){return (*a)<(*b);}
 QString Commarize(double num,unsigned int precision=0);
-double CalculateIRR(const QList<QDate>& Dte, const QList<double>& Flws, int Daycount=360, double Guess=0.05,int precision=3);
+double CalculateIRR(const QList<QDate>& Dte, const QList<double>& Flws, int Daycount=360, double Guess=0.05);
 double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, double Interest, int Daycount=360);
 double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, const BloombergVector& Interest, int Daycount=360);
 double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, const QString& Interest, int Daycount=360);
-double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, double BaseRate,int Daycount=360, double Guess=0.05,int precision=3);
-double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const BloombergVector& BaseRate,int Daycount=360, double Guess=0.05,int precision=3);
-double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const QString& BaseRate,int Daycount=360, double Guess=0.05,int precision=3);
-double CalculateIRRSimple(const QList<QDate>& Dte, const QList<double>& Flws, int Daycount=360, double Guess=0.05,int precision=3);
-double CalculateNPVSimple(const QList<QDate>& Dte, const QList<double>& Flws, double Interest, int Daycount=360);
-double CalculateDMSimple(const QList<QDate>& Dte, const QList<double>& Flws, double BaseRate,int Daycount=360, double Guess=0.05,int precision=3);
+double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, double BaseRate,int Daycount=360, double Guess=0.05);
+double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const BloombergVector& BaseRate,int Daycount=360, double Guess=0.05);
+double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const QString& BaseRate,int Daycount=360, double Guess=0.05);
 bool removeDir(const QString & dirName);
 #endif // CommonFunctions_h__

@@ -6,7 +6,7 @@
 #include <qmath.h>
 #include <QDir>
 #include "BloombergVector.h"
-
+#include <boost/math/tools/roots.hpp>
 int MonthDiff(const QDate& FutureDte,const QDate& PresentDte){
 	int Result;
 	Result=(FutureDte.year()-PresentDte.year())*12;
@@ -62,17 +62,17 @@ double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, const Bl
 double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, const QString& Interest, int Daycount){
 	return CalculateNPV(Dte,Flws,BloombergVector(Interest),Daycount);
 }
-double CalculateNPVsimple(const QList<QDate>& Dte, const QList<double>& Flws, double Interest, int Daycount){
-	if(Dte.size()!=Flws.size() || Dte.size()==0) return 0.0;
-	double Result=Flws.at(0);
-	for(int i=1;i<Dte.size();i++){
-		Result+=Flws.at(i)/(1.0+(Interest*static_cast<double>(Dte.at(0).daysTo(Dte.at(i)))/static_cast<double>(Daycount)));
-	}
-	return Result;
-}
-double CalculateIRR(const QList<QDate>& Dte, const QList<double>& Flws, int Daycount, double Guess,int precision){
-	if(Guess<=0 || Guess>10) Guess=0.05;
-	unsigned int CurrentIterations=0;
+double CalculateIRR(const QList<QDate>& Dte, const QList<double>& Flws, int Daycount, double Guess){
+	if (Guess <= 0 || Guess > 10) Guess = 0.05;
+	boost::math::tools::eps_tolerance<double> tol(std::numeric_limits<double>::digits / 2);
+	boost::uintmax_t MaxIter(MaximumIRRIterations);
+	std::pair<double, double> Result = boost::math::tools::bracket_and_solve_root(
+		[&](double Discount) -> double {return CalculateNPV(Dte, Flws, Discount, Daycount); }
+	, Guess, 2.0, false, tol, MaxIter);
+	if (MaxIter >= MaximumIRRIterations) return 0.0;
+	return (Result.first + Result.second) / 2.0;
+
+	/*unsigned int CurrentIterations=0;
 	double Result=Guess;
 	double PreviuousGuess=Guess+0.01;
 	double CurrentGuess=Guess;
@@ -92,32 +92,11 @@ double CalculateIRR(const QList<QDate>& Dte, const QList<double>& Flws, int Dayc
 	}
 	if (IterationWatch == MaximumIRRIterations)
 		return 0.0;
-	return Result;
+	return Result;*/
 }
-double CalculateIRRSimple(const QList<QDate>& Dte, const QList<double>& Flws, int Daycount, double Guess,int precision){
-	if(Guess<=0 || Guess>10) Guess=0.05;
-	double Result=Guess;
-	double PreviuousGuess=Guess+0.01;
-	double CurrentGuess=Guess;
-	double PreviousNPV=CalculateNPVsimple(Dte,Flws,PreviuousGuess,Daycount);
-	double CurrentNPV=CalculateNPVsimple(Dte,Flws,Result,Daycount);
-	unsigned int IterationWatch;
-	for (IterationWatch = 0; qAbs(CurrentNPV)>qPow(10.0, -static_cast<double>(precision)) && IterationWatch<MaximumIRRIterations; IterationWatch++)
-	//while(qAbs(CurrentNPV)>qPow(10.0,-static_cast<double>(precision)))
-	{
-		Result-=CurrentNPV*(Result-PreviuousGuess)/(CurrentNPV-PreviousNPV);
-		//if(Result<0.0 || Result>10.0) return 0.0;
-		PreviousNPV=CurrentNPV;
-		PreviuousGuess=CurrentGuess;
-		CurrentGuess=Result;
-		CurrentNPV=CalculateNPVsimple(Dte,Flws,Result,Daycount);
-	}
-	if (IterationWatch == MaximumIRRIterations)
-		return 0.0;
-	return Result;
-}
-double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, double BaseRate,int Daycount, double Guess,int precision){
-	double Yld = CalculateIRR(Dte,Flws,Daycount,Guess,precision);
+double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, double BaseRate,int Daycount, double Guess){
+	return CalculateDM(Dte, Flws, BloombergVector(QString("%1").arg(BaseRate)), Daycount, Guess);
+	/*double Yld = CalculateIRR(Dte,Flws,Daycount,Guess,precision);
 	double Freq=1.0;
 	if(Dte.size()>2){
 		Freq=(1.0/((static_cast<double>(Dte.at(1).daysTo(Dte.last())))/(static_cast<double>(Dte.size())-2.0)/365.0));
@@ -125,10 +104,22 @@ double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, double Ba
 		else Freq=static_cast<double>(static_cast<int>(Freq));
 	}
 	double AdjYeld= (qPow(1.0+Yld,1.0/Freq)-1.0)*Freq;
-	return (AdjYeld-BaseRate)*10000.0;
+	return (AdjYeld-BaseRate)*10000.0;*/
 }
-double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const BloombergVector& BaseRate,int Daycount, double Guess,int precision){
-	if(Guess<=0 || Guess>10) Guess=0.05;
+
+double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const BloombergVector& BaseRate,int Daycount, double Guess){
+	if (Guess <= 0 || Guess>10) Guess = 0.05;
+	boost::math::tools::eps_tolerance<double> tol(std::numeric_limits<double>::digits / 2);
+	boost::uintmax_t MaxIter(MaximumIRRIterations);
+	std::pair<double, double> Result = boost::math::tools::bracket_and_solve_root(
+		[&](double Discount) -> double {return CalculateNPV(Dte, Flws, BaseRate + Discount, Daycount); }
+	, Guess, 2.0, false, tol, MaxIter);
+	if (MaxIter >= MaximumIRRIterations) return 0.0;
+	return 10000.0*(Result.first + Result.second) / 2.0;
+
+
+
+	/*
 	double Result=Guess;
 	double PreviuousGuess=Guess+0.01;
 	double CurrentGuess=Guess;
@@ -147,13 +138,10 @@ double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const Blo
 	}
 	if (IterationWatch == MaximumIRRIterations) 
 		return 0.0;
-	return Result*10000.0;
+	return Result*10000.0;*/
 }
-double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const QString& BaseRate,int Daycount, double Guess,int precision){
-	return CalculateDM(Dte,Flws,BloombergVector(BaseRate),Daycount,Guess,precision);
-}
-double CalculateDMSimple(const QList<QDate>& Dte, const QList<double>& Flws, double BaseRate,int Daycount, double Guess,int precision){
-	return (CalculateIRRSimple(Dte,Flws,Daycount,Guess,precision)-BaseRate)*10000.0;
+double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const QString& BaseRate,int Daycount, double Guess){
+	return CalculateDM(Dte,Flws,BloombergVector(BaseRate),Daycount,Guess);
 }
 bool removeDir(const QString & dirName)
 {

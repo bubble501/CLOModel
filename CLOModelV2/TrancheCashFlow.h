@@ -10,8 +10,8 @@ private:
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream);
 public:
-	enum TrancheFlowType{
-		InterestFlow=0,
+	enum class TrancheFlowType : qint32{
+		InterestFlow= 1 << 8,
 		PrincipalFlow=1,
 		OCFlow=11,
 		ICFlow=12,
@@ -19,18 +19,18 @@ public:
 	};
 	TrancheCashFlow(double ThrancheOutstanding=0.0);
 	TrancheCashFlow(const TrancheCashFlow& a);
-	double GetInterest(int index)const { return GetFlow(index, InterestFlow); }
-	double GetPrincipal(int index)const { return GetFlow(index, PrincipalFlow); }
-	double GetOCTest(int index)const { return GetFlow(index, OCFlow); }
-	double GetICTest(int index)const { return GetFlow(index, ICFlow); }
-	double GetDeferred(int index)const { return GetFlow(index, DeferredFlow); }
-	double GetTotalFlow(int index)const{return GetInterest(index)+GetPrincipal(index);}
+	double GetInterest(int index)const { return GetFlow(index, static_cast<qint32>(TrancheFlowType::InterestFlow)); }
+	double GetPrincipal(int index)const { return GetFlow(index, static_cast<qint32>(TrancheFlowType::PrincipalFlow)); }
+	double GetOCTest(int index)const { return GetFlow(index, static_cast<qint32>(TrancheFlowType::OCFlow)); }
+	double GetICTest(int index)const { return GetFlow(index, static_cast<qint32>(TrancheFlowType::ICFlow)); }
+	double GetDeferred(int index)const { return GetFlow(index, static_cast<qint32>(TrancheFlowType::DeferredFlow)); }
+	double GetTotalFlow(int index)const;
 	double GetAmountOutstanding(int index = 0)const;
-	double GetInterest(const QDate& a)const { return GetFlow(a, InterestFlow); }
-	double GetPrincipal(const QDate& a)const { return GetFlow(a, PrincipalFlow); }
-	double GetOCTest(const QDate& a)const { return GetFlow(a, OCFlow); }
-	double GetICTest(const QDate& a)const { return GetFlow(a, ICFlow); }
-	double GetDeferred(const QDate& a)const { return GetFlow(a, DeferredFlow); }
+	double GetInterest(const QDate& a)const { return GetFlow(a, static_cast<qint32>(TrancheFlowType::InterestFlow)); }
+	double GetPrincipal(const QDate& a)const { return GetFlow(a, static_cast<qint32>(TrancheFlowType::PrincipalFlow)); }
+	double GetOCTest(const QDate& a)const { return GetFlow(a, static_cast<qint32>(TrancheFlowType::OCFlow)); }
+	double GetICTest(const QDate& a)const { return GetFlow(a, static_cast<qint32>(TrancheFlowType::ICFlow)); }
+	double GetDeferred(const QDate& a)const { return GetFlow(a, static_cast<qint32>(TrancheFlowType::DeferredFlow)); }
 	double GetTotalFlow(const QDate& a)const{return GetInterest(a)+GetPrincipal(a);}
 	double GetAmountOutstanding(const QDate& a)const{return GetAmountOutstanding(FindDate(a));} //TODO
 	double GetInitialOutstanding()const{return OutstandingAmt;}

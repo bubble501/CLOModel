@@ -81,21 +81,22 @@ int main(int argc, char *argv[]) {
 	}*/
 	
 
-	/*Tranche TempTrnch;
+	Tranche TempTrnch;
 	TempTrnch.SetSettlementDate(QDate(2014, 6, 1));
 	TempTrnch.SetOutstandingAmt(1000000.0);
 	TempTrnch.SetAccruedInterest(0.0);
-	TempTrnch.SetReferenceRateValue("0.5");
-	TempTrnch.AddCashFlow(QDate(2015, 6, 1), 50000.0, TrancheCashFlow::InterestFlow);
-	TempTrnch.AddCashFlow(QDate(2016, 6, 1), 50000.0, TrancheCashFlow::InterestFlow);
-	TempTrnch.AddCashFlow(QDate(2017, 6, 1), 50000.0, TrancheCashFlow::InterestFlow);
-	TempTrnch.AddCashFlow(QDate(2018, 6, 1), 50000.0, TrancheCashFlow::InterestFlow);
-	TempTrnch.AddCashFlow(QDate(2019, 6, 1), 50000.0, TrancheCashFlow::InterestFlow);
-	TempTrnch.AddCashFlow(QDate(2020, 6, 1), 50000.0, TrancheCashFlow::InterestFlow);
-	TempTrnch.AddCashFlow(QDate(2020, 6, 1), 1000000.0, TrancheCashFlow::PrincipalFlow);
+	TempTrnch.SetReferenceRate("BP00ON");
+	//TempTrnch.SetDefaultRefRate("BP00ON");
+	TempTrnch.AddCashFlow(QDate(2015, 6, 1), 50000.0, TrancheCashFlow::TrancheFlowType::InterestFlow);
+	TempTrnch.AddCashFlow(QDate(2016, 6, 1), 50000.0, TrancheCashFlow::TrancheFlowType::InterestFlow);
+	TempTrnch.AddCashFlow(QDate(2017, 6, 1), 50000.0, TrancheCashFlow::TrancheFlowType::InterestFlow);
+	TempTrnch.AddCashFlow(QDate(2018, 6, 1), 50000.0, TrancheCashFlow::TrancheFlowType::InterestFlow);
+	TempTrnch.AddCashFlow(QDate(2019, 6, 1), 50000.0, TrancheCashFlow::TrancheFlowType::InterestFlow);
+	TempTrnch.AddCashFlow(QDate(2020, 6, 1), 50000.0, TrancheCashFlow::TrancheFlowType::InterestFlow);
+	TempTrnch.AddCashFlow(QDate(2020, 6, 1), 1000000.0, TrancheCashFlow::TrancheFlowType::PrincipalFlow);
 	double currentDM = TempTrnch.GetDiscountMargin(100.0);
 	double NewPrice = TempTrnch.GetPrice(currentDM - 1.0);
-	double NewDM = TempTrnch.GetDiscountMargin(NewPrice);*/
+	double NewDM = TempTrnch.GetDiscountMargin(NewPrice);
 
 	/*QApplication a(argc, argv);
 	StressTest SlowResult;
@@ -135,7 +136,7 @@ int main(int argc, char *argv[]) {
 
 
 
-	Mortgage TempMtg1;
+	/*Mortgage TempMtg1;
 	TempMtg1.SetAnnuity("I");
 	TempMtg1.SetInterest("5");
 	TempMtg1.SetPaymentFreq("1");
@@ -252,7 +253,7 @@ int main(int argc, char *argv[]) {
 		if (file3.exists()) file3.remove();
 		QApplication a(argc, argv);
 		QMessageBox::information(0,"Success", "Cash Flows are identical");		
-	}
+	}*/
 
 
 #endif

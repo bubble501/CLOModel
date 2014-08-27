@@ -53,6 +53,7 @@ double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, const Bl
 	double Result=Flws.at(0);
 	double DiscountFactor=1.0;
 	for(int i=1;i<Dte.size();i++){
+		if (Flws.at(i) == 0.0) continue;
 		//DiscountFactor*=qPow(1.0+AdjInterest.GetValue(Dte.at(i)),static_cast<double>(Dte.at(i-1).daysTo(Dte.at(i)))/static_cast<double>(Daycount));
 		DiscountFactor*=1.0+(AdjInterest.GetValue(Dte.at(i))*static_cast<double>(Dte.at(i-1).daysTo(Dte.at(i)))/static_cast<double>(Daycount));
 		Result+=Flws.at(i)/DiscountFactor;

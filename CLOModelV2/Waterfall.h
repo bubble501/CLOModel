@@ -51,7 +51,8 @@ private:
 	int FindMostJuniorLevel() const;
 	void SortByProRataGroup();
 	double GroupOutstanding(int GroupTarget)const;
-	double GroupWACoupon(int GroupTarget)const;
+	double GroupWACoupon(int GroupTarget, const QDate& Period, qint32 CouponType=0)const;
+	double GroupWACoupon(int GroupTarget, const QDate& Period, QList<qint32> CouponTypes)const;
 	double RedeemNotes(double AvailableFunds,int GroupTarget, int PeriodIndex);
 	double RedeemProRata(double AvailableFunds, int PeriodIndex,QList<int> Groups);
 	double RedeemSequential(double AvailableFunds, int PeriodIndex,int MaxGroup=-1);

@@ -20,27 +20,27 @@ public:
 #endif
 	void AddTranche(
 		const QString& Name
-		,const QString& ISIN
-		,int ProRataGroup
-		,double OrigAmnt
-		,const QString& Crncy
-		,double OutstandingAmt
-		,Tranche::TrancheInterestType IntrTyp
-		,const QString& Coupon
-		,const QString& RefRte
-		,const QDate& LastPayDte
-		,const QString& DefRefRte
-		,const QString& PayFreq
-		,const QDate& SettlementDate
-		,double AccruedInterest=0.0
-		,double StartingDeferredInterest=0.0
+		, const QString& ISIN
+		, int ProRataGroup
+		, double OrigAmnt
+		, const QString& Crncy
+		, double OutstandingAmt
+		, const  QList<Tranche::TrancheInterestType>& IntrTyp
+		, const QList<QString>& Coupon
+		, const QList<QString>& RefRte
+		, const QDate& LastPayDte
+		, const QString& DefRefRte
+		, const QString& PayFreq
+		, const QDate& SettlementDate
+		, double AccruedInterest = 0.0
+		, double StartingDeferredInterest = 0.0
 		//,const QString& RefRteValue=""
-		,double MinOC=0.0
-		,double MinIC=0.0
-		,double Price=100.0
-		,double FxRate= 1.0
-		,const QString& BbgExt="Mtge"
-		,int DayCount=360
+		, double MinOC = 0.0
+		, double MinIC = 0.0
+		, double Price = 100.0
+		, double FxRate = 1.0
+		, const QString& BbgExt = "Mtge"
+		, int DayCount = 360
 	);
 	void AddWaterfallStep(WatFalPrior::WaterfallStepType Tpe, int GrpTgt, int RdmpGrp=0, double RdmpShare=0.0);
 	void SetSeniorExpenses(const QString& a){Structure.SetSeniorExpenses(a);}

@@ -45,8 +45,10 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		}
 	}
 	{//Tranches
-		QString TrName, Curr, RefRt, BasRt ,coup, TrancheISIN,IPDfrq/*,RefRtVal*/;
-		int ProRat,IntrTpe;
+		QString TrName, Curr, BasRt ,TrancheISIN,IPDfrq/*,RefRtVal*/;
+		QList<QString> RefRt, coup;
+		QList<Tranche::TrancheInterestType>IntrTpe;
+		int ProRat, TempSize;
 		double origOut,currOut,OClim,IClim,Price,Exchan,accruedIntr,startingDeferred/*,coup*/;
 		QDate PrevIPD,SettDate;
 		NumElements=pdFreq++->intVal;
@@ -54,15 +56,22 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		QMessageBox::information(0,"Tranches",QString("Numero Tranches: %1").arg(NumElements));
 #endif
 		for(int i=0;i<NumElements;i++){
+			RefRt.clear(); coup.clear(); IntrTpe.clear();
 			TrName=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			TrancheISIN=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			ProRat=pdFreq->intVal; pdFreq++;
 			origOut=pdFreq->dblVal;pdFreq++;
 			Curr=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			currOut=pdFreq->dblVal;pdFreq++;
-			IntrTpe=pdFreq->intVal; pdFreq++;
-			coup=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
-			RefRt=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
+			TempSize = pdFreq->intVal; pdFreq++;
+			for (int i = 0; i < TempSize;++i)
+				{IntrTpe.append(static_cast<Tranche::TrancheInterestType>(pdFreq->intVal)); pdFreq++;}
+			TempSize = pdFreq->intVal; pdFreq++;
+			for (int i = 0; i < TempSize; ++i)
+				{coup.append(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;}
+			TempSize = pdFreq->intVal; pdFreq++;
+			for (int i = 0; i < TempSize; ++i)
+				{RefRt.append(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;}
 			PrevIPD=QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd");pdFreq++;
 			BasRt=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			IPDfrq=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
@@ -73,7 +82,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			SettDate=QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd");pdFreq++;
 			accruedIntr=(pdFreq->dblVal)/100.0;pdFreq++;
 			startingDeferred = pdFreq->dblVal; pdFreq++;
-			TempUnit.AddTranche(TrName, TrancheISIN, ProRat, origOut, Curr, currOut, Tranche::TrancheInterestType(IntrTpe), coup, RefRt, PrevIPD, BasRt, IPDfrq, SettDate, accruedIntr, startingDeferred, /*RefRtVal,*/ OClim, IClim, Price, Exchan);
+			TempUnit.AddTranche(TrName, TrancheISIN, ProRat, origOut, Curr, currOut, IntrTpe, coup, RefRt, PrevIPD, BasRt, IPDfrq, SettDate, accruedIntr, startingDeferred, /*RefRtVal,*/ OClim, IClim, Price, Exchan);
 		}
 	}
 	{//Base Rates Compilation

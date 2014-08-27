@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
 	}*/
 
 
-/*
+
 	Waterfall TempWtf, TempCallWaterfall;
 	QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/.BaseCase.clo");
 	file.open(QIODevice::ReadOnly);
@@ -75,13 +75,11 @@ int main(int argc, char *argv[]) {
 	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempCallWaterfall;
 	file.close();
-	ConstantBaseRateTable ResultingValues;
-	for (int i = 0; i < TempWtf.GetTranchesCount();i++) {
-		TempWtf.GetTranche(i)->GetBaseRatesDatabase(ResultingValues,true);
-	}*/
+	double TestDM = TempWtf.GetTranche(4)->GetDiscountMargin(100.0);
+	TempWtf.CalculateTranchesCashFlows();
 	
 
-	Tranche TempTrnch;
+	/*Tranche TempTrnch;
 	TempTrnch.SetSettlementDate(QDate(2014, 6, 1));
 	TempTrnch.SetOutstandingAmt(1000000.0);
 	TempTrnch.SetAccruedInterest(0.0);
@@ -96,7 +94,7 @@ int main(int argc, char *argv[]) {
 	TempTrnch.AddCashFlow(QDate(2020, 6, 1), 1000000.0, TrancheCashFlow::TrancheFlowType::PrincipalFlow);
 	double currentDM = TempTrnch.GetDiscountMargin(100.0);
 	double NewPrice = TempTrnch.GetPrice(currentDM - 1.0);
-	double NewDM = TempTrnch.GetDiscountMargin(NewPrice);
+	double NewDM = TempTrnch.GetDiscountMargin(NewPrice);*/
 
 	/*QApplication a(argc, argv);
 	StressTest SlowResult;

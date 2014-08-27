@@ -236,18 +236,32 @@ double Tranche::GetCoupon(const QDate& index, qint32 CoupIndex , int Frequency) 
 double Tranche::GetCoupon(int index, qint32 CoupIndex, int Frequency) const {
 	QDate CoupDate = CashFlow.GetDate(index);
 	if(CoupDate.isNull()) return 0.0;
-	return GetCoupon(CoupDate);
+	return GetCoupon(CoupDate, CoupIndex, Frequency);
 }
-double Tranche::GetRawCoupon(int index, qint32 CoupIndex) const {
+double Tranche::GetTotalCoupon(const QDate& index, int Frequency) const {
+	double Result = 0.0;
+	for (auto i = Coupon.constBegin(); i != Coupon.constEnd(); ++i) {
+		Result += GetCoupon(index, i.key(), Frequency);
+	}
+	return Result;
+}
+double Tranche::GetTotalCoupon(int index, int Frequency) const {
+	double Result = 0.0;
+	for (auto i = Coupon.constBegin(); i != Coupon.constEnd(); ++i) {
+		Result += GetCoupon(index, i.key(), Frequency);
+	}
+	return Result;
+}
+double Tranche::GetRawCoupon(int index, qint32 CoupIndex, int Frequency) const {
 	if (!Coupon.contains(CoupIndex)) return 0.0;
-	return Coupon.value(CoupIndex)->GetValue(index);
+	return Coupon.value(CoupIndex)->GetValue(index, Frequency);
 }
-double Tranche::GetRawCoupon(const QDate& index, qint32 CoupIndex) const {
+double Tranche::GetRawCoupon(const QDate& index, qint32 CoupIndex, int Frequency) const {
 	if (!Coupon.contains(CoupIndex)) return 0.0;
 	bool NullCoupAnch = Coupon.value(CoupIndex)->GetAnchorDate().isNull();
 	if (NullCoupAnch) Coupon.operator[](CoupIndex)->SetAnchorDate(LastPaymentDate);
 	if (Coupon.value(CoupIndex)->GetAnchorDate().isNull()) Coupon.operator[](CoupIndex)->SetAnchorDate(index);
-	double Result = Coupon.value(CoupIndex)->GetValue(index);
+	double Result = Coupon.value(CoupIndex)->GetValue(index, Frequency);
 	if (NullCoupAnch) Coupon.operator[](CoupIndex)->RemoveAnchorDate();
 	return Result;
 }
@@ -439,13 +453,17 @@ QDataStream& operator<<(QDataStream & stream, const Tranche& flows){
 	;
 	
 	stream << static_cast<qint32>(flows.InterestType.size());
-	for (QHash<qint32, Tranche::TrancheInterestType>::const_iterator i = flows.InterestType.constBegin(); i != flows.InterestType.constEnd(); ++i) stream << i.key() << static_cast<qint32>(i.value());
+	for (QHash<qint32, Tranche::TrancheInterestType>::const_iterator i = flows.InterestType.constBegin(); i != flows.InterestType.constEnd(); ++i) 
+		stream << i.key() << static_cast<qint32>(i.value());
 	stream << static_cast<qint32>(flows.Coupon.size());
-	for (QHash<qint32, BloombergVector*>::const_iterator i = flows.Coupon.constBegin(); i != flows.Coupon.constEnd(); ++i) stream << i.key() << *(i.value());
+	for (QHash<qint32, BloombergVector*>::const_iterator i = flows.Coupon.constBegin(); i != flows.Coupon.constEnd(); ++i) 
+		stream << i.key() << *(i.value());
 	stream << static_cast<qint32>(flows.ReferenceRate.size());
-	for (QHash<qint32, BaseRateVector*>::const_iterator i = flows.ReferenceRate.constBegin(); i != flows.ReferenceRate.constEnd(); ++i) stream << i.key() << *(i.value());
+	for (QHash<qint32, BaseRateVector*>::const_iterator i = flows.ReferenceRate.constBegin(); i != flows.ReferenceRate.constEnd(); ++i) 
+		stream << i.key() << *(i.value());
 	stream << static_cast<qint32>(flows.ReferenceRateValue.size());
-	for (QHash<qint32, BloombergVector*>::const_iterator i = flows.ReferenceRateValue.constBegin(); i != flows.ReferenceRateValue.constEnd(); ++i) stream << i.key() << *(i.value());
+	for (QHash<qint32, BloombergVector*>::const_iterator i = flows.ReferenceRateValue.constBegin(); i != flows.ReferenceRateValue.constEnd(); ++i) 
+		stream << i.key() << *(i.value());
 	return stream;
 }
 QDataStream& operator>>(QDataStream & stream, Tranche& flows){
@@ -469,6 +487,7 @@ QDataStream& Tranche::LoadOldVersion(QDataStream& stream){
 	stream >> LastPaymentDate;
 	stream >> DayCount;
 	stream >> ExchangeRate;
+	PaymentFrequency.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> PaymentFrequency;
 	stream >> SettlementDate;
 	stream >> AccruedInterest;
 	stream >> m_UseForwardCurve;
@@ -540,14 +559,32 @@ QString Tranche::GetCouponVector(qint32 CoupIndex ) const {
 	return "";
 }
 void Tranche::SetCoupon(const QString& a, qint32 CoupIndex ) {
+	if (CoupIndex<0 || CoupIndex>=(1 << MaximumInterestsTypes)) return;
 	if (Coupon.contains(CoupIndex)) 
 		(*(Coupon[CoupIndex])) = a;
 	else 
 		Coupon.insert(CoupIndex, new BloombergVector(a));
 }
 void Tranche::SetReferenceRate(const QString& a, qint32 CoupIndex ) {
+	if (CoupIndex<0 || CoupIndex >= (1 << MaximumInterestsTypes)) return;
+	if (BaseRateVector(a).IsEmpty()) return;
 	if (ReferenceRate.contains(CoupIndex))
 		(*(ReferenceRate[CoupIndex])) = a;
 	else
 		ReferenceRate.insert(CoupIndex, new BaseRateVector(a));
 }
+
+void Tranche::SetDefaultRefRate(const QString& a) {
+	if (BaseRateVector(a).IsEmpty()) return;
+	if (ReferenceRate.contains(-1))
+		(*(ReferenceRate[-1])) = a;
+	else
+		ReferenceRate.insert(-1, new BaseRateVector(a));
+}
+
+void Tranche::SetInterestType(TrancheInterestType a, qint32 CoupIndex ) {
+	if (CoupIndex<0 || CoupIndex >= (1 << MaximumInterestsTypes)) return;
+	InterestType[CoupIndex] = a;
+}
+
+

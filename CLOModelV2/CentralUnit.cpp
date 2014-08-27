@@ -63,27 +63,27 @@ void CentralUnit::AddTranche(const QString& Name,int ProRataGroup, double MinOC,
 #endif
 void CentralUnit::AddTranche(
 	const QString& Name
-	,const QString& ISIN
-	,int ProRataGroup
-	,double OrigAmnt
-	,const QString& Crncy
-	,double OutstandingAmt
-	,Tranche::TrancheInterestType IntrTyp
-	,const QString& Coupon
-	,const QString& RefRte
-	,const QDate& LastPayDte
-	,const QString& DefRefRte
-	,const QString& PayFreq
-	,const QDate& SettlementDate
-	,double AccruedInterest
-	,double StartingDeferredInterest
+	, const QString& ISIN
+	, int ProRataGroup
+	, double OrigAmnt
+	, const QString& Crncy
+	, double OutstandingAmt
+	, const QList<Tranche::TrancheInterestType>& IntrTyp
+	, const QList< QString>& Coupon
+	, const  QList< QString>& RefRte
+	, const QDate& LastPayDte
+	, const QString& DefRefRte
+	, const QString& PayFreq
+	, const QDate& SettlementDate
+	, double AccruedInterest
+	, double StartingDeferredInterest
 	//,const QString& RefRteValue
-	,double MinOC
-	,double MinIC
-	,double Price
-	,double FxRate
-	,const QString& BbgExt
-	,int DayCount
+	, double MinOC
+	, double MinIC
+	, double Price
+	, double FxRate
+	, const QString& BbgExt
+	, int DayCount
 ){
 	Tranche TempTrnch;
 	TempTrnch.SetTrancheName(Name);
@@ -92,9 +92,12 @@ void CentralUnit::AddTranche(
 	TempTrnch.SetOriginalAmount(OrigAmnt);
 	TempTrnch.SetCurrency(Crncy);
 	TempTrnch.SetOutstandingAmt(OutstandingAmt);
-	TempTrnch.SetInterestType(IntrTyp);
-	TempTrnch.SetCoupon(Coupon);
-	TempTrnch.SetReferenceRate(RefRte);
+	for (int i = 0; i < IntrTyp.size();i++)
+		TempTrnch.SetInterestType(IntrTyp.at(i), i);
+	for (int i = 0; i < Coupon.size(); i++)
+		TempTrnch.SetCoupon(Coupon.at(i), i);
+	for (int i = 0; i < RefRte.size(); i++)
+		TempTrnch.SetReferenceRate(RefRte.at(i), i);
 	TempTrnch.SetLastPaymentDate(LastPayDte);
 	TempTrnch.SetDefaultRefRate(DefRefRte);
 	TempTrnch.SetPaymentFrequency(PayFreq);

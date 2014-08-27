@@ -3,19 +3,21 @@
 #include "GenericCashFlow.h"
 #include <QList>
 #include <QDate>
+#define MaximumInterestsTypes 8
 class TrancheCashFlow : public GenericCashFlow {
 private:
 	double OutstandingAmt;
 	double StartingDeferredInterest;
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream);
+	
 public:
 	enum class TrancheFlowType : qint32{
-		InterestFlow= 1 << 8,
+		InterestFlow = 1 << MaximumInterestsTypes,
 		PrincipalFlow=1,
 		OCFlow=11,
 		ICFlow=12,
-		DeferredFlow=13
+		DeferredFlow = 1 << (MaximumInterestsTypes+1)
 	};
 	TrancheCashFlow(double ThrancheOutstanding=0.0);
 	TrancheCashFlow(const TrancheCashFlow& a);

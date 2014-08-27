@@ -34,6 +34,7 @@ void GenericCashFlow::AddFlow(const QDate& Dte, double Amt, qint32 FlowTpe) {
 
 void GenericCashFlow::AddFlow(const GenericCashFlow& a) {
 	for (QMap<QDate, QHash<qint32, double>* >::const_iterator i = a.m_CashFlows.constBegin(); i != a.m_CashFlows.constEnd(); i++) {
+		if (!m_CashFlows.contains(i.key())) m_CashFlows.insert(i.key(), new QHash<qint32, double>());
 		QHash<qint32, double>* const & TempHash = i.value();
 		for (QHash<qint32, double>::const_iterator j = TempHash->constBegin(); j != TempHash->constEnd(); j++) {
 			AddFlow(i.key(), j.value(), j.key());
@@ -223,9 +224,22 @@ QString GenericCashFlow::ToString() const {
 	}
 	return Result;
 }
-
-
-
-
-
 #endif
+GenericCashFlow GenericCashFlow::SingleFlow(qint32 FlowTpe) const {
+	GenericCashFlow Result;
+	Result.Aggregate(m_AggregationLevel);
+	if (m_Stocks.contains(FlowTpe)) Result.SetStock(FlowTpe);
+	for (QMap<QDate, QHash<qint32, double>* >::const_iterator MainIter = m_CashFlows.constBegin(); MainIter != m_CashFlows.constEnd(); ++MainIter) {
+		Result.AddFlow(MainIter.key(), MainIter.value()->value(FlowTpe, 0.0), FlowTpe);
+	}
+	return Result;
+}
+
+bool GenericCashFlow::HasFlowType(qint32 FlowTpe) const {
+	for (QMap<QDate, QHash<qint32, double>* >::const_iterator MainIter = m_CashFlows.constBegin(); MainIter != m_CashFlows.constEnd(); ++MainIter) {
+		if (MainIter.value()->contains(FlowTpe)) return true;
+	}
+	return false;
+}
+
+

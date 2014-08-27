@@ -41,7 +41,9 @@ public:
 	virtual void ReplaceDate(const QDate& OriginalDate, const QDate& NewDate);
 	virtual void Aggregate(CashFlowAggregation Freq);
 	virtual void SetStock(qint32 FlowTpe, bool IsStock = true);
-	virtual bool IsStock(qint32 FlowTpe) const { return false;/* m_Stocks.contains(FlowTpe);*/ }
+	virtual bool IsStock(qint32 FlowTpe) const {  m_Stocks.contains(FlowTpe); }
+	virtual GenericCashFlow SingleFlow(qint32 FlowTpe) const;
+	virtual bool HasFlowType(qint32 FlowTpe)const;
 #ifdef _DEBUG
 	virtual QString ToString() const;
 #endif // _DEBUG

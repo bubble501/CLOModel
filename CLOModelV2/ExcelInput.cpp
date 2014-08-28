@@ -48,7 +48,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		QString TrName, Curr, BasRt ,TrancheISIN,IPDfrq/*,RefRtVal*/;
 		QList<QString> RefRt, coup;
 		QList<Tranche::TrancheInterestType>IntrTpe;
-		int ProRat, TempSize;
+		int ProRat, TempSize, DayCnt;
 		double origOut,currOut,OClim,IClim,Price,Exchan,accruedIntr,startingDeferred/*,coup*/;
 		QDate PrevIPD,SettDate;
 		NumElements=pdFreq++->intVal;
@@ -81,8 +81,9 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			Exchan=pdFreq->dblVal;pdFreq++;
 			SettDate=QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd");pdFreq++;
 			accruedIntr=(pdFreq->dblVal)/100.0;pdFreq++;
+			DayCnt = pdFreq->intVal; pdFreq++;
 			startingDeferred = pdFreq->dblVal; pdFreq++;
-			TempUnit.AddTranche(TrName, TrancheISIN, ProRat, origOut, Curr, currOut, IntrTpe, coup, RefRt, PrevIPD, BasRt, IPDfrq, SettDate, accruedIntr, startingDeferred, /*RefRtVal,*/ OClim, IClim, Price, Exchan);
+			TempUnit.AddTranche(TrName, TrancheISIN, ProRat, origOut, Curr, currOut, IntrTpe, coup, RefRt, PrevIPD, BasRt, IPDfrq, SettDate, accruedIntr, startingDeferred, /*RefRtVal,*/ OClim, IClim, Price, Exchan, "Mtge", static_cast<DayCountConvention>(DayCnt));
 		}
 	}
 	{//Base Rates Compilation
@@ -223,7 +224,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 #endif
 			TempUnit.SetupReinvBond(Intr, CPR, CDR, LS, WAL, Frq, ReinvBondAnnuit, Pric, Delay, BaseVal, RecLag, Dlq, DlqLag);
 		}
-		TempUnit.SetPrincipalAvailable(pdFreq->dblVal);pdFreq++;
+		TempUnit.SetSchedPrincAvailable(pdFreq->dblVal);pdFreq++; //TODO starting Prepay
 		TempUnit.SetInterestAvailable(pdFreq->dblVal);pdFreq++;
 		TempUnit.SetPoolCutOff(QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd"));pdFreq++;
 		TempUnit.SetRunCall(pdFreq->boolVal);pdFreq++;

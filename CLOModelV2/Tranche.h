@@ -18,6 +18,7 @@ public:
 		FloatingInterest /*!< Floating Rate Coupon*/
 	};
 private:
+	DayCountConvention m_DayCount;
 	QString ISINcode;
 	QString TrancheName;
 	double OriginalAmt;
@@ -34,7 +35,6 @@ private:
 	double MinOClevel;
 	double MinIClevel;
 	QDate LastPaymentDate;
-	int DayCount;
 	double ExchangeRate;
 	IntegerVector PaymentFrequency;
 	QDate SettlementDate;
@@ -84,7 +84,6 @@ public:
 	double GetMinOClevel() const {return MinOClevel;}
 	double GetMinIClevel() const {return MinIClevel;}
 	const QDate& GetLastPaymentDate() const {return LastPaymentDate;}
-	int GetDayCount() const{return DayCount;}
 	QString GetDefaultRefRate() const { return GetReferenceRate(-1); }
 	double GetExchangeRate() const {return ExchangeRate;}
 	QString GetPaymentFrequency() const{return PaymentFrequency.GetVector();}
@@ -105,6 +104,8 @@ public:
 	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll=false)const;
 	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll=false)const;
 #endif
+	DayCountConvention GetDayCount() const { return m_DayCount; }
+	void SetDayCount(DayCountConvention val) { m_DayCount = val; }
 	void SetPrice(double a){if(a>0) Price=a;}
 	void SetBloombergExtension(const QString& a);
 	void SetProrataGroup(int a){if(a>0) ProrataGroup=a;}
@@ -112,7 +113,6 @@ public:
 	void SetMinOClevel(double a){if(a>0.0 || a==-1.0) MinOClevel=a;}
 	void SetMinIClevel(double a){if(a>0.0 || a==-1.0) MinIClevel=a;}
 	void SetLastPaymentDate(const QDate& a){LastPaymentDate=a;}
-	void SetDayCount(int a){DayCount=a;}
 	void SetDefaultRefRate(const QString& a);
 	void SetExchangeRate(double a);
 	void SetPaymentFrequency(const QString& a);

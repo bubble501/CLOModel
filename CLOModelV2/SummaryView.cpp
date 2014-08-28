@@ -217,9 +217,9 @@ void SummaryView::DisplayStructure(){
 		for (int i=0;i<Structure.GetTotalSeniorExpenses().Count();i++){
 			ColumnCount=0;
 			ExpensesTable->setItem(i,ColumnCount++,new QTableWidgetItem(Structure.GetTotalSeniorExpenses().GetDate(i).toString("MMM-yy")));
-			ExpensesTable->setItem(i,ColumnCount++,new QTableWidgetItem(Commarize(Structure.GetTotalSeniorExpenses().GetTotalFlow(i))));
-			ExpensesTable->setItem(i,ColumnCount++,new QTableWidgetItem(Commarize(Structure.GetTotalSeniorFees().GetTotalFlow(i))));
-			ExpensesTable->setItem(i,ColumnCount++,new QTableWidgetItem(Commarize(Structure.GetTotalJuniorFees().GetTotalFlow(i))));
+			ExpensesTable->setItem(i, ColumnCount++, new QTableWidgetItem(Commarize(Structure.GetTotalSeniorExpenses().GetFlow(i, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow)) + Structure.GetTotalSeniorExpenses().GetFlow(i, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow)))));
+			ExpensesTable->setItem(i, ColumnCount++, new QTableWidgetItem(Commarize(Structure.GetTotalSeniorFees().GetFlow(i, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow)) + Structure.GetTotalSeniorFees().GetFlow(i, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow)))));
+			ExpensesTable->setItem(i, ColumnCount++, new QTableWidgetItem(Commarize(Structure.GetTotalJuniorFees().GetFlow(i, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow)) + Structure.GetTotalJuniorFees().GetFlow(i, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow)))));
 			ExpensesTable->setItem(i,ColumnCount++,new QTableWidgetItem(Commarize(100.0*Structure.GetAnnualizedExcess(i),2)+'%'));
 			ExpensesTable->setItem(i,ColumnCount++,new QTableWidgetItem(Commarize(100.0*Structure.GetWACostOfCapital(i),2)+'%'));
 			for (int j = 0; j<NumRes; j++) {
@@ -234,8 +234,8 @@ void SummaryView::DisplayStructure(){
 	ReinvestmentsTable->setRowCount(Structure.GetReinvested().Count());
 	for (int i=0;i<Structure.GetReinvested().Count();i++){
 		ReinvestmentsTable->setItem(i,0,new QTableWidgetItem(Structure.GetReinvested().GetDate(i).toString("MMM-yy")));
-		ReinvestmentsTable->setItem(i,1,new QTableWidgetItem(Commarize(Structure.GetReinvested().GetInterest(i))));
-		ReinvestmentsTable->setItem(i,2,new QTableWidgetItem(Commarize(Structure.GetReinvested().GetPrincipal(i))));
+		ReinvestmentsTable->setItem(i,1,new QTableWidgetItem(Commarize(Structure.GetReinvested().GetFlow(i,static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow)))));
+		ReinvestmentsTable->setItem(i, 2, new QTableWidgetItem(Commarize(Structure.GetReinvested().GetFlow(i, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow)))));
 	}
 	StructureTable->setRowCount(0);
 	StructureTable->setRowCount(Structure.GetTranchesCount());

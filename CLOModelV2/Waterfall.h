@@ -10,6 +10,56 @@
 #include "BackwardCompatibilityInterface.h"
 #include "IntegerVector.h"
 #include "ReserveFund.h"
+struct PrincipalRecip {
+	double Scheduled;
+	double Prepay;
+	PrincipalRecip() :Scheduled(0.0), Prepay(0.0) {}
+	PrincipalRecip(const PrincipalRecip& a) :Scheduled(a.Scheduled), Prepay(a.Prepay) {}
+	PrincipalRecip& operator=(const PrincipalRecip& a) { Scheduled = a.Scheduled; Prepay = a.Prepay; return *this; }
+	PrincipalRecip& operator=(double a) { 
+		if (a == 0.0) {
+			Erase();
+			return *this;
+		}
+		double Temp;
+		if (Toatal() == 0.0 || operator<(0.0))
+			Temp = 0.5;
+		else
+			Temp = Scheduled / Toatal();
+
+		Scheduled = a*Temp;
+		Prepay = a*(1.0-Temp);
+		return *this;
+	}
+	PrincipalRecip operator-(double a) { PrincipalRecip Result(*this); Result -= a; return Result; }
+	PrincipalRecip& operator-=(double a) { 
+		if (a == 0.0) return *this;
+		double Temp; 
+		if (Toatal() == 0.0) 
+			Temp = 0.5; 
+		else 
+			Temp = Scheduled / Toatal();
+		Scheduled -= a*Temp;
+		Prepay -= a*(1.0 - Temp); 
+		if (Scheduled<0.0 && Prepay>0.0) {
+			Temp = -Scheduled;
+			Scheduled += qMin(Prepay, Temp);
+			Prepay = qMax(0.0, Prepay - Temp);
+		}
+		if (Prepay<0.0 && Scheduled>0.0) {
+			Temp = -Prepay;
+			Prepay += qMin(Scheduled, Temp);
+			Scheduled = qMax(0.0, Scheduled - Temp);
+		}
+		return *this;
+	}
+	PrincipalRecip& operator+=(double a) { return operator-=(-a); }
+	PrincipalRecip operator+(double a) { return operator-(-a); }
+	bool operator<(double a){return Scheduled<a || Prepay<a;}
+	
+	double Toatal() const { return Scheduled + Prepay; }
+	void Erase() { Scheduled = Prepay = 0.0; }
+};
 class Waterfall : public BackwardInterface{
 private:
 	QList<ReserveFund*> m_Reserves;
@@ -25,22 +75,22 @@ private:
 	MtgCashFlow m_MortgagesPayments; 
 	MtgCashFlow m_CalculatedMtgPayments;
 	IntegerVector m_PaymentFrequency;
-	TrancheCashFlow m_ExcessCashFlow; 
-	TrancheCashFlow m_TotalSeniorExpenses; 
-	TrancheCashFlow m_TotalSeniorFees; 
-	TrancheCashFlow m_TotalJuniorFees; 
+	GenericCashFlow m_ExcessCashFlow; 
+	GenericCashFlow m_TotalSeniorExpenses;
+	GenericCashFlow m_TotalSeniorFees;
+	GenericCashFlow m_TotalJuniorFees;
 	ReinvestmentTest m_ReinvestmentTest; 
 	double m_CCCTestLimit; 
 	BloombergVector m_CCCcurve; 
 	double m_CCChaircut; 
 	bool m_UseTurbo; 
-	double m_PrincipalAvailable; 
+	PrincipalRecip m_PrincipalAvailable;
 	double m_InterestAvailable; 
 	double m_JuniorFeesCoupon; 
-	TrancheCashFlow m_AnnualizedExcess; 
-	TrancheCashFlow m_EquityIncome;
+	GenericCashFlow m_AnnualizedExcess;
+	GenericCashFlow m_EquityIncome;
 	QDate m_FirstIPDdate;
-	TrancheCashFlow m_Reinvested; 
+	GenericCashFlow m_Reinvested;
 	QDate m_LastIPDdate; 
 	QDate m_CallDate; 
 	double m_PoolValueAtCall; 
@@ -75,7 +125,7 @@ public:
 	double GetCCCTestLimit() const {return m_CCCTestLimit;} 
 	double GetCCChaircut() const {return m_CCChaircut;} 
 	bool GetUseTurbo() const {return m_UseTurbo;} 
-	double GetPrincipalAvailable() const {return m_PrincipalAvailable;} 
+	double GetPrincipalAvailable() const {return m_PrincipalAvailable.Toatal();} 
 	double GetInterestAvailable() const {return m_InterestAvailable;} 
 	double GetJuniorFeesCoupon() const {return m_JuniorFeesCoupon;} 
 	double GetPoolValueAtCall() const {return m_PoolValueAtCall;} 
@@ -83,27 +133,27 @@ public:
 	double GetCallMultiple() const {return m_CallMultiple;} 
 	double GetCallReserve() const {return m_CallReserve;}
 	const MtgCashFlow& GetMortgagesPayments() const {return m_MortgagesPayments;}
-	const TrancheCashFlow& GetExcessCashFlow() const {return m_ExcessCashFlow;} 
-	const TrancheCashFlow& GetTotalSeniorExpenses() const {return m_TotalSeniorExpenses;} 
-	const TrancheCashFlow& GetTotalSeniorFees() const {return m_TotalSeniorFees;} 
-	const TrancheCashFlow& GetTotalJuniorFees() const {return m_TotalJuniorFees;} 
+	const GenericCashFlow& GetExcessCashFlow() const {return m_ExcessCashFlow;} 
+	const GenericCashFlow& GetTotalSeniorExpenses() const { return m_TotalSeniorExpenses; }
+	const GenericCashFlow& GetTotalSeniorFees() const { return m_TotalSeniorFees; }
+	const GenericCashFlow& GetTotalJuniorFees() const { return m_TotalJuniorFees; }
 	const ReinvestmentTest& GetReinvestmentTest() const {return m_ReinvestmentTest;}
 	MtgCashFlow& GetMortgagesPayments() {return m_MortgagesPayments;}
-	TrancheCashFlow& GetExcessCashFlow() {return m_ExcessCashFlow;} 
-	TrancheCashFlow& GetTotalSeniorExpenses() {return m_TotalSeniorExpenses;} 
-	TrancheCashFlow& GetTotalSeniorFees() {return m_TotalSeniorFees;} 
-	TrancheCashFlow& GetTotalJuniorFees() {return m_TotalJuniorFees;} 
+	GenericCashFlow& GetExcessCashFlow() { return m_ExcessCashFlow; }
+	GenericCashFlow& GetTotalSeniorExpenses() { return m_TotalSeniorExpenses; }
+	GenericCashFlow& GetTotalSeniorFees() { return m_TotalSeniorFees; }
+	GenericCashFlow& GetTotalJuniorFees() { return m_TotalJuniorFees; }
 	ReinvestmentTest& GetReinvestmentTest() {return m_ReinvestmentTest;}
 	QString GetCCCcurve() const {return m_CCCcurve.GetVector();}
-	const TrancheCashFlow& GetRawAnnualizedExcess() const {return m_AnnualizedExcess;}
-	TrancheCashFlow& GetRawAnnualizedExcess(){return m_AnnualizedExcess;}
+	const GenericCashFlow& GetRawAnnualizedExcess() const { return m_AnnualizedExcess; }
+	GenericCashFlow& GetRawAnnualizedExcess() { return m_AnnualizedExcess; }
 	double GetAnnualizedExcess(int index, bool AsShareOfLoans=false)const;
 	double GetEquityReturn(int index)const;
 	double GetCumulativeEquityReturn(int index)const;
 	double GetCallEquityRatio(int index)const;
 	const QDate& GetFirstIPDdate() const {return m_FirstIPDdate;}
-	const TrancheCashFlow& GetReinvested() const {return m_Reinvested;} 
-	TrancheCashFlow& GetReinvested() {return m_Reinvested;} 
+	const GenericCashFlow& GetReinvested() const { return m_Reinvested; }
+	GenericCashFlow& GetReinvested() { return m_Reinvested; }
 	const QDate& GetLastIPDdate() const {return m_LastIPDdate;} 
 	const QDate& GetCallDate() const {return m_CallDate;}
 	QDate GetCalledPeriod() const;
@@ -141,7 +191,8 @@ public:
 	void SetCCCTestLimit(double a){if(a>=0.0 && a<=1.0) m_CCCTestLimit=a;}
 	void SetCCChaircut(double a){if(a>=0.0 && a<=1.0) m_CCChaircut=a;}
 	void SetUseTurbo(bool a){m_UseTurbo=a;}
-	void SetPrincipalAvailable(double a){m_PrincipalAvailable=a;}
+	void SetSchedPrincAvailable(double a){m_PrincipalAvailable.Scheduled=a;}
+	void SetPrepPrincAvailable(double a) { m_PrincipalAvailable.Prepay = a; }
 	void SetInterestAvailable(double a){m_InterestAvailable=a;}
 	void SetJuniorFeesCoupon(double a){if(a>=0.0) m_JuniorFeesCoupon=a;}
 	void SetPoolValueAtCall(double a){if(a>=0.0) m_PoolValueAtCall=a;}

@@ -16,7 +16,7 @@ public:
 	CentralUnit(QObject* parent=0);
 	void AddLoan(const QDate& Maturity, double Size, const QString& Interest, const QString& Annuity, const QString& Freq = "1", const QString& floatBase = "ZERO", const QString& LossMult = "100", const QString& PrepayMult = "100", const QString& HaicutVect = "0");
 #ifndef NO_BLOOMBERG
-	void AddTranche(const QString& Name,int ProRataGroup, double MinOC=0.0, double MinIC=0.0, double Price=100.0,double FxRate= 1.0,const QString& BbgExt="Mtge", int DayCount=360);
+	void AddTranche(const QString& Name,int ProRataGroup, double MinOC=0.0, double MinIC=0.0, double Price=100.0,double FxRate= 1.0,const QString& BbgExt="Mtge");
 #endif
 	void AddTranche(
 		const QString& Name
@@ -40,7 +40,7 @@ public:
 		, double Price = 100.0
 		, double FxRate = 1.0
 		, const QString& BbgExt = "Mtge"
-		, int DayCount = 360
+		, DayCountConvention DayCount = DayCountConvention::ACT360
 	);
 	void AddWaterfallStep(WatFalPrior::WaterfallStepType Tpe, int GrpTgt, int RdmpGrp=0, double RdmpShare=0.0);
 	void SetSeniorExpenses(const QString& a){Structure.SetSeniorExpenses(a);}
@@ -53,7 +53,8 @@ public:
 	void SetCCCTestLimit(double a){Structure.SetCCCTestLimit(a);}
 	void SetCCChaircut(double a){Structure.SetCCChaircut(a);}
 	void SetUseTurbo(bool a){Structure.SetUseTurbo(a);}
-	void SetPrincipalAvailable(double a){Structure.SetPrincipalAvailable(a);}
+	void SetSchedPrincAvailable(double a) { Structure.SetSchedPrincAvailable(a); }
+	void SetPrepPrincAvailable(double a) { Structure.SetPrepPrincAvailable(a); }
 	void SetInterestAvailable(double a){Structure.SetInterestAvailable(a);}
 	void SetJuniorFeesCoupon(double a){Structure.SetJuniorFeesCoupon(a);}
 	void SetPoolValueAtCall(double a){Structure.SetPoolValueAtCall(a);}

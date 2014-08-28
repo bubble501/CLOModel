@@ -8,21 +8,32 @@ template<typename T> class QList;
 //#define SaveLoanTape
 int MonthDiff(const QDate& FutureDte,const QDate& PresentDte);
 class BloombergVector;
-/*
-bool ValidAnnuityVector(const QString& AnnVect);
-bool ValidBloombergVector(const QString& BloombergVector);
-QList<double> UnpackVect(QString Vect, int PaymFreq=1, bool AdjustFreq=true);
-QString ShiftBloombergVector(const QString& OriginalVect, int ByMonths);
-QList<QString> UnpackAnnuityVect(QString Vect);*/
+enum class DayCountConvention : short {
+	ACTACT = 101
+	, ACT360 = 102
+	, ACT365 = 103
+	, N30360 = 104
+	, NACTACT = 105
+	, NACT360 = 106
+	, NACT365 = 107
+	, ISMA30360 = 131
+	, ISDAACTACT = 201
+	, AFBACTACT = 202
+	, NISDAACTACT = 203
+	, NAFBACTACT = 204
+};
 double RoundUp(double a);
 template<class T> bool LessThanPoint(T* a,T* b){return (*a)<(*b);}
 QString Commarize(double num,unsigned int precision=0);
-double CalculateIRR(const QList<QDate>& Dte, const QList<double>& Flws, int Daycount=360, double Guess=0.05);
-double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, double Interest, int Daycount=360);
-double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, const BloombergVector& Interest, int Daycount=360);
-double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, const QString& Interest, int Daycount=360);
-double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, double BaseRate,int Daycount=360, double Guess=0.05);
-double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const BloombergVector& BaseRate,int Daycount=360, double Guess=0.05);
-double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const QString& BaseRate,int Daycount=360, double Guess=0.05);
-bool removeDir(const QString & dirName);
+double CalculateIRR(const QList<QDate>& Dte, const QList<double>& Flws, DayCountConvention Daycount = DayCountConvention::ACT360, double Guess = 0.05);
+double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, double Interest, DayCountConvention Daycount = DayCountConvention::ACT360);
+double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, const BloombergVector& Interest, DayCountConvention Daycount = DayCountConvention::ACT360);
+double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, const QString& Interest, DayCountConvention Daycount = DayCountConvention::ACT360);
+double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, double BaseRate, DayCountConvention Daycount = DayCountConvention::ACT360, double Guess = 0.05);
+double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const BloombergVector& BaseRate, DayCountConvention Daycount = DayCountConvention::ACT360, double Guess = 0.05);
+double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const QString& BaseRate, DayCountConvention Daycount = DayCountConvention::ACT360, double Guess = 0.05);
+double AdjustCoupon(double AnnualCoupon, QDate PrevIPD, QDate CurrIPD, DayCountConvention DayCount);
+bool IsHoliday(const QDate& a/*,const QString& CountryCode*/);
+bool removeDir(const QString& dirName);
+
 #endif // CommonFunctions_h__

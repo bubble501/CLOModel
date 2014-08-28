@@ -27,6 +27,7 @@ public:
 	virtual bool operator==(const GenericCashFlow& a) const;
 	virtual void AddFlow(const QDate& Dte, double Amt, qint32 FlowTpe);
 	virtual void AddFlow(const GenericCashFlow& a);
+	virtual void AddStack(const QDate& Dte, double Amt, qint32 FlowTpe);
 	virtual QDate GetDate(int index) const;
 	virtual double GetFlow(int index, qint32 FlowTpe) const;
 	virtual double GetFlow(const QDate& index, qint32 FlowTpe) const;
@@ -41,7 +42,7 @@ public:
 	virtual void ReplaceDate(const QDate& OriginalDate, const QDate& NewDate);
 	virtual void Aggregate(CashFlowAggregation Freq);
 	virtual void SetStock(qint32 FlowTpe, bool IsStock = true);
-	virtual bool IsStock(qint32 FlowTpe) const {  m_Stocks.contains(FlowTpe); }
+	virtual bool IsStock(qint32 FlowTpe) const {  return m_Stocks.contains(FlowTpe); }
 	virtual GenericCashFlow SingleFlow(qint32 FlowTpe) const;
 	virtual bool HasFlowType(qint32 FlowTpe)const;
 #ifdef _DEBUG

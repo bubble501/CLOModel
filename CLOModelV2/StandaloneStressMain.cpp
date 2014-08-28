@@ -75,7 +75,6 @@ int main(int argc, char *argv[]) {
 	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempCallWaterfall;
 	file.close();
-	double TestDM = TempWtf.GetTranche(4)->GetDiscountMargin(100.0);
 	TempWtf.CalculateTranchesCashFlows();
 	
 

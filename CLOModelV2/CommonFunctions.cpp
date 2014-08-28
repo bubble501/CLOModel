@@ -36,17 +36,17 @@ QString Commarize(double num,unsigned int precision){
 	return Commarized;
 }
 
-double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, double Interest, int Daycount){
+double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, double Interest, DayCountConvention Daycount){
 	if(Dte.size()!=Flws.size() || Dte.size()==0 || Dte.size()<2) return 0.0;
 	double Result=Flws.at(0);
 	double DiscountFactor=1.0;
 	for(int i=1;i<Dte.size();i++){
-		DiscountFactor*=qPow(1.0+Interest,static_cast<double>(Dte.at(i-1).daysTo(Dte.at(i)))/static_cast<double>(Daycount));
-		Result+=Flws.at(i)/DiscountFactor;//qPow(1.0+Interest,static_cast<double>(Dte.at(0).daysTo(Dte.at(i)))/static_cast<double>(Daycount));
+		DiscountFactor *= 1.0 + AdjustCoupon(Interest, Dte.at(i - 1), Dte.at(i), Daycount);
+		Result+=Flws.at(i)/DiscountFactor;
 	}
 	return Result;
 }
-double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, const BloombergVector& Interest, int Daycount){
+double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, const BloombergVector& Interest, DayCountConvention Daycount) {
 	if(Dte.size()!=Flws.size() || Dte.size()<2) return 0.0;
 	BloombergVector AdjInterest(Interest);
 	if(AdjInterest.GetAnchorDate().isNull()) AdjInterest.SetAnchorDate(Dte.at(1));
@@ -54,16 +54,15 @@ double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, const Bl
 	double DiscountFactor=1.0;
 	for(int i=1;i<Dte.size();i++){
 		if (Flws.at(i) == 0.0) continue;
-		//DiscountFactor*=qPow(1.0+AdjInterest.GetValue(Dte.at(i)),static_cast<double>(Dte.at(i-1).daysTo(Dte.at(i)))/static_cast<double>(Daycount));
-		DiscountFactor*=1.0+(AdjInterest.GetValue(Dte.at(i))*static_cast<double>(Dte.at(i-1).daysTo(Dte.at(i)))/static_cast<double>(Daycount));
+		DiscountFactor*=1.0+AdjustCoupon(AdjInterest.GetValue(Dte.at(i)),Dte.at(i-1),Dte.at(i),Daycount);
 		Result+=Flws.at(i)/DiscountFactor;
 	}
 	return Result;
 }
-double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, const QString& Interest, int Daycount){
+double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, const QString& Interest, DayCountConvention Daycount) {
 	return CalculateNPV(Dte,Flws,BloombergVector(Interest),Daycount);
 }
-double CalculateIRR(const QList<QDate>& Dte, const QList<double>& Flws, int Daycount, double Guess){
+double CalculateIRR(const QList<QDate>& Dte, const QList<double>& Flws, DayCountConvention Daycount, double Guess) {
 	if (Guess <= 0 || Guess > 10) Guess = 0.05;
 	boost::math::tools::eps_tolerance<double> tol(std::numeric_limits<double>::digits / 2);
 	boost::uintmax_t MaxIter(MaximumIRRIterations);
@@ -72,43 +71,12 @@ double CalculateIRR(const QList<QDate>& Dte, const QList<double>& Flws, int Dayc
 	, Guess, 2.0, false, tol, MaxIter);
 	if (MaxIter >= MaximumIRRIterations) return 0.0;
 	return (Result.first + Result.second) / 2.0;
-
-	/*unsigned int CurrentIterations=0;
-	double Result=Guess;
-	double PreviuousGuess=Guess+0.01;
-	double CurrentGuess=Guess;
-	double PreviousNPV=CalculateNPV(Dte,Flws,PreviuousGuess,Daycount);
-	double CurrentNPV=CalculateNPV(Dte,Flws,Result,Daycount);
-	unsigned int IterationWatch;
-	for (IterationWatch = 0; qAbs(CurrentNPV)>qPow(10.0, -static_cast<double>(precision)) && IterationWatch<MaximumIRRIterations; IterationWatch++)
-	//while(qAbs(CurrentNPV)>qPow(10.0,-static_cast<double>(precision)))
-	{
-		Result-=CurrentNPV*(Result-PreviuousGuess)/(CurrentNPV-PreviousNPV);
-		//if(Result<0.0 || Result>10.0) return 0.0;
-		PreviousNPV=CurrentNPV;
-		PreviuousGuess=CurrentGuess;
-		CurrentGuess=Result;
-		CurrentNPV=CalculateNPV(Dte,Flws,Result,Daycount);
-		if(++CurrentIterations>=MaximumIRRIterations) return 0.0;
-	}
-	if (IterationWatch == MaximumIRRIterations)
-		return 0.0;
-	return Result;*/
 }
-double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, double BaseRate,int Daycount, double Guess){
+double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, double BaseRate, DayCountConvention Daycount, double Guess) {
 	return CalculateDM(Dte, Flws, BloombergVector(QString("%1").arg(BaseRate)), Daycount, Guess);
-	/*double Yld = CalculateIRR(Dte,Flws,Daycount,Guess,precision);
-	double Freq=1.0;
-	if(Dte.size()>2){
-		Freq=(1.0/((static_cast<double>(Dte.at(1).daysTo(Dte.last())))/(static_cast<double>(Dte.size())-2.0)/365.0));
-		if(Freq-static_cast<double>(static_cast<int>(Freq))>=0.5) Freq=RoundUp(Freq);
-		else Freq=static_cast<double>(static_cast<int>(Freq));
-	}
-	double AdjYeld= (qPow(1.0+Yld,1.0/Freq)-1.0)*Freq;
-	return (AdjYeld-BaseRate)*10000.0;*/
 }
 
-double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const BloombergVector& BaseRate,int Daycount, double Guess){
+double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const BloombergVector& BaseRate, DayCountConvention Daycount, double Guess) {
 	if (Guess <= 0 || Guess>10) Guess = 0.05;
 	boost::math::tools::eps_tolerance<double> tol(std::numeric_limits<double>::digits / 2);
 	boost::uintmax_t MaxIter(MaximumIRRIterations);
@@ -117,31 +85,8 @@ double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const Blo
 	, Guess, 2.0, false, tol, MaxIter);
 	if (MaxIter >= MaximumIRRIterations) return 0.0;
 	return 10000.0*(Result.first + Result.second) / 2.0;
-
-
-
-	/*
-	double Result=Guess;
-	double PreviuousGuess=Guess+0.01;
-	double CurrentGuess=Guess;
-	double PreviousNPV=CalculateNPV(Dte,Flws,BaseRate+PreviuousGuess,Daycount);
-	double CurrentNPV=CalculateNPV(Dte,Flws,BaseRate+Result,Daycount);
-	unsigned int IterationWatch;
-	for (IterationWatch = 0; qAbs(CurrentNPV)>qPow(10.0, -static_cast<double>(precision)) && IterationWatch<MaximumIRRIterations; IterationWatch++)
-	//while(qAbs(CurrentNPV)>qPow(10.0,-static_cast<double>(precision)))
-	{
-		Result-=CurrentNPV*(Result-PreviuousGuess)/(CurrentNPV-PreviousNPV);
-		//if(Result<0.0 || Result>10.0) return 0.0;
-		PreviousNPV=CurrentNPV;
-		PreviuousGuess=CurrentGuess;
-		CurrentGuess=Result;
-		CurrentNPV=CalculateNPV(Dte,Flws,BaseRate+Result,Daycount);
-	}
-	if (IterationWatch == MaximumIRRIterations) 
-		return 0.0;
-	return Result*10000.0;*/
 }
-double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const QString& BaseRate,int Daycount, double Guess){
+double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const QString& BaseRate, DayCountConvention Daycount, double Guess) {
 	return CalculateDM(Dte,Flws,BloombergVector(BaseRate),Daycount,Guess);
 }
 bool removeDir(const QString & dirName)
@@ -165,4 +110,77 @@ bool removeDir(const QString & dirName)
 		result = dir.rmdir(dirName);
 	}
 	return result;
+}
+
+double AdjustCoupon(double AnnualCoupon, QDate PrevIPD, QDate CurrIPD, DayCountConvention DayCount) {
+	if (PrevIPD.isNull() || CurrIPD.isNull()) return AnnualCoupon;
+	if (AnnualCoupon == 0.0) return 0.0;
+	if (PrevIPD > CurrIPD) {
+		QDate Temp = PrevIPD;
+		PrevIPD = CurrIPD;
+		CurrIPD = Temp;
+	}
+	int Offset = 0;
+	switch (DayCount) {
+	case DayCountConvention::ISMA30360:
+		if (PrevIPD.day() == 31) PrevIPD.setDate(PrevIPD.year(), PrevIPD.month(), 30);
+		if (CurrIPD.day() == 31) CurrIPD.setDate(CurrIPD.year(), CurrIPD.month(), 30);
+		return AnnualCoupon * (
+			(360.0*static_cast<double>(CurrIPD.year() - PrevIPD.year())) +
+			(30.0*static_cast<double>(CurrIPD.month() - PrevIPD.month())) +
+			static_cast<double>(CurrIPD.day() - PrevIPD.day())
+			) / 360.0;
+	case DayCountConvention::N30360:
+		if (PrevIPD.day() == 31) PrevIPD.setDate(PrevIPD.year(), PrevIPD.month(), 30);
+		if (CurrIPD.day() == 31 && PrevIPD.day() == 30) CurrIPD.setDate(CurrIPD.year(), CurrIPD.month(), 30);
+		if (PrevIPD.day() == 29 && PrevIPD.month() == 2 && QDate::isLeapYear(PrevIPD.year())) Offset = 1;
+		if (PrevIPD.day() == 28 && PrevIPD.month() == 2 && !QDate::isLeapYear(PrevIPD.year())) Offset = 2;
+		return AnnualCoupon * (
+				(360.0*static_cast<double>(CurrIPD.year() - PrevIPD.year())) +
+				(30.0*static_cast<double>(CurrIPD.month() - PrevIPD.month())) +
+				static_cast<double>(CurrIPD.day() - PrevIPD.day() - Offset)
+			) /360.0;
+	case DayCountConvention::ISDAACTACT:
+		while (IsHoliday(CurrIPD)) CurrIPD = CurrIPD.addDays(1);
+		while (IsHoliday(PrevIPD)) PrevIPD = PrevIPD.addDays(1);
+	case DayCountConvention::NISDAACTACT:
+		if (QDate::isLeapYear(CurrIPD.year()) || QDate::isLeapYear(PrevIPD.year())) {
+			return AnnualCoupon * (
+				(static_cast<double>(PrevIPD.daysTo(QDate(PrevIPD.year(), 12, 31))) / static_cast<double>(PrevIPD.daysInYear()))
+				+ (static_cast<double>(QDate(CurrIPD.year(), 1, 1).daysTo(CurrIPD)) / static_cast<double>(CurrIPD.daysInYear()))
+			);
+		}
+		else return AdjustCoupon(AnnualCoupon, PrevIPD, CurrIPD, DayCountConvention::ACT365);
+	case DayCountConvention::ACT360:
+		while (IsHoliday(CurrIPD)) CurrIPD = CurrIPD.addDays(1);
+		while (IsHoliday(PrevIPD)) PrevIPD = PrevIPD.addDays(1);
+	case DayCountConvention::NACT360:
+		return AnnualCoupon * static_cast<double>(PrevIPD.daysTo(CurrIPD)) / 360.0;
+	case DayCountConvention::ACT365:
+		while (IsHoliday(CurrIPD)) CurrIPD = CurrIPD.addDays(1);
+		while (IsHoliday(PrevIPD)) PrevIPD = PrevIPD.addDays(1);
+	case DayCountConvention::NACT365:
+		return AnnualCoupon * static_cast<double>(PrevIPD.daysTo(CurrIPD)) / 365.0;
+	case DayCountConvention::AFBACTACT:
+		while (IsHoliday(CurrIPD)) CurrIPD = CurrIPD.addDays(1);
+		while (IsHoliday(PrevIPD)) PrevIPD = PrevIPD.addDays(1);
+	case DayCountConvention::NAFBACTACT:
+		for (QDate TempDate = PrevIPD; TempDate <= CurrIPD; TempDate = TempDate.addYears(1)) {
+			if (QDate(TempDate.year(), 2, 29).isValid()) {
+				if(QDate(TempDate.year(), 2, 29) >= PrevIPD && QDate(TempDate.year(), 2, 29) <= CurrIPD)
+					return AnnualCoupon * static_cast<double>(PrevIPD.daysTo(CurrIPD)) / 366.0;
+			}
+		}
+		return AnnualCoupon * static_cast<double>(PrevIPD.daysTo(CurrIPD)) / 365.0;
+	case DayCountConvention::ACTACT:
+		while (IsHoliday(CurrIPD)) CurrIPD = CurrIPD.addDays(1);
+		while (IsHoliday(PrevIPD)) PrevIPD = PrevIPD.addDays(1);
+	case DayCountConvention::NACTACT:
+		return AnnualCoupon * static_cast<double>(PrevIPD.daysTo(CurrIPD)) / CurrIPD.daysInYear();
+	default:
+		return AnnualCoupon;
+	}
+}
+bool IsHoliday(const QDate& a/*, const QString& CountryCode*/) {
+	return a.dayOfWeek() >= 6;
 }

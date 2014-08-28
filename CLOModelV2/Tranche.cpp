@@ -4,7 +4,7 @@
 #include <boost/math/tools/roots.hpp>
 Tranche::Tranche()
 	: LastPaymentDate(2000, 1, 1)
-	, DayCount(360)
+	, m_DayCount(DayCountConvention::ACT360)
 	, Currency("GBP")
 	, Price(100)
 	, BloombergExtension("Mtge")
@@ -41,7 +41,7 @@ void Tranche::ClearInterest() {
 }
 Tranche::Tranche(const Tranche& a)
 	: LastPaymentDate(a.LastPaymentDate)
-	, DayCount(a.DayCount)
+	, m_DayCount(a.m_DayCount)
 	, Currency(a.Currency)
 	, Price(a.Price)
 	, BloombergExtension(a.BloombergExtension)
@@ -70,7 +70,7 @@ Tranche::Tranche(const Tranche& a)
 }
 Tranche& Tranche::operator=(const Tranche& a){
 	LastPaymentDate=a.LastPaymentDate;
-	DayCount=a.DayCount;
+	m_DayCount = a.m_DayCount;
 	Currency=a.Currency;
 	Price=a.Price;
 	BloombergExtension=a.BloombergExtension;
@@ -289,6 +289,7 @@ void Tranche::GetDataFromBloomberg(){
 	TempReq.AddRequest(11, IdentityCode, "SETTLE_DT", QBloombergLib::QBbgRequest::String2YellowKey(BloombergExtension));
 	TempReq.AddRequest(12, IdentityCode, "NAME", QBloombergLib::QBbgRequest::String2YellowKey(BloombergExtension));
 	TempReq.AddRequest(13, IdentityCode, "ID_ISIN", QBloombergLib::QBbgRequest::String2YellowKey(BloombergExtension));
+	TempReq.AddRequest(14, IdentityCode, "DAY_CNT", QBloombergLib::QBbgRequest::String2YellowKey(BloombergExtension));
 
 
 	Bee.StartRequestSync(TempReq);
@@ -353,6 +354,9 @@ void Tranche::GetDataFromBloomberg(){
 	if (Bee.GetResult(13)->HasErrors()) ISINcode = "";
 	else ISINcode = Bee.GetResult(13)->GetString();
 
+	if (Bee.GetResult(14)->HasErrors()) m_DayCount = DayCountConvention::ACT360;
+	else m_DayCount = static_cast<DayCountConvention>(static_cast<int>(Bee.GetResult(14)->GetDouble()));
+
 	DownloadBaseRates();
 }
 #endif
@@ -388,7 +392,7 @@ double Tranche::GetDiscountMargin(double NewPrice)const{
 		ApplicableRate = ReferenceRateValue.value(0, ReferenceRateValue.value(-1, NULL));
 		if (ApplicableRate->IsEmpty()) return 0.0;
 	}
-	return qMax(0.0, CalculateDM(FlowsDates, FlowsValues, *ApplicableRate, DayCount));
+	return qMax(0.0, CalculateDM(FlowsDates, FlowsValues, *ApplicableRate, m_DayCount));
 }
 double Tranche::GetIRR() const {return GetIRR(Price);}
 double Tranche::GetIRR(double NewPrice)const{
@@ -401,7 +405,7 @@ double Tranche::GetIRR(double NewPrice)const{
 		FlowsDates.append(CashFlow.GetDate(i));
 		FlowsValues.append(CashFlow.GetTotalFlow(i));
 	}
-	return qMax(0.0,CalculateIRR(FlowsDates,FlowsValues,DayCount));
+	return qMax(0.0,CalculateIRR(FlowsDates,FlowsValues,m_DayCount));
 }
 bool Tranche::operator>(const Tranche& a) const {
 	return ProrataGroup>a.ProrataGroup;
@@ -444,7 +448,7 @@ QDataStream& operator<<(QDataStream & stream, const Tranche& flows){
 		<< flows.MinOClevel
 		<< flows.MinIClevel
 		<< flows.LastPaymentDate
-		<< flows.DayCount
+		<< static_cast<qint16>(flows.m_DayCount)
 		<< flows.ExchangeRate
 		<< flows.PaymentFrequency
 		<< flows.SettlementDate
@@ -470,7 +474,8 @@ QDataStream& operator>>(QDataStream & stream, Tranche& flows){
 	return flows.LoadOldVersion(stream);
 }
 QDataStream& Tranche::LoadOldVersion(QDataStream& stream){
-	qint32 TempSize,TempInt,TempKey;
+	qint32 TempSize, TempInt, TempKey;
+	qint16 TempShort;
 	BloombergVector* TempBV;
 	BaseRateVector* TempBRV;
 	stream >> TrancheName;
@@ -485,7 +490,8 @@ QDataStream& Tranche::LoadOldVersion(QDataStream& stream){
 	stream >> MinOClevel;
 	stream >> MinIClevel;
 	stream >> LastPaymentDate;
-	stream >> DayCount;
+	stream >> TempShort;
+	m_DayCount = static_cast<DayCountConvention>(TempShort);
 	stream >> ExchangeRate;
 	PaymentFrequency.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> PaymentFrequency;
 	stream >> SettlementDate;

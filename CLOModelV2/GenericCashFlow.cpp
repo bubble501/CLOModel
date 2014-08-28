@@ -32,6 +32,30 @@ void GenericCashFlow::AddFlow(const QDate& Dte, double Amt, qint32 FlowTpe) {
 	}
 }
 
+void GenericCashFlow::AddStack(const QDate& Dte, double Amt, qint32 FlowTpe) {
+	if (Dte.isNull()) return;
+	QMap<QDate, QHash<qint32, double>* >::iterator index = m_CashFlows.begin();
+	for (; index != m_CashFlows.end(); ++index) {
+		if (SamePeriod(Dte, index.key(), m_AggregationLevel)) break;
+	}
+	if (index != m_CashFlows.end()) {
+		if (qAbs(Amt) < 0.01) return;
+		if (index.value()->contains(FlowTpe)) {
+			if (IsStock(FlowTpe))
+				index.value()->operator[](FlowTpe) = Amt;
+			else
+				index.value()->operator[](FlowTpe) += Amt;
+		}
+		else
+			index.value()->insert(FlowTpe, Amt);
+	}
+	else {
+		m_CashFlows.insert(Dte, new QHash<qint32, double>());
+		if (qAbs(Amt) >= 0.01) m_CashFlows[Dte]->insert(FlowTpe, Amt);
+	}
+}
+
+
 void GenericCashFlow::AddFlow(const GenericCashFlow& a) {
 	for (QMap<QDate, QHash<qint32, double>* >::const_iterator i = a.m_CashFlows.constBegin(); i != a.m_CashFlows.constEnd(); i++) {
 		if (!m_CashFlows.contains(i.key())) m_CashFlows.insert(i.key(), new QHash<qint32, double>());
@@ -241,5 +265,4 @@ bool GenericCashFlow::HasFlowType(qint32 FlowTpe) const {
 	}
 	return false;
 }
-
 

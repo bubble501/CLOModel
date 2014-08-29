@@ -1,16 +1,22 @@
 #include "GenericCashFlow.h"
 #include <QDataStream>
-GenericCashFlow::GenericCashFlow() : m_AggregationLevel(NoAggregation) {}
+GenericCashFlow::GenericCashFlow() 
+	: m_AggregationLevel(NoAggregation)
+	, m_AdjustHolidays(false)
+{}
 GenericCashFlow::GenericCashFlow(const GenericCashFlow& a)
-	: m_AggregationLevel(a.m_AggregationLevel) {
+	: m_AggregationLevel(a.m_AggregationLevel) 
+	, m_AdjustHolidays(a.m_AdjustHolidays)
+{
 	AddFlow(a);
 }
 
 GenericCashFlow::~GenericCashFlow() {
 	Clear();
 }
-void GenericCashFlow::AddFlow(const QDate& Dte, double Amt, qint32 FlowTpe) {
+void GenericCashFlow::AddFlow(QDate Dte, double Amt, qint32 FlowTpe) {
 	if (Dte.isNull()) return;
+	if (m_AdjustHolidays) { while (IsHoliday(Dte)) Dte=Dte.addDays(1); }
 	QMap<QDate, QHash<qint32, double>* >::iterator index = m_CashFlows.begin();
 	for (; index != m_CashFlows.end(); ++index) {
 		if (SamePeriod(Dte, index.key(), m_AggregationLevel)) break;
@@ -32,8 +38,9 @@ void GenericCashFlow::AddFlow(const QDate& Dte, double Amt, qint32 FlowTpe) {
 	}
 }
 
-void GenericCashFlow::AddStack(const QDate& Dte, double Amt, qint32 FlowTpe) {
+void GenericCashFlow::AddStock(QDate Dte, double Amt, qint32 FlowTpe) {
 	if (Dte.isNull()) return;
+	if (m_AdjustHolidays) { while (IsHoliday(Dte)) Dte = Dte.addDays(1); }
 	QMap<QDate, QHash<qint32, double>* >::iterator index = m_CashFlows.begin();
 	for (; index != m_CashFlows.end(); ++index) {
 		if (SamePeriod(Dte, index.key(), m_AggregationLevel)) break;
@@ -173,7 +180,7 @@ bool GenericCashFlow::SamePeriod(const QDate& a, const QDate& b, CashFlowAggrega
 	}
 }
 QDataStream& operator<<(QDataStream & stream, const GenericCashFlow& flows) {
-	stream << quint32(flows.m_CashFlows.size());
+	stream << flows.m_AdjustHolidays << static_cast<qint32>(flows.m_AggregationLevel) << static_cast<qint32>(flows.m_CashFlows.size());
 	for (QMap<QDate, QHash<qint32, double>* >::const_iterator MainIter = flows.m_CashFlows.constBegin(); MainIter != flows.m_CashFlows.constEnd(); ++MainIter) {
 		const QHash<qint32, double>* TempMain = MainIter.value();
 		stream << MainIter.key() << (*TempMain);
@@ -185,6 +192,8 @@ QDataStream& GenericCashFlow::LoadOldVersion(QDataStream& stream) {
 	quint32 TempSize;
 	QDate TempDate;
 	QHash<qint32, double> TempMain;
+	stream >> m_AdjustHolidays >> TempSize;
+	m_AggregationLevel = static_cast<CashFlowAggregation>(TempSize);
 	stream >> TempSize;
 	for (quint32 i = 0; i < TempSize; i++) {
 		stream >> TempDate >> TempMain;
@@ -264,5 +273,23 @@ bool GenericCashFlow::HasFlowType(qint32 FlowTpe) const {
 		if (MainIter.value()->contains(FlowTpe)) return true;
 	}
 	return false;
+}
+
+QList<qint32> GenericCashFlow::AvailableFlows(const QDate& a) const {
+	QMap<QDate, QHash<qint32, double>*	>::const_iterator TempIter = m_CashFlows.find(a);
+	if (TempIter == m_CashFlows.constEnd()) return QList<qint32>();
+	return TempIter.value()->keys();
+}
+
+void GenericCashFlow::SetAdjustHolidays(bool val) {
+	m_AdjustHolidays = val;
+	if (m_AdjustHolidays) {
+		for (QMap<QDate, QHash<qint32, double>* >::iterator i = m_CashFlows.begin(); i != m_CashFlows.end(); ++i) {
+			while (IsHoliday(i.key())) {
+				m_CashFlows.insert(i.key().addDays(1), i.value());
+				i = m_CashFlows.erase(i);
+			}
+		}
+	}
 }
 

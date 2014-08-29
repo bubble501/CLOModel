@@ -42,7 +42,7 @@ public:
 	virtual TrancheCashFlow& operator=(const TrancheCashFlow& a);
 	double GetPreviousDeferred(const QDate& CurrentDate);
 	double GetPreviousOutstanding(const QDate& CurrentDate);
-	QDate GetLastFlowDate(bool IncludeDeferred = false) const { return GetDate(GetLastFlowIndex(IncludeDeferred)); }
+	QDate GetLastFlowDate(bool IncludeDeferred = false) const;
 	int GetLastFlowIndex(bool IncludeDeferred = false) const;
 	const double& GetStartingDeferredInterest() const { return StartingDeferredInterest; }
 	void SetStartingDeferredInterest(const double& val) { StartingDeferredInterest = val; }

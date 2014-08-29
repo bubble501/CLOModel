@@ -702,7 +702,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						m_TotalJuniorFees.AddFlow(CurrentDate, qMin(AvailableInterest, TotalPayable), static_cast<double>(TrancheCashFlow::TrancheFlowType::InterestFlow));
 						m_AnnualizedExcess.AddFlow(CurrentDate, qMin(AvailableInterest, TotalPayable), static_cast<double>(TrancheCashFlow::TrancheFlowType::InterestFlow));
 						if(AvailableInterest<TotalPayable){
-							m_TotalJuniorFees.AddStack(CurrentDate, TotalPayable - AvailableInterest, static_cast<double>(TrancheCashFlow::TrancheFlowType::DeferredFlow));
+							m_TotalJuniorFees.AddStock(CurrentDate, TotalPayable - AvailableInterest, static_cast<double>(TrancheCashFlow::TrancheFlowType::DeferredFlow));
 						}
 						AvailableInterest=qMax(0.0,AvailableInterest-TotalPayable);
 					}
@@ -710,7 +710,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						m_TotalJuniorFees.AddFlow(CurrentDate, qMin(AvailablePrincipal.Toatal(), TotalPayable), static_cast<double>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
 						m_AnnualizedExcess.AddFlow(CurrentDate, qMin(AvailablePrincipal.Toatal(), TotalPayable), static_cast<double>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
 						if(AvailablePrincipal.Toatal()<TotalPayable){
-							m_TotalJuniorFees.AddStack(CurrentDate, TotalPayable - AvailablePrincipal.Toatal(), static_cast<double>(TrancheCashFlow::TrancheFlowType::DeferredFlow));
+							m_TotalJuniorFees.AddStock(CurrentDate, TotalPayable - AvailablePrincipal.Toatal(), static_cast<double>(TrancheCashFlow::TrancheFlowType::DeferredFlow));
 						}
 						AvailablePrincipal -= TotalPayable;
 						if (AvailablePrincipal < 0.0) AvailablePrincipal.Erase();
@@ -756,14 +756,14 @@ bool Waterfall::CalculateTranchesCashFlows(){
 							if(TotalPayable>=0.01){
 								if(SingleStep->GetRedemptionGroup()==1){
 									m_Reserves[SingleStep->GetGroupTarget() - 1]->GetReserveFundFlow().AddFlow(CurrentDate,qMin(AvailableInterest,TotalPayable),ReserveFund::ReplenishFromInterest);
-									m_Reserves[SingleStep->GetGroupTarget() - 1]->GetReserveFundFlow().AddStack(CurrentDate, qMax(0.0, TotalPayable - AvailableInterest), ReserveFund::ShortFall);
+									m_Reserves[SingleStep->GetGroupTarget() - 1]->GetReserveFundFlow().AddStock(CurrentDate, qMax(0.0, TotalPayable - AvailableInterest), ReserveFund::ShortFall);
 									m_Reserves[SingleStep->GetGroupTarget() - 1]->SetReserveFundCurrent(m_Reserves.at(SingleStep->GetGroupTarget() - 1)->GetReserveFundCurrent() + qMin(AvailableInterest, TotalPayable));
 									AvailableInterest=qMax(0.0,AvailableInterest-TotalPayable);
 								}
 								else if(SingleStep->GetRedemptionGroup()==2){
 
 									m_Reserves[SingleStep->GetGroupTarget() - 1]->GetReserveFundFlow().AddFlow(CurrentDate, qMin(AvailablePrincipal.Toatal(), TotalPayable), ReserveFund::ReplenishFromPrincipal);
-									m_Reserves[SingleStep->GetGroupTarget() - 1]->GetReserveFundFlow().AddStack(CurrentDate, qMax(0.0, TotalPayable - AvailablePrincipal.Toatal()), ReserveFund::ShortFall);
+									m_Reserves[SingleStep->GetGroupTarget() - 1]->GetReserveFundFlow().AddStock(CurrentDate, qMax(0.0, TotalPayable - AvailablePrincipal.Toatal()), ReserveFund::ShortFall);
 									m_Reserves[SingleStep->GetGroupTarget() - 1]->SetReserveFundCurrent(m_Reserves.at(SingleStep->GetGroupTarget() - 1)->GetReserveFundCurrent() + qMin(AvailablePrincipal.Toatal(), TotalPayable));
 									AvailablePrincipal -= TotalPayable;
 									if (AvailablePrincipal < 0.0) AvailablePrincipal.Erase();

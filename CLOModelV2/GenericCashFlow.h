@@ -25,9 +25,9 @@ public:
 	virtual GenericCashFlow& operator+=(const GenericCashFlow& a) { AddFlow(a); return *this; }
 	virtual GenericCashFlow operator+(const GenericCashFlow& a) const;
 	virtual bool operator==(const GenericCashFlow& a) const;
-	virtual void AddFlow(const QDate& Dte, double Amt, qint32 FlowTpe);
+	virtual void AddFlow(QDate Dte, double Amt, qint32 FlowTpe);
 	virtual void AddFlow(const GenericCashFlow& a);
-	virtual void AddStack(const QDate& Dte, double Amt, qint32 FlowTpe);
+	virtual void AddStock(QDate Dte, double Amt, qint32 FlowTpe);
 	virtual QDate GetDate(int index) const;
 	virtual double GetFlow(int index, qint32 FlowTpe) const;
 	virtual double GetFlow(const QDate& index, qint32 FlowTpe) const;
@@ -45,6 +45,9 @@ public:
 	virtual bool IsStock(qint32 FlowTpe) const {  return m_Stocks.contains(FlowTpe); }
 	virtual GenericCashFlow SingleFlow(qint32 FlowTpe) const;
 	virtual bool HasFlowType(qint32 FlowTpe)const;
+	virtual QList<qint32> AvailableFlows(const QDate& a) const;
+	virtual bool GetAdjustHolidays() const { return m_AdjustHolidays; }
+	virtual void SetAdjustHolidays(bool val);
 #ifdef _DEBUG
 	virtual QString ToString() const;
 #endif // _DEBUG
@@ -54,6 +57,7 @@ protected:
 	QMap<QDate, QHash<qint32, double>*	> m_CashFlows;
 	QSet<qint32> m_Stocks;
 	CashFlowAggregation m_AggregationLevel;
+	bool m_AdjustHolidays;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream);
 	friend QDataStream& operator<<(QDataStream & stream, const GenericCashFlow& flows);
 	friend QDataStream& operator>>(QDataStream & stream, GenericCashFlow& flows);

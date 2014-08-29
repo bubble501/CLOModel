@@ -54,15 +54,30 @@ QDataStream& TrancheCashFlow::LoadOldVersion(QDataStream& stream) {
 		;
 	return GenericCashFlow::LoadOldVersion(stream);
 }
-int TrancheCashFlow::GetLastFlowIndex(bool IncludeDeferred) const {
-	for (int i = Count() - 1; i >= 0; i--) {
-		if (
-			GetFlow(i, static_cast<qint32>(TrancheFlowType::InterestFlow)) >= 0.01
-			|| GetFlow(i, static_cast<qint32>(TrancheFlowType::PrincipalFlow)) >= 0.01
-			|| (IncludeDeferred && GetFlow(i, static_cast<qint32>(TrancheFlowType::DeferredFlow)) > 0.01)
-			) return i;
+
+QDate TrancheCashFlow::GetLastFlowDate(bool IncludeDeferred ) const {
+	for (QMap<QDate, QHash<qint32, double>* >::const_iterator i = m_CashFlows.constEnd() - 1; true; --i) {
+		for (QHash<qint32, double>::const_iterator j = i.value()->constBegin(); j != i.value()->constEnd(); ++j) {
+			if ((
+				(j.key() & static_cast<qint32>(TrancheFlowType::InterestFlow)) 
+				|| (j.key() == static_cast<qint32>(TrancheFlowType::PrincipalFlow))
+				|| ((j.key() & static_cast<qint32>(TrancheFlowType::DeferredFlow)) && IncludeDeferred)
+			) && j.value() >= 0.01) return i.key();
+
+		}
+		if (i == m_CashFlows.constBegin()) break;
 	}
-	return -1;
+	return QDate();
+}
+
+int TrancheCashFlow::GetLastFlowIndex(bool IncludeDeferred) const {
+	QDate Target = GetLastFlowDate(IncludeDeferred);
+	if (!Target.isValid()) return -1;
+	int Counter = 0;
+	for (QMap<QDate, QHash<qint32, double>* >::const_iterator i = m_CashFlows.constBegin(); i != m_CashFlows.constEnd(); ++i) {
+		if (i.key() == Target) return Counter;
+		++Counter;
+	}
 }
 
 TrancheCashFlow& TrancheCashFlow::operator=(const TrancheCashFlow& a) {

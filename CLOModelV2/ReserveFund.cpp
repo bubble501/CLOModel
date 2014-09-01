@@ -5,6 +5,7 @@ m_ReserveFundFreed(0),
 m_StartingReserve(0.0),
 m_ReserveToInterest(true)
 {
+	m_ReserveFundFlows.Aggregate(GenericCashFlow::Monthly);
 	for (int i = 0; i < ReserveFund::EnumEnd; i++) {
 		m_ReserveVects[i].SetVector("0");
 		m_ReserveVects[i].SetDivisor(1.0);

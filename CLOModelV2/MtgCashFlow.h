@@ -59,7 +59,8 @@ public:
 	double GetDefaults(const QDate& index) const { return GenericCashFlow::GetFlow(index, PrincipalDefault); }
 	double GetRecoveries(const QDate& index) const { return GenericCashFlow::GetFlow(index, PrincipalRecovered); }
 	double GetInterestRecoveries(const QDate& index) const { return GenericCashFlow::GetFlow(index, InterestRecovered); }
-	
+	virtual double GetTotalFlow(int index)const override;
+	virtual double GetTotalFlow(const QDate& a)const override;
 
 
 

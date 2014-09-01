@@ -74,7 +74,6 @@ void CentralUnit::AddTranche(
 	, const QString& DefRefRte
 	, const QString& PayFreq
 	, const QDate& SettlementDate
-	, double AccruedInterest
 	, double StartingDeferredInterest
 	//,const QString& RefRteValue
 	, double MinOC
@@ -101,7 +100,6 @@ void CentralUnit::AddTranche(
 	TempTrnch.SetDefaultRefRate(DefRefRte);
 	TempTrnch.SetPaymentFrequency(PayFreq);
 	TempTrnch.SetSettlementDate(SettlementDate);
-	TempTrnch.SetAccruedInterest(AccruedInterest);
 	//TempTrnch.SetReferenceRateValue(RefRteValue);
 	TempTrnch.SetMinIClevel(MinIC);
 	TempTrnch.SetMinOClevel(MinOC);
@@ -207,7 +205,11 @@ void CentralUnit::CalculationStep2(){
 		CallStructure.ResetMtgFlows();
 		CallStructure.ResetTranches();
 		CallStructure.ResetSteps();
-		Structure.CalculateTranchesCashFlows();
+		if (!Structure.CalculateTranchesCashFlows()) {
+			QMessageBox::critical(0, "Error", "Critical error in waterfall calculation");
+			QApplication::quit();
+			return;
+		}
 		CheckCalculationDone();
 	}
 	else{
@@ -237,6 +239,11 @@ void CentralUnit::CheckCalculationDone()
 	if(RunCall){
 		Structure=*(ParallWatFalls->GetWaterfalls().at(0));
 		CallStructure=*(ParallWatFalls->GetWaterfalls().at(1));
+		if(Structure.GetTranchesCount()==0 || CallStructure.GetTranchesCount()==0){
+			QMessageBox::critical(0, "Error", "Critical error in waterfall calculation");
+			QApplication::quit();
+			return;
+		}
 	}
 	#ifdef SaveLoanTape
 	{

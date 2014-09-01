@@ -6,7 +6,9 @@ WaterfallCalcThread::WaterfallCalcThread(int ID, QObject* parent/* =0 */)
 	connect(this,SIGNAL(finished()),this,SLOT(deleteLater()));
 }
 void WaterfallCalcThread::run(){
-	LocalFall.CalculateTranchesCashFlows();
-	emit Calculated(Identifier,LocalFall);
+	if(LocalFall.CalculateTranchesCashFlows())
+		emit Calculated(Identifier,LocalFall);
+	else
+		emit Calculated(Identifier, Waterfall());
 	exec();
 }

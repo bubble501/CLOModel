@@ -38,7 +38,6 @@ private:
 	double ExchangeRate;
 	IntegerVector PaymentFrequency;
 	QDate SettlementDate;
-	double AccruedInterest;
 	mutable bool m_UseForwardCurve;
 #ifndef NO_BLOOMBERG
 	void GetRefRateValueFromBloomberg() const;
@@ -131,9 +130,7 @@ public:
 	double GetIRR(double NewPrice) const;
 	double GetCurrentOutstanding() const;
 	double GetWALife(const QDate& StartDate) const;
-	double GetAccruedInterest() const{return AccruedInterest;}
 	const QDate& GetSettlementDate() const{return SettlementDate;}
-	void SetAccruedInterest(double a) {if(a>=0.0) AccruedInterest=a;}
 	void SetSettlementDate(const QDate& a){SettlementDate=a;}
 	friend QDataStream& operator<<(QDataStream & stream, const Tranche& flows);
 	friend QDataStream& operator>>(QDataStream & stream, Tranche& flows);

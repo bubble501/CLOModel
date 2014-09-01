@@ -36,4 +36,8 @@ double AdjustCoupon(double AnnualCoupon, QDate PrevIPD, QDate CurrIPD, DayCountC
 bool IsHoliday(const QDate& a/*,const QString& CountryCode*/);
 bool removeDir(const QString& dirName);
 
+void PrintToTempFile(const QString& TempFileName, const QString& Message);
+
+
+
 #endif // CommonFunctions_h__

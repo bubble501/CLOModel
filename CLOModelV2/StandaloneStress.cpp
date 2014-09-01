@@ -19,6 +19,7 @@
 #include <QCheckBox>
 #include "CommonFunctions.h"
 #include "BloombergVector.h"
+#include "MtgCalculator.h"
 StandaloneStress::StandaloneStress(QWidget *parent)
 	: QWidget(parent)
 {
@@ -232,36 +233,39 @@ void StandaloneStress::Start(){
 	Waterfall TempWaterfall;
 	//QString Tempstring;
 	BloombergVector TempVector;
-	int countloans;
 	QDate StartDate;
-	Mortgage TmpMtg;
 	QDir dir(PathEdit->text());
-	{QFile file(dir.absolutePath()+"/.Loans.clp");
-	file.open(QIODevice::ReadOnly);
-	qint32 VersionChecker;
-	QDataStream out(&file);
-	out.setVersion(QDataStream::Qt_5_3);
-	out >> VersionChecker;
-	if(VersionChecker!=qint32(ModelVersionNumber)) return;
-	out >> countloans;
-	out >> TempVector;
-	out >> TempVector;
-	out >> TempVector;
-	out >> StartDate;
-	for(int i=0;i<countloans;i++){
-		out >> TmpMtg;
-		Stresser->AddLoan(TmpMtg);
+	{
+		QFile file(dir.absolutePath()+"/.Loans.clp");
+		file.open(QIODevice::ReadOnly);
+		qint32 VersionChecker;
+		QDataStream out(&file);
+		out.setVersion(QDataStream::Qt_5_3);
+		out >> VersionChecker;
+		if (VersionChecker<MinimumSupportedVersion || VersionChecker>ModelVersionNumber) 
+			return;
+		{
+			MtgCalculator TmpMtg;
+			TmpMtg.SetLoadProtocolVersion(VersionChecker);
+			out >> TmpMtg;
+			StartDate = TmpMtg.GetStartDate();
+			for (int i = 0; i < TmpMtg.Count(); i++) {
+				Stresser->AddLoan(*(TmpMtg.GetLoans().at(i)));
+			}
+		}
+		file.close();
 	}
-	file.close();}
-	{QFile file(dir.absolutePath()+"/.BaseCase.clo");
-	file.open(QIODevice::ReadOnly);
-	qint32 VersionChecker;
-	QDataStream out(&file);
-	out.setVersion(QDataStream::Qt_5_3);
-	out >> VersionChecker;
-	if(VersionChecker!=qint32(ModelVersionNumber)) return;
-	out >> TempWaterfall;
-	file.close();}
+	{
+		QFile file(dir.absolutePath() + "/.BaseCase.clo");
+		file.open(QIODevice::ReadOnly);
+		qint32 VersionChecker;
+		QDataStream out(&file);
+		out.setVersion(QDataStream::Qt_5_3);
+		out >> VersionChecker;
+		if (VersionChecker != qint32(ModelVersionNumber)) return;
+		out >> TempWaterfall;
+		file.close();
+	}
 
 
 
@@ -272,16 +276,16 @@ void StandaloneStress::Start(){
 	TempStrLst.clear();
 	for(int i=0;i<VariablesList[1]->rowCount();i++) TempStrLst.append(VariablesList[1]->item(i,0)->text());
 	Stresser->SetYSpann(TempStrLst);
-	switch(StressTypeCombo->currentIndex()){
-	case 1:
+	switch(StressTypeCombo->currentData().toInt()){
+	case StressTest::ChangingCPR | StressTest::ChangingLS:
 		Stresser->SetXVariability(StressTest::ChangingCPR);
 		Stresser->SetYVariability(StressTest::ChangingLS);
 		break;
-	case 2:
+	case StressTest::ChangingCPR | StressTest::ChangingCDR:
 		Stresser->SetXVariability(StressTest::ChangingCPR);
 		Stresser->SetYVariability(StressTest::ChangingCDR);
 		break;
-	case 0:
+	case StressTest::ChangingCDR | StressTest::ChangingLS:
 	default:
 		Stresser->SetXVariability(StressTest::ChangingCDR);
 		Stresser->SetYVariability(StressTest::ChangingLS);
@@ -291,6 +295,9 @@ void StandaloneStress::Start(){
 	Stresser->SetStructure(TempWaterfall);
 	Stresser->SetUseFastVersion(FastStressBox->isChecked());
 	hide();
+#ifdef _DEBUG
+	//Stresser->UseMultithread(false);
+#endif // _DEBUG
 	Stresser->RunStressTest();
 }
 void StandaloneStress::Finished(){

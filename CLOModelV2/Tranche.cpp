@@ -15,7 +15,6 @@ Tranche::Tranche()
 	, OriginalAmt(0.0)
 	, OutstandingAmt(0.0)
 	, PaymentFrequency("3")
-	, AccruedInterest(0.0)
 	, m_UseForwardCurve(false)
 {
 	BloombergVector* TempCoup = new BloombergVector("0");
@@ -55,7 +54,6 @@ Tranche::Tranche(const Tranche& a)
 	, PaymentFrequency(a.PaymentFrequency)
 	, TrancheName(a.TrancheName)
 	, CashFlow(a.CashFlow)
-	, AccruedInterest(a.AccruedInterest)
 	, SettlementDate(a.SettlementDate)
 	, ISINcode(a.ISINcode)
 	, m_UseForwardCurve(a.m_UseForwardCurve)
@@ -84,7 +82,6 @@ Tranche& Tranche::operator=(const Tranche& a){
 	PaymentFrequency=a.PaymentFrequency;
 	TrancheName=a.TrancheName;
 	CashFlow=a.CashFlow;
-	AccruedInterest=a.AccruedInterest;
 	SettlementDate=a.SettlementDate;
 	ISINcode=a.ISINcode;
 	m_LoadProtocolVersion=a.m_LoadProtocolVersion;
@@ -285,7 +282,6 @@ void Tranche::GetDataFromBloomberg(){
 	TempReq.AddRequest(7, IdentityCode, "RESET_IDX", QBloombergLib::QBbgRequest::String2YellowKey(BloombergExtension));
 	TempReq.AddRequest(8, IdentityCode, "CPN", QBloombergLib::QBbgRequest::String2YellowKey(BloombergExtension));
 	TempReq.AddRequest(9, IdentityCode, "CPN_FREQ", QBloombergLib::QBbgRequest::String2YellowKey(BloombergExtension));
-	TempReq.AddRequest(10, IdentityCode, "INT_ACC", QBloombergLib::QBbgRequest::String2YellowKey(BloombergExtension));
 	TempReq.AddRequest(11, IdentityCode, "SETTLE_DT", QBloombergLib::QBbgRequest::String2YellowKey(BloombergExtension));
 	TempReq.AddRequest(12, IdentityCode, "NAME", QBloombergLib::QBbgRequest::String2YellowKey(BloombergExtension));
 	TempReq.AddRequest(13, IdentityCode, "ID_ISIN", QBloombergLib::QBbgRequest::String2YellowKey(BloombergExtension));
@@ -342,9 +338,6 @@ void Tranche::GetDataFromBloomberg(){
 	if (Bee.GetResult(9)->HasErrors()) PaymentFrequency = "";
 	else PaymentFrequency = QString("%1").arg(static_cast<int>(12.0/Bee.GetResult(9)->GetDouble()));
 
-	if (Bee.GetResult(10)->HasErrors()) AccruedInterest = 0.0;
-	else AccruedInterest = Bee.GetResult(10)->GetDouble() / 100.0;
-
 	if (Bee.GetResult(11)->HasErrors()) SettlementDate = QDate();
 	else SettlementDate = Bee.GetResult(11)->GetDate();
 
@@ -373,12 +366,24 @@ double Tranche::GetLossRate() const{
 double Tranche::GetDiscountMargin() const {return GetDiscountMargin(Price);}
 double Tranche::GetDiscountMargin(double NewPrice)const{
 	if(/*GetLossRate()>0.0000 ||*/ OutstandingAmt<0.01) return 0.0;
+	const bool AdjHolidays =
+		m_DayCount == DayCountConvention::ACT360
+		|| m_DayCount == DayCountConvention::ACT365
+		|| m_DayCount == DayCountConvention::ACTACT
+		|| m_DayCount == DayCountConvention::AFBACTACT
+		|| m_DayCount == DayCountConvention::ISDAACTACT
+		;
+	double AccruedInterest = AdjustCoupon(GetTotalCoupon(0), LastPaymentDate, SettlementDate, m_DayCount);
+	QDate TempDate;
 	QList<QDate> FlowsDates;
 	QList<double> FlowsValues;
 	FlowsDates.append(SettlementDate);
 	FlowsValues.append(-OutstandingAmt*((NewPrice/100.0)+AccruedInterest));
 	for (int i=0;i<CashFlow.Count();i++){
-		FlowsDates.append(CashFlow.GetDate(i));
+		TempDate = CashFlow.GetDate(i);
+		while (AdjHolidays && IsHoliday(TempDate)) 
+			TempDate = TempDate.addDays(1);
+		FlowsDates.append(TempDate);
 		FlowsValues.append(CashFlow.GetTotalFlow(i));
 	}
 	const BloombergVector* ApplicableRate = ReferenceRateValue.value(0, ReferenceRateValue.value(-1, NULL));
@@ -397,12 +402,23 @@ double Tranche::GetDiscountMargin(double NewPrice)const{
 double Tranche::GetIRR() const {return GetIRR(Price);}
 double Tranche::GetIRR(double NewPrice)const{
 	if(/*GetLossRate()>0.0000 ||*/ OutstandingAmt<0.01) return 0.0;
+	const bool AdjHolidays =
+		m_DayCount == DayCountConvention::ACT360
+		|| m_DayCount == DayCountConvention::ACT365
+		|| m_DayCount == DayCountConvention::ACTACT
+		|| m_DayCount == DayCountConvention::AFBACTACT
+		|| m_DayCount == DayCountConvention::ISDAACTACT
+	;
+	double AccruedInterest = AdjustCoupon(GetTotalCoupon(0), LastPaymentDate, SettlementDate, m_DayCount);
 	QList<QDate> FlowsDates;
 	QList<double> FlowsValues;
+	QDate TempDate;
 	FlowsDates.append(SettlementDate);
 	FlowsValues.append(-OutstandingAmt*((NewPrice/100.0)+AccruedInterest));
 	for (int i=0;i<CashFlow.Count();i++){
-		FlowsDates.append(CashFlow.GetDate(i));
+		TempDate = CashFlow.GetDate(i);
+		while (AdjHolidays && IsHoliday(TempDate)) TempDate = TempDate.addDays(1);
+		FlowsDates.append(TempDate);
 		FlowsValues.append(CashFlow.GetTotalFlow(i));
 	}
 	return qMax(0.0,CalculateIRR(FlowsDates,FlowsValues,m_DayCount));
@@ -452,7 +468,6 @@ QDataStream& operator<<(QDataStream & stream, const Tranche& flows){
 		<< flows.ExchangeRate
 		<< flows.PaymentFrequency
 		<< flows.SettlementDate
-		<< flows.AccruedInterest
 		<< flows.m_UseForwardCurve
 	;
 	
@@ -495,7 +510,6 @@ QDataStream& Tranche::LoadOldVersion(QDataStream& stream){
 	stream >> ExchangeRate;
 	PaymentFrequency.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> PaymentFrequency;
 	stream >> SettlementDate;
-	stream >> AccruedInterest;
 	stream >> m_UseForwardCurve;
 
 	ClearInterest();

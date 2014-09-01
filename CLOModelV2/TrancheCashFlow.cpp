@@ -6,9 +6,6 @@ TrancheCashFlow::TrancheCashFlow(double ThrancheOutstanding)
 	, StartingDeferredInterest(0.0)
 {
 	m_AggregationLevel = Monthly;
-	SetStock(static_cast<qint32>(TrancheFlowType::OCFlow));
-	SetStock(static_cast<qint32>(TrancheFlowType::ICFlow));
-	SetStock(static_cast<qint32>(TrancheFlowType::DeferredFlow));
 }
 
 double TrancheCashFlow::GetAmountOutstanding(int index)const{
@@ -78,6 +75,7 @@ int TrancheCashFlow::GetLastFlowIndex(bool IncludeDeferred) const {
 		if (i.key() == Target) return Counter;
 		++Counter;
 	}
+	return -1;
 }
 
 TrancheCashFlow& TrancheCashFlow::operator=(const TrancheCashFlow& a) {
@@ -88,8 +86,16 @@ TrancheCashFlow& TrancheCashFlow::operator=(const TrancheCashFlow& a) {
 }
 
 double TrancheCashFlow::GetTotalFlow(int index) const {
-	double Result = GetPrincipal(index);
+	QList<qint32> FlowsType;
+	FlowsType.append(static_cast<qint32>(TrancheFlowType::PrincipalFlow));
 	for (qint32 i = static_cast<qint32>(TrancheFlowType::InterestFlow); i < (static_cast<qint32>(TrancheFlowType::InterestFlow) << 1); ++i)
-		Result += GetFlow(index, i);
-	return Result;
+		FlowsType.append(i);
+	return GenericCashFlow::GetTotalFlow(index,FlowsType);
+}
+double TrancheCashFlow::GetTotalFlow(const QDate& a) const {
+	QList<qint32> FlowsType;
+	FlowsType.append(static_cast<qint32>(TrancheFlowType::PrincipalFlow));
+	for (qint32 i = static_cast<qint32>(TrancheFlowType::InterestFlow); i < (static_cast<qint32>(TrancheFlowType::InterestFlow) << 1); ++i)
+		FlowsType.append(i);
+	return GenericCashFlow::GetTotalFlow(a, FlowsType);
 }

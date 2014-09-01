@@ -184,3 +184,14 @@ double AdjustCoupon(double AnnualCoupon, QDate PrevIPD, QDate CurrIPD, DayCountC
 bool IsHoliday(const QDate& a/*, const QString& CountryCode*/) {
 	return a.dayOfWeek() >= 6;
 }
+
+
+#include <QFile>
+void PrintToTempFile(const QString& TempFileName, const QString& Message) {
+	QFile TempFile("C:/Temp/" + TempFileName);
+	if (!TempFile.open(QIODevice::WriteOnly | QIODevice::Text)) return;
+	QDataStream TempWrite(&TempFile);
+	TempWrite << Message;
+	TempFile.close();
+}
+

@@ -6,7 +6,6 @@
 #include <QMap>
 #include <QDate>
 #include <QList>
-#include <QSet>
 class GenericCashFlow : public BackwardInterface {
 public:
 	enum CashFlowAggregation {
@@ -25,9 +24,10 @@ public:
 	virtual GenericCashFlow& operator+=(const GenericCashFlow& a) { AddFlow(a); return *this; }
 	virtual GenericCashFlow operator+(const GenericCashFlow& a) const;
 	virtual bool operator==(const GenericCashFlow& a) const;
+	virtual bool operator!=(const GenericCashFlow& a) const { return !(this->operator==(a)); }
 	virtual void AddFlow(QDate Dte, double Amt, qint32 FlowTpe);
 	virtual void AddFlow(const GenericCashFlow& a);
-	virtual void AddStock(QDate Dte, double Amt, qint32 FlowTpe);
+	virtual void SetFlow(QDate Dte, double Amt, qint32 FlowTpe);
 	virtual QDate GetDate(int index) const;
 	virtual double GetFlow(int index, qint32 FlowTpe) const;
 	virtual double GetFlow(const QDate& index, qint32 FlowTpe) const;
@@ -41,13 +41,15 @@ public:
 	virtual int FindDate(const QDate& a) const;
 	virtual void ReplaceDate(const QDate& OriginalDate, const QDate& NewDate);
 	virtual void Aggregate(CashFlowAggregation Freq);
-	virtual void SetStock(qint32 FlowTpe, bool IsStock = true);
-	virtual bool IsStock(qint32 FlowTpe) const {  return m_Stocks.contains(FlowTpe); }
 	virtual GenericCashFlow SingleFlow(qint32 FlowTpe) const;
 	virtual bool HasFlowType(qint32 FlowTpe)const;
 	virtual QList<qint32> AvailableFlows(const QDate& a) const;
 	virtual bool GetAdjustHolidays() const { return m_AdjustHolidays; }
 	virtual void SetAdjustHolidays(bool val);
+	virtual double GetTotalFlow(const QDate& a, const QList<qint32>& Groups) const;
+	virtual double GetTotalFlow(int index, const QList<qint32>& Groups) const;
+	virtual double GetTotalFlow(const QDate& a) const { return GetTotalFlow(a, QList<qint32>()); }
+	virtual double GetTotalFlow(int index) const { return GetTotalFlow(index, QList<qint32>()); }
 #ifdef _DEBUG
 	virtual QString ToString() const;
 #endif // _DEBUG
@@ -55,7 +57,6 @@ public:
 protected:
 	static bool SamePeriod(const QDate& a, const QDate& b, CashFlowAggregation Freq);
 	QMap<QDate, QHash<qint32, double>*	> m_CashFlows;
-	QSet<qint32> m_Stocks;
 	CashFlowAggregation m_AggregationLevel;
 	bool m_AdjustHolidays;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream);

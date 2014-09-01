@@ -79,8 +79,10 @@ void StressWorker::WorkFast() {
 	}
 	LocalStructure.ResetMtgFlows();
 	LocalStructure.AddMortgagesFlows(BaseCashFlows);
-	LocalStructure.CalculateTranchesCashFlows();
-	emit ScenarioCalculated(Identity[0], Identity[1], LocalStructure);
+	if(LocalStructure.CalculateTranchesCashFlows())
+		emit ScenarioCalculated(Identity[0], Identity[1], LocalStructure);
+	else
+		emit ScenarioCalculated(Identity[0], Identity[1], Waterfall());
 }
 void StressWorker::WorkSlow(){
 	MtgCashFlow TotalFlow;
@@ -144,6 +146,8 @@ void StressWorker::WorkSlow(){
 	}
 	LocalStructure.ResetMtgFlows();
 	LocalStructure.AddMortgagesFlows(TotalFlow);
-	LocalStructure.CalculateTranchesCashFlows();
-	emit ScenarioCalculated(Identity[0],Identity[1],LocalStructure);
+	if(LocalStructure.CalculateTranchesCashFlows())
+		emit ScenarioCalculated(Identity[0],Identity[1],LocalStructure);
+	else
+		emit ScenarioCalculated(Identity[0], Identity[1], LocalStructure);
 }

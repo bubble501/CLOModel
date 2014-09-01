@@ -63,6 +63,8 @@ public:
 	void FillMissingAnchors(const QDate& NewAnchor);
 	void ResetMissingAnchors();
 
+	void ClearFlows() { m_ReserveFundFlows.Clear(); }
+
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream);
 private:

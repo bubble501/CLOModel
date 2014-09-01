@@ -19,8 +19,9 @@ public:
 		wst_juniorFees, /*!< Junior Fees*/
 		wst_ReinvestmentTest, /*!< Reinvestment Test*/
 		wst_Excess, /*!< Excess Spread*/
-		wst_ReinvestPrincipal, /*!< Reinvest all available princiapl during the reinvestment period*/
-		wst_ReserveReplenish /*!< Replenish the reserve fund*/
+		wst_ReinvestPrincipal, /*!< Reinvest all available principal during the reinvestment period*/
+		wst_ReserveReplenish, /*!< Replenish the reserve fund*/
+		wst_RedeemProRata /*!< Use principal to redeem bonds pro-rata*/
 	};
 	int GetGroupTarget()const{return GroupTarget;}
 	int GetRedemptionGroup()const{return RedemptionGroup;}

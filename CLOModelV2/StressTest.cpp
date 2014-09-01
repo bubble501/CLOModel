@@ -104,7 +104,7 @@ void StressTest::RunStressTest() {
 		ProgressForm->SetMax((XSpann.size()*YSpann.size()) + (UseFastVersion ? 1 : 0));
 		ProgressForm->show();
 	}
-	QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+	//QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 	ContinueCalculation = true;
 	BeesReturned = 0;
 	BaseCalculator->SetSequentialComputation(SequentialComputation);
@@ -221,9 +221,11 @@ void StressTest::RecievedData(int IDx,int IDy,const Waterfall& Res){
 			ThreadsStack[ConcatenateIDs(SentBees / YSpann.size(), SentBees%YSpann.size())]->start();
 			SentBees++;
 		}
+		double Testing = 100.0*static_cast<double>(BeesReturned) / static_cast<double>(XSpann.size()*YSpann.size());
 		emit ProgressStatus(100.0*static_cast<double>(BeesReturned)/static_cast<double>(XSpann.size()*YSpann.size()));
 		if (ProgressForm && ShowProgress) ProgressForm->SetValue(BeesReturned + (UseFastVersion ? 1 : 0));
-		QApplication::processEvents();
+		
+		//QApplication::processEvents();
 		if(BeesReturned==XSpann.size()*YSpann.size()){
 #ifdef PrintExecutionTime
 			QTime TempTime;
@@ -310,7 +312,7 @@ void StressTest::SaveResults(const QString& DestPath)const{
 	if(DestinationPath.at(DestinationPath.size()-1)!='\\') DestinationPath.append('\\');
 	QDir curDir;
 	QStringList FileNames;
-	QString DestinationFull = DestinationPath+QString("\\.StressResult%1%2.fcsr").arg(StressDimension[0]).arg(StressDimension[1]);
+	QString DestinationFull = DestinationPath + QString("\\.StressResult%1%2.fcsr").arg(StressDimension[0] >> 1).arg(StressDimension[1] >> 1);
 	if (curDir.exists(DestinationFull)) {
 		if (!curDir.remove(DestinationFull)) return;
 	}
@@ -320,7 +322,7 @@ void StressTest::SaveResults(const QString& DestPath)const{
 	if (file.open(QIODevice::WriteOnly)) {
 		QDataStream out(&file);
 		out.setVersion(QDataStream::Qt_5_3);
-		out << qint32(ModelVersionNumber) << ConstantPar << qint32(StressDimension[0]) << qint32(StressDimension[1]) << UseFastVersion;
+		out << qint32(ModelVersionNumber) << ConstantPar << (qint32(StressDimension[0]) >> 1) << (qint32(StressDimension[1]) >> 1) << UseFastVersion;
 		file.close();
 	}
 	foreach(const QString& SingleX,XSpann){

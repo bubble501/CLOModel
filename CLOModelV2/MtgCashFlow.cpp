@@ -112,19 +112,21 @@ MtgCashFlow MtgCashFlow::ApplyScenario(BloombergVector CPRv, BloombergVector CDR
 
 MtgCashFlow::MtgCashFlow() {
 	Aggregate(Monthly); 
-	SetStock(AmountOutstandingFlow);
-	SetStock(WACouponFlow);
-	SetStock(AccruedInterestFlow);
-	SetStock(WAPrepayMult);
-	SetStock(WALossMult);
 }
 
 MtgCashFlow::MtgCashFlow(const MtgCashFlow& a) {
 	Aggregate(Monthly); 
-	SetStock(AmountOutstandingFlow);
-	SetStock(WACouponFlow);
-	SetStock(AccruedInterestFlow);
-	SetStock(WAPrepayMult);
-	SetStock(WALossMult);
 	AddFlow(a);
+}
+double MtgCashFlow::GetTotalFlow(int index) const {
+	QList<qint32> FlowsType;
+	FlowsType.append(static_cast<qint32>(InterestFlow));
+	FlowsType.append(static_cast<qint32>(PrincipalFlow));
+	FlowsType.append(static_cast<qint32>(PrepaymentFlow));
+	return GenericCashFlow::GetTotalFlow(index, FlowsType);
+}
+double MtgCashFlow::GetTotalFlow(const QDate& a) const {
+	QList<qint32> FlowsType;
+	
+	return GenericCashFlow::GetTotalFlow(a, FlowsType);
 }

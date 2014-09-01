@@ -91,7 +91,7 @@ QString MtgCalculator::ReadyToCalculate()const{
 
 QDataStream& operator<<(QDataStream & stream, const MtgCalculator& flows){
 	stream 
-		<< flows.Loans.size()
+		<< static_cast<qint32>(flows.Loans.size())
 		<< flows.m_CPRass
 		<< flows.m_CDRass
 		<< flows.m_LSass
@@ -106,7 +106,7 @@ QDataStream& operator<<(QDataStream & stream, const MtgCalculator& flows){
 	return stream;
 }
 QDataStream& MtgCalculator::LoadOldVersion(QDataStream& stream) {
-	int tempInt;
+	qint32 tempInt;
 	stream >> tempInt;
 	stream >> m_CPRass;
 	stream >> m_CDRass;
@@ -119,8 +119,8 @@ QDataStream& MtgCalculator::LoadOldVersion(QDataStream& stream) {
 	for (int i = 0; i < tempInt; i++) {
 		TmpMtg.SetLoadProtocolVersion(m_LoadProtocolVersion);
 		stream >> TmpMtg;
+		AddLoan(TmpMtg);
 	}
-	AddLoan(TmpMtg);
 	ResetProtocolVersion();
 	return stream;
 }

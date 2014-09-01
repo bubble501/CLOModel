@@ -10,55 +10,39 @@
 #include "BackwardCompatibilityInterface.h"
 #include "IntegerVector.h"
 #include "ReserveFund.h"
-struct PrincipalRecip {
-	double Scheduled;
-	double Prepay;
-	PrincipalRecip() :Scheduled(0.0), Prepay(0.0) {}
-	PrincipalRecip(const PrincipalRecip& a) :Scheduled(a.Scheduled), Prepay(a.Prepay) {}
-	PrincipalRecip& operator=(const PrincipalRecip& a) { Scheduled = a.Scheduled; Prepay = a.Prepay; return *this; }
-	PrincipalRecip& operator=(double a) { 
-		if (a == 0.0) {
-			Erase();
-			return *this;
-		}
-		double Temp;
-		if (Toatal() == 0.0 || operator<(0.0))
-			Temp = 0.5;
-		else
-			Temp = Scheduled / Toatal();
-
-		Scheduled = a*Temp;
-		Prepay = a*(1.0-Temp);
-		return *this;
-	}
+class PrincipalRecip {
+protected:
+	double m_Scheduled;
+	double m_Prepay;
+public:
+	const double& GetPrepay() const { return m_Prepay; }
+	void SetPrepay(const double& val) { if (qAbs(val) >= 0.01) m_Prepay = val; }
+	void AddPrepay(const double& val) { if (qAbs(val) >= 0.01) m_Prepay += val; }
+	const double& GetScheduled() const { return m_Scheduled; }
+	void SetScheduled(const double& val) { if (qAbs(val) >= 0.01) m_Scheduled = val; }
+	void AddScheduled(const double& val) { if (qAbs(val) >= 0.01) m_Scheduled += val; }
+	PrincipalRecip() :m_Scheduled(0.0), m_Prepay(0.0) {}
+	PrincipalRecip(const PrincipalRecip& a) :m_Scheduled(a.m_Scheduled), m_Prepay(a.m_Prepay) {}
+	PrincipalRecip& operator=(const PrincipalRecip& a) { m_Scheduled = a.m_Scheduled; m_Prepay = a.m_Prepay; return *this; }
 	PrincipalRecip operator-(double a) { PrincipalRecip Result(*this); Result -= a; return Result; }
 	PrincipalRecip& operator-=(double a) { 
-		if (a == 0.0) return *this;
-		double Temp; 
-		if (Toatal() == 0.0) 
-			Temp = 0.5; 
-		else 
-			Temp = Scheduled / Toatal();
-		Scheduled -= a*Temp;
-		Prepay -= a*(1.0 - Temp); 
-		if (Scheduled<0.0 && Prepay>0.0) {
-			Temp = -Scheduled;
-			Scheduled += qMin(Prepay, Temp);
-			Prepay = qMax(0.0, Prepay - Temp);
-		}
-		if (Prepay<0.0 && Scheduled>0.0) {
-			Temp = -Prepay;
-			Prepay += qMin(Scheduled, Temp);
-			Scheduled = qMax(0.0, Scheduled - Temp);
-		}
+		if (qAbs(a) < 0.01) return *this;
+		if (a < 0.0) return operator+=(-a);
+		double Temp=qMin(a,m_Scheduled); 
+		m_Scheduled -= Temp;
+		m_Prepay -= a - Temp;
 		return *this;
 	}
-	PrincipalRecip& operator+=(double a) { return operator-=(-a); }
-	PrincipalRecip operator+(double a) { return operator-(-a); }
-	bool operator<(double a){return Scheduled<a || Prepay<a;}
-	
-	double Toatal() const { return Scheduled + Prepay; }
-	void Erase() { Scheduled = Prepay = 0.0; }
+	PrincipalRecip& operator+=(double a) { 
+		if (qAbs(a) < 0.01) return *this;
+		if (a < 0.0) return operator-=(-a);
+		m_Scheduled += a;
+		return *this;
+	}
+	PrincipalRecip operator+(double a) { PrincipalRecip Result(*this); Result += a; return Result; }
+	bool operator<(double a){return m_Scheduled<a || m_Prepay<a;}
+	double Total() const { return m_Scheduled + m_Prepay; }
+	void Erase() { m_Scheduled = m_Prepay = 0.0; }
 };
 class Waterfall : public BackwardInterface{
 private:
@@ -103,9 +87,9 @@ private:
 	double GroupOutstanding(int GroupTarget)const;
 	double GroupWACoupon(int GroupTarget, const QDate& Period, qint32 CouponType=0)const;
 	double GroupWACoupon(int GroupTarget, const QDate& Period, QList<qint32> CouponTypes)const;
-	double RedeemNotes(double AvailableFunds,int GroupTarget, int PeriodIndex);
-	double RedeemProRata(double AvailableFunds, int PeriodIndex,QList<int> Groups);
-	double RedeemSequential(double AvailableFunds, int PeriodIndex,int MaxGroup=-1);
+	double RedeemNotes(double AvailableFunds, int GroupTarget, const QDate& PeriodIndex);
+	double RedeemProRata(double AvailableFunds, const QDate& PeriodIndex, QList<int> Groups);
+	double RedeemSequential(double AvailableFunds, const QDate& PeriodIndex, int MaxGroup = -1);
 	int FindTrancheIndex(const QString& Tranchename)const;
 	void FillAllDates();
 protected:
@@ -125,7 +109,7 @@ public:
 	double GetCCCTestLimit() const {return m_CCCTestLimit;} 
 	double GetCCChaircut() const {return m_CCChaircut;} 
 	bool GetUseTurbo() const {return m_UseTurbo;} 
-	double GetPrincipalAvailable() const {return m_PrincipalAvailable.Toatal();} 
+	double GetPrincipalAvailable() const {return m_PrincipalAvailable.Total();} 
 	double GetInterestAvailable() const {return m_InterestAvailable;} 
 	double GetJuniorFeesCoupon() const {return m_JuniorFeesCoupon;} 
 	double GetPoolValueAtCall() const {return m_PoolValueAtCall;} 
@@ -191,8 +175,8 @@ public:
 	void SetCCCTestLimit(double a){if(a>=0.0 && a<=1.0) m_CCCTestLimit=a;}
 	void SetCCChaircut(double a){if(a>=0.0 && a<=1.0) m_CCChaircut=a;}
 	void SetUseTurbo(bool a){m_UseTurbo=a;}
-	void SetSchedPrincAvailable(double a){m_PrincipalAvailable.Scheduled=a;}
-	void SetPrepPrincAvailable(double a) { m_PrincipalAvailable.Prepay = a; }
+	void SetSchedPrincAvailable(double a){m_PrincipalAvailable.SetScheduled(a);}
+	void SetPrepPrincAvailable(double a) { m_PrincipalAvailable.SetPrepay(a); }
 	void SetInterestAvailable(double a){m_InterestAvailable=a;}
 	void SetJuniorFeesCoupon(double a){if(a>=0.0) m_JuniorFeesCoupon=a;}
 	void SetPoolValueAtCall(double a){if(a>=0.0) m_PoolValueAtCall=a;}

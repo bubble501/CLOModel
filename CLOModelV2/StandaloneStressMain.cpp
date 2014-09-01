@@ -31,7 +31,10 @@ int main(int argc, char *argv[]) {
 	TempObj.show();
 	return a.exec();
 #else
-
+	/*QApplication a(argc, argv);
+	StandaloneStress TempObj;
+	TempObj.show();
+	return a.exec();*/
 
 	/*QFile file("C:\\Temp\\.Loans.clp");
 	MtgCalculator TempCalc;
@@ -76,6 +79,7 @@ int main(int argc, char *argv[]) {
 	out >> TempCallWaterfall;
 	file.close();
 	TempWtf.CalculateTranchesCashFlows();
+	double Testing=TempWtf.GetTranche(0)->GetDiscountMargin(100.0);
 	
 
 	/*Tranche TempTrnch;

@@ -32,7 +32,6 @@ public:
 		, const QString& DefRefRte
 		, const QString& PayFreq
 		, const QDate& SettlementDate
-		, double AccruedInterest = 0.0
 		, double StartingDeferredInterest = 0.0
 		//,const QString& RefRteValue=""
 		, double MinOC = 0.0

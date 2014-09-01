@@ -26,14 +26,14 @@ public:
 	double GetOCTest(int index)const { return GetFlow(index, static_cast<qint32>(TrancheFlowType::OCFlow)); }
 	double GetICTest(int index)const { return GetFlow(index, static_cast<qint32>(TrancheFlowType::ICFlow)); }
 	double GetDeferred(int index)const { return GetFlow(index, static_cast<qint32>(TrancheFlowType::DeferredFlow)); }
-	double GetTotalFlow(int index)const;
+	virtual double GetTotalFlow(int index)const override;
+	virtual double GetTotalFlow(const QDate& a)const override;
 	double GetAmountOutstanding(int index = 0)const;
 	double GetInterest(const QDate& a)const { return GetFlow(a, static_cast<qint32>(TrancheFlowType::InterestFlow)); }
 	double GetPrincipal(const QDate& a)const { return GetFlow(a, static_cast<qint32>(TrancheFlowType::PrincipalFlow)); }
 	double GetOCTest(const QDate& a)const { return GetFlow(a, static_cast<qint32>(TrancheFlowType::OCFlow)); }
 	double GetICTest(const QDate& a)const { return GetFlow(a, static_cast<qint32>(TrancheFlowType::ICFlow)); }
 	double GetDeferred(const QDate& a)const { return GetFlow(a, static_cast<qint32>(TrancheFlowType::DeferredFlow)); }
-	double GetTotalFlow(const QDate& a)const{return GetInterest(a)+GetPrincipal(a);}
 	double GetAmountOutstanding(const QDate& a)const{return GetAmountOutstanding(FindDate(a));} //TODO
 	double GetInitialOutstanding()const{return OutstandingAmt;}
 	void SetInitialOutstanding(double a){OutstandingAmt=a;}

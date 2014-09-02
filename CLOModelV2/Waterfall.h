@@ -82,6 +82,9 @@ private:
 	double m_CallMultiple; 
 	double m_CallReserve;
 	QString m_DealName;
+	BloombergVector m_GICinterest;
+	double m_StartingDeferredJunFees;
+	GenericCashFlow m_GICflows;
 	int FindMostJuniorLevel() const;
 	void SortByProRataGroup();
 	double GroupOutstanding(int GroupTarget)const;
@@ -99,6 +102,7 @@ public:
 	Waterfall(const Waterfall& a);
 	~Waterfall();
 	Waterfall& operator=(const Waterfall& a);
+	QString GetGICinterest() const { return m_GICinterest.GetVector(); }
 	QString GetSeniorExpenses() const { return m_SeniorExpenses.GetVector(); }
 	QString GetSeniorFees() const { return m_SeniorFees.GetVector(); }
 	QString GetJuniorFees() const { return m_JuniorFees.GetVector(); }
@@ -122,6 +126,7 @@ public:
 	const GenericCashFlow& GetTotalSeniorFees() const { return m_TotalSeniorFees; }
 	const GenericCashFlow& GetTotalJuniorFees() const { return m_TotalJuniorFees; }
 	const ReinvestmentTest& GetReinvestmentTest() const {return m_ReinvestmentTest;}
+	const GenericCashFlow& GetGICflows() const { return m_GICflows; }
 	MtgCashFlow& GetMortgagesPayments() {return m_MortgagesPayments;}
 	GenericCashFlow& GetExcessCashFlow() { return m_ExcessCashFlow; }
 	GenericCashFlow& GetTotalSeniorExpenses() { return m_TotalSeniorExpenses; }
@@ -162,9 +167,12 @@ public:
 	bool GetCumulativeReserves() const {return m_CumulativeReserves;}
 	int GetNumReserves()const { return m_Reserves.size(); }
 	const QString& GetDealName() const { return m_DealName; }
+	const double& GetStartingDeferredJunFees() const { return m_StartingDeferredJunFees; }
 	//////////////////////////////////////////////////////////////////////////
+	void SetStartingDeferredJunFees(const double& val) { m_StartingDeferredJunFees = val; }
 	void SetDealName(const QString& a) { m_DealName = a; }
 	void SetCumulativeReserves(bool a){m_CumulativeReserves=a;}
+	void SetGICinterest(const QString& a) { m_GICinterest = a; }
 	void SetSeniorExpenses(const QString& a) { m_SeniorExpenses = a; }
 	void SetSeniorFees(const QString& a) { m_SeniorFees = a; }
 	void SetJuniorFees(const QString& a) { m_JuniorFees = a; }

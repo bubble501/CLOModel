@@ -63,6 +63,8 @@ public:
 	void SetCCCcurve(const QString& a){Structure.SetCCCcurve(a);}
 	void SetLastIPDdate(const QDate& a){Structure.SetLastIPDdate(a);}
 	void SetCallDate(const QDate& a){Structure.SetCallDate(a);}
+	void SetStartingDeferredJunFees(const double& val) { Structure.SetStartingDeferredJunFees(val); }
+	void SetGICinterest(const QString& a) { Structure.SetGICinterest(a); }
 	void SetupReinvestmentTest(const QDate& ReinvPer,double TstLvl, double IIshare,double IRshare,double OIshare,double ORshare){Structure.SetupReinvestmentTest(ReinvPer,TstLvl,IIshare,IRshare,OIshare,ORshare);}
 	void SetupReinvBond(
 		const QString& IntrVec

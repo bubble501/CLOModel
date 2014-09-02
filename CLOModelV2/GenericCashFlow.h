@@ -50,6 +50,7 @@ public:
 	virtual double GetTotalFlow(int index, const QList<qint32>& Groups) const;
 	virtual double GetTotalFlow(const QDate& a) const { return GetTotalFlow(a, QList<qint32>()); }
 	virtual double GetTotalFlow(int index) const { return GetTotalFlow(index, QList<qint32>()); }
+	virtual bool IsEmpty() const;
 #ifdef _DEBUG
 	virtual QString ToString() const;
 #endif // _DEBUG

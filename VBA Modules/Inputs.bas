@@ -114,8 +114,12 @@ Public Sub GetInputFromStructure( _
     Dim UseForwardCell As Range
     Dim DayCountHead As Range
     Dim BaseCaseCall As Range
+    Dim StartingDefJunFees As Range
+    Dim GICInterestCell As Range
     On Error Resume Next
     Set HaircutVecStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("HaircutVecHeader"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set StartingDefJunFees = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("StartingDefJunFees"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set GICInterestCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("GICInterestCell"), LookAt:=xlWhole, LookIn:=xlValues)
     Set BaseCaseCall = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("BaseCaseCall"), LookAt:=xlWhole, LookIn:=xlValues)
     Set IsinFldsStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("IsinFldsHeader"), LookAt:=xlWhole, LookIn:=xlValues)
     Set FirstResTargCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("FirstResTargCell"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -348,10 +352,20 @@ DefaultExchange:
         Call AddInput(AllTheInputs, WaterfallStart.Offset(i + 1, 3).Value)
         i = i + 1
     Loop
-        If (DealNameCell Is Nothing) Then
+    If (DealNameCell Is Nothing) Then
         Call AddInput(AllTheInputs, "")
-        Else
-                Call AddInput(AllTheInputs, CStr(DealNameCell.Offset(0, 1).Value))
+    Else
+        Call AddInput(AllTheInputs, CStr(DealNameCell.Offset(0, 1).Value))
+    End If
+    If (StartingDefJunFees Is Nothing) Then
+        Call AddInput(AllTheInputs, 0#)
+    Else
+        Call AddInput(AllTheInputs, CDbl(StartingDefJunFees.Offset(0, 1).Value))
+    End If
+    If (GICInterestCell Is Nothing) Then
+        Call AddInput(GICInterestCell, "0")
+    Else
+        Call AddInput(AllTheInputs, CStr(GICInterestCell.Offset(0, 1).Value))
     End If
     Call AddInput(AllTheInputs, CStr(SeniorExpensesCell.Offset(0, 1).Value))
     Call AddInput(AllTheInputs, CStr(SeniorFeesCell.Offset(0, 1).Value))
@@ -705,6 +719,8 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
     a.Add "Use Forward Curves", "UseForwardCell"
     a.Add "Day Count", "DayCountHead"
     a.Add "Base Case To Call", "BaseCaseCall"
+    a.Add "Current deferred junior fees", "StartingDefJunFees"
+    a.Add "GIC Interest", "GICInterestCell"
 End Sub
 
 Private Function FromStringToInterestType(a As String) As Long

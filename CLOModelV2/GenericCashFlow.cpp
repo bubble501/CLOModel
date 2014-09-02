@@ -295,3 +295,9 @@ double GenericCashFlow::GetTotalFlow(int index, const QList<qint32>& Groups /*= 
 	}
 	return Result;
 }
+bool GenericCashFlow::IsEmpty() const {
+	for (QMap<QDate, QHash<qint32, double>* >::const_iterator i = m_CashFlows.constBegin(); i != m_CashFlows.constEnd(); ++i) {
+		if (!i.value()->isEmpty()) return false;
+	}
+	return true;
+}

@@ -332,6 +332,10 @@ void CentralUnit::CheckCalculationDone()
 			if(TempTranche.GetCashFlow().Count()>0)
 				ExcelOutput::PrintTrancheFlow(TempTranche,ExcelCommons::CellOffset(TranchesOutputAddress,1,(++ClolumnCount)+(6*Structure.GetTranchesCount())),(Structure.GetTranchesCount()+ClolumnCount)%2==0 ? QColor(235,241,222) : QColor(216,228,188),false,false,false,false,true,false,false,false);
 		}
+		/*if (!Structure.GetGICflows().IsEmpty()) {
+			TempValList.clear(); for (int i = 0; i < Structure.GetGICflows().Count(); i++) TempValList.append(Structure.GetGICflows().GetFlow(i, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow)) + Structure.GetGICflows().GetFlow(i, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow)));
+			ExcelOutput::PrintColumn("GIC Interest", TempValList, ExcelCommons::CellOffset(TranchesOutputAddress, 2, (++ClolumnCount) + (6 * Structure.GetTranchesCount())), "_-* #,##0_-;-* #,##0_-;_-* \" - \"??_-;_-@_-", (Structure.GetTranchesCount() + ClolumnCount) % 2 == 0 ? QColor(235, 241, 222) : QColor(216, 228, 188));
+		}*/
 		if(Structure.GetExcessCashFlow().Count()>0){
 			TempValList.clear(); for (int i = 0; i<Structure.GetExcessCashFlow().Count(); i++) TempValList.append(Structure.GetExcessCashFlow().GetFlow(i, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow)) + Structure.GetExcessCashFlow().GetFlow(i, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow)));
 			ExcelOutput::PrintColumn("Excess Spread",TempValList,ExcelCommons::CellOffset(TranchesOutputAddress,2,(++ClolumnCount)+(6*Structure.GetTranchesCount())),"_-* #,##0_-;-* #,##0_-;_-* \" - \"??_-;_-@_-",(Structure.GetTranchesCount()+ClolumnCount)%2==0 ? QColor(235,241,222) : QColor(216,228,188));
@@ -378,6 +382,10 @@ void CentralUnit::CheckCalculationDone()
 				if(TempTranche.GetCashFlow().Count()>0)
 					ExcelOutput::PrintTrancheFlow(TempTranche,ExcelCommons::CellOffset(TranchesOutputAddress,4+Structure.GetTranche(0)->GetCashFlow().Count(),(++ClolumnCount)+(6*Structure.GetTranchesCount())),(CallStructure.GetTranchesCount()+ClolumnCount)%2==0 ? QColor(235,241,222) : QColor(216,228,188),false,false,false,false,true,false,false,false);
 			}
+			/*if (!CallStructure.GetGICflows().IsEmpty()) {
+				TempValList.clear(); for (int i = 0; i < CallStructure.GetGICflows().Count(); i++) TempValList.append(CallStructure.GetGICflows().GetFlow(i, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow)) + CallStructure.GetGICflows().GetFlow(i, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow)));
+				ExcelOutput::PrintColumn("GIC Interest", TempValList, ExcelCommons::CellOffset(TranchesOutputAddress, 5 + Structure.GetTranche(0)->GetCashFlow().Count(), (++ClolumnCount) + (6 * CallStructure.GetTranchesCount())), "_-* #,##0_-;-* #,##0_-;_-* \" - \"??_-;_-@_-", (CallStructure.GetTranchesCount() + ClolumnCount) % 2 == 0 ? QColor(235, 241, 222) : QColor(216, 228, 188));
+			}*/
 			if(CallStructure.GetExcessCashFlow().Count()>0){
 				TempValList.clear(); for (int i = 0; i<CallStructure.GetExcessCashFlow().Count(); i++) TempValList.append(CallStructure.GetExcessCashFlow().GetFlow(i, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow)) + CallStructure.GetExcessCashFlow().GetFlow(i, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow)));
 				ExcelOutput::PrintColumn("Excess Spread",TempValList,ExcelCommons::CellOffset(TranchesOutputAddress,5+Structure.GetTranche(0)->GetCashFlow().Count(),(++ClolumnCount)+(6*CallStructure.GetTranchesCount())),"_-* #,##0_-;-* #,##0_-;_-* \" - \"??_-;_-@_-",(CallStructure.GetTranchesCount()+ClolumnCount)%2==0 ? QColor(235,241,222) : QColor(216,228,188));

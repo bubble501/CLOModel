@@ -73,7 +73,9 @@ Waterfall::Waterfall()
 	,m_CallMultiple(0.0)
 	,m_CallReserve(0.0)
 	,m_CumulativeReserves(false)
+	, m_StartingDeferredJunFees(0.0)
 {
+	m_GICflows.Aggregate(GenericCashFlow::Monthly);
 	m_ExcessCashFlow.Aggregate(GenericCashFlow::Monthly);
 	m_TotalSeniorExpenses.Aggregate(GenericCashFlow::Monthly);
 	m_TotalSeniorFees.Aggregate(GenericCashFlow::Monthly);
@@ -120,6 +122,9 @@ Waterfall::Waterfall(const Waterfall& a)
 	, m_SeniorExpensesFixed(a.m_SeniorExpensesFixed)
 	, m_SeniorFeesFixed(a.m_SeniorFeesFixed)
 	, m_JuniorFeesFixed(a.m_JuniorFeesFixed)
+	, m_GICinterest(a.m_GICinterest)
+	, m_StartingDeferredJunFees(a.m_StartingDeferredJunFees)
+	, m_GICflows(a.m_GICflows)
 {
 	m_LoadProtocolVersion = a.m_LoadProtocolVersion;
 	for(QList<Tranche*>::const_iterator i=a.m_Tranches.constBegin();i!=a.m_Tranches.constEnd();i++){
@@ -167,6 +172,9 @@ Waterfall& Waterfall::operator=(const Waterfall& a){
 	m_SeniorFeesFixed = a.m_SeniorFeesFixed;
 	m_JuniorFeesFixed = a.m_JuniorFeesFixed;
 	m_LoadProtocolVersion = a.m_LoadProtocolVersion;
+	m_GICinterest = a.m_GICinterest;
+	m_StartingDeferredJunFees = a.m_StartingDeferredJunFees;
+	m_GICflows = a.m_GICflows;
 	ResetTranches();
 	for(QList<Tranche*>::const_iterator i=a.m_Tranches.constBegin();i!=a.m_Tranches.constEnd();i++){
 		m_Tranches.append(new Tranche(**i));
@@ -274,24 +282,24 @@ void Waterfall::FillAllDates(){
 		}
 	}
 	//dates from tranches to excess, fees and reserve
-	for(int i=0;i<m_Tranches.size();i++){
-		for(int h=0;h<m_Tranches.at(i)->GetCashFlow().Count();h++){
+	if(m_Tranches.size()>0){
+		for(int h=0;h<m_Tranches.at(0)->GetCashFlow().Count();h++){
 			if(!ExcessIsEmpty){
-				if (m_ExcessCashFlow.FindDate(m_Tranches.at(i)->GetCashFlow().GetDate(h)) < 0)
-					m_ExcessCashFlow.AddFlow(m_Tranches.at(i)->GetCashFlow().GetDate(h), 0.0, 0);
+				if (m_ExcessCashFlow.FindDate(m_Tranches.at(0)->GetCashFlow().GetDate(h)) < 0)
+					m_ExcessCashFlow.AddFlow(m_Tranches.at(0)->GetCashFlow().GetDate(h), 0.0, 0);
 			}
-			if (m_AnnualizedExcess.FindDate(m_Tranches.at(i)->GetCashFlow().GetDate(h)) < 0)
-				m_AnnualizedExcess.AddFlow(m_Tranches.at(i)->GetCashFlow().GetDate(h), 0.0, 0);
-			if (m_TotalSeniorExpenses.FindDate(m_Tranches.at(i)->GetCashFlow().GetDate(h)) < 0)
-				m_TotalSeniorExpenses.AddFlow(m_Tranches.at(i)->GetCashFlow().GetDate(h), 0.0, 0);
-			if (m_TotalSeniorFees.FindDate(m_Tranches.at(i)->GetCashFlow().GetDate(h)) < 0)
-				m_TotalSeniorFees.AddFlow(m_Tranches.at(i)->GetCashFlow().GetDate(h), 0.0, 0);
-			if (m_TotalJuniorFees.FindDate(m_Tranches.at(i)->GetCashFlow().GetDate(h)) < 0)
-				m_TotalJuniorFees.AddFlow(m_Tranches.at(i)->GetCashFlow().GetDate(h), 0.0, 0);
+			if (m_AnnualizedExcess.FindDate(m_Tranches.at(0)->GetCashFlow().GetDate(h)) < 0)
+				m_AnnualizedExcess.AddFlow(m_Tranches.at(0)->GetCashFlow().GetDate(h), 0.0, 0);
+			if (m_TotalSeniorExpenses.FindDate(m_Tranches.at(0)->GetCashFlow().GetDate(h)) < 0)
+				m_TotalSeniorExpenses.AddFlow(m_Tranches.at(0)->GetCashFlow().GetDate(h), 0.0, 0);
+			if (m_TotalSeniorFees.FindDate(m_Tranches.at(0)->GetCashFlow().GetDate(h)) < 0)
+				m_TotalSeniorFees.AddFlow(m_Tranches.at(0)->GetCashFlow().GetDate(h), 0.0, 0);
+			if (m_TotalJuniorFees.FindDate(m_Tranches.at(0)->GetCashFlow().GetDate(h)) < 0)
+				m_TotalJuniorFees.AddFlow(m_Tranches.at(0)->GetCashFlow().GetDate(h), 0.0, 0);
 			for (QList<ReserveFund*>::iterator ResIter = m_Reserves.begin(); ResIter != m_Reserves.end(); ResIter++) {
 				if ((*ResIter)->GetReserveFundFlow().Count() == 0) continue;
-				if ((*ResIter)->GetReserveFundFlow().FindDate(m_Tranches.at(i)->GetCashFlow().GetDate(h)) < 0)
-					(*ResIter)->GetReserveFundFlow().AddFlow(m_Tranches.at(i)->GetCashFlow().GetDate(h), 0.0, ReserveFund::ReplenishFromInterest);
+				if ((*ResIter)->GetReserveFundFlow().FindDate(m_Tranches.at(0)->GetCashFlow().GetDate(h)) < 0)
+					(*ResIter)->GetReserveFundFlow().AddFlow(m_Tranches.at(0)->GetCashFlow().GetDate(h), 0.0, ReserveFund::ReplenishFromInterest);
 			}
 		}
 	}
@@ -581,6 +589,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		double adjJuniorFees;
 		double OriginalAvailableInterest=m_InterestAvailable;
 		PrincipalRecip OriginalAvailablePrincipal=m_PrincipalAvailable;
+		double OriginalStartingDefJunFees = m_StartingDeferredJunFees;
 		double* OriginalReserveLevel;
 		bool IsCallPaymentDate=false;
 		double ActualCallReserveLevel=0.0;
@@ -603,6 +612,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 			, m_SeniorExpensesFixed.GetAnchorDate().isNull()
 			, m_SeniorFeesFixed.GetAnchorDate().isNull()
 			, m_JuniorFeesFixed.GetAnchorDate().isNull()
+			, m_GICinterest.GetAnchorDate().isNull()
 		};
 		if(NullCCCanchor[0]) m_CCCcurve.SetAnchorDate(m_MortgagesPayments.GetDate(0));
 		if(NullCCCanchor[1]) m_PaymentFrequency.SetAnchorDate(m_MortgagesPayments.GetDate(0));
@@ -612,6 +622,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		if (NullCCCanchor[5]) m_SeniorExpensesFixed.SetAnchorDate(m_MortgagesPayments.GetDate(0));
 		if (NullCCCanchor[6]) m_SeniorFeesFixed.SetAnchorDate(m_MortgagesPayments.GetDate(0));
 		if (NullCCCanchor[7]) m_JuniorFeesFixed.SetAnchorDate(m_MortgagesPayments.GetDate(0));
+		if (NullCCCanchor[8]) m_GICinterest.SetAnchorDate(m_MortgagesPayments.GetDate(0));
 		foreach(ReserveFund* SingleRes, m_Reserves) {
 			SingleRes->ClearFlows();
 		}
@@ -621,6 +632,15 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		for(int i=0;i<m_MortgagesPayments.Count();i++){
 			CurrentDate=m_MortgagesPayments.GetDate(i);
 			CheckResults -= m_MortgagesPayments.GetScheduled(i) + m_MortgagesPayments.GetPrepay(i) + m_MortgagesPayments.GetInterest(i);
+			if (i > 0) {
+				m_GICflows.AddFlow(CurrentDate, m_InterestAvailable*m_GICinterest.GetValue(CurrentDate) *static_cast<double>(m_MortgagesPayments.GetDate(i-1).daysTo(m_MortgagesPayments.GetDate(i ))) / 360.0, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
+				m_GICflows.AddFlow(CurrentDate, m_PrincipalAvailable.GetScheduled()*m_GICinterest.GetValue(CurrentDate) *static_cast<double>(m_MortgagesPayments.GetDate(i-1).daysTo(m_MortgagesPayments.GetDate(i ))) / 360.0, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
+				m_GICflows.AddFlow(CurrentDate, m_PrincipalAvailable.GetPrepay()*m_GICinterest.GetValue(CurrentDate) *static_cast<double>(m_MortgagesPayments.GetDate(i-1).daysTo(m_MortgagesPayments.GetDate(i ))) / 360.0, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
+				m_InterestAvailable +=
+					m_GICflows.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow))
+					+ m_GICflows.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow))
+				;
+			}
 			m_PrincipalAvailable.AddScheduled(m_MortgagesPayments.GetScheduled(i));
 			m_PrincipalAvailable.AddPrepay(m_MortgagesPayments.GetPrepay(i));
 			m_InterestAvailable+=m_MortgagesPayments.GetInterest(i);
@@ -740,7 +760,9 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						- m_TotalJuniorFees.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow))
 						- m_TotalJuniorFees.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow))
 						+ ((1.0 + AdjustCoupon(m_JuniorFeesCoupon,RollingLastIPD,RollingNextIPD, DayCountConvention::ACT360))*m_TotalJuniorFees.GetPreviousFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow)))
+						+ ((1.0 + AdjustCoupon(m_JuniorFeesCoupon, RollingLastIPD, RollingNextIPD, DayCountConvention::ACT360))*m_StartingDeferredJunFees)
 					;
+					m_StartingDeferredJunFees = 0.0;
 					TotalPayable += m_JuniorFeesFixed.GetValue(CurrentDate);
 					TotalPayable=qMax(TotalPayable,0.0);
 					if(SingleStep->GetRedemptionGroup()==1){
@@ -1132,6 +1154,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 			m_Reserves[j]->SetReserveFundCurrent(m_Reserves[j]->GetStartingReserve());
 			m_Reserves[j]->ResetMissingAnchors();
 		}
+		m_StartingDeferredJunFees = OriginalStartingDefJunFees;
 		m_PrincipalAvailable=OriginalAvailablePrincipal;
 		m_InterestAvailable=OriginalAvailableInterest;
 		m_CalculatedMtgPayments=m_MortgagesPayments;
@@ -1145,7 +1168,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		if (NullCCCanchor[5]) m_SeniorExpensesFixed.RemoveAnchorDate();
 		if (NullCCCanchor[6]) m_SeniorFeesFixed.RemoveAnchorDate();
 		if (NullCCCanchor[7]) m_JuniorFeesFixed.RemoveAnchorDate();
-		
+		if (NullCCCanchor[8]) m_GICinterest.RemoveAnchorDate();
 		//Check that there is no losses of cash flows
 		TrancheCashFlow CheckTranCashFlow;
 		MtgCashFlow CheckMtgCashFlow;
@@ -1155,8 +1178,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		CheckTranCashFlow.Clear(); CheckTranCashFlow.AddFlow(m_Reinvested); CheckResults += CheckTranCashFlow.GetTotalFlow(0);
 		CheckTranCashFlow.Clear(); CheckTranCashFlow.AddFlow(m_TotalSeniorExpenses); CheckResults += CheckTranCashFlow.GetTotalFlow(0);
 		CheckTranCashFlow.Clear(); CheckTranCashFlow.AddFlow(m_TotalSeniorFees); CheckResults += CheckTranCashFlow.GetTotalFlow(0);
-		CheckTranCashFlow.Clear(); CheckTranCashFlow.AddFlow(m_TotalJuniorFees); 
-		CheckResults += CheckTranCashFlow.GetTotalFlow(0);
+		CheckTranCashFlow.Clear(); CheckTranCashFlow.AddFlow(m_TotalJuniorFees); CheckResults += CheckTranCashFlow.GetTotalFlow(0);
 		CheckTranCashFlow.Clear(); CheckTranCashFlow.AddFlow(m_ExcessCashFlow); CheckResults += CheckTranCashFlow.GetTotalFlow(0);
 		foreach(const ReserveFund* SingleReserve, m_Reserves) {
 			CheckTranCashFlow.Clear(); CheckTranCashFlow.AddFlow(SingleReserve->GetReserveFundFlow()); CheckResults += CheckTranCashFlow.GetTotalFlow(0);
@@ -1164,6 +1186,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		foreach(const Tranche* SingleTranche, m_Tranches) {
 			CheckTranCashFlow.Clear(); CheckTranCashFlow.AddFlow(SingleTranche->GetCashFlow());	CheckResults += CheckTranCashFlow.GetTotalFlow(0);
 		}
+		CheckTranCashFlow.Clear(); CheckTranCashFlow.AddFlow(m_GICflows); CheckResults -= CheckTranCashFlow.GetTotalFlow(0);
 		
 		CheckResults -= m_InterestAvailable;
 		CheckResults -= m_PrincipalAvailable.Total();
@@ -1209,6 +1232,9 @@ QDataStream& operator<<(QDataStream & stream, const Waterfall& flows){
 		<< flows.m_CallMultiple
 		<< flows.m_CallReserve
 		<< flows.m_DealName
+		<< flows.m_GICinterest
+		<< flows.m_StartingDeferredJunFees
+		<< flows.m_GICflows
 		<< flows.m_WaterfallStesps.size();
 	;
 	foreach(const WatFalPrior* SingleStep, flows.m_WaterfallStesps)
@@ -1266,8 +1292,11 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream){
 		>> m_UseCall
 		>> m_CallMultiple
 		>> m_CallReserve
-		>> m_DealName
-		>> TempInt
+		>> m_DealName;
+	m_GICinterest.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_GICinterest;
+	stream >> m_StartingDeferredJunFees;
+	m_GICflows.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_GICflows;
+	stream >> TempInt;
 	;
 	ResetSteps();
 	for (int i = 0; i < TempInt; i++) {
@@ -1321,57 +1350,58 @@ QDate Waterfall::GetCalledPeriod() const{
 }
 QString Waterfall::ReadyToCalculate()const{
 	QString Result;
-	if (m_SeniorExpenses.GetVector().isEmpty()) Result += "Senior Expenses\n";
-	if (m_SeniorFees.GetVector().isEmpty()) Result += "Senior Fees\n";
-	if (m_JuniorFees.GetVector().isEmpty()) Result += "Junior Fees\n";
-	if (m_SeniorExpensesFixed.GetVector().isEmpty()) Result += "Senior Expenses Fixed\n";
-	if (m_SeniorFeesFixed.GetVector().isEmpty()) Result += "Senior Fees Fixed\n";
-	if (m_JuniorFeesFixed.GetVector().isEmpty()) Result += "Junior Fees Fixed\n";
-	if(m_Tranches.isEmpty()) Result+="Tranches\n";
-	if(m_WaterfallStesps.isEmpty()) Result+="Waterfall Steps\n";
-	if(m_MortgagesPayments.Count()==0) Result+="Loans Payments\n";
-	if(m_PaymentFrequency.GetVector().isEmpty()) Result+="IDP Frequency\n";
-	if(m_ReinvestmentTest.GetCDRAssumption().isEmpty())Result+="CDR\n";
-	if(m_ReinvestmentTest.GetCPRAssumption().isEmpty())Result+="CPR\n";
-	if(m_ReinvestmentTest.GetLSAssumption().isEmpty())Result+="LS\n";
-	if(m_ReinvestmentTest.GetWALAssumption().isEmpty())Result+="Reinvestment Bond WAL\n";
+	if (m_GICinterest.IsEmpty()) Result += "GIC Interest\n";
+	if (m_SeniorExpenses.IsEmpty()) Result += "Senior Expenses\n";
+	if (m_SeniorFees.IsEmpty()) Result += "Senior Fees\n";
+	if (m_JuniorFees.IsEmpty()) Result += "Junior Fees\n";
+	if (m_SeniorExpensesFixed.IsEmpty()) Result += "Senior Expenses Fixed\n";
+	if (m_SeniorFeesFixed.IsEmpty()) Result += "Senior Fees Fixed\n";
+	if (m_JuniorFeesFixed.IsEmpty()) Result += "Junior Fees Fixed\n";
+	if (m_Tranches.isEmpty()) Result += "Tranches\n";
+	if (m_WaterfallStesps.isEmpty()) Result += "Waterfall Steps\n";
+	if (m_MortgagesPayments.Count() == 0) Result += "Loans Payments\n";
+	if (m_PaymentFrequency.IsEmpty()) Result += "IDP Frequency\n";
+	if (m_ReinvestmentTest.GetCDRAssumption().isEmpty())Result += "CDR\n";
+	if (m_ReinvestmentTest.GetCPRAssumption().isEmpty())Result += "CPR\n";
+	if (m_ReinvestmentTest.GetLSAssumption().isEmpty())Result += "LS\n";
+	if (m_ReinvestmentTest.GetWALAssumption().isEmpty())Result += "Reinvestment Bond WAL\n";
 	if (m_ReinvestmentTest.GetReinvDelay().isEmpty())Result += "Reinvestment Delay\n";
 	if (m_ReinvestmentTest.GetReinvPrice().isEmpty())Result += "Reinvestment Price\n";
-	if(m_ReinvestmentTest.GetReinvestmentPeriod()<QDate(2000,1,1))Result+="Reinvestment Period\n";
-	if(m_ReinvestmentTest.GetTestLevel()<0.0)Result+="Reinvestment Test Limit\n";
-	if(m_ReinvestmentTest.GetReinvestmentBond().GetPaymentFreq().IsEmpty(1)) Result+="Reinvestment Bond Payment Frequency\n";
-	if(m_ReinvestmentTest.GetReinvestmentBond().GetInterest().isEmpty())Result+="Reinvestment Bond Spread\n";
-	if(m_CCCcurve.IsEmpty())Result+="CCC Curve\n";
-	if(m_CCChaircut<0.0)Result+="CCC Value\n";
-	if(m_PoolValueAtCall<0.0)Result+="Pool Value at Call\n";
-	if(m_UseCall && m_CallDate<QDate(2000,1,1) && (m_CallReserve<=0.0 || m_CallMultiple<=0.0))Result+="Specify a call Criteria to use the Call\n";
-	if(m_MortgagesPayments.Count()>0 && m_MortgagesPayments.GetDate(0)<QDate(2000,1,1))Result+="Pool Cut Off Date\n";
-	if(m_CCCTestLimit<0.0)Result+="CCC Test Limit\n";
-	if(
-		m_ReinvestmentTest.GetShare(ReinvestmentTest::InRedempShare)<0.0
-		|| m_ReinvestmentTest.GetShare(ReinvestmentTest::OutRedempShare)<0.0
-		|| m_ReinvestmentTest.GetShare(ReinvestmentTest::InReinvShare)<0.0
-		|| m_ReinvestmentTest.GetShare(ReinvestmentTest::OutReinvShare)<0.0
-		|| m_ReinvestmentTest.GetShare(ReinvestmentTest::InRedempShare)+m_ReinvestmentTest.GetShare(ReinvestmentTest::InReinvShare)>1.0
-		|| m_ReinvestmentTest.GetShare(ReinvestmentTest::OutRedempShare)+m_ReinvestmentTest.GetShare(ReinvestmentTest::OutReinvShare)>1.0
-	)Result+=QString("Reinvestment Test Shares InRedempShare: %1 | OutRedempShare: %2 | InReinvShare: %3 | OutReinvShare: %4 | %5 | %6\n")
+	if (m_ReinvestmentTest.GetReinvestmentPeriod() < QDate(2000, 1, 1))Result += "Reinvestment Period\n";
+	if (m_ReinvestmentTest.GetTestLevel() < 0.0)Result += "Reinvestment Test Limit\n";
+	if (m_ReinvestmentTest.GetReinvestmentBond().GetPaymentFreq().IsEmpty(1)) Result += "Reinvestment Bond Payment Frequency\n";
+	if (m_ReinvestmentTest.GetReinvestmentBond().GetInterest().isEmpty())Result += "Reinvestment Bond Spread\n";
+	if (m_CCCcurve.IsEmpty())Result += "CCC Curve\n";
+	if (m_CCChaircut < 0.0)Result += "CCC Value\n";
+	if (m_PoolValueAtCall < 0.0)Result += "Pool Value at Call\n";
+	if (m_UseCall && m_CallDate < QDate(2000, 1, 1) && (m_CallReserve <= 0.0 || m_CallMultiple <= 0.0))Result += "Specify a call Criteria to use the Call\n";
+	if (m_MortgagesPayments.Count() > 0 && m_MortgagesPayments.GetDate(0) < QDate(2000, 1, 1))Result += "Pool Cut Off Date\n";
+	if (m_CCCTestLimit < 0.0)Result += "CCC Test Limit\n";
+	if (
+		m_ReinvestmentTest.GetShare(ReinvestmentTest::InRedempShare) < 0.0
+		|| m_ReinvestmentTest.GetShare(ReinvestmentTest::OutRedempShare) < 0.0
+		|| m_ReinvestmentTest.GetShare(ReinvestmentTest::InReinvShare) < 0.0
+		|| m_ReinvestmentTest.GetShare(ReinvestmentTest::OutReinvShare) < 0.0
+		|| m_ReinvestmentTest.GetShare(ReinvestmentTest::InRedempShare) + m_ReinvestmentTest.GetShare(ReinvestmentTest::InReinvShare) > 1.0
+		|| m_ReinvestmentTest.GetShare(ReinvestmentTest::OutRedempShare) + m_ReinvestmentTest.GetShare(ReinvestmentTest::OutReinvShare) > 1.0
+		)Result += QString("Reinvestment Test Shares InRedempShare: %1 | OutRedempShare: %2 | InReinvShare: %3 | OutReinvShare: %4 | %5 | %6\n")
 		.arg(m_ReinvestmentTest.GetShare(ReinvestmentTest::InRedempShare))
 		.arg(m_ReinvestmentTest.GetShare(ReinvestmentTest::OutRedempShare))
 		.arg(m_ReinvestmentTest.GetShare(ReinvestmentTest::InReinvShare))
 		.arg(m_ReinvestmentTest.GetShare(ReinvestmentTest::OutReinvShare))
-		.arg(m_ReinvestmentTest.GetShare(ReinvestmentTest::InRedempShare)+m_ReinvestmentTest.GetShare(ReinvestmentTest::InReinvShare))
-		.arg(m_ReinvestmentTest.GetShare(ReinvestmentTest::OutRedempShare)+m_ReinvestmentTest.GetShare(ReinvestmentTest::OutReinvShare))
-	;
-	if(m_FirstIPDdate<QDate(2000,1,1))Result+="Next IDP\n";
-	if(m_LastIPDdate<QDate(2000,1,1))Result+="Last IDP\n";
-	for (int ResIter = 0; ResIter<m_Reserves.size(); ResIter++) {
-		if (m_Reserves.at(ResIter)->GetReserveFundTargetString().isEmpty()) Result+=QString("Reserve %1 Target Level\n").arg(ResIter+1);
+		.arg(m_ReinvestmentTest.GetShare(ReinvestmentTest::InRedempShare) + m_ReinvestmentTest.GetShare(ReinvestmentTest::InReinvShare))
+		.arg(m_ReinvestmentTest.GetShare(ReinvestmentTest::OutRedempShare) + m_ReinvestmentTest.GetShare(ReinvestmentTest::OutReinvShare))
+		;
+	if (m_FirstIPDdate < QDate(2000, 1, 1))Result += "Next IDP\n";
+	if (m_LastIPDdate < QDate(2000, 1, 1))Result += "Last IDP\n";
+	for (int ResIter = 0; ResIter < m_Reserves.size(); ResIter++) {
+		if (m_Reserves.at(ResIter)->GetReserveFundTargetString().isEmpty()) Result += QString("Reserve %1 Target Level\n").arg(ResIter + 1);
 		if (m_Reserves.at(ResIter)->GetReserveFundMultipleString().isEmpty()) Result += QString("Reserve %1 Multiple\n").arg(ResIter + 1);
 		if (m_Reserves.at(ResIter)->GetReserveFundFloorString().isEmpty())Result += QString("Reserve %1 Floor Level\n").arg(ResIter + 1);
-		if (m_Reserves.at(ResIter)->GetReserveFundFreed()<0) Result += QString("Reserve %1 Freed After Redemption\n").arg(ResIter + 1);
-		if (m_Reserves.at(ResIter)->GetReserveFundCurrent()<0.0) Result += QString("Reserve %1 Current Amount\n").arg(ResIter + 1);
+		if (m_Reserves.at(ResIter)->GetReserveFundFreed() < 0) Result += QString("Reserve %1 Freed After Redemption\n").arg(ResIter + 1);
+		if (m_Reserves.at(ResIter)->GetReserveFundCurrent() < 0.0) Result += QString("Reserve %1 Current Amount\n").arg(ResIter + 1);
 	}
-	if(!Result.isEmpty()) return Result.left(Result.size()-1);
+	if (!Result.isEmpty()) return Result.left(Result.size() - 1);
 	return Result;
 }
 double Waterfall::GetEquityReturn(int index)const{

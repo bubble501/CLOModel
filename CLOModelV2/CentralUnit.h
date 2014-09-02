@@ -115,6 +115,10 @@ public:
 	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll=false)const;
 #endif
 	void SetDealName(const QString& a) {Structure.SetDealName(a);}
+	bool GetBaseCaseToCall() const { return m_BaseCaseToCall; }
+	void SetBaseCaseToCall(bool val) { m_BaseCaseToCall = val; }
+	bool GetSaveBaseCase() const { return m_SaveBaseCase; }
+	void SetSaveBaseCase(bool val) { m_SaveBaseCase = val; }
 private:
 	ProgressWidget* MtgsProgress;
 	WaterfallCalculator* ParallWatFalls;
@@ -138,6 +142,8 @@ private:
 	int PlotIndexes[NumberOfPlots];
 	mutable QDate LiborUpdateDate;
 	mutable bool m_UseForwardCurve;
+	bool m_SaveBaseCase;
+	bool m_BaseCaseToCall;
 signals:
 	void LoopStarted();
 	void StressLoopStarted();

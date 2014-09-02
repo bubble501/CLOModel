@@ -18,6 +18,8 @@ CentralUnit::CentralUnit(QObject* parent)
 	,RunCall(false)
 	,UseFastStress(false)
 	, m_UseForwardCurve(false)
+	, m_SaveBaseCase(true)
+	, m_BaseCaseToCall(true)
 {
 	for(int i=0;i<NumberOfPlots;i++) PlotIndexes[i]=0;
 	if(!QMetaType::isRegistered(qMetaTypeId<Waterfall>()))
@@ -245,6 +247,7 @@ void CentralUnit::CheckCalculationDone()
 			return;
 		}
 	}
+	
 	#ifdef SaveLoanTape
 	{
 		QFile file(FolderPath+"\\.Loans.clp");
@@ -264,10 +267,10 @@ void CentralUnit::CheckCalculationDone()
 	if (file.open(QIODevice::WriteOnly)) {
 		QDataStream out(&file);
 		out.setVersion(QDataStream::Qt_5_3);
-		out << qint32(ModelVersionNumber) << Structure << CallStructure;
+		out << qint32(ModelVersionNumber) << m_BaseCaseToCall << Structure << CallStructure;
 		file.close();
 	}
-	{
+	if (m_SaveBaseCase) {
 		QSettings ConfigIni(":/Configs/GlobalConfigs.ini", QSettings::IniFormat);
 		ConfigIni.beginGroup("Folders");
 		QDir UnifiedDir(ConfigIni.value("UnifiedResultsFolder","\\\\synserver2\\Company Share\\24AM\\Monitoring\\Model Results").toString());
@@ -280,7 +283,7 @@ void CentralUnit::CheckCalculationDone()
 			if (UnifiedFile.open(QIODevice::WriteOnly)) {
 				QDataStream out(&UnifiedFile);
 				out.setVersion(QDataStream::Qt_5_3);
-				out << qint32(ModelVersionNumber) << LiborUpdateDate << m_UseForwardCurve << Structure << CallStructure << LoansCalculator;
+				out << qint32(ModelVersionNumber) << LiborUpdateDate << m_UseForwardCurve << m_BaseCaseToCall << Structure << CallStructure << LoansCalculator;
 				UnifiedFile.close();
 			}
 		}

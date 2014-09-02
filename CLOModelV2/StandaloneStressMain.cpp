@@ -73,6 +73,7 @@ int main(int argc, char *argv[]) {
 		file.close();
 		return 1;
 	}
+	{bool Junk; out >> Junk; }
 	TempWtf.SetLoadProtocolVersion(VersionChecker);
 	out >> TempWtf;
 	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);

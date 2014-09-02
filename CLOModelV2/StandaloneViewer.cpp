@@ -130,6 +130,7 @@ void StandaloneViewer::LoadFile(const QString& fileName){
 			QMessageBox::critical(this,"Invalid File Format","The selected file version is not compatible with this viewer");
 			return closeFile();
 		}
+		{bool Junk; out >> Junk; }
 		TempWaterfall.SetLoadProtocolVersion(VersionChecker);
 		out >> TempWaterfall;
 		TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);

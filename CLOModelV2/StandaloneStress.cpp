@@ -263,6 +263,7 @@ void StandaloneStress::Start(){
 		out.setVersion(QDataStream::Qt_5_3);
 		out >> VersionChecker;
 		if (VersionChecker != qint32(ModelVersionNumber)) return;
+		{bool Junk; out >> Junk; }
 		out >> TempWaterfall;
 		file.close();
 	}

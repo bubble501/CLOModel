@@ -179,6 +179,12 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			bool CumRes=pdFreq->boolVal; pdFreq++;
 			TempUnit.SetCumulativeReserves(CumRes);
 		}
+		{// Base Case Infos
+			bool TempBool = pdFreq->boolVal; pdFreq++;
+			TempUnit.SetBaseCaseToCall(TempBool);
+			TempBool = pdFreq->boolVal; pdFreq++;
+			TempUnit.SetSaveBaseCase(TempBool);
+		}
 		{// Reinvestment Test
 			QDate ReinPer;
 			double ReinvLim,IISha,IRsha,OIsha,ORsha;
@@ -298,6 +304,7 @@ double __stdcall CLOReturnRate(LPSAFEARRAY *ArrayData){
 	out >> VersionChecker;
 	//if(VersionChecker!=qint32(ModelVersionNumber)) return 0.0;
 	if(VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) return 0.0;
+	{bool Junk; out >> Junk; }
 	TempWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempWaterfall;
 	if(ToCall){
@@ -335,6 +342,7 @@ double __stdcall CLODiscountMargin(LPSAFEARRAY *ArrayData){
 	out >> VersionChecker;
 	//if(VersionChecker!=qint32(ModelVersionNumber)) return 0.0;
 	if(VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) return 0.0;
+	{bool Junk; out >> Junk; }
 	TempWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempWaterfall;
 	if(ToCall){
@@ -367,6 +375,7 @@ double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
 	out.setVersion(QDataStream::Qt_5_3);
 	out >> VersionChecker;
 	if(VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) return 0.0;
+	{bool Junk; out >> Junk; }
 	TempWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempWaterfall;
 	if(ToCall){

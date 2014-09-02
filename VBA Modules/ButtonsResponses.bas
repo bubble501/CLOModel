@@ -1,31 +1,10 @@
 Attribute VB_Name = "ButtonsResponses"
 Option Explicit
-Public Sub RunModel()
-    Application.ScreenUpdating = False
-    Dim FieldsLabels As New Collection
-    Sheets("Tranches Results").Unprotect
-    Sheets("Mortgages Results").Unprotect
-    Sheets("Graphical Output").Unprotect
-    Sheets("Liabilities + input").Unprotect
-    Call PopulateDafaultLabels(FieldsLabels)
-    Sheets("Mortgages Results").Cells.Clear
-    Sheets("Tranches Results").Cells.Clear
-    Call GetInputFromStructure( _
-        "Loans Pool" _
-        , "Liabilities + input" _
-        , Left(ActiveWorkbook.FullName, InStrRev(ActiveWorkbook.FullName, "\")) _
-        , FieldsLabels _
-    )
-    With Sheets("Liabilities + input")
-      .EnableCalculation = False
-      .EnableCalculation = True
-      .Calculate
-    End With
-    Sheets("Tranches Results").Protect UserInterfaceOnly:=True, AllowFormattingCells:=True, AllowFormattingColumns:=True, AllowFormattingRows:=True
-    Sheets("Mortgages Results").Protect UserInterfaceOnly:=True, AllowFormattingCells:=True, AllowFormattingColumns:=True, AllowFormattingRows:=True
-    Sheets("Graphical Output").Protect
-    Sheets("Graphical Output").EnableSelection = xlUnlockedCells
-    Sheets("Liabilities + input").Protect UserInterfaceOnly:=True, AllowFormattingCells:=True
+Public Sub RunBaseModel()
+Call RunCLOModel(True)
+End Sub
+Public Sub RunTestModel()
+Call RunCLOModel(False)
 End Sub
 Private Sub RunStress(StressGrid As Long)
     If (StressGrid < 1 Or StressGrid > 3) Then Exit Sub

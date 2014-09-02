@@ -13,6 +13,7 @@ Public Sub GetInputFromStructure( _
     InputsSheet As String, _
     CallerPath As String, _
     FieldsLabels As Collection, _
+    Optional SaveBaseCase As Boolean = True, _
     Optional RunStressTest As Boolean = False, _
     Optional StressRowDimension As Long = 0, _
     Optional StressColDimension As Long = 1, _
@@ -83,7 +84,7 @@ Public Sub GetInputFromStructure( _
     Dim LossToCallCell As Range
     Dim CallMultiplierCell As Range
     Dim CallReserveCell As Range
-    Dim AccruedIntrStart As Range
+    'Dim AccruedIntrStart As Range
     Dim IsinFldsStart As Range
     Dim FirstResTargCell As Range
     Dim FirstResMultCell As Range
@@ -111,8 +112,11 @@ Public Sub GetInputFromStructure( _
     Dim DelinqLagCell As Range
     Dim CurrentDeferredCell As Range
     Dim UseForwardCell As Range
+    Dim DayCountHead As Range
+    Dim BaseCaseCall As Range
     On Error Resume Next
     Set HaircutVecStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("HaircutVecHeader"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set BaseCaseCall = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("BaseCaseCall"), LookAt:=xlWhole, LookIn:=xlValues)
     Set IsinFldsStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("IsinFldsHeader"), LookAt:=xlWhole, LookIn:=xlValues)
     Set FirstResTargCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("FirstResTargCell"), LookAt:=xlWhole, LookIn:=xlValues)
     Set FirstResMultCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("FirstResMultCell"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -142,6 +146,7 @@ Public Sub GetInputFromStructure( _
     Set DelinqLagCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("DelinqLagCell"), LookAt:=xlWhole, LookIn:=xlValues)
     Set CurrentDeferredCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("CurrentDeferredCell"), LookAt:=xlWhole, LookIn:=xlValues)
     Set UseForwardCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("UseForwardCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set DayCountHead = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("DayCountHead"), LookAt:=xlWhole, LookIn:=xlValues)
     On Error GoTo 0
     Set BaseIndexHead = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("BaseIndexHead"), LookAt:=xlWhole, LookIn:=xlValues)
     Set MaturityStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("MaturityHeader"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -169,7 +174,7 @@ Public Sub GetInputFromStructure( _
     Set LossOutputCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("LossOutputHeader"), LookAt:=xlWhole, LookIn:=xlValues)
     Set LossToCallCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("LossToCallField"), LookAt:=xlWhole, LookIn:=xlValues)
     Set SettleDateCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SettleDateField"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set AccruedIntrStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("IntrAccrHead"), LookAt:=xlWhole, LookIn:=xlValues)
+    'Set AccruedIntrStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("IntrAccrHead"), LookAt:=xlWhole, LookIn:=xlValues)
     Set TrancheCouponStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("TrancheCouponHead"), LookAt:=xlWhole, LookIn:=xlValues)
     Set RefRateStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("RefRateHead"), LookAt:=xlWhole, LookIn:=xlValues)
     Set WaterfallStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("WaterfallHeader"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -234,7 +239,11 @@ ReferenceRateFromBBg:
             Call AddInput(AllTheInputs, Format(MaturityStart.Offset(i, 0).Value, "yyyy-mm-dd"))
             Call AddInput(AllTheInputs, OutstandingStart.Offset(i, 0).Value)
             Call AddInput(AllTheInputs, CStr(CouponStart.Offset(i, 0).Value))
-            Call AddInput(AllTheInputs, CStr(BaseIndexHead.Offset(i, 0).Value))
+            If IsEmpty(BaseIndexHead.Offset(i, 0)) Then
+                Call AddInput(AllTheInputs, "ZERO")
+            Else
+                Call AddInput(AllTheInputs, CStr(BaseIndexHead.Offset(i, 0).Value))
+            End If
             Call AddInput(AllTheInputs, CStr(AnnuityStart.Offset(i, 0).Value))
             Call AddInput(AllTheInputs, CStr(FrequencyStart.Offset(i, 0).Value))
             Call AddInput(AllTheInputs, CStr(CPRMultiStart.Offset(i, 0).Value))
@@ -265,9 +274,11 @@ ReferenceRateFromBBg:
         Call AddInput(AllTheInputs, OriginalOutStart.Offset(i, 0).Value)
         Call AddInput(AllTheInputs, CStr(CurrencyStart.Offset(i, 0).Value))
         Call AddInput(AllTheInputs, CurrentOutStart.Offset(i, 0).Value)
+        Call AddInput(AllTheInputs, CLng(1))
         Call AddInput(AllTheInputs, FromStringToInterestType(FixFloatStart.Offset(i, 0).Value))
-        'Call AddInput(AllTheInputs, TrancheCouponStart.Offset(i, 0).Value / 10000)
+        Call AddInput(AllTheInputs, CLng(1))
         Call AddInput(AllTheInputs, CStr(TrancheCouponStart.Offset(i, 0).Value))
+        Call AddInput(AllTheInputs, CLng(1))
         Call AddInput(AllTheInputs, CStr(RefRateStart.Offset(i, 0).Value))
         Call AddInput(AllTheInputs, Format(PrevIPDCell.Offset(0, 1).Value, "yyyy-mm-dd"))
         Call AddInput(AllTheInputs, CStr(InterestBaseCell.Offset(0, 1).Value))
@@ -296,7 +307,12 @@ DefaultExchange:
         End If
         On Error GoTo 0
         Call AddInput(AllTheInputs, Format(SettleDateCell.Offset(0, 1).Value, "yyyy-mm-dd"))
-        Call AddInput(AllTheInputs, AccruedIntrStart.Offset(i, 0).Value)
+        'Call AddInput(AllTheInputs, AccruedIntrStart.Offset(i, 0).Value)
+        If (DayCountHead Is Nothing) Then
+            Call AddInput(AllTheInputs, 102)
+        Else
+            Call AddInput(AllTheInputs, CLng(DayCountHead.Offset(i, 0).Value))
+        End If
         If (CurrentDeferredCell Is Nothing) Then
             Call AddInput(AllTheInputs, 0#)
         Else
@@ -446,6 +462,12 @@ DefaultExchange:
         Call AddInput(AllTheInputs, CBool(UseCumulativeReservesCell.Offset(0, 1).Value))
     End If
     ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    If (BaseCaseCall Is Nothing) Then
+        Call AddInput(AllTheInputs, True)
+    Else
+        Call AddInput(AllTheInputs, CBool(BaseCaseCall.Offset(0, 1).Value))
+    End If
+    Call AddInput(AllTheInputs, SaveBaseCase)
     Call AddInput(AllTheInputs, Format(ReinvestPeriodCell.Offset(0, 1).Value, "yyyy-mm-dd"))
     Call AddInput(AllTheInputs, ReinvestLimitCell.Offset(0, 1).Value)
     Call AddInput(AllTheInputs, ReinvestTableCell.Offset(1, 1).Value)
@@ -654,7 +676,7 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
     a.Add 8, "CPRLSPlotIndex"
     a.Add 9, "CallToEquityPlotIndex"
     a.Add 7, "EquityReturnPlotIndex"
-    a.Add "Accrued Interest", "IntrAccrHead"
+    'a.Add "Accrued Interest", "IntrAccrHead"
     a.Add "First Fund Target", "FirstResTargCell"
     a.Add "First Fund Multiple", "FirstResMultCell"
     a.Add "First Fund Floor", "FirstResFloorCell"
@@ -681,6 +703,8 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
     a.Add "Delinquency Lag", "DelinqLagCell"
     a.Add "Current Deferred", "CurrentDeferredCell"
     a.Add "Use Forward Curves", "UseForwardCell"
+    a.Add "Day Count", "DayCountHead"
+    a.Add "Base Case To Call", "BaseCaseCall"
 End Sub
 
 Private Function FromStringToInterestType(a As String) As Long
@@ -724,6 +748,8 @@ Private Function FromStringToPriorty(a As String) As Long
             FromStringToPriorty = 11
         Case UCase("Replenish Reserve")
             FromStringToPriorty = 14
+        Case UCase("Redeem Pro-Rata")
+            FromStringToPriorty = 15
         Case Else
             GoTo FromStringToPriorty_Error
     End Select

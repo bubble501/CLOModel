@@ -81,6 +81,9 @@ Public Sub WaterfallStepChanged(TargetAllCell As Range)
                 TargetCell.Offset(0, 2).Value = 1
                 TargetCell.Offset(0, 1).AddComment "Index of the reserve fund to use"
                 TargetCell.Offset(0, 2).AddComment "1 if it's replenished using interest, 2 if it's replenished using principal"
+            Case UCase("Interest")
+                TargetCell.Offset(0, 2).NumberFormat = ";;;"
+                TargetCell.Offset(0, 2).Value = 1
             Case UCase("Reinvestment")
                 TargetCell.Offset(0, 1).ClearContents
                 TargetCell.Offset(0, 1).Locked = True
@@ -111,6 +114,11 @@ Public Sub WaterfallStepChanged(TargetAllCell As Range)
                 TargetCell.Offset(0, 3).Value = 0
                 TargetCell.Offset(0, 3).NumberFormat = "0%"
                 TargetCell.Offset(0, 2).NumberFormat = "0"
+            Case UCase("Redeem Pro-Rata")
+                TargetCell.Offset(0, 2).Locked = False
+                TargetCell.Offset(0, 1).AddComment ("First Seniority Level To Redeem")
+                TargetCell.Offset(0, 2).AddComment ("Last Seniority Level To Redeem")
+                TargetCell.Offset(0, 1).Resize(1, 2).NumberFormat = "0"
             Case ""
                 TargetCell.Offset(0, 1).Resize(1, 3).ClearContents
                 TargetCell.Offset(0, 1).Resize(1, 3).Locked = True
@@ -348,3 +356,32 @@ For i = 1 To 16
         "=IF(" + BondNameCell.Offset(i, 0).Address + "="""","""",BDP(" + BondNameCell.Offset(i, 0).Address + " & "" " + "Mtge" + """,""INT_ACC""))"
 Next i
 End Sub
+Public Sub RunCLOModel(SaveBase As Boolean)
+    Application.ScreenUpdating = False
+    Dim FieldsLabels As New Collection
+    Sheets("Tranches Results").Unprotect
+    Sheets("Mortgages Results").Unprotect
+    Sheets("Graphical Output").Unprotect
+    Sheets("Liabilities + input").Unprotect
+    Call PopulateDafaultLabels(FieldsLabels)
+    Sheets("Mortgages Results").Cells.Clear
+    Sheets("Tranches Results").Cells.Clear
+    Call GetInputFromStructure( _
+        "Loans Pool" _
+        , "Liabilities + input" _
+        , Left(ActiveWorkbook.FullName, InStrRev(ActiveWorkbook.FullName, "\")) _
+        , FieldsLabels _
+        , SaveBase _
+    )
+    With Sheets("Liabilities + input")
+      .EnableCalculation = False
+      .EnableCalculation = True
+      .Calculate
+    End With
+    Sheets("Tranches Results").Protect UserInterfaceOnly:=True, AllowFormattingCells:=True, AllowFormattingColumns:=True, AllowFormattingRows:=True
+    Sheets("Mortgages Results").Protect UserInterfaceOnly:=True, AllowFormattingCells:=True, AllowFormattingColumns:=True, AllowFormattingRows:=True
+    Sheets("Graphical Output").Protect
+    Sheets("Graphical Output").EnableSelection = xlUnlockedCells
+    Sheets("Liabilities + input").Protect UserInterfaceOnly:=True, AllowFormattingCells:=True
+End Sub
+

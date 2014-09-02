@@ -187,7 +187,11 @@ void CentralUnit::CalculationStep1(){
 	connect(&LoansCalculator,SIGNAL(BeeCalculated(int)),MtgsProgress,SLOT(SetValue(int)));
 	MtgsProgress->show();
 	QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
-	LoansCalculator.StartCalculation();
+	if (!LoansCalculator.StartCalculation()) {
+		QMessageBox::critical(0, "Invalid Input", "A base rate in the loans is invalid");
+		QApplication::quit();
+		return;
+	}
 }
 void CentralUnit::CalculationStep2(){
 	MtgsProgress->SetValue(0);

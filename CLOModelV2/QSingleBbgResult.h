@@ -65,7 +65,7 @@ namespace QBloombergLib {
 		void AddValueRow(const QList<QString>& val, const QList<QString>& Headers = QList<QString>());
 		void SetErrorCode(BbgErrorCodes ErrCd);
 		friend class QBbgWorker;
-		virtual QDataStream& LoadOldVersion(QDataStream& stream);
+		virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 		friend QDataStream& ::operator<<(QDataStream& stream, const QBloombergLib::QSingleBbgResult& flows);
 		friend QDataStream& ::operator>>(QDataStream& stream, QBloombergLib::QSingleBbgResult& flows);
 #endif

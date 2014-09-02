@@ -71,7 +71,7 @@ private:
 	IntegerVector m_DelinquencyLag;
 	
 protected:
-	virtual QDataStream& LoadOldVersion(QDataStream& stream);
+	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 
 };
 QDataStream& operator<<(QDataStream & stream, const ReinvestmentTest& flows);

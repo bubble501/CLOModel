@@ -40,7 +40,7 @@ private:
 	double RedemptionShare;
 	WaterfallStepType PriorityType;
 protected:
-	virtual QDataStream& LoadOldVersion(QDataStream& stream);
+	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 	friend QDataStream& operator<<(QDataStream & stream, const WatFalPrior& flows);
 	friend QDataStream& operator>>(QDataStream & stream, WatFalPrior& flows);
 };

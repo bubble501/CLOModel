@@ -117,7 +117,10 @@ void StressTest::RunStressTest() {
 	BaseCalculator->SetDelinquencyLag("0");
 	if (UseFastVersion) {
 		QString CheckLoans = BaseCalculator->ReadyToCalculate();
-		if (CheckLoans.isEmpty()) BaseCalculator->StartCalculation();
+		if (CheckLoans.isEmpty()) {
+			if(!BaseCalculator->StartCalculation())
+				QMessageBox::critical(0, "Invalid Input", "A base rate in the loans is invalid");
+		}
 		else QMessageBox::critical(0, "Invalid Input", "The following Inputs are missing or invalid:\n" + CheckLoans);
 	}
 	else

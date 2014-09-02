@@ -66,7 +66,7 @@ public:
 	void ClearFlows() { m_ReserveFundFlows.Clear(); }
 
 protected:
-	virtual QDataStream& LoadOldVersion(QDataStream& stream);
+	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 private:
 	enum VectorType {
 		ResTarget

@@ -10,7 +10,7 @@ private:
 protected:
 	virtual void UnpackVector();
 	virtual bool IsValid() const;
-	virtual QDataStream& LoadOldVersion(QDataStream& stream);
+	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 public:
 	BoolVector(){}
 	BoolVector(const BoolVector& Vec);

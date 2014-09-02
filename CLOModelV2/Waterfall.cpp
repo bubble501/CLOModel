@@ -537,10 +537,31 @@ double Waterfall::GetWACostOfCapital(int index)const{
 }
 
 bool Waterfall::CalculateTranchesCashFlows(){
-	if (!ReadyToCalculate().isEmpty()) {
-		PrintToTempFile("ReturnFalse.txt", "Not Ready To Calculate");
-		return false;
-	}
+		if (!ReadyToCalculate().isEmpty()) {
+			PrintToTempFile("ReturnFalse.txt", "Not Ready To Calculate");
+			return false;
+		}
+		{//Check if all base rates are valid
+			bool KeepSearching = false;
+			ConstantBaseRateTable TempTable;
+			for (QList<Tranche*>::const_iterator SingleTranche = m_Tranches.constBegin(); SingleTranche != m_Tranches.constEnd(); ++SingleTranche) {
+				for (QHash<qint32, BloombergVector*>::const_iterator SingleRate = (*SingleTranche)->GetRefRateValues().constBegin();SingleRate != (*SingleTranche)->GetRefRateValues().constEnd(); ++SingleRate) {
+					if (SingleRate.value()->IsEmpty()) {
+						KeepSearching = true;
+						(*SingleTranche)->CompileReferenceRateValue(TempTable);
+						break;
+					}
+				}
+			}
+			for (QList<Tranche*>::const_iterator SingleTranche = m_Tranches.constBegin(); KeepSearching && SingleTranche != m_Tranches.constEnd(); ++SingleTranche) {
+				for (QHash<qint32, BloombergVector*>::const_iterator SingleRate = (*SingleTranche)->GetRefRateValues().constBegin(); SingleRate != (*SingleTranche)->GetRefRateValues().constEnd(); ++SingleRate) {
+					if (SingleRate.value()->IsEmpty()) {
+						PrintToTempFile("ReturnFalse.txt", "Missing Base Rate Value");
+						return false;
+					}
+				}
+			}
+		}
 		double CheckResults = 0.0;
 		PrincipalRecip AvailablePrincipal;
 		double AvailableInterest;

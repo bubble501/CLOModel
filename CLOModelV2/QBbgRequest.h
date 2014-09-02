@@ -69,7 +69,7 @@ namespace QBloombergLib {
 		void ClearResults();
 		void SetErrorCode(QSingleBbgResult::BbgErrorCodes ErrCd);
 		friend QBbgWorker;
-		virtual QDataStream& LoadOldVersion(QDataStream& stream);
+		virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 		friend QDataStream& ::operator<<(QDataStream& stream, const QBloombergLib::QBbgRequest& flows);
 		friend QDataStream& ::operator>>(QDataStream& stream, QBloombergLib::QBbgRequest& flows);
 #endif

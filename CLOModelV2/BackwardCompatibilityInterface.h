@@ -9,10 +9,10 @@
 class BackwardInterface {
 public:
 	BackwardInterface() : m_LoadProtocolVersion(ModelVersionNumber) {}
-	virtual void SetLoadProtocolVersion(qint32 VersionNum = ModelVersionNumber) { if (VersionNum >= MinimumSupportedVersion && VersionNum <= ModelVersionNumber) m_LoadProtocolVersion = VersionNum; }
+	virtual void SetLoadProtocolVersion(qint32 VersionNum = ModelVersionNumber) final { if (VersionNum >= MinimumSupportedVersion && VersionNum <= ModelVersionNumber) m_LoadProtocolVersion = VersionNum; }
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) = 0;
-	virtual void ResetProtocolVersion() { m_LoadProtocolVersion = ModelVersionNumber; }
+	virtual void ResetProtocolVersion() final { m_LoadProtocolVersion = ModelVersionNumber; }
 	qint32 m_LoadProtocolVersion;
 };
 #endif // BackwardCompatibilityInterface_h__

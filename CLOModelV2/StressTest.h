@@ -92,7 +92,7 @@ private slots:
 	void RecievedData(int IDx,int IDy,const Waterfall& Res);
 	void StopCalculation();
 protected:
-	virtual QDataStream& LoadOldVersion(QDataStream& stream);
+	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 signals:
 	void ProgressStatus(double);
 	void AllFinished();

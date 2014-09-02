@@ -9,7 +9,7 @@ private:
 	double OutstandingAmt;
 	double StartingDeferredInterest;
 protected:
-	virtual QDataStream& LoadOldVersion(QDataStream& stream);
+	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 	
 public:
 	enum class TrancheFlowType : qint32{

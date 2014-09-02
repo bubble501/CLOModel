@@ -23,8 +23,21 @@ MtgCalculator::~MtgCalculator() {
 void MtgCalculator::AddLoan(const Mortgage& a){
 	Loans.append(new Mortgage(a));
 }
-void MtgCalculator::StartCalculation(){
+bool MtgCalculator::StartCalculation(){
 	BeesReturned=0;
+	{//Check if all base rates are valid
+		bool CheckAgain = false;
+		ConstantBaseRateTable TempTable;
+		for (QList<Mortgage*>::const_iterator i = Loans.constBegin(); i != Loans.constEnd(); ++i) {
+			if ((*i)->GetFloatingRateValue().IsEmpty()) {
+				(*i)->CompileReferenceRateValue(TempTable);
+				CheckAgain = true;
+			}
+		}
+		for (QList<Mortgage*>::const_iterator i = Loans.constBegin(); CheckAgain && i != Loans.constEnd(); ++i) {
+			if ((*i)->GetFloatingRateValue().IsEmpty()) return false;
+		}
+	}
 	int NumberOfThreads=QThread::idealThreadCount();
 	if(SequentialComputation || NumberOfThreads<1) NumberOfThreads=1;
 	for(BeesSent=0;BeesSent<Loans.size() && BeesSent<NumberOfThreads;BeesSent++){
@@ -41,6 +54,7 @@ void MtgCalculator::StartCalculation(){
 		connect(ThreadPool[BeesSent], SIGNAL(Calculated(int, const MtgCashFlow&)), ThreadPool[BeesSent], SLOT(stop()), Qt::QueuedConnection);
 		ThreadPool[BeesSent]->start();
 	}
+	return true;
 }
 void MtgCalculator::BeeReturned(int Ident,const MtgCashFlow& a){
 	Result+=a;

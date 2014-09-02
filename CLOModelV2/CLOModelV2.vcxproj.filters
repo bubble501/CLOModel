@@ -84,11 +84,14 @@
     <Filter Include="Documentation">
       <UniqueIdentifier>{7a611743-10f0-4ec2-a9b3-0b304d7df91b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Common Items">
+      <UniqueIdentifier>{734e6d33-44f9-415b-903c-6b321956b113}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Common Items">
+      <UniqueIdentifier>{cfa50875-80bb-4374-995c-124a8b96952f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CommonFunctions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="quazip\crypt.h">
       <Filter>QuaZIP</Filter>
     </ClInclude>
@@ -170,9 +173,6 @@
     <ClInclude Include="IntegerVector.h">
       <Filter>Header Files\Vectors</Filter>
     </ClInclude>
-    <ClInclude Include="BackwardCompatibilityInterface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="BoolVector.h">
       <Filter>Header Files\Vectors</Filter>
     </ClInclude>
@@ -197,14 +197,17 @@
     <ClInclude Include="QSingleBbgResult.h">
       <Filter>Header Files\Bloomberg</Filter>
     </ClInclude>
+    <ClInclude Include="CommonFunctions.h">
+      <Filter>Header Files\Common Items</Filter>
+    </ClInclude>
+    <ClInclude Include="BackwardCompatibilityInterface.h">
+      <Filter>Header Files\Common Items</Filter>
+    </ClInclude>
     <ClInclude Include="GenericCashFlow.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Common Items</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="CentralUnit.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="Resources.qrc">
       <Filter>Resource Files</Filter>
     </CustomBuild>
@@ -258,6 +261,9 @@
     </CustomBuild>
     <CustomBuild Include="QBbgWorker.h">
       <Filter>Header Files\Bloomberg</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CentralUnit.h">
+      <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -346,9 +352,6 @@
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="CentralUnit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CommonFunctions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\qrc_Resources.cpp">
@@ -501,9 +504,6 @@
     <ClCompile Include="ReserveFund.cpp">
       <Filter>Source Files\Deal Structure</Filter>
     </ClCompile>
-    <ClCompile Include="BaseRateTable.cpp">
-      <Filter>Source Files\Vectors</Filter>
-    </ClCompile>
     <ClCompile Include="QBbgRequest.cpp">
       <Filter>Source Files\Bloomberg</Filter>
     </ClCompile>
@@ -525,8 +525,14 @@
     <ClCompile Include="GeneratedFiles\Release\moc_QBbgWorker.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="BaseRateTable.cpp">
+      <Filter>Source Files\Common Items</Filter>
+    </ClCompile>
     <ClCompile Include="GenericCashFlow.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Common Items</Filter>
+    </ClCompile>
+    <ClCompile Include="CommonFunctions.cpp">
+      <Filter>Source Files\Common Items</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

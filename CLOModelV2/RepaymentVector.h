@@ -19,7 +19,7 @@ protected:
 	virtual void UnpackVector();
 	virtual bool IsValid() const;
 	static RepaymentMethods ConvertRepayment(QChar a);
-	virtual QDataStream& LoadOldVersion(QDataStream& stream);
+	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 public:
 	RepaymentVector() {}
 	RepaymentVector(const RepaymentVector& Vec);

@@ -93,7 +93,7 @@ private:
 	int FindTrancheIndex(const QString& Tranchename)const;
 	void FillAllDates();
 protected:
-	virtual QDataStream& LoadOldVersion(QDataStream& stream);
+	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 public:
 	Waterfall();
 	Waterfall(const Waterfall& a);

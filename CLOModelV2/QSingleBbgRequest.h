@@ -49,7 +49,7 @@ namespace QBloombergLib {
 	protected:
 		bool SameOverrides(const QSingleBbgRequest& a)const;
 		friend class QBbgRequest;
-		virtual QDataStream& LoadOldVersion(QDataStream& stream);
+		virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 		friend QDataStream& ::operator<<(QDataStream & stream, const QBloombergLib::QSingleBbgRequest& flows);
 		friend QDataStream& ::operator>>(QDataStream & stream, QBloombergLib::QSingleBbgRequest& flows);
 #endif

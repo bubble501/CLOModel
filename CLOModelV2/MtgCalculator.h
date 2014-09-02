@@ -16,7 +16,7 @@ public:
 	~MtgCalculator();
 	void AddLoan(const Mortgage& a);
 	void SetStartDate(const QDate& a){StartDate=a;}
-	void StartCalculation();
+	bool StartCalculation();
 	const QString& GetCPRass() const { return m_CPRass; }
 	void SetCPRass(const QString& val) { m_CPRass = val; }
 	const QString& GetCDRass() const { return m_CDRass; }
@@ -61,7 +61,7 @@ private:
 	int BeesReturned;
 	bool SequentialComputation;
 protected:
-	virtual QDataStream& LoadOldVersion(QDataStream& stream);
+	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 private slots:
 	void BeeReturned(int,const MtgCashFlow& a);
 signals:

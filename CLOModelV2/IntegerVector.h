@@ -8,7 +8,7 @@ private:
 protected:
 	virtual void UnpackVector();
 	virtual bool IsValid() const;
-	virtual QDataStream& LoadOldVersion(QDataStream& stream);
+	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 public:
 	using AbstarctBbgVect::IsEmpty;
 	virtual bool IsEmpty(int Lbound, int Ubound=INT_MAX)const;

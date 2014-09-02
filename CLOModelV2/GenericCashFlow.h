@@ -59,7 +59,7 @@ protected:
 	QMap<QDate, QHash<qint32, double>*	> m_CashFlows;
 	CashFlowAggregation m_AggregationLevel;
 	bool m_AdjustHolidays;
-	virtual QDataStream& LoadOldVersion(QDataStream& stream);
+	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 	friend QDataStream& operator<<(QDataStream & stream, const GenericCashFlow& flows);
 	friend QDataStream& operator>>(QDataStream & stream, GenericCashFlow& flows);
 };

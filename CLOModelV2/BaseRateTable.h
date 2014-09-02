@@ -29,7 +29,7 @@ public:
 	void SetUpdateDate(const QDate& val) { UpdateDate = val; }
 	QList<QString> GetAvailableKeys() const { return Values.keys(); }
 protected:
-	virtual QDataStream& LoadOldVersion(QDataStream& stream);
+	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 private:
 	QHash<QString, double> Values;
 	QDate UpdateDate;
@@ -58,7 +58,7 @@ public:
 	void SetUpdateDate(const QDate& val) { UpdateDate = val; }
 	QList<QString> GetAvailableKeys() const { return Values.keys(); }
 protected:
-	virtual QDataStream& LoadOldVersion(QDataStream& stream);
+	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 private:
 	QHash<QString, BloombergVector> Values;
 	QDate UpdateDate;

@@ -23,7 +23,7 @@ private:
 	IntegerVector m_PaymentFreq;
 	mutable bool m_UseForwardCurve;
 protected:
-	virtual QDataStream& LoadOldVersion(QDataStream& stream);
+	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 	double GetInterest(const QDate& a, int frequency=12);
 	double GetInterest(int a, int frequency = 12);
 public:

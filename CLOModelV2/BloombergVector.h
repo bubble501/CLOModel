@@ -5,7 +5,7 @@
 class BloombergVector : public AbstarctBbgVect
 {
 protected:
-	virtual QDataStream& LoadOldVersion(QDataStream& stream);
+	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 	QList<double> m_VectVal;
 	double m_Divisor;
 	virtual void UnpackVector();

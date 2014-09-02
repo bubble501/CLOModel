@@ -45,7 +45,7 @@ private:
 	void ClearInterest();
 	void DownloadBaseRates() const;
 protected:
-	virtual QDataStream& LoadOldVersion(QDataStream& stream);
+	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 public:
 	Tranche();
 	Tranche(const Tranche& a);
@@ -53,6 +53,7 @@ public:
 	Tranche& operator=(const Tranche& a);
 	bool operator<(const Tranche& a)const;
 	bool operator>(const Tranche& a)const;
+	const QHash<qint32, BloombergVector*>& GetRefRateValues() const { return ReferenceRateValue; }
 	const double& GetStartingDeferredInterest() const { return CashFlow.GetStartingDeferredInterest(); }
 	void SetStartingDeferredInterest(const double& val) { CashFlow.SetStartingDeferredInterest(val); }
 	const QString& GetTrancheName() const{return TrancheName;}

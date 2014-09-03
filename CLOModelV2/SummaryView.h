@@ -28,6 +28,7 @@ private:
 	QListWidget* TranchesList;
 	QTableWidget* ExpensesTable;
 	QTableWidget* ReinvestmentsTable;
+	QTableWidget* GICTable;
 	QTableWidget* StructureTable;
 	QList<QLineEdit*> PricesLabel;
 	ChartsWidget* ChartPlotter;

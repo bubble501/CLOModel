@@ -53,7 +53,8 @@ public:
 	QHash<QString, BloombergVector>& GetValues() { return Values; }
 	bool Contains(const QString& key) const { return Values.contains(key); }
 	BloombergVector GetValue(const QString& key) const { return Values.value(key, BloombergVector()); }
-	void SetValue(const QString& key, const BloombergVector& a) { Values[key] = a; }
+	void SetValue(const QString& key, const BloombergVector& a) { if(!a.IsEmpty()) Values[key] = a; }
+	void SetValue(const QString& key, const QList<QDate>& RefDates, const QList<double>& Refvals) { SetValue(key, BloombergVector(RefDates, Refvals)); }
 	const QDate& GetUpdateDate() const { return UpdateDate; }
 	void SetUpdateDate(const QDate& val) { UpdateDate = val; }
 	QList<QString> GetAvailableKeys() const { return Values.keys(); }

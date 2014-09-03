@@ -10,8 +10,6 @@
 #include <QSqlQuery>
 #include <QSettings>
 #include <QVariant>
-#include <QSqlTableModel>
-#include <QMap>
 #endif
 
 
@@ -234,6 +232,7 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ConstantBaseRateTable& Refe
 			ReferencesValues.SetUpdateDate(MinUpdateDate);
 			return CompileReferenceRateValue(ReferencesValues);
 		}
+		db.close();
 	}
 	return BloombergVector();
 }
@@ -271,14 +270,18 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ForwardBaseRateTable& Refer
 			}
 			db.close();
 			ConfigIni.endGroup();
-			const QList<QString> ReferencesList = QueryResults.keys();
+			for (QHash < QString, QHash<QDate, double> >::const_iterator i = QueryResults.constBegin(); i != QueryResults.constEnd(); ++i) {
+				ReferencesValues.SetValue(i.key(), i.value().keys(), i.value().values());
+			}
+			/*const QList<QString> ReferencesList = QueryResults.keys();
 			for (QList<QString>::ConstIterator i = ReferencesList.constBegin(); i != ReferencesList.constEnd(); i++) {
 				QHash<QDate, double> CurrentResult = QueryResults.value(*i);
 				ReferencesValues.GetValues().insert(*i, BloombergVector(CurrentResult.keys(), CurrentResult.values()));
-			}
+			}*/
 			ReferencesValues.SetUpdateDate(MinUpdateDate);
 			return CompileReferenceRateValue(ReferencesValues);
 		}
+		db.close();
 	}
 	return BloombergVector();
 }

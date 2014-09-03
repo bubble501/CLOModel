@@ -1,6 +1,13 @@
 #include "TrancheCashFlow.h"
 #include <QMap>
 #include <QDataStream>
+#ifndef NO_DATABASE
+#include <QSqlDatabase>
+#include <QSqlError>
+#include <QSqlQuery>
+#include <QSettings>
+#include <QVariant>
+#endif
 TrancheCashFlow::TrancheCashFlow(double ThrancheOutstanding)
 	:OutstandingAmt(ThrancheOutstanding)
 	, StartingDeferredInterest(0.0)
@@ -99,3 +106,42 @@ double TrancheCashFlow::GetTotalFlow(const QDate& a) const {
 		FlowsType.append(i);
 	return GenericCashFlow::GetTotalFlow(a, FlowsType);
 }
+#ifndef NO_DATABASE
+bool TrancheCashFlow::GetCashFlowsDatabase(const QString& TrancheID) {
+	if (TrancheID.isEmpty()) return false;
+	QSettings ConfigIni(":/Configs/GlobalConfigs.ini", QSettings::IniFormat);
+	ConfigIni.beginGroup("Database");
+	QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
+	db.setDatabaseName(
+		"Driver={" + ConfigIni.value("Driver", "SQL Server").toString()
+		+ "}; "
+		+ ConfigIni.value("DataSource", "Server=SYNSERVER2\\SQLExpress;Initial Catalog=ABSDB;Integrated Security=SSPI;Trusted_Connection=Yes;").toString()
+		);
+	if (db.open()) {
+		QSqlQuery query;
+		query.setForwardOnly(true);
+		query.prepare("CALL " + ConfigIni.value("CashFlowsStoredProc", "getBondFlows").toString() + "(?)");
+		query.bindValue(0,TrancheID);
+		if (query.exec()) {
+			bool Cleared = false;
+			while (query.next()) {
+				if (!Cleared) {
+					Cleared = true;
+					Clear();
+					SetInitialOutstanding(query.value(5).toDouble() + query.value(4).toDouble());
+					SetStartingDeferredInterest(0.0);
+				}
+				AddFlow(query.value(0).toDate(), query.value(3).toDouble(), TrancheFlowType::InterestFlow);
+				AddFlow(query.value(0).toDate(), query.value(4).toDouble(), TrancheFlowType::PrincipalFlow);
+				AddFlow(query.value(0).toDate(), query.value(2).toDouble(), TrancheFlowType::DeferredFlow);
+			}
+			db.close();
+			ConfigIni.endGroup();
+			if (!Cleared) return false;
+			return true;
+		}
+		db.close();
+	}
+	return false;
+}
+#endif

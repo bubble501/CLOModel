@@ -131,6 +131,22 @@ SummaryView::SummaryView(QWidget* parent)
 	ReinvestmentsTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	MainWidget->addTab(ReinvestmentsTable,"Reinvestments");
 
+	GICTable = new QTableWidget(this);
+	HeadersStrings.clear();
+	HeadersStrings
+		<< "Date"
+		<< "Interest On Revenues Cash"
+		<< "Interest On Principal Cash"
+		;
+	GICTable->setRowCount(0);
+	GICTable->setColumnCount(3);
+	GICTable->setHorizontalHeaderLabels(HeadersStrings);
+	GICTable->verticalHeader()->setVisible(false);
+	GICTable->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	GICTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+	GICTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+	MainWidget->addTab(GICTable, "GIC");
+
 	ChartPlotter=new ChartsWidget(this);
 	MainWidget->addTab(ChartPlotter,"Charts");
 
@@ -236,6 +252,13 @@ void SummaryView::DisplayStructure(){
 		ReinvestmentsTable->setItem(i,0,new QTableWidgetItem(Structure.GetReinvested().GetDate(i).toString("MMM-yy")));
 		ReinvestmentsTable->setItem(i,1,new QTableWidgetItem(Commarize(Structure.GetReinvested().GetFlow(i,static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow)))));
 		ReinvestmentsTable->setItem(i, 2, new QTableWidgetItem(Commarize(Structure.GetReinvested().GetFlow(i, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow)))));
+	}
+	GICTable->setRowCount(0);
+	GICTable->setRowCount(Structure.GetGICflows().Count());
+	for (int i = 0; i < Structure.GetGICflows().Count(); i++) {
+		GICTable->setItem(i, 0, new QTableWidgetItem(Structure.GetGICflows().GetDate(i).toString("MMM-yy")));
+		GICTable->setItem(i, 1, new QTableWidgetItem(Commarize(Structure.GetGICflows().GetFlow(i, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow)))));
+		GICTable->setItem(i, 2, new QTableWidgetItem(Commarize(Structure.GetGICflows().GetFlow(i, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow)))));
 	}
 	StructureTable->setRowCount(0);
 	StructureTable->setRowCount(Structure.GetTranchesCount());

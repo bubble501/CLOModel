@@ -128,7 +128,7 @@ ForwardBaseRateTable& ForwardBaseRateTable::operator += (const QHash<QString, Bl
 	}
 	return *this;
 }
-ForwardBaseRateTable& ForwardBaseRateTable::operator += (const ConstantBaseRateTable& a) {
+ForwardBaseRateTable& ForwardBaseRateTable::operator+= (const ConstantBaseRateTable& a) {
 	for (QHash<QString, double>::ConstIterator i = a.GetValues().constBegin(); i != a.GetValues().constEnd(); i++) {
 		if (!Values.contains(i.key())) Values.insert(i.key(), QString("%1").arg(i.value()));
 	}

@@ -87,8 +87,24 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	}
 	{//Base Rates Compilation
 		bool UseForwardRates = pdFreq->boolVal; pdFreq++;
+		int HowManyFwdCurves = pdFreq->intVal; pdFreq++;
 		if (UseForwardRates) {
 			ForwardBaseRateTable CompilationTable;
+			QList<QDate> TempRefDates;
+			QList<double> TempRefVals;
+			QString TempKey;
+			int HowManyDates;
+			for (int FwdCrvIte = 0; FwdCrvIte < HowManyFwdCurves; ++FwdCrvIte) {
+				TempRefDates.clear();
+				TempRefVals.clear();
+				TempKey = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+				HowManyDates= pdFreq->intVal; pdFreq++;
+				for (int FwdDtsIte = 0; FwdDtsIte < HowManyDates; ++FwdDtsIte) {
+					TempRefDates.append(QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal), "yyyy-MM-dd")); pdFreq++;
+					TempRefVals.append(pdFreq->dblVal / 100.0); pdFreq++;
+				}
+				CompilationTable.SetValue(TempKey,TempRefDates,TempRefVals);
+			}
 #ifndef NO_DATABASE
 			TempUnit.GetBaseRatesDatabase(CompilationTable);
 #else
@@ -109,6 +125,12 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		}
 		else{
 			ConstantBaseRateTable CompilationTable;
+			QString TempKey; double TempValue;
+			for (int FwdCrvIte = 0; FwdCrvIte < HowManyFwdCurves; ++FwdCrvIte) {
+				TempKey=QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+				TempValue=pdFreq->dblVal; pdFreq++;
+				CompilationTable.SetValue(TempKey,TempValue/100.0);
+			}
 #ifndef NO_DATABASE
 			TempUnit.GetBaseRatesDatabase(CompilationTable);
 #else

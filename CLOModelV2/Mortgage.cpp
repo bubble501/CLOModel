@@ -310,7 +310,7 @@ void Mortgage::SetInterest(const QString& a){
 			 m_UseForwardCurve = false;
 #endif
 		 }
-		 return m_InterestVect.GetValue(a, frequency) + m_FloatingRateBaseValue.GetValue(a, frequency);
+		 return (m_InterestVect + m_FloatingRateBaseValue).GetValue(a, frequency);
 	 }
  }
  double Mortgage::GetInterest(int a, int frequency/*=12*/) {
@@ -325,6 +325,6 @@ void Mortgage::SetInterest(const QString& a){
 			 m_UseForwardCurve = false;
 #endif
 		 }
-		 return m_InterestVect.GetValue(a, frequency) + m_FloatingRateBaseValue.GetValue(a, frequency);
+		 return (m_InterestVect + m_FloatingRateBaseValue).GetValue(a, frequency);
 	 }
  }

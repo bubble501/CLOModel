@@ -46,6 +46,10 @@ public:
 	int GetLastFlowIndex(bool IncludeDeferred = false) const;
 	const double& GetStartingDeferredInterest() const { return StartingDeferredInterest; }
 	void SetStartingDeferredInterest(const double& val) { StartingDeferredInterest = val; }
+#ifndef NO_DATABASE
+	virtual bool GetCashFlowsDatabase(const QString& TrancheID);
+#endif
+
 	friend QDataStream& operator<<(QDataStream & stream, const TrancheCashFlow& flows);
 	friend QDataStream& operator>>(QDataStream & stream, TrancheCashFlow& flows);
 };

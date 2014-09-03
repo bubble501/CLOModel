@@ -35,7 +35,7 @@ double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const QSt
 double AdjustCoupon(double AnnualCoupon, QDate PrevIPD, QDate CurrIPD, DayCountConvention DayCount);
 bool IsHoliday(const QDate& a/*,const QString& CountryCode*/);
 bool removeDir(const QString& dirName);
-
+double GetLoanAssumption(const QString& LoanName, int columnIndex);
 void PrintToTempFile(const QString& TempFileName, const QString& Message);
 
 

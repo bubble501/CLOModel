@@ -5,6 +5,7 @@
 #include <QList>
 #include <qmath.h>
 #include <QDir>
+#include <QTextStream>
 #include "BloombergVector.h"
 #include <boost/math/tools/roots.hpp>
 int MonthDiff(const QDate& FutureDte,const QDate& PresentDte){
@@ -190,8 +191,46 @@ bool IsHoliday(const QDate& a/*, const QString& CountryCode*/) {
 void PrintToTempFile(const QString& TempFileName, const QString& Message) {
 	QFile TempFile("C:/Temp/" + TempFileName);
 	if (!TempFile.open(QIODevice::WriteOnly | QIODevice::Text)) return;
-	QDataStream TempWrite(&TempFile);
+	QTextStream  TempWrite(&TempFile);
 	TempWrite << Message;
 	TempFile.close();
+}
+#include <QSettings>
+double GetLoanAssumption(const QString& LoanName, int columnIndex) {
+	QStringList Assumptions;
+	QStringList AKAs;
+	int FoundLoan = -1;
+	if (columnIndex >= 0 && columnIndex <= 7) {
+		QSettings ConfigIni(":/Configs/GlobalConfigs.ini", QSettings::IniFormat);
+		ConfigIni.beginGroup("Folders");
+		QFile AssumptionsFile(ConfigIni.value("UnifiedResultsFolder", "Z:/24AM/Monitoring/Model Results").toString() + '/' + ConfigIni.value("AssumptionsFile", "Loans Assumptions").toString());
+		if (AssumptionsFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+			QString CurrentLoan;
+			QTextStream Streamer(&AssumptionsFile);
+			while (!Streamer.atEnd() && FoundLoan < 0) {
+				CurrentLoan = Streamer.readLine();
+				Assumptions = CurrentLoan.split("#,#");
+				AKAs = Assumptions.first().split("$,$");
+				for (FoundLoan = 0; FoundLoan < AKAs.size(); ++FoundLoan) {
+					if (AKAs.at(FoundLoan).contains(LoanName, Qt::CaseInsensitive) || LoanName.contains(AKAs.at(FoundLoan), Qt::CaseInsensitive))
+						break;
+				}
+				if (FoundLoan >= AKAs.size()) FoundLoan = -1;
+			}
+			AssumptionsFile.close();
+		}
+	}
+	if (FoundLoan < 0) {
+		return -1;
+	}
+	else {
+		switch (columnIndex) {
+		case 3:
+			return (Assumptions.at(3) == "False" ? 0.0 : 1.0);
+			break;
+		default:
+			return Assumptions.at(columnIndex).toDouble();
+		}
+	}
 }
 

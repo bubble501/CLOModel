@@ -8,6 +8,7 @@ Declare Function CLOReturnRate Lib "C:\Visual Studio Projects\CLOModelV2\Win32\R
 Declare Sub StressTargetChanged Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
 Declare Sub InspectStress Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
 Declare Sub InspectWaterfall Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
+Declare Function GetAssumption Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
 Public Sub GetInputFromStructure( _
     MortgagesSheet As String, _
     InputsSheet As String, _
@@ -891,4 +892,37 @@ Public Sub SeparateWaterfall( _
     Loop
     Call InspectWaterfall(Params)
 End Sub
+Public Function GetLoanAssumption(Loan As String, Column As Long)
+Attribute GetLoanAssumption.VB_Description = "Get Assumptions for Loans"
+Attribute GetLoanAssumption.VB_ProcData.VB_Invoke_Func = " \n14"
+'Column
+'1-Senior Price
+'2-Sub Price
+'3-Default
+'4-Senior Haircut Amt
+'5-Senior Haircut Period
+'6-Sub Haircut Amt
+'7-Sub Haircut Period
+    If (Column < 1 Or Column > 7) Then
+        GetLoanAssumption = ""
+        Exit Function
+    End If
+    Dim result() As Variant
+    ReDim result(0 To 1)
+    result(0) = Loan
+    result(1) = Column
+    Dim response As Double
+    response = GetAssumption(result)
+    If (response < 0) Then
+        GetLoanAssumption = ""
+        Exit Function
+    End If
+    If (Column = 3) Then
+        GetLoanAssumption = True
+        If (response = 0#) Then GetLoanAssumption = False
+    Else
+        GetLoanAssumption = response
+    End If
+End Function
+
 

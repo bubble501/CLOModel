@@ -8,11 +8,13 @@
 #include <QDate>
 #include <QString>
 #include <QFile>
+#include <QSettings>
 //#define  DebuggungInputs //TODO Comment me
 #include <QApplication>
 #ifdef DebuggungInputs
 #include <QMessageBox>
 #endif
+#include <QTextStream>
 void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 #ifdef DebuggungInputs
 	char *argv[] = {"NoArgumnets"};
@@ -490,6 +492,19 @@ void __stdcall InspectWaterfall(LPSAFEARRAY *ArrayData){
 	ComputationLoop.exec();	
 }
 
+double __stdcall GetAssumption(LPSAFEARRAY *ArrayData) {
+	ExcelCommons::InitExcelOLE();
+	int ColumnIndex;
+	VARIANT HUGEP *pdFreq;
+	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
+	if (SUCCEEDED(hr)) {
+		QString LoanName = QString::fromStdWString(pdFreq->bstrVal).trimmed(); pdFreq++;
+		ColumnIndex = pdFreq->intVal; pdFreq++;
+		SafeArrayUnaccessData(*ArrayData);
+		return GetLoanAssumption(LoanName, ColumnIndex);
+	}
+	return -1.0;
+}
 /*!
 \file ExcelInput.cpp
 \brief Excel exported functions

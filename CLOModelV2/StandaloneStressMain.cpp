@@ -60,6 +60,9 @@ int main(int argc, char *argv[]) {
 	file.close();
 	}*/
 
+	ConstantBaseRateTable Temp;
+
+
 
 
 	Waterfall TempWtf, TempCallWaterfall;

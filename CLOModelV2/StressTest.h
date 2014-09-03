@@ -15,9 +15,9 @@ class StressTest:public QObject , public BackwardInterface{
 public:
 	//! Enum defining what parameter is currently being stressed
 	enum StressVariability{
-		ChangingCDR=1, /*!< Constant Default Rate*/
-		ChangingLS=2, /*!< Loss Severity*/
-		ChangingCPR=4 /*!< Constant Prepayment Rate*/
+		ChangingCDR=0x1, /*!< Constant Default Rate*/
+		ChangingLS=0x2, /*!< Loss Severity*/
+		ChangingCPR=0x4 /*!< Constant Prepayment Rate*/
 	};
 private:
 	quint64 ConcatenateIDs(qint32 a, qint32 b){return (static_cast<quint64>(a) << 32) | static_cast<quint64>(b);}

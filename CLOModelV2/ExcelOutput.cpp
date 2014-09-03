@@ -1853,12 +1853,12 @@ HRESULT ExcelOutput::PlotCPRLS(
 				CPRIter->vt = VT_R8;
 				LSIter->vt = VT_R8;
 				DatesIter->bstrVal = SysAllocString(source.GetCalculatedMtgPayments().GetDate(i).toString("yyyy-MM-dd").toStdWString().c_str());
-				TempDbl= qPow(1.0+(source.GetCalculatedMtgPayments().GetPrepay(i)/(source.GetCalculatedMtgPayments().GetAmountOut(i-1)-source.GetCalculatedMtgPayments().GetScheduled(i))),12.0)-1.0;
+				TempDbl= 1.0-qPow(1.0-(source.GetCalculatedMtgPayments().GetPrepay(i)/(source.GetCalculatedMtgPayments().GetAmountOut(i-1)-source.GetCalculatedMtgPayments().GetScheduled(i))),12.0);
 				if(TempDbl<=1.00){
 					CPRIter->vt = VT_R8;
 					CPRIter->dblVal = TempDbl;
 				}
-				TempDbl=qPow(1.0+(source.GetCalculatedMtgPayments().GetLoss(i)/(source.GetCalculatedMtgPayments().GetAmountOut(i-1)-source.GetCalculatedMtgPayments().GetScheduled(i))),12.0)-1.0;
+				TempDbl=1.0-qPow(1.0-(source.GetCalculatedMtgPayments().GetLoss(i)/(source.GetCalculatedMtgPayments().GetAmountOut(i-1)-source.GetCalculatedMtgPayments().GetScheduled(i))),12.0);
 				if(TempDbl<=1.00){
 					LSIter->vt = VT_R8;
 					LSIter->dblVal =  TempDbl;

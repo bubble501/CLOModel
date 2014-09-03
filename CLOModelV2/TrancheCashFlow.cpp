@@ -146,7 +146,9 @@ bool TrancheCashFlow::GetCashFlowsDatabase(const QString& TrancheID) {
 }
 #endif
 TrancheCashFlow TrancheCashFlow::ScaledCashFlows(double NewSize) {
+	if (NewSize <= 0.0) return TrancheCashFlow();
 	TrancheCashFlow Result(*this);
+	if (qAbs(NewSize - OutstandingAmt) < 0.01) return Result;
 	Result.SetInitialOutstanding(NewSize);
 	Result.StartingDeferredInterest*=NewSize / OutstandingAmt;
 	for (auto i = Result.m_CashFlows.begin(); i != Result.m_CashFlows.end(); ++i) {

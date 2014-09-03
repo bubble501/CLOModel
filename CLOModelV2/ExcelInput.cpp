@@ -279,8 +279,17 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		RunStress=pdFreq->boolVal;pdFreq++;
 		if(RunStress){// Stress Test
 			QString ConstPar=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
+#ifdef DebuggungInputs
+			QMessageBox::information(0, "ConstPar", QString("Stress ConstPar: %1").arg(ConstPar));
+#endif
 			int XVar=pdFreq->intVal;pdFreq++;
+#ifdef DebuggungInputs
+			QMessageBox::information(0, "XVar", QString("Stress XVar: %1").arg(XVar));
+#endif
 			int YVar=pdFreq->intVal;pdFreq++;
+#ifdef DebuggungInputs
+			QMessageBox::information(0, "YVar", QString("Stress YVar: %1").arg(YVar));
+#endif
 			int NumElem=pdFreq->intVal;pdFreq++;
 			QList<QString> XSpann;
 			for(int i=0;i<NumElem;i++){

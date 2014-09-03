@@ -332,12 +332,57 @@ DefaultExchange:
 '        Call AddInput(AllTheInputs, CStr(BaseIndexesStart.Offset(i, 0).Value))
 '        Call AddInput(AllTheInputs, BaseIndexesStart.Offset(i, 1).Value)
 '    Next i
-
+    Dim LocalUseFwd As Boolean
     If (UseForwardCell Is Nothing) Then
         Call AddInput(AllTheInputs, False)
+        LocalUseFwd = False
     Else
         Call AddInput(AllTheInputs, CBool(UseForwardCell.Offset(0, 1).Value))
+        LocalUseFwd = CBool(UseForwardCell.Offset(0, 1).Value)
     End If
+    
+    On Error GoTo ExtraSheetMissing
+    If (Sheets(FieldsLabels("ForwardCurvesSheet")).Visible = xlSheetVisible) Then
+        Dim CountFwd As Long
+        Dim countDates As Long
+        CountFwd = 0
+        Do While (True)
+            If (IsEmpty(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(1, (CountFwd * 2) + 1))) Then Exit Do
+            CountFwd = CountFwd + 1
+        Loop
+        Call AddInput(AllTheInputs, CountFwd)
+        CountFwd = 0
+        Do While (True)
+            If (IsEmpty(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(1, (CountFwd * 2) + 1))) Then Exit Do
+            Call AddInput(AllTheInputs, CStr(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(1, (CountFwd * 2) + 1)))
+            If LocalUseFwd Then
+                countDates = 0
+                Do While (True)
+                    If IsEmpty(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(3 + countDates, (CountFwd * 2) + 1)) Then Exit Do
+                Loop
+                Call AddInput(AllTheInputs, countDates)
+                countDates = 0
+                Do While (True)
+                    If IsEmpty(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(3 + countDates, (CountFwd * 2) + 1)) Then Exit Do
+                    Call AddInput(AllTheInputs, Format(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(3 + countDates, (CountFwd * 2) + 1).Value, "yyyy-mm-dd"))
+                    Call AddInput(AllTheInputs, CDbl(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(3 + countDates, (CountFwd * 2) + 2).Value))
+                    countDates = countDates + 1
+                Loop
+            Else
+                Call AddInput(AllTheInputs, CDbl(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(3, (CountFwd * 2) + 2).Value))
+            End If
+            CountFwd = CountFwd + 1
+        Loop
+    Else
+        Call AddInput(AllTheInputs, CLng(0))
+    End If
+    If False Then
+ExtraSheetMissing:
+        Call AddInput(AllTheInputs, CLng(0))
+        Resume Next
+    End If
+    On Error GoTo 0
+    
     If (IsEmpty(WaterfallStart.Offset(2, 0))) Then
         Call AddInput(AllTheInputs, CLng(0))
     Else
@@ -721,6 +766,7 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
     a.Add "Base Case To Call", "BaseCaseCall"
     a.Add "Current deferred junior fees", "StartingDefJunFees"
     a.Add "GIC Interest", "GICInterestCell"
+    a.Add "Forward Curves", "ForwardCurvesSheet"
 End Sub
 
 Private Function FromStringToInterestType(a As String) As Long

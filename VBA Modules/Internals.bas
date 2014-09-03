@@ -99,6 +99,7 @@ Public Sub WaterfallStepChanged(TargetAllCell As Range)
                 TargetCell.Offset(0, 1).Locked = True
                 TargetCell.Offset(0, 2).Locked = False
                 TargetCell.Offset(0, 2).AddComment ("Tranche that will recieve excess spread payments." + vbCrLf + "Leave blank if no bond should recieve it")
+                TargetCell.Offset(0, 2).NumberFormat = "0"
                 TargetCell.Offset(0, 2).Validation.Delete
                 TargetCell.Offset(0, 2).Validation.Add Type:=xlValidateWholeNumber, AlertStyle:=xlValidAlertStop, Operator:= _
                     xlBetween, Formula1:="0", Formula2:="=max(" + Range(TempRange, TempRange.End(xlDown)).Address + ")"

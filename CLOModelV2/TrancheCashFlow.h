@@ -49,7 +49,7 @@ public:
 #ifndef NO_DATABASE
 	virtual bool GetCashFlowsDatabase(const QString& TrancheID);
 #endif
-
+	TrancheCashFlow ScaledCashFlows(double NewSize);
 	friend QDataStream& operator<<(QDataStream & stream, const TrancheCashFlow& flows);
 	friend QDataStream& operator>>(QDataStream & stream, TrancheCashFlow& flows);
 };

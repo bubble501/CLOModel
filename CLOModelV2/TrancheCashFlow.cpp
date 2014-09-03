@@ -145,3 +145,16 @@ bool TrancheCashFlow::GetCashFlowsDatabase(const QString& TrancheID) {
 	return false;
 }
 #endif
+TrancheCashFlow TrancheCashFlow::ScaledCashFlows(double NewSize) {
+	TrancheCashFlow Result(*this);
+	Result.SetInitialOutstanding(NewSize);
+	Result.StartingDeferredInterest*=NewSize / OutstandingAmt;
+	for (auto i = Result.m_CashFlows.begin(); i != Result.m_CashFlows.end(); ++i) {
+		for (auto j = i.value()->begin(); j != i.value()->end(); ++j) {
+			if (j.key() != static_cast<qint32>(TrancheFlowType::OCFlow) && j.key() != static_cast<qint32>(TrancheFlowType::ICFlow))
+				j.value() *= NewSize / OutstandingAmt;
+		}
+	}
+	return Result;
+}
+

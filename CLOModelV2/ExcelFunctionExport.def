@@ -1,0 +1,9 @@
+LIBRARY CLOmodel2
+EXPORTS
+	RunModel
+	CLODiscountMargin
+	CLOReturnRate
+	CLOWALife
+	StressTargetChanged
+	InspectStress
+	InspectWaterfall

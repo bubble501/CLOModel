@@ -1,31 +1,10 @@
 Attribute VB_Name = "ButtonsResponses"
 Option Explicit
-Public Sub RunModel()
-    Application.ScreenUpdating = False
-    Dim FieldsLabels As New Collection
-    Sheets("Tranches Results").Unprotect
-    Sheets("Mortgages Results").Unprotect
-    Sheets("Graphical Output").Unprotect
-    Sheets("Liabilities + input").Unprotect
-    Call PopulateDafaultLabels(FieldsLabels)
-    Sheets("Mortgages Results").Cells.Clear
-    Sheets("Tranches Results").Cells.Clear
-    Call GetInputFromStructure( _
-        "Loans Pool" _
-        , "Liabilities + input" _
-        , Left(ActiveWorkbook.FullName, InStrRev(ActiveWorkbook.FullName, "\")) _
-        , FieldsLabels _
-    )
-    With Sheets("Liabilities + input")
-      .EnableCalculation = False
-      .EnableCalculation = True
-      .Calculate
-    End With
-    Sheets("Tranches Results").Protect UserInterfaceOnly:=True, AllowFormattingCells:=True, AllowFormattingColumns:=True, AllowFormattingRows:=True
-    Sheets("Mortgages Results").Protect UserInterfaceOnly:=True, AllowFormattingCells:=True, AllowFormattingColumns:=True, AllowFormattingRows:=True
-    Sheets("Graphical Output").Protect
-    Sheets("Graphical Output").EnableSelection = xlUnlockedCells
-    Sheets("Liabilities + input").Protect UserInterfaceOnly:=True, AllowFormattingCells:=True
+Public Sub RunBaseModel()
+Call RunCLOModel(True)
+End Sub
+Public Sub RunTestModel()
+Call RunCLOModel(False)
 End Sub
 Private Sub RunStress(StressGrid As Long)
     If (StressGrid < 1 Or StressGrid > 3) Then Exit Sub
@@ -42,20 +21,21 @@ Private Sub RunStress(StressGrid As Long)
     FieldsLabels.Add "Field" + Format(((StressGrid - 1) * 3) + 2, "0"), "StressLSHead"
     FieldsLabels.Add "Field" + Format(StressGrid * 3, "0"), "StressCDRHead"
     If (StressGrid = 1) Then
-        CurrRowDim = 0
-        CurrColDim = 1
+        CurrRowDim = 1
+        CurrColDim = 2
     ElseIf (StressGrid = 2) Then
-        CurrRowDim = 2
-        CurrColDim = 1
+        CurrRowDim = 4
+        CurrColDim = 2
     Else
-        CurrRowDim = 2
-        CurrColDim = 0
+        CurrRowDim = 4
+        CurrColDim = 1
     End If
     Call GetInputFromStructure( _
         "Loans Pool" _
         , "Liabilities + input" _
         , Left(ActiveWorkbook.FullName, InStrRev(ActiveWorkbook.FullName, "\")) _
         , FieldsLabels _
+        , False _
         , True _
         , StressTestSheet:="Stress Test" _
         , StressRowDimension:=CurrRowDim _
@@ -253,4 +233,19 @@ Public Sub ImportFromOldVersion()
         i = i + 1
     Loop
     Application.Calculation = xlCalculationAutomatic
+End Sub
+Sub Forward_Curves_Check()
+    Application.ScreenUpdating = False
+    Dim i As Long
+    i = 1
+    While Sheets("Liabilities + input").CheckBoxes(i).Text <> "Forward Curves"
+        If (i = Sheets("Liabilities + input").CheckBoxes.Count) Then Exit Sub
+        i = i + 1
+    Wend
+    If Sheets("Liabilities + input").CheckBoxes(i).Value = xlOn Then
+        Sheets("Forward Curves").Visible = xlSheetVisible
+    Else
+        Sheets("Forward Curves").Visible = xlSheetVeryHidden
+    End If
+    Application.ScreenUpdating = True
 End Sub

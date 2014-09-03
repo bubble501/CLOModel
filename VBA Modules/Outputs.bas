@@ -177,6 +177,7 @@ Public Sub PrintMortgagesRepLines( _
     Optional PrintPrepay As Boolean = True, _
     Optional PrintAccruedInterest As Boolean = True, _
     Optional PrintTotalPrincipal As Boolean = False, _
+    Optional PrintDefaults As Boolean = True, _
     Optional PrintLoss As Boolean = True, _
     Optional PrintLossOnInterest As Boolean = True _
 )
@@ -235,6 +236,11 @@ Public Sub PrintMortgagesRepLines( _
         TargetCell.Offset(0, ColOffset).EntireColumn.ColumnWidth = 12
         ColOffset = ColOffset + 1
     End If
+    If (PrintDefaults) Then
+        TargetCell.Offset(0, ColOffset).Value = "New Defaults"
+        TargetCell.Offset(0, ColOffset).EntireColumn.ColumnWidth = 12
+        ColOffset = ColOffset + 1
+    End If
     If (PrintLoss) Then
         TargetCell.Offset(0, ColOffset).Value = "Principal Loss"
         TargetCell.Offset(0, ColOffset).EntireColumn.ColumnWidth = 12
@@ -285,6 +291,11 @@ Public Sub PrintMortgagesRepLines( _
             ColOffset = ColOffset + 1
         End If
         If (PrintTotalPrincipal) Then
+            TargetCell.Offset(i, ColOffset).Value = RepLines(i, ColOffset)
+            TargetCell.Offset(i, ColOffset).NumberFormat = "_-* #,##0_-;-* #,##0_-;_-* "" - ""??_-;_-@_-"
+            ColOffset = ColOffset + 1
+        End If
+        If (PrintDefaults) Then
             TargetCell.Offset(i, ColOffset).Value = RepLines(i, ColOffset)
             TargetCell.Offset(i, ColOffset).NumberFormat = "_-* #,##0_-;-* #,##0_-;_-* "" - ""??_-;_-@_-"
             ColOffset = ColOffset + 1
@@ -460,6 +471,7 @@ Public Sub PrintStressTest( _
             .FormatConditions.Add(xlCellValue, xlGreaterEqual, "0.0001").Interior.Color = RGB(255, 192, 0)
         End If
     End With
+    Application.ScreenUpdating = True
 End Sub
 Public Sub PrintMergedCell(msg As String, DestinatAddress As String, RowSpann As Long, ColSpann As Long, FillColor As String)
     Application.ScreenUpdating = False

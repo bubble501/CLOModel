@@ -118,6 +118,9 @@
 			<Component Id="QtSql" Guid="D53EC043-2887-464F-85A5-9B0ED3A23E3E">
 				<File Id="Qt5Sql" Name="Qt5Sql.dll" Source="C:\Qt5\5.3\msvc2013\bin\Qt5Sql.dll" KeyPath="yes" />
 			</Component>
+			<Component Id="QtXml" Guid="3F91E097-66C8-4369-8339-CB0C8E0A78AA">
+				<File Id="Qt5Xml" Name="Qt5Xml.dll" Source="C:\Qt5\5.3\msvc2013\bin\Qt5Xml.dll" KeyPath="yes" />
+			</Component>
 			<Component Id="QtPrintSupport" Guid="387A664F-73E8-423F-A8CF-5C491E1ACFAD">
 				<File Id="Qt5PrintSupport" Name="Qt5PrintSupport.dll" Source="C:\Qt5\5.3\msvc2013\bin\Qt5PrintSupport.dll" KeyPath="yes" />
 			</Component>

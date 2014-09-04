@@ -19,6 +19,8 @@
 #include <QTextEdit>
 #include <QVBoxLayout>
 #include <QTime>
+#include <QTextStream>
+#include <QDomDocument>
 #endif
 
 
@@ -59,12 +61,19 @@ int main(int argc, char *argv[]) {
 	out >> TempRead;
 	file.close();
 	}*/
+	MtgCalculator TempCalucator;
+	Mortgage TestMtg;
+	TestMtg.SetProperty("Issuer", "PARGN 8");
+	TestMtg.SetProperty("Facility", "XS0203410922");
+	TestMtg.SetSize(10000000.0);
+	TempCalucator.AddLoan(TestMtg);
+	TestMtg.SetProperty("Issuer", "AQUIL 2006-1X");
+	TestMtg.SetProperty("Facility", "AQUIL 2006-1X A");
+	TempCalucator.AddLoan(TestMtg);
+	TempCalucator.StartCalculation(true);
 
-	GetLoanAssumption("Truvo", 0);
 
-
-
-
+/*
 	Waterfall TempWtf, TempCallWaterfall;
 	QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/.BaseCase.clo");
 	file.open(QIODevice::ReadOnly);
@@ -83,7 +92,7 @@ int main(int argc, char *argv[]) {
 	out >> TempCallWaterfall;
 	file.close();
 	//TempWtf.CalculateTranchesCashFlows();
-	double Testing=TempWtf.GetTranche(0)->GetDiscountMargin(100.0);
+	double Testing=TempWtf.GetTranche(0)->GetDiscountMargin(100.0);*/
 	
 
 	/*Tranche TempTrnch;

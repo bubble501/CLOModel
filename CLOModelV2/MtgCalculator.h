@@ -15,8 +15,9 @@ public:
 	MtgCalculator(QObject* parent=0);
 	~MtgCalculator();
 	void AddLoan(const Mortgage& a);
+	void SetLoans(const QHash<qint32, Mortgage*>& a);
 	void SetStartDate(const QDate& a){StartDate=a;}
-	bool StartCalculation();
+	bool StartCalculation(bool UseStoredCF=true);
 	const QString& GetCPRass() const { return m_CPRass; }
 	void SetCPRass(const QString& val) { m_CPRass = val; }
 	const QString& GetCDRass() const { return m_CDRass; }
@@ -29,16 +30,16 @@ public:
 	void SetDelinquency(const QString& val) { m_Delinquency = val; }
 	const QString& GetDelinquencyLag() const { return m_DelinquencyLag; }
 	void SetDelinquencyLag(const QString& val) { m_DelinquencyLag = val; }
-	void CompileReferenceRateValue(ForwardBaseRateTable& Values)const;
-	void CompileReferenceRateValue(ConstantBaseRateTable& Values)const;
+	void CompileReferenceRateValue(ForwardBaseRateTable& Values);
+	void CompileReferenceRateValue(ConstantBaseRateTable& Values);
 #ifndef NO_DATABASE
-	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll=false)const;
-	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll=false)const;
+	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll=false);
+	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll=false);
 #endif
 
 	const QDate& GetStartDate()const {return StartDate;}
-	const QList<Mortgage*>& GetLoans() const {return Loans;}
-	QList<Mortgage*>& GetLoans() {return Loans;}
+	const QHash<qint32, Mortgage*>& GetLoans() const { return Loans; }
+	QHash<qint32, Mortgage*>& GetLoans() { return Loans; }
 	const MtgCashFlow& GetResult()const{return Result;}
 	void Reset();
 	QString ReadyToCalculate()const;
@@ -46,8 +47,10 @@ public:
 	void SetSequentialComputation(bool a){SequentialComputation=a;}
 	bool GetSequentialComputation()const {return SequentialComputation;}
 private:
-	QHash<int, MtgCalculatorThread*> ThreadPool;
-	QList<Mortgage*> Loans;
+	void AddLoan(const Mortgage& a, qint32 Index);
+	QHash<qint32, MtgCalculatorThread*> ThreadPool;
+	QHash<qint32, Mortgage*> Loans;
+	qint32 CurrentIndex;
 	QString m_CPRass;
 	QString m_CDRass;
 	QString m_LSass;
@@ -57,8 +60,8 @@ private:
 	
 	QDate StartDate;
 	MtgCashFlow Result;
-	int BeesSent;
-	int BeesReturned;
+	QList<qint32> BeesSent;
+	QList<qint32> BeesReturned;
 	bool SequentialComputation;
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;

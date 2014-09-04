@@ -145,8 +145,8 @@ void CentralUnit::SetupStress(const QString& ConstPar,QList<QString> XSpann,QLis
 	Stresser->SetStartDate(PoolCutOff);
 	Structure.SetUseCall(StressToCall);
 	Stresser->SetStructure(Structure);
-	for(int i=0;i<LoansCalculator.GetLoans().size();i++)
-		Stresser->AddLoan(*LoansCalculator.GetLoans().at(i));
+	for (auto i = LoansCalculator.GetLoans().constBegin(); i != LoansCalculator.GetLoans().constEnd(); i++)
+		Stresser->AddLoan(*(i.value()));
 	connect(this,SIGNAL(StressLoopStarted()),Stresser,SLOT(RunStressTest()),Qt::QueuedConnection);
 	connect(Stresser,SIGNAL(AllFinished()),this,SLOT(StressFinished()));
 }
@@ -187,7 +187,7 @@ void CentralUnit::CalculationStep1(){
 	connect(&LoansCalculator,SIGNAL(BeeCalculated(int)),MtgsProgress,SLOT(SetValue(int)));
 	MtgsProgress->show();
 	QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
-	if (!LoansCalculator.StartCalculation()) {
+	if (!LoansCalculator.StartCalculation(true)) {
 		QMessageBox::critical(0, "Invalid Input", "A base rate in the loans is invalid");
 		QApplication::quit();
 		return;

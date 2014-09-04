@@ -1,6 +1,7 @@
 #include "Mortgage.h"
 #include "CommonFunctions.h"
 #include <qmath.h>
+#include <QDomDocument>
 Mortgage::Mortgage()
 	:m_LossMultiplier("100")
 	,m_PrepayMultiplier("100")
@@ -12,6 +13,7 @@ Mortgage::Mortgage()
 	, m_FloatingRateBaseValue("0")
 	,m_Size(0.0)
 	, m_UseForwardCurve(false)
+	, m_Properties("<Loan></Loan>")
 {}
 void Mortgage::SetAnnuity(const QString& a){
 	m_AnnuityVect=a;
@@ -32,6 +34,7 @@ void Mortgage::SetInterest(const QString& a){
 	 ,m_CashFlows(a.m_CashFlows)
 	 ,m_HaircutVector(a.m_HaircutVector)
 	 , m_UseForwardCurve(a.m_UseForwardCurve)
+	 ,m_Properties(a.m_Properties)
  {}
  const Mortgage& Mortgage::operator=(const Mortgage& a){
 	 m_LossMultiplier=a.m_LossMultiplier;
@@ -46,6 +49,7 @@ void Mortgage::SetInterest(const QString& a){
 	 m_CashFlows=a.m_CashFlows;
 	 m_HaircutVector=a.m_HaircutVector;
 	 m_UseForwardCurve = a.m_UseForwardCurve;
+	 m_Properties = a.m_Properties;
 	 return *this;
  }
  bool Mortgage::CalculateCashFlows(const QDate& StartDate, const QString& CPRVecs, const QString& CDRVecs, const QString& LossVecs, const QString& RecoveryLag, const QString& Delinquency, const QString& DelinquencyLag) {
@@ -249,7 +253,7 @@ void Mortgage::SetInterest(const QString& a){
 	 return (PresentValue*qPow(1.0+Interest,Periods))/((qPow(1.0+Interest,Periods)-1.0)/Interest);
  }
  QDataStream& operator<<(QDataStream & stream, const Mortgage& flows){
-	 stream 
+	 stream
 		 << flows.m_MaturityDate
 		 << flows.m_AnnuityVect
 		 << flows.m_Size
@@ -262,6 +266,7 @@ void Mortgage::SetInterest(const QString& a){
 		 << flows.m_PaymentFreq
 		 << flows.m_HaircutVector
 		 << flows.m_UseForwardCurve
+		 << flows.m_Properties
 	;
 	 return stream;
  }
@@ -278,6 +283,7 @@ void Mortgage::SetInterest(const QString& a){
 	 m_PaymentFreq.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_PaymentFreq;
 	 m_HaircutVector.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_HaircutVector;
 	 stream >> m_UseForwardCurve;
+	 stream >> m_Properties;
 	 ResetProtocolVersion();
 	 return stream;
  }
@@ -328,3 +334,33 @@ void Mortgage::SetInterest(const QString& a){
 		 return (m_InterestVect + m_FloatingRateBaseValue).GetValue(a, frequency);
 	 }
  }
+
+ void Mortgage::SetProperty(const QString& PropName, const QString& Value) {
+	 QDomDocument PropertiesDoc;
+	 PropertiesDoc.setContent(m_Properties);
+	 QDomNodeList FoundGroup = PropertiesDoc.elementsByTagName(PropName.trimmed());
+	 auto tempNode = PropertiesDoc.createTextNode(Value.trimmed());
+	 if (FoundGroup.size()==0)
+	 {
+		 auto TempProp = PropertiesDoc.createElement(PropName.trimmed());
+		 PropertiesDoc.elementsByTagName("Loan").at(0).appendChild(TempProp);
+		 TempProp.appendChild(tempNode);
+	 }
+	 else {
+		 FoundGroup.at(0).replaceChild(tempNode, FoundGroup.at(0).firstChild());
+	 }
+	 m_Properties = PropertiesDoc.toString(-1);
+ }
+
+QString Mortgage::GetProperty(const QString& PropName) const {
+	QDomDocument PropertiesDoc;
+	PropertiesDoc.setContent(m_Properties);
+	QDomNodeList FoundGroup = PropertiesDoc.elementsByTagName(PropName.trimmed());
+	if (FoundGroup.size() == 0) return QString();
+	return FoundGroup.at(0).firstChild().nodeValue();
+}
+bool Mortgage::HasProperty(const QString& PropName) const { 
+	QDomDocument PropertiesDoc;
+	PropertiesDoc.setContent(m_Properties);
+	return PropertiesDoc.elementsByTagName(PropName.trimmed()).size()>0;
+}

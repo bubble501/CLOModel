@@ -10,6 +10,7 @@
 #include "BaseRateTable.h"
 class Mortgage : public BackwardInterface{
 private:
+	QString m_Properties;
 	QDate m_MaturityDate;
 	RepaymentVector m_AnnuityVect;
 	double m_Size;
@@ -67,7 +68,10 @@ public:
 	bool CalculateCashFlows(const QDate& StartDate, BloombergVector CPRVec, BloombergVector CDRVec, BloombergVector LossVec, IntegerVector  RecoveryLag = IntegerVector("0"), BloombergVector Delinquency = BloombergVector("0"), IntegerVector DelinquencyLag = IntegerVector("0"));
 	void AddCashFlow(const QDate& Dte, double Amt, MtgCashFlow::MtgFlowType FlowTpe) { m_CashFlows.AddFlow(Dte, Amt, FlowTpe); }
 	QString ReadyToCalculate() const;
-	void ResetFlows(){m_CashFlows.Clear();}
+	void ResetFlows() { m_CashFlows.Clear(); }
+	void SetProperty(const QString& PropName, const QString& Value);
+	QString GetProperty(const QString& PropName) const;
+	bool HasProperty(const QString& PropName) const;
 	friend QDataStream& operator<<(QDataStream & stream, const Mortgage& flows);
 	friend QDataStream& operator>>(QDataStream & stream, Mortgage& flows);
 };

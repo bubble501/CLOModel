@@ -51,7 +51,7 @@ public:
 	const QList<QString>& GetXSpann()const{return XSpann;}
 	const QList<QString>& GetYSpann()const{return YSpann;}
 	const QString& GetConstantPar()const{return ConstantPar;}
-	const QList<Mortgage*>& GetLoans()const;
+	const QHash<qint32,Mortgage*>& GetLoans()const;
 	const Mortgage* GetLoans(int index)const;
 	Mortgage* GetLoans(int index);
 	const Waterfall& GetStructure()const{return Structure;}

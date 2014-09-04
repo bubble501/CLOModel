@@ -110,11 +110,11 @@ public:
 	void SetCumulativeReserves(bool a){Structure.SetCumulativeReserves(a);}
 	const  QDate& GetLiborUpdateDate() const { return LiborUpdateDate; }
 	bool GetUseForwardCurve() const { return m_UseForwardCurve; }
-	void CompileBaseRates(ConstantBaseRateTable& Values)const;
-	void CompileBaseRates(ForwardBaseRateTable& Values)const;
+	void CompileBaseRates(ConstantBaseRateTable& Values);
+	void CompileBaseRates(ForwardBaseRateTable& Values);
 #ifndef NO_DATABASE
-	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll=false)const;
-	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll=false)const;
+	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll = false);
+	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll=false);
 #endif
 	void SetDealName(const QString& a) {Structure.SetDealName(a);}
 	bool GetBaseCaseToCall() const { return m_BaseCaseToCall; }
@@ -142,10 +142,12 @@ private:
 	QString FolderPath;
 	QString PlotsSheet;
 	int PlotIndexes[NumberOfPlots];
-	mutable QDate LiborUpdateDate;
-	mutable bool m_UseForwardCurve;
+	QDate LiborUpdateDate;
+	bool m_UseForwardCurve;
 	bool m_SaveBaseCase;
 	bool m_BaseCaseToCall;
+	ForwardBaseRateTable m_OverrideForwards;
+	ConstantBaseRateTable m_OverrideConstants;
 signals:
 	void LoopStarted();
 	void StressLoopStarted();

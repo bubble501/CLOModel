@@ -287,7 +287,17 @@ void CentralUnit::CheckCalculationDone()
 			if (UnifiedFile.open(QIODevice::WriteOnly)) {
 				QDataStream out(&UnifiedFile);
 				out.setVersion(QDataStream::Qt_5_3);
-				out << qint32(ModelVersionNumber) << LiborUpdateDate << m_UseForwardCurve << m_BaseCaseToCall << Structure << CallStructure << LoansCalculator;
+				out 
+					<< qint32(ModelVersionNumber) 
+					<< LiborUpdateDate 
+					<< m_UseForwardCurve 
+					<< m_BaseCaseToCall 
+					<< Structure 
+					<< CallStructure 
+					<< LoansCalculator
+					<< m_OverrideConstants
+					<< m_OverrideForwards
+				;
 				UnifiedFile.close();
 			}
 		}
@@ -424,7 +434,8 @@ void CentralUnit::StressFinished(){
 CentralUnit::~CentralUnit(){
 	if(MtgsProgress) MtgsProgress->deleteLater();
 }
-void CentralUnit::CompileBaseRates(ConstantBaseRateTable& Values)const {
+void CentralUnit::CompileBaseRates(ConstantBaseRateTable& Values) {
+	m_OverrideConstants = Values;
 	for(int i=0;i<Structure.GetTranchesCount();i++){
 		Structure.GetTranche(i)->CompileReferenceRateValue(Values);
 	}
@@ -435,7 +446,8 @@ void CentralUnit::CompileBaseRates(ConstantBaseRateTable& Values)const {
 	LiborUpdateDate = Values.GetUpdateDate();
 	m_UseForwardCurve = false;
 }
-void CentralUnit::CompileBaseRates(ForwardBaseRateTable& Values)const {
+void CentralUnit::CompileBaseRates(ForwardBaseRateTable& Values) {
+	m_OverrideForwards = Values;
 	for (int i = 0; i < Structure.GetTranchesCount(); i++) {
 		Structure.GetTranche(i)->CompileReferenceRateValue(Values);
 	}
@@ -447,7 +459,8 @@ void CentralUnit::CompileBaseRates(ForwardBaseRateTable& Values)const {
 	m_UseForwardCurve = true;
 }
 #ifndef NO_DATABASE
-void CentralUnit::GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll) const {
+void CentralUnit::GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll)  {
+	m_OverrideConstants = Values;
 	for (int i = 0; i < Structure.GetTranchesCount(); i++) {
 		Structure.GetTranche(i)->GetBaseRatesDatabase(Values, DownloadAll);
 	}
@@ -458,7 +471,8 @@ void CentralUnit::GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool Downl
 	LiborUpdateDate = Values.GetUpdateDate();
 	m_UseForwardCurve = false;
 }
-void CentralUnit::GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll) const {
+void CentralUnit::GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll)  {
+	m_OverrideForwards = Values;
 	for (int i = 0; i < Structure.GetTranchesCount(); i++) {
 		Structure.GetTranche(i)->GetBaseRatesDatabase(Values, DownloadAll);
 	}

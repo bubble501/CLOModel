@@ -179,9 +179,6 @@
     <ClInclude Include="ReserveFund.h">
       <Filter>Header Files\DealStructure</Filter>
     </ClInclude>
-    <ClInclude Include="BaseRateTable.h">
-      <Filter>Header Files\Vectors</Filter>
-    </ClInclude>
     <ClInclude Include="QBbgRequest.h">
       <Filter>Header Files\Bloomberg</Filter>
     </ClInclude>
@@ -204,6 +201,9 @@
       <Filter>Header Files\Common Items</Filter>
     </ClInclude>
     <ClInclude Include="GenericCashFlow.h">
+      <Filter>Header Files\Common Items</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseRateTable.h">
       <Filter>Header Files\Common Items</Filter>
     </ClInclude>
   </ItemGroup>

@@ -8,7 +8,18 @@
 #include "BloombergVector.h"
 class ConstantBaseRateTable;
 class ForwardBaseRateTable;
-class ConstantBaseRateTable : public BackwardInterface {
+class AbstractBaseRateTable : public BackwardInterface {
+protected:
+	QDate UpdateDate;
+public:
+	AbstractBaseRateTable(const QDate& a) : UpdateDate(a) {}
+	AbstractBaseRateTable() {}
+	virtual const QDate& GetUpdateDate() const { return UpdateDate; }
+	virtual void SetUpdateDate(const QDate& val) { UpdateDate = val; }
+	virtual bool Contains(const QString& key) const = 0;
+	virtual QList<QString> GetAvailableKeys() const = 0;
+};
+class ConstantBaseRateTable : public AbstractBaseRateTable {
 public:
 	ConstantBaseRateTable() {}
 	ConstantBaseRateTable(const ConstantBaseRateTable& a);
@@ -20,24 +31,21 @@ public:
 	ConstantBaseRateTable& operator+=(const ConstantBaseRateTable& a);
 	ConstantBaseRateTable& operator+=(const ForwardBaseRateTable& a);
 	ConstantBaseRateTable& operator+=(const QHash<QString, double>& a);
-	const QHash<QString, double>& GetValues() const { return Values; }
-	QHash<QString, double>& GetValues() { return Values; }
-	bool Contains(const QString& key) const { return Values.contains(key); }
-	double GetValue(const QString& key) const { return Values.value(key, -1.0); }
-	void SetValue(const QString& key, double a) { Values[key] = a; }
-	const QDate& GetUpdateDate() const { return UpdateDate; }
-	void SetUpdateDate(const QDate& val) { UpdateDate = val; }
-	QList<QString> GetAvailableKeys() const { return Values.keys(); }
+	virtual const QHash<QString, double>& GetValues() const { return Values; }
+	virtual QHash<QString, double>& GetValues() { return Values; }
+	virtual bool Contains(const QString& key) const override { return Values.contains(key); }
+	virtual double GetValue(const QString& key) const { return Values.value(key, -1.0); }
+	virtual void SetValue(const QString& key, double a) { Values[key] = a; }
+	virtual QList<QString> GetAvailableKeys() const override { return Values.keys(); }
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 private:
 	QHash<QString, double> Values;
-	QDate UpdateDate;
 	friend QDataStream& operator<<(QDataStream & stream, const ConstantBaseRateTable& flows);
 	friend QDataStream& operator>>(QDataStream & stream, ConstantBaseRateTable& flows);
 
 };
-class ForwardBaseRateTable : public BackwardInterface {
+class ForwardBaseRateTable : public AbstractBaseRateTable {
 public:
 	ForwardBaseRateTable() {}
 	ForwardBaseRateTable(const ForwardBaseRateTable& a);
@@ -49,20 +57,17 @@ public:
 	ForwardBaseRateTable& operator+=(const ForwardBaseRateTable& a);
 	ForwardBaseRateTable& operator+=(const ConstantBaseRateTable& a);
 	ForwardBaseRateTable& operator+=(const QHash<QString, BloombergVector>& a);
-	const QHash<QString, BloombergVector>& GetValues() const { return Values; }
-	QHash<QString, BloombergVector>& GetValues() { return Values; }
-	bool Contains(const QString& key) const { return Values.contains(key); }
-	BloombergVector GetValue(const QString& key) const { return Values.value(key, BloombergVector()); }
-	void SetValue(const QString& key, const BloombergVector& a) { if(!a.IsEmpty()) Values[key] = a; }
-	void SetValue(const QString& key, const QList<QDate>& RefDates, const QList<double>& Refvals) { SetValue(key, BloombergVector(RefDates, Refvals)); }
-	const QDate& GetUpdateDate() const { return UpdateDate; }
-	void SetUpdateDate(const QDate& val) { UpdateDate = val; }
-	QList<QString> GetAvailableKeys() const { return Values.keys(); }
+	virtual const QHash<QString, BloombergVector>& GetValues() const { return Values; }
+	virtual QHash<QString, BloombergVector>& GetValues() { return Values; }
+	virtual bool Contains(const QString& key) const override { return Values.contains(key); }
+	virtual BloombergVector GetValue(const QString& key) const { return Values.value(key, BloombergVector()); }
+	virtual void SetValue(const QString& key, const BloombergVector& a) { if (!a.IsEmpty()) Values[key] = a; }
+	virtual void SetValue(const QString& key, const QList<QDate>& RefDates, const QList<double>& Refvals) { SetValue(key, BloombergVector(RefDates, Refvals)); }
+	virtual QList<QString> GetAvailableKeys() const override{ return Values.keys(); }
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 private:
 	QHash<QString, BloombergVector> Values;
-	QDate UpdateDate;
 	friend QDataStream& operator<<(QDataStream & stream, const ForwardBaseRateTable& flows);
 	friend QDataStream& operator>>(QDataStream & stream, ForwardBaseRateTable& flows);
 };

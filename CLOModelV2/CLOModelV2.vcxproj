@@ -22,6 +22,7 @@
     <ClInclude Include="ExcelCommons.h" />
     <ClInclude Include="ExcelOutput.h" />
     <ClInclude Include="IntegerVector.h" />
+    <ClInclude Include="IRSwap.h" />
     <ClInclude Include="Mortgage.h" />
     <ClInclude Include="MtgCashFlow.h" />
     <ClInclude Include="QBbgRequest.h" />
@@ -358,6 +359,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="IntegerVector.cpp" />
+    <ClCompile Include="IRSwap.cpp" />
     <ClCompile Include="Mortgage.cpp" />
     <ClCompile Include="MtgCalculator.cpp" />
     <ClCompile Include="MtgCalculatorThread.cpp" />

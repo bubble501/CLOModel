@@ -63,12 +63,9 @@ int main(int argc, char *argv[]) {
 	}*/
 	MtgCalculator TempCalucator;
 	Mortgage TestMtg;
-	TestMtg.SetProperty("Issuer", "PARGN 8");
-	TestMtg.SetProperty("Facility", "XS0203410922");
+	TestMtg.SetProperty("Issuer", "PARGN 17");
+	TestMtg.SetProperty("Facility", "XS0843326314");
 	TestMtg.SetSize(10000000.0);
-	TempCalucator.AddLoan(TestMtg);
-	TestMtg.SetProperty("Issuer", "AQUIL 2006-1X");
-	TestMtg.SetProperty("Facility", "AQUIL 2006-1X A");
 	TempCalucator.AddLoan(TestMtg);
 	TempCalucator.StartCalculation(true);
 

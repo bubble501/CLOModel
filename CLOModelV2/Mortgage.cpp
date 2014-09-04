@@ -13,7 +13,7 @@ Mortgage::Mortgage()
 	, m_FloatingRateBaseValue("0")
 	,m_Size(0.0)
 	, m_UseForwardCurve(false)
-	, m_Properties("<Loan></Loan>")
+	, m_Properties("<?xml version=\"1.0\"?><Loan></Loan>")
 {}
 void Mortgage::SetAnnuity(const QString& a){
 	m_AnnuityVect=a;

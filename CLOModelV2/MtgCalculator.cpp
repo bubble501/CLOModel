@@ -74,6 +74,7 @@ bool MtgCalculator::StartCalculation(bool UseStoredCF) {
 		MtgCashFlow ResultingFlow;
 		ConfigIni.beginGroup("Folders");
 		QDir CLOMsFolder(ConfigIni.value("UnifiedResultsFolder", "Z:/24AM/Monitoring/Model Results").toString());
+		ConfigIni.endGroup();
 		for (auto i = Loans.constBegin(); i != Loans.constEnd(); ++i) {
 			ResultingFlow.Clear();
 			if (CLOMsFolder.exists()) {
@@ -113,8 +114,10 @@ bool MtgCalculator::StartCalculation(bool UseStoredCF) {
 			}
 			#ifndef NO_DATABASE
 			if (!CashFound && DBAvailable) {
+				ConfigIni.beginGroup("Database");
 				QSqlQuery query;
 				query.prepare("exec " + ConfigIni.value("CashFlowsStoredProc", "getCashFlows").toString() + " ?");
+				ConfigIni.endGroup();
 				query.setForwardOnly(true);
 				query.bindValue(0, TrancheName);
 				bool FirstTime = true;

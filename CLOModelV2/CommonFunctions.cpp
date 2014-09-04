@@ -196,11 +196,14 @@ void PrintToTempFile(const QString& TempFileName, const QString& Message) {
 	TempFile.close();
 }
 #include <QSettings>
+#include <QRegExp>
+//UGLY!!!
 double GetLoanAssumption(const QString& LoanName, int columnIndex) {
 	QStringList Assumptions;
 	QStringList AKAs;
 	int FoundLoan = -1;
-	if (columnIndex >= 0 && columnIndex <= 7) {
+	int LineCounter = 0;
+	if (columnIndex >= 0 && columnIndex <= 7 && !LoanName.isEmpty()) {
 		QSettings ConfigIni(":/Configs/GlobalConfigs.ini", QSettings::IniFormat);
 		ConfigIni.beginGroup("Folders");
 		QFile AssumptionsFile(ConfigIni.value("UnifiedResultsFolder", "Z:/24AM/Monitoring/Model Results").toString() + '/' + ConfigIni.value("AssumptionsFile", "Loans Assumptions").toString());
@@ -209,25 +212,35 @@ double GetLoanAssumption(const QString& LoanName, int columnIndex) {
 			QTextStream Streamer(&AssumptionsFile);
 			while (!Streamer.atEnd() && FoundLoan < 0) {
 				CurrentLoan = Streamer.readLine();
+				CurrentLoan=CurrentLoan.right(CurrentLoan.size() - 1);
+				CurrentLoan=CurrentLoan.left(CurrentLoan.size() - 1);
 				Assumptions = CurrentLoan.split("#,#");
 				AKAs = Assumptions.first().split("$,$");
+				QRegExp WholeWordRX;
+				WholeWordRX.setCaseSensitivity(Qt::CaseInsensitive);
 				for (FoundLoan = 0; FoundLoan < AKAs.size(); ++FoundLoan) {
-					if (AKAs.at(FoundLoan).contains(LoanName, Qt::CaseInsensitive) || LoanName.contains(AKAs.at(FoundLoan), Qt::CaseInsensitive))
+					WholeWordRX.setPattern("\\b" + LoanName + "\\b");
+					if (AKAs.at(FoundLoan).contains(WholeWordRX))
+						break;
+					WholeWordRX.setPattern("\\b" + AKAs.at(FoundLoan) + "\\b");
+					if (LoanName.contains(WholeWordRX))
 						break;
 				}
 				if (FoundLoan >= AKAs.size()) FoundLoan = -1;
+				++LineCounter;
 			}
 			AssumptionsFile.close();
 		}
 	}
 	if (FoundLoan < 0) {
-		return -1;
+		return -1.0;
 	}
 	else {
 		switch (columnIndex) {
+		case 0:
+			return static_cast<double>(LineCounter);
 		case 3:
 			return (Assumptions.at(3) == "False" ? 0.0 : 1.0);
-			break;
 		default:
 			return Assumptions.at(columnIndex).toDouble();
 		}

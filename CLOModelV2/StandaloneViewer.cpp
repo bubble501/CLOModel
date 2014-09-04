@@ -138,9 +138,8 @@ void StandaloneViewer::LoadFile(const QString& fileName){
 		file.close();
 		TheViewer->SetStructure(TempWaterfall,TempCallWaterfall);
 		TheViewer->ShowCallStructure();
-		QString TempName=TempWaterfall.GetTranche(0)->GetTrancheName();
-		recentNames.removeAll(TempName);
-		recentNames.prepend(TempName);
+		recentNames.removeAll(TempWaterfall.GetDealName());
+		recentNames.prepend(TempWaterfall.GetDealName());
 		recentFiles.removeAll(fileName);
 		recentFiles.prepend(fileName);
 		updateRecentFileActions();
@@ -148,9 +147,8 @@ void StandaloneViewer::LoadFile(const QString& fileName){
 	else if (QFileInfo(file).suffix().toLower()=="fcsr"){
 		 if(!StressWindow->LoadStress(fileName)) return closeFile();
 		 StressWindow->show();
-		 QString TempName=StressWindow->GetFirstName();
-		 recentNames.removeAll("Stress " +TempName);
-		 recentNames.prepend("Stress " +TempName);
+		 recentNames.removeAll("Stress " + StressWindow->GetFirstName());
+		 recentNames.prepend("Stress " + StressWindow->GetFirstName());
 		 recentFiles.removeAll(fileName);
 		 recentFiles.prepend(fileName);
 		 updateRecentFileActions();

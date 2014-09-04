@@ -492,6 +492,7 @@ void __stdcall InspectWaterfall(LPSAFEARRAY *ArrayData){
 	ComputationLoop.exec();	
 }
 
+//Ugly!!!
 double __stdcall GetAssumption(LPSAFEARRAY *ArrayData) {
 	ExcelCommons::InitExcelOLE();
 	int ColumnIndex;
@@ -501,7 +502,7 @@ double __stdcall GetAssumption(LPSAFEARRAY *ArrayData) {
 		QString LoanName = QString::fromStdWString(pdFreq->bstrVal).trimmed(); pdFreq++;
 		ColumnIndex = pdFreq->intVal; pdFreq++;
 		SafeArrayUnaccessData(*ArrayData);
-		return GetLoanAssumption(LoanName, ColumnIndex);
+		return GetLoanAssumption(LoanName.trimmed(), ColumnIndex);
 	}
 	return -1.0;
 }

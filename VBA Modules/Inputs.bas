@@ -896,6 +896,7 @@ Public Function GetLoanAssumption(Loan As String, Column As Long)
 Attribute GetLoanAssumption.VB_Description = "Get Assumptions for Loans"
 Attribute GetLoanAssumption.VB_ProcData.VB_Invoke_Func = " \n14"
 'Column
+'0-Loan Identifier
 '1-Senior Price
 '2-Sub Price
 '3-Default
@@ -903,7 +904,7 @@ Attribute GetLoanAssumption.VB_ProcData.VB_Invoke_Func = " \n14"
 '5-Senior Haircut Period
 '6-Sub Haircut Amt
 '7-Sub Haircut Period
-    If (Column < 1 Or Column > 7) Then
+    If (Column < 0 Or Column > 7) Then
         GetLoanAssumption = ""
         Exit Function
     End If
@@ -913,13 +914,14 @@ Attribute GetLoanAssumption.VB_ProcData.VB_Invoke_Func = " \n14"
     result(1) = Column
     Dim response As Double
     response = GetAssumption(result)
-    If (response < 0) Then
-        GetLoanAssumption = ""
-        Exit Function
-    End If
     If (Column = 3) Then
-        GetLoanAssumption = True
-        If (response = 0#) Then GetLoanAssumption = False
+        If (response > 0#) Then
+            GetLoanAssumption = True
+        Else
+            GetLoanAssumption = False
+        End If
+    ElseIf (response < 0) Or (Column >= 4 And response = 0) Then
+        GetLoanAssumption = ""
     Else
         GetLoanAssumption = response
     End If

@@ -11,7 +11,7 @@ class StressViewer : public QWidget{
 public:
 	StressViewer(QWidget* parent=0);
 	bool LoadStress(const QString& filename);
-	QString GetFirstName() const{return StressTarget.GetResults().value(StressTarget.GetXSpann().first()).value(StressTarget.GetYSpann().first()).GetTranche(0)->GetTrancheName();}
+	QString GetFirstName() const{return StressTarget.GetResults().value(StressTarget.GetXSpann().first()).value(StressTarget.GetYSpann().first()).GetDealName();}
 private:
 	QTableWidget* Table;
 	QLabel* TypeLabel;

@@ -200,8 +200,8 @@ void Mortgage::SetInterest(const QString& a){
 			 m_CashFlows.AddFlow(CurrentMonth, TempFlow1, MtgCashFlow::PrepaymentFlow);
 			 CurrentAmtOut -= TempFlow1;
 			 TempFlow1 = qMin(m_CashFlows.GetAccruedInterest(CurrentMonth), m_CashFlows.GetAccruedInterest(CurrentMonth) * CPRVec.GetSMM(CurrentMonth, 1) * m_PrepayMultiplier.GetValue(CurrentMonth));
-			m_CashFlows.AddFlow(CurrentMonth, TempFlow1, MtgCashFlow::InterestFlow);
-			m_CashFlows.AddFlow(CurrentMonth, -TempFlow1, MtgCashFlow::AccruedInterestFlow);
+			 m_CashFlows.AddFlow(CurrentMonth, TempFlow1, MtgCashFlow::InterestFlow);
+			 m_CashFlows.AddFlow(CurrentMonth, -TempFlow1, MtgCashFlow::AccruedInterestFlow);
 			//////////////////////////////////////////////////////////////////////////
 			//Defaults
 			 TempFlow1 = qMin(CurrentAmtOut, CurrentAmtOut * CDRVec.GetSMM(CurrentMonth, 1));

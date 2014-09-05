@@ -117,7 +117,21 @@ Public Sub GetInputFromStructure( _
     Dim BaseCaseCall As Range
     Dim StartingDefJunFees As Range
     Dim GICInterestCell As Range
+    'loans assumptions
+    Dim IssuerProperty As Range
+    Dim FacilityProperty As Range
+    Dim CountryProperty As Range
+    Dim IndustryProperty As Range
+    Dim MezzanineProperty As Range
+    Dim PriceProperty As Range
     On Error Resume Next
+    Set IssuerProperty = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("IssuerProperty"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set FacilityProperty = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("FacilityProperty"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set CountryProperty = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("CountryProperty"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set IndustryProperty = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("IndustryProperty"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set MezzanineProperty = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("MezzanineProperty"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set PriceProperty = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("PriceProperty"), LookAt:=xlWhole, LookIn:=xlValues)
+    ''''''''''''''''''''''''''''''''''''''''''''''''''''
     Set HaircutVecStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("HaircutVecHeader"), LookAt:=xlWhole, LookIn:=xlValues)
     Set StartingDefJunFees = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("StartingDefJunFees"), LookAt:=xlWhole, LookIn:=xlValues)
     Set GICInterestCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("GICInterestCell"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -258,6 +272,17 @@ ReferenceRateFromBBg:
             Else
                 Call AddInput(AllTheInputs, CStr(HaircutVecStart.Offset(i, 0).Value))
             End If
+            
+            'Loans Properties
+            Dim PropertyString As String
+            PropertyString = ""
+            If Not (IssuerProperty Is Nothing) Then PropertyString = PropertyString & "Issuer#=#" & CStr(IssuerProperty.Offset(i, 0).Value) & "#,#"
+            If Not (FacilityProperty Is Nothing) Then PropertyString = PropertyString & "Facility#=#" & CStr(FacilityProperty.Offset(i, 0).Value) & "#,#"
+            If Not (CountryProperty Is Nothing) Then PropertyString = PropertyString & "Country#=#" & CStr(CountryProperty.Offset(i, 0).Value) & "#,#"
+            If Not (IndustryProperty Is Nothing) Then PropertyString = PropertyString & "Industry#=#" & CStr(IndustryProperty.Offset(i, 0).Value) & "#,#"
+            If Not (MezzanineProperty Is Nothing) Then PropertyString = PropertyString & "Mezzanine#=#" & CStr(MezzanineProperty.Offset(i, 0).Value) & "#,#"
+            If Not (PriceProperty Is Nothing) Then PropertyString = PropertyString & "Price#=#" & CStr(PriceProperty.Offset(i, 0).Value) & "#,#"
+            Call AddInput(AllTheInputs, Left(PropertyString, Len(PropertyString) - 3))
         End If
         i = i + 1
     Loop
@@ -768,6 +793,13 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
     a.Add "Current deferred junior fees", "StartingDefJunFees"
     a.Add "GIC Interest", "GICInterestCell"
     a.Add "Forward Curves", "ForwardCurvesSheet"
+    'Loans Properties
+     a.Add "Issuer", "IssuerProperty"
+     a.Add "Facility", "FacilityProperty"
+     a.Add "Country", "CountryProperty"
+     a.Add "Industry", "IndustryProperty"
+     a.Add "Mezzanine", "MezzanineProperty"
+     a.Add "Price", "PriceProperty"
 End Sub
 
 Private Function FromStringToInterestType(a As String) As Long
@@ -892,7 +924,7 @@ Public Sub SeparateWaterfall( _
     Loop
     Call InspectWaterfall(Params)
 End Sub
-Public Function GetLoanAssumption(Loan As String, Column As Long)
+Public Function GetLoanAssumption(Loan As String, Column As Long, refDate As Date)
 Attribute GetLoanAssumption.VB_Description = "Get Assumptions for Loans"
 Attribute GetLoanAssumption.VB_ProcData.VB_Invoke_Func = " \n14"
 'Column
@@ -904,14 +936,17 @@ Attribute GetLoanAssumption.VB_ProcData.VB_Invoke_Func = " \n14"
 '5-Senior Haircut Period
 '6-Sub Haircut Amt
 '7-Sub Haircut Period
-    If (Column < 0 Or Column > 7) Then
+'8-Prepay Month
+'9-View (1=Positive, 0=Neutral, -1=Uncertain, 2=Negative
+    If (Column < 0 Or Column > 9) Then
         GetLoanAssumption = ""
         Exit Function
     End If
     Dim result() As Variant
-    ReDim result(0 To 1)
+    ReDim result(0 To 2)
     result(0) = Loan
     result(1) = Column
+    result(2) = Format(refDate, "yyyy-mm-dd")
     Dim response As Double
     response = GetAssumption(result)
     If (Column = 3) Then

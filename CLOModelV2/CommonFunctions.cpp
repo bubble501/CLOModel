@@ -6,6 +6,7 @@
 #include <qmath.h>
 #include <QDir>
 #include <QTextStream>
+#include <QDate>
 #include "BloombergVector.h"
 #include <boost/math/tools/roots.hpp>
 int MonthDiff(const QDate& FutureDte,const QDate& PresentDte){
@@ -198,12 +199,25 @@ void PrintToTempFile(const QString& TempFileName, const QString& Message) {
 #include <QSettings>
 #include <QRegExp>
 //UGLY!!!
-double GetLoanAssumption(const QString& LoanName, int columnIndex) {
+double GetLoanAssumption(const QString& LoanName, int columnIndex, QDate RefDate) {
+/*columnIndex
+0-Loan Identifier
+1-Senior Price
+2-Sub Price
+3-Default
+4-Senior Haircut Amt
+5-Senior Haircut Period
+6-Sub Haircut Amt
+7-Sub Haircut Period
+8-Prepay Period
+9-View
+*/
+	
 	QStringList Assumptions;
 	QStringList AKAs;
 	int FoundLoan = -1;
 	int LineCounter = 0;
-	if (columnIndex >= 0 && columnIndex <= 7 && !LoanName.isEmpty()) {
+	if (columnIndex >= 0 && columnIndex <= 9 && !LoanName.isEmpty()) {
 		QSettings ConfigIni(":/Configs/GlobalConfigs.ini", QSettings::IniFormat);
 		ConfigIni.beginGroup("Folders");
 		QFile AssumptionsFile(ConfigIni.value("UnifiedResultsFolder", "Z:/24AM/Monitoring/Model Results").toString() + '/' + ConfigIni.value("AssumptionsFile", "Loans Assumptions").toString());
@@ -237,10 +251,16 @@ double GetLoanAssumption(const QString& LoanName, int columnIndex) {
 	}
 	else {
 		switch (columnIndex) {
-		case 0:
+		case 0: //Scenario Name
 			return static_cast<double>(LineCounter);
-		case 3:
+		case 3: //Default
 			return (Assumptions.at(3) == "False" ? 0.0 : 1.0);
+		case 5: //Senior Haircut Period
+		case 7: //Sub Haircut Period
+		case 8: //Prepay Period
+			if (RefDate.isNull()) RefDate = QDate::currentDate();
+			if (Assumptions.at(columnIndex).isEmpty()) return 0.0;
+			return qMax(1.0,static_cast<double>(Assumptions.at(columnIndex).toDouble() - MonthDiff(RefDate,QDate::fromString(Assumptions.last(), "yyyy-MM-dd"))));
 		default:
 			return Assumptions.at(columnIndex).toDouble();
 		}

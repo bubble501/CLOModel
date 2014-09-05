@@ -13,14 +13,15 @@ void IRSwap::SetMissingAnchors(const QDate& a) {
 	if (!m_FloatingSpread.IsEmpty() && m_FixedLegRate.GetAnchorDate().isNull()) m_FixedLegRate.SetAnchorDate(a);
 }
 IRSwap::IRSwap(const IRSwap& a) 
-:m_FixedLegRate(a.m_FixedLegRate)
-, m_FloatingBase(a.m_FloatingBase)
-, m_FloatingSpread(a.m_FloatingSpread)
-, m_FixedToFloating(a.m_FixedToFloating)
-, m_LastPay(a.m_LastPay)
-, m_LastReceive(a.m_LastReceive)
-,m_DayCount(a.m_DayCount)
-, m_FloatingBaseValue(a.m_FloatingBaseValue)
+	:m_FixedLegRate(a.m_FixedLegRate)
+	, m_FloatingBase(a.m_FloatingBase)
+	, m_FloatingSpread(a.m_FloatingSpread)
+	, m_FixedToFloating(a.m_FixedToFloating)
+	, m_LastPay(a.m_LastPay)
+	, m_LastReceive(a.m_LastReceive)
+	, m_DayCount(a.m_DayCount)
+	, m_FloatingBaseValue(a.m_FloatingBaseValue)
+	, m_UseForwardCurves(a.m_UseForwardCurves)
 {}
 
 IRSwap::IRSwap() 
@@ -28,6 +29,7 @@ IRSwap::IRSwap()
 	, m_LastPay(0.0)
 	, m_LastReceive(0.0)
 	, m_DayCount(DayCountConvention::ACT360)
+	, m_UseForwardCurves(false)
 {}
 IRSwap& IRSwap::operator=(const IRSwap& a) {
 	m_FixedLegRate = a.m_FixedLegRate;
@@ -38,9 +40,11 @@ IRSwap& IRSwap::operator=(const IRSwap& a) {
 	m_LastReceive=a.m_LastReceive;
 	m_DayCount = a.m_DayCount;
 	m_FloatingBaseValue = a.m_FloatingBaseValue;
+	m_UseForwardCurves = a.m_UseForwardCurves;
+	return *this;
 }
 
-void IRSwap::CalculateFlow(double Notional, const QDate& StartAccrueDate, const QDate& EndAccrueDate) {
+double IRSwap::CalculateFlow(double Notional, const QDate& StartAccrueDate, const QDate& EndAccrueDate) {
 	//TODO Libor fixing at what date?
 	if (m_FloatingBaseValue.IsEmpty()) {
 #ifndef NO_DATABASE
@@ -52,7 +56,7 @@ void IRSwap::CalculateFlow(double Notional, const QDate& StartAccrueDate, const 
 #ifndef NO_BLOOMBERG
 		m_FloatingBaseValue = m_FloatingBase.GetRefRateValueFromBloomberg();
 #else
-		return;
+		return 0.0;
 #endif
 #endif 
 	}
@@ -63,6 +67,7 @@ void IRSwap::CalculateFlow(double Notional, const QDate& StartAccrueDate, const 
 		m_LastPay = m_LastReceive;
 		m_LastReceive = tempD;
 	}
+	return GetLastNetFlow();
 }
 
 QDataStream& IRSwap::LoadOldVersion(QDataStream& stream) {

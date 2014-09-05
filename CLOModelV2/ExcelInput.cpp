@@ -32,6 +32,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		QDate Matur;
 		double sze;
 		QString Intr, frq, lossm, prem, Ann, Hairc, BaseRte;
+		QString Properties;
 		NumElements=pdFreq->intVal;pdFreq++;
 		for(int i=0;i<NumElements;i++){
 			Matur=QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd");pdFreq++;
@@ -43,7 +44,8 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			prem=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			lossm=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			Hairc=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
-			if (sze>=0.01) TempUnit.AddLoan(Matur, sze, Intr, Ann, frq, BaseRte, lossm, prem, Hairc);
+			Properties = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+			if (sze >= 0.01) TempUnit.AddLoan(Matur, sze, Intr, Ann, frq, BaseRte, lossm, prem, Hairc, Properties);
 		}
 	}
 	{//Tranches
@@ -501,8 +503,9 @@ double __stdcall GetAssumption(LPSAFEARRAY *ArrayData) {
 	if (SUCCEEDED(hr)) {
 		QString LoanName = QString::fromStdWString(pdFreq->bstrVal).trimmed(); pdFreq++;
 		ColumnIndex = pdFreq->intVal; pdFreq++;
+		QDate RefDate = QDate::fromString(QString::fromStdWString(pdFreq->bstrVal).trimmed(),"yyyy-MM-dd"); pdFreq++;
 		SafeArrayUnaccessData(*ArrayData);
-		return GetLoanAssumption(LoanName.trimmed(), ColumnIndex);
+		return GetLoanAssumption(LoanName.trimmed(), ColumnIndex, RefDate);
 	}
 	return -1.0;
 }

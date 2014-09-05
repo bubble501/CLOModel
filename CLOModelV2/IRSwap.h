@@ -13,9 +13,9 @@ public:
 	void SetFloatingToFixed() { m_FixedToFloating = false; }
 	bool IsFixedToFloating() const { return m_FixedToFloating; }
 	bool IsFloatingToFixed() const { return !m_FixedToFloating; }
-	const QString& GetFixedLegRate() const { return m_FixedLegRate.GetVector(); }
-	const QString& GetFloatingBase() const { return m_FloatingBase.GetVector(); }
-	const QString& GetFloatingSpread() const { return m_FloatingSpread.GetVector(); }
+	QString GetFixedLegRate() const { return m_FixedLegRate.GetVector(); }
+	QString GetFloatingBase() const { return m_FloatingBase.GetVector(); }
+	QString GetFloatingSpread() const { return m_FloatingSpread.GetVector(); }
 	void SetFixedLegRate(const QString& val) { m_FixedLegRate = val; }
 	void SetFloatingSpread(const QString& val) { m_FloatingSpread = val; }
 	void SetFloatingBase(const QString& val) { m_FloatingBase = val; }
@@ -25,7 +25,7 @@ public:
 	double GetLastNetFlow() const { return m_LastReceive - m_LastPay; }
 	const DayCountConvention& GetDayCount() const { return m_DayCount; }
 	void SetDayCount(const DayCountConvention& val) { m_DayCount = val; }
-	void CalculateFlow(double Notional, const QDate& StartAccrueDate, const QDate& EndAccrueDate);
+	double CalculateFlow(double Notional, const QDate& StartAccrueDate, const QDate& EndAccrueDate);
 	bool GetUseForwardCurves() const { return m_UseForwardCurves; }
 	void SetUseForwardCurves( bool val) { m_UseForwardCurves = val; }
 	void CompileBaseRates(ConstantBaseRateTable& a) { m_UseForwardCurves = false; m_FloatingBaseValue = m_FloatingBase.CompileReferenceRateValue(a); }

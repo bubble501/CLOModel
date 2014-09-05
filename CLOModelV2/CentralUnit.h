@@ -14,7 +14,7 @@ class CentralUnit : public QObject{
 public:
 	~CentralUnit();
 	CentralUnit(QObject* parent=0);
-	void AddLoan(const QDate& Maturity, double Size, const QString& Interest, const QString& Annuity, const QString& Freq = "1", const QString& floatBase = "ZERO", const QString& LossMult = "100", const QString& PrepayMult = "100", const QString& HaicutVect = "0");
+	void AddLoan(const QDate& Maturity, double Size, const QString& Interest, const QString& Annuity, const QString& Freq = "1", const QString& floatBase = "ZERO", const QString& LossMult = "100", const QString& PrepayMult = "100", const QString& HaicutVect = "0" ,const QString& Properties="");
 #ifndef NO_BLOOMBERG
 	void AddTranche(const QString& Name,int ProRataGroup, double MinOC=0.0, double MinIC=0.0, double Price=100.0,double FxRate= 1.0,const QString& BbgExt="Mtge");
 #endif

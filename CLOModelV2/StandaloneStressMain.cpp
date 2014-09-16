@@ -61,7 +61,8 @@ int main(int argc, char *argv[]) {
 	out >> TempRead;
 	file.close();
 	}*/
-	Waterfall TempWtf;
+
+	/*Waterfall TempWtf;
 	MtgCalculator TempLoans;
 	QFile file("\\\\synserver2\\Company Share\\24AM\\Monitoring\\Model Results\\AQUIL 2006-1X.clom");
 	file.open(QIODevice::ReadOnly);
@@ -86,10 +87,10 @@ int main(int argc, char *argv[]) {
 	Testing = (*(TempLoans.GetLoans().begin()))->GetProperty("Price");
 	Testing = (*(TempLoans.GetLoans().begin()))->GetProperty("Mezzanine");
 	Testing = (*(TempLoans.GetLoans().begin()))->GetProperty("Industry");
-	Testing = (*(TempLoans.GetLoans().begin()))->GetProperty("Country");
+	Testing = (*(TempLoans.GetLoans().begin()))->GetProperty("Country");*/
 
 
-/*
+
 	Waterfall TempWtf, TempCallWaterfall;
 	QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/.BaseCase.clo");
 	file.open(QIODevice::ReadOnly);
@@ -108,7 +109,7 @@ int main(int argc, char *argv[]) {
 	out >> TempCallWaterfall;
 	file.close();
 	//TempWtf.CalculateTranchesCashFlows();
-	double Testing=TempWtf.GetTranche(0)->GetDiscountMargin(100.0);*/
+	double Testing=TempWtf.GetTranche(2)->GetDiscountMargin(100.0);
 	
 
 	/*Tranche TempTrnch;

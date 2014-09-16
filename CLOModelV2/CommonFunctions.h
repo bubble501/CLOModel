@@ -4,7 +4,9 @@
 class QDate;
 class QString;
 template<typename T> class QList;
+#define DebugLogging
 #define MaximumIRRIterations 10000//INT_MAX-1
+#define MaximumInterestsTypes 8
 //#define SaveLoanTape
 int MonthDiff(const QDate& FutureDte,const QDate& PresentDte);
 class BloombergVector;
@@ -37,7 +39,15 @@ bool IsHoliday(const QDate& a/*,const QString& CountryCode*/);
 bool removeDir(const QString& dirName);
 double GetLoanAssumption(const QString& LoanName, int columnIndex, QDate RefDate);
 void PrintToTempFile(const QString& TempFileName, const QString& Message);
-
+#ifdef DebugLogging
+#define LOGASSERT(CheckExp,LogMsg) ((CheckExp) ? qt_noop() : PrintToTempFile("DebugLog.log",LogMsg)); Q_ASSERT_X(CheckExp,"LOGASSERT",LogMsg)
+#define LOGDEBUG(LogMsg) PrintToTempFile("DebugLog.log",LogMsg)
+#define LOGTOFILE(LogFile,LogMsg) PrintToTempFile(QString(LogFile) + ".log",LogMsg)
+#else
+#define LOGASSERT(CheckExp,LogMsg)
+#define LOGDEBUG(LogMsg)
+#define LOGTOFILE(LogFile,LogMsg)
+#endif
 
 
 #endif // CommonFunctions_h__

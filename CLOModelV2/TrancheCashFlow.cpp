@@ -111,14 +111,17 @@ bool TrancheCashFlow::GetCashFlowsDatabase(const QString& TrancheID) {
 	if (TrancheID.isEmpty()) return false;
 	QSettings ConfigIni(":/Configs/GlobalConfigs.ini", QSettings::IniFormat);
 	ConfigIni.beginGroup("Database");
-	QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
-	db.setDatabaseName(
-		"Driver={" + ConfigIni.value("Driver", "SQL Server").toString()
-		+ "}; "
-		+ ConfigIni.value("DataSource", "Server=SYNSERVER2\\SQLExpress;Initial Catalog=ABSDB;Integrated Security=SSPI;Trusted_Connection=Yes;").toString()
-		);
+	QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
+	if (!db.isValid()) {
+		db = QSqlDatabase::addDatabase(ConfigIni.value("DBtype", "QODBC").toString(), "TwentyFourDB");
+		db.setDatabaseName(
+			"Driver={" + ConfigIni.value("Driver", "SQL Server").toString()
+			+ "}; "
+			+ ConfigIni.value("DataSource", "Server=SYNSERVER2\\SQLExpress;Initial Catalog=ABSDB;Integrated Security=SSPI;Trusted_Connection=Yes;").toString()
+			);
+	}
 	if (db.open()) {
-		QSqlQuery query;
+		QSqlQuery query(db);
 		query.setForwardOnly(true);
 		query.prepare("CALL " + ConfigIni.value("CashFlowsStoredProc", "getCashFlows").toString() + "(?)");
 		query.bindValue(0,TrancheID);

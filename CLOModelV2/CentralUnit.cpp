@@ -281,6 +281,7 @@ void CentralUnit::CheckCalculationDone()
 		out << qint32(ModelVersionNumber) << m_BaseCaseToCall << Structure << CallStructure;
 		file.close();
 	}
+	emit CalculationFinished();
 	if (m_SaveBaseCase) {
 		QSettings ConfigIni(":/Configs/GlobalConfigs.ini", QSettings::IniFormat);
 		ConfigIni.beginGroup("Folders");

@@ -14,6 +14,7 @@ class CentralUnit : public QObject{
 public:
 	~CentralUnit();
 	CentralUnit(QObject* parent=0);
+	void AddLoan(const Mortgage& TempMtg) { LoansCalculator.AddLoan(TempMtg);	if (Stresser)Stresser->AddLoan(TempMtg); }
 	void AddLoan(const QDate& Maturity, double Size, const QString& Interest, const QString& Annuity, const QString& Freq = "1", const QString& floatBase = "ZERO", const QString& LossMult = "100", const QString& PrepayMult = "100", const QString& HaicutVect = "0" ,const QString& Properties="");
 #ifndef NO_BLOOMBERG
 	void AddTranche(const QString& Name,int ProRataGroup, double MinOC=0.0, double MinIC=0.0, double Price=100.0,double FxRate= 1.0,const QString& BbgExt="Mtge");
@@ -121,6 +122,8 @@ public:
 	void SetBaseCaseToCall(bool val) { m_BaseCaseToCall = val; }
 	bool GetSaveBaseCase() const { return m_SaveBaseCase; }
 	void SetSaveBaseCase(bool val) { m_SaveBaseCase = val; }
+	const Waterfall& GetStructure() { return Structure; }
+	const Waterfall& GetCallStructure() { return CallStructure; }
 private:
 	ProgressWidget* MtgsProgress;
 	WaterfallCalculator* ParallWatFalls;
@@ -151,6 +154,7 @@ private:
 signals:
 	void LoopStarted();
 	void StressLoopStarted();
+	void CalculationFinished();
 private slots:
 	void CalculationStep2();
 	void CalculationStep1();

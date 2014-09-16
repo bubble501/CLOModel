@@ -5,28 +5,28 @@
 #include <QDataStream>
 #include <qmath.h>
 double MtgCashFlow::GetWAcoupon(int index) const {
-	if (GenericCashFlow::GetFlow(index, AmountOutstandingFlow) == 0) return 0.0;
-	return GenericCashFlow::GetFlow(index, WACouponFlow) / GenericCashFlow::GetFlow(index, AmountOutstandingFlow);
+	if (GetFlow(index,MtgFlowType::AmountOutstandingFlow) == 0) return 0.0;
+	return GetFlow(index, MtgFlowType::WACouponFlow) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
 }
 double MtgCashFlow::GetWAcoupon(const QDate& index) const {
-	if (GenericCashFlow::GetFlow(index, AmountOutstandingFlow) == 0) return 0.0;
-	return GenericCashFlow::GetFlow(index, WACouponFlow) / GenericCashFlow::GetFlow(index, AmountOutstandingFlow);
+	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0) return 0.0;
+	return GetFlow(index, MtgFlowType::WACouponFlow) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
 }
 double MtgCashFlow::GetWAprepayMult(int index) const {
-	if (GenericCashFlow::GetFlow(index, AmountOutstandingFlow) == 0) return 0.0;
-	return GenericCashFlow::GetFlow(index, WAPrepayMult) / GenericCashFlow::GetFlow(index, AmountOutstandingFlow);
+	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0) return 0.0;
+	return GetFlow(index, MtgFlowType::WAPrepayMult) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
 }
 double MtgCashFlow::GetWAprepayMult(const QDate& index) const {
-	if (GenericCashFlow::GetFlow(index, AmountOutstandingFlow) == 0) return 0.0;
-	return GenericCashFlow::GetFlow(index, WAPrepayMult) / GenericCashFlow::GetFlow(index, AmountOutstandingFlow);
+	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0) return 0.0;
+	return GetFlow(index, MtgFlowType::WAPrepayMult) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
 }
 double MtgCashFlow::GetWAlossMult(int index) const {
-	if (GenericCashFlow::GetFlow(index, AmountOutstandingFlow) == 0) return 0.0;
-	return GenericCashFlow::GetFlow(index, WALossMult) / GenericCashFlow::GetFlow(index, AmountOutstandingFlow);
+	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0) return 0.0;
+	return GetFlow(index, MtgFlowType::WALossMult) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
 }
 double MtgCashFlow::GetWAlossMult(const QDate& index) const {
-	if (GenericCashFlow::GetFlow(index, AmountOutstandingFlow) == 0) return 0.0;
-	return GenericCashFlow::GetFlow(index, WALossMult) / GenericCashFlow::GetFlow(index, AmountOutstandingFlow);
+	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0) return 0.0;
+	return GetFlow(index, MtgFlowType::WALossMult) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
 }
 /*
 QDataStream& operator<<(QDataStream & stream, const MtgCashFlow& flows) {
@@ -43,68 +43,68 @@ MtgCashFlow MtgCashFlow::ApplyScenario(BloombergVector CPRv, BloombergVector CDR
 	if (CPRv.GetAnchorDate().isNull()) CPRv.SetAnchorDate(GetDate(0));
 	if (CDRv.GetAnchorDate().isNull()) CDRv.SetAnchorDate(GetDate(0));
 	if (LSv.GetAnchorDate().isNull()) LSv.SetAnchorDate(GetDate(0));
-	for (i = 0; i <= LossFlow; i++)
-		Result.AddFlow(GetDate(0), GetFlow(GetDate(0), i), static_cast<MtgFlowType>(i));
+
+	Result.AddFlow(SingleDate(GetDate(0)));
 	double ShareOfPrinc, ShareOfIntr, ShareOfAccrIntr, ShareOfLoss, ShareOfLossOnInterest, SumDeltaOut, TempF, ApplicablePrincipal, ApplicableMultiplier;
 	for (i = 1; i < Count(); i++) {
 
-		ShareOfPrinc = GetFlow(i, PrincipalFlow) / GetPreviousFlow(i, AmountOutstandingFlow); 
-		ShareOfIntr = GetFlow(i, InterestFlow) / GetPreviousFlow(i, AmountOutstandingFlow);
-		ShareOfAccrIntr = GetFlow(i, AccruedInterestFlow) / GetPreviousFlow(i, AmountOutstandingFlow);
-		if (GetPreviousFlow(i, AmountOutstandingFlow) - GetFlow(i, PrincipalFlow) <= 0.0) {
+		ShareOfPrinc = GetFlow(i, MtgFlowType::PrincipalFlow) / GetPreviousFlow(i, MtgFlowType::AmountOutstandingFlow);
+		ShareOfIntr = GetFlow(i, MtgFlowType::InterestFlow) / GetPreviousFlow(i, MtgFlowType::AmountOutstandingFlow);
+		ShareOfAccrIntr = GetFlow(i, MtgFlowType::AccruedInterestFlow) / GetPreviousFlow(i, MtgFlowType::AmountOutstandingFlow);
+		if (GetPreviousFlow(i, MtgFlowType::AmountOutstandingFlow) - GetFlow(i, MtgFlowType::PrincipalFlow) <= 0.0) {
 			ShareOfLoss = 0.0;
 			ShareOfLossOnInterest = 0.0;
 		}
 		else {
-			ShareOfLoss = GetFlow(i, LossFlow) / (GetPreviousFlow(i, AmountOutstandingFlow) - GetFlow(i, PrincipalFlow));
-			ShareOfLossOnInterest = GetFlow(i, LossOnInterestFlow) / (GetPreviousFlow(i, AmountOutstandingFlow) - GetFlow(i, PrincipalFlow));
+			ShareOfLoss = GetFlow(i, MtgFlowType::LossFlow) / (GetPreviousFlow(i, MtgFlowType::AmountOutstandingFlow) - GetFlow(i, MtgFlowType::PrincipalFlow));
+			ShareOfLossOnInterest = GetFlow(i, MtgFlowType::LossOnInterestFlow) / (GetPreviousFlow(i, MtgFlowType::AmountOutstandingFlow) - GetFlow(i, MtgFlowType::PrincipalFlow));
 		}
 
-		ApplicablePrincipal = Result.GetPreviousFlow(i, AmountOutstandingFlow) + Result.GetFlow(i, PrincipalRecovered);
+		ApplicablePrincipal = Result.GetPreviousFlow(i, MtgFlowType::AmountOutstandingFlow) + Result.GetFlow(i, MtgFlowType::PrincipalRecovered);
 
-		Result.AddFlow(GetDate(i), ApplicablePrincipal*ShareOfIntr, InterestFlow);
-		Result.AddFlow(GetDate(i), ApplicablePrincipal*ShareOfAccrIntr, AccruedInterestFlow);
+		Result.AddFlow(GetDate(i), ApplicablePrincipal*ShareOfIntr, MtgFlowType::InterestFlow);
+		Result.AddFlow(GetDate(i), ApplicablePrincipal*ShareOfAccrIntr, MtgFlowType::AccruedInterestFlow);
 
 		SumDeltaOut = ApplicablePrincipal*ShareOfPrinc;
-		Result.AddFlow(GetDate(i), SumDeltaOut, PrincipalFlow);
+		Result.AddFlow(GetDate(i), SumDeltaOut, MtgFlowType::PrincipalFlow);
 
-		Result.AddFlow(GetDate(i), (ApplicablePrincipal - SumDeltaOut)*ShareOfLoss, LossFlow);
-		Result.AddFlow(GetDate(i), (ApplicablePrincipal - SumDeltaOut)*ShareOfLossOnInterest, LossOnInterestFlow);
+		Result.AddFlow(GetDate(i), (ApplicablePrincipal - SumDeltaOut)*ShareOfLoss, MtgFlowType::LossFlow);
+		Result.AddFlow(GetDate(i), (ApplicablePrincipal - SumDeltaOut)*ShareOfLossOnInterest, MtgFlowType::LossOnInterestFlow);
 		SumDeltaOut += (ApplicablePrincipal - SumDeltaOut)*ShareOfLoss;
 
 
-		if (GetFlow(i, AmountOutstandingFlow) == 0.0)
+		if (GetFlow(i, MtgFlowType::AmountOutstandingFlow) == 0.0)
 			ApplicableMultiplier = 1.0;
 		else
-			ApplicableMultiplier = GetFlow(i, WAPrepayMult) / GetFlow(i, AmountOutstandingFlow);
+			ApplicableMultiplier = GetFlow(i, MtgFlowType::WAPrepayMult) / GetFlow(i, MtgFlowType::AmountOutstandingFlow);
 		ApplicableMultiplier *= CPRv.GetSMM(GetDate(i), 1);
-		Result.AddFlow(GetDate(i), (ApplicablePrincipal - SumDeltaOut)*ApplicableMultiplier, PrepaymentFlow);
+		Result.AddFlow(GetDate(i), (ApplicablePrincipal - SumDeltaOut)*ApplicableMultiplier, MtgFlowType::PrepaymentFlow);
 		SumDeltaOut += (ApplicablePrincipal - SumDeltaOut)*ApplicableMultiplier;
-		Result.AddFlow(GetDate(i), Result.GetAccruedInterest(GetDate(i))*ApplicableMultiplier, InterestFlow);
-		Result.AddFlow(GetDate(i), -Result.GetAccruedInterest(GetDate(i))*ApplicableMultiplier, AccruedInterestFlow);
+		Result.AddFlow(GetDate(i), Result.GetAccruedInterest(GetDate(i))*ApplicableMultiplier, MtgFlowType::InterestFlow);
+		Result.AddFlow(GetDate(i), -Result.GetAccruedInterest(GetDate(i))*ApplicableMultiplier, MtgFlowType::AccruedInterestFlow);
 
-		if (GetFlow(i, AmountOutstandingFlow) == 0.0)
+		if (GetFlow(i, MtgFlowType::AmountOutstandingFlow) == 0.0)
 			ApplicableMultiplier = LSv.GetValue(GetDate(i));
 		else
-			ApplicableMultiplier = LSv.GetValue(GetDate(i))* GetFlow(i, WALossMult) / GetFlow(i, AmountOutstandingFlow);
+			ApplicableMultiplier = LSv.GetValue(GetDate(i))* GetFlow(i, MtgFlowType::WALossMult) / GetFlow(i, MtgFlowType::AmountOutstandingFlow);
 		TempF = (ApplicablePrincipal - SumDeltaOut)*CDRv.GetSMM(GetDate(i), 1);
-		Result.AddFlow(GetDate(i), TempF, PrincipalDefault);
-		Result.AddFlow(GetDate(i), qMin(TempF, TempF*ApplicableMultiplier), LossFlow);
-		Result.AddFlow(GetDate(i), qMin(TempF, TempF*(1.0 - ApplicableMultiplier)), PrincipalRecovered);
+		Result.AddFlow(GetDate(i), TempF, MtgFlowType::PrincipalDefault);
+		Result.AddFlow(GetDate(i), qMin(TempF, TempF*ApplicableMultiplier), MtgFlowType::LossFlow);
+		Result.AddFlow(GetDate(i), qMin(TempF, TempF*(1.0 - ApplicableMultiplier)), MtgFlowType::PrincipalRecovered);
 		SumDeltaOut += TempF;
 		SumDeltaOut -= qMin(TempF, TempF*(1.0 - ApplicableMultiplier));
 
 		TempF = Result.GetAccruedInterest(GetDate(i))*CDRv.GetSMM(GetDate(i), 1);
 		if (TempF >= 0.01) {
-			Result.AddFlow(GetDate(i), qMin(TempF, -TempF*ApplicableMultiplier), AccruedInterestFlow);
-			Result.AddFlow(GetDate(i), qMin(TempF, TempF*(1.0 - (ApplicableMultiplier))), InterestRecovered);
-			Result.AddFlow(GetDate(i), qMin(TempF, TempF*(ApplicableMultiplier)), LossOnInterestFlow);
+			Result.AddFlow(GetDate(i), qMin(TempF, -TempF*ApplicableMultiplier), MtgFlowType::AccruedInterestFlow);
+			Result.AddFlow(GetDate(i), qMin(TempF, TempF*(1.0 - (ApplicableMultiplier))), MtgFlowType::InterestRecovered);
+			Result.AddFlow(GetDate(i), qMin(TempF, TempF*(ApplicableMultiplier)), MtgFlowType::LossOnInterestFlow);
 		}
-		Result.AddFlow(GetDate(i), ApplicablePrincipal - SumDeltaOut, AmountOutstandingFlow);
-		if (GetFlow(i, AmountOutstandingFlow) != 0.0) {
-			Result.AddFlow(GetDate(i), GetFlow(i, WACouponFlow) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, AmountOutstandingFlow), WACouponFlow);
-			Result.AddFlow(GetDate(i), GetFlow(i, WAPrepayMult) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, AmountOutstandingFlow), WAPrepayMult);
-			Result.AddFlow(GetDate(i), GetFlow(i, WALossMult) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, AmountOutstandingFlow), WALossMult);
+		Result.AddFlow(GetDate(i), ApplicablePrincipal - SumDeltaOut, MtgFlowType::AmountOutstandingFlow);
+		if (GetFlow(i, MtgFlowType::AmountOutstandingFlow) != 0.0) {
+			Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::WACouponFlow) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::WACouponFlow);
+			Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::WAPrepayMult) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::WAPrepayMult);
+			Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::WALossMult) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::WALossMult);
 		}
 	}
 	return Result;
@@ -120,9 +120,9 @@ MtgCashFlow::MtgCashFlow(const MtgCashFlow& a) {
 }
 double MtgCashFlow::GetTotalFlow(int index) const {
 	QList<qint32> FlowsType;
-	FlowsType.append(static_cast<qint32>(InterestFlow));
-	FlowsType.append(static_cast<qint32>(PrincipalFlow));
-	FlowsType.append(static_cast<qint32>(PrepaymentFlow));
+	FlowsType.append(static_cast<qint32>(MtgFlowType::InterestFlow));
+	FlowsType.append(static_cast<qint32>(MtgFlowType::PrincipalFlow));
+	FlowsType.append(static_cast<qint32>(MtgFlowType::PrepaymentFlow));
 	return GenericCashFlow::GetTotalFlow(index, FlowsType);
 }
 double MtgCashFlow::GetTotalFlow(const QDate& a) const {

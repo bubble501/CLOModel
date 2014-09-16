@@ -127,7 +127,7 @@ void ReinvestmentTest::CalculateBondCashFlows(double Size, QDate StartDate, int 
 		, m_DelinquencyLag
 	);
 	for (int DelayIter = 0; DelayIter < CurrentDelay; DelayIter++) {
-		ReinvestmentBond.AddCashFlow(StartDate.addMonths(DelayIter), Size, MtgCashFlow::AmountOutstandingFlow);
+		ReinvestmentBond.AddCashFlow(StartDate.addMonths(DelayIter), Size, MtgCashFlow::MtgFlowType::AmountOutstandingFlow);
 	}
 	if (NullDates[0]) CPRAssumption.RemoveAnchorDate();
 	if (NullDates[1]) CDRAssumption.RemoveAnchorDate();

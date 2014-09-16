@@ -55,7 +55,7 @@ double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, const Bl
 	double Result=Flws.at(0);
 	double DiscountFactor=1.0;
 	for(int i=1;i<Dte.size();i++){
-		if (Flws.at(i) == 0.0) continue;
+		//if (Flws.at(i) == 0.0) continue; //WRONG, Discount factor should be adjusted regardless
 		DiscountFactor*=1.0+AdjustCoupon(AdjInterest.GetValue(Dte.at(i)),Dte.at(i-1),Dte.at(i),Daycount);
 		Result+=Flws.at(i)/DiscountFactor;
 	}
@@ -190,10 +190,10 @@ bool IsHoliday(const QDate& a/*, const QString& CountryCode*/) {
 
 #include <QFile>
 void PrintToTempFile(const QString& TempFileName, const QString& Message) {
-	QFile TempFile("C:/Temp/" + TempFileName);
-	if (!TempFile.open(QIODevice::WriteOnly | QIODevice::Text)) return;
+	QFile TempFile("C:/Temp/" + TempFileName +".log");
+	if (!TempFile.open(QIODevice::Append | QIODevice::Text)) return;
 	QTextStream  TempWrite(&TempFile);
-	TempWrite << Message;
+	TempWrite << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm ") + Message + '\n';
 	TempFile.close();
 }
 #include <QSettings>

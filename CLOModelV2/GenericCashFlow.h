@@ -42,6 +42,7 @@ public:
 	virtual void ReplaceDate(const QDate& OriginalDate, const QDate& NewDate);
 	virtual void Aggregate(CashFlowAggregation Freq);
 	virtual GenericCashFlow SingleFlow(qint32 FlowTpe) const;
+	virtual GenericCashFlow SingleDate(const QDate& a) const;
 	virtual bool HasFlowType(qint32 FlowTpe)const;
 	virtual QList<qint32> AvailableFlows(const QDate& a) const;
 	virtual bool GetAdjustHolidays() const { return m_AdjustHolidays; }

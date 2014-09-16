@@ -62,12 +62,15 @@ bool MtgCalculator::StartCalculation(bool UseStoredCF) {
 #ifndef NO_DATABASE
 		bool DBAvailable;
 		ConfigIni.beginGroup("Database");
-		QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
-		db.setDatabaseName(
-			"Driver={" + ConfigIni.value("Driver", "SQL Server").toString()
-			+ "}; "
-			+ ConfigIni.value("DataSource", "Server=SYNSERVER2\\SQLExpress;Initial Catalog=ABSDB;Integrated Security=SSPI;Trusted_Connection=Yes;").toString()
-			);
+		QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
+		if (!db.isValid()) {
+			db = QSqlDatabase::addDatabase(ConfigIni.value("DBtype", "QODBC").toString(), "TwentyFourDB");
+			db.setDatabaseName(
+				"Driver={" + ConfigIni.value("Driver", "SQL Server").toString()
+				+ "}; "
+				+ ConfigIni.value("DataSource", "Server=SYNSERVER2\\SQLExpress;Initial Catalog=ABSDB;Integrated Security=SSPI;Trusted_Connection=Yes;").toString()
+				);
+		}
 		DBAvailable = db.open();
 		ConfigIni.endGroup();
 #endif
@@ -100,11 +103,11 @@ bool MtgCalculator::StartCalculation(bool UseStoredCF) {
 							const Tranche* TargetTranche = TargetDeal.GetTranche(TrancheName);
 							TrancheCashFlow ScaledFlows = TargetTranche->GetCashFlow().ScaledCashFlows(i.value()->GetSize());
 							for (int j = 0; j < ScaledFlows.Count(); ++j) {
-								ResultingFlow.AddFlow(ScaledFlows.GetDate(j), ScaledFlows.GetInterest(j), MtgCashFlow::InterestFlow);
-								ResultingFlow.AddFlow(ScaledFlows.GetDate(j), ScaledFlows.GetPrincipal(j), MtgCashFlow::PrincipalFlow);
+								ResultingFlow.AddFlow(ScaledFlows.GetDate(j), ScaledFlows.GetInterest(j), MtgCashFlow::MtgFlowType::InterestFlow);
+								ResultingFlow.AddFlow(ScaledFlows.GetDate(j), ScaledFlows.GetPrincipal(j), MtgCashFlow::MtgFlowType::PrincipalFlow);
 								double TempOut = ScaledFlows.GetAmountOutstanding(j);
-								ResultingFlow.AddFlow(ScaledFlows.GetDate(j), TempOut, MtgCashFlow::AmountOutstandingFlow);
-								ResultingFlow.AddFlow(ScaledFlows.GetDate(j), TempOut*TargetTranche->GetTotalCoupon(TargetTranche->GetCashFlow().GetDate(j)), MtgCashFlow::WACouponFlow);
+								ResultingFlow.AddFlow(ScaledFlows.GetDate(j), TempOut, MtgCashFlow::MtgFlowType::AmountOutstandingFlow);
+								ResultingFlow.AddFlow(ScaledFlows.GetDate(j), TempOut*TargetTranche->GetTotalCoupon(TargetTranche->GetCashFlow().GetDate(j)), MtgCashFlow::MtgFlowType::WACouponFlow);
 							}
 							CashFound = true;
 						}
@@ -115,7 +118,7 @@ bool MtgCalculator::StartCalculation(bool UseStoredCF) {
 			#ifndef NO_DATABASE
 			if (!CashFound && DBAvailable) {
 				ConfigIni.beginGroup("Database");
-				QSqlQuery query;
+				QSqlQuery query(db);
 				query.prepare("exec " + ConfigIni.value("CashFlowsStoredProc", "getCashFlows").toString() + " ?");
 				ConfigIni.endGroup();
 				query.setForwardOnly(true);
@@ -131,16 +134,16 @@ bool MtgCalculator::StartCalculation(bool UseStoredCF) {
 						}
 						ScaledFlows.AddFlow(query.value(0).toDate(), query.value(3).toDouble(), TrancheCashFlow::TrancheFlowType::InterestFlow);
 						ScaledFlows.AddFlow(query.value(0).toDate(), query.value(4).toDouble(), TrancheCashFlow::TrancheFlowType::PrincipalFlow);
-						ScaledFlows.AddFlow(query.value(0).toDate(), query.value(1).toDouble(), static_cast<qint32>(MtgCashFlow::WACouponFlow));
+						ScaledFlows.AddFlow(query.value(0).toDate(), query.value(1).toDouble(), static_cast<qint32>(MtgCashFlow::MtgFlowType::WACouponFlow));
 					}
 					if (!FirstTime) {
 						ScaledFlows = ScaledFlows.ScaledCashFlows(i.value()->GetSize());
 						for (int j = 0; j < ScaledFlows.Count(); ++j) {
-							ResultingFlow.AddFlow(ScaledFlows.GetDate(j), ScaledFlows.GetInterest(j), MtgCashFlow::InterestFlow);
-							ResultingFlow.AddFlow(ScaledFlows.GetDate(j), ScaledFlows.GetPrincipal(j), MtgCashFlow::PrincipalFlow);
+							ResultingFlow.AddFlow(ScaledFlows.GetDate(j), ScaledFlows.GetInterest(j), MtgCashFlow::MtgFlowType::InterestFlow);
+							ResultingFlow.AddFlow(ScaledFlows.GetDate(j), ScaledFlows.GetPrincipal(j), MtgCashFlow::MtgFlowType::PrincipalFlow);
 							double TempOut = ScaledFlows.GetAmountOutstanding(j);
-							ResultingFlow.AddFlow(ScaledFlows.GetDate(j), TempOut, MtgCashFlow::AmountOutstandingFlow);
-							ResultingFlow.AddFlow(ScaledFlows.GetDate(j), TempOut*ScaledFlows.GetFlow(j, static_cast<qint32>(MtgCashFlow::WACouponFlow)), MtgCashFlow::WACouponFlow);
+							ResultingFlow.AddFlow(ScaledFlows.GetDate(j), TempOut, MtgCashFlow::MtgFlowType::AmountOutstandingFlow);
+							ResultingFlow.AddFlow(ScaledFlows.GetDate(j), TempOut*ScaledFlows.GetFlow(j, static_cast<qint32>(MtgCashFlow::MtgFlowType::WACouponFlow)), MtgCashFlow::MtgFlowType::WACouponFlow);
 						}
 					}
 				}

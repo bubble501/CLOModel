@@ -16,12 +16,6 @@
 #endif
 #include <QTextStream>
 void __stdcall RunModel(LPSAFEARRAY *ArrayData){
-#ifdef DebuggungInputs
-	char *argv[] = {"NoArgumnets"};
-	int argc = sizeof(argv) / sizeof(char*) - 1;
-	QApplication ComputationLoop(argc,argv);
-	QMessageBox::information(0,"Partito",QString("Dimensione Vettore: %1").arg((*ArrayData)->rgsabound->cElements));
-#endif
 	bool RunStress;
 	CentralUnit TempUnit;
 	VARIANT HUGEP *pdFreq;
@@ -56,9 +50,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		double origOut,currOut,OClim,IClim,Price,Exchan,startingDeferred/*,coup*/;
 		QDate PrevIPD,SettDate;
 		NumElements=pdFreq++->intVal;
-#ifdef DebuggungInputs
-		QMessageBox::information(0,"Tranches",QString("Numero Tranches: %1").arg(NumElements));
-#endif
+		LOGDEBUG(QString("Numero Tranches: %1").arg(NumElements));
 		for(int i=0;i<NumElements;i++){
 			RefRt.clear(); coup.clear(); IntrTpe.clear();
 			TrName=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
@@ -237,8 +229,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			RecLag = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 			Dlq = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 			DlqLag = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
-#ifdef DebuggungInputs
-			QMessageBox::information(0, "Reinvestment Bond", 
+			LOGDEBUG(
 				QString("Interest: %1\nCPR: %2\nCDR: %3\nLS: %4\nWAL: %5\nFrequency: %6\nAnnuity: %7\nPrice: %8\nDelay: %9\nBase Rate: %10\nRecovery Lag: %11\nDelinquency: %12\nDelinquency Lag: %13")
 				.arg(Intr)
 				.arg(CPR)
@@ -254,16 +245,13 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 				.arg(Dlq)
 				.arg(DlqLag)
 			);
-#endif
 			TempUnit.SetupReinvBond(Intr, CPR, CDR, LS, WAL, Frq, ReinvBondAnnuit, Pric, Delay, BaseVal, RecLag, Dlq, DlqLag);
 		}
 		TempUnit.SetSchedPrincAvailable(pdFreq->dblVal);pdFreq++; //TODO starting Prepay
 		TempUnit.SetInterestAvailable(pdFreq->dblVal);pdFreq++;
 		TempUnit.SetPoolCutOff(QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd"));pdFreq++;
 		TempUnit.SetRunCall(pdFreq->boolVal);pdFreq++;
-#ifdef DebuggungInputs
-		QMessageBox::information(0,"Call",QString("Use Call: %1").arg(TempUnit.GetRunCall()));
-#endif
+		LOGDEBUG(QString("Use Call: %1").arg(TempUnit.GetRunCall()));
 		TempUnit.SetMtgOutputAddress(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
 		TempUnit.SetTranchesOutputAddress(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
 		TempUnit.SetPlotsSheet(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
@@ -283,17 +271,11 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		RunStress=pdFreq->boolVal;pdFreq++;
 		if(RunStress){// Stress Test
 			QString ConstPar=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
-#ifdef DebuggungInputs
-			QMessageBox::information(0, "ConstPar", QString("Stress ConstPar: %1").arg(ConstPar));
-#endif
+			LOGDEBUG(QString("Stress ConstPar: %1").arg(ConstPar));
 			int XVar=pdFreq->intVal;pdFreq++;
-#ifdef DebuggungInputs
-			QMessageBox::information(0, "XVar", QString("Stress XVar: %1").arg(XVar));
-#endif
+			LOGDEBUG(QString("Stress XVar: %1").arg(XVar));
 			int YVar=pdFreq->intVal;pdFreq++;
-#ifdef DebuggungInputs
-			QMessageBox::information(0, "YVar", QString("Stress YVar: %1").arg(YVar));
-#endif
+			LOGDEBUG(QString("Stress YVar: %1").arg(YVar));
 			int NumElem=pdFreq->intVal;pdFreq++;
 			QList<QString> XSpann;
 			for(int i=0;i<NumElem;i++){
@@ -311,10 +293,9 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		}
 	}
 	SafeArrayUnaccessData(*ArrayData);
-#ifndef DebuggungInputs
 	if(RunStress) TempUnit.CalculateStress();
 	else TempUnit.Calculate();
-#endif
+
 }
 
 double __stdcall CLOReturnRate(LPSAFEARRAY *ArrayData){

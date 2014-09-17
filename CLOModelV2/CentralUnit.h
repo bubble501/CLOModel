@@ -57,7 +57,7 @@ public:
 	void SetPrepPrincAvailable(double a) { Structure.SetPrepPrincAvailable(a); }
 	void SetInterestAvailable(double a){Structure.SetInterestAvailable(a);}
 	void SetJuniorFeesCoupon(double a){Structure.SetJuniorFeesCoupon(a);}
-	void SetPoolValueAtCall(double a){Structure.SetPoolValueAtCall(a);}
+	void SetPoolValueAtCall(const QString& a){Structure.SetPoolValueAtCall(a);}
 	void SetCallMultiple(double a){Structure.SetCallMultiple(a);}
 	void SetCallReserve(double a){Structure.SetCallReserve(a);}
 	void SetFirstIPDdate(const QDate& a){Structure.SetFirstIPDdate(a);}

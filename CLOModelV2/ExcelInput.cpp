@@ -112,7 +112,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		TempUnit.SetCallDate(QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd"));pdFreq++;
 		TempUnit.SetCallMultiple(pdFreq->dblVal);pdFreq++;
 		TempUnit.SetCallReserve(pdFreq->dblVal);pdFreq++;
-		TempUnit.SetPoolValueAtCall(pdFreq->dblVal);pdFreq++;
+		TempUnit.SetPoolValueAtCall(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
 		{//Reserve Fund
 			QString RFtarget,RFmultiple,RFfloor,RFcap;
 			double RFcurrent;

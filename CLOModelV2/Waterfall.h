@@ -77,7 +77,7 @@ private:
 	GenericCashFlow m_Reinvested;
 	QDate m_LastIPDdate; 
 	QDate m_CallDate; 
-	double m_PoolValueAtCall; 
+	BloombergVector m_PoolValueAtCall; 
 	bool m_UseCall; 
 	double m_CallMultiple; 
 	double m_CallReserve;
@@ -120,7 +120,7 @@ public:
 	double GetPrepayPrincipalAvailable() const { return m_PrincipalAvailable.GetPrepay(); }
 	double GetInterestAvailable() const {return m_InterestAvailable;} 
 	double GetJuniorFeesCoupon() const {return m_JuniorFeesCoupon;} 
-	double GetPoolValueAtCall() const {return m_PoolValueAtCall;} 
+	QString GetPoolValueAtCall() const {return m_PoolValueAtCall.GetVector();} 
 	bool GetUseCall() const {return m_UseCall;} 
 	double GetCallMultiple() const {return m_CallMultiple;} 
 	double GetCallReserve() const {return m_CallReserve;}
@@ -193,7 +193,7 @@ public:
 	void SetPrepPrincAvailable(double a) { m_PrincipalAvailable.SetPrepay(a); }
 	void SetInterestAvailable(double a){m_InterestAvailable=a;}
 	void SetJuniorFeesCoupon(double a){if(a>=0.0) m_JuniorFeesCoupon=a;}
-	void SetPoolValueAtCall(double a){if(a>=0.0) m_PoolValueAtCall=a;}
+	void SetPoolValueAtCall(const QString& a){m_PoolValueAtCall=a;}
 	void SetUseCall(bool a){m_UseCall=a;}
 	void SetCallMultiple(double a){if(a>=0.0) m_CallMultiple=a;}
 	void SetCallReserve(double a){if(a>=0.0) m_CallReserve=a;} 

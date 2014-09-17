@@ -236,6 +236,19 @@ void Mortgage::SetInterest(const QString& a){
 	 }
 	 m_CashFlows.AddFlow(DelinquenciesFlows);
 
+	 {
+		 double LoanPrice;
+		 if (HasProperty("Price")) LoanPrice=GetProperty("Price").toDouble()/100.0;
+		 else LoanPrice = 1.0;
+		 for (int WAPriceIter = 0; WAPriceIter < m_CashFlows.Count(); ++WAPriceIter) {
+			 m_CashFlows.AddFlow(
+				 m_CashFlows.GetDate(WAPriceIter)
+				 , LoanPrice*m_CashFlows.GetFlow(WAPriceIter, MtgCashFlow::MtgFlowType::AmountOutstandingFlow)
+				 , MtgCashFlow::MtgFlowType::WAPrice
+			);
+		 }
+	 }
+
 	 if (NullAnchorDates[0]) m_InterestVect.RemoveAnchorDate();
 	 if (NullAnchorDates[1]) m_LossMultiplier.RemoveAnchorDate();
 	 if (NullAnchorDates[2]) m_PrepayMultiplier.RemoveAnchorDate();

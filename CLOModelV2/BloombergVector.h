@@ -14,7 +14,7 @@ protected:
 public:
 	QString BloombergSafeVector(QDate CurrentDate=QDate::currentDate()) const;
 	using AbstarctBbgVect::IsEmpty;
-	virtual bool IsEmpty(double Lbound, double Ubound)const;
+	virtual bool IsEmpty(double Lbound, double Ubound = std::numeric_limits<double>::max())const;
 	static BloombergVector Combine(const BloombergVector& StartVect, const BloombergVector& SwitchVect, quint32 Periods);
 	void Combine(const BloombergVector& SwitchVect, quint32 Periods) { operator=(Combine(*this, SwitchVect, Periods)); }
 	BloombergVector() : m_Divisor(100.0) {}

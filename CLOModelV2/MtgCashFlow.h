@@ -23,9 +23,10 @@ public:
 		PrincipalDefault = 7,
 		PrincipalRecovered = 8,
 		InterestRecovered = 9,
+		LossFlow = 10,
 		WAPrepayMult = 129,
 		WALossMult = 130,
-		LossFlow = 10
+		WAPrice = 131
 	};
 	virtual MtgCashFlow ApplyScenario(BloombergVector CPRv, BloombergVector CDRv, BloombergVector LSv) const;
 	virtual MtgCashFlow ApplyScenario(const QString& CPRv, const QString& CDRv, const QString& LSv) const { return ApplyScenario(BloombergVector(CPRv), BloombergVector(CDRv), BloombergVector(LSv)); }
@@ -42,6 +43,7 @@ public:
 	double GetWAcoupon(int index) const;
 	double GetWAprepayMult(int index) const;
 	double GetWAlossMult(int index) const;
+	double GetWAPrice(int index) const;
 	double GetDefaults(int index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::PrincipalDefault)); }
 	double GetRecoveries(int index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::PrincipalRecovered)); }
 	double GetInterestRecoveries(int index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::InterestRecovered)); }
@@ -56,6 +58,7 @@ public:
 	double GetWAcoupon(const QDate& index) const;
 	double GetWAprepayMult(const QDate& index) const;
 	double GetWAlossMult(const QDate& index) const;
+	double GetWAPrice(const QDate& index) const;
 	double GetDefaults(const QDate& index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::PrincipalDefault)); }
 	double GetRecoveries(const QDate& index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::PrincipalRecovered)); }
 	double GetInterestRecoveries(const QDate& index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::InterestRecovered)); }

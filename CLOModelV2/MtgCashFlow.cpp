@@ -28,6 +28,14 @@ double MtgCashFlow::GetWAlossMult(const QDate& index) const {
 	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0) return 0.0;
 	return GetFlow(index, MtgFlowType::WALossMult) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
 }
+double MtgCashFlow::GetWAPrice(int index) const {
+	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0) return 0.0;
+	return GetFlow(index, MtgFlowType::WAPrice) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
+}
+double MtgCashFlow::GetWAPrice(const QDate& index) const {
+	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0) return 0.0;
+	return GetFlow(index, MtgFlowType::WAPrice) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
+}
 /*
 QDataStream& operator<<(QDataStream & stream, const MtgCashFlow& flows) {
 	stream << static_cast<const GenericCashFlow&>(flows);
@@ -105,6 +113,7 @@ MtgCashFlow MtgCashFlow::ApplyScenario(BloombergVector CPRv, BloombergVector CDR
 			Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::WACouponFlow) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::WACouponFlow);
 			Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::WAPrepayMult) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::WAPrepayMult);
 			Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::WALossMult) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::WALossMult);
+			Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::WAPrice) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::WAPrice);
 		}
 	}
 	return Result;

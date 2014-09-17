@@ -1,6 +1,6 @@
 #ifndef CommonFunctions_h__
 #define CommonFunctions_h__
-
+#include <QtGlobal>
 class QDate;
 class QString;
 template<typename T> class QList;
@@ -10,7 +10,7 @@ template<typename T> class QList;
 //#define SaveLoanTape
 int MonthDiff(const QDate& FutureDte,const QDate& PresentDte);
 class BloombergVector;
-enum class DayCountConvention : short {
+enum class DayCountConvention : qint16 {
 	ACTACT = 101
 	, ACT360 = 102
 	, ACT365 = 103

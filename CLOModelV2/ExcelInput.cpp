@@ -95,6 +95,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		TempUnit.SetStartingDeferredJunFees(pdFreq->dblVal); pdFreq++;
 		TempUnit.SetGICinterest(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
 		TempUnit.SetGICBaseRate(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+		TempUnit.SetDealDayCountConvention(static_cast<DayCountConvention>(pdFreq->intVal)); pdFreq++;
 		TempUnit.SetSeniorExpenses(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
 		TempUnit.SetSeniorFees(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
 		TempUnit.SetJuniorFees(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;

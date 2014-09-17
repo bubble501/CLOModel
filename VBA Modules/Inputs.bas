@@ -117,6 +117,8 @@ Public Sub GetInputFromStructure( _
     Dim BaseCaseCall As Range
     Dim StartingDefJunFees As Range
     Dim GICInterestCell As Range
+    Dim GICBaseRateCell As Range
+    Dim DealDaycountCell As Range
     'loans assumptions
     Dim IssuerProperty As Range
     Dim FacilityProperty As Range
@@ -124,7 +126,6 @@ Public Sub GetInputFromStructure( _
     Dim IndustryProperty As Range
     Dim MezzanineProperty As Range
     Dim PriceProperty As Range
-    Dim GICBaseRateCell As Range
     On Error Resume Next
     Set IssuerProperty = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("IssuerProperty"), LookAt:=xlWhole, LookIn:=xlValues)
     Set FacilityProperty = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("FacilityProperty"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -168,6 +169,7 @@ Public Sub GetInputFromStructure( _
     Set UseForwardCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("UseForwardCell"), LookAt:=xlWhole, LookIn:=xlValues)
     Set DayCountHead = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("DayCountHead"), LookAt:=xlWhole, LookIn:=xlValues)
     Set GICBaseRateCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("GICBaseRateCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set DealDaycountCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("DealDaycountCell"), LookAt:=xlWhole, LookIn:=xlValues)
     On Error GoTo 0
     Set BaseIndexHead = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("BaseIndexHead"), LookAt:=xlWhole, LookIn:=xlValues)
     Set MaturityStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("MaturityHeader"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -377,6 +379,11 @@ DefaultExchange:
         Call AddInput(AllTheInputs, "ZERO")
     Else
         Call AddInput(AllTheInputs, CStr(GICBaseRateCell.Offset(0, 1).Value))
+    End If
+    If (DealDaycountCell Is Nothing) Then
+        Call AddInput(AllTheInputs, 102)
+    Else
+        Call AddInput(AllTheInputs, CLng(DealDaycountCell.Offset(0, 1).Value))
     End If
     Call AddInput(AllTheInputs, CStr(SeniorExpensesCell.Offset(0, 1).Value))
     Call AddInput(AllTheInputs, CStr(SeniorFeesCell.Offset(0, 1).Value))
@@ -786,6 +793,7 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
     a.Add "GIC Interest", "GICInterestCell"
     a.Add "GIC Base Rate", "GICBaseRateCell"
     a.Add "Forward Curves", "ForwardCurvesSheet"
+    a.Add "Deal Day Count Convention", "DealDaycountCell"
     'Loans Properties
      a.Add "Issuer", "IssuerProperty"
      a.Add "Facility", "FacilityProperty"

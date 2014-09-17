@@ -656,6 +656,9 @@ bool Waterfall::CalculateTranchesCashFlows(){
 				m_GICflows.AddFlow(CurrentDate, m_InterestAvailable*TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
 				m_GICflows.AddFlow(CurrentDate, m_PrincipalAvailable.GetScheduled()*TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
 				m_GICflows.AddFlow(CurrentDate, m_PrincipalAvailable.GetPrepay()*TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
+				foreach(const ReserveFund* SingleRes, m_Reserves) {
+					m_GICflows.AddFlow(CurrentDate, SingleRes->GetReserveFundCurrent()*TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
+				}
 				m_InterestAvailable +=
 					m_GICflows.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow))
 					+ m_GICflows.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow))

@@ -591,7 +591,8 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		//int CurrentSeniority;
 		double Solution;
 		int SolutionDegree;
-		//double CurrentWArate;
+		double CurrentAssetSum=0.0;
+		int CurrentAssetCount=0;
 		double AdjustedCoupon;
 		double InterestPayableBefore;
 		QDate RollingNextIPD=m_FirstIPDdate;
@@ -652,6 +653,8 @@ bool Waterfall::CalculateTranchesCashFlows(){
 			CurrentDate=m_MortgagesPayments.GetDate(i);
 			CheckResults -= m_MortgagesPayments.GetScheduled(i) + m_MortgagesPayments.GetPrepay(i) + m_MortgagesPayments.GetInterest(i);
 			if (i > 0) {
+				CurrentAssetSum += m_MortgagesPayments.GetAmountOut(i-1);
+				++CurrentAssetCount;
 				TotalPayable = AdjustCoupon(m_GICinterest.GetValue(CurrentDate) + m_GICBaseRateValue.GetValue(CurrentDate), m_MortgagesPayments.GetDate(i - 1), m_MortgagesPayments.GetDate(i), DayCountConvention::ACT360);
 				m_GICflows.AddFlow(CurrentDate, m_InterestAvailable*TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
 				m_GICflows.AddFlow(CurrentDate, m_PrincipalAvailable.GetScheduled()*TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
@@ -743,7 +746,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				case WatFalPrior::wst_SeniorExpenses:
 					adjSeniorExpenses = AdjustCoupon(m_SeniorExpenses.GetValue(CurrentDate),RollingLastIPD,RollingNextIPD,DayCountConvention::ACT360);
-					TotalPayable=adjSeniorExpenses*m_MortgagesPayments.GetAmountOut(i)
+					TotalPayable=adjSeniorExpenses*(CurrentAssetSum/static_cast<double>(CurrentAssetCount))
 						- m_TotalSeniorExpenses.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow))
 						- m_TotalSeniorExpenses.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow))
 					;
@@ -763,7 +766,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				case WatFalPrior::wst_SeniorFees:
 					adjSeniorFees = AdjustCoupon(m_SeniorFees.GetValue(CurrentDate), RollingLastIPD, RollingNextIPD, DayCountConvention::ACT360);
-					TotalPayable=adjSeniorFees*m_MortgagesPayments.GetAmountOut(i)
+					TotalPayable = adjSeniorFees*(CurrentAssetSum / static_cast<double>(CurrentAssetCount))
 						- m_TotalSeniorFees.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow))
 						- m_TotalSeniorFees.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow))
 						;
@@ -783,7 +786,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				case WatFalPrior::wst_juniorFees:
 					adjJuniorFees = AdjustCoupon(m_JuniorFees.GetValue(CurrentDate), RollingLastIPD, RollingNextIPD, DayCountConvention::ACT360);
-					TotalPayable= (adjJuniorFees*m_MortgagesPayments.GetAmountOut(i))
+					TotalPayable = (adjJuniorFees*(CurrentAssetSum / static_cast<double>(CurrentAssetCount)))
 						- m_TotalJuniorFees.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow))
 						- m_TotalJuniorFees.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow))
 						+ ((1.0 + AdjustCoupon(m_JuniorFeesCoupon,RollingLastIPD,RollingNextIPD, DayCountConvention::ACT360))*m_TotalJuniorFees.GetPreviousFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow)))
@@ -1184,6 +1187,8 @@ bool Waterfall::CalculateTranchesCashFlows(){
 			}//End Cicle through the steps of the waterfall
 			m_PrincipalAvailable.Erase();
 			m_InterestAvailable=0.0;
+			CurrentAssetSum = 0.0;
+			CurrentAssetCount = 0;
 			RollingLastIPD=RollingNextIPD;
 			RollingNextIPD=RollingNextIPD.addMonths(m_PaymentFrequency.GetValue(RollingNextIPD));
 			if(IsCallPaymentDate){

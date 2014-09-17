@@ -374,7 +374,7 @@ DefaultExchange:
         Call AddInput(AllTheInputs, CStr(GICInterestCell.Offset(0, 1).Value))
     End If
     If (GICBaseRateCell Is Nothing) Then
-        Call AddInput(GICBaseRateCell, "ZERO")
+        Call AddInput(AllTheInputs, "ZERO")
     Else
         Call AddInput(AllTheInputs, CStr(GICBaseRateCell.Offset(0, 1).Value))
     End If
@@ -407,7 +407,7 @@ DefaultExchange:
     Call AddInput(AllTheInputs, Format(CallDateCell.Offset(0, 1).Value, "yyyy-mm-dd"))
     Call AddInput(AllTheInputs, CallMultiplierCell.Offset(0, 1).Value)
     Call AddInput(AllTheInputs, CallReserveCell.Offset(0, 1).Value)
-    Call AddInput(AllTheInputs, CallValueCell.Offset(0, 1).Value)
+    Call AddInput(AllTheInputs, CStr(CallValueCell.Offset(0, 1).Value))
     ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     'Reserve fund
     Call AddInput(AllTheInputs, CLng(2))

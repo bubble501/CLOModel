@@ -74,6 +74,7 @@ Waterfall::Waterfall()
 	,m_CallReserve(0.0)
 	,m_CumulativeReserves(false)
 	, m_StartingDeferredJunFees(0.0)
+	, m_GICBaseRate("ZERO")
 {
 	m_GICflows.Aggregate(GenericCashFlow::Monthly);
 	m_ExcessCashFlow.Aggregate(GenericCashFlow::Monthly);
@@ -125,6 +126,8 @@ Waterfall::Waterfall(const Waterfall& a)
 	, m_GICinterest(a.m_GICinterest)
 	, m_StartingDeferredJunFees(a.m_StartingDeferredJunFees)
 	, m_GICflows(a.m_GICflows)
+	, m_GICBaseRate(a.m_GICBaseRate)
+	, m_GICBaseRateValue(a.m_GICBaseRateValue)
 {
 	m_LoadProtocolVersion = a.m_LoadProtocolVersion;
 	for(QList<Tranche*>::const_iterator i=a.m_Tranches.constBegin();i!=a.m_Tranches.constEnd();i++){
@@ -175,6 +178,8 @@ Waterfall& Waterfall::operator=(const Waterfall& a){
 	m_GICinterest = a.m_GICinterest;
 	m_StartingDeferredJunFees = a.m_StartingDeferredJunFees;
 	m_GICflows = a.m_GICflows;
+	m_GICBaseRate = a.m_GICBaseRate;
+	m_GICBaseRateValue = a.m_GICBaseRateValue;
 	ResetTranches();
 	for(QList<Tranche*>::const_iterator i=a.m_Tranches.constBegin();i!=a.m_Tranches.constEnd();i++){
 		m_Tranches.append(new Tranche(**i));
@@ -299,7 +304,7 @@ void Waterfall::FillAllDates(){
 			for (QList<ReserveFund*>::iterator ResIter = m_Reserves.begin(); ResIter != m_Reserves.end(); ResIter++) {
 				if ((*ResIter)->GetReserveFundFlow().Count() == 0) continue;
 				if ((*ResIter)->GetReserveFundFlow().FindDate(m_Tranches.at(0)->GetCashFlow().GetDate(h)) < 0)
-					(*ResIter)->GetReserveFundFlow().AddFlow(m_Tranches.at(0)->GetCashFlow().GetDate(h), 0.0, ReserveFund::ReplenishFromInterest);
+					(*ResIter)->GetReserveFundFlow().AddFlow(m_Tranches.at(0)->GetCashFlow().GetDate(h), 0.0, static_cast<qint32>(ReserveFund::ReserveFlowsType::ReplenishFromInterest));
 			}
 		}
 	}
@@ -552,6 +557,13 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		{//Check if all base rates are valid
 			bool KeepSearching = false;
 			ConstantBaseRateTable TempTable;
+			if (m_GICBaseRateValue.IsEmpty()) {
+				m_GICBaseRateValue = m_GICBaseRate.CompileReferenceRateValue(TempTable);
+				if (m_GICBaseRateValue.IsEmpty()) {
+					PrintToTempFile("ReturnFalse.txt", "Missing Base Rate Value");
+					return false;
+				}
+			}
 			for (QList<Tranche*>::const_iterator SingleTranche = m_Tranches.constBegin(); SingleTranche != m_Tranches.constEnd(); ++SingleTranche) {
 				for (QHash<qint32, BloombergVector*>::const_iterator SingleRate = (*SingleTranche)->GetRefRateValues().constBegin();SingleRate != (*SingleTranche)->GetRefRateValues().constEnd(); ++SingleRate) {
 					if (SingleRate.value()->IsEmpty()) {
@@ -617,6 +629,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 			, m_SeniorFeesFixed.GetAnchorDate().isNull()
 			, m_JuniorFeesFixed.GetAnchorDate().isNull()
 			, m_GICinterest.GetAnchorDate().isNull()
+			, m_GICBaseRateValue.GetAnchorDate().isNull()
 		};
 		if(NullCCCanchor[0]) m_CCCcurve.SetAnchorDate(m_MortgagesPayments.GetDate(0));
 		if(NullCCCanchor[1]) m_PaymentFrequency.SetAnchorDate(m_MortgagesPayments.GetDate(0));
@@ -627,7 +640,9 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		if (NullCCCanchor[6]) m_SeniorFeesFixed.SetAnchorDate(m_MortgagesPayments.GetDate(0));
 		if (NullCCCanchor[7]) m_JuniorFeesFixed.SetAnchorDate(m_MortgagesPayments.GetDate(0));
 		if (NullCCCanchor[8]) m_GICinterest.SetAnchorDate(m_MortgagesPayments.GetDate(0));
+		if (NullCCCanchor[9]) m_GICBaseRateValue.SetAnchorDate(m_MortgagesPayments.GetDate(0));
 		foreach(ReserveFund* SingleRes, m_Reserves) {
+			CheckResults -= SingleRes->GetStartingReserve();
 			SingleRes->ClearFlows();
 		}
 		foreach(Tranche* SingleTranche, m_Tranches) {
@@ -637,9 +652,10 @@ bool Waterfall::CalculateTranchesCashFlows(){
 			CurrentDate=m_MortgagesPayments.GetDate(i);
 			CheckResults -= m_MortgagesPayments.GetScheduled(i) + m_MortgagesPayments.GetPrepay(i) + m_MortgagesPayments.GetInterest(i);
 			if (i > 0) {
-				m_GICflows.AddFlow(CurrentDate, m_InterestAvailable*m_GICinterest.GetValue(CurrentDate) *static_cast<double>(m_MortgagesPayments.GetDate(i-1).daysTo(m_MortgagesPayments.GetDate(i ))) / 360.0, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
-				m_GICflows.AddFlow(CurrentDate, m_PrincipalAvailable.GetScheduled()*m_GICinterest.GetValue(CurrentDate) *static_cast<double>(m_MortgagesPayments.GetDate(i-1).daysTo(m_MortgagesPayments.GetDate(i ))) / 360.0, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
-				m_GICflows.AddFlow(CurrentDate, m_PrincipalAvailable.GetPrepay()*m_GICinterest.GetValue(CurrentDate) *static_cast<double>(m_MortgagesPayments.GetDate(i-1).daysTo(m_MortgagesPayments.GetDate(i ))) / 360.0, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
+				TotalPayable = AdjustCoupon(m_GICinterest.GetValue(CurrentDate) + m_GICBaseRateValue.GetValue(CurrentDate), m_MortgagesPayments.GetDate(i - 1), m_MortgagesPayments.GetDate(i), DayCountConvention::ACT360);
+				m_GICflows.AddFlow(CurrentDate, m_InterestAvailable*TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
+				m_GICflows.AddFlow(CurrentDate, m_PrincipalAvailable.GetScheduled()*TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
+				m_GICflows.AddFlow(CurrentDate, m_PrincipalAvailable.GetPrepay()*TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
 				m_InterestAvailable +=
 					m_GICflows.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow))
 					+ m_GICflows.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow))
@@ -828,15 +844,15 @@ bool Waterfall::CalculateTranchesCashFlows(){
 
 							if(TotalPayable>=0.01){
 								if(SingleStep->GetRedemptionGroup()==1){
-									m_Reserves[SingleStep->GetGroupTarget() - 1]->GetReserveFundFlow().AddFlow(CurrentDate,qMin(AvailableInterest,TotalPayable),ReserveFund::ReplenishFromInterest);
-									m_Reserves[SingleStep->GetGroupTarget() - 1]->GetReserveFundFlow().SetFlow(CurrentDate, qMax(0.0, TotalPayable - AvailableInterest), ReserveFund::ShortFall);
+									m_Reserves[SingleStep->GetGroupTarget() - 1]->GetReserveFundFlow().AddFlow(CurrentDate, qMin(AvailableInterest, TotalPayable), static_cast<qint32>(ReserveFund::ReserveFlowsType::ReplenishFromInterest));
+									m_Reserves[SingleStep->GetGroupTarget() - 1]->GetReserveFundFlow().SetFlow(CurrentDate, qMax(0.0, TotalPayable - AvailableInterest), static_cast<qint32>(ReserveFund::ReserveFlowsType::ShortFall));
 									m_Reserves[SingleStep->GetGroupTarget() - 1]->SetReserveFundCurrent(m_Reserves.at(SingleStep->GetGroupTarget() - 1)->GetReserveFundCurrent() + qMin(AvailableInterest, TotalPayable));
 									AvailableInterest=qMax(0.0,AvailableInterest-TotalPayable);
 								}
 								else if(SingleStep->GetRedemptionGroup()==2){
 
-									m_Reserves[SingleStep->GetGroupTarget() - 1]->GetReserveFundFlow().AddFlow(CurrentDate, qMin(AvailablePrincipal.Total(), TotalPayable), ReserveFund::ReplenishFromPrincipal);
-									m_Reserves[SingleStep->GetGroupTarget() - 1]->GetReserveFundFlow().SetFlow(CurrentDate, qMax(0.0, TotalPayable - AvailablePrincipal.Total()), ReserveFund::ShortFall);
+									m_Reserves[SingleStep->GetGroupTarget() - 1]->GetReserveFundFlow().AddFlow(CurrentDate, qMin(AvailablePrincipal.Total(), TotalPayable), static_cast<qint32>(ReserveFund::ReserveFlowsType::ReplenishFromPrincipal));
+									m_Reserves[SingleStep->GetGroupTarget() - 1]->GetReserveFundFlow().SetFlow(CurrentDate, qMax(0.0, TotalPayable - AvailablePrincipal.Total()), static_cast<qint32>(ReserveFund::ReserveFlowsType::ShortFall));
 									m_Reserves[SingleStep->GetGroupTarget() - 1]->SetReserveFundCurrent(m_Reserves.at(SingleStep->GetGroupTarget() - 1)->GetReserveFundCurrent() + qMin(AvailablePrincipal.Total(), TotalPayable));
 									AvailablePrincipal -= TotalPayable;
 									if (AvailablePrincipal < 0.0) AvailablePrincipal.Erase();
@@ -929,6 +945,11 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						ProRataBonds.append(SigleGroup);
 					TotalPayable = RedeemProRata(AvailablePrincipal.Total(), CurrentDate, ProRataBonds);
 					AvailablePrincipal -= AvailablePrincipal.Total() - TotalPayable;
+				break;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				case WatFalPrior::wst_Turbo:
+					TotalPayable = RedeemNotes(AvailableInterest*SingleStep->GetRedemptionShare(), SingleStep->GetRedemptionGroup(), CurrentDate);
+					AvailableInterest += TotalPayable-(AvailableInterest*SingleStep->GetRedemptionShare());
 				break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				case WatFalPrior::wst_Excess:
@@ -1182,6 +1203,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		if (NullCCCanchor[6]) m_SeniorFeesFixed.RemoveAnchorDate();
 		if (NullCCCanchor[7]) m_JuniorFeesFixed.RemoveAnchorDate();
 		if (NullCCCanchor[8]) m_GICinterest.RemoveAnchorDate();
+		if (NullCCCanchor[9]) m_GICBaseRateValue.RemoveAnchorDate();
 		for (int i = 0; i < m_Tranches.size(); ++i) {
 			m_Tranches[i]->SetStartingDeferredInterest(OriginalStartingDeferred[i]);
 		}
@@ -1197,9 +1219,9 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		CheckTranCashFlow.Clear(); CheckTranCashFlow.AddFlow(m_TotalSeniorFees); CheckResults += CheckTranCashFlow.GetTotalFlow(0);
 		CheckTranCashFlow.Clear(); CheckTranCashFlow.AddFlow(m_TotalJuniorFees); CheckResults += CheckTranCashFlow.GetTotalFlow(0);
 		CheckTranCashFlow.Clear(); CheckTranCashFlow.AddFlow(m_ExcessCashFlow); CheckResults += CheckTranCashFlow.GetTotalFlow(0);
-		foreach(const ReserveFund* SingleReserve, m_Reserves) {
-			CheckTranCashFlow.Clear(); CheckTranCashFlow.AddFlow(SingleReserve->GetReserveFundFlow()); CheckResults += CheckTranCashFlow.GetFlow(0, ReserveFund::ReplenishFromInterest) + CheckTranCashFlow.GetFlow(0, ReserveFund::ReplenishFromPrincipal);
-		}
+		/*foreach(const ReserveFund* SingleReserve, m_Reserves) {
+			CheckTranCashFlow.Clear(); CheckTranCashFlow.AddFlow(SingleReserve->GetReserveFundFlow()); CheckResults += CheckTranCashFlow.GetFlow(0, static_cast<qint32>(ReserveFund::ReserveFlowsType::ReplenishFromInterest)) + CheckTranCashFlow.GetFlow(0, static_cast<qint32>(ReserveFund::ReserveFlowsType::ReplenishFromPrincipal));
+		}*/
 		foreach(const Tranche* SingleTranche, m_Tranches) {
 			CheckTranCashFlow.Clear(); CheckTranCashFlow.AddFlow(SingleTranche->GetCashFlow());	CheckResults += CheckTranCashFlow.GetTotalFlow(0);
 		}
@@ -1209,7 +1231,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		CheckResults -= m_PrincipalAvailable.Total();
 		if (qAbs(CheckResults) >= 0.01) {
 			PrintToTempFile("ReturnFalse.txt", "Cash Flows Dont Match");
-			//return false;
+			return false;
 		}
 		return true;
 }
@@ -1250,6 +1272,8 @@ QDataStream& operator<<(QDataStream & stream, const Waterfall& flows){
 		<< flows.m_CallReserve
 		<< flows.m_DealName
 		<< flows.m_GICinterest
+		<< flows.m_GICBaseRate
+		<< flows.m_GICBaseRateValue
 		<< flows.m_StartingDeferredJunFees
 		<< flows.m_GICflows
 		<< flows.m_WaterfallStesps.size();
@@ -1311,6 +1335,8 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream){
 		>> m_CallReserve
 		>> m_DealName;
 	m_GICinterest.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_GICinterest;
+	m_GICBaseRate.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_GICBaseRate;
+	m_GICBaseRateValue.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_GICBaseRateValue;
 	stream >> m_StartingDeferredJunFees;
 	m_GICflows.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_GICflows;
 	stream >> TempInt;
@@ -1368,6 +1394,7 @@ QDate Waterfall::GetCalledPeriod() const{
 QString Waterfall::ReadyToCalculate()const{
 	QString Result;
 	if (m_GICinterest.IsEmpty()) Result += "GIC Interest\n";
+	if (m_GICBaseRate.IsEmpty()) Result += "GIC Base Rate\n";
 	if (m_SeniorExpenses.IsEmpty()) Result += "Senior Expenses\n";
 	if (m_SeniorFees.IsEmpty()) Result += "Senior Fees\n";
 	if (m_JuniorFees.IsEmpty()) Result += "Junior Fees\n";
@@ -1556,3 +1583,25 @@ void Waterfall::SetPaymentFrequency(const QString& a){
 	}
 	m_PaymentFrequency = TempVect;
 }
+void Waterfall::CompileReferenceRateValue(ForwardBaseRateTable& Values) {
+	m_GICBaseRateValue = m_GICBaseRate.CompileReferenceRateValue(Values);
+	for (auto i = m_Tranches.begin(); i != m_Tranches.end(); ++i)
+		(*i)->CompileReferenceRateValue(Values);
+}
+void Waterfall::CompileReferenceRateValue(ConstantBaseRateTable& Values) {
+	m_GICBaseRateValue = m_GICBaseRate.CompileReferenceRateValue(Values);
+	for (auto i = m_Tranches.begin(); i != m_Tranches.end(); ++i)
+		(*i)->CompileReferenceRateValue(Values);
+}
+#ifndef NO_DATABASE
+void Waterfall::GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll) {
+	m_GICBaseRateValue = m_GICBaseRate.GetBaseRatesDatabase(Values, DownloadAll);
+	for (auto i = m_Tranches.begin(); i != m_Tranches.end(); ++i)
+		(*i)->GetBaseRatesDatabase(Values, DownloadAll);
+}
+void Waterfall::GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll) {
+	m_GICBaseRateValue = m_GICBaseRate.GetBaseRatesDatabase(Values, DownloadAll);
+	for (auto i = m_Tranches.begin(); i != m_Tranches.end(); ++i)
+		(*i)->GetBaseRatesDatabase(Values, DownloadAll);
+}
+#endif

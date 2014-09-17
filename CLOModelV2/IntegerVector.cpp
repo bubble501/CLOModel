@@ -64,7 +64,7 @@ void IntegerVector::UnpackVector() {
 	m_VectVal.append(StringParts.last().toInt());
 }
 bool IntegerVector::IsValid() const {
-	return AbstarctBbgVect::IsValid("\\d+", true);
+	return AbstarctBbgVect::IsValid("-?\\d+", true);
 }
 int IntegerVector::GetValue(const QDate& index)const {
 	QDate ValidDate(m_AnchorDate);

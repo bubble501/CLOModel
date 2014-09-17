@@ -7,10 +7,10 @@
 #include <QDataStream>
 class ReserveFund :public BackwardInterface {
 public:
-	enum ReserveFlowsType{
-		ReplenishFromInterest = 0
+	enum class ReserveFlowsType : qint32{
+		ReplenishFromInterest = 1 << MaximumInterestsTypes
 		, ReplenishFromPrincipal =1
-		, ShortFall=13
+		, ShortFall = 1 << (MaximumInterestsTypes + 1)
 	};
 	ReserveFund();
 	ReserveFund(const ReserveFund& a);
@@ -37,12 +37,12 @@ public:
 	void SetReserveFundCap(const BloombergVector& val) { m_ReserveVects[ResCap] = val; OriginallyNullAnchor[ResCap] = m_ReserveVects[ResCap].GetAnchorDate().isNull(); }
 
 	double GetReserveFundCurrent()const { return m_ReserveFundCurrent; }
-	double GetReserveFundCurrent(const QDate& RepDate)const { return m_ReserveFundFlows.GetFlow(RepDate, ReplenishFromInterest) + m_ReserveFundFlows.GetFlow(RepDate, ReplenishFromPrincipal); }
-	double GetReserveFundCurrent(int a)const { return m_ReserveFundFlows.GetFlow(a, ReplenishFromInterest) + m_ReserveFundFlows.GetFlow(a, ReplenishFromPrincipal); }
+	double GetReserveFundCurrent(const QDate& RepDate)const { return m_ReserveFundFlows.GetFlow(RepDate, static_cast<qint32>(ReserveFlowsType::ReplenishFromInterest)) + m_ReserveFundFlows.GetFlow(RepDate, static_cast<qint32>(ReserveFlowsType::ReplenishFromPrincipal)); }
+	double GetReserveFundCurrent(int a)const { return m_ReserveFundFlows.GetFlow(a, static_cast<qint32>(ReserveFlowsType::ReplenishFromInterest)) + m_ReserveFundFlows.GetFlow(a, static_cast<qint32>(ReserveFlowsType::ReplenishFromPrincipal)); }
 	void SetReserveFundCurrent(double a) { m_ReserveFundCurrent = a; }
 
-	double GetShortfall(const QDate& RepDate)const { return m_ReserveFundFlows.GetFlow(RepDate, ShortFall); }
-	double GetShortfall(int a)const { return m_ReserveFundFlows.GetFlow(a, ShortFall); }
+	double GetShortfall(const QDate& RepDate)const { return m_ReserveFundFlows.GetFlow(RepDate, static_cast<qint32>(ReserveFlowsType::ShortFall)); }
+	double GetShortfall(int a)const { return m_ReserveFundFlows.GetFlow(a, static_cast<qint32>(ReserveFlowsType::ShortFall)); }
 
 	const double& GetStartingReserve() const { return m_StartingReserve; }
 	void SetStartingReserve(const double& val) { m_StartingReserve = val; }

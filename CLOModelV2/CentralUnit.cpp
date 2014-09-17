@@ -443,24 +443,16 @@ CentralUnit::~CentralUnit(){
 }
 void CentralUnit::CompileBaseRates(ConstantBaseRateTable& Values) {
 	m_OverrideConstants = Values;
-	for(int i=0;i<Structure.GetTranchesCount();i++){
-		Structure.GetTranche(i)->CompileReferenceRateValue(Values);
-	}
-	for(int i=0;i<CallStructure.GetTranchesCount();i++){
-		CallStructure.GetTranche(i)->CompileReferenceRateValue(Values);
-	}
+	Structure.CompileReferenceRateValue(Values);
+	CallStructure.CompileReferenceRateValue(Values);
 	LoansCalculator.CompileReferenceRateValue(Values);
 	LiborUpdateDate = Values.GetUpdateDate();
 	m_UseForwardCurve = false;
 }
 void CentralUnit::CompileBaseRates(ForwardBaseRateTable& Values) {
 	m_OverrideForwards = Values;
-	for (int i = 0; i < Structure.GetTranchesCount(); i++) {
-		Structure.GetTranche(i)->CompileReferenceRateValue(Values);
-	}
-	for (int i = 0; i < CallStructure.GetTranchesCount(); i++) {
-		CallStructure.GetTranche(i)->CompileReferenceRateValue(Values);
-	}
+	Structure.CompileReferenceRateValue(Values);
+	CallStructure.CompileReferenceRateValue(Values);
 	LoansCalculator.CompileReferenceRateValue(Values);
 	LiborUpdateDate = Values.GetUpdateDate();
 	m_UseForwardCurve = true;
@@ -468,24 +460,16 @@ void CentralUnit::CompileBaseRates(ForwardBaseRateTable& Values) {
 #ifndef NO_DATABASE
 void CentralUnit::GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll)  {
 	m_OverrideConstants = Values;
-	for (int i = 0; i < Structure.GetTranchesCount(); i++) {
-		Structure.GetTranche(i)->GetBaseRatesDatabase(Values, DownloadAll);
-	}
-	for (int i = 0; i < CallStructure.GetTranchesCount(); i++) {
-		CallStructure.GetTranche(i)->GetBaseRatesDatabase(Values, DownloadAll);
-	}
+	Structure.GetBaseRatesDatabase(Values, DownloadAll);
+	CallStructure.GetBaseRatesDatabase(Values, DownloadAll);
 	LoansCalculator.GetBaseRatesDatabase(Values, DownloadAll);
 	LiborUpdateDate = Values.GetUpdateDate();
 	m_UseForwardCurve = false;
 }
 void CentralUnit::GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll)  {
 	m_OverrideForwards = Values;
-	for (int i = 0; i < Structure.GetTranchesCount(); i++) {
-		Structure.GetTranche(i)->GetBaseRatesDatabase(Values, DownloadAll);
-	}
-	for (int i = 0; i < CallStructure.GetTranchesCount(); i++) {
-		CallStructure.GetTranche(i)->GetBaseRatesDatabase(Values, DownloadAll);
-	}
+	Structure.GetBaseRatesDatabase(Values, DownloadAll);
+	CallStructure.GetBaseRatesDatabase(Values, DownloadAll);
 	LoansCalculator.GetBaseRatesDatabase(Values, DownloadAll);
 	LiborUpdateDate = Values.GetUpdateDate();
 	m_UseForwardCurve = true;

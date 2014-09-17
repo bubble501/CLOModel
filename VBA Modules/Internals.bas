@@ -81,7 +81,7 @@ Public Sub WaterfallStepChanged(TargetAllCell As Range)
                 TargetCell.Offset(0, 2).Value = 1
                 TargetCell.Offset(0, 1).AddComment "Index of the reserve fund to use"
                 TargetCell.Offset(0, 2).AddComment "1 if it's replenished using interest, 2 if it's replenished using principal"
-            Case UCase("Interest")
+            Case UCase("Interest"), UCase("Deferred"), UCase("Deferred from Principal"), UCase("IC"), UCase("IC from Principal")
                 TargetCell.Offset(0, 2).NumberFormat = ";;;"
                 TargetCell.Offset(0, 2).Value = 1
             Case UCase("Reinvestment")
@@ -113,6 +113,15 @@ Public Sub WaterfallStepChanged(TargetAllCell As Range)
                 TargetCell.Offset(0, 2).AddComment ("Most junior tranche that will be considered for the test level")
                 TargetCell.Offset(0, 3).AddComment ("Share that will redeem that tranche")
                 TargetCell.Offset(0, 3).Value = 0
+                TargetCell.Offset(0, 3).NumberFormat = "0%"
+                TargetCell.Offset(0, 2).NumberFormat = "0"
+            Case UCase("Turbo")
+                TargetCell.Offset(0, 2).Resize(1, 2).Locked = False
+                TargetCell.Offset(0, 1).Locked = True
+                TargetCell.Offset(0, 1).Value = ""
+                TargetCell.Offset(0, 2).AddComment ("Class of notes that will be redeemed")
+                TargetCell.Offset(0, 3).AddComment ("Share of interest that will redeem that tranche")
+                TargetCell.Offset(0, 3).Value = 1#
                 TargetCell.Offset(0, 3).NumberFormat = "0%"
                 TargetCell.Offset(0, 2).NumberFormat = "0"
             Case UCase("Redeem Pro-Rata")

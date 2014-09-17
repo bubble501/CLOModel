@@ -189,11 +189,11 @@ bool IsHoliday(const QDate& a/*, const QString& CountryCode*/) {
 
 
 #include <QFile>
-void PrintToTempFile(const QString& TempFileName, const QString& Message) {
+void PrintToTempFile(const QString& TempFileName, const QString& Message, bool PrintTime) {
 	QFile TempFile("C:/Temp/" + TempFileName +".log");
 	if (!TempFile.open(QIODevice::Append | QIODevice::Text)) return;
 	QTextStream  TempWrite(&TempFile);
-	TempWrite << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm ") + Message + '\n';
+	TempWrite << (PrintTime ? QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm "):QString()) + Message + '\n';
 	TempFile.close();
 }
 #include <QSettings>

@@ -83,6 +83,8 @@ private:
 	double m_CallReserve;
 	QString m_DealName;
 	BloombergVector m_GICinterest;
+	BaseRateVector m_GICBaseRate;
+	BloombergVector m_GICBaseRateValue;
 	double m_StartingDeferredJunFees;
 	GenericCashFlow m_GICflows;
 	int FindMostJuniorLevel() const;
@@ -170,7 +172,9 @@ public:
 	int GetNumReserves()const { return m_Reserves.size(); }
 	const QString& GetDealName() const { return m_DealName; }
 	const double& GetStartingDeferredJunFees() const { return m_StartingDeferredJunFees; }
+	QString GetGICBaseRate() const { return m_GICBaseRate.GetVector(); }
 	//////////////////////////////////////////////////////////////////////////
+	void SetGICBaseRate(const QString& a) { m_GICBaseRate = a; }
 	void SetStartingDeferredJunFees(const double& val) { m_StartingDeferredJunFees = val; }
 	void SetDealName(const QString& a) { m_DealName = a; }
 	void SetCumulativeReserves(bool a){m_CumulativeReserves=a;}
@@ -228,6 +232,12 @@ public:
 	void ResetTranches();
 	bool CalculateTranchesCashFlows();
 	QString ReadyToCalculate() const;
+	void CompileReferenceRateValue(ForwardBaseRateTable& Values);
+	void CompileReferenceRateValue(ConstantBaseRateTable& Values);
+#ifndef NO_DATABASE
+	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll = false);
+	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll = false);
+#endif
 	friend QDataStream& operator<<(QDataStream & stream, const Waterfall& flows);
 	friend QDataStream& operator>>(QDataStream & stream, Waterfall& flows);
 };

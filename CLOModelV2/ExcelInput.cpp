@@ -9,11 +9,7 @@
 #include <QString>
 #include <QFile>
 #include <QSettings>
-//#define  DebuggungInputs //TODO Comment me
 #include <QApplication>
-#ifdef DebuggungInputs
-#include <QMessageBox>
-#endif
 #include <QTextStream>
 void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	bool RunStress;
@@ -81,71 +77,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			TempUnit.AddTranche(TrName, TrancheISIN, ProRat, origOut, Curr, currOut, IntrTpe, coup, RefRt, PrevIPD, BasRt, IPDfrq, SettDate, startingDeferred, /*RefRtVal,*/ OClim, IClim, Price, Exchan, "Mtge", static_cast<DayCountConvention>(DayCnt));
 		}
 	}
-	{//Base Rates Compilation
-		bool UseForwardRates = pdFreq->boolVal; pdFreq++;
-		int HowManyFwdCurves = pdFreq->intVal; pdFreq++;
-		if (UseForwardRates) {
-			ForwardBaseRateTable CompilationTable;
-			QList<QDate> TempRefDates;
-			QList<double> TempRefVals;
-			QString TempKey;
-			int HowManyDates;
-			for (int FwdCrvIte = 0; FwdCrvIte < HowManyFwdCurves; ++FwdCrvIte) {
-				TempRefDates.clear();
-				TempRefVals.clear();
-				TempKey = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
-				HowManyDates= pdFreq->intVal; pdFreq++;
-				for (int FwdDtsIte = 0; FwdDtsIte < HowManyDates; ++FwdDtsIte) {
-					TempRefDates.append(QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal), "yyyy-MM-dd")); pdFreq++;
-					TempRefVals.append(pdFreq->dblVal / 100.0); pdFreq++;
-				}
-				CompilationTable.SetValue(TempKey,TempRefDates,TempRefVals);
-			}
-#ifndef NO_DATABASE
-			TempUnit.GetBaseRatesDatabase(CompilationTable);
-#else
-#ifndef NO_BLOOMBERG
-			TempUnit.CompileBaseRates(CompilationTable);
-#else
-			int NumOfBaseRates = pdFreq->intVal; pdFreq++;
-			QString BaseName;
-			double BaseVal;
-			for (int i = 0; i < NumOfBaseRates; i++) {
-				BaseName = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
-				BaseVal = pdFreq->dblVal; pdFreq++;
-				CompilationTable.insert(BaseName.trimmed().toUpper(), BaseVal);
-			}
-			TempUnit.CompileBaseRates(CompilationTable);
-#endif // NO_BLOOMBERG
-#endif // NO_DATABASE
-		}
-		else{
-			ConstantBaseRateTable CompilationTable;
-			QString TempKey; double TempValue;
-			for (int FwdCrvIte = 0; FwdCrvIte < HowManyFwdCurves; ++FwdCrvIte) {
-				TempKey=QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
-				TempValue=pdFreq->dblVal; pdFreq++;
-				CompilationTable.SetValue(TempKey,TempValue/100.0);
-			}
-#ifndef NO_DATABASE
-			TempUnit.GetBaseRatesDatabase(CompilationTable);
-#else
-#ifndef NO_BLOOMBERG
-			TempUnit.CompileBaseRates(CompilationTable);
-#else
-			int NumOfBaseRates = pdFreq->intVal; pdFreq++;
-			QString BaseName;
-			double BaseVal;
-			for (int i = 0; i < NumOfBaseRates; i++) {
-				BaseName = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
-				BaseVal = pdFreq->dblVal; pdFreq++;
-				CompilationTable.insert(BaseName.trimmed().toUpper(), BaseVal);
-			}
-			TempUnit.CompileBaseRates(CompilationTable);
-#endif // NO_BLOOMBERG
-#endif // NO_DATABASE
-		}
-	}
+	
 	{ //Waterfall Steps
 		int Prior,GrpTg, RedTg;
 		double RedSh;
@@ -162,6 +94,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		TempUnit.SetDealName(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
 		TempUnit.SetStartingDeferredJunFees(pdFreq->dblVal); pdFreq++;
 		TempUnit.SetGICinterest(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+		TempUnit.SetGICBaseRate(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
 		TempUnit.SetSeniorExpenses(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
 		TempUnit.SetSeniorFees(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
 		TempUnit.SetJuniorFees(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
@@ -268,6 +201,75 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		TempUnit.SetLossOnCallOutputAddress(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
 		TempUnit.SetCreditEnanAddress(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
 		TempUnit.SetFolderPath(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
+		{//Base Rates Compilation
+			bool UseForwardRates = pdFreq->boolVal; pdFreq++;
+			LOGDEBUG(QString("use Forward: %1").arg(UseForwardRates));
+			int HowManyFwdCurves = pdFreq->intVal; pdFreq++;
+			LOGDEBUG(QString("Numero Curve Forward: %1").arg(HowManyFwdCurves));
+			if (UseForwardRates) {
+				ForwardBaseRateTable CompilationTable;
+				QList<QDate> TempRefDates;
+				QList<double> TempRefVals;
+				QString TempKey;
+				int HowManyDates;
+				for (int FwdCrvIte = 0; FwdCrvIte < HowManyFwdCurves; ++FwdCrvIte) {
+					TempRefDates.clear();
+					TempRefVals.clear();
+					TempKey = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+					LOGDEBUG(TempKey);
+					HowManyDates = pdFreq->intVal; pdFreq++;
+					LOGDEBUG(QString("Numero Date Forward: %1").arg(HowManyDates));
+					for (int FwdDtsIte = 0; FwdDtsIte < HowManyDates; ++FwdDtsIte) {
+						TempRefDates.append(QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal), "yyyy-MM-dd")); pdFreq++;
+						TempRefVals.append(pdFreq->dblVal / 100.0); pdFreq++;
+					}
+					CompilationTable.SetValue(TempKey, TempRefDates, TempRefVals);
+				}
+#ifndef NO_DATABASE
+				TempUnit.GetBaseRatesDatabase(CompilationTable);
+#else
+#ifndef NO_BLOOMBERG
+				TempUnit.CompileBaseRates(CompilationTable);
+#else
+				int NumOfBaseRates = pdFreq->intVal; pdFreq++;
+				QString BaseName;
+				double BaseVal;
+				for (int i = 0; i < NumOfBaseRates; i++) {
+					BaseName = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+					BaseVal = pdFreq->dblVal; pdFreq++;
+					CompilationTable.insert(BaseName.trimmed().toUpper(), BaseVal);
+				}
+				TempUnit.CompileBaseRates(CompilationTable);
+#endif // NO_BLOOMBERG
+#endif // NO_DATABASE
+			}
+			else {
+				ConstantBaseRateTable CompilationTable;
+				QString TempKey; double TempValue;
+				for (int FwdCrvIte = 0; FwdCrvIte < HowManyFwdCurves; ++FwdCrvIte) {
+					TempKey = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+					TempValue = pdFreq->dblVal; pdFreq++;
+					CompilationTable.SetValue(TempKey, TempValue / 100.0);
+				}
+#ifndef NO_DATABASE
+				TempUnit.GetBaseRatesDatabase(CompilationTable);
+#else
+#ifndef NO_BLOOMBERG
+				TempUnit.CompileBaseRates(CompilationTable);
+#else
+				int NumOfBaseRates = pdFreq->intVal; pdFreq++;
+				QString BaseName;
+				double BaseVal;
+				for (int i = 0; i < NumOfBaseRates; i++) {
+					BaseName = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+					BaseVal = pdFreq->dblVal; pdFreq++;
+					CompilationTable.insert(BaseName.trimmed().toUpper(), BaseVal);
+				}
+				TempUnit.CompileBaseRates(CompilationTable);
+#endif // NO_BLOOMBERG
+#endif // NO_DATABASE
+			}
+		}
 		RunStress=pdFreq->boolVal;pdFreq++;
 		if(RunStress){// Stress Test
 			QString ConstPar=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
@@ -407,11 +409,7 @@ double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
 	return TempTranche.GetWALife(StartDate);
 }
 void __stdcall StressTargetChanged(LPSAFEARRAY *ArrayData){
-#ifdef DebuggungInputs
-	char *argv[] = {"NoArgumnets"};
-	int argc = sizeof(argv) / sizeof(char*) - 1;
-	QApplication ComputationLoop(argc,argv);
-#endif
+
 	StressTest TempStress;
 	VARIANT HUGEP *pdFreq;
 	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
@@ -499,13 +497,7 @@ double __stdcall GetAssumption(LPSAFEARRAY *ArrayData) {
 \details File containing the definition of the function exported into the dll and available through Excel
 */
 
-/*!
-\def DebuggungInputs
-  If this name is defined, instead of running the model, you'll get a diagnosis of your inputs.
 
-  Useful for debugging the input.
-\warning Must be undefined for the actual model to work
-*/
 /*! \fn void __stdcall RunModel(LPSAFEARRAY *ArrayData)
 \brief Function that runs the cash flow model, and the stress test saves and prints the results in excel
 \param ArrayData Excel Variant Array of Inputs

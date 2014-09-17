@@ -38,10 +38,10 @@ double AdjustCoupon(double AnnualCoupon, QDate PrevIPD, QDate CurrIPD, DayCountC
 bool IsHoliday(const QDate& a/*,const QString& CountryCode*/);
 bool removeDir(const QString& dirName);
 double GetLoanAssumption(const QString& LoanName, int columnIndex, QDate RefDate);
-void PrintToTempFile(const QString& TempFileName, const QString& Message);
+void PrintToTempFile(const QString& TempFileName, const QString& Message, bool PrintTime = true);
 #ifdef DebugLogging
 #define LOGASSERT(CheckExp,LogMsg) ((CheckExp) ? qt_noop() : PrintToTempFile("DebugLog.log",LogMsg)); Q_ASSERT_X(CheckExp,"LOGASSERT",LogMsg)
-#define LOGDEBUG(LogMsg) PrintToTempFile("DebugLog.log",LogMsg)
+#define LOGDEBUG(LogMsg) PrintToTempFile("DebugLog",LogMsg,false)
 #define LOGTOFILE(LogFile,LogMsg) PrintToTempFile(QString(LogFile) + ".log",LogMsg)
 #else
 #define LOGASSERT(CheckExp,LogMsg)

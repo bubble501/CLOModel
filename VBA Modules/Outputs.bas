@@ -851,7 +851,8 @@ Public Sub PlotAnnualExcess( _
         With .Axes(xlValue)
             .HasDisplayUnitLabel = False
             .DisplayUnit = xlNone
-            .MinimumScaleIsAuto = True
+            .MinimumScale = 0
+            '.MinimumScaleIsAuto = True
             .MaximumScaleIsAuto = True
             .TickLabels.NumberFormat = "0.00%"
         End With
@@ -1073,7 +1074,8 @@ Public Sub PlotCPRLS( _
             .AxisTitle.Caption = "CPR"
             .HasDisplayUnitLabel = False
             .DisplayUnit = xlNone
-            .MinimumScaleIsAuto = True
+            .MinimumScale = 0
+            '.MinimumScaleIsAuto = True
             .MaximumScaleIsAuto = True
             .TickLabels.NumberFormat = "0.00%"
         End With
@@ -1082,7 +1084,8 @@ Public Sub PlotCPRLS( _
             .AxisTitle.Caption = "LR"
             .HasDisplayUnitLabel = False
             .DisplayUnit = xlNone
-            .MinimumScaleIsAuto = True
+            .MinimumScale = 0
+            '.MinimumScaleIsAuto = True
             .MaximumScaleIsAuto = True
             .TickLabels.NumberFormat = "0.00%"
         End With

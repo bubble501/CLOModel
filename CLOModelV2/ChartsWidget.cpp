@@ -898,11 +898,11 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 			ChartsModels.append(new QStandardItemModel(CurrentResFlows.Count(),2,this));
 			for(int i=0;i<CurrentResFlows.Count();i++){
 				QModelIndex TempIndex=ChartsModels.last()->index(i,0);
-				ChartsModels.last()->setData(TempIndex, (CurrentResFlows.GetFlow(i, ReserveFund::ReplenishFromInterest) + CurrentResFlows.GetFlow(i, ReserveFund::ReplenishFromPrincipal)) / 1000000.0);
-				ChartsModels.last()->setData(TempIndex, "Reserve Level - Date: " + CurrentResFlows.GetDate(i).toString("MMM-yy") + " - Value: " + Commarize((CurrentResFlows.GetFlow(i, ReserveFund::ReplenishFromInterest) + CurrentResFlows.GetFlow(i, ReserveFund::ReplenishFromPrincipal))), Qt::ToolTipRole);
+				ChartsModels.last()->setData(TempIndex, (CurrentResFlows.GetFlow(i, static_cast<qint32>(ReserveFund::ReserveFlowsType::ReplenishFromInterest)) + CurrentResFlows.GetFlow(i, static_cast<qint32>(ReserveFund::ReserveFlowsType::ReplenishFromPrincipal))) / 1000000.0);
+				ChartsModels.last()->setData(TempIndex, "Reserve Level - Date: " + CurrentResFlows.GetDate(i).toString("MMM-yy") + " - Value: " + Commarize((CurrentResFlows.GetFlow(i, static_cast<qint32>(ReserveFund::ReserveFlowsType::ReplenishFromInterest)) + CurrentResFlows.GetFlow(i, static_cast<qint32>(ReserveFund::ReserveFlowsType::ReplenishFromPrincipal)))), Qt::ToolTipRole);
 				TempIndex=ChartsModels.last()->index(i,1);
-				ChartsModels.last()->setData(TempIndex, CurrentResFlows.GetFlow(i, ReserveFund::ShortFall) / 1000000.0);
-				ChartsModels.last()->setData(TempIndex,"Reserve Target - Date: "+CurrentResFlows.GetDate(i).toString("MMM-yy")+" - Value: "+Commarize(CurrentResFlows.GetFlow(i,ReserveFund::ShortFall)),Qt::ToolTipRole);
+				ChartsModels.last()->setData(TempIndex, CurrentResFlows.GetFlow(i, static_cast<qint32>(ReserveFund::ReserveFlowsType::ShortFall)) / 1000000.0);
+				ChartsModels.last()->setData(TempIndex, "Reserve Target - Date: " + CurrentResFlows.GetDate(i).toString("MMM-yy") + " - Value: " + Commarize(CurrentResFlows.GetFlow(i, static_cast<qint32>(ReserveFund::ReserveFlowsType::ShortFall))), Qt::ToolTipRole);
 				DatesLabels << CurrentResFlows.GetDate(i).toString("MMM-yy");
 			}
 			ChartsModels.last()->setHorizontalHeaderLabels(ReserveLabels);

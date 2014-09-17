@@ -1,7 +1,6 @@
 #include "CentralUnit.h"
 #include <QMetaType>
 #include <QApplication>
-#include <QTimer>
 #include <QFile>
 #include "WaterfallCalculator.h"
 #include "CommonFunctions.h"

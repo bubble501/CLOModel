@@ -163,10 +163,6 @@ namespace ManagedCLO {
 		*/
 		void Clear() { Unmanaged->Clear(); }
 		/*!
-		\brief Estimates the payment frequency of the cash flows
-		*/
-		ManIntegerVector^ GetPaymentFrequency() { return gcnew ManIntegerVector(Unmanaged->GetPaymentFrequency()); }
-		/*!
 		\brief Returns the date of the last non-zero cash flow
 		*/
 		DateTime MaturityDate() { return QDate2DateTime(Unmanaged->MaturityDate()); }

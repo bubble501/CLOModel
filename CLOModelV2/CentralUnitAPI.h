@@ -41,11 +41,11 @@ public:
 	bool GetSequentialComputation()const {return SequentialComputation;}
 	const  QDate& GetLiborUpdateDate() const { return LiborUpdateDate; }
 	bool GetUseForwardCurve() const { return m_UseForwardCurve; }
-	void CompileBaseRates(ForwardBaseRateTable& Values)const;
-	void CompileBaseRates(ConstantBaseRateTable& Values)const;
+	void CompileBaseRates(ForwardBaseRateTable& Values);
+	void CompileBaseRates(ConstantBaseRateTable& Values);
 #ifndef NO_DATABASE
-	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll=false)const;
-	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll=false)const;
+	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll=false);
+	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll=false);
 #endif
 private:
 	ProgressWidget* MtgsProgress;

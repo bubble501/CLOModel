@@ -1,5 +1,6 @@
 #include "GenericCashFlow.h"
 #include <QDataStream>
+#include <QSet>
 GenericCashFlow::GenericCashFlow() 
 	: m_AggregationLevel(NoAggregation)
 	, m_AdjustHolidays(false)
@@ -222,8 +223,8 @@ bool GenericCashFlow::operator==(const GenericCashFlow& a) const {
 GenericCashFlow GenericCashFlow::operator+(const GenericCashFlow& a) const {
 	GenericCashFlow Result(*this); Result.AddFlow(a); return Result;
 }
-#ifdef _DEBUG
-#include <QSet>
+
+
 QString GenericCashFlow::ToString() const {
 	QSet<qint32> FlowsTypes;
 	for (QMap<QDate, QHash<qint32, double>* >::const_iterator MainIter = m_CashFlows.constBegin(); MainIter != m_CashFlows.constEnd(); ++MainIter) {
@@ -243,7 +244,7 @@ QString GenericCashFlow::ToString() const {
 	}
 	return Result;
 }
-#endif
+
 GenericCashFlow GenericCashFlow::SingleFlow(qint32 FlowTpe) const {
 	GenericCashFlow Result;
 	Result.Aggregate(m_AggregationLevel);

@@ -230,11 +230,24 @@ namespace ManagedCLO {
 			void set(bool a){Unmanaged->SetUseTurbo(a);}
 		}
 		/*!
-		\brief Cash in the principal collection account
+		\brief Cash in the principal collection account relating to scheduled redemption
+		*/
+		property double ScheduledPrincipalAvailable{
+			double get(){return Unmanaged->GetScheduledPrincipalAvailable();}
+			void set(double a){Unmanaged->SetSchedPrincAvailable(a);}
+		}
+		/*!
+		\brief Cash in the principal collection account relating to prepayments
+		*/
+		property double PrepayPrincipalAvailable{
+			double get() { return Unmanaged->GetPrepayPrincipalAvailable(); }
+			void set(double a) { Unmanaged->SetPrepPrincAvailable(a); }
+		}
+		/*!
+		\brief Total cash in the principal collection account
 		*/
 		property double PrincipalAvailable{
-			double get(){return Unmanaged->GetPrincipalAvailable();}
-			void set(double a){Unmanaged->SetPrincipalAvailable(a);}
+			double get() { return Unmanaged->GetPrincipalAvailable(); }
 		}
 		/*!
 		\brief Cash in the interest collection account

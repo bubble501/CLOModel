@@ -114,6 +114,8 @@ public:
 	double GetCCChaircut() const {return m_CCChaircut;} 
 	bool GetUseTurbo() const {return m_UseTurbo;} 
 	double GetPrincipalAvailable() const {return m_PrincipalAvailable.Total();} 
+	double GetScheduledPrincipalAvailable() const { return m_PrincipalAvailable.GetScheduled(); }
+	double GetPrepayPrincipalAvailable() const { return m_PrincipalAvailable.GetPrepay(); }
 	double GetInterestAvailable() const {return m_InterestAvailable;} 
 	double GetJuniorFeesCoupon() const {return m_JuniorFeesCoupon;} 
 	double GetPoolValueAtCall() const {return m_PoolValueAtCall;} 

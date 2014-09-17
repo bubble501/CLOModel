@@ -10,6 +10,7 @@ class ConsoleTestObj : public QObject
 public:
 	ConsoleTestObj(QObject *parent=0);
 	void BBVALTest();
+	void SlateTest();
 private slots:
 	void PrintOutput();
 private:

@@ -208,6 +208,7 @@ void MtgCalculator::BeeReturned(int Ident,const MtgCashFlow& a){
 		connect(ThreadPool[SingleLoan.key()], SIGNAL(Calculated(int, const MtgCashFlow&)), this, SLOT(BeeReturned(int, const MtgCashFlow&)));
 		connect(ThreadPool[SingleLoan.key()], SIGNAL(Calculated(int, const MtgCashFlow&)), ThreadPool[SingleLoan.key()], SLOT(stop()), Qt::QueuedConnection);
 		ThreadPool[SingleLoan.key()]->start();
+		return;
 	}
 }
 void MtgCalculator::Reset(){

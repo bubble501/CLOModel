@@ -1198,7 +1198,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		CheckTranCashFlow.Clear(); CheckTranCashFlow.AddFlow(m_TotalJuniorFees); CheckResults += CheckTranCashFlow.GetTotalFlow(0);
 		CheckTranCashFlow.Clear(); CheckTranCashFlow.AddFlow(m_ExcessCashFlow); CheckResults += CheckTranCashFlow.GetTotalFlow(0);
 		foreach(const ReserveFund* SingleReserve, m_Reserves) {
-			CheckTranCashFlow.Clear(); CheckTranCashFlow.AddFlow(SingleReserve->GetReserveFundFlow()); CheckResults += CheckTranCashFlow.GetTotalFlow(0);
+			CheckTranCashFlow.Clear(); CheckTranCashFlow.AddFlow(SingleReserve->GetReserveFundFlow()); CheckResults += CheckTranCashFlow.GetFlow(0, ReserveFund::ReplenishFromInterest) + CheckTranCashFlow.GetFlow(0, ReserveFund::ReplenishFromPrincipal);
 		}
 		foreach(const Tranche* SingleTranche, m_Tranches) {
 			CheckTranCashFlow.Clear(); CheckTranCashFlow.AddFlow(SingleTranche->GetCashFlow());	CheckResults += CheckTranCashFlow.GetTotalFlow(0);
@@ -1209,7 +1209,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		CheckResults -= m_PrincipalAvailable.Total();
 		if (qAbs(CheckResults) >= 0.01) {
 			PrintToTempFile("ReturnFalse.txt", "Cash Flows Dont Match");
-			return false;
+			//return false;
 		}
 		return true;
 }

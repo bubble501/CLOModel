@@ -18,46 +18,6 @@ namespace ManagedCLO {
 		BaseRateVector* Unmanaged;
 		ManBaseRateVector(const BaseRateVector& a){Unmanaged=new BaseRateVector(a);}
 	public:			
-		/*! Enum defining the different types of base rates supported.*/
-		enum class ManAvailableRates : int{
-			Invalid=-1, /*!< Invalid Index Rate*/
-			ZeroFlat, /*!< 0% Index rate Rate*/
-			EUR001W, /*!< 1 Week EURIBOR in Euros*/
-			EUR002W, /*!< 2 Weeks EURIBOR in Euros*/
-			EUR003W, /*!< 3 Weeks EURIBOR in Euros*/
-			EUR001M, /*!< 1 Month EURIBOR in Euros*/
-			EUR002M, /*!< 2 Months EURIBOR in Euros*/
-			EUR003M, /*!< 3 Months EURIBOR in Euros*/
-			EUR004M, /*!< 4 Months EURIBOR in Euros*/
-			EUR005M, /*!< 5 Months EURIBOR in Euros*/
-			EUR006M, /*!< 6 Months EURIBOR in Euros*/
-			EUR007M, /*!< 7 Months EURIBOR in Euros*/
-			EUR008M, /*!< 8 Months EURIBOR in Euros*/
-			EUR009M, /*!< 9 Months EURIBOR in Euros*/
-			EUR010M, /*!< 10 Months EURIBOR in Euros*/
-			EUR011M, /*!< 11 Months EURIBOR in Euros*/
-			EUR012M, /*!< 12 Months EURIBOR in Euros*/
-			BP00ON, /*!< Overnight LIBOR in Pound sterling*/
-			BP0001W, /*!< 1 Week LIBOR in Pound sterling*/
-			BP0001M, /*!< 1 Month LIBOR in Pound sterling*/
-			BP0002M, /*!< 2 Months LIBOR in Pound sterling*/
-			BP0003M, /*!< 3 Months LIBOR in Pound sterling*/
-			BP0006M, /*!< 6 Months LIBOR in Pound sterling*/
-			BP0012M, /*!< 12 Months LIBOR in Pound sterling*/
-			US00ON, /*!< Overnight LIBOR in US Dollars*/
-			US0001W, /*!< 1 Week LIBOR in US Dollars*/
-			US0001M, /*!< 1 Month LIBOR in US Dollars*/
-			US0002M, /*!< 2 Months LIBOR in US Dollars*/
-			US0003M, /*!< 3 Months LIBOR in US Dollars*/
-			US0006M, /*!< 6 Months LIBOR in US Dollars*/
-			US0012M, /*!< 12 Months LIBOR in US Dollars*/
-			LIBOR01W, /*!< 1 Week LIBOR in US Dollars*/
-			LIBOR01M, /*!< 1 Month LIBOR in US Dollars*/
-			LIBOR02M, /*!< 2 Months LIBOR in US Dollars*/
-			LIBOR03M, /*!< 3 Months LIBOR in US Dollars*/
-			LIBOR06M, /*!< 6 Months LIBOR in US Dollars*/
-			LIBOR12M, /*!< 12 Months LIBOR in US Dollars*/
-		};
 		/*!
 		\brief Write class to stream
 		\arg Dest Stream to write on
@@ -113,24 +73,7 @@ namespace ManagedCLO {
 				return false;
 			}
 		}
-		/*! 
-		\brief Gets the vector value for the specified date
-		\arg index the date for which to get the value of the vector
-		\details Returns the value of the vector corresponding to the specific date.<br/>If no anchor date is specified the first day of the vector will be assumed to be today.<br/>If the date provided is anterior to the anchor date or the vector is empty, ManAvailableRates::Invalid is returned.
-		\sa GetValue(int)
-		\sa GetValueString(DateTime)
-		\sa GetValueString(int)
-		*/
-		ManAvailableRates GetValue(DateTime index) {return static_cast<ManAvailableRates>(static_cast<int>(Unmanaged->GetValue(DateTime2QDate(index))));}
-		/*! 
-		\brief Gets the vector value for the specified index
-		\arg index The number of months after the start of the vector for which the value is retrieved
-		\details Returns the value of the vector corresponding to the specific index.<br/>If the vector is empty or the index supplied is negative, ManAvailableRates::Invalid is returned.
-		\sa GetValue(DateTime)
-		\sa GetValueString(DateTime)
-		\sa GetValueString(int)
-		*/
-		ManAvailableRates GetValue(int index) {return static_cast<ManAvailableRates>(static_cast<int>(Unmanaged->GetValue(index)));}
+	
 		/*! 
 		\brief Gets the string representation of the vector value for the specified date
 		\arg index the date for which to get the value of the vector
@@ -139,7 +82,7 @@ namespace ManagedCLO {
 		\sa GetValue(int)
 		\sa GetValue(DateTime)
 		*/
-		String^ GetValueString(DateTime index){return QString2String(Unmanaged->GetValueString(DateTime2QDate(index)));}
+		String^ GetValueString(DateTime index){return QString2String(Unmanaged->GetValue(DateTime2QDate(index)));}
 		/*! 
 		\brief Gets the string representation of the vector value for the specified index
 		\arg index The number of months after the start of the vector for which the value is retrieved
@@ -148,7 +91,7 @@ namespace ManagedCLO {
 		\sa GetValue(DateTime)
 		\sa GetValue(int)
 		*/
-		String^ GetValueString(int index){return QString2String(Unmanaged->GetValueString(index));}
+		String^ GetValueString(int index){return QString2String(Unmanaged->GetValue(index));}
 		/*! 
 		\brief Returns a Bloomberg vector containing the value of the base indexes represented in this vector using Values as a source
 		\arg Values a table containing the relevant index values

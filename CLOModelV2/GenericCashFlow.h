@@ -52,9 +52,7 @@ public:
 	virtual double GetTotalFlow(const QDate& a) const { return GetTotalFlow(a, QList<qint32>()); }
 	virtual double GetTotalFlow(int index) const { return GetTotalFlow(index, QList<qint32>()); }
 	virtual bool IsEmpty() const;
-#ifdef _DEBUG
 	virtual QString ToString() const;
-#endif // _DEBUG
 
 protected:
 	static bool SamePeriod(const QDate& a, const QDate& b, CashFlowAggregation Freq);

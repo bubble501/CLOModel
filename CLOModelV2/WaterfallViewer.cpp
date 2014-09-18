@@ -186,6 +186,18 @@ void WaterfallViewer::AddStep(const WatFalPrior& a){
 		else if (a.GetRedemptionGroup() == 2) PrincipalTable->setItem(PrincipalTable->rowCount() - 1, 2, new QTableWidgetItem("Scheduled"));
 		else PrincipalTable->setItem(PrincipalTable->rowCount() - 1, 2, new QTableWidgetItem("All Principal"));
 	break;
+	case WatFalPrior::wst_RedeemProRata:
+		PrincipalTable->setRowCount(PrincipalTable->rowCount() + 1);
+		PrincipalTable->setItem(PrincipalTable->rowCount() - 1, 0, new QTableWidgetItem("Redeem Pro rata"));
+		PrincipalTable->setItem(PrincipalTable->rowCount() - 1, 1, new QTableWidgetItem(QString("From Seniority %1").arg(qMin(a.GetRedemptionGroup(), a.GetGroupTarget()))));
+		PrincipalTable->setItem(PrincipalTable->rowCount() - 1, 2, new QTableWidgetItem(QString("To Seniority %1").arg(qMax(a.GetRedemptionGroup(), a.GetGroupTarget()))));
+	break;
+	case WatFalPrior::wst_Turbo:
+		InterestTable->setRowCount(InterestTable->rowCount() + 1);
+		InterestTable->setItem(InterestTable->rowCount() - 1, 0, new QTableWidgetItem("Turbo Redemption"));
+		InterestTable->setItem(InterestTable->rowCount() - 1, 2, new QTableWidgetItem(QString("%1").arg(a.GetRedemptionGroup())));
+		InterestTable->setItem(InterestTable->rowCount() - 1, 3, new QTableWidgetItem(QString("%1%").arg(a.GetRedemptionShare() * 100)));
+	break;
 	default:
 		QMessageBox::critical(this,"Invalid Step","The step you tried to add is invalid.\nPlease check the Waterfall");
 	}

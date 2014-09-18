@@ -122,47 +122,53 @@ double AdjustCoupon(double AnnualCoupon, QDate PrevIPD, QDate CurrIPD, DayCountC
 		PrevIPD = CurrIPD;
 		CurrIPD = Temp;
 	}
+	double TimeFactor;
 	int Offset = 0;
-	switch (DayCount) {
+	switch (static_cast<DayCountConvention>(static_cast<qint16>(DayCount) & (((1 << CompoundShift)-1)))) {
 	case DayCountConvention::ISMA30360:
 		if (PrevIPD.day() == 31) PrevIPD.setDate(PrevIPD.year(), PrevIPD.month(), 30);
 		if (CurrIPD.day() == 31) CurrIPD.setDate(CurrIPD.year(), CurrIPD.month(), 30);
-		return AnnualCoupon * (
+		TimeFactor=(
 			(360.0*static_cast<double>(CurrIPD.year() - PrevIPD.year())) +
 			(30.0*static_cast<double>(CurrIPD.month() - PrevIPD.month())) +
 			static_cast<double>(CurrIPD.day() - PrevIPD.day())
 			) / 360.0;
+		break;
 	case DayCountConvention::N30360:
 		if (PrevIPD.day() == 31) PrevIPD.setDate(PrevIPD.year(), PrevIPD.month(), 30);
 		if (CurrIPD.day() == 31 && PrevIPD.day() == 30) CurrIPD.setDate(CurrIPD.year(), CurrIPD.month(), 30);
 		if (PrevIPD.day() == 29 && PrevIPD.month() == 2 && QDate::isLeapYear(PrevIPD.year())) Offset = 1;
 		if (PrevIPD.day() == 28 && PrevIPD.month() == 2 && !QDate::isLeapYear(PrevIPD.year())) Offset = 2;
-		return AnnualCoupon * (
+		TimeFactor = (
 				(360.0*static_cast<double>(CurrIPD.year() - PrevIPD.year())) +
 				(30.0*static_cast<double>(CurrIPD.month() - PrevIPD.month())) +
 				static_cast<double>(CurrIPD.day() - PrevIPD.day() - Offset)
 			) /360.0;
+		break;
 	case DayCountConvention::ISDAACTACT:
 		while (IsHoliday(CurrIPD)) CurrIPD = CurrIPD.addDays(1);
 		while (IsHoliday(PrevIPD)) PrevIPD = PrevIPD.addDays(1);
 	case DayCountConvention::NISDAACTACT:
 		if (QDate::isLeapYear(CurrIPD.year()) || QDate::isLeapYear(PrevIPD.year())) {
-			return AnnualCoupon * (
+			TimeFactor = (
 				(static_cast<double>(PrevIPD.daysTo(QDate(PrevIPD.year(), 12, 31))) / static_cast<double>(PrevIPD.daysInYear()))
 				+ (static_cast<double>(QDate(CurrIPD.year(), 1, 1).daysTo(CurrIPD)) / static_cast<double>(CurrIPD.daysInYear()))
 			);
 		}
 		else return AdjustCoupon(AnnualCoupon, PrevIPD, CurrIPD, DayCountConvention::ACT365);
+		break;
 	case DayCountConvention::ACT360:
 		while (IsHoliday(CurrIPD)) CurrIPD = CurrIPD.addDays(1);
 		while (IsHoliday(PrevIPD)) PrevIPD = PrevIPD.addDays(1);
 	case DayCountConvention::NACT360:
-		return AnnualCoupon * static_cast<double>(PrevIPD.daysTo(CurrIPD)) / 360.0;
+		TimeFactor = static_cast<double>(PrevIPD.daysTo(CurrIPD)) / 360.0;
+		break;
 	case DayCountConvention::ACT365:
 		while (IsHoliday(CurrIPD)) CurrIPD = CurrIPD.addDays(1);
 		while (IsHoliday(PrevIPD)) PrevIPD = PrevIPD.addDays(1);
 	case DayCountConvention::NACT365:
-		return AnnualCoupon * static_cast<double>(PrevIPD.daysTo(CurrIPD)) / 365.0;
+		TimeFactor = static_cast<double>(PrevIPD.daysTo(CurrIPD)) / 365.0;
+		break;
 	case DayCountConvention::AFBACTACT:
 		while (IsHoliday(CurrIPD)) CurrIPD = CurrIPD.addDays(1);
 		while (IsHoliday(PrevIPD)) PrevIPD = PrevIPD.addDays(1);
@@ -170,18 +176,24 @@ double AdjustCoupon(double AnnualCoupon, QDate PrevIPD, QDate CurrIPD, DayCountC
 		for (QDate TempDate = PrevIPD; TempDate <= CurrIPD; TempDate = TempDate.addYears(1)) {
 			if (QDate(TempDate.year(), 2, 29).isValid()) {
 				if(QDate(TempDate.year(), 2, 29) >= PrevIPD && QDate(TempDate.year(), 2, 29) <= CurrIPD)
-					return AnnualCoupon * static_cast<double>(PrevIPD.daysTo(CurrIPD)) / 366.0;
+					TimeFactor = static_cast<double>(PrevIPD.daysTo(CurrIPD)) / 366.0;
 			}
 		}
-		return AnnualCoupon * static_cast<double>(PrevIPD.daysTo(CurrIPD)) / 365.0;
+		TimeFactor = static_cast<double>(PrevIPD.daysTo(CurrIPD)) / 365.0;
+		break;
 	case DayCountConvention::ACTACT:
 		while (IsHoliday(CurrIPD)) CurrIPD = CurrIPD.addDays(1);
 		while (IsHoliday(PrevIPD)) PrevIPD = PrevIPD.addDays(1);
 	case DayCountConvention::NACTACT:
-		return AnnualCoupon * static_cast<double>(PrevIPD.daysTo(CurrIPD)) / CurrIPD.daysInYear();
+		TimeFactor = static_cast<double>(PrevIPD.daysTo(CurrIPD)) / CurrIPD.daysInYear();
+		break;
 	default:
-		return AnnualCoupon;
+		TimeFactor = 1.0;
 	}
+	if (static_cast<qint16>(DayCount)& (1 << CompoundShift))
+		return qPow(1.0 + AnnualCoupon, TimeFactor) - 1.0;
+	else
+		return AnnualCoupon * TimeFactor;
 }
 bool IsHoliday(const QDate& a/*, const QString& CountryCode*/) {
 	return a.dayOfWeek() >= 6;

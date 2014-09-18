@@ -249,7 +249,7 @@ void ConsoleTestObj::BBVALTest() {
 	TempUnit.SetCCCcurve("0");
 	TempUnit.SetCCChaircut(0.5);
 	TempUnit.SetCCCTestLimit(0.1);
-	TempUnit.SetPoolValueAtCall(100.0);
+	TempUnit.SetPoolValueAtCall("100");
 
 	//Reserve Fund
 	TempUnit.AddReserveFund("2500000000", "0.0165", "0", "0", 0.0, 0, true);
@@ -1777,7 +1777,7 @@ void ConsoleTestObj::SlateTest() {
 	TempUnit.SetCCCcurve("1");
 	TempUnit.SetCCChaircut(0.5);
 	TempUnit.SetCCCTestLimit(0.5);
-	TempUnit.SetPoolValueAtCall(100.0);
+	TempUnit.SetPoolValueAtCall("100");
 	TempUnit.SetCallDate(QDate(2019, 8, 1));
 
 	//Reserve Fund

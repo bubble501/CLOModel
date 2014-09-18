@@ -4,9 +4,10 @@
 class QDate;
 class QString;
 template<typename T> class QList;
-#define DebugLogging
+//#define DebugLogging
 #define MaximumIRRIterations 10000//INT_MAX-1
 #define MaximumInterestsTypes 8
+#define CompoundShift 10
 //#define SaveLoanTape
 int MonthDiff(const QDate& FutureDte,const QDate& PresentDte);
 class BloombergVector;
@@ -23,6 +24,19 @@ enum class DayCountConvention : qint16 {
 	, AFBACTACT = 202
 	, NISDAACTACT = 203
 	, NAFBACTACT = 204
+	//Compound
+	, CompACTACT = (1 << CompoundShift) | 101
+	, CompACT360 = (1 << CompoundShift) | 102
+	, CompACT365 = (1 << CompoundShift) | 103
+	, CompN30360 = (1 << CompoundShift) | 104
+	, CompNACTACT = (1 << CompoundShift) | 105
+	, CompNACT360 = (1 << CompoundShift) | 106
+	, CompNACT365 = (1 << CompoundShift) | 107
+	, CompISMA30360 = (1 << CompoundShift) | 131
+	, CompISDAACTACT = (1 << CompoundShift) | 201
+	, CompAFBACTACT = (1 << CompoundShift) | 202
+	, CompNISDAACTACT = (1 << CompoundShift) | 203
+	, CompNAFBACTACT = (1 << CompoundShift) | 204
 };
 double RoundUp(double a);
 template<class T> bool LessThanPoint(T* a,T* b){return (*a)<(*b);}

@@ -893,7 +893,7 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		GenericCashFlow CurrentResFlows;
 		for(int ReserveIter=0;ReserveIter<a.GetNumReserves();ReserveIter++){
 			CurrentResFlows = a.GetReserveFund(ReserveIter)->GetReserveFundFlow();
-			if(CurrentResFlows.Count()==0) continue;
+			if(CurrentResFlows.IsEmpty()) continue;
 			DatesLabels.clear();
 			ChartsModels.append(new QStandardItemModel(CurrentResFlows.Count(),2,this));
 			for(int i=0;i<CurrentResFlows.Count();i++){

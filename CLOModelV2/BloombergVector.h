@@ -9,7 +9,7 @@ protected:
 	QList<double> m_VectVal;
 	double m_Divisor;
 	virtual void UnpackVector();
-	virtual bool IsValid() const;
+	virtual bool IsValid() const override;
 	virtual void RepackVector();
 public:
 	QString BloombergSafeVector(QDate CurrentDate=QDate::currentDate()) const;

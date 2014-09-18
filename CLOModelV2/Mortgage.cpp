@@ -1,7 +1,6 @@
 #include "Mortgage.h"
 #include "CommonFunctions.h"
 #include <qmath.h>
-#include <QDomDocument>
 Mortgage::Mortgage()
 	:m_LossMultiplier("100")
 	,m_PrepayMultiplier("100")
@@ -13,7 +12,7 @@ Mortgage::Mortgage()
 	, m_FloatingRateBaseValue("0")
 	,m_Size(0.0)
 	, m_UseForwardCurve(false)
-	, m_Properties("<?xml version=\"1.0\"?><Loan></Loan>")
+	, m_Properties("")
 {}
 void Mortgage::SetAnnuity(const QString& a){
 	m_AnnuityVect=a;
@@ -347,33 +346,28 @@ void Mortgage::SetInterest(const QString& a){
 		 return (m_InterestVect + m_FloatingRateBaseValue).GetValue(a, frequency);
 	 }
  }
-
  void Mortgage::SetProperty(const QString& PropName, const QString& Value) {
-	 QDomDocument PropertiesDoc;
-	 PropertiesDoc.setContent(m_Properties);
-	 QDomNodeList FoundGroup = PropertiesDoc.elementsByTagName(PropName.trimmed());
-	 auto tempNode = PropertiesDoc.createTextNode(Value.trimmed());
-	 if (FoundGroup.size()==0)
-	 {
-		 auto TempProp = PropertiesDoc.createElement(PropName.trimmed());
-		 PropertiesDoc.elementsByTagName("Loan").at(0).appendChild(TempProp);
-		 TempProp.appendChild(tempNode);
+	 QRegExp TempReg('<' + PropName.trimmed() + "#=#(.+)>", Qt::CaseInsensitive);
+	 TempReg.setMinimal(true);
+	 if (HasProperty(PropName)) {
+		 m_Properties.replace(TempReg, '<' + PropName.trimmed() + "#=#" + Value.trimmed() + '>');
 	 }
 	 else {
-		 FoundGroup.at(0).replaceChild(tempNode, FoundGroup.at(0).firstChild());
+		 m_Properties+='<' + PropName.trimmed() + "#=#" + Value.trimmed() + '>';
+		 LOGDEBUG(m_Properties);
 	 }
-	 m_Properties = PropertiesDoc.toString(-1);
  }
 
 QString Mortgage::GetProperty(const QString& PropName) const {
-	QDomDocument PropertiesDoc;
-	PropertiesDoc.setContent(m_Properties);
-	QDomNodeList FoundGroup = PropertiesDoc.elementsByTagName(PropName.trimmed());
-	if (FoundGroup.size() == 0) return QString();
-	return FoundGroup.at(0).firstChild().nodeValue();
+	QRegExp TempReg('<' + PropName.trimmed() + "#=#(.+)>", Qt::CaseInsensitive);
+	TempReg.setMinimal(true);
+	if (TempReg.indexIn(m_Properties)!=-1) {
+		return TempReg.cap(1);
+	}
+	return QString();
 }
 bool Mortgage::HasProperty(const QString& PropName) const { 
-	QDomDocument PropertiesDoc;
-	PropertiesDoc.setContent(m_Properties);
-	return PropertiesDoc.elementsByTagName(PropName.trimmed()).size()>0;
+	QRegExp TempReg('<' + PropName.trimmed() + "#=#(.+)>", Qt::CaseInsensitive);
+	TempReg.setMinimal(true);
+	return  TempReg.indexIn(m_Properties) != -1;
 }

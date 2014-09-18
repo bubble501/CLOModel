@@ -7,7 +7,7 @@ private:
 	QList<int> m_VectVal;
 protected:
 	virtual void UnpackVector();
-	virtual bool IsValid() const;
+	virtual bool IsValid() const override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 public:
 	using AbstarctBbgVect::IsEmpty;

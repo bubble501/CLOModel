@@ -9,7 +9,7 @@ private:
 	QList<bool> m_VectVal;
 protected:
 	virtual void UnpackVector();
-	virtual bool IsValid() const;
+	virtual bool IsValid() const override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 public:
 	BoolVector(){}

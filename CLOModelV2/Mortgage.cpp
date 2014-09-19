@@ -3,16 +3,17 @@
 #include <qmath.h>
 Mortgage::Mortgage()
 	:m_LossMultiplier("100")
-	,m_PrepayMultiplier("100")
-	,m_PaymentFreq("1")
-	,m_AnnuityVect("N")
-	,m_InterestVect("0")
-	,m_HaircutVector("0")
+	, m_PrepayMultiplier("100")
+	, m_PaymentFreq("1")
+	, m_AnnuityVect("N")
+	, m_InterestVect("0")
+	, m_HaircutVector("0")
 	, m_FloatRateBase("ZERO")
 	, m_FloatingRateBaseValue("0")
-	,m_Size(0.0)
+	, m_Size(0.0)
 	, m_UseForwardCurve(false)
 	, m_Properties("")
+	, m_DayCountConvention(DayCountConvention::CompN30360)
 {}
 void Mortgage::SetAnnuity(const QString& a){
 	m_AnnuityVect=a;
@@ -34,6 +35,7 @@ void Mortgage::SetInterest(const QString& a){
 	 ,m_HaircutVector(a.m_HaircutVector)
 	 , m_UseForwardCurve(a.m_UseForwardCurve)
 	 ,m_Properties(a.m_Properties)
+	 , m_DayCountConvention(a.m_DayCountConvention)
  {}
  const Mortgage& Mortgage::operator=(const Mortgage& a){
 	 m_LossMultiplier=a.m_LossMultiplier;
@@ -49,6 +51,7 @@ void Mortgage::SetInterest(const QString& a){
 	 m_HaircutVector=a.m_HaircutVector;
 	 m_UseForwardCurve = a.m_UseForwardCurve;
 	 m_Properties = a.m_Properties;
+	 m_DayCountConvention = a.m_DayCountConvention;
 	 return *this;
  }
  bool Mortgage::CalculateCashFlows(const QDate& StartDate, const QString& CPRVecs, const QString& CDRVecs, const QString& LossVecs, const QString& RecoveryLag, const QString& Delinquency, const QString& DelinquencyLag) {
@@ -67,7 +70,8 @@ void Mortgage::SetInterest(const QString& a){
 	 BloombergVector LossVec,
 	 IntegerVector  RecoveryLag,
 	 BloombergVector Delinquency,
-	 IntegerVector DelinquencyLag
+	 IntegerVector DelinquencyLag,
+	 bool OverrideProperties
 	 )
  {
 	 QDate AdjStartDate(StartDate.year(), StartDate.month(), 15);
@@ -78,13 +82,21 @@ void Mortgage::SetInterest(const QString& a){
 		 m_CashFlows.AddFlow(AdjStartDate, m_Size, MtgCashFlow::MtgFlowType::PrincipalFlow);
 		 return true;
 	 }
+	 if (!OverrideProperties){
+		 if (HasProperty("CPR")) CPRVec = GetProperty("CPR");
+		 if (HasProperty("CDR")) CDRVec = GetProperty("CDR");
+		 if (HasProperty("LS")) LossVec = GetProperty("LS");
+		 if (HasProperty("RecoveryLag")) RecoveryLag = GetProperty("RecoveryLag");
+		 if (HasProperty("Delinquency")) Delinquency = GetProperty("Delinquency");
+		 if (HasProperty("DelinquencyLag")) DelinquencyLag = GetProperty("DelinquencyLag");
+	 }
 	 if (
 		 CPRVec.IsEmpty(0.0,1.0)
 		 || CDRVec.IsEmpty(0.0,1.0)
-		 || LossVec.IsEmpty()
-		 || RecoveryLag.IsEmpty()
-		 || Delinquency.IsEmpty(0,1.0)
-		 || DelinquencyLag.IsEmpty()
+		 || LossVec.IsEmpty(0.0,1.0)
+		 || RecoveryLag.IsEmpty(0)
+		 || Delinquency.IsEmpty(0.0,1.0)
+		 || DelinquencyLag.IsEmpty(0)
 		 ) return false;
 	 //if (!ReadyToCalculate().isEmpty()) return false;
 	 bool NullAnchorDates[] = {
@@ -121,7 +133,7 @@ void Mortgage::SetInterest(const QString& a){
 		 
 
 		 //Accrue Interest for the month
-		 CurrentInterest = GetInterest(CurrentMonth, 1);
+		 CurrentInterest = GetInterest(CurrentMonth,CurrentMonth.addMonths(-1),CurrentMonth);
 		 TempFlow1 = (CurrentInterest*CurrentAmtOut) + ((1.0 + CurrentInterest)*m_CashFlows.GetAccruedInterest(CurrentMonth.addMonths(-1))) + m_CashFlows.GetInterestRecoveries(CurrentMonth);
 		 m_CashFlows.AddFlow(CurrentMonth, TempFlow1, MtgCashFlow::MtgFlowType::AccruedInterestFlow);
 		 //Add back the recoveries
@@ -142,9 +154,9 @@ void Mortgage::SetInterest(const QString& a){
 					 CurrentDelinq.AddFlow(CurrentMonth, TempFlow1*Delinquency.GetValue(CurrentMonth), MtgCashFlow::MtgFlowType::AccruedInterestFlow);
 					 m_CashFlows.AddFlow(CurrentMonth, -TempFlow1*Delinquency.GetValue(CurrentMonth), MtgCashFlow::MtgFlowType::AccruedInterestFlow);
 					 for (RollingdateCounter = CurrentMonth.addMonths(1); RollingdateCounter < CurrentMonth.addMonths(TempStep); RollingdateCounter = RollingdateCounter.addMonths(1)) {
-						 CurrentDelinq.AddFlow(RollingdateCounter, (1.0 + GetInterest(RollingdateCounter, 1))*CurrentDelinq.GetAccruedInterest(RollingdateCounter.addMonths(-1)), MtgCashFlow::MtgFlowType::AccruedInterestFlow);
+						 CurrentDelinq.AddFlow(RollingdateCounter, (1.0 + GetInterest(RollingdateCounter, RollingdateCounter.addMonths(-1), RollingdateCounter))*CurrentDelinq.GetAccruedInterest(RollingdateCounter.addMonths(-1)), MtgCashFlow::MtgFlowType::AccruedInterestFlow);
 					 }
-					 CurrentDelinq.AddFlow(CurrentMonth.addMonths(TempStep), (1.0 + GetInterest(CurrentMonth.addMonths(TempStep), 1))*CurrentDelinq.GetAccruedInterest(CurrentMonth.addMonths(TempStep - 1)), MtgCashFlow::MtgFlowType::InterestFlow);
+					 CurrentDelinq.AddFlow(CurrentMonth.addMonths(TempStep), (1.0 + GetInterest(CurrentMonth.addMonths(TempStep), CurrentMonth.addMonths(TempStep-1), CurrentMonth.addMonths(TempStep)))*CurrentDelinq.GetAccruedInterest(CurrentMonth.addMonths(TempStep - 1)), MtgCashFlow::MtgFlowType::InterestFlow);
 					 //for (int RemAccrIter = 0; RemAccrIter < CurrentDelinq.Count(); RemAccrIter++) CurrentDelinq.AddFlow(CurrentDelinq.GetDate(RemAccrIter), -CurrentDelinq.GetAccruedInterest(RemAccrIter), MtgCashFlow::MtgFlowType::AccruedInterestFlow);
 					 DelinquenciesFlows.AddFlow(CurrentDelinq);
 				 }
@@ -170,7 +182,7 @@ void Mortgage::SetInterest(const QString& a){
 					 TempFlow2 = CurrentAmtOut / static_cast<double>(CountPeriods);
 				 }
 				 else { // RepaymentVector::Annuity
-					 TempFlow2 = qAbs(pmt(GetInterest(CurrentMonth, m_PaymentFreq.GetValue(CurrentMonth)), CountPeriods, CurrentAmtOut)) - TempFlow1;
+					 TempFlow2 = qAbs(pmt(GetInterest(CurrentMonth, CurrentMonth.addMonths(-m_PaymentFreq.GetValue(CurrentMonth)), CurrentMonth), CountPeriods, CurrentAmtOut)) - TempFlow1;
 				 }
 			 }
 			 m_CashFlows.AddFlow(CurrentMonth, TempFlow2, MtgCashFlow::MtgFlowType::PrincipalFlow);
@@ -279,10 +291,12 @@ void Mortgage::SetInterest(const QString& a){
 		 << flows.m_HaircutVector
 		 << flows.m_UseForwardCurve
 		 << flows.m_Properties
+		 << static_cast<qint16>(flows.m_DayCountConvention)
 	;
 	 return stream;
  }
  QDataStream& Mortgage::LoadOldVersion(QDataStream& stream) {
+	 qint16 TempDaycount;
 	 stream >> m_MaturityDate;
 	 m_AnnuityVect.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_AnnuityVect;
 	 stream >> m_Size;
@@ -294,8 +308,8 @@ void Mortgage::SetInterest(const QString& a){
 	 m_FloatingRateBaseValue.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_FloatingRateBaseValue;
 	 m_PaymentFreq.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_PaymentFreq;
 	 m_HaircutVector.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_HaircutVector;
-	 stream >> m_UseForwardCurve;
-	 stream >> m_Properties;
+	 stream >> m_UseForwardCurve >> m_Properties >> TempDaycount;
+	 m_DayCountConvention = static_cast<DayCountConvention>(TempDaycount);
 	 ResetProtocolVersion();
 	 return stream;
  }
@@ -312,13 +326,14 @@ void Mortgage::SetInterest(const QString& a){
 	if (m_InterestVect.IsEmpty())Result += "Loan Coupon\n";
 	if (m_HaircutVector.IsEmpty())Result += "Haircut Vector\n";
 	if (m_PaymentFreq.IsEmpty(1))Result += "Loan Payment Frequency\n";
+	if (m_DayCountConvention == DayCountConvention::Invalid)Result += "Loan Day Count Convention\n";
 	if(!Result.isEmpty()) return Result.left(Result.size()-1);
 	return Result;
  }
 
- double Mortgage::GetInterest(const QDate& a, int frequency/*=12*/) {
+ double Mortgage::GetInterest(const QDate& a, const QDate& StartAccrue, const QDate& EndAccrue) {
 	 if (m_FloatRateBase.IsEmpty()) //Fixed rate
-		 return m_InterestVect.GetValue(a, frequency);
+		 return AdjustCoupon(m_InterestVect.GetValue(a),StartAccrue,EndAccrue,m_DayCountConvention);
 	 else {
 		 if (m_FloatingRateBaseValue.IsEmpty()) {
 #ifdef NO_BLOOMBERG
@@ -328,12 +343,12 @@ void Mortgage::SetInterest(const QString& a){
 			 m_UseForwardCurve = false;
 #endif
 		 }
-		 return (m_InterestVect + m_FloatingRateBaseValue).GetValue(a, frequency);
+		 return  AdjustCoupon((m_InterestVect + m_FloatingRateBaseValue).GetValue(a),StartAccrue, EndAccrue, m_DayCountConvention);
 	 }
  }
- double Mortgage::GetInterest(int a, int frequency/*=12*/) {
+ double Mortgage::GetInterest(int a, const QDate& StartAccrue, const QDate& EndAccrue) {
 	 if (m_FloatRateBase.IsEmpty()) //Fixed rate
-		 return m_InterestVect.GetValue(a, frequency);
+		 return AdjustCoupon(m_InterestVect.GetValue(a), StartAccrue, EndAccrue, m_DayCountConvention);
 	 else {
 		 if (m_FloatingRateBaseValue.IsEmpty()) {
 #ifdef NO_BLOOMBERG
@@ -343,31 +358,96 @@ void Mortgage::SetInterest(const QString& a){
 			 m_UseForwardCurve = false;
 #endif
 		 }
-		 return (m_InterestVect + m_FloatingRateBaseValue).GetValue(a, frequency);
+		 return  AdjustCoupon((m_InterestVect + m_FloatingRateBaseValue).GetValue(a), StartAccrue, EndAccrue, m_DayCountConvention);
+	 }
+ }
+ double Mortgage::GetInterest(const QDate& a) {
+	 if (m_FloatRateBase.IsEmpty()) //Fixed rate
+		 return m_InterestVect.GetValue(a);
+	 else {
+		 if (m_FloatingRateBaseValue.IsEmpty()) {
+#ifdef NO_BLOOMBERG
+			 m_FloatingRateBaseValue = "0";
+#else
+			 m_FloatingRateBaseValue = m_FloatRateBase.GetRefRateValueFromBloomberg(ConstantBaseRateTable());
+			 m_UseForwardCurve = false;
+#endif
+		 }
+		 return  (m_InterestVect + m_FloatingRateBaseValue).GetValue(a);
+	 }
+ }
+ double Mortgage::GetInterest(int a) {
+	 if (m_FloatRateBase.IsEmpty()) //Fixed rate
+		 return m_InterestVect.GetValue(a);
+	 else {
+		 if (m_FloatingRateBaseValue.IsEmpty()) {
+#ifdef NO_BLOOMBERG
+			 m_FloatingRateBaseValue = "0";
+#else
+			 m_FloatingRateBaseValue = m_FloatRateBase.GetRefRateValueFromBloomberg(ConstantBaseRateTable());
+			 m_UseForwardCurve = false;
+#endif
+		 }
+		 return  (m_InterestVect + m_FloatingRateBaseValue).GetValue(a);
 	 }
  }
  void Mortgage::SetProperty(const QString& PropName, const QString& Value) {
-	 QRegExp TempReg('<' + PropName.trimmed() + "#=#(.+)>", Qt::CaseInsensitive);
-	 TempReg.setMinimal(true);
+	 if (PropName.isEmpty() || Value.isEmpty() || PropName.contains(QRegExp("#[<>=]#")) || Value.contains(QRegExp("#[<>=]#"))) return;
 	 if (HasProperty(PropName)) {
-		 m_Properties.replace(TempReg, '<' + PropName.trimmed() + "#=#" + Value.trimmed() + '>');
+		 QRegExp TempReg("#<#" + PropName.trimmed() + "#=#(.+)#>#", Qt::CaseInsensitive);
+		 TempReg.setMinimal(true);
+		 m_Properties.replace(TempReg, "#<#" + PropName.trimmed() + "#=#" + Value.trimmed() + "#>#");
 	 }
 	 else {
-		 m_Properties+='<' + PropName.trimmed() + "#=#" + Value.trimmed() + '>';
+		 m_Properties+="#<#" + PropName.trimmed() + "#=#" + Value.trimmed() + "#>#";
 		 LOGDEBUG(m_Properties);
 	 }
  }
 
 QString Mortgage::GetProperty(const QString& PropName) const {
-	QRegExp TempReg('<' + PropName.trimmed() + "#=#(.+)>", Qt::CaseInsensitive);
+	QRegExp TempReg("#<#" + PropName.trimmed() + "#=#(.+)#>#", Qt::CaseInsensitive);
 	TempReg.setMinimal(true);
 	if (TempReg.indexIn(m_Properties)!=-1) {
 		return TempReg.cap(1);
 	}
 	return QString();
 }
-bool Mortgage::HasProperty(const QString& PropName) const { 
-	QRegExp TempReg('<' + PropName.trimmed() + "#=#(.+)>", Qt::CaseInsensitive);
+
+QString Mortgage::GetProperty(qint32 PropIndex, bool PropValue) const {
+	if (PropIndex < 0) return QString();
+	qint32 pos=0;
+	QRegExp TempReg("#<#(.+)#=#(.+)#>#", Qt::CaseInsensitive);
+	TempReg.setMinimal(true);
+	for (qint32 i = 0; i <= PropIndex; ++i) {
+		if ((pos=TempReg.indexIn(m_Properties, pos)) == -1) return QString();
+	}
+	return TempReg.cap(PropValue ? 2:1);
+}
+
+bool Mortgage::HasProperty(const QString& PropName) const {
+	QRegExp TempReg('#<#' + PropName.trimmed() + "#=#(.+)#>#", Qt::CaseInsensitive);
 	TempReg.setMinimal(true);
 	return  TempReg.indexIn(m_Properties) != -1;
+}
+
+qint32 Mortgage::GetNumProperties() const {
+	return m_Properties.count("#=#");
+}
+
+void Mortgage::RemoveProperty(const QString& PropName) {
+	if (HasProperty(PropName)) {
+		QRegExp TempReg("#<#" + PropName.trimmed() + "#=#.+#>#", Qt::CaseInsensitive);
+		TempReg.setMinimal(true);
+		m_Properties.replace(TempReg, "");
+	}
+}
+void Mortgage::RemoveProperty(qint32 PropIndex) {
+	if (PropIndex < 0) return;
+	qint32 pos = 0;
+	QRegExp TempReg("#<#(.+)#=#.+#>#", Qt::CaseInsensitive);
+	TempReg.setMinimal(true);
+	for (qint32 i = 0; i <= PropIndex; ++i) {
+		if ((pos=TempReg.indexIn(m_Properties, pos)) == -1) return;
+	}
+	return RemoveProperty(TempReg.cap(1));
 }

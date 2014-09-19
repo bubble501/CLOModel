@@ -1413,6 +1413,7 @@ QDate Waterfall::GetCalledPeriod() const{
 }
 QString Waterfall::ReadyToCalculate()const{
 	QString Result;
+	if (m_DealDayCountConvention == DayCountConvention::Invalid) Result += "Deal Day Count Convention\n";
 	if (m_GICinterest.IsEmpty()) Result += "GIC Interest\n";
 	if (m_GICBaseRate.IsEmpty()) Result += "GIC Base Rate\n";
 	if (m_SeniorExpenses.IsEmpty(0.0)) Result += "Senior Expenses\n";
@@ -1464,6 +1465,13 @@ QString Waterfall::ReadyToCalculate()const{
 		if (m_Reserves.at(ResIter)->GetReserveFundFloor().IsEmpty(0.0))Result += QString("Reserve %1 Floor Level\n").arg(ResIter + 1);
 		if (m_Reserves.at(ResIter)->GetReserveFundFreed() < 0) Result += QString("Reserve %1 Freed After Redemption\n").arg(ResIter + 1);
 		if (m_Reserves.at(ResIter)->GetReserveFundCurrent() < 0.0) Result += QString("Reserve %1 Current Amount\n").arg(ResIter + 1);
+	}
+	foreach(const Tranche* SingleTranche, m_Tranches) {
+		if (SingleTranche->GetDayCount() == DayCountConvention::Invalid) Result += "Tranche Day Count Convention\n";
+		if (IntegerVector(SingleTranche->GetPaymentFrequency()).IsEmpty(1)) Result += "Tranche payment Frequency\n";
+		if (SingleTranche->GetOriginalAmount() < 0.0) Result += "Tranche Original Amount";
+		if (SingleTranche->GetOutstandingAmt() < 0.0) Result += "Tranche Amount Outstanding";
+		if (SingleTranche->GetPrice() < 0.0) Result += "Tranche Price";
 	}
 	if (!Result.isEmpty()) return Result.left(Result.size() - 1);
 	return Result;

@@ -38,7 +38,7 @@ void MtgCalculator::AddLoan(const Mortgage& a, qint32 Index) {
 	Loans.insert(Index, new Mortgage(a));
 	if (CurrentIndex < Index)CurrentIndex = Index;
 }
-bool MtgCalculator::StartCalculation(bool UseStoredCF) {
+bool MtgCalculator::StartCalculation( bool UseStoredCF) {
 	if (!ThreadPool.isEmpty()) return false;
 	BeesReturned.clear();
 	BeesSent.clear();
@@ -164,22 +164,24 @@ bool MtgCalculator::StartCalculation(bool UseStoredCF) {
 	int NumberOfThreads=QThread::idealThreadCount();
 	if(SequentialComputation || NumberOfThreads<1) NumberOfThreads=1;
 	int NumofSent = 0;
+	MtgCalculatorThread* CurrentThread;
 	for (auto SingleLoan = Loans.constBegin(); SingleLoan != Loans.constEnd(); ++SingleLoan) {
 		if (NumofSent >= NumberOfThreads) break;
 		if (BeesSent.contains(SingleLoan.key())) continue;
 		BeesSent.append(SingleLoan.key());
-		ThreadPool[SingleLoan.key()] = new MtgCalculatorThread(SingleLoan.key(), this);
-		ThreadPool[SingleLoan.key()]->SetLoan(*(SingleLoan.value()));
-		ThreadPool[SingleLoan.key()]->SetCPR(m_CPRass);
-		ThreadPool[SingleLoan.key()]->SetCDR(m_CDRass);
-		ThreadPool[SingleLoan.key()]->SetLS(m_LSass);
-		ThreadPool[SingleLoan.key()]->SetRecoveryLag(m_RecoveryLag);
-		ThreadPool[SingleLoan.key()]->SetDelinquency(m_Delinquency);
-		ThreadPool[SingleLoan.key()]->SetDelinquencyLag(m_DelinquencyLag);
-		ThreadPool[SingleLoan.key()]->SetStartDate(StartDate);
-		connect(ThreadPool[SingleLoan.key()], SIGNAL(Calculated(int, const MtgCashFlow&)), this, SLOT(BeeReturned(int, const MtgCashFlow&)));
-		connect(ThreadPool[SingleLoan.key()], SIGNAL(Calculated(int, const MtgCashFlow&)), ThreadPool[SingleLoan.key()], SLOT(stop()), Qt::QueuedConnection);
-		ThreadPool[SingleLoan.key()]->start();
+		ThreadPool[SingleLoan.key()] = CurrentThread=new MtgCalculatorThread(SingleLoan.key(), this);
+		CurrentThread->SetLoan(*(SingleLoan.value()));
+		CurrentThread->SetCPR(m_CPRass);
+		CurrentThread->SetCDR(m_CDRass);
+		CurrentThread->SetLS(m_LSass);
+		CurrentThread->SetRecoveryLag(m_RecoveryLag);
+		CurrentThread->SetDelinquency(m_Delinquency);
+		CurrentThread->SetDelinquencyLag(m_DelinquencyLag);
+		CurrentThread->SetOverrideAssumptions(m_OverrideAssumptions);
+		CurrentThread->SetStartDate(StartDate);
+		connect(CurrentThread, SIGNAL(Calculated(int, const MtgCashFlow&)), this, SLOT(BeeReturned(int, const MtgCashFlow&)));
+		connect(CurrentThread, SIGNAL(Calculated(int, const MtgCashFlow&)), CurrentThread, SLOT(stop()), Qt::QueuedConnection);
+		CurrentThread->start();
 		++NumofSent;
 	}
 	return true;
@@ -193,21 +195,23 @@ void MtgCalculator::BeeReturned(int Ident,const MtgCashFlow& a){
 		emit Calculated();
 		return;
 	}
+	MtgCalculatorThread* CurrentThread;
 	for (auto SingleLoan = Loans.constBegin(); SingleLoan != Loans.constEnd(); ++SingleLoan) {
 		if (BeesSent.contains(SingleLoan.key())) continue;
 		BeesSent.append(SingleLoan.key());
-		ThreadPool[SingleLoan.key()] = new MtgCalculatorThread(SingleLoan.key(), this);
-		ThreadPool[SingleLoan.key()]->SetLoan(*(SingleLoan.value()));
-		ThreadPool[SingleLoan.key()]->SetCPR(m_CPRass);
-		ThreadPool[SingleLoan.key()]->SetCDR(m_CDRass);
-		ThreadPool[SingleLoan.key()]->SetLS(m_LSass);
-		ThreadPool[SingleLoan.key()]->SetRecoveryLag(m_RecoveryLag);
-		ThreadPool[SingleLoan.key()]->SetDelinquency(m_Delinquency);
-		ThreadPool[SingleLoan.key()]->SetDelinquencyLag(m_DelinquencyLag);
-		ThreadPool[SingleLoan.key()]->SetStartDate(StartDate);
-		connect(ThreadPool[SingleLoan.key()], SIGNAL(Calculated(int, const MtgCashFlow&)), this, SLOT(BeeReturned(int, const MtgCashFlow&)));
-		connect(ThreadPool[SingleLoan.key()], SIGNAL(Calculated(int, const MtgCashFlow&)), ThreadPool[SingleLoan.key()], SLOT(stop()), Qt::QueuedConnection);
-		ThreadPool[SingleLoan.key()]->start();
+		ThreadPool[SingleLoan.key()] = CurrentThread=new MtgCalculatorThread(SingleLoan.key(), this);
+		CurrentThread->SetLoan(*(SingleLoan.value()));
+		CurrentThread->SetCPR(m_CPRass);
+		CurrentThread->SetCDR(m_CDRass);
+		CurrentThread->SetLS(m_LSass);
+		CurrentThread->SetRecoveryLag(m_RecoveryLag);
+		CurrentThread->SetDelinquency(m_Delinquency);
+		CurrentThread->SetDelinquencyLag(m_DelinquencyLag);
+		CurrentThread->SetOverrideAssumptions(m_OverrideAssumptions);
+		CurrentThread->SetStartDate(StartDate);
+		connect(CurrentThread, SIGNAL(Calculated(int, const MtgCashFlow&)), this, SLOT(BeeReturned(int, const MtgCashFlow&)));
+		connect(CurrentThread, SIGNAL(Calculated(int, const MtgCashFlow&)), CurrentThread, SLOT(stop()), Qt::QueuedConnection);
+		CurrentThread->start();
 		return;
 	}
 }

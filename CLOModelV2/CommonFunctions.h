@@ -12,7 +12,9 @@ template<typename T> class QList;
 int MonthDiff(const QDate& FutureDte,const QDate& PresentDte);
 class BloombergVector;
 enum class DayCountConvention : qint16 {
-	ACTACT = 101
+	Invalid = 0
+	//Simple
+	, ACTACT = 101
 	, ACT360 = 102
 	, ACT365 = 103
 	, N30360 = 104
@@ -24,7 +26,7 @@ enum class DayCountConvention : qint16 {
 	, AFBACTACT = 202
 	, NISDAACTACT = 203
 	, NAFBACTACT = 204
-	//Compound
+	//Compounded
 	, CompACTACT = (1 << CompoundShift) | 101
 	, CompACT360 = (1 << CompoundShift) | 102
 	, CompACT365 = (1 << CompoundShift) | 103
@@ -37,6 +39,20 @@ enum class DayCountConvention : qint16 {
 	, CompAFBACTACT = (1 << CompoundShift) | 202
 	, CompNISDAACTACT = (1 << CompoundShift) | 203
 	, CompNAFBACTACT = (1 << CompoundShift) | 204
+	//Continuously Compounded
+	, ContCompACTACT = (1 << (1+CompoundShift)) | 101
+	, ContCompACT360 = (1 << (1+CompoundShift)) | 102
+	, ContCompACT365 = (1 << (1+CompoundShift)) | 103
+	, ContCompN30360 = (1 << (1+CompoundShift)) | 104
+	, ContCompNACTACT = (1 << (1+CompoundShift)) | 105
+	, ContCompNACT360 = (1 << (1+CompoundShift)) | 106
+	, ContCompNACT365 = (1 << (1+CompoundShift)) | 107
+	, ContCompISMA30360 = (1 << (1+CompoundShift)) | 131
+	, ContCompISDAACTACT = (1 << (1+CompoundShift)) | 201
+	, ContCompAFBACTACT = (1 << (1+CompoundShift)) | 202
+	, ContCompNISDAACTACT = (1 << (1+CompoundShift)) | 203
+	, ContCompNAFBACTACT = (1 << (1+CompoundShift)) | 204
+
 };
 double RoundUp(double a);
 template<class T> bool LessThanPoint(T* a,T* b){return (*a)<(*b);}
@@ -53,6 +69,7 @@ bool IsHoliday(const QDate& a/*,const QString& CountryCode*/);
 bool removeDir(const QString& dirName);
 double GetLoanAssumption(const QString& LoanName, int columnIndex, QDate RefDate);
 void PrintToTempFile(const QString& TempFileName, const QString& Message, bool PrintTime = true);
+bool VaidDayCount(qint16 a);
 #ifdef DebugLogging
 #define LOGASSERT(CheckExp,LogMsg) ((CheckExp) ? qt_noop() : PrintToTempFile("DebugLog.log",LogMsg)); Q_ASSERT_X(CheckExp,"LOGASSERT",LogMsg)
 #define LOGDEBUG(LogMsg) PrintToTempFile("DebugLog",LogMsg,false)

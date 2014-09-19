@@ -269,7 +269,7 @@ void Tranche::SetBloombergExtension(const QString& a){
 	if(AdjustedString=="Mtge" || AdjustedString=="Corp") BloombergExtension=a;
 }
 #ifndef NO_BLOOMBERG
-void Tranche::GetDataFromBloomberg(){
+void Tranche::GetDataFromBloomberg() {
 	QBloombergLib::QBbgWorker Bee;
 	QBloombergLib::QBbgRequest TempReq;
 	QString IdentityCode = (TrancheName.isEmpty() ? ISINcode : TrancheName);

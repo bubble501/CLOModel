@@ -9,11 +9,12 @@ MtgCalculatorThread::MtgCalculatorThread(int Identity,QObject* parent)
 	, Delinquency("0")
 	, DelinquencyLag("0")
 	, m_ID(Identity)
+	, m_OverrideAssumptions(false)
 {
 	connect(this,SIGNAL(finished()),this,SLOT(deleteLater()));
 }
 void MtgCalculatorThread::run(){
-	if(Loan.CalculateCashFlows(StartDate, CPRass, CDRass, LSass, RecoveryLag, Delinquency, DelinquencyLag))
+	if(Loan.CalculateCashFlows(StartDate, CPRass, CDRass, LSass, RecoveryLag, Delinquency, DelinquencyLag,m_OverrideAssumptions))
 		emit Calculated(m_ID,Loan.GetCashFlow());
 	else
 		emit ErrorCalculation(m_ID);

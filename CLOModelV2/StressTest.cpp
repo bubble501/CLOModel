@@ -25,6 +25,7 @@ StressTest::StressTest(QObject* parent)
 	, UseFastVersion(false)
 {
 	BaseCalculator = new MtgCalculator(this);
+	BaseCalculator->SetOverrideAssumptions(true);
 	StressDimension[0]=ChangingCDR;
 	StressDimension[1]=ChangingLS;
 	connect(BaseCalculator, SIGNAL(Calculated()), this, SLOT(StartStresses()));

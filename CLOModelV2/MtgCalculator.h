@@ -17,7 +17,7 @@ public:
 	void AddLoan(const Mortgage& a);
 	void SetLoans(const QHash<qint32, Mortgage*>& a);
 	void SetStartDate(const QDate& a){StartDate=a;}
-	bool StartCalculation(bool UseStoredCF=true);
+	bool StartCalculation(bool UseStoredCF = true);
 	const QString& GetCPRass() const { return m_CPRass; }
 	void SetCPRass(const QString& val) { m_CPRass = val; }
 	const QString& GetCDRass() const { return m_CDRass; }
@@ -46,6 +46,8 @@ public:
 	int Count() const{return Loans.size();}
 	void SetSequentialComputation(bool a){SequentialComputation=a;}
 	bool GetSequentialComputation()const {return SequentialComputation;}
+	void SetOverrideAssumptions(bool a) { m_OverrideAssumptions = a; }
+	bool GetOverrideAssumptions()const { return m_OverrideAssumptions; }
 private:
 	void AddLoan(const Mortgage& a, qint32 Index);
 	QHash<qint32, MtgCalculatorThread*> ThreadPool;
@@ -57,7 +59,7 @@ private:
 	QString m_RecoveryLag;
 	QString m_Delinquency;
 	QString m_DelinquencyLag;
-	
+	bool m_OverrideAssumptions;
 	QDate StartDate;
 	MtgCashFlow Result;
 	QList<qint32> BeesSent;

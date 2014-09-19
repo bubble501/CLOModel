@@ -15,7 +15,19 @@ public:
 	~CentralUnit();
 	CentralUnit(QObject* parent=0);
 	void AddLoan(const Mortgage& TempMtg) { LoansCalculator.AddLoan(TempMtg);	if (Stresser)Stresser->AddLoan(TempMtg); }
-	void AddLoan(const QDate& Maturity, double Size, const QString& Interest, const QString& Annuity, const QString& Freq = "1", const QString& floatBase = "ZERO", const QString& LossMult = "100", const QString& PrepayMult = "100", const QString& HaicutVect = "0" ,const QString& Properties="");
+	void AddLoan(
+		const QDate& Maturity
+		, double Size
+		, const QString& Interest
+		, const QString& Annuity
+		, const QString& Freq = "1"
+		, const QString& floatBase = "ZERO"
+		, const QString& LossMult = "100"
+		, const QString& PrepayMult = "100"
+		, const QString& HaicutVect = "0" 
+		, const QString& Properties=""
+		, DayCountConvention dayCnt=DayCountConvention::CompN30360
+		);
 #ifndef NO_BLOOMBERG
 	void AddTranche(const QString& Name,int ProRataGroup, double MinOC=0.0, double MinIC=0.0, double Price=100.0,double FxRate= 1.0,const QString& BbgExt="Mtge");
 #endif
@@ -42,6 +54,7 @@ public:
 		, const QString& BbgExt = "Mtge"
 		, DayCountConvention DayCount = DayCountConvention::ACT360
 	);
+	void AddTranche(const Tranche& a) { Structure.AddTranche(a);	if (Stresser)Stresser->SetStructure(Structure); }
 	void AddWaterfallStep(WatFalPrior::WaterfallStepType Tpe, int GrpTgt, int RdmpGrp=0, double RdmpShare=0.0);
 	void SetSeniorExpenses(const QString& a){Structure.SetSeniorExpenses(a);}
 	void SetSeniorFees(const QString& a) { Structure.SetSeniorFees(a); }

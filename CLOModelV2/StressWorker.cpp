@@ -16,6 +16,7 @@ StressWorker::StressWorker(int IDx,int IDy, const QString& Xs,const QString& Ys,
 	Loans = new MtgCalculator();
 	Loans->SetLoans(Mtgs);
 	Loans->SetSequentialComputation(true);
+	Loans->SetOverrideAssumptions(true);
 	Loans->SetStartDate(StartDate);
 	connect(Loans, &MtgCalculator::Calculated, this, &StressWorker::LoansCalculated);
 }

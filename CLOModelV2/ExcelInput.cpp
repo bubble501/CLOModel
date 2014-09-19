@@ -23,6 +23,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		double sze;
 		QString Intr, frq, lossm, prem, Ann, Hairc, BaseRte;
 		QString Properties;
+		int TempDayCnt;
 		NumElements=pdFreq->intVal;pdFreq++;
 		for(int i=0;i<NumElements;i++){
 			Matur=QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd");pdFreq++;
@@ -34,8 +35,9 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			prem=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			lossm=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			Hairc=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
+			TempDayCnt = pdFreq->intVal; pdFreq++;
 			Properties = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
-			if (sze >= 0.01) TempUnit.AddLoan(Matur, sze, Intr, Ann, frq, BaseRte, lossm, prem, Hairc, Properties);
+			if (sze >= 0.01) TempUnit.AddLoan(Matur, sze, Intr, Ann, frq, BaseRte, lossm, prem, Hairc, Properties, VaidDayCount(TempDayCnt) ? static_cast<DayCountConvention>(TempDayCnt) : DayCountConvention::Invalid);
 		}
 	}
 	{//Tranches
@@ -74,7 +76,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			SettDate=QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd");pdFreq++;
 			DayCnt = pdFreq->intVal; pdFreq++;
 			startingDeferred = pdFreq->dblVal; pdFreq++;
-			TempUnit.AddTranche(TrName, TrancheISIN, ProRat, origOut, Curr, currOut, IntrTpe, coup, RefRt, PrevIPD, BasRt, IPDfrq, SettDate, startingDeferred, /*RefRtVal,*/ OClim, IClim, Price, Exchan, "Mtge", static_cast<DayCountConvention>(DayCnt));
+			TempUnit.AddTranche(TrName, TrancheISIN, ProRat, origOut, Curr, currOut, IntrTpe, coup, RefRt, PrevIPD, BasRt, IPDfrq, SettDate, startingDeferred, /*RefRtVal,*/ OClim, IClim, Price, Exchan, "Mtge", VaidDayCount(DayCnt) ? static_cast<DayCountConvention>(DayCnt):DayCountConvention::Invalid);
 		}
 	}
 	
@@ -91,11 +93,13 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		}
 	}
 	{ //General Inputs
+		int  DayCnt;
 		TempUnit.SetDealName(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
 		TempUnit.SetStartingDeferredJunFees(pdFreq->dblVal); pdFreq++;
 		TempUnit.SetGICinterest(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
 		TempUnit.SetGICBaseRate(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
-		TempUnit.SetDealDayCountConvention(static_cast<DayCountConvention>(pdFreq->intVal)); pdFreq++;
+		DayCnt = pdFreq->intVal; pdFreq++;
+		TempUnit.SetDealDayCountConvention(VaidDayCount(DayCnt) ? static_cast<DayCountConvention>(DayCnt) : DayCountConvention::Invalid);
 		TempUnit.SetSeniorExpenses(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
 		TempUnit.SetSeniorFees(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
 		TempUnit.SetJuniorFees(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;

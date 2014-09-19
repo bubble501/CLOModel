@@ -33,7 +33,19 @@ CentralUnit::CentralUnit(QObject* parent)
 }
 void CentralUnit::SetPoolCutOff(const QDate& a){PoolCutOff=a; if(Stresser) Stresser->SetStartDate(PoolCutOff);}
 void CentralUnit::SetFolderPath(const QString& a){FolderPath=a;}
-void CentralUnit::AddLoan(const QDate& Maturity, double Size, const QString& Interest, const QString& Annuity, const QString& Freq, const QString& floatBase, const QString& LossMult, const QString& PrepayMult, const QString& HaicutVect, const QString& Properties) {
+void CentralUnit::AddLoan(
+	const QDate& Maturity
+	, double Size
+	, const QString& Interest
+	, const QString& Annuity
+	, const QString& Freq
+	, const QString& floatBase
+	, const QString& LossMult
+	, const QString& PrepayMult
+	, const QString& HaicutVect
+	, const QString& Properties
+	, DayCountConvention dayCnt
+	) {
 	Mortgage TempMtg;
 	TempMtg.SetMaturityDate(Maturity);
 	TempMtg.SetSize(Size);
@@ -44,6 +56,7 @@ void CentralUnit::AddLoan(const QDate& Maturity, double Size, const QString& Int
 	TempMtg.SetPaymentFreq(Freq);
 	TempMtg.SetAnnuity(Annuity);
 	TempMtg.SetHaircutVector(HaicutVect);
+	TempMtg.SetDayCountConvention(dayCnt);
 	QStringList PropList = Properties.split("#,#");
 	foreach(const QString& SingleProp, PropList) {
 		QStringList KeyVal = SingleProp.split("#=#");

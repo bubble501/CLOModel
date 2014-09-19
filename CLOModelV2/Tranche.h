@@ -43,8 +43,8 @@ private:
 	void GetRefRateValueFromBloomberg() const;
 #endif
 	void ClearInterest();
-	void DownloadBaseRates() const;
 protected:
+	void DownloadBaseRates() const;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 public:
 	Tranche();
@@ -101,8 +101,8 @@ public:
 	void CompileReferenceRateValue(ConstantBaseRateTable& Values)const;
 	void CompileReferenceRateValue(ForwardBaseRateTable& Values)const;
 #ifndef NO_DATABASE
-	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll=false)const;
-	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll=false)const;
+	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll = false)const;
+	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll = false)const;
 #endif
 	DayCountConvention GetDayCount() const { return m_DayCount; }
 	void SetDayCount(DayCountConvention val) { m_DayCount = val; }

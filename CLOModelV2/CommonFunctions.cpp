@@ -190,15 +190,60 @@ double AdjustCoupon(double AnnualCoupon, QDate PrevIPD, QDate CurrIPD, DayCountC
 	default:
 		TimeFactor = 1.0;
 	}
-	if (static_cast<qint16>(DayCount)& (1 << CompoundShift))
+	if (static_cast<qint16>(DayCount)& (1 << CompoundShift)) //Compounded
 		return qPow(1.0 + AnnualCoupon, TimeFactor) - 1.0;
-	else
+	else if (static_cast<qint16>(DayCount)& (1 << (1 + CompoundShift))) //Continuously Compounded
+		return qExp(AnnualCoupon*TimeFactor);
+	else //Simple
 		return AnnualCoupon * TimeFactor;
 }
 bool IsHoliday(const QDate& a/*, const QString& CountryCode*/) {
 	return a.dayOfWeek() >= 6;
 }
-
+bool VaidDayCount(qint16 a) {
+	DayCountConvention b;
+	switch (a) {
+	case static_cast<qint16>(DayCountConvention::ACTACT) :
+	case static_cast<qint16>(DayCountConvention::ACT360) :
+	case static_cast<qint16>(DayCountConvention::ACT365) :
+	case static_cast<qint16>(DayCountConvention::N30360) :
+	case static_cast<qint16>(DayCountConvention::NACTACT) :
+	case static_cast<qint16>(DayCountConvention::NACT360) :
+	case static_cast<qint16>(DayCountConvention::NACT365) :
+	case static_cast<qint16>(DayCountConvention::ISMA30360) :
+	case static_cast<qint16>(DayCountConvention::ISDAACTACT) :
+	case static_cast<qint16>(DayCountConvention::AFBACTACT) :
+	case static_cast<qint16>(DayCountConvention::NISDAACTACT) :
+	case static_cast<qint16>(DayCountConvention::NAFBACTACT) :
+	case static_cast<qint16>(DayCountConvention::CompACTACT) :
+	case static_cast<qint16>(DayCountConvention::CompACT360) :
+	case static_cast<qint16>(DayCountConvention::CompACT365) :
+	case static_cast<qint16>(DayCountConvention::CompN30360) :
+	case static_cast<qint16>(DayCountConvention::CompNACTACT) :
+	case static_cast<qint16>(DayCountConvention::CompNACT360) :
+	case static_cast<qint16>(DayCountConvention::CompNACT365) :
+	case static_cast<qint16>(DayCountConvention::CompISMA30360) :
+	case static_cast<qint16>(DayCountConvention::CompISDAACTACT) :
+	case static_cast<qint16>(DayCountConvention::CompAFBACTACT) :
+	case static_cast<qint16>(DayCountConvention::CompNISDAACTACT) :
+	case static_cast<qint16>(DayCountConvention::CompNAFBACTACT) :
+	case static_cast<qint16>(DayCountConvention::ContCompACTACT) :
+	case static_cast<qint16>(DayCountConvention::ContCompACT360) :
+	case static_cast<qint16>(DayCountConvention::ContCompACT365) :
+	case static_cast<qint16>(DayCountConvention::ContCompN30360) :
+	case static_cast<qint16>(DayCountConvention::ContCompNACTACT) :
+	case static_cast<qint16>(DayCountConvention::ContCompNACT360) :
+	case static_cast<qint16>(DayCountConvention::ContCompNACT365) :
+	case static_cast<qint16>(DayCountConvention::ContCompISMA30360) :
+	case static_cast<qint16>(DayCountConvention::ContCompISDAACTACT) :
+	case static_cast<qint16>(DayCountConvention::ContCompAFBACTACT) :
+	case static_cast<qint16>(DayCountConvention::ContCompNISDAACTACT) :
+	case static_cast<qint16>(DayCountConvention::ContCompNAFBACTACT) :
+		return true;
+	default:
+		return false;
+	}
+}
 
 #include <QFile>
 void PrintToTempFile(const QString& TempFileName, const QString& Message, bool PrintTime) {

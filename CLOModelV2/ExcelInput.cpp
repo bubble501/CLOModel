@@ -153,13 +153,14 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			ORsha=pdFreq->dblVal;pdFreq++;
 			OIsha=pdFreq->dblVal;pdFreq++;
 			TempUnit.SetupReinvestmentTest(ReinPer,ReinvLim,IISha,IRsha,OIsha,ORsha);
-			QString Intr, CPR, CDR, LS, WAL, Delay, Pric, Frq, BaseVal, ReinvBondAnnuit,RecLag,Dlq,DlqLag;
+			QString Intr, CPR, CDR, LS, WAL, Delay, Timespread, Pric, Frq, BaseVal, ReinvBondAnnuit,RecLag,Dlq,DlqLag;
 			Intr=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			CPR=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			CDR=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			LS=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			WAL=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			Delay = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+			Timespread = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 			Pric = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 			Frq = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 			BaseVal = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
@@ -168,7 +169,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			Dlq = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 			DlqLag = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 			LOGDEBUG(
-				QString("Interest: %1\nCPR: %2\nCDR: %3\nLS: %4\nWAL: %5\nFrequency: %6\nAnnuity: %7\nPrice: %8\nDelay: %9\nBase Rate: %10\nRecovery Lag: %11\nDelinquency: %12\nDelinquency Lag: %13")
+				QString("Interest: %1\nCPR: %2\nCDR: %3\nLS: %4\nWAL: %5\nFrequency: %6\nAnnuity: %7\nPrice: %8\nDelay: %9\nBase Rate: %10\nRecovery Lag: %11\nDelinquency: %12\nDelinquency Lag: %13\nReinvestement Spread Over Time: %14")
 				.arg(Intr)
 				.arg(CPR)
 				.arg(CDR)
@@ -182,8 +183,9 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 				.arg(RecLag)
 				.arg(Dlq)
 				.arg(DlqLag)
+				.arg(Timespread)
 			);
-			TempUnit.SetupReinvBond(Intr, CPR, CDR, LS, WAL, Frq, ReinvBondAnnuit, Pric, Delay, BaseVal, RecLag, Dlq, DlqLag);
+			TempUnit.SetupReinvBond(Intr, CPR, CDR, LS, WAL, Frq, ReinvBondAnnuit, Pric, Delay, Timespread, BaseVal, RecLag, Dlq, DlqLag);
 		}
 		TempUnit.SetSchedPrincAvailable(pdFreq->dblVal);pdFreq++; //TODO starting Prepay
 		TempUnit.SetInterestAvailable(pdFreq->dblVal);pdFreq++;

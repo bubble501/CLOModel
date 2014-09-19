@@ -118,6 +118,7 @@ Public Sub GetInputFromStructure( _
     Dim StartingDefJunFees As Range
     Dim GICInterestCell As Range
     Dim GICBaseRateCell As Range
+    Dim ReinvestementWindowCell As Range
     Dim DealDaycountCell As Range
     'loans assumptions
     Dim IssuerProperty As Range
@@ -174,6 +175,7 @@ Public Sub GetInputFromStructure( _
     Set DayCountHead = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("DayCountHead"), LookAt:=xlWhole, LookIn:=xlValues)
     Set GICBaseRateCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("GICBaseRateCell"), LookAt:=xlWhole, LookIn:=xlValues)
     Set DealDaycountCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("DealDaycountCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set ReinvestementWindowCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("ReinvestementWindowCell"), LookAt:=xlWhole, LookIn:=xlValues)
     On Error GoTo 0
     Set BaseIndexHead = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("BaseIndexHead"), LookAt:=xlWhole, LookIn:=xlValues)
     Set MaturityStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("MaturityHeader"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -542,6 +544,12 @@ DefaultExchange:
     Else
         Call AddInput(AllTheInputs, CStr(ReinvestmentDelayCell.Offset(0, 1).Value))
     End If
+    If (ReinvestementWindowCell Is Nothing) Then
+        Call AddInput(AllTheInputs, "1")
+    Else
+        Call AddInput(AllTheInputs, CStr(ReinvestementWindowCell.Offset(0, 1).Value))
+    End If
+    
     If (ReinvestmentPriceCell Is Nothing) Then
         Call AddInput(AllTheInputs, "100")
     Else
@@ -829,6 +837,7 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
      a.Add "Mezzanine", "MezzanineProperty"
      a.Add "Price", "PriceProperty"
      a.Add "Additional Properties", "StartingAdditionalProp"
+     a.Add "Reinvestement Window", "ReinvestementWindowCell"
 End Sub
 
 Private Function FromStringToInterestType(a As String) As Long

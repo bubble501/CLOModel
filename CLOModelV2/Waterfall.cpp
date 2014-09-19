@@ -454,12 +454,13 @@ void Waterfall::SetupReinvBond(
 	, const QString& AnnuityVec 
 	, const QString& ReinvPric 
 	, const QString& ReinvDel
+	, const QString& ReinvSpr
 	, const QString& FloatingBase 
 	, const QString& RecoveryLag 
 	, const QString& Delinquency 
 	, const QString& DelinquencyLag
 	) {
-	m_ReinvestmentTest.SetupReinvBond(IntrVec, CPRVec, CDRVec, LSVec, WALval, PayFreq, AnnuityVec, ReinvPric, ReinvDel, FloatingBase, RecoveryLag, Delinquency, DelinquencyLag);
+	m_ReinvestmentTest.SetupReinvBond(IntrVec, CPRVec, CDRVec, LSVec, WALval, PayFreq, AnnuityVec, ReinvPric, ReinvDel, ReinvSpr, FloatingBase, RecoveryLag, Delinquency, DelinquencyLag);
 }
 void Waterfall::SetupReinvestmentTest(const QDate& ReinvPer,double TstLvl, double IIshare,double IRshare,double OIshare,double ORshare){
 	m_ReinvestmentTest.SetupTest(ReinvPer,TstLvl,IIshare,IRshare,OIshare,ORshare);
@@ -645,6 +646,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		if (NullCCCanchor[7]) m_JuniorFeesFixed.SetAnchorDate(m_MortgagesPayments.GetDate(0));
 		if (NullCCCanchor[8]) m_GICinterest.SetAnchorDate(m_MortgagesPayments.GetDate(0));
 		if (NullCCCanchor[9]) m_GICBaseRateValue.SetAnchorDate(m_MortgagesPayments.GetDate(0));
+		m_ReinvestmentTest.SetMissingAnchors(m_MortgagesPayments.GetDate(0));
 		foreach(ReserveFund* SingleRes, m_Reserves) {
 			CheckResults -= SingleRes->GetStartingReserve();
 			SingleRes->ClearFlows();
@@ -1436,6 +1438,7 @@ QString Waterfall::ReadyToCalculate()const{
 	if (m_ReinvestmentTest.GetTestLevel() < 0.0)Result += "Reinvestment Test Limit\n";
 	if (m_ReinvestmentTest.GetReinvestmentBond().GetPaymentFreq().IsEmpty(1)) Result += "Reinvestment Bond Payment Frequency\n";
 	if (m_ReinvestmentTest.GetReinvestmentBond().GetInterest().isEmpty())Result += "Reinvestment Bond Spread\n";
+	if (IntegerVector(m_ReinvestmentTest.GetReinvestmentSpreadOverTime()).IsEmpty(1)) Result += "Reinvestment Spread Over Time\n";
 	if (m_CCCcurve.IsEmpty(0.0,1.0))Result += "CCC Curve\n";
 	if (m_CCChaircut < 0.0 || m_CCChaircut>1.0)Result += "CCC Value\n";
 	if (m_PoolValueAtCall.IsEmpty(0.0) && !m_PoolValueAtCall.IsEmpty()) Result += "Pool Value at Call\n";

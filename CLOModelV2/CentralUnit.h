@@ -92,12 +92,13 @@ public:
 		, const QString& AnnuityVec = "I"
 		, const QString& ReinvPric = "100"
 		, const QString& ReinvDel = "0"
+		, const QString& ReinvSpr = "0"
 		, const QString& FloatingBase = "ZERO"
 		, const QString& RecoveryLag = "0"
 		, const QString& Delinquency = "0"
 		, const QString& DelinquencyLag = "0"
 		) {
-		Structure.SetupReinvBond(IntrVec, CPRVec, CDRVec, LSVec, WALval, PayFreq, AnnuityVec, ReinvPric, ReinvDel, FloatingBase, RecoveryLag, Delinquency, DelinquencyLag);
+		Structure.SetupReinvBond(IntrVec, CPRVec, CDRVec, LSVec, WALval, PayFreq, AnnuityVec, ReinvPric, ReinvDel, ReinvSpr, FloatingBase, RecoveryLag, Delinquency, DelinquencyLag);
 	}
 	void Reset();
 	void SetupStress(const QString& ConstPar,QList<QString> XSpann,QList<QString> YSpann, StressTest::StressVariability Xvar=StressTest::ChangingCDR,StressTest::StressVariability Yvar=StressTest::ChangingLS);

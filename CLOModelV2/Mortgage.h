@@ -71,6 +71,7 @@ public:
 	bool CalculateCashFlows(const QDate& StartDate,const QString& CPRVecs, const QString& CDRVecs, const QString& LossVecs, const QString& RecoveryLag = "0", const QString& Delinquency = "0", const QString& DelinquencyLag = "0");
 	bool CalculateCashFlows(const QDate& StartDate, BloombergVector CPRVec, BloombergVector CDRVec, BloombergVector LossVec, IntegerVector  RecoveryLag = IntegerVector("0"), BloombergVector Delinquency = BloombergVector("0"), IntegerVector DelinquencyLag = IntegerVector("0"), bool OverrideProperties=false);
 	void AddCashFlow(const QDate& Dte, double Amt, MtgCashFlow::MtgFlowType FlowTpe) { m_CashFlows.AddFlow(Dte, Amt, FlowTpe); }
+	void AddCashFlow(const MtgCashFlow& a) { m_CashFlows.AddFlow(a); }
 	QString ReadyToCalculate() const;
 	void ResetFlows() { m_CashFlows.Clear(); }
 	void SetProperty(const QString& PropName, const QString& Value);

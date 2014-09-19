@@ -1244,8 +1244,8 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		
 		CheckResults -= m_InterestAvailable;
 		CheckResults -= m_PrincipalAvailable.Total();
-		if (qAbs(CheckResults) >= 0.01) {
-			PrintToTempFile("ReturnFalse.txt", "Cash Flows Dont Match");
+		if (qAbs(CheckResults) >= 1.0) {
+			PrintToTempFile("ReturnFalse.txt", QString("Cash Flows Dont Match, Diff: %1").arg(CheckResults));
 			return false;
 		}
 		return true;

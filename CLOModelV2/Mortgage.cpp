@@ -327,6 +327,13 @@ void Mortgage::SetInterest(const QString& a){
 	if (m_HaircutVector.IsEmpty())Result += "Haircut Vector\n";
 	if (m_PaymentFreq.IsEmpty(1))Result += "Loan Payment Frequency\n";
 	if (m_DayCountConvention == DayCountConvention::Invalid)Result += "Loan Day Count Convention\n";
+	if (HasProperty("CPR")) {if (BloombergVector(GetProperty("CPR")).IsEmpty(0.0, 1.0)) Result += "Loan CPR Assumption\n";}
+	if (HasProperty("CDR")) { if (BloombergVector(GetProperty("CDR")).IsEmpty(0.0, 1.0)) Result += "Loan CDR Assumption\n"; }
+	if (HasProperty("LS")) { if (BloombergVector(GetProperty("LS")).IsEmpty(0.0, 1.0)) Result += "Loan LS Assumption\n"; }
+	if (HasProperty("RecoveryLag")) { if (IntegerVector(GetProperty("RecoveryLag")).IsEmpty(0)) Result += "Loan Recovery Lag Assumption\n"; }
+	if (HasProperty("Delinquency")) { if (BloombergVector(GetProperty("Delinquency")).IsEmpty(0.0, 1.0)) Result += "Loan Delinquency Assumption\n"; }
+	if (HasProperty("DelinquencyLag")) { if (IntegerVector(GetProperty("DelinquencyLag")).IsEmpty(0)) Result += "Loan Delinquency Lag Assumption\n"; }
+	if (HasProperty("Price")) { if (BloombergVector(GetProperty("Price")).IsEmpty(0.0)) Result += "Loan Price\n"; }
 	if(!Result.isEmpty()) return Result.left(Result.size()-1);
 	return Result;
  }

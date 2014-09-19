@@ -21,7 +21,7 @@ Public Sub GetInputFromStructure( _
     Optional StressTestSheet As String _
 )
     Application.ScreenUpdating = False
-    Dim i As Long, j As Long
+    Dim i As Long, j As Long, propCounter As Long
     ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     'Fields to search
     Dim MaturityStart As Range
@@ -126,6 +126,8 @@ Public Sub GetInputFromStructure( _
     Dim IndustryProperty As Range
     Dim MezzanineProperty As Range
     Dim PriceProperty As Range
+    Dim LoanDayCountHead As Range
+    Dim StartingAdditionalProp As Range
     On Error Resume Next
     Set IssuerProperty = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("IssuerProperty"), LookAt:=xlWhole, LookIn:=xlValues)
     Set FacilityProperty = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("FacilityProperty"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -133,6 +135,8 @@ Public Sub GetInputFromStructure( _
     Set IndustryProperty = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("IndustryProperty"), LookAt:=xlWhole, LookIn:=xlValues)
     Set MezzanineProperty = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("MezzanineProperty"), LookAt:=xlWhole, LookIn:=xlValues)
     Set PriceProperty = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("PriceProperty"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set LoanDayCountHead = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("LoanDayCountHead"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set StartingAdditionalProp = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("StartingAdditionalProp"), LookAt:=xlWhole, LookIn:=xlValues)
     ''''''''''''''''''''''''''''''''''''''''''''''''''''
     Set HaircutVecStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("HaircutVecHeader"), LookAt:=xlWhole, LookIn:=xlValues)
     Set StartingDefJunFees = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("StartingDefJunFees"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -276,7 +280,15 @@ ReferenceRateFromBBg:
             Else
                 Call AddInput(AllTheInputs, CStr(HaircutVecStart.Offset(i, 0).Value))
             End If
-            
+            If (LoanDayCountHead Is Nothing) Then
+                Call AddInput(AllTheInputs, CLng(1024 + 104))
+            Else
+               If (IsEmpty(LoanDayCountHead.Offset(i, 0)) Or LoanDayCountHead.Offset(i, 0).Value = "") Then
+                    Call AddInput(AllTheInputs, CLng(1024 + 104))
+               Else
+                    Call AddInput(AllTheInputs, CLng(LoanDayCountHead.Offset(i, 0).Value))
+               End If
+            End If
             'Loans Properties
             Dim PropertyString As String
             PropertyString = ""
@@ -286,6 +298,20 @@ ReferenceRateFromBBg:
             If Not (IndustryProperty Is Nothing) Then PropertyString = PropertyString & "Industry#=#" & CStr(IndustryProperty.Offset(i, 0).Value) & "#,#"
             If Not (MezzanineProperty Is Nothing) Then PropertyString = PropertyString & "Mezzanine#=#" & CStr(MezzanineProperty.Offset(i, 0).Value) & "#,#"
             If Not (PriceProperty Is Nothing) Then PropertyString = PropertyString & "Price#=#" & CStr(PriceProperty.Offset(i, 0).Value) & "#,#"
+            If Not (StartingAdditionalProp Is Nothing) Then
+                propCounter = 1
+                Do While (True)
+                    If Not (IsEmpty(StartingAdditionalProp.Offset(i, propCounter)) Or StartingAdditionalProp.Offset(i, propCounter).Value = "") Then
+                        PropertyString = PropertyString & _
+                                        Replace(CStr(StartingAdditionalProp.Offset(0, propCounter).Value), " ", "") & _
+                                        "#=#" & _
+                                        CStr(StartingAdditionalProp.Offset(i, propCounter).Value) & "#,#"
+                    Else
+                        Exit Do
+                    End If
+                    propCounter = propCounter + 1
+                Loop
+            End If
             Call AddInput(AllTheInputs, Left(PropertyString, Len(PropertyString) - 3))
         End If
         i = i + 1
@@ -794,6 +820,7 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
     a.Add "GIC Base Rate", "GICBaseRateCell"
     a.Add "Forward Curves", "ForwardCurvesSheet"
     a.Add "Deal Day Count Convention", "DealDaycountCell"
+    a.Add "Day count", "LoanDayCountHead"
     'Loans Properties
      a.Add "Issuer", "IssuerProperty"
      a.Add "Facility", "FacilityProperty"
@@ -801,6 +828,7 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
      a.Add "Industry", "IndustryProperty"
      a.Add "Mezzanine", "MezzanineProperty"
      a.Add "Price", "PriceProperty"
+     a.Add "Additional Properties", "StartingAdditionalProp"
 End Sub
 
 Private Function FromStringToInterestType(a As String) As Long

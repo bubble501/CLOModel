@@ -394,4 +394,8 @@ Public Sub RunCLOModel(SaveBase As Boolean)
     Sheets("Graphical Output").EnableSelection = xlUnlockedCells
     Sheets("Liabilities + input").Protect UserInterfaceOnly:=True, AllowFormattingCells:=True
 End Sub
-
+Public Function ShowDayCount(Target As String, CurrentDcnt As Integer) As String
+    Call DayCountForm.SetDayCount(CurrentDcnt)
+    DayCountForm.TargetAddress = Target
+    ShowDayCount = DayCountForm.ShowForm
+End Function

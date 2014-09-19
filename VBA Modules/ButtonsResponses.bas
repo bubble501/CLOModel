@@ -180,46 +180,46 @@ Public Sub ImportFromOldVersion()
     On Error GoTo 0
     SourceBook.Sheets("Raw Portfolio").Cells.Copy Destination:=DestinationBook.Sheets("Raw Portfolio").Cells
     SourceBook.Sheets("Monitoring").Cells.Copy Destination:=DestinationBook.Sheets("Monitoring").Cells
-    DestinationBook.Sheets("Liabilities + input").Range("B1").formula = SourceBook.Sheets("Liabilities + input").Range("B1").formula
-    DestinationBook.Sheets("Liabilities + input").Range("D1").formula = SourceBook.Sheets("Liabilities + input").Range("D1").formula
-    DestinationBook.Sheets("Liabilities + input").Range("F1").formula = SourceBook.Sheets("Liabilities + input").Range("F1").formula
-    DestinationBook.Sheets("Liabilities + input").Range("H1").formula = SourceBook.Sheets("Liabilities + input").Range("H1").formula
+    DestinationBook.Sheets("Liabilities + input").Range("B1").Formula = SourceBook.Sheets("Liabilities + input").Range("B1").Formula
+    DestinationBook.Sheets("Liabilities + input").Range("D1").Formula = SourceBook.Sheets("Liabilities + input").Range("D1").Formula
+    DestinationBook.Sheets("Liabilities + input").Range("F1").Formula = SourceBook.Sheets("Liabilities + input").Range("F1").Formula
+    DestinationBook.Sheets("Liabilities + input").Range("H1").Formula = SourceBook.Sheets("Liabilities + input").Range("H1").Formula
     For i = 1 To 16
-        DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 0).formula = SourceBook.Sheets("Liabilities + input").Range("A3").Offset(i, 0).formula
-        DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 1).formula = SourceBook.Sheets("Liabilities + input").Range("A3").Offset(i, 1).formula
-        DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 2).formula = SourceBook.Sheets("Liabilities + input").Range("A3").Offset(i, 2).formula
-        DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 3).formula = SourceBook.Sheets("Liabilities + input").Range("A3").Offset(i, 3).formula
-        DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 5).formula = SourceBook.Sheets("Liabilities + input").Range("A3").Offset(i, 5).formula
-        DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 8).formula = SourceBook.Sheets("Liabilities + input").Range("A3").Offset(i, 8).formula
-        DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 10).formula = SourceBook.Sheets("Liabilities + input").Range("A3").Offset(i, 10).formula
-        DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 11).formula = SourceBook.Sheets("Liabilities + input").Range("A3").Offset(i, 11).formula
-        DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 12).formula = SourceBook.Sheets("Liabilities + input").Range("A3").Offset(i, 12).formula
-        DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 13).formula = SourceBook.Sheets("Liabilities + input").Range("A3").Offset(i, 13).formula
-        DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 22).formula = SourceBook.Sheets("Liabilities + input").Range("A3").Offset(i, 22).formula
-        DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 23).formula = SourceBook.Sheets("Liabilities + input").Range("A3").Offset(i, 23).formula
-        DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 24).formula = "=BDP(" + DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 24).Address + "& "" Mtge"",""INT_ACC"")"
+        DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 0).Formula = SourceBook.Sheets("Liabilities + input").Range("A3").Offset(i, 0).Formula
+        DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 1).Formula = SourceBook.Sheets("Liabilities + input").Range("A3").Offset(i, 1).Formula
+        DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 2).Formula = SourceBook.Sheets("Liabilities + input").Range("A3").Offset(i, 2).Formula
+        DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 3).Formula = SourceBook.Sheets("Liabilities + input").Range("A3").Offset(i, 3).Formula
+        DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 5).Formula = SourceBook.Sheets("Liabilities + input").Range("A3").Offset(i, 5).Formula
+        DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 8).Formula = SourceBook.Sheets("Liabilities + input").Range("A3").Offset(i, 8).Formula
+        DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 10).Formula = SourceBook.Sheets("Liabilities + input").Range("A3").Offset(i, 10).Formula
+        DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 11).Formula = SourceBook.Sheets("Liabilities + input").Range("A3").Offset(i, 11).Formula
+        DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 12).Formula = SourceBook.Sheets("Liabilities + input").Range("A3").Offset(i, 12).Formula
+        DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 13).Formula = SourceBook.Sheets("Liabilities + input").Range("A3").Offset(i, 13).Formula
+        DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 22).Formula = SourceBook.Sheets("Liabilities + input").Range("A3").Offset(i, 22).Formula
+        DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 23).Formula = SourceBook.Sheets("Liabilities + input").Range("A3").Offset(i, 23).Formula
+        DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 24).Formula = "=BDP(" + DestinationBook.Sheets("Liabilities + input").Range("A3").Offset(i, 24).Address + "& "" Mtge"",""INT_ACC"")"
     Next i
     For i = 1 To 47
         If Not ( _
         i = 3 Or i = 4 Or i = 10 Or i = 11 Or i = 16 Or i = 17 Or i = 18 Or i = 28 Or i = 29 Or i = 38 Or i = 41 Or i = 42 Or i = 43 Or i = 44 _
         ) Then
-            DestinationBook.Sheets("Liabilities + input").Range("B23").Offset(i, 0).formula = SourceBook.Sheets("Liabilities + input").Range("B23").Offset(i, 0).formula
+            DestinationBook.Sheets("Liabilities + input").Range("B23").Offset(i, 0).Formula = SourceBook.Sheets("Liabilities + input").Range("B23").Offset(i, 0).Formula
         End If
     Next i
-    DestinationBook.Sheets("Liabilities + input").Range("C62").formula = SourceBook.Sheets("Liabilities + input").Range("C62").formula
-    DestinationBook.Sheets("Liabilities + input").Range("C63").formula = SourceBook.Sheets("Liabilities + input").Range("C63").formula
+    DestinationBook.Sheets("Liabilities + input").Range("C62").Formula = SourceBook.Sheets("Liabilities + input").Range("C62").Formula
+    DestinationBook.Sheets("Liabilities + input").Range("C63").Formula = SourceBook.Sheets("Liabilities + input").Range("C63").Formula
     i = 1
     Do While (True)
         If (IsEmpty(SourceBook.Sheets("Liabilities + input").Range("E24").Offset(i, 0))) Then Exit Do
-        DestinationBook.Sheets("Liabilities + input").Range("E24").Offset(i, 0).formula = SourceBook.Sheets("Liabilities + input").Range("E24").Offset(i, 0).formula
+        DestinationBook.Sheets("Liabilities + input").Range("E24").Offset(i, 0).Formula = SourceBook.Sheets("Liabilities + input").Range("E24").Offset(i, 0).Formula
         If Not IsEmpty(SourceBook.Sheets("Liabilities + input").Range("E24").Offset(i, 1)) Then
-            DestinationBook.Sheets("Liabilities + input").Range("E24").Offset(i, 1).formula = SourceBook.Sheets("Liabilities + input").Range("E24").Offset(i, 1).formula
+            DestinationBook.Sheets("Liabilities + input").Range("E24").Offset(i, 1).Formula = SourceBook.Sheets("Liabilities + input").Range("E24").Offset(i, 1).Formula
         End If
         If Not IsEmpty(SourceBook.Sheets("Liabilities + input").Range("E24").Offset(i, 2)) Then
-            DestinationBook.Sheets("Liabilities + input").Range("E24").Offset(i, 2).formula = SourceBook.Sheets("Liabilities + input").Range("E24").Offset(i, 2).formula
+            DestinationBook.Sheets("Liabilities + input").Range("E24").Offset(i, 2).Formula = SourceBook.Sheets("Liabilities + input").Range("E24").Offset(i, 2).Formula
         End If
         If Not IsEmpty(SourceBook.Sheets("Liabilities + input").Range("E24").Offset(i, 3)) Then
-            DestinationBook.Sheets("Liabilities + input").Range("E24").Offset(i, 3).formula = SourceBook.Sheets("Liabilities + input").Range("E24").Offset(i, 3).formula
+            DestinationBook.Sheets("Liabilities + input").Range("E24").Offset(i, 3).Formula = SourceBook.Sheets("Liabilities + input").Range("E24").Offset(i, 3).Formula
         End If
         i = i + 1
     Loop
@@ -228,7 +228,7 @@ Public Sub ImportFromOldVersion()
     Do While (True)
         If (IsEmpty(SourceBook.Sheets("Loans Pool").Range("D1").Offset(i, 0))) Then Exit Do
         For j = 1 To 15
-            DestinationBook.Sheets("Loans Pool").Range("A1").Offset(i, j).formula = SourceBook.Sheets("Loans Pool").Range("A1").Offset(i, j).formula
+            DestinationBook.Sheets("Loans Pool").Range("A1").Offset(i, j).Formula = SourceBook.Sheets("Loans Pool").Range("A1").Offset(i, j).Formula
         Next j
         i = i + 1
     Loop

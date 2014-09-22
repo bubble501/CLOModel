@@ -30,11 +30,11 @@ void TrancheViewer::SetTranche(const Tranche& a){
 	MainTable->setRowCount(0);
 	const auto& Temp = a.GetCashFlow();
 	MainTable->setRowCount(a.GetCashFlow().Count());
-	bool EmptyIC = a.GetCashFlow().SingleFlow(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::ICFlow)).IsEmpty();
-	bool EmptyOC = a.GetCashFlow().SingleFlow(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::OCFlow)).IsEmpty();
-	bool EmptyPDL = a.GetCashFlow().SingleFlow(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PDLOutstanding)).IsEmpty() 
+	bool EmptyIC = a.GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::ICFlow));
+	bool EmptyOC = a.GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::OCFlow));
+	bool EmptyPDL = a.GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PDLOutstanding))
 		&&
-		a.GetCashFlow().SingleFlow(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PDLCured)).IsEmpty()
+		a.GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PDLCured))
 	;
 
 	MainTable->setColumnCount(5

@@ -245,7 +245,6 @@ void ConsoleTestObj::BBVALTest() {
 	TempUnit.SetPaymentFrequency("3");
 	TempUnit.SetFirstIPDdate(QDate(2014, 11, 26));
 	TempUnit.SetLastIPDdate(QDate(2014, 8, 26));
-	TempUnit.SetUseTurbo(true);
 	TempUnit.SetCCCcurve("0");
 	TempUnit.SetCCChaircut(0.5);
 	TempUnit.SetCCCTestLimit(0.1);
@@ -1773,7 +1772,6 @@ void ConsoleTestObj::SlateTest() {
 	TempUnit.SetPaymentFrequency("3");
 	TempUnit.SetFirstIPDdate(QDate(2014, 11, 1));
 	TempUnit.SetLastIPDdate(QDate(2014, 8, 1));
-	TempUnit.SetUseTurbo(true);
 	TempUnit.SetCCCcurve("1");
 	TempUnit.SetCCChaircut(0.5);
 	TempUnit.SetCCCTestLimit(0.5);

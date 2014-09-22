@@ -27,6 +27,8 @@ public:
 	double GetPrincipal(int index)const { return GetFlow(index, static_cast<qint32>(TrancheFlowType::PrincipalFlow)); }
 	double GetOCTest(int index)const { return GetFlow(index, static_cast<qint32>(TrancheFlowType::OCFlow)); }
 	double GetICTest(int index)const { return GetFlow(index, static_cast<qint32>(TrancheFlowType::ICFlow)); }
+	double GetPDLOutstanding(int index)const { return GetFlow(index, static_cast<qint32>(TrancheFlowType::PDLOutstanding)); }
+	double GetPDLCured(int index)const { return GetFlow(index, static_cast<qint32>(TrancheFlowType::PDLCured)); }
 	double GetDeferred(int index)const; /*{ return GetFlow(index, static_cast<qint32>(TrancheFlowType::DeferredFlow)); }*/
 	virtual double GetTotalFlow(int index)const override;
 	virtual double GetTotalFlow(const QDate& a)const override;
@@ -35,6 +37,8 @@ public:
 	double GetPrincipal(const QDate& a)const { return GetFlow(a, static_cast<qint32>(TrancheFlowType::PrincipalFlow)); }
 	double GetOCTest(const QDate& a)const { return GetFlow(a, static_cast<qint32>(TrancheFlowType::OCFlow)); }
 	double GetICTest(const QDate& a)const { return GetFlow(a, static_cast<qint32>(TrancheFlowType::ICFlow)); }
+	double GetPDLOutstanding(const QDate& a)const { return GetFlow(a, static_cast<qint32>(TrancheFlowType::PDLOutstanding)); }
+	double GetPDLCured(const QDate& a)const { return GetFlow(a, static_cast<qint32>(TrancheFlowType::PDLCured)); }
 	double GetDeferred(const QDate& a)const; /*{ return GetFlow(a, static_cast<qint32>(TrancheFlowType::DeferredFlow)); }*/
 	double GetAmountOutstanding(const QDate& a)const{return GetAmountOutstanding(FindDate(a));} //TODO
 	double GetInitialOutstanding()const{return OutstandingAmt;}

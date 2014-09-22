@@ -4,7 +4,7 @@
 class QDate;
 class QString;
 template<typename T> class QList;
-//#define DebugLogging
+#define DebugLogging
 #define MaximumIRRIterations 10000//INT_MAX-1
 #define MaximumInterestsTypes 8
 #define CompoundShift 10

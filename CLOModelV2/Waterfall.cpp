@@ -999,10 +999,39 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					AvailablePrincipal.Erase();
 				break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				case WatFalPrior::wst_PDL:
+					ProRataBonds.clear();
+					TotalPayable = TestTarget = 0.0;
+					for (int h = 0; h < m_Tranches.size(); h++) {
+						if (m_Tranches.at(h)->GetProrataGroup() <= SingleStep->GetGroupTarget()) {
+							TotalPayable += m_Tranches.at(h)->GetCurrentOutstanding();
+							if (m_Tranches.at(h)->GetProrataGroup() == SingleStep->GetGroupTarget()) {
+								TestTarget += m_Tranches.at(h)->GetCurrentOutstanding();
+								ProRataBonds.enqueue(h);
+							}
+						}
+					}
+					LOGDEBUG(QString("TotalSenior: %1\nCollateral: %2\nCurrnet Out: %3").arg(TotalPayable).arg(m_MortgagesPayments.GetAmountOut(i) + AvailablePrincipal.Total()).arg(TestTarget));
+					Solution = qMin(TotalPayable - m_MortgagesPayments.GetAmountOut(i) - AvailablePrincipal.Total(), TestTarget);
+					if (Solution>=0.01) {
+						foreach(const int& SingleBond, ProRataBonds) {
+							m_Tranches[SingleBond]->AddCashFlow(CurrentDate, qMax(0.0, Solution - AvailableInterest)* m_Tranches.at(SingleBond)->GetCurrentOutstanding() / TestTarget, TrancheCashFlow::TrancheFlowType::PDLOutstanding);
+							m_Tranches[SingleBond]->AddCashFlow(CurrentDate, qMin(AvailableInterest, Solution)* m_Tranches.at(SingleBond)->GetCurrentOutstanding() / TestTarget, TrancheCashFlow::TrancheFlowType::PDLCured);
+						}
+						TotalPayable=qMin(AvailableInterest, Solution);
+						if (SingleStep->GetRedemptionGroup() > 0 && SingleStep->GetRedemptionShare() > 0.0) {
+							TotalPayable =
+								(TotalPayable*(1.0 - SingleStep->GetRedemptionShare()))
+								+ RedeemNotes(SingleStep->GetRedemptionShare()*TotalPayable, SingleStep->GetRedemptionGroup(), CurrentDate);
+						}
+						TotalPayable = RedeemSequential(TotalPayable, CurrentDate);
+						AvailableInterest += TotalPayable - qMin(AvailableInterest, Solution);
+					}
+				break;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				case WatFalPrior::wst_OCTest:
 				case WatFalPrior::wst_OCTestPrinc:
 				case WatFalPrior::wst_ReinvestmentTest:
-				case WatFalPrior::wst_PDL:
 					ProRataBonds.clear();
 					TotalPayable=0.0;
 					for(int h=0;h<m_Tranches.size();h++){
@@ -1013,7 +1042,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					}
 					TotalPayable=qMax(TotalPayable,0.000001);
 					//CCC test
-					if (m_CCCcurve.GetValue(CurrentDate)>m_CCCTestLimit && SingleStep->GetPriorityType() != WatFalPrior::wst_PDL)
+					if (m_CCCcurve.GetValue(CurrentDate)>m_CCCTestLimit)
 						Solution=(1.0-((m_CCCcurve.GetValue(CurrentDate)-m_CCCTestLimit)*m_CCChaircut))*m_MortgagesPayments.GetAmountOut(i);
 					else
 						Solution=m_MortgagesPayments.GetAmountOut(i);
@@ -1029,17 +1058,9 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					else if (SingleStep->GetPriorityType() == WatFalPrior::wst_ReinvestmentTest) {
 						TestTarget = m_ReinvestmentTest.GetTestLevel();
 					}
-					else if (SingleStep->GetPriorityType() == WatFalPrior::wst_PDL) {
-						Solution = 0;
-						while (ProRataBonds.size() > 0) {
-							Solution += qMax(0.0, TotalPayable - Solution);
-							m_Tranches[ProRataBonds.dequeue()]->AddCashFlow(CurrentDate, qMax(0.0, TotalPayable - Solution), TrancheCashFlow::TrancheFlowType::PDLOutstanding);
-						}
-						TestTarget = 1.0;
-					}
 					//if it fails redeem notes until cured
 					if (Solution / TotalPayable < TestTarget) {
-						if (SingleStep->GetPriorityType() == WatFalPrior::wst_OCTest || SingleStep->GetPriorityType() == WatFalPrior::wst_OCTestPrinc || SingleStep->GetPriorityType() == WatFalPrior::wst_PDL) {
+						if (SingleStep->GetPriorityType() == WatFalPrior::wst_OCTest || SingleStep->GetPriorityType() == WatFalPrior::wst_OCTestPrinc) {
 							//Calculate the amount needed to cure the test
 							//If the need is greater than the available funds adjust it down
 							if (SingleStep->GetPriorityType() == WatFalPrior::wst_OCTestPrinc) {

@@ -71,15 +71,15 @@ Private Sub UserForm_Initialize()
     InterestTypeArray(1, 0) = "Compounded"
     InterestTypeArray(1, 1) = 1024
     InterestTypeArray(2, 0) = "Continuously Compounded"
-    InterestTypeArray(2, 1) = 256
+    InterestTypeArray(2, 1) = 2048
     Me.InterestTypeCombo.List = InterestTypeArray
 End Sub
 Public Sub SetDayCount(CurrentDayCnt As Integer)
 Dim DayCountsArray
 DayCountsArray = Me.DayCountCombo.List
-If (CurrentDayCnt >= 2056) Then
+If (CurrentDayCnt >= 2048) Then
         Me.InterestTypeCombo.ListIndex = 2
-        CurrentDayCnt = CurrentDayCnt - 2056
+        CurrentDayCnt = CurrentDayCnt - 2048
     ElseIf (CurrentDayCnt >= 1024) Then
         Me.InterestTypeCombo.ListIndex = 1
         CurrentDayCnt = CurrentDayCnt - 1024

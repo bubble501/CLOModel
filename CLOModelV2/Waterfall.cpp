@@ -65,7 +65,6 @@ Waterfall::Waterfall()
 	,m_CCCTestLimit(1.0)
 	,m_CCCcurve("0")
 	,m_CCChaircut(0.0)
-	,m_UseTurbo(true)
 	,m_InterestAvailable(0.0)
 	,m_JuniorFeesCoupon(0.0)
 	,m_PoolValueAtCall("100")
@@ -104,7 +103,6 @@ Waterfall::Waterfall(const Waterfall& a)
 	,m_CCCTestLimit(a.m_CCCTestLimit)
 	,m_CCCcurve(a.m_CCCcurve)
 	,m_CCChaircut(a.m_CCChaircut)
-	,m_UseTurbo(a.m_UseTurbo)
 	,m_PrincipalAvailable(a.m_PrincipalAvailable)
 	,m_InterestAvailable(a.m_InterestAvailable)
 	,m_JuniorFeesCoupon(a.m_JuniorFeesCoupon)
@@ -156,7 +154,6 @@ Waterfall& Waterfall::operator=(const Waterfall& a){
 	m_CCCTestLimit=a.m_CCCTestLimit;
 	m_CCCcurve=a.m_CCCcurve;
 	m_CCChaircut=a.m_CCChaircut;
-	m_UseTurbo=a.m_UseTurbo;
 	m_PrincipalAvailable=a.m_PrincipalAvailable;
 	m_InterestAvailable=a.m_InterestAvailable;
 	m_JuniorFeesCoupon=a.m_JuniorFeesCoupon;
@@ -1004,6 +1001,8 @@ bool Waterfall::CalculateTranchesCashFlows(){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				case WatFalPrior::wst_OCTest:
 				case WatFalPrior::wst_OCTestPrinc:
+				case WatFalPrior::wst_ReinvestmentTest:
+				case WatFalPrior::wst_PDL:
 					ProRataBonds.clear();
 					TotalPayable=0.0;
 					for(int h=0;h<m_Tranches.size();h++){
@@ -1014,41 +1013,85 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					}
 					TotalPayable=qMax(TotalPayable,0.000001);
 					//CCC test
-					if(m_CCCcurve.GetValue(CurrentDate)>m_CCCTestLimit)
+					if (m_CCCcurve.GetValue(CurrentDate)>m_CCCTestLimit && SingleStep->GetPriorityType() != WatFalPrior::wst_PDL)
 						Solution=(1.0-((m_CCCcurve.GetValue(CurrentDate)-m_CCCTestLimit)*m_CCChaircut))*m_MortgagesPayments.GetAmountOut(i);
 					else
 						Solution=m_MortgagesPayments.GetAmountOut(i);
 					Solution+=AvailablePrincipal.Total();
 					if(Solution==0.0) Solution=1.0;
-					while(ProRataBonds.size()>0){
-						if(m_Tranches.at(ProRataBonds.head())->GetCashFlow().GetOCTest(CurrentDate)<=0.0)
-							m_Tranches[ProRataBonds.head()]->AddCashFlow(CurrentDate, Solution / TotalPayable, TrancheCashFlow::TrancheFlowType::OCFlow);
-						TestTarget=m_Tranches.at(ProRataBonds.dequeue())->GetMinOClevel();
+					if (SingleStep->GetPriorityType() == WatFalPrior::wst_OCTest || SingleStep->GetPriorityType() == WatFalPrior::wst_OCTestPrinc) {
+						while (ProRataBonds.size() > 0) {
+							if (m_Tranches.at(ProRataBonds.head())->GetCashFlow().GetOCTest(CurrentDate) <= 0.0)
+								m_Tranches[ProRataBonds.head()]->AddCashFlow(CurrentDate, Solution / TotalPayable, TrancheCashFlow::TrancheFlowType::OCFlow);
+							TestTarget = m_Tranches.at(ProRataBonds.dequeue())->GetMinOClevel();
+						}
+					}
+					else if (SingleStep->GetPriorityType() == WatFalPrior::wst_ReinvestmentTest) {
+						TestTarget = m_ReinvestmentTest.GetTestLevel();
+					}
+					else if (SingleStep->GetPriorityType() == WatFalPrior::wst_PDL) {
+						Solution = 0;
+						while (ProRataBonds.size() > 0) {
+							Solution += qMax(0.0, TotalPayable - Solution);
+							m_Tranches[ProRataBonds.dequeue()]->AddCashFlow(CurrentDate, qMax(0.0, TotalPayable - Solution), TrancheCashFlow::TrancheFlowType::PDLOutstanding);
+						}
+						TestTarget = 1.0;
 					}
 					//if it fails redeem notes until cured
-					if(Solution/TotalPayable<TestTarget){
-						//Calculate the amount needed to cure the test
-						//If the need is greater than the available funds adjust it down
-						if(SingleStep->GetPriorityType()== WatFalPrior::wst_OCTestPrinc){
-							TotalPayable=qMin(TotalPayable-(Solution/TestTarget),AvailablePrincipal.Total());
-							AvailablePrincipal-=TotalPayable;
+					if (Solution / TotalPayable < TestTarget) {
+						if (SingleStep->GetPriorityType() == WatFalPrior::wst_OCTest || SingleStep->GetPriorityType() == WatFalPrior::wst_OCTestPrinc || SingleStep->GetPriorityType() == WatFalPrior::wst_PDL) {
+							//Calculate the amount needed to cure the test
+							//If the need is greater than the available funds adjust it down
+							if (SingleStep->GetPriorityType() == WatFalPrior::wst_OCTestPrinc) {
+								TotalPayable = qMin(TotalPayable - (Solution / TestTarget), AvailablePrincipal.Total());
+								AvailablePrincipal -= TotalPayable;
+							}
+							else {
+								TotalPayable = qMin(TotalPayable - (Solution / TestTarget), AvailableInterest);
+								AvailableInterest -= TotalPayable;
+							}
+							//If turbo is to be used
+							if (SingleStep->GetRedemptionGroup() > 0 && SingleStep->GetRedemptionShare() > 0.0) {
+								TotalPayable =
+									(TotalPayable*(1.0 - SingleStep->GetRedemptionShare()))
+									+ RedeemNotes(SingleStep->GetRedemptionShare()*TotalPayable, SingleStep->GetRedemptionGroup(), CurrentDate);
+							}
+							TotalPayable = RedeemSequential(TotalPayable, CurrentDate);
+							if (TotalPayable > 0.0) {
+								if (SingleStep->GetPriorityType() == WatFalPrior::wst_OCTestPrinc)
+									AvailablePrincipal += TotalPayable;
+								else
+									AvailableInterest += TotalPayable;
+							}
 						}
-						else{
-							TotalPayable=qMin(TotalPayable-(Solution/TestTarget),AvailableInterest);
-							AvailableInterest-=TotalPayable;
-						}
-						//If turbo is to be used
-						if(SingleStep->GetRedemptionGroup()>0 && SingleStep->GetRedemptionShare()>0.0 && m_UseTurbo){
-							TotalPayable=
-								(TotalPayable*(1.0-SingleStep->GetRedemptionShare()))
-								+RedeemNotes(SingleStep->GetRedemptionShare()*TotalPayable,SingleStep->GetRedemptionGroup(),CurrentDate);
-						}
-						TotalPayable=RedeemSequential(TotalPayable,CurrentDate);
-						if(TotalPayable>0.0){
-							if(SingleStep->GetPriorityType()== WatFalPrior::wst_OCTestPrinc)
-								AvailablePrincipal+=TotalPayable;
-							else
-								AvailableInterest+=TotalPayable;
+						else if (SingleStep->GetPriorityType() == WatFalPrior::wst_ReinvestmentTest) {
+							if (CurrentDate < m_ReinvestmentTest.GetReinvestmentPeriod()) {
+								//during reinvestment period
+								Solution = qMin(TotalPayable - (Solution / m_ReinvestmentTest.GetTestLevel()), AvailableInterest);
+								TotalPayable = Solution*m_ReinvestmentTest.GetShare(ReinvestmentTest::InReinvShare);
+								Solution *= m_ReinvestmentTest.GetShare(ReinvestmentTest::InRedempShare);
+							}
+							else {
+								//after reinvestment period
+								Solution = qMin(TotalPayable - (Solution / m_ReinvestmentTest.GetTestLevel()), AvailableInterest);
+								TotalPayable = Solution*m_ReinvestmentTest.GetShare(ReinvestmentTest::OutReinvShare);
+								Solution *= m_ReinvestmentTest.GetShare(ReinvestmentTest::OutRedempShare);
+							}
+							AvailableInterest -= TotalPayable + Solution;
+							//reinvest
+							if (TotalPayable > 0.0) {
+								m_ReinvestmentTest.CalculateBondCashFlows(TotalPayable, CurrentDate, i);
+								m_MortgagesPayments.AddFlow(m_ReinvestmentTest.GetBondCashFlow());
+								m_Reinvested.AddFlow(CurrentDate, TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
+								AvailableInterest += m_ReinvestmentTest.GetBondCashFlow().GetInterest(CurrentDate);
+								AvailablePrincipal.AddScheduled(m_ReinvestmentTest.GetBondCashFlow().GetScheduled(CurrentDate));
+								AvailablePrincipal.AddPrepay(m_ReinvestmentTest.GetBondCashFlow().GetPrepay(CurrentDate));
+								CheckResults -= m_ReinvestmentTest.GetBondCashFlow().GetScheduled(CurrentDate) + m_ReinvestmentTest.GetBondCashFlow().GetPrepay(CurrentDate) + m_ReinvestmentTest.GetBondCashFlow().GetInterest(CurrentDate);
+							}
+							//Redeem
+							if (SingleStep->GetRedemptionGroup() > 0) Solution = RedeemNotes(Solution, SingleStep->GetRedemptionGroup(), CurrentDate);
+							else Solution = RedeemSequential(Solution, CurrentDate);
+							AvailableInterest += Solution;
 						}
 					}
 				break;
@@ -1104,59 +1147,6 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						} while (!SolutionFound);
 					}
 					break;
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-				case WatFalPrior::wst_ReinvestmentTest:
-					if(m_UseTurbo && !IsCallPaymentDate){
-						//Just like an OC
-						ProRataBonds.clear();
-						TotalPayable=0.0;
-						for(int h=0;h<m_Tranches.size();h++){
-							if(m_Tranches.at(h)->GetProrataGroup()<=SingleStep->GetGroupTarget()){
-								TotalPayable+=m_Tranches.at(h)->GetCurrentOutstanding();
-								if(m_Tranches.at(h)->GetProrataGroup()==SingleStep->GetGroupTarget()) ProRataBonds.enqueue(h);
-							}
-						}
-						TotalPayable=qMax(TotalPayable,0.000001);
-						//CCC test
-						if(m_CCCcurve.GetValue(CurrentDate)>m_CCCTestLimit)
-							Solution=(1.0-((m_CCCcurve.GetValue(CurrentDate)-m_CCCTestLimit)*m_CCChaircut))*m_MortgagesPayments.GetAmountOut(i);
-						else
-							Solution=m_MortgagesPayments.GetAmountOut(i);
-						Solution += AvailablePrincipal.Total();
-						if(Solution==0.0) Solution=1.0;
-
-						if(Solution/TotalPayable<m_ReinvestmentTest.GetTestLevel() && AvailableInterest>0.0){
-							//if it fails and you can do something about it
-							if(CurrentDate<m_ReinvestmentTest.GetReinvestmentPeriod()){
-								//during reinvestment period
-								Solution=qMin(TotalPayable-(Solution/m_ReinvestmentTest.GetTestLevel()),AvailableInterest);
-								TotalPayable=Solution*m_ReinvestmentTest.GetShare(ReinvestmentTest::InReinvShare);
-								Solution*=m_ReinvestmentTest.GetShare(ReinvestmentTest::InRedempShare);
-							}
-							else{
-								//after reinvestment period
-								Solution=qMin(TotalPayable-(Solution/m_ReinvestmentTest.GetTestLevel()),AvailableInterest);
-								TotalPayable=Solution*m_ReinvestmentTest.GetShare(ReinvestmentTest::OutReinvShare);
-								Solution*=m_ReinvestmentTest.GetShare(ReinvestmentTest::OutRedempShare);
-							}
-							AvailableInterest-=TotalPayable+Solution;
-							//reinvest
-							if(TotalPayable>0.0){
-								m_ReinvestmentTest.CalculateBondCashFlows(TotalPayable,CurrentDate,i);
-								m_MortgagesPayments.AddFlow(m_ReinvestmentTest.GetBondCashFlow());
-								m_Reinvested.AddFlow(CurrentDate, TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
-								AvailableInterest+=m_ReinvestmentTest.GetBondCashFlow().GetInterest(CurrentDate);
-								AvailablePrincipal.AddScheduled(m_ReinvestmentTest.GetBondCashFlow().GetScheduled(CurrentDate));
-								AvailablePrincipal.AddPrepay(m_ReinvestmentTest.GetBondCashFlow().GetPrepay(CurrentDate));
-								CheckResults -= m_ReinvestmentTest.GetBondCashFlow().GetScheduled(CurrentDate) + m_ReinvestmentTest.GetBondCashFlow().GetPrepay(CurrentDate) + m_ReinvestmentTest.GetBondCashFlow().GetInterest(CurrentDate);
-							}
-							//Redeem
-							if(SingleStep->GetRedemptionGroup()>0) Solution=RedeemNotes(Solution,SingleStep->GetRedemptionGroup(),CurrentDate);
-							else Solution=RedeemSequential(Solution,CurrentDate);
-							AvailableInterest+=Solution;
-						}
-					}
-				break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				case WatFalPrior::wst_ReinvestPrincipal:
 					if(CurrentDate<=m_ReinvestmentTest.GetReinvestmentPeriod() && !IsCallPaymentDate){
@@ -1272,7 +1262,6 @@ QDataStream& operator<<(QDataStream & stream, const Waterfall& flows){
 		<< flows.m_CCCTestLimit
 		<< flows.m_CCCcurve
 		<< flows.m_CCChaircut
-		<< flows.m_UseTurbo
 		<< flows.m_PrincipalAvailable.GetScheduled()
 		<< flows.m_PrincipalAvailable.GetPrepay()
 		<< flows.m_InterestAvailable
@@ -1334,7 +1323,6 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream){
 	stream >> m_CCCTestLimit;
 	m_CCCcurve.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_CCCcurve;
 	stream >> m_CCChaircut
-		>> m_UseTurbo
 		>> TempDouble;
 	m_PrincipalAvailable.SetScheduled(TempDouble);
 	stream >> TempDouble

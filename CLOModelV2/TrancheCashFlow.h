@@ -17,7 +17,9 @@ public:
 		PrincipalFlow=1,
 		OCFlow=11,
 		ICFlow=12,
-		DeferredFlow = 1 << (MaximumInterestsTypes+1)
+		DeferredFlow = 1 << (MaximumInterestsTypes+1),
+		PDLOutstanding=201,
+		PDLCured=202
 	};
 	TrancheCashFlow(double ThrancheOutstanding=0.0);
 	TrancheCashFlow(const TrancheCashFlow& a);

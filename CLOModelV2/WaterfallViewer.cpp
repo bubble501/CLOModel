@@ -198,6 +198,15 @@ void WaterfallViewer::AddStep(const WatFalPrior& a){
 		InterestTable->setItem(InterestTable->rowCount() - 1, 2, new QTableWidgetItem(QString("%1").arg(a.GetRedemptionGroup())));
 		InterestTable->setItem(InterestTable->rowCount() - 1, 3, new QTableWidgetItem(QString("%1%").arg(a.GetRedemptionShare() * 100)));
 	break;
+	case WatFalPrior::wst_PDL:
+		InterestTable->setRowCount(InterestTable->rowCount() + 1);
+		InterestTable->setItem(InterestTable->rowCount() - 1, 0, new QTableWidgetItem("Cure PDL"));
+		InterestTable->setItem(InterestTable->rowCount() - 1, 1, new QTableWidgetItem(QString("%1").arg(a.GetGroupTarget())));
+		if (a.GetRedemptionGroup() > 0) {
+			InterestTable->setItem(InterestTable->rowCount() - 1, 2, new QTableWidgetItem(QString("%1").arg(a.GetRedemptionGroup())));
+			InterestTable->setItem(InterestTable->rowCount() - 1, 3, new QTableWidgetItem(QString("%1%").arg(a.GetRedemptionShare() * 100)));
+		}
+	break;
 	default:
 		QMessageBox::critical(this,"Invalid Step","The step you tried to add is invalid.\nPlease check the Waterfall");
 	}

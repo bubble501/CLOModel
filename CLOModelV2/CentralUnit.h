@@ -65,7 +65,6 @@ public:
 	void SetPaymentFrequency(const QString& a){Structure.SetPaymentFrequency(a);}
 	void SetCCCTestLimit(double a){Structure.SetCCCTestLimit(a);}
 	void SetCCChaircut(double a){Structure.SetCCChaircut(a);}
-	void SetUseTurbo(bool a){Structure.SetUseTurbo(a);}
 	void SetSchedPrincAvailable(double a) { Structure.SetSchedPrincAvailable(a); }
 	void SetPrepPrincAvailable(double a) { Structure.SetPrepPrincAvailable(a); }
 	void SetInterestAvailable(double a){Structure.SetInterestAvailable(a);}

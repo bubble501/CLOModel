@@ -110,7 +110,6 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		TempUnit.SetPaymentFrequency(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
 		TempUnit.SetFirstIPDdate(QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd"));pdFreq++;
 		TempUnit.SetLastIPDdate(QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd"));pdFreq++;
-		TempUnit.SetUseTurbo(pdFreq->boolVal);pdFreq++;
 		TempUnit.SetCCCcurve(QString::fromWCharArray(pdFreq->bstrVal));pdFreq++;
 		TempUnit.SetCCChaircut(pdFreq->dblVal);pdFreq++;
 		TempUnit.SetCCCTestLimit(pdFreq->dblVal);pdFreq++;

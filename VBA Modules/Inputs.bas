@@ -45,7 +45,6 @@ Public Sub GetInputFromStructure( _
     Dim SeniorExpensesFixedCell As Range
     Dim SeniorFeesFixedCell As Range
     Dim JuniorFeesFixedCell As Range
-    Dim UseTurboCell As Range
     Dim CCCcurveCell As Range
     Dim CCCvalueCell As Range
     Dim CCClimitCell As Range
@@ -210,7 +209,6 @@ Public Sub GetInputFromStructure( _
     Set SeniorExpensesCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SeniorExpensesField"), LookAt:=xlWhole, LookIn:=xlValues)
     Set SeniorFeesCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SeniorFeesField"), LookAt:=xlWhole, LookIn:=xlValues)
     Set JuniorFeesCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("JuniorFeesField"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set UseTurboCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("UseTurboField"), LookAt:=xlWhole, LookIn:=xlValues)
     Set CCCcurveCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("CCCcurveField"), LookAt:=xlWhole, LookIn:=xlValues)
     Set CCCvalueCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("CCCvalueField"), LookAt:=xlWhole, LookIn:=xlValues)
     Set CCClimitCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("CCClimitField"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -283,10 +281,10 @@ ReferenceRateFromBBg:
                 Call AddInput(AllTheInputs, CStr(HaircutVecStart.Offset(i, 0).Value))
             End If
             If (LoanDayCountHead Is Nothing) Then
-                Call AddInput(AllTheInputs, CLng(1024 + 104))
+                Call AddInput(AllTheInputs, 1128)
             Else
                If (IsEmpty(LoanDayCountHead.Offset(i, 0)) Or LoanDayCountHead.Offset(i, 0).Value = "") Then
-                    Call AddInput(AllTheInputs, CLng(1024 + 104))
+                    Call AddInput(AllTheInputs, 1128)
                Else
                     Call AddInput(AllTheInputs, CLng(LoanDayCountHead.Offset(i, 0).Value))
                End If
@@ -435,7 +433,6 @@ DefaultExchange:
     Call AddInput(AllTheInputs, CStr(IPDfrequencyCell.Offset(0, 1)))
     Call AddInput(AllTheInputs, Format(FirstIPDcell.Offset(0, 1), "yyyy-mm-dd"))
     Call AddInput(AllTheInputs, Format(PrevIPDCell.Offset(0, 1), "yyyy-mm-dd"))
-    Call AddInput(AllTheInputs, UseTurboCell.Offset(0, 1).Value)
     Call AddInput(AllTheInputs, CStr(CCCcurveCell.Offset(0, 1).Value))
     Call AddInput(AllTheInputs, CCCvalueCell.Offset(0, 1).Value)
     Call AddInput(AllTheInputs, CCClimitCell.Offset(0, 1).Value)
@@ -747,7 +744,6 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
     a.Add "Senior management fees fixed", "SeniorFeesFieldFixed"
     a.Add "Junior management fees fixed", "JuniorFeesFieldFixed"
     a.Add "Junior fees deferred coupon", "JuniorFeesCouponField"
-    a.Add "Use Turbo feature", "UseTurboField"
     a.Add "CCC curve", "CCCcurveField"
     a.Add "CCC value", "CCCvalueField"
     a.Add "CCC limit", "CCClimitField"
@@ -885,6 +881,8 @@ Private Function FromStringToPriorty(a As String) As Long
             FromStringToPriorty = 15
         Case UCase("Turbo")
             FromStringToPriorty = 16
+        Case UCase("Cure PDL")
+            FromStringToPriorty = 17
         Case Else
             GoTo FromStringToPriorty_Error
     End Select

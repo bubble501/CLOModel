@@ -67,7 +67,6 @@ private:
 	double m_CCCTestLimit; 
 	BloombergVector m_CCCcurve; 
 	double m_CCChaircut; 
-	bool m_UseTurbo; 
 	PrincipalRecip m_PrincipalAvailable;
 	double m_InterestAvailable; 
 	double m_JuniorFeesCoupon; 
@@ -115,7 +114,6 @@ public:
 	QString GetPaymentFrequency() const {return m_PaymentFrequency.GetVector();}
 	double GetCCCTestLimit() const {return m_CCCTestLimit;} 
 	double GetCCChaircut() const {return m_CCChaircut;} 
-	bool GetUseTurbo() const {return m_UseTurbo;} 
 	double GetPrincipalAvailable() const {return m_PrincipalAvailable.Total();} 
 	double GetScheduledPrincipalAvailable() const { return m_PrincipalAvailable.GetScheduled(); }
 	double GetPrepayPrincipalAvailable() const { return m_PrincipalAvailable.GetPrepay(); }
@@ -191,7 +189,6 @@ public:
 	void SetPaymentFrequency(const QString& a);
 	void SetCCCTestLimit(double a){if(a>=0.0 && a<=1.0) m_CCCTestLimit=a;}
 	void SetCCChaircut(double a){if(a>=0.0 && a<=1.0) m_CCChaircut=a;}
-	void SetUseTurbo(bool a){m_UseTurbo=a;}
 	void SetSchedPrincAvailable(double a){m_PrincipalAvailable.SetScheduled(a);}
 	void SetPrepPrincAvailable(double a) { m_PrincipalAvailable.SetPrepay(a); }
 	void SetInterestAvailable(double a){m_InterestAvailable=a;}

@@ -831,6 +831,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						AvailablePrincipal-= AvailablePrincipal.Total()*SingleStep->GetRedemptionShare();
 					}
 					m_TotalJuniorFees.AddFlow(CurrentDate, TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow) + 1);
+					m_AnnualizedExcess.AddFlow(CurrentDate, TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow) + 1);
 				break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				case WatFalPrior::wst_ReserveReplenish:

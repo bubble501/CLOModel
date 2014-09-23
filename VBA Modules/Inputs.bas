@@ -883,6 +883,8 @@ Private Function FromStringToPriorty(a As String) As Long
             FromStringToPriorty = 16
         Case UCase("Cure PDL")
             FromStringToPriorty = 17
+        Case UCase("Fees From XS")
+            FromStringToPriorty = 18
         Case Else
             GoTo FromStringToPriorty_Error
     End Select

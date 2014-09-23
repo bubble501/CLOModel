@@ -207,6 +207,24 @@ void WaterfallViewer::AddStep(const WatFalPrior& a){
 			InterestTable->setItem(InterestTable->rowCount() - 1, 3, new QTableWidgetItem(QString("%1%").arg(a.GetRedemptionShare() * 100)));
 		}
 	break;
+	case WatFalPrior::wst_FeesFromExcess:
+		if (a.GetRedemptionGroup() == 1 || a.GetRedemptionGroup()==3) {
+			InterestTable->setRowCount(InterestTable->rowCount() + 1);
+			InterestTable->setItem(InterestTable->rowCount() - 1, 0, new QTableWidgetItem("Junior Fees from Excess Spread"));
+			InterestTable->setItem(InterestTable->rowCount() - 1, 2, new QTableWidgetItem(QString("%1").arg(
+				(a.GetRedemptionGroup() == 1) ? "Excess Interest" : "All Excess"
+				)));
+			InterestTable->setItem(InterestTable->rowCount() - 1, 3, new QTableWidgetItem(QString("%1%").arg(a.GetRedemptionShare() * 100)));
+		}
+		else if (a.GetRedemptionGroup() == 2 || a.GetRedemptionGroup() == 3) {
+			PrincipalTable->setRowCount(PrincipalTable->rowCount() + 1);
+			PrincipalTable->setItem(PrincipalTable->rowCount() - 1, 0, new QTableWidgetItem("Junior Fees from Excess Spread"));
+			PrincipalTable->setItem(PrincipalTable->rowCount() - 1, 2, new QTableWidgetItem(QString("%1").arg(
+				(a.GetRedemptionGroup() == 2) ? "Excess Principal" : "All Excess"
+				)));
+			PrincipalTable->setItem(PrincipalTable->rowCount() - 1, 3, new QTableWidgetItem(QString("%1%").arg(a.GetRedemptionShare() * 100)));
+		}
+	break;
 	default:
 		QMessageBox::critical(this,"Invalid Step","The step you tried to add is invalid.\nPlease check the Waterfall");
 	}

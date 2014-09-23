@@ -798,21 +798,39 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					TotalPayable += m_JuniorFeesFixed.GetValue(CurrentDate);
 					TotalPayable=qMax(TotalPayable,0.0);
 					if(SingleStep->GetRedemptionGroup()==1){
-						m_TotalJuniorFees.AddFlow(CurrentDate, qMin(AvailableInterest, TotalPayable), static_cast<double>(TrancheCashFlow::TrancheFlowType::InterestFlow));
-						m_AnnualizedExcess.AddFlow(CurrentDate, qMin(AvailableInterest, TotalPayable), static_cast<double>(TrancheCashFlow::TrancheFlowType::InterestFlow));
+						m_TotalJuniorFees.AddFlow(CurrentDate, qMin(AvailableInterest, TotalPayable), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
+						m_AnnualizedExcess.AddFlow(CurrentDate, qMin(AvailableInterest, TotalPayable), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
 						if(AvailableInterest<TotalPayable){
-							m_TotalJuniorFees.SetFlow(CurrentDate, TotalPayable - AvailableInterest, static_cast<double>(TrancheCashFlow::TrancheFlowType::DeferredFlow));
+							m_TotalJuniorFees.SetFlow(CurrentDate, TotalPayable - AvailableInterest, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow));
 						}
 						AvailableInterest -= qMin(AvailableInterest, TotalPayable);
 					}
 					else if(SingleStep->GetRedemptionGroup()==2){
-						m_TotalJuniorFees.AddFlow(CurrentDate, qMin(AvailablePrincipal.Total(), TotalPayable), static_cast<double>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
-						m_AnnualizedExcess.AddFlow(CurrentDate, qMin(AvailablePrincipal.Total(), TotalPayable), static_cast<double>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
+						m_TotalJuniorFees.AddFlow(CurrentDate, qMin(AvailablePrincipal.Total(), TotalPayable), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
+						m_AnnualizedExcess.AddFlow(CurrentDate, qMin(AvailablePrincipal.Total(), TotalPayable), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
 						if(AvailablePrincipal.Total()<TotalPayable){
-							m_TotalJuniorFees.SetFlow(CurrentDate, TotalPayable - AvailablePrincipal.Total(), static_cast<double>(TrancheCashFlow::TrancheFlowType::DeferredFlow));
+							m_TotalJuniorFees.SetFlow(CurrentDate, TotalPayable - AvailablePrincipal.Total(), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow));
 						}
 						AvailablePrincipal -= qMin(AvailablePrincipal.Total(),TotalPayable);
 					}
+				break;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				case WatFalPrior::wst_FeesFromExcess:
+					TotalPayable = 0.0;
+					if (SingleStep->GetRedemptionShare() < 0.0 || SingleStep->GetRedemptionShare() > 1.0) {
+						PrintToTempFile("ReturnFalse.txt", "Redemption Share Over 100%");
+						return false;
+					}
+					if (SingleStep->GetRedemptionGroup() == 1 || SingleStep->GetRedemptionGroup()==3) {
+						TotalPayable += AvailableInterest*SingleStep->GetRedemptionShare();
+						AvailableInterest *= (1.0 - SingleStep->GetRedemptionShare());
+					}
+					if (SingleStep->GetRedemptionGroup() == 2 || SingleStep->GetRedemptionGroup() == 3) {
+						TotalPayable += AvailablePrincipal.Total()*SingleStep->GetRedemptionShare();
+						AvailablePrincipal-= AvailablePrincipal.Total()*SingleStep->GetRedemptionShare();
+					}
+					m_TotalJuniorFees.AddFlow(CurrentDate, TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow) + 1);
 				break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				case WatFalPrior::wst_ReserveReplenish:
@@ -1073,6 +1091,10 @@ bool Waterfall::CalculateTranchesCashFlows(){
 							}
 							//If turbo is to be used
 							if (SingleStep->GetRedemptionGroup() > 0 && SingleStep->GetRedemptionShare() > 0.0) {
+								if (SingleStep->GetRedemptionShare() > 1.0) {
+									PrintToTempFile("ReturnFalse.txt", "Redemption Share Over 100%");
+									return false;
+								}
 								TotalPayable =
 									(TotalPayable*(1.0 - SingleStep->GetRedemptionShare()))
 									+ RedeemNotes(SingleStep->GetRedemptionShare()*TotalPayable, SingleStep->GetRedemptionGroup(), CurrentDate);
@@ -1196,6 +1218,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					}	
 				break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				
 				default:
 					PrintToTempFile("ReturnFalse.txt", "Reached Default");
 					return false;

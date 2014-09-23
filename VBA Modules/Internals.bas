@@ -138,6 +138,17 @@ Public Sub WaterfallStepChanged(TargetAllCell As Range)
                 TargetCell.Offset(0, 1).AddComment ("First Seniority Level To Redeem")
                 TargetCell.Offset(0, 2).AddComment ("Last Seniority Level To Redeem")
                 TargetCell.Offset(0, 1).Resize(1, 2).NumberFormat = "0"
+            Case UCase("Fees from XS")
+                TargetCell.Offset(0, 1).Value = ""
+                TargetCell.Offset(0, 2).Value = 3
+                TargetCell.Offset(0, 3).Value = 0
+                TargetCell.Offset(0, 2).Locked = False
+                TargetCell.Offset(0, 3).Locked = False
+                TargetCell.Offset(0, 1).Locked = True
+                TargetCell.Offset(0, 2).AddComment ("1 Excess Interest, 2 Excess Principal, 3 All excess")
+                TargetCell.Offset(0, 3).AddComment ("Share of Excess Toward Fees")
+                TargetCell.Offset(0, 2).NumberFormat = "[=1]""XS Interst"";[=2]""XS Principal"";""All XS"""
+                TargetCell.Offset(0, 3).NumberFormat = "0%"
             Case ""
                 TargetCell.Offset(0, 1).Resize(1, 3).ClearContents
                 TargetCell.Offset(0, 1).Resize(1, 3).Locked = True

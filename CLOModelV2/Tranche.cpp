@@ -347,8 +347,8 @@ void Tranche::GetDataFromBloomberg() {
 	if (Bee.GetResult(13)->HasErrors()) ISINcode = "";
 	else ISINcode = Bee.GetResult(13)->GetString();
 
-	if (Bee.GetResult(14)->HasErrors()) m_DayCount = DayCountConvention::ACT360;
-	else m_DayCount = static_cast<DayCountConvention>(static_cast<int>(Bee.GetResult(14)->GetDouble()));
+	if (Bee.GetResult(14)->HasErrors()) m_DayCount = QString::number(static_cast<qint16>(DayCountConvention::ACT360));
+	else m_DayCount = QString::number(static_cast<int>(Bee.GetResult(14)->GetDouble()));
 
 	DownloadBaseRates();
 }
@@ -366,14 +366,8 @@ double Tranche::GetLossRate() const{
 double Tranche::GetDiscountMargin() const {return GetDiscountMargin(Price);}
 double Tranche::GetDiscountMargin(double NewPrice)const{
 	if(/*GetLossRate()>0.0000 ||*/ OutstandingAmt<0.01) return 0.0;
-	const bool AdjHolidays =
-		m_DayCount == DayCountConvention::ACT360
-		|| m_DayCount == DayCountConvention::ACT365
-		|| m_DayCount == DayCountConvention::ACTACT
-		|| m_DayCount == DayCountConvention::AFBACTACT
-		|| m_DayCount == DayCountConvention::ISDAACTACT
-		;
-	double AccruedInterest = AdjustCoupon(GetTotalCoupon(0), LastPaymentDate, SettlementDate, m_DayCount);
+	
+	double AccruedInterest = AdjustCoupon(GetTotalCoupon(0), LastPaymentDate, SettlementDate, m_DayCount.GetValue(SettlementDate));
 	QDate TempDate;
 	QList<QDate> FlowsDates;
 	QList<double> FlowsValues;
@@ -381,7 +375,7 @@ double Tranche::GetDiscountMargin(double NewPrice)const{
 	FlowsValues.append(-OutstandingAmt*((NewPrice/100.0)+AccruedInterest));
 	for (int i=0;i<CashFlow.Count();i++){
 		TempDate = CashFlow.GetDate(i);
-		while (AdjHolidays && IsHoliday(TempDate)) 
+		while (AdjHolidays(m_DayCount.GetValue(TempDate)) && IsHoliday(TempDate))
 			TempDate = TempDate.addDays(1);
 		FlowsDates.append(TempDate);
 		FlowsValues.append(CashFlow.GetTotalFlow(i));
@@ -402,14 +396,8 @@ double Tranche::GetDiscountMargin(double NewPrice)const{
 double Tranche::GetIRR() const {return GetIRR(Price);}
 double Tranche::GetIRR(double NewPrice)const{
 	if(/*GetLossRate()>0.0000 ||*/ OutstandingAmt<0.01) return 0.0;
-	const bool AdjHolidays =
-		m_DayCount == DayCountConvention::ACT360
-		|| m_DayCount == DayCountConvention::ACT365
-		|| m_DayCount == DayCountConvention::ACTACT
-		|| m_DayCount == DayCountConvention::AFBACTACT
-		|| m_DayCount == DayCountConvention::ISDAACTACT
-	;
-	double AccruedInterest = AdjustCoupon(GetTotalCoupon(0), LastPaymentDate, SettlementDate, m_DayCount);
+
+	double AccruedInterest = AdjustCoupon(GetTotalCoupon(0), LastPaymentDate, SettlementDate, m_DayCount.GetValue(SettlementDate));
 	QList<QDate> FlowsDates;
 	QList<double> FlowsValues;
 	QDate TempDate;
@@ -417,7 +405,7 @@ double Tranche::GetIRR(double NewPrice)const{
 	FlowsValues.append(-OutstandingAmt*((NewPrice/100.0)+AccruedInterest));
 	for (int i=0;i<CashFlow.Count();i++){
 		TempDate = CashFlow.GetDate(i);
-		while (AdjHolidays && IsHoliday(TempDate)) TempDate = TempDate.addDays(1);
+		while (AdjHolidays(m_DayCount.GetValue(TempDate)) && IsHoliday(TempDate)) TempDate = TempDate.addDays(1);
 		FlowsDates.append(TempDate);
 		FlowsValues.append(CashFlow.GetTotalFlow(i));
 	}
@@ -464,7 +452,7 @@ QDataStream& operator<<(QDataStream & stream, const Tranche& flows){
 		<< flows.MinOClevel
 		<< flows.MinIClevel
 		<< flows.LastPaymentDate
-		<< static_cast<qint16>(flows.m_DayCount)
+		<< flows.m_DayCount
 		<< flows.ExchangeRate
 		<< flows.PaymentFrequency
 		<< flows.SettlementDate
@@ -505,8 +493,7 @@ QDataStream& Tranche::LoadOldVersion(QDataStream& stream){
 	stream >> MinOClevel;
 	stream >> MinIClevel;
 	stream >> LastPaymentDate;
-	stream >> TempShort;
-	m_DayCount = static_cast<DayCountConvention>(TempShort);
+	m_DayCount.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_DayCount;
 	stream >> ExchangeRate;
 	PaymentFrequency.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> PaymentFrequency;
 	stream >> SettlementDate;
@@ -605,6 +592,16 @@ void Tranche::SetDefaultRefRate(const QString& a) {
 void Tranche::SetInterestType(TrancheInterestType a, qint32 CoupIndex ) {
 	if (CoupIndex<0 || CoupIndex >= (1 << MaximumInterestsTypes)) return;
 	InterestType[CoupIndex] = a;
+}
+
+bool Tranche::AdjHolidays(DayCountConvention a) {
+	return
+		a == DayCountConvention::ACT360
+		|| a == DayCountConvention::ACT365
+		|| a == DayCountConvention::ACTACT
+		|| a == DayCountConvention::AFBACTACT
+		|| a == DayCountConvention::ISDAACTACT
+		;
 }
 
 

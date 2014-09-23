@@ -291,12 +291,11 @@ void Mortgage::SetInterest(const QString& a){
 		 << flows.m_HaircutVector
 		 << flows.m_UseForwardCurve
 		 << flows.m_Properties
-		 << static_cast<qint16>(flows.m_DayCountConvention)
+		 << flows.m_DayCountConvention
 	;
 	 return stream;
  }
  QDataStream& Mortgage::LoadOldVersion(QDataStream& stream) {
-	 qint16 TempDaycount;
 	 stream >> m_MaturityDate;
 	 m_AnnuityVect.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_AnnuityVect;
 	 stream >> m_Size;
@@ -308,8 +307,8 @@ void Mortgage::SetInterest(const QString& a){
 	 m_FloatingRateBaseValue.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_FloatingRateBaseValue;
 	 m_PaymentFreq.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_PaymentFreq;
 	 m_HaircutVector.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_HaircutVector;
-	 stream >> m_UseForwardCurve >> m_Properties >> TempDaycount;
-	 m_DayCountConvention = static_cast<DayCountConvention>(TempDaycount);
+	 stream >> m_UseForwardCurve >> m_Properties;
+	 m_DayCountConvention.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_DayCountConvention;
 	 ResetProtocolVersion();
 	 return stream;
  }
@@ -326,7 +325,7 @@ void Mortgage::SetInterest(const QString& a){
 	if (m_InterestVect.IsEmpty())Result += "Loan Coupon\n";
 	if (m_HaircutVector.IsEmpty())Result += "Haircut Vector\n";
 	if (m_PaymentFreq.IsEmpty(1))Result += "Loan Payment Frequency\n";
-	if (m_DayCountConvention == DayCountConvention::Invalid)Result += "Loan Day Count Convention\n";
+	if (m_DayCountConvention.IsEmpty())Result += "Loan Day Count Convention\n";
 	if (HasProperty("CPR")) {if (BloombergVector(GetProperty("CPR")).IsEmpty(0.0, 1.0)) Result += "Loan CPR Assumption\n";}
 	if (HasProperty("CDR")) { if (BloombergVector(GetProperty("CDR")).IsEmpty(0.0, 1.0)) Result += "Loan CDR Assumption\n"; }
 	if (HasProperty("LS")) { if (BloombergVector(GetProperty("LS")).IsEmpty(0.0, 1.0)) Result += "Loan LS Assumption\n"; }
@@ -340,7 +339,7 @@ void Mortgage::SetInterest(const QString& a){
 
  double Mortgage::GetInterest(const QDate& a, const QDate& StartAccrue, const QDate& EndAccrue) {
 	 if (m_FloatRateBase.IsEmpty()) //Fixed rate
-		 return AdjustCoupon(m_InterestVect.GetValue(a),StartAccrue,EndAccrue,m_DayCountConvention);
+		 return AdjustCoupon(m_InterestVect.GetValue(a), StartAccrue, EndAccrue, m_DayCountConvention.GetValue(a));
 	 else {
 		 if (m_FloatingRateBaseValue.IsEmpty()) {
 #ifdef NO_BLOOMBERG
@@ -350,12 +349,12 @@ void Mortgage::SetInterest(const QString& a){
 			 m_UseForwardCurve = false;
 #endif
 		 }
-		 return  AdjustCoupon((m_InterestVect + m_FloatingRateBaseValue).GetValue(a),StartAccrue, EndAccrue, m_DayCountConvention);
+		 return  AdjustCoupon((m_InterestVect + m_FloatingRateBaseValue).GetValue(a), StartAccrue, EndAccrue, m_DayCountConvention.GetValue(a));
 	 }
  }
  double Mortgage::GetInterest(int a, const QDate& StartAccrue, const QDate& EndAccrue) {
 	 if (m_FloatRateBase.IsEmpty()) //Fixed rate
-		 return AdjustCoupon(m_InterestVect.GetValue(a), StartAccrue, EndAccrue, m_DayCountConvention);
+		 return AdjustCoupon(m_InterestVect.GetValue(a), StartAccrue, EndAccrue, m_DayCountConvention.GetValue(a));
 	 else {
 		 if (m_FloatingRateBaseValue.IsEmpty()) {
 #ifdef NO_BLOOMBERG
@@ -365,7 +364,7 @@ void Mortgage::SetInterest(const QString& a){
 			 m_UseForwardCurve = false;
 #endif
 		 }
-		 return  AdjustCoupon((m_InterestVect + m_FloatingRateBaseValue).GetValue(a), StartAccrue, EndAccrue, m_DayCountConvention);
+		 return  AdjustCoupon((m_InterestVect + m_FloatingRateBaseValue).GetValue(a), StartAccrue, EndAccrue, m_DayCountConvention.GetValue(a));
 	 }
  }
  double Mortgage::GetInterest(const QDate& a) {

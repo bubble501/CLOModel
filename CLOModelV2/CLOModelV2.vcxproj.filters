@@ -209,6 +209,9 @@
     <ClInclude Include="IRSwap.h">
       <Filter>Header Files\DealStructure</Filter>
     </ClInclude>
+    <ClInclude Include="DayCountVect.h">
+      <Filter>Header Files\Vectors</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Resources.qrc">
@@ -539,6 +542,9 @@
     </ClCompile>
     <ClCompile Include="IRSwap.cpp">
       <Filter>Source Files\Deal Structure</Filter>
+    </ClCompile>
+    <ClCompile Include="DayCountVect.cpp">
+      <Filter>Source Files\Vectors</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

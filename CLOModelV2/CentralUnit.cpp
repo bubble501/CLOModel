@@ -44,7 +44,7 @@ void CentralUnit::AddLoan(
 	, const QString& PrepayMult
 	, const QString& HaicutVect
 	, const QString& Properties
-	, DayCountConvention dayCnt
+	, const QString& dayCnt
 	) {
 	Mortgage TempMtg;
 	TempMtg.SetMaturityDate(Maturity);
@@ -102,7 +102,7 @@ void CentralUnit::AddTranche(
 	, double Price
 	, double FxRate
 	, const QString& BbgExt
-	, DayCountConvention DayCount
+	, const QString& DayCount
 ){
 	Tranche TempTrnch;
 	TempTrnch.SetTrancheName(Name);

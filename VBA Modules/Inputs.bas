@@ -281,12 +281,12 @@ ReferenceRateFromBBg:
                 Call AddInput(AllTheInputs, CStr(HaircutVecStart.Offset(i, 0).Value))
             End If
             If (LoanDayCountHead Is Nothing) Then
-                Call AddInput(AllTheInputs, 1128)
+                Call AddInput(AllTheInputs, "1128")
             Else
                If (IsEmpty(LoanDayCountHead.Offset(i, 0)) Or LoanDayCountHead.Offset(i, 0).Value = "") Then
-                    Call AddInput(AllTheInputs, 1128)
+                    Call AddInput(AllTheInputs, "1128")
                Else
-                    Call AddInput(AllTheInputs, CLng(LoanDayCountHead.Offset(i, 0).Value))
+                    Call AddInput(AllTheInputs, CStr(LoanDayCountHead.Offset(i, 0).Value))
                End If
             End If
             'Loans Properties
@@ -357,9 +357,9 @@ DefaultExchange:
         Call AddInput(AllTheInputs, Format(SettleDateCell.Offset(0, 1).Value, "yyyy-mm-dd"))
         'Call AddInput(AllTheInputs, AccruedIntrStart.Offset(i, 0).Value)
         If (DayCountHead Is Nothing) Then
-            Call AddInput(AllTheInputs, 102)
+            Call AddInput(AllTheInputs, "102")
         Else
-            Call AddInput(AllTheInputs, CLng(DayCountHead.Offset(i, 0).Value))
+            Call AddInput(AllTheInputs, CStr(DayCountHead.Offset(i, 0).Value))
         End If
         If (CurrentDeferredCell Is Nothing) Then
             Call AddInput(AllTheInputs, 0#)
@@ -407,9 +407,9 @@ DefaultExchange:
         Call AddInput(AllTheInputs, CStr(GICBaseRateCell.Offset(0, 1).Value))
     End If
     If (DealDaycountCell Is Nothing) Then
-        Call AddInput(AllTheInputs, 102)
+        Call AddInput(AllTheInputs, "102")
     Else
-        Call AddInput(AllTheInputs, CLng(DealDaycountCell.Offset(0, 1).Value))
+        Call AddInput(AllTheInputs, CStr(DealDaycountCell.Offset(0, 1).Value))
     End If
     Call AddInput(AllTheInputs, CStr(SeniorExpensesCell.Offset(0, 1).Value))
     Call AddInput(AllTheInputs, CStr(SeniorFeesCell.Offset(0, 1).Value))

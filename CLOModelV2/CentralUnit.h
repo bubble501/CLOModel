@@ -24,9 +24,9 @@ public:
 		, const QString& floatBase = "ZERO"
 		, const QString& LossMult = "100"
 		, const QString& PrepayMult = "100"
-		, const QString& HaicutVect = "0" 
-		, const QString& Properties=""
-		, DayCountConvention dayCnt=DayCountConvention::CompN30360
+		, const QString& HaicutVect = "0"
+		, const QString& Properties = ""
+		, const QString& dayCnt = QString::number(static_cast<qint16>(DayCountConvention::CompN30360))
 		);
 #ifndef NO_BLOOMBERG
 	void AddTranche(const QString& Name,int ProRataGroup, double MinOC=0.0, double MinIC=0.0, double Price=100.0,double FxRate= 1.0,const QString& BbgExt="Mtge");
@@ -52,7 +52,7 @@ public:
 		, double Price = 100.0
 		, double FxRate = 1.0
 		, const QString& BbgExt = "Mtge"
-		, DayCountConvention DayCount = DayCountConvention::ACT360
+		, const QString& DayCount = QString::number(static_cast<qint16>(DayCountConvention::ACT360))
 	);
 	void AddTranche(const Tranche& a) { Structure.AddTranche(a);	if (Stresser)Stresser->SetStructure(Structure); }
 	void AddWaterfallStep(WatFalPrior::WaterfallStepType Tpe, int GrpTgt, int RdmpGrp=0, double RdmpShare=0.0);
@@ -79,7 +79,7 @@ public:
 	void SetStartingDeferredJunFees(const double& val) { Structure.SetStartingDeferredJunFees(val); }
 	void SetGICinterest(const QString& a) { Structure.SetGICinterest(a); }
 	void SetGICBaseRate(const QString& a) { Structure.SetGICBaseRate(a); }
-	void SetDealDayCountConvention(DayCountConvention val) { Structure.SetDealDayCountConvention(val); }
+	void SetDealDayCountConvention(const QString&  val) { Structure.SetDealDayCountConvention(val); }
 	void SetupReinvestmentTest(const QDate& ReinvPer,double TstLvl, double IIshare,double IRshare,double OIshare,double ORshare){Structure.SetupReinvestmentTest(ReinvPer,TstLvl,IIshare,IRshare,OIshare,ORshare);}
 	void SetupReinvBond(
 		const QString& IntrVec

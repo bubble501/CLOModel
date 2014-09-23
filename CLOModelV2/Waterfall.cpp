@@ -31,7 +31,7 @@ Tranche* Waterfall::GetTranche(const QString& TrancheName){
 	return GetTranche(FindTrancheIndex(TrancheName));
 }
 void Waterfall::SortByProRataGroup(){
-	qSort(m_Tranches.begin(),m_Tranches.end(),LessThanPoint<Tranche>);
+	qSort(m_Tranches.begin(), m_Tranches.end(), [](const Tranche* a, const Tranche* b) -> bool {return (*a) < (*b); });
 }
 QDate Waterfall::GetStructureMaturity()const{
 	if(m_Tranches.isEmpty()) return QDate();
@@ -657,7 +657,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 			if (i > 0) {
 				CurrentAssetSum += m_MortgagesPayments.GetAmountOut(i-1);
 				++CurrentAssetCount;
-				TotalPayable = AdjustCoupon(m_GICinterest.GetValue(CurrentDate) + m_GICBaseRateValue.GetValue(CurrentDate), m_MortgagesPayments.GetDate(i - 1), m_MortgagesPayments.GetDate(i), m_DealDayCountConvention);
+				TotalPayable = AdjustCoupon(m_GICinterest.GetValue(CurrentDate) + m_GICBaseRateValue.GetValue(CurrentDate), m_MortgagesPayments.GetDate(i - 1), m_MortgagesPayments.GetDate(i), m_DealDayCountConvention.GetValue(CurrentDate));
 				m_GICflows.AddFlow(CurrentDate, m_InterestAvailable*TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
 				m_GICflows.AddFlow(CurrentDate, m_PrincipalAvailable.GetScheduled()*TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
 				m_GICflows.AddFlow(CurrentDate, m_PrincipalAvailable.GetPrepay()*TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
@@ -747,7 +747,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 				switch(SingleStep->GetPriorityType()){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				case WatFalPrior::wst_SeniorExpenses:
-					adjSeniorExpenses = AdjustCoupon(m_SeniorExpenses.GetValue(CurrentDate), RollingLastIPD, RollingNextIPD, m_DealDayCountConvention);
+					adjSeniorExpenses = AdjustCoupon(m_SeniorExpenses.GetValue(CurrentDate), RollingLastIPD, RollingNextIPD, m_DealDayCountConvention.GetValue(CurrentDate));
 					TotalPayable=adjSeniorExpenses*(CurrentAssetSum/static_cast<double>(CurrentAssetCount))
 						- m_TotalSeniorExpenses.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow))
 						- m_TotalSeniorExpenses.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow))
@@ -767,7 +767,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 				break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				case WatFalPrior::wst_SeniorFees:
-					adjSeniorFees = AdjustCoupon(m_SeniorFees.GetValue(CurrentDate), RollingLastIPD, RollingNextIPD, m_DealDayCountConvention);
+					adjSeniorFees = AdjustCoupon(m_SeniorFees.GetValue(CurrentDate), RollingLastIPD, RollingNextIPD, m_DealDayCountConvention.GetValue(CurrentDate));
 					TotalPayable = adjSeniorFees*(CurrentAssetSum / static_cast<double>(CurrentAssetCount))
 						- m_TotalSeniorFees.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow))
 						- m_TotalSeniorFees.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow))
@@ -787,12 +787,12 @@ bool Waterfall::CalculateTranchesCashFlows(){
 				break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				case WatFalPrior::wst_juniorFees:
-					adjJuniorFees = AdjustCoupon(m_JuniorFees.GetValue(CurrentDate), RollingLastIPD, RollingNextIPD, m_DealDayCountConvention);
+					adjJuniorFees = AdjustCoupon(m_JuniorFees.GetValue(CurrentDate), RollingLastIPD, RollingNextIPD, m_DealDayCountConvention.GetValue(CurrentDate));
 					TotalPayable = (adjJuniorFees*(CurrentAssetSum / static_cast<double>(CurrentAssetCount)))
 						- m_TotalJuniorFees.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow))
 						- m_TotalJuniorFees.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow))
-						+ ((1.0 + AdjustCoupon(m_JuniorFeesCoupon,RollingLastIPD,RollingNextIPD, m_DealDayCountConvention))*m_TotalJuniorFees.GetPreviousFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow)))
-						+ ((1.0 + AdjustCoupon(m_JuniorFeesCoupon, RollingLastIPD, RollingNextIPD, m_DealDayCountConvention))*m_StartingDeferredJunFees)
+						+ ((1.0 + AdjustCoupon(m_JuniorFeesCoupon, RollingLastIPD, RollingNextIPD, m_DealDayCountConvention.GetValue(CurrentDate)))*m_TotalJuniorFees.GetPreviousFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow)))
+						+ ((1.0 + AdjustCoupon(m_JuniorFeesCoupon, RollingLastIPD, RollingNextIPD, m_DealDayCountConvention.GetValue(CurrentDate)))*m_StartingDeferredJunFees)
 					;
 					m_StartingDeferredJunFees = 0.0;
 					TotalPayable += m_JuniorFeesFixed.GetValue(CurrentDate);
@@ -880,7 +880,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					for(int h=0;h<m_Tranches.size();h++){
 						if(m_Tranches.at(h)->GetProrataGroup()==SingleStep->GetGroupTarget()){
 							ProRataBonds.enqueue(h);
-							AdjustedCoupon = AdjustCoupon(m_Tranches.at(h)->GetCoupon(CurrentDate, qMin(SingleStep->GetRedemptionGroup() - 1, 0)), RollingLastIPD, RollingNextIPD, m_Tranches.at(h)->GetDayCount());
+							AdjustedCoupon = AdjustCoupon(m_Tranches.at(h)->GetCoupon(CurrentDate, qMin(SingleStep->GetRedemptionGroup() - 1, 0)), RollingLastIPD, RollingNextIPD, m_Tranches.at(h)->GetDayCount().GetValue(CurrentDate));
 							if (m_Tranches.at(h)->GetStartingDeferredInterest()>=0.01) {
 								Solution = m_Tranches.at(h)->GetStartingDeferredInterest();
 							}
@@ -891,7 +891,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						}
 					}
 					while (ProRataBonds.size()>0) {
-						AdjustedCoupon = AdjustCoupon(m_Tranches.at(ProRataBonds.head())->GetCoupon(CurrentDate, qMin(SingleStep->GetRedemptionGroup() - 1, 0)), RollingLastIPD, RollingNextIPD, m_Tranches.at(ProRataBonds.head())->GetDayCount());
+						AdjustedCoupon = AdjustCoupon(m_Tranches.at(ProRataBonds.head())->GetCoupon(CurrentDate, qMin(SingleStep->GetRedemptionGroup() - 1, 0)), RollingLastIPD, RollingNextIPD, m_Tranches.at(ProRataBonds.head())->GetDayCount().GetValue(CurrentDate));
 						if (m_Tranches.at(ProRataBonds.head())->GetStartingDeferredInterest() >= 0.01) {
 							Solution = AdjustedCoupon* m_Tranches.at(ProRataBonds.head())->GetStartingDeferredInterest();
 							m_Tranches[ProRataBonds.head()]->SetStartingDeferredInterest(0.0);
@@ -1119,14 +1119,14 @@ bool Waterfall::CalculateTranchesCashFlows(){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				case WatFalPrior::wst_ICTest:
 				case WatFalPrior::wst_ICTestPrinc:
-					adjSeniorExpenses = AdjustCoupon(m_SeniorExpenses.GetValue(CurrentDate),RollingNextIPD,RollingNextIPD.addMonths(m_PaymentFrequency.GetValue(RollingNextIPD)),m_DealDayCountConvention);
-					adjSeniorFees = AdjustCoupon(m_SeniorFees.GetValue(CurrentDate), RollingNextIPD, RollingNextIPD.addMonths(m_PaymentFrequency.GetValue(RollingNextIPD)), m_DealDayCountConvention);
+					adjSeniorExpenses = AdjustCoupon(m_SeniorExpenses.GetValue(CurrentDate), RollingNextIPD, RollingNextIPD.addMonths(m_PaymentFrequency.GetValue(RollingNextIPD)), m_DealDayCountConvention.GetValue(CurrentDate));
+					adjSeniorFees = AdjustCoupon(m_SeniorFees.GetValue(CurrentDate), RollingNextIPD, RollingNextIPD.addMonths(m_PaymentFrequency.GetValue(RollingNextIPD)), m_DealDayCountConvention.GetValue(CurrentDate));
 					ProRataBonds.clear();
 					TotalPayable = 0.0;
 					Solution = m_InterestAvailable + m_MortgagesPayments.GetAccruedInterest(i) - ((adjSeniorFees + adjSeniorExpenses)*(CurrentAssetSum / static_cast<double>(CurrentAssetCount))) - m_SeniorExpensesFixed.GetValue(CurrentDate) - m_SeniorFeesFixed.GetValue(CurrentDate);
 					for (int h = 0; h < m_Tranches.size(); h++) {
 						if (m_Tranches.at(h)->GetProrataGroup() <= SingleStep->GetGroupTarget()) {
-							AdjustedCoupon = AdjustCoupon((m_Tranches.at(h)->GetCoupon(CurrentDate, qMin(SingleStep->GetRedemptionGroup() - 1, 0))), RollingNextIPD, RollingNextIPD.addMonths(m_PaymentFrequency.GetValue(RollingNextIPD)), m_Tranches.at(h)->GetDayCount());
+							AdjustedCoupon = AdjustCoupon((m_Tranches.at(h)->GetCoupon(CurrentDate, qMin(SingleStep->GetRedemptionGroup() - 1, 0))), RollingNextIPD, RollingNextIPD.addMonths(m_PaymentFrequency.GetValue(RollingNextIPD)), m_Tranches.at(h)->GetDayCount().GetValue(CurrentDate));
 							TotalPayable += AdjustedCoupon*(m_Tranches.at(h)->GetCurrentOutstanding() + m_Tranches.at(h)->GetCashFlow().GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | (qMin(SingleStep->GetRedemptionGroup() - 1, 0))));
 							if (m_Tranches.at(h)->GetProrataGroup() == SingleStep->GetGroupTarget()) ProRataBonds.enqueue(h);
 						}
@@ -1148,7 +1148,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 							Solution = 0.0;
 							for (int h = 0; h<m_Tranches.size(); h++) {
 								if (m_Tranches.at(h)->GetProrataGroup() <= SingleStep->GetGroupTarget() && m_Tranches.at(h)->GetProrataGroup() >= SolutionDegree) {
-									AdjustedCoupon = AdjustCoupon((m_Tranches.at(h)->GetCoupon(CurrentDate, qMin(SingleStep->GetRedemptionGroup() - 1, 0))), RollingNextIPD, RollingNextIPD.addMonths((m_PaymentFrequency.GetValue(RollingNextIPD))), m_Tranches.at(h)->GetDayCount());
+									AdjustedCoupon = AdjustCoupon((m_Tranches.at(h)->GetCoupon(CurrentDate, qMin(SingleStep->GetRedemptionGroup() - 1, 0))), RollingNextIPD, RollingNextIPD.addMonths((m_PaymentFrequency.GetValue(RollingNextIPD))), m_Tranches.at(h)->GetDayCount().GetValue(CurrentDate));
 									Solution += AdjustedCoupon*(m_Tranches.at(h)->GetCurrentOutstanding() + m_Tranches.at(h)->GetCashFlow().GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | (qMin(SingleStep->GetRedemptionGroup() - 1, 0))));
 								}
 							}
@@ -1301,7 +1301,7 @@ QDataStream& operator<<(QDataStream & stream, const Waterfall& flows){
 		<< flows.m_GICinterest
 		<< flows.m_GICBaseRate
 		<< flows.m_GICBaseRateValue
-		<< static_cast<qint16>(flows.m_DealDayCountConvention)
+		<< flows.m_DealDayCountConvention
 		<< flows.m_StartingDeferredJunFees
 		<< flows.m_GICflows
 		<< flows.m_WaterfallStesps.size();
@@ -1365,10 +1365,8 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream){
 	m_GICinterest.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_GICinterest;
 	m_GICBaseRate.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_GICBaseRate;
 	m_GICBaseRateValue.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_GICBaseRateValue;
-	stream 
-		>> TemShort 
-		>> m_StartingDeferredJunFees;
-	m_DealDayCountConvention = static_cast<DayCountConvention>(TemShort);
+	m_DealDayCountConvention.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_DealDayCountConvention;
+	stream >> m_StartingDeferredJunFees;
 	m_GICflows.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_GICflows;
 	stream >> TempInt;
 	;
@@ -1424,7 +1422,7 @@ QDate Waterfall::GetCalledPeriod() const{
 }
 QString Waterfall::ReadyToCalculate()const{
 	QString Result;
-	if (m_DealDayCountConvention == DayCountConvention::Invalid) Result += "Deal Day Count Convention\n";
+	if (m_DealDayCountConvention.IsEmpty()) Result += "Deal Day Count Convention\n";
 	if (m_GICinterest.IsEmpty()) Result += "GIC Interest\n";
 	if (m_GICBaseRate.IsEmpty()) Result += "GIC Base Rate\n";
 	if (m_SeniorExpenses.IsEmpty(0.0)) Result += "Senior Expenses\n";
@@ -1479,7 +1477,7 @@ QString Waterfall::ReadyToCalculate()const{
 		if (m_Reserves.at(ResIter)->GetReserveFundCurrent() < 0.0) Result += QString("Reserve %1 Current Amount\n").arg(ResIter + 1);
 	}
 	foreach(const Tranche* SingleTranche, m_Tranches) {
-		if (SingleTranche->GetDayCount() == DayCountConvention::Invalid) Result += "Tranche Day Count Convention\n";
+		if (SingleTranche->GetDayCount().IsEmpty()) Result += "Tranche Day Count Convention\n";
 		if (IntegerVector(SingleTranche->GetPaymentFrequency()).IsEmpty(1)) Result += "Tranche payment Frequency\n";
 		if (SingleTranche->GetOriginalAmount() < 0.0) Result += "Tranche Original Amount";
 		if (SingleTranche->GetOutstandingAmt() < 0.0) Result += "Tranche Amount Outstanding";

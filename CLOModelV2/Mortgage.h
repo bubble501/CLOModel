@@ -8,9 +8,10 @@
 #include "IntegerVector.h"
 #include "BaseRateVect.h"
 #include "BaseRateTable.h"
+#include "DayCountVect.h"
 class Mortgage : public BackwardInterface{
 private:
-	DayCountConvention m_DayCountConvention;
+	DayCountVector m_DayCountConvention;
 	QString m_Properties;
 	QDate m_MaturityDate;
 	RepaymentVector m_AnnuityVect;
@@ -82,8 +83,8 @@ public:
 	QString GetPropertyName(qint32 PropIndex) const { return GetProperty(PropIndex, false); }
 	bool HasProperty(const QString& PropName) const;
 	qint32 GetNumProperties()const;
-	DayCountConvention GetDayCountConvention() const { return m_DayCountConvention; }
-	void SetDayCountConvention(DayCountConvention val) { m_DayCountConvention = val; }
+	const DayCountVector& GetDayCountConvention() const { return m_DayCountConvention; }
+	void SetDayCountConvention(const QString& val) { m_DayCountConvention = val; }
 	friend QDataStream& operator<<(QDataStream & stream, const Mortgage& flows);
 	friend QDataStream& operator>>(QDataStream & stream, Mortgage& flows);
 };

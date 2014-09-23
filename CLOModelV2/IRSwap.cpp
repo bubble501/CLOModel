@@ -28,7 +28,7 @@ IRSwap::IRSwap()
 	:m_FixedToFloating(true) 
 	, m_LastPay(0.0)
 	, m_LastReceive(0.0)
-	, m_DayCount(DayCountConvention::ACT360)
+	, m_DayCount(QString::number(static_cast<qint16>(DayCountConvention::ACT360)))
 	, m_UseForwardCurves(false)
 {}
 IRSwap& IRSwap::operator=(const IRSwap& a) {
@@ -60,8 +60,8 @@ double IRSwap::CalculateFlow(double Notional, const QDate& StartAccrueDate, cons
 #endif
 #endif 
 	}
-	m_LastPay = AdjustCoupon(m_FixedLegRate.GetValue(StartAccrueDate), StartAccrueDate, EndAccrueDate, m_DayCount)*Notional;
-	m_LastReceive = AdjustCoupon(m_FloatingSpread.GetValue(StartAccrueDate)+m_FloatingBaseValue.GetValue(StartAccrueDate), StartAccrueDate, EndAccrueDate, m_DayCount)*Notional;
+	m_LastPay = AdjustCoupon(m_FixedLegRate.GetValue(StartAccrueDate), StartAccrueDate, EndAccrueDate, m_DayCount.GetValue(StartAccrueDate))*Notional;
+	m_LastReceive = AdjustCoupon(m_FloatingSpread.GetValue(StartAccrueDate) + m_FloatingBaseValue.GetValue(StartAccrueDate), StartAccrueDate, EndAccrueDate, m_DayCount.GetValue(StartAccrueDate))*Notional;
 	if (!m_FixedToFloating) {
 		double tempD = m_LastPay;
 		m_LastPay = m_LastReceive;
@@ -76,8 +76,7 @@ QDataStream& IRSwap::LoadOldVersion(QDataStream& stream) {
 	m_FloatingBase.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_FloatingBase;
 	m_FloatingBaseValue.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_FloatingBaseValue;
 	m_FloatingSpread.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_FloatingSpread;
-	qint32 tempInt;
-	stream >> tempInt; m_DayCount = static_cast<DayCountConvention>(tempInt);
+	m_DayCount.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_DayCount;
 	stream >> m_FixedToFloating;
 	stream >> m_LastPay;
 	stream >> m_LastReceive;
@@ -91,7 +90,7 @@ QDataStream& operator<<(QDataStream & stream, const IRSwap& flows) {
 		<< flows.m_FloatingBase
 		<< flows.m_FloatingBaseValue
 		<< flows.m_FloatingSpread
-		<< qint32(flows.m_DayCount)
+		<< flows.m_DayCount
 		<< flows.m_FixedToFloating
 		<< flows.m_LastPay
 		<< flows.m_LastReceive

@@ -10,6 +10,7 @@
 #include "BackwardCompatibilityInterface.h"
 #include "IntegerVector.h"
 #include "ReserveFund.h"
+#include "DayCountVect.h"
 class PrincipalRecip {
 protected:
 	double m_Scheduled;
@@ -86,7 +87,7 @@ private:
 	BloombergVector m_GICBaseRateValue;
 	double m_StartingDeferredJunFees;
 	GenericCashFlow m_GICflows;
-	DayCountConvention m_DealDayCountConvention;
+	DayCountVector m_DealDayCountConvention;
 	int FindMostJuniorLevel() const;
 	void SortByProRataGroup();
 	double GroupOutstanding(int GroupTarget)const;
@@ -172,9 +173,9 @@ public:
 	const QString& GetDealName() const { return m_DealName; }
 	const double& GetStartingDeferredJunFees() const { return m_StartingDeferredJunFees; }
 	QString GetGICBaseRate() const { return m_GICBaseRate.GetVector(); }
-	DayCountConvention GetDealDayCountConvention() const { return m_DealDayCountConvention; }
+	const DayCountVector& GetDealDayCountConvention() const { return m_DealDayCountConvention; }
 	//////////////////////////////////////////////////////////////////////////
-	void SetDealDayCountConvention(DayCountConvention val) { m_DealDayCountConvention = val; }
+	void SetDealDayCountConvention(const QString&  val) { m_DealDayCountConvention = val; }
 	void SetGICBaseRate(const QString& a) { m_GICBaseRate = a; }
 	void SetStartingDeferredJunFees(const double& val) { m_StartingDeferredJunFees = val; }
 	void SetDealName(const QString& a) { m_DealName = a; }

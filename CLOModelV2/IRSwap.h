@@ -3,6 +3,7 @@
 #include "BackwardCompatibilityInterface.h"
 #include "BloombergVector.h"
 #include "BaseRateVect.h"
+#include "DayCountVect.h"
 class IRSwap : public BackwardInterface {
 public:
 	IRSwap();
@@ -23,8 +24,8 @@ public:
 	double GetLastReceive() const { return m_LastReceive; }
 	double GetLastPay() const { return m_LastPay; }
 	double GetLastNetFlow() const { return m_LastReceive - m_LastPay; }
-	const DayCountConvention& GetDayCount() const { return m_DayCount; }
-	void SetDayCount(const DayCountConvention& val) { m_DayCount = val; }
+	const DayCountVector& GetDayCount() const { return m_DayCount; }
+	void SetDayCount(const QString& val) { m_DayCount = val; }
 	double CalculateFlow(double Notional, const QDate& StartAccrueDate, const QDate& EndAccrueDate);
 	bool GetUseForwardCurves() const { return m_UseForwardCurves; }
 	void SetUseForwardCurves( bool val) { m_UseForwardCurves = val; }
@@ -44,7 +45,7 @@ protected:
 	BaseRateVector m_FloatingBase;
 	BloombergVector m_FloatingBaseValue;
 	BloombergVector m_FloatingSpread;
-	DayCountConvention m_DayCount;
+	DayCountVector m_DayCount;
 	bool m_FixedToFloating;
 	double m_LastPay;
 	double m_LastReceive;

@@ -3,14 +3,15 @@
 #include <QtGlobal>
 class QDate;
 class QString;
+class DayCountVector;
+class BloombergVector;
 template<typename T> class QList;
-#define DebugLogging
 #define MaximumIRRIterations 10000//INT_MAX-1
 #define MaximumInterestsTypes 8
 #define CompoundShift 10
 //#define SaveLoanTape
+//#define DebugLogging
 int MonthDiff(const QDate& FutureDte,const QDate& PresentDte);
-class BloombergVector;
 enum class DayCountConvention : qint16 {
 	Invalid = 0
 	//Simple
@@ -57,19 +58,19 @@ enum class DayCountConvention : qint16 {
 double RoundUp(double a);
 template<class T> bool LessThanPoint(T* a,T* b){return (*a)<(*b);}
 QString Commarize(double num,unsigned int precision=0);
-double CalculateIRR(const QList<QDate>& Dte, const QList<double>& Flws, DayCountConvention Daycount = DayCountConvention::ACT360, double Guess = 0.05);
-double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, double Interest, DayCountConvention Daycount = DayCountConvention::ACT360);
-double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, const BloombergVector& Interest, DayCountConvention Daycount = DayCountConvention::ACT360);
-double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, const QString& Interest, DayCountConvention Daycount = DayCountConvention::ACT360);
-double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, double BaseRate, DayCountConvention Daycount = DayCountConvention::ACT360, double Guess = 0.05);
-double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const BloombergVector& BaseRate, DayCountConvention Daycount = DayCountConvention::ACT360, double Guess = 0.05);
-double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const QString& BaseRate, DayCountConvention Daycount = DayCountConvention::ACT360, double Guess = 0.05);
+double CalculateIRR(const QList<QDate>& Dte, const QList<double>& Flws, const DayCountVector& Daycount, double Guess = 0.05);
+double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, double Interest, const DayCountVector& Daycount);
+double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, const BloombergVector& Interest, const DayCountVector& Daycount);
+double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, const QString& Interest, const DayCountVector& Daycount);
+double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, double BaseRate, const DayCountVector& Daycount, double Guess = 0.05);
+double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const BloombergVector& BaseRate, const DayCountVector& Daycount, double Guess = 0.05);
+double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const QString& BaseRate, const DayCountVector& Daycount, double Guess = 0.05);
 double AdjustCoupon(double AnnualCoupon, QDate PrevIPD, QDate CurrIPD, DayCountConvention DayCount);
 bool IsHoliday(const QDate& a/*,const QString& CountryCode*/);
 bool removeDir(const QString& dirName);
 double GetLoanAssumption(const QString& LoanName, int columnIndex, QDate RefDate);
 void PrintToTempFile(const QString& TempFileName, const QString& Message, bool PrintTime = true);
-bool VaidDayCount(qint16 a);
+bool ValidDayCount(qint16 a);
 #ifdef DebugLogging
 #define LOGASSERT(CheckExp,LogMsg) ((CheckExp) ? qt_noop() : PrintToTempFile("DebugLog.log",LogMsg)); Q_ASSERT_X(CheckExp,"LOGASSERT",LogMsg)
 #define LOGDEBUG(LogMsg) PrintToTempFile("DebugLog",LogMsg,false)

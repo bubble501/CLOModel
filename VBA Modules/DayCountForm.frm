@@ -1,7 +1,7 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} DayCountForm 
    Caption         =   "Set Day Count Convention"
-   ClientHeight    =   4665
+   ClientHeight    =   5640
    ClientLeft      =   45
    ClientTop       =   375
    ClientWidth     =   5280
@@ -16,6 +16,37 @@ Attribute VB_Exposed = False
 Option Explicit
 Public result As String
 Public TargetAddress As String
+
+Private Sub AddStepButton_Click()
+    If (Me.DayCountCombo.Value = "") Or (Me.InterestTypeCombo.Value = "") Then
+        Exit Sub
+    Else
+        If VectorBox.Text = "" Then
+            VectorBox.Text = CStr(Me.DayCountCombo.List(Me.DayCountCombo.ListIndex, 1) + Me.InterestTypeCombo.List(Me.InterestTypeCombo.ListIndex, 1))
+        Else
+            VectorBox.Text = VectorBox.Text & " " & StepBox.Text & "S " & _
+                CStr(Me.DayCountCombo.List(Me.DayCountCombo.ListIndex, 1) + Me.InterestTypeCombo.List(Me.InterestTypeCombo.ListIndex, 1))
+        End If
+        StepSpinn.Enabled = True
+        StepBox.Enabled = True
+        StepLabel.Enabled = True
+        StepBox.Text = "1"
+        DayCountCombo.Value = Null
+        InterestTypeCombo.Value = Null
+        AnchorDatePick.Enabled = True
+        AnchorLabel.Enabled = True
+    End If
+End Sub
+
+Private Sub AnchorDatePick_Change()
+    If (Left(VectorBox.Text, 1) = "A") Then
+        VectorBox.Text = Right(VectorBox.Text, Len(VectorBox.Text) - 13)
+    End If
+    If Not IsNull(AnchorDatePick.Value) Then
+        VectorBox.Text = "A " & Format(AnchorDatePick.Month, "00") & "/" & Format(AnchorDatePick.Day, "00") & "/" & Format(AnchorDatePick.Year, "0000") & " " & VectorBox.Text
+    End If
+End Sub
+
 Private Sub BbgButton_Click()
     result = "=bdp(" + TargetAddress + " & "" Mtge"",""DAY_CNT"")"
     Me.Hide
@@ -26,17 +57,55 @@ Private Sub CancelButton_Click()
 End Sub
 
 
+
+Private Sub ClearButton_Click()
+        StepSpinn.Enabled = False
+        StepBox.Enabled = False
+        StepLabel.Enabled = False
+        StepBox.Text = ""
+        DayCountCombo.Value = Null
+        InterestTypeCombo.Value = Null
+        AnchorDatePick.Enabled = False
+        AnchorLabel.Enabled = False
+        VectorBox.Text = ""
+End Sub
+
 Private Sub kButton_Click()
 
-    If (Me.DayCountCombo.Value = "") Then
+    If (Me.DayCountCombo.Value = "") Or (Me.InterestTypeCombo.Value = "") Then
          result = ""
-    ElseIf (Me.InterestTypeCombo.Value = "") Then
-        result = ""
+    ElseIf (VectorBox.Text <> "") And (Not ((Left(VectorBox.Text, 1) = "A") And (Len(VectorBox.Text) = 13))) Then
+        result = VectorBox.Text
     Else
         result = CStr(Me.DayCountCombo.List(Me.DayCountCombo.ListIndex, 1) + Me.InterestTypeCombo.List(Me.InterestTypeCombo.ListIndex, 1))
     End If
     Me.Hide
 End Sub
+
+
+Private Sub StepBox_Change()
+    If (Val(StepBox.Text) = 0) Then StepBox.Text = ""
+End Sub
+
+Private Sub StepSpinn_SpinDown()
+    If (Val(StepBox.Text) > 1) Then
+        StepBox.Text = Val(StepBox.Text) - 1
+    End If
+End Sub
+
+Private Sub StepSpinn_SpinUp()
+    StepBox.Text = Val(StepBox.Text) + 1
+End Sub
+
+Private Sub StepBox_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
+    Select Case KeyAscii
+      Case vbKey0 To vbKey9, 8
+      Case Else
+        KeyAscii = 0
+    End Select
+End Sub
+
+
 Private Sub UserForm_Initialize()
     Dim DayCountsArray(0 To 11, 0 To 1)
     DayCountsArray(0, 0) = "ACT/ACT"
@@ -73,6 +142,7 @@ Private Sub UserForm_Initialize()
     InterestTypeArray(2, 0) = "Continuously Compounded"
     InterestTypeArray(2, 1) = 2048
     Me.InterestTypeCombo.List = InterestTypeArray
+    
 End Sub
 Public Sub SetDayCount(CurrentDayCnt As Integer)
 Dim DayCountsArray

@@ -15,6 +15,7 @@
     <ClCompile Include="BaseRateTable.cpp" />
     <ClCompile Include="BaseRateVect.cpp" />
     <ClCompile Include="BloombergVector.cpp" />
+    <ClCompile Include="DayCountVect.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_QBbgWorker.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
@@ -234,6 +235,7 @@
     <ClInclude Include="BloombergVector.h" />
     <ClInclude Include="BoolVector.h" />
     <ClInclude Include="CommonFunctions.h" />
+    <ClInclude Include="DayCountVect.h" />
     <ClInclude Include="GenericCashFlow.h" />
     <ClInclude Include="IntegerVector.h" />
     <ClInclude Include="ManBaseRateTable.h" />

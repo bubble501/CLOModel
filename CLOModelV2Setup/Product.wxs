@@ -45,6 +45,7 @@
 			<ComponentGroupRef Id="RequiredPlugins" />
 			<ComponentGroupRef Id="FileAssociation" />
 			<ComponentRef Id='SetEnviromnment' />
+			<ComponentRef Id='MSCOM2'/>
 			<ComponentRef Id='INSTALLFOLDER'/>
 		</Feature>
 		<Feature Id='APImanual' Title='.Net API Manual' Level='5' Description='Installs the manual for the .Net API' ConfigurableDirectory='MANUALSDIR'>
@@ -83,7 +84,7 @@
 		<WixVariable Id="WixUILicenseRtf" Value="..\Documentation\License.rtf"/>
 		<Icon Id='TwentyFourIcon.ico' SourceFile='..\CLOModelV2\Resources\Logo.ico'/>
 	</Product>
-
+	<?include mscom.wxi?>
 	<Fragment>
 		<Directory Id="TARGETDIR" Name="SourceDir">
 			<Directory Id="WindowsDir" Name="Windows">
@@ -150,7 +151,7 @@
 			<Component Id="QtWindows" Guid="1A642659-CEC0-487F-9E4A-173A3D6B2262">
 				<File Id="WindowsPlugin" Name="qwindows.dll" Source="C:\Qt5\5.3\msvc2013\plugins\platforms\qwindows.dll" KeyPath="yes" />
 			</Component>
-		</ComponentGroup>
+		</ComponentGroup>	
 		<ComponentGroup Id="FileAssociation" Directory="INSTALLFOLDER">
 			<Component Id="BaseCases" Guid="92A982A3-368D-40EB-9D93-C91647879B8C">
 				<RegistryKey Id="BaseCasesKey" Root="HKCU" Key="SOFTWARE\Classes\.clo" ForceCreateOnInstall="yes">
@@ -212,4 +213,5 @@
 			<RemoveFolder Id='INSTALLFOLDER' On='uninstall' />
 		</Component>
 	</Fragment>
+	
 </Wix>

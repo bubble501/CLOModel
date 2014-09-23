@@ -38,6 +38,11 @@
 				<FileSearch Id="Checkzlib" Name="zlib1.dll" />
 			</DirectorySearch>
 		</Property>
+		<Property Id="FOUNDMSCOM">
+			<DirectorySearch Id="CheckMsComDir" Path="[System32Dir]" Depth="0">
+				<FileSearch Id="CheckMsCom" Name="mscomct2.ocx" />
+			</DirectorySearch>
+		</Property>
 		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
 		<Property Id="ARPPRODUCTICON" Value="TwentyFourIcon.ico" />
 		<Feature Id="ModelSetup" Title="CLO Model 2.0 Setup" Level="1" Description="Installs the new components" ConfigurableDirectory="INSTALLFOLDER">
@@ -45,7 +50,6 @@
 			<ComponentGroupRef Id="RequiredPlugins" />
 			<ComponentGroupRef Id="FileAssociation" />
 			<ComponentRef Id='SetEnviromnment' />
-			<ComponentRef Id='MSCOM2'/>
 			<ComponentRef Id='INSTALLFOLDER'/>
 		</Feature>
 		<Feature Id='APImanual' Title='.Net API Manual' Level='5' Description='Installs the manual for the .Net API' ConfigurableDirectory='MANUALSDIR'>
@@ -75,6 +79,10 @@
 			<ComponentRef Id ='RemoveOldzlib'/>
 			<Condition Level='1'>FOUNDZLIB</Condition>
 		</Feature>
+		<Feature Id='InstallMsCom' Title='Install MS Com 2 toolkit' Level='1' Display='hidden'>
+			<ComponentRef Id ='MSCOM2'/>
+			<Condition Level='0'>FOUNDMSCOM</Condition>
+		</Feature>
 		<Feature Id="VCRedist" Title="Visual C++ 12.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
 			<MergeRef Id="VCRedist"/>
 		</Feature>
@@ -89,6 +97,7 @@
 		<Directory Id="TARGETDIR" Name="SourceDir">
 			<Directory Id="WindowsDir" Name="Windows">
 					<Directory Id="System16Dir" Name="system" />
+					<Directory Id="System32Dir" Name="$(var.SystemDir)" />
 			</Directory>
 			<Directory Id="ProgramFilesFolder">
 				<Directory Id="INSTALLFOLDER" Name="CLO Model 2.0">

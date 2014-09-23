@@ -10,6 +10,7 @@
 #include "BackwardCompatibilityInterface.h"
 #include "IntegerVector.h"
 #include "ReserveFund.h"
+#include "DayCountVect.h"
 class PrincipalRecip {
 protected:
 	double m_Scheduled;
@@ -67,7 +68,6 @@ private:
 	double m_CCCTestLimit; 
 	BloombergVector m_CCCcurve; 
 	double m_CCChaircut; 
-	bool m_UseTurbo; 
 	PrincipalRecip m_PrincipalAvailable;
 	double m_InterestAvailable; 
 	double m_JuniorFeesCoupon; 
@@ -77,14 +77,17 @@ private:
 	GenericCashFlow m_Reinvested;
 	QDate m_LastIPDdate; 
 	QDate m_CallDate; 
-	double m_PoolValueAtCall; 
+	BloombergVector m_PoolValueAtCall; 
 	bool m_UseCall; 
 	double m_CallMultiple; 
 	double m_CallReserve;
 	QString m_DealName;
 	BloombergVector m_GICinterest;
+	BaseRateVector m_GICBaseRate;
+	BloombergVector m_GICBaseRateValue;
 	double m_StartingDeferredJunFees;
 	GenericCashFlow m_GICflows;
+	DayCountVector m_DealDayCountConvention;
 	int FindMostJuniorLevel() const;
 	void SortByProRataGroup();
 	double GroupOutstanding(int GroupTarget)const;
@@ -112,11 +115,12 @@ public:
 	QString GetPaymentFrequency() const {return m_PaymentFrequency.GetVector();}
 	double GetCCCTestLimit() const {return m_CCCTestLimit;} 
 	double GetCCChaircut() const {return m_CCChaircut;} 
-	bool GetUseTurbo() const {return m_UseTurbo;} 
 	double GetPrincipalAvailable() const {return m_PrincipalAvailable.Total();} 
+	double GetScheduledPrincipalAvailable() const { return m_PrincipalAvailable.GetScheduled(); }
+	double GetPrepayPrincipalAvailable() const { return m_PrincipalAvailable.GetPrepay(); }
 	double GetInterestAvailable() const {return m_InterestAvailable;} 
 	double GetJuniorFeesCoupon() const {return m_JuniorFeesCoupon;} 
-	double GetPoolValueAtCall() const {return m_PoolValueAtCall;} 
+	QString GetPoolValueAtCall() const {return m_PoolValueAtCall.GetVector();} 
 	bool GetUseCall() const {return m_UseCall;} 
 	double GetCallMultiple() const {return m_CallMultiple;} 
 	double GetCallReserve() const {return m_CallReserve;}
@@ -168,7 +172,11 @@ public:
 	int GetNumReserves()const { return m_Reserves.size(); }
 	const QString& GetDealName() const { return m_DealName; }
 	const double& GetStartingDeferredJunFees() const { return m_StartingDeferredJunFees; }
+	QString GetGICBaseRate() const { return m_GICBaseRate.GetVector(); }
+	const DayCountVector& GetDealDayCountConvention() const { return m_DealDayCountConvention; }
 	//////////////////////////////////////////////////////////////////////////
+	void SetDealDayCountConvention(const QString&  val) { m_DealDayCountConvention = val; }
+	void SetGICBaseRate(const QString& a) { m_GICBaseRate = a; }
 	void SetStartingDeferredJunFees(const double& val) { m_StartingDeferredJunFees = val; }
 	void SetDealName(const QString& a) { m_DealName = a; }
 	void SetCumulativeReserves(bool a){m_CumulativeReserves=a;}
@@ -182,12 +190,11 @@ public:
 	void SetPaymentFrequency(const QString& a);
 	void SetCCCTestLimit(double a){if(a>=0.0 && a<=1.0) m_CCCTestLimit=a;}
 	void SetCCChaircut(double a){if(a>=0.0 && a<=1.0) m_CCChaircut=a;}
-	void SetUseTurbo(bool a){m_UseTurbo=a;}
 	void SetSchedPrincAvailable(double a){m_PrincipalAvailable.SetScheduled(a);}
 	void SetPrepPrincAvailable(double a) { m_PrincipalAvailable.SetPrepay(a); }
 	void SetInterestAvailable(double a){m_InterestAvailable=a;}
 	void SetJuniorFeesCoupon(double a){if(a>=0.0) m_JuniorFeesCoupon=a;}
-	void SetPoolValueAtCall(double a){if(a>=0.0) m_PoolValueAtCall=a;}
+	void SetPoolValueAtCall(const QString& a){m_PoolValueAtCall=a;}
 	void SetUseCall(bool a){m_UseCall=a;}
 	void SetCallMultiple(double a){if(a>=0.0) m_CallMultiple=a;}
 	void SetCallReserve(double a){if(a>=0.0) m_CallReserve=a;} 
@@ -208,6 +215,7 @@ public:
 		, const QString& AnnuityVec = "I"
 		, const QString& ReinvPric = "100"
 		, const QString& ReinvDel = "0"
+		, const QString& ReinvSpr = "0"
 		, const QString& FloatingBase = "ZERO"
 		, const QString& RecoveryLag = "0"
 		, const QString& Delinquency = "0"
@@ -226,6 +234,12 @@ public:
 	void ResetTranches();
 	bool CalculateTranchesCashFlows();
 	QString ReadyToCalculate() const;
+	void CompileReferenceRateValue(ForwardBaseRateTable& Values);
+	void CompileReferenceRateValue(ConstantBaseRateTable& Values);
+#ifndef NO_DATABASE
+	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll = false);
+	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll = false);
+#endif
 	friend QDataStream& operator<<(QDataStream & stream, const Waterfall& flows);
 	friend QDataStream& operator>>(QDataStream & stream, Waterfall& flows);
 };

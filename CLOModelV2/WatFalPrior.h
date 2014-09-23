@@ -21,7 +21,10 @@ public:
 		wst_Excess, /*!< Excess Spread*/
 		wst_ReinvestPrincipal, /*!< Reinvest all available principal during the reinvestment period*/
 		wst_ReserveReplenish, /*!< Replenish the reserve fund*/
-		wst_RedeemProRata /*!< Use principal to redeem bonds pro-rata*/
+		wst_RedeemProRata, /*!< Use principal to redeem bonds pro-rata*/
+		wst_Turbo,  /*!< Use interest to redeem a class of notes*/
+		wst_PDL,  /*!< Cure Outstanding PDL*/
+		wst_FeesFromExcess /*!< Junior Fees as percentage of excess spread*/
 	};
 	int GetGroupTarget()const{return GroupTarget;}
 	int GetRedemptionGroup()const{return RedemptionGroup;}

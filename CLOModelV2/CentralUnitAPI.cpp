@@ -33,11 +33,10 @@ void CentralUnitAPI::SetSequentialComputation(bool a){
 	SequentialComputation=a;
 }
 const Mortgage* CentralUnitAPI::GetLoan(int index)const{
-	if(index<0 || index>=LoansCount()) return NULL;
-	return LoansCalculator.GetLoans().at(index);
+	return LoansCalculator.GetLoans().value(index,NULL);
 }
 Mortgage* CentralUnitAPI::GetLoan(int index){
-	if(index<0 || index>=LoansCount()) return NULL;
+	if (!LoansCalculator.GetLoans().contains(index)) return NULL;
 	return LoansCalculator.GetLoans()[index];
 }
 void CentralUnitAPI::Calculate(){
@@ -231,7 +230,7 @@ void CentralUnitAPI::HandleProgress(int a){
 		1000*static_cast<double>(a)/static_cast<double>(LoansCalculator.Count())
 	);
 }
-void CentralUnitAPI::CompileBaseRates(ForwardBaseRateTable& Values)const {
+void CentralUnitAPI::CompileBaseRates(ForwardBaseRateTable& Values) {
 	for(int i=0;i<Structure.GetTranchesCount();i++){
 		Structure.GetTranche(i)->CompileReferenceRateValue(Values);
 	}
@@ -242,7 +241,7 @@ void CentralUnitAPI::CompileBaseRates(ForwardBaseRateTable& Values)const {
 	LiborUpdateDate = Values.GetUpdateDate();
 	m_UseForwardCurve = true;
 }
-void CentralUnitAPI::CompileBaseRates(ConstantBaseRateTable& Values)const {
+void CentralUnitAPI::CompileBaseRates(ConstantBaseRateTable& Values) {
 	for (int i = 0; i < Structure.GetTranchesCount(); i++) {
 		Structure.GetTranche(i)->CompileReferenceRateValue(Values);
 	}
@@ -254,7 +253,7 @@ void CentralUnitAPI::CompileBaseRates(ConstantBaseRateTable& Values)const {
 	m_UseForwardCurve = false;
 }
 #ifndef NO_DATABASE
-void CentralUnitAPI::GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll)const {
+void CentralUnitAPI::GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll) {
 	for (int i = 0; i < Structure.GetTranchesCount(); i++) {
 		Structure.GetTranche(i)->GetBaseRatesDatabase(Values, DownloadAll);
 	}
@@ -265,7 +264,7 @@ void CentralUnitAPI::GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool Do
 	LiborUpdateDate = Values.GetUpdateDate();
 	m_UseForwardCurve = false;
 }
-void CentralUnitAPI::GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll)const {
+void CentralUnitAPI::GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll) {
 	for (int i = 0; i < Structure.GetTranchesCount(); i++) {
 		Structure.GetTranche(i)->GetBaseRatesDatabase(Values, DownloadAll);
 	}

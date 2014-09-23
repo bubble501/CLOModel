@@ -14,7 +14,20 @@ class CentralUnit : public QObject{
 public:
 	~CentralUnit();
 	CentralUnit(QObject* parent=0);
-	void AddLoan(const QDate& Maturity, double Size, const QString& Interest, const QString& Annuity, const QString& Freq = "1", const QString& floatBase = "ZERO", const QString& LossMult = "100", const QString& PrepayMult = "100", const QString& HaicutVect = "0");
+	void AddLoan(const Mortgage& TempMtg) { LoansCalculator.AddLoan(TempMtg);	if (Stresser)Stresser->AddLoan(TempMtg); }
+	void AddLoan(
+		const QDate& Maturity
+		, double Size
+		, const QString& Interest
+		, const QString& Annuity
+		, const QString& Freq = "1"
+		, const QString& floatBase = "ZERO"
+		, const QString& LossMult = "100"
+		, const QString& PrepayMult = "100"
+		, const QString& HaicutVect = "0"
+		, const QString& Properties = ""
+		, const QString& dayCnt = QString::number(static_cast<qint16>(DayCountConvention::CompN30360))
+		);
 #ifndef NO_BLOOMBERG
 	void AddTranche(const QString& Name,int ProRataGroup, double MinOC=0.0, double MinIC=0.0, double Price=100.0,double FxRate= 1.0,const QString& BbgExt="Mtge");
 #endif
@@ -39,8 +52,9 @@ public:
 		, double Price = 100.0
 		, double FxRate = 1.0
 		, const QString& BbgExt = "Mtge"
-		, DayCountConvention DayCount = DayCountConvention::ACT360
+		, const QString& DayCount = QString::number(static_cast<qint16>(DayCountConvention::ACT360))
 	);
+	void AddTranche(const Tranche& a) { Structure.AddTranche(a);	if (Stresser)Stresser->SetStructure(Structure); }
 	void AddWaterfallStep(WatFalPrior::WaterfallStepType Tpe, int GrpTgt, int RdmpGrp=0, double RdmpShare=0.0);
 	void SetSeniorExpenses(const QString& a){Structure.SetSeniorExpenses(a);}
 	void SetSeniorFees(const QString& a) { Structure.SetSeniorFees(a); }
@@ -51,12 +65,11 @@ public:
 	void SetPaymentFrequency(const QString& a){Structure.SetPaymentFrequency(a);}
 	void SetCCCTestLimit(double a){Structure.SetCCCTestLimit(a);}
 	void SetCCChaircut(double a){Structure.SetCCChaircut(a);}
-	void SetUseTurbo(bool a){Structure.SetUseTurbo(a);}
 	void SetSchedPrincAvailable(double a) { Structure.SetSchedPrincAvailable(a); }
 	void SetPrepPrincAvailable(double a) { Structure.SetPrepPrincAvailable(a); }
 	void SetInterestAvailable(double a){Structure.SetInterestAvailable(a);}
 	void SetJuniorFeesCoupon(double a){Structure.SetJuniorFeesCoupon(a);}
-	void SetPoolValueAtCall(double a){Structure.SetPoolValueAtCall(a);}
+	void SetPoolValueAtCall(const QString& a){Structure.SetPoolValueAtCall(a);}
 	void SetCallMultiple(double a){Structure.SetCallMultiple(a);}
 	void SetCallReserve(double a){Structure.SetCallReserve(a);}
 	void SetFirstIPDdate(const QDate& a){Structure.SetFirstIPDdate(a);}
@@ -65,6 +78,8 @@ public:
 	void SetCallDate(const QDate& a){Structure.SetCallDate(a);}
 	void SetStartingDeferredJunFees(const double& val) { Structure.SetStartingDeferredJunFees(val); }
 	void SetGICinterest(const QString& a) { Structure.SetGICinterest(a); }
+	void SetGICBaseRate(const QString& a) { Structure.SetGICBaseRate(a); }
+	void SetDealDayCountConvention(const QString&  val) { Structure.SetDealDayCountConvention(val); }
 	void SetupReinvestmentTest(const QDate& ReinvPer,double TstLvl, double IIshare,double IRshare,double OIshare,double ORshare){Structure.SetupReinvestmentTest(ReinvPer,TstLvl,IIshare,IRshare,OIshare,ORshare);}
 	void SetupReinvBond(
 		const QString& IntrVec
@@ -76,12 +91,13 @@ public:
 		, const QString& AnnuityVec = "I"
 		, const QString& ReinvPric = "100"
 		, const QString& ReinvDel = "0"
+		, const QString& ReinvSpr = "0"
 		, const QString& FloatingBase = "ZERO"
 		, const QString& RecoveryLag = "0"
 		, const QString& Delinquency = "0"
 		, const QString& DelinquencyLag = "0"
 		) {
-		Structure.SetupReinvBond(IntrVec, CPRVec, CDRVec, LSVec, WALval, PayFreq, AnnuityVec, ReinvPric, ReinvDel, FloatingBase, RecoveryLag, Delinquency, DelinquencyLag);
+		Structure.SetupReinvBond(IntrVec, CPRVec, CDRVec, LSVec, WALval, PayFreq, AnnuityVec, ReinvPric, ReinvDel, ReinvSpr, FloatingBase, RecoveryLag, Delinquency, DelinquencyLag);
 	}
 	void Reset();
 	void SetupStress(const QString& ConstPar,QList<QString> XSpann,QList<QString> YSpann, StressTest::StressVariability Xvar=StressTest::ChangingCDR,StressTest::StressVariability Yvar=StressTest::ChangingLS);
@@ -110,17 +126,19 @@ public:
 	void SetCumulativeReserves(bool a){Structure.SetCumulativeReserves(a);}
 	const  QDate& GetLiborUpdateDate() const { return LiborUpdateDate; }
 	bool GetUseForwardCurve() const { return m_UseForwardCurve; }
-	void CompileBaseRates(ConstantBaseRateTable& Values)const;
-	void CompileBaseRates(ForwardBaseRateTable& Values)const;
+	void CompileBaseRates(ConstantBaseRateTable& Values);
+	void CompileBaseRates(ForwardBaseRateTable& Values);
 #ifndef NO_DATABASE
-	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll=false)const;
-	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll=false)const;
+	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll = false);
+	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll=false);
 #endif
 	void SetDealName(const QString& a) {Structure.SetDealName(a);}
 	bool GetBaseCaseToCall() const { return m_BaseCaseToCall; }
 	void SetBaseCaseToCall(bool val) { m_BaseCaseToCall = val; }
 	bool GetSaveBaseCase() const { return m_SaveBaseCase; }
 	void SetSaveBaseCase(bool val) { m_SaveBaseCase = val; }
+	const Waterfall& GetStructure() { return Structure; }
+	const Waterfall& GetCallStructure() { return CallStructure; }
 private:
 	ProgressWidget* MtgsProgress;
 	WaterfallCalculator* ParallWatFalls;
@@ -142,13 +160,16 @@ private:
 	QString FolderPath;
 	QString PlotsSheet;
 	int PlotIndexes[NumberOfPlots];
-	mutable QDate LiborUpdateDate;
-	mutable bool m_UseForwardCurve;
+	QDate LiborUpdateDate;
+	bool m_UseForwardCurve;
 	bool m_SaveBaseCase;
 	bool m_BaseCaseToCall;
+	ForwardBaseRateTable m_OverrideForwards;
+	ConstantBaseRateTable m_OverrideConstants;
 signals:
 	void LoopStarted();
 	void StressLoopStarted();
+	void CalculationFinished();
 private slots:
 	void CalculationStep2();
 	void CalculationStep1();

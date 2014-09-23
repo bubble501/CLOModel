@@ -8,8 +8,11 @@
 #include "IntegerVector.h"
 #include "BaseRateVect.h"
 #include "BaseRateTable.h"
+#include "DayCountVect.h"
 class Mortgage : public BackwardInterface{
 private:
+	DayCountVector m_DayCountConvention;
+	QString m_Properties;
 	QDate m_MaturityDate;
 	RepaymentVector m_AnnuityVect;
 	double m_Size;
@@ -19,13 +22,16 @@ private:
 	BloombergVector m_HaircutVector;
 	MtgCashFlow m_CashFlows;
 	BaseRateVector m_FloatRateBase;
-	mutable BloombergVector m_FloatingRateBaseValue;
+	BloombergVector m_FloatingRateBaseValue;
 	IntegerVector m_PaymentFreq;
-	mutable bool m_UseForwardCurve;
+	bool m_UseForwardCurve;
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
-	double GetInterest(const QDate& a, int frequency=12);
-	double GetInterest(int a, int frequency = 12);
+	double GetInterest(const QDate& a, const QDate& StartAccrue, const QDate& EndAccrue);
+	double GetInterest(int a, const QDate& StartAccrue, const QDate& EndAccrue);
+	double GetInterest(const QDate& a);
+	double GetInterest(int a);
+	QString GetProperty(qint32 PropIndex, bool PropValue) const;
 public:
 	static double pmt(double Interest, int Periods, double PresentValue);
 	Mortgage();
@@ -37,11 +43,11 @@ public:
 	const BaseRateVector& GetFloatingRateBase() const { return m_FloatRateBase; }
 	const BloombergVector& GetFloatingRateValue() const { return m_FloatingRateBaseValue; }
 	bool GetUseForwardCurve() const { return m_UseForwardCurve; }
-	void CompileReferenceRateValue(ForwardBaseRateTable& Values)const { m_FloatingRateBaseValue = m_FloatRateBase.CompileReferenceRateValue(Values); m_UseForwardCurve = true; }
-	void CompileReferenceRateValue(ConstantBaseRateTable& Values)const { m_FloatingRateBaseValue = m_FloatRateBase.CompileReferenceRateValue(Values); m_UseForwardCurve = false; }
+	void CompileReferenceRateValue(ForwardBaseRateTable& Values) { m_FloatingRateBaseValue = m_FloatRateBase.CompileReferenceRateValue(Values); m_UseForwardCurve = true; }
+	void CompileReferenceRateValue(ConstantBaseRateTable& Values) { m_FloatingRateBaseValue = m_FloatRateBase.CompileReferenceRateValue(Values); m_UseForwardCurve = false; }
 #ifndef NO_DATABASE
-	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll = false)const { m_FloatingRateBaseValue = m_FloatRateBase.GetBaseRatesDatabase(Values, DownloadAll); m_UseForwardCurve = false; }
-	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll = false)const { m_FloatingRateBaseValue = m_FloatRateBase.GetBaseRatesDatabase(Values, DownloadAll); m_UseForwardCurve = true; }
+	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll = false) { m_FloatingRateBaseValue = m_FloatRateBase.GetBaseRatesDatabase(Values, DownloadAll); m_UseForwardCurve = false; }
+	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll = false) { m_FloatingRateBaseValue = m_FloatRateBase.GetBaseRatesDatabase(Values, DownloadAll); m_UseForwardCurve = true; }
 #endif
 
 	void SetFloatingRateBase(const BaseRateVector& a) { m_FloatRateBase = a; }
@@ -64,10 +70,21 @@ public:
 	double GetSize() const{return m_Size;}
 	void SetSize(double a){if(a>=0) m_Size=a;}
 	bool CalculateCashFlows(const QDate& StartDate,const QString& CPRVecs, const QString& CDRVecs, const QString& LossVecs, const QString& RecoveryLag = "0", const QString& Delinquency = "0", const QString& DelinquencyLag = "0");
-	bool CalculateCashFlows(const QDate& StartDate, BloombergVector CPRVec, BloombergVector CDRVec, BloombergVector LossVec, IntegerVector  RecoveryLag = IntegerVector("0"), BloombergVector Delinquency = BloombergVector("0"), IntegerVector DelinquencyLag = IntegerVector("0"));
+	bool CalculateCashFlows(const QDate& StartDate, BloombergVector CPRVec, BloombergVector CDRVec, BloombergVector LossVec, IntegerVector  RecoveryLag = IntegerVector("0"), BloombergVector Delinquency = BloombergVector("0"), IntegerVector DelinquencyLag = IntegerVector("0"), bool OverrideProperties=false);
 	void AddCashFlow(const QDate& Dte, double Amt, MtgCashFlow::MtgFlowType FlowTpe) { m_CashFlows.AddFlow(Dte, Amt, FlowTpe); }
+	void AddCashFlow(const MtgCashFlow& a) { m_CashFlows.AddFlow(a); }
 	QString ReadyToCalculate() const;
-	void ResetFlows(){m_CashFlows.Clear();}
+	void ResetFlows() { m_CashFlows.Clear(); }
+	void SetProperty(const QString& PropName, const QString& Value);
+	void RemoveProperty(const QString& PropName);
+	void RemoveProperty(qint32 PropName);
+	QString GetProperty(const QString& PropName) const;
+	QString GetPropertyValue(qint32 PropIndex) const { return GetProperty(PropIndex, true); }
+	QString GetPropertyName(qint32 PropIndex) const { return GetProperty(PropIndex, false); }
+	bool HasProperty(const QString& PropName) const;
+	qint32 GetNumProperties()const;
+	const DayCountVector& GetDayCountConvention() const { return m_DayCountConvention; }
+	void SetDayCountConvention(const QString& val) { m_DayCountConvention = val; }
 	friend QDataStream& operator<<(QDataStream & stream, const Mortgage& flows);
 	friend QDataStream& operator>>(QDataStream & stream, Mortgage& flows);
 };

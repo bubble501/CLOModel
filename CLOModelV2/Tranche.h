@@ -9,6 +9,7 @@
 #include "IntegerVector.h"
 #include <QHash>
 #include "BaseRateTable.h"
+#include "DayCountVect.h"
 class  Tranche : public BackwardInterface {
 public:
 	//! Enum defining what type of coupon the tranche is paying
@@ -18,7 +19,7 @@ public:
 		FloatingInterest /*!< Floating Rate Coupon*/
 	};
 private:
-	DayCountConvention m_DayCount;
+	DayCountVector m_DayCount;
 	QString ISINcode;
 	QString TrancheName;
 	double OriginalAmt;
@@ -43,9 +44,10 @@ private:
 	void GetRefRateValueFromBloomberg() const;
 #endif
 	void ClearInterest();
-	void DownloadBaseRates() const;
 protected:
+	void DownloadBaseRates() const;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
+	static bool AdjHolidays(DayCountConvention a);
 public:
 	Tranche();
 	Tranche(const Tranche& a);
@@ -101,11 +103,11 @@ public:
 	void CompileReferenceRateValue(ConstantBaseRateTable& Values)const;
 	void CompileReferenceRateValue(ForwardBaseRateTable& Values)const;
 #ifndef NO_DATABASE
-	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll=false)const;
-	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll=false)const;
+	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll = false)const;
+	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll = false)const;
 #endif
-	DayCountConvention GetDayCount() const { return m_DayCount; }
-	void SetDayCount(DayCountConvention val) { m_DayCount = val; }
+	const DayCountVector& GetDayCount() const { return m_DayCount; }
+	void SetDayCount(QString val) { m_DayCount = val; }
 	void SetPrice(double a){if(a>0) Price=a;}
 	void SetBloombergExtension(const QString& a);
 	void SetProrataGroup(int a){if(a>0) ProrataGroup=a;}

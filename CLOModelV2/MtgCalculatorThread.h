@@ -14,6 +14,7 @@ private:
 	QString Delinquency;
 	QString DelinquencyLag;
 	QDate StartDate;
+	bool m_OverrideAssumptions;
 public:
 	MtgCalculatorThread(int Identity,QObject* parent=0);
 	void SetLoan(const Mortgage& a){Loan=a;}
@@ -29,10 +30,13 @@ public:
 	const QString& GetCPR() const { return CPRass; }
 	const QString& GetCDR() const { return CDRass; }
 	const QString& GetCLR() const { return LSass; }
+	
 	const QString& GetRecoveryLag() const { return RecoveryLag; }
 	const QString& GetDelinquency() const { return Delinquency; }
 	const QString& GetDelinquencyLag() const { return DelinquencyLag; }
 	const QDate& GetStartDate()const {return StartDate;}
+	void SetOverrideAssumptions(bool a) { m_OverrideAssumptions = a; }
+	bool GetOverrideAssumptions()const { return m_OverrideAssumptions; }
 signals:
 	void Calculated(int,const MtgCashFlow&);
 	void ErrorCalculation(int);

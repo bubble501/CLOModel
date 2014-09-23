@@ -22,7 +22,7 @@ public:
 		bool i = true;
 #endif // _DEBUG
 	}
-	StressThread(int IDx,int IDy, const QString& Xs,const QString& Ys,const QString& Cp,const QList<Mortgage*>& Mtgs,const Waterfall& Stct,const QDate& StDt,StressTest::StressVariability Xv,StressTest::StressVariability Yv,QObject* parent=0);
+	StressThread(int IDx, int IDy, const QString& Xs, const QString& Ys, const QString& Cp, const QHash<qint32, Mortgage*>& Mtgs, const Waterfall& Stct, const QDate& StDt, StressTest::StressVariability Xv, StressTest::StressVariability Yv, QObject* parent = 0);
 	StressThread(int IDx, int IDy, const QString& Xs, const QString& Ys, const QString& Cp, const MtgCashFlow& Mtgs, const Waterfall& Stct, const QDate& StDt, StressTest::StressVariability Xv, StressTest::StressVariability Yv, QObject* parent = 0);
 };
 #endif // StressThread_h__

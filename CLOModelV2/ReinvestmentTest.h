@@ -36,11 +36,13 @@ public:
 		, const QString& AnnuityVec = "I"
 		, const QString& ReinvPric = "100"
 		, const QString& ReinvDel = "0"
+		, const QString& ReinvSpr = "1"
 		, const QString& FloatingBase = "ZERO"
 		, const QString& RecoveryLag = "0"
 		, const QString& Delinquency = "0"
 		, const QString& DelinquencyLag = "0"
 	);
+	void SetMissingAnchors(const QDate& a);
 	void SetupTest(const QDate& ReinvPer,double TstLvl, double IIshare,double IRshare,double OIshare,double ORshare);
 	void CalculateBondCashFlows(double Size, QDate StartDate, int Period=0);
 	const MtgCashFlow& GetBondCashFlow() const;
@@ -53,9 +55,11 @@ public:
 	void GetDelinquencyLag(const QString& a) { m_DelinquencyLag = a; }
 	void GetRecoveryLag(const QString& a) { m_RecoveryLag = a; }
 	void GetDelinquency(const QString& a) { m_Delinquency = a; }
+	QString GetReinvestmentSpreadOverTime() const { return m_ReinvestmentSpreadOverTime.GetVector(); }
+	void SetReinvestmentSpreadOverTime(const QString& val) { m_ReinvestmentSpreadOverTime = val; }
 	friend QDataStream& operator<<(QDataStream & stream, const ReinvestmentTest& flows);
 	friend QDataStream& operator>>(QDataStream & stream, ReinvestmentTest& flows);
-private:
+protected:
 	QDate ReinvestmentPeriod;
 	double ReinvestmentTestLevel;
 	double ReinvestmentShare[4];
@@ -69,8 +73,7 @@ private:
 	IntegerVector m_RecoveryLag;
 	BloombergVector m_Delinquency;
 	IntegerVector m_DelinquencyLag;
-	
-protected:
+	IntegerVector m_ReinvestmentSpreadOverTime;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 
 };

@@ -142,17 +142,18 @@ namespace ManagedCLO {
 		}
 		/*!
 		\brief The type of interest of the tranche (fixed or floating)
+		\details The index specifies what coupon you wish to set (0 is the main coupon)
 		*/
-		property ManTrancheInterestType InterestType{
-			ManTrancheInterestType get(){return static_cast<ManTrancheInterestType>(static_cast<int>(Unmanaged->GetInterestType()));}
-			void set(ManTrancheInterestType a){Unmanaged->SetInterestType(static_cast<Tranche::TrancheInterestType>(static_cast<int>(a)));}
+		property ManTrancheInterestType InterestType[int]{
+			ManTrancheInterestType get(int CoupType) { return static_cast<ManTrancheInterestType>(static_cast<int>(Unmanaged->GetInterestType(CoupType))); }
+			void set(int CoupType, ManTrancheInterestType a) { Unmanaged->SetInterestType(static_cast<Tranche::TrancheInterestType>(static_cast<int>(a)), CoupType); }
 		}
 		/*!
 		\brief Set the coupon or margin paid by the tranche
-		\details If the tranche is fixed rate this is the interest paid on the note, if the tranche is floating rate this is the margin over the base rate.<br/>Accepts Bloomberg vectors. If the anchor date for the vector is not specified, the last payment date will be used.<br/>The format is in basis points 5%=500.
+		\details If the tranche is fixed rate this is the interest paid on the note, if the tranche is floating rate this is the margin over the base rate.<br/>Accepts Bloomberg vectors. If the anchor date for the vector is not specified, the last payment date will be used.<br/>The format is in basis points 5%=500.<br/>The index specifies what coupon you wish to set (0 is the main coupon)
 		*/
-		property String^ Coupon{
-			void set(String^ a){Unmanaged->SetCoupon(String2QString(a));}
+		property String^ Coupon[int]{
+			void set(int CoupType, String^ a) { Unmanaged->SetCoupon(String2QString(a), CoupType); }
 		}
 		/*!
 		\brief The annualised coupon paid by the tranche
@@ -161,66 +162,72 @@ namespace ManagedCLO {
 		\note If the tranche is floating rate, the output of this property will be the sum of the base interest rate and the margin.
 		\sa GetRawCoupon(int)
 		*/
-		double GetCoupon(int index){return Unmanaged->GetCoupon(index);}
+		double GetCoupon(int index, int CoupType) { return Unmanaged->GetCoupon(index, CoupType); }
 		/*!
 		\brief The annualised coupon paid by the tranche
 		\arg index The date for which to retrieve the tranche coupon.
+		\arg CoupType Specifies what coupon you are referring to (0 is the main coupon)
 		\details If the tranche is fixed rate this is the interest paid on the note, if the tranche is floating rate this is the margin over the base rate.
 		\note If the tranche is floating rate, the output of this property will be the sum of the base interest rate and the margin.
 		\sa GetRawCoupon(DateTime)
 		*/
-		double GetCoupon(DateTime index){return Unmanaged->GetCoupon(DateTime2QDate(index));}
+		double GetCoupon(DateTime index, int CoupType) { return Unmanaged->GetCoupon(DateTime2QDate(index), CoupType); }
 		/*!
 		\brief The coupon paid by the tranche
 		\arg index The time index for which to retrieve the tranche coupon. 0 corresponds to the Coupon vector anchor date or, if it's missing, the last payment date.
+		\arg CoupType Specifies what coupon you are referring to (0 is the main coupon)
 		\arg Frequency the frequency, in months, by which the coupon should be de-annualized. 1 for monthly de-annualization, 3 for quarterly
 		\details If the tranche is fixed rate this is the interest paid on the note, if the tranche is floating rate this is the margin over the base rate.
 		\note If the tranche is floating rate, the output of this property will be the sum of the base interest rate and the margin.
 		\sa GetRawCoupon(int)
 		*/
-		double GetCoupon(int index, int Frequency) { return Unmanaged->GetCoupon(index, Frequency); }
+		double GetCoupon(int index, int CoupType, int Frequency) { return Unmanaged->GetCoupon(index, CoupType, Frequency); }
 		/*!
 		\brief The coupon paid by the tranche
 		\arg index The date for which to retrieve the tranche coupon.
+		\arg CoupType Specifies what coupon you are referring to (0 is the main coupon)
 		\arg Frequency the frequency, in months, by which the coupon should be de-annualized. 1 for monthly de-annualization, 3 for quarterly
 		\details If the tranche is fixed rate this is the interest paid on the note, if the tranche is floating rate this is the margin over the base rate.
 		\note If the tranche is floating rate, the output of this property will be the sum of the base interest rate and the margin.
 		\sa GetRawCoupon(DateTime)
 		*/
-		double GetCoupon(DateTime index, int Frequency) { return Unmanaged->GetCoupon(DateTime2QDate(index), Frequency); }
+		double GetCoupon(DateTime index, int CoupType, int Frequency) { return Unmanaged->GetCoupon(DateTime2QDate(index), CoupType,Frequency); }
 		/*!
 		\brief The coupon or margin paid by the tranche
 		\arg index The time index for which to retrieve the tranche coupon. 0 corresponds to the Coupon vector anchor date or, if it's missing, the last payment date.
+		\arg CoupType Specifies what coupon you are referring to (0 is the main coupon)
 		\details For fixed rate tranches this is equivalent to GetCoupon, for floating rate notes this will return the margin over the base rate.
 		\sa GetCoupon(int)
 		*/
-		double GetRawCoupon(int index){return Unmanaged->GetRawCoupon(index);}
+		double GetRawCoupon(int index, int CoupType) { return Unmanaged->GetRawCoupon(index, CoupType); }
 		/*!
 		\brief The coupon or margin paid by the tranche
 		\arg index The date for which to retrieve the tranche coupon.
+		\arg CoupType Specifies what coupon you are referring to (0 is the main coupon)
 		\details For fixed rate tranches this is equivalent to GetCoupon, for floating rate notes this will return the margin over the base rate.
 		\sa GetCoupon(DateTime)
 		*/
-		double GetRawCoupon(DateTime index){return Unmanaged->GetRawCoupon(DateTime2QDate(index));}
+		double GetRawCoupon(DateTime index, int CoupType) { return Unmanaged->GetRawCoupon(DateTime2QDate(index), CoupType); }
 		/*!
 		\brief The ticker of the base rate of the tranche
-		\details This property contains the bloomberg ticker (*without* yellow key) of the base rate for floating rate tranche.
+		\details This property contains the bloomberg ticker (*without* yellow key) of the base rate for floating rate tranche.<br/>The index specifies what coupon you wish to set (0 is the main coupon).
 		\sa ReferenceRateValue
 		*/
-		property String^ ReferenceRate{
-			String^ get(){return QString2String(Unmanaged->GetReferenceRate());}
-			void set(String^ a){Unmanaged->SetReferenceRate(String2QString(a));}
+		property String^ ReferenceRate[int]{
+			String^ get(int CoupType) { return QString2String(Unmanaged->GetReferenceRate(CoupType)); }
+			void set(int CoupType, String^ a) { Unmanaged->SetReferenceRate(String2QString(a), CoupType); }
 		}
 		/*!
 		\brief The value of the base rate for the tranche
-		\details For floating rate tranches this property holds the value of the base rate and for fixed rate notes the value for the base rate used when calculating the discount margin.<br/>Use CompileBaseRates or GetBaseRatesDatabase to set the value for this property.
+		\details For floating rate tranches this property holds the value of the base rate and for fixed rate notes the value for the base rate used when calculating the discount margin.<br/>Use CompileBaseRates or GetBaseRatesDatabase to set the value for this property.<br/>The index specifies what coupon you wish to set (0 is the main coupon).
+		\arg CoupType Specifies what coupon you are referring to (0 is the main coupon)
 		\sa ReferenceRate
 		\sa DefaultRefRate
 		\sa GetReferenceRateValue(int)
 		\sa GetReferenceRateValue(Datetime)
 		*/
-		property String^ ReferenceRateValue{
-			String^ get(){return QString2String(Unmanaged->GetReferenceRateValue().GetVector());}
+		property String^ ReferenceRateValue[int]{
+			String^ get(int CoupType) { return QString2String(Unmanaged->GetReferenceRateValue(CoupType)); }
 			//void set(String^ a){Unmanaged->SetReferenceRateValue(String2QString(a));}
 		}
 		/*!
@@ -236,7 +243,6 @@ namespace ManagedCLO {
 		\sa ReferenceRateValue
 		\sa GetReferenceRateValue(Datetime)
 		*/
-		double GetReferenceRateValue(int index) {return Unmanaged->GetReferenceRateValue(index);}
 		/*!
 		\brief The value of the base rate for the tranche at the specified index
 		\arg index The date for which to retrieve the index value.
@@ -244,7 +250,7 @@ namespace ManagedCLO {
 		\sa ReferenceRateValue
 		\sa GetReferenceRateValue(int)
 		*/
-		double GetReferenceRateValue(DateTime index) {return Unmanaged->GetReferenceRateValue(DateTime2QDate(index));}
+		double GetReferenceRateValue(DateTime index, int CoupType) { return Unmanaged->GetReferenceRateValue(DateTime2QDate(index), CoupType); }
 		/*!
 		\brief Uses the supplied base rates table to fill in the base rate values
 		\arg Values a table containing the spot rates of the relevant base rates
@@ -357,9 +363,9 @@ namespace ManagedCLO {
 		\brief The day count convention used to calculate interest.
 		\details By default is set to 360 by the constructor, this corresponds to Actual/360
 		*/
-		property int DayCount{
-			int get(){return Unmanaged->GetDayCount();}
-			void set(int a){Unmanaged->SetDayCount(a);}
+		property ManDayCountConvention DayCount{
+			ManDayCountConvention get() { return static_cast<ManDayCountConvention>(static_cast<int>(Unmanaged->GetDayCount())); }
+			void set(ManDayCountConvention a) { Unmanaged->SetDayCount(static_cast<DayCountConvention>(static_cast<int>(a))); }
 		}
 		/*!
 		\brief The ticker of the default base rate.
@@ -463,13 +469,6 @@ namespace ManagedCLO {
 		\arg The date from which to calculate the WAL
 		*/
 		double GetWALife(DateTime StartDate){return Unmanaged->GetWALife(DateTime2QDate(StartDate));}
-		/*!
-		\brief The interest accrued on the notes
-		*/
-		property double AccruedInterest{
-			double get(){return Unmanaged->GetAccruedInterest();}
-			void set(double a){Unmanaged->SetAccruedInterest(a);}
-		}
 		/*!
 		\brief The tranche settlement date
 		*/

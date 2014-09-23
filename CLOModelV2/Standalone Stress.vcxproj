@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AbstarctBbgVect.h" />
+    <ClInclude Include="DayCountVect.h" />
     <ClInclude Include="GenericCashFlow.h" />
     <ClInclude Include="BackwardCompatibilityInterface.h" />
     <ClInclude Include="BaseRateTable.h" />
@@ -26,11 +27,11 @@
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing QBbgWorker.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB -DQUAZIP_BUILD -DNOMINMAX -DQT_SQL_LIB "-IC:\Boost\Boost-1.55" "-IC:\KDAB\KDChart-2.5.1\include\KDChart" "-IC:\Zlib\include" "-IC:\blp\API\APIv3\C++API\v3.6.2.0\include" "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtSql"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB -DQUAZIP_BUILD -DNOMINMAX -DQT_SQL_LIB  "-IC:\Boost\Boost-1.55" "-IC:\KDAB\KDChart-2.5.1\include\KDChart" "-IC:\Zlib\include" "-IC:\blp\API\APIv3\C++API\v3.6.2.0\include" "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtSql"</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing QBbgWorker.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB -DQUAZIP_BUILD -DNOMINMAX -DQT_SQL_LIB "-IC:\Boost\Boost-1.55" "-IC:\KDAB\KDChart-2.5.1\include\KDChart" "-IC:\Zlib\include" "-IC:\blp\API\APIv3\C++API\v3.6.2.0\include" "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtSql"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB -DQUAZIP_BUILD -DNOMINMAX -DQT_SQL_LIB  "-IC:\Boost\Boost-1.55" "-IC:\KDAB\KDChart-2.5.1\include\KDChart" "-IC:\Zlib\include" "-IC:\blp\API\APIv3\C++API\v3.6.2.0\include" "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtSql"</Command>
     </CustomBuild>
     <ClInclude Include="QBbgRequest.h" />
     <ClInclude Include="QBbgResultsIterator.h" />
@@ -231,6 +232,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AbstarctBbgVect.cpp" />
+    <ClCompile Include="DayCountVect.cpp" />
     <ClCompile Include="GenericCashFlow.cpp" />
     <ClCompile Include="BaseRateTable.cpp" />
     <ClCompile Include="BaseRateVect.cpp" />

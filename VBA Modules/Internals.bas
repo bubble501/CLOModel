@@ -81,7 +81,7 @@ Public Sub WaterfallStepChanged(TargetAllCell As Range)
                 TargetCell.Offset(0, 2).Value = 1
                 TargetCell.Offset(0, 1).AddComment "Index of the reserve fund to use"
                 TargetCell.Offset(0, 2).AddComment "1 if it's replenished using interest, 2 if it's replenished using principal"
-            Case UCase("Interest")
+            Case UCase("Interest"), UCase("Deferred"), UCase("Deferred from Principal"), UCase("IC"), UCase("IC from Principal")
                 TargetCell.Offset(0, 2).NumberFormat = ";;;"
                 TargetCell.Offset(0, 2).Value = 1
             Case UCase("Reinvestment")
@@ -110,9 +110,27 @@ Public Sub WaterfallStepChanged(TargetAllCell As Range)
                 TargetCell.Offset(0, 2).AddComment ("Tranche that will be redeemed if the test fails and turbo is on" + vbCrLf + "Leave Blank for Sequential")
             Case UCase("OC"), UCase("OC from Principal")
                 TargetCell.Offset(0, 2).Resize(1, 2).Locked = False
-                TargetCell.Offset(0, 2).AddComment ("Most junior tranche that will be considered for the test level")
+                TargetCell.Offset(0, 1).AddComment ("Most junior tranche that will be considered for the test level")
+                TargetCell.Offset(0, 2).AddComment ("Tranche that will be redeemed if the test fails. Leave blank for sequential")
                 TargetCell.Offset(0, 3).AddComment ("Share that will redeem that tranche")
                 TargetCell.Offset(0, 3).Value = 0
+                TargetCell.Offset(0, 3).NumberFormat = "0%"
+                TargetCell.Offset(0, 2).NumberFormat = "0"
+            Case UCase("Cure PDL")
+                TargetCell.Offset(0, 2).Resize(1, 2).Locked = False
+                TargetCell.Offset(0, 1).AddComment ("Tranche whose PDL will be cured")
+                TargetCell.Offset(0, 2).AddComment ("Tranche that will recieve PDL cure. Leave blank for sequential")
+                TargetCell.Offset(0, 3).AddComment ("Share that will redeem that tranche")
+                TargetCell.Offset(0, 3).Value = 0
+                TargetCell.Offset(0, 3).NumberFormat = "0%"
+                TargetCell.Offset(0, 2).NumberFormat = "0"
+            Case UCase("Turbo")
+                TargetCell.Offset(0, 2).Resize(1, 2).Locked = False
+                TargetCell.Offset(0, 1).Locked = True
+                TargetCell.Offset(0, 1).Value = ""
+                TargetCell.Offset(0, 2).AddComment ("Class of notes that will be redeemed")
+                TargetCell.Offset(0, 3).AddComment ("Share of interest that will redeem that tranche")
+                TargetCell.Offset(0, 3).Value = 1#
                 TargetCell.Offset(0, 3).NumberFormat = "0%"
                 TargetCell.Offset(0, 2).NumberFormat = "0"
             Case UCase("Redeem Pro-Rata")
@@ -120,6 +138,17 @@ Public Sub WaterfallStepChanged(TargetAllCell As Range)
                 TargetCell.Offset(0, 1).AddComment ("First Seniority Level To Redeem")
                 TargetCell.Offset(0, 2).AddComment ("Last Seniority Level To Redeem")
                 TargetCell.Offset(0, 1).Resize(1, 2).NumberFormat = "0"
+            Case UCase("Fees from XS")
+                TargetCell.Offset(0, 1).Value = ""
+                TargetCell.Offset(0, 2).Value = 3
+                TargetCell.Offset(0, 3).Value = 0
+                TargetCell.Offset(0, 2).Locked = False
+                TargetCell.Offset(0, 3).Locked = False
+                TargetCell.Offset(0, 1).Locked = True
+                TargetCell.Offset(0, 2).AddComment ("1 Excess Interest, 2 Excess Principal, 3 All excess")
+                TargetCell.Offset(0, 3).AddComment ("Share of Excess Toward Fees")
+                TargetCell.Offset(0, 2).NumberFormat = "[=1]""XS Interst"";[=2]""XS Principal"";""All XS"""
+                TargetCell.Offset(0, 3).NumberFormat = "0%"
             Case ""
                 TargetCell.Offset(0, 1).Resize(1, 3).ClearContents
                 TargetCell.Offset(0, 1).Resize(1, 3).Locked = True
@@ -385,4 +414,8 @@ Public Sub RunCLOModel(SaveBase As Boolean)
     Sheets("Graphical Output").EnableSelection = xlUnlockedCells
     Sheets("Liabilities + input").Protect UserInterfaceOnly:=True, AllowFormattingCells:=True
 End Sub
-
+Public Function ShowDayCount(Target As String, CurrentDcnt As Integer) As String
+    Call DayCountForm.SetDayCount(CurrentDcnt)
+    DayCountForm.TargetAddress = Target
+    ShowDayCount = DayCountForm.ShowForm
+End Function

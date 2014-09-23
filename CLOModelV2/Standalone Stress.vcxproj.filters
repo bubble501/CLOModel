@@ -155,6 +155,9 @@
     <ClInclude Include="GenericCashFlow.h">
       <Filter>Header Files\Core Files</Filter>
     </ClInclude>
+    <ClInclude Include="DayCountVect.h">
+      <Filter>Header Files\Core Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="StandaloneStress.h">
@@ -475,6 +478,9 @@
       <Filter>Source Files\Core Files</Filter>
     </ClCompile>
     <ClCompile Include="GenericCashFlow.cpp">
+      <Filter>Source Files\Core Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DayCountVect.cpp">
       <Filter>Source Files\Core Files</Filter>
     </ClCompile>
   </ItemGroup>

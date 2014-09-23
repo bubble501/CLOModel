@@ -1,5 +1,6 @@
 #include "GenericCashFlow.h"
 #include <QDataStream>
+#include <QSet>
 GenericCashFlow::GenericCashFlow() 
 	: m_AggregationLevel(NoAggregation)
 	, m_AdjustHolidays(false)
@@ -211,6 +212,7 @@ bool GenericCashFlow::operator==(const GenericCashFlow& a) const {
 		const QHash<qint32, double>* TempMain = MainIter.value();
 		const QHash<qint32, double>* TempSec = a.m_CashFlows.value(MainIter.key());
 		if (TempMain->size() != TempSec->size()) return false;
+
 		for (QHash<qint32, double>::const_iterator SecIter = TempMain->constBegin(); SecIter != TempMain->constEnd(); ++SecIter) {
 			if (!TempSec->contains(SecIter.key())) return false;
 			if (qAbs(TempSec->value(SecIter.key()) - SecIter.value()) >= 0.01) return false;
@@ -221,8 +223,8 @@ bool GenericCashFlow::operator==(const GenericCashFlow& a) const {
 GenericCashFlow GenericCashFlow::operator+(const GenericCashFlow& a) const {
 	GenericCashFlow Result(*this); Result.AddFlow(a); return Result;
 }
-#ifdef _DEBUG
-#include <QSet>
+
+
 QString GenericCashFlow::ToString() const {
 	QSet<qint32> FlowsTypes;
 	for (QMap<QDate, QHash<qint32, double>* >::const_iterator MainIter = m_CashFlows.constBegin(); MainIter != m_CashFlows.constEnd(); ++MainIter) {
@@ -242,7 +244,7 @@ QString GenericCashFlow::ToString() const {
 	}
 	return Result;
 }
-#endif
+
 GenericCashFlow GenericCashFlow::SingleFlow(qint32 FlowTpe) const {
 	GenericCashFlow Result;
 	Result.Aggregate(m_AggregationLevel);
@@ -251,7 +253,19 @@ GenericCashFlow GenericCashFlow::SingleFlow(qint32 FlowTpe) const {
 	}
 	return Result;
 }
-
+GenericCashFlow GenericCashFlow::SingleDate(const QDate& a) const {
+	GenericCashFlow Result;
+	Result.Aggregate(m_AggregationLevel);
+	for (QMap<QDate, QHash<qint32, double>* >::const_iterator MainIter = m_CashFlows.constBegin(); MainIter != m_CashFlows.constEnd(); ++MainIter) {
+		if (SamePeriod(a, MainIter.key(), m_AggregationLevel)) {
+			for (auto SecondIter = MainIter.value()->constBegin(); SecondIter != MainIter.value()->constEnd(); ++SecondIter) {
+				Result.AddFlow(a, SecondIter.value(), SecondIter.key());
+			}
+			return Result;
+		}
+	}
+	return Result;
+}
 bool GenericCashFlow::HasFlowType(qint32 FlowTpe) const {
 	for (QMap<QDate, QHash<qint32, double>* >::const_iterator MainIter = m_CashFlows.constBegin(); MainIter != m_CashFlows.constEnd(); ++MainIter) {
 		if (MainIter.value()->contains(FlowTpe)) return true;

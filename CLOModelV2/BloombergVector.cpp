@@ -119,7 +119,7 @@ BloombergVector BloombergVector::operator+(const BloombergVector& Vec) const{
 		// The part of the vector up to the most recent anchor date will be discarded
 		QDate MaxAnchor=qMax(m_AnchorDate,Vec.m_AnchorDate);
 		QDate MaxEnd=qMax(m_AnchorDate.addMonths(m_VectVal.size()),Vec.m_AnchorDate.addMonths(Vec.m_VectVal.size()));
-		for(QDate i=MaxAnchor;i<=MaxEnd;i.addMonths(1)){
+		for(QDate i=MaxAnchor;i<=MaxEnd;i=i.addMonths(1)){
 			ResultVector.append(
 				GetValue(i)
 				+
@@ -227,7 +227,7 @@ void BloombergVector::UnpackVector(){
 	m_VectVal.append(StringParts.last().toDouble() / m_Divisor);
 }
 bool BloombergVector::IsValid() const{
-	return AbstarctBbgVect::IsValid("\\d*\\.?\\d+",true);
+	return AbstarctBbgVect::IsValid("-?\\d*\\.?\\d+",true);
 }
 double BloombergVector::GetValue(const QDate& index,int Frequency)const{
 	QDate ValidDate(m_AnchorDate);

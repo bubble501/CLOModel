@@ -58,3 +58,4 @@ Makefile*
 *.dylib
 *.autosave
 *.snk
+ConsoleTest*

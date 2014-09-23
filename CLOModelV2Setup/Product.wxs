@@ -38,6 +38,11 @@
 				<FileSearch Id="Checkzlib" Name="zlib1.dll" />
 			</DirectorySearch>
 		</Property>
+		<Property Id="FOUNDMSCOM">
+			<DirectorySearch Id="CheckMsComDir" Path="[System32Dir]" Depth="0">
+				<FileSearch Id="CheckMsCom" Name="mscomct2.ocx" />
+			</DirectorySearch>
+		</Property>
 		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
 		<Property Id="ARPPRODUCTICON" Value="TwentyFourIcon.ico" />
 		<Feature Id="ModelSetup" Title="CLO Model 2.0 Setup" Level="1" Description="Installs the new components" ConfigurableDirectory="INSTALLFOLDER">
@@ -74,6 +79,10 @@
 			<ComponentRef Id ='RemoveOldzlib'/>
 			<Condition Level='1'>FOUNDZLIB</Condition>
 		</Feature>
+		<Feature Id='InstallMsCom' Title='Install MS Com 2 toolkit' Level='1' Display='hidden'>
+			<ComponentRef Id ='MSCOM2'/>
+			<Condition Level='0'>FOUNDMSCOM</Condition>
+		</Feature>
 		<Feature Id="VCRedist" Title="Visual C++ 12.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
 			<MergeRef Id="VCRedist"/>
 		</Feature>
@@ -83,11 +92,12 @@
 		<WixVariable Id="WixUILicenseRtf" Value="..\Documentation\License.rtf"/>
 		<Icon Id='TwentyFourIcon.ico' SourceFile='..\CLOModelV2\Resources\Logo.ico'/>
 	</Product>
-
+	<?include mscom.wxi?>
 	<Fragment>
 		<Directory Id="TARGETDIR" Name="SourceDir">
 			<Directory Id="WindowsDir" Name="Windows">
 					<Directory Id="System16Dir" Name="system" />
+					<Directory Id="System32Dir" Name="$(var.SystemDir)" />
 			</Directory>
 			<Directory Id="ProgramFilesFolder">
 				<Directory Id="INSTALLFOLDER" Name="CLO Model 2.0">
@@ -150,7 +160,7 @@
 			<Component Id="QtWindows" Guid="1A642659-CEC0-487F-9E4A-173A3D6B2262">
 				<File Id="WindowsPlugin" Name="qwindows.dll" Source="C:\Qt5\5.3\msvc2013\plugins\platforms\qwindows.dll" KeyPath="yes" />
 			</Component>
-		</ComponentGroup>
+		</ComponentGroup>	
 		<ComponentGroup Id="FileAssociation" Directory="INSTALLFOLDER">
 			<Component Id="BaseCases" Guid="92A982A3-368D-40EB-9D93-C91647879B8C">
 				<RegistryKey Id="BaseCasesKey" Root="HKCU" Key="SOFTWARE\Classes\.clo" ForceCreateOnInstall="yes">
@@ -212,4 +222,5 @@
 			<RemoveFolder Id='INSTALLFOLDER' On='uninstall' />
 		</Component>
 	</Fragment>
+	
 </Wix>

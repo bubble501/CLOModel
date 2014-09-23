@@ -158,7 +158,7 @@ void StressViewer::UpdateTable(){
 				Tranche marginTranche=*(StressTarget.GetResults().value(StressTarget.GetXSpann().at(i)).value(StressTarget.GetYSpann().at(j)).GetTranche(TrancheTarg));
 				double currentDisc=marginTranche.GetDiscountMargin();
 				if((i==0 && j==0) || currentDisc>MaxDisc) MaxDisc=currentDisc;
-				if((!Minset || currentDisc<MinDisc) && currentDisc>0) {MinDisc=currentDisc; Minset=true;}
+				if((!Minset || currentDisc<MinDisc) && currentDisc>=1.0) {MinDisc=currentDisc; Minset=true;}
 				TempItem = new QTableWidgetItem(Commarize(currentDisc, 0));
 				TempItem->setData(Qt::UserRole, currentDisc);
 				Table->setItem(i, j, TempItem);
@@ -182,7 +182,7 @@ void StressViewer::UpdateTable(){
 		for(int i=0;i<StressTarget.GetXSpann().size();i++){
 			for(int j=0;j<StressTarget.GetYSpann().size();j++){
 				double CurrentVal = Table->item(i, j)->data(Qt::UserRole).toDouble();
-				if(CurrentVal<=0.0) Table->item(i,j)->setBackgroundColor(Qt::red);
+				if(CurrentVal<0) Table->item(i,j)->setBackgroundColor(Qt::red);
 				else{
 					if(MaxDisc-MinDisc<1.0) GradientBase.setCurrentTime(100.0);
 					else GradientBase.setCurrentTime(100.0-(100.0*(CurrentVal-MinDisc)/(MaxDisc-MinDisc)));
@@ -197,7 +197,7 @@ void StressViewer::UpdateTable(){
 		for(int i=0;i<StressTarget.GetXSpann().size();i++){
 			for(int j=0;j<StressTarget.GetYSpann().size();j++){
 				double CurrentVal = Table->item(i, j)->data(Qt::UserRole).toDouble();
-				if(CurrentVal<=0.0) Table->item(i,j)->setBackgroundColor(Qt::red);
+				if(CurrentVal<1.0) Table->item(i,j)->setBackgroundColor(Qt::red);
 				else{
 					if(MaxDisc-MinDisc<1.0) GradientBase.setCurrentTime(100.0);
 					else GradientBase.setCurrentTime(100.0*(CurrentVal-MinDisc)/(MaxDisc-MinDisc));
@@ -230,14 +230,14 @@ void StressViewer::PriceChanged(double a){
 			double currentDisc=marginTranche.GetDiscountMargin(a);
 			OriginalDiscounts[i][j]=currentDisc;
 			if((i==0 && j==0) || currentDisc>MaxDisc) MaxDisc=currentDisc;
-			if((!Minset || currentDisc<MinDisc) && currentDisc>0) {MinDisc=currentDisc; Minset=true;}
+			if((!Minset || currentDisc<MinDisc) && currentDisc>=1.0) {MinDisc=currentDisc; Minset=true;}
 			Table->item(i,j)->setText(Commarize(currentDisc,0));
 		}
 	}
 	for(int i=0;i<StressTarget.GetXSpann().size();i++){
 		for(int j=0;j<StressTarget.GetYSpann().size();j++){
 			double CurrentVal=OriginalDiscounts[i][j];
-			if(CurrentVal<=0) Table->item(i,j)->setBackgroundColor(Qt::red);
+			if(CurrentVal<1.0) Table->item(i,j)->setBackgroundColor(Qt::red);
 			else{
 				if(MaxDisc-MinDisc<1.0) GradientBase.setCurrentTime(100.0);
 				else GradientBase.setCurrentTime(100.0*(CurrentVal-MinDisc)/(MaxDisc-MinDisc));

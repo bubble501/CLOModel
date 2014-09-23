@@ -438,12 +438,13 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 	bool PrintTotalFlow, 
 	bool PrintDeferred, 
 	bool PrintOCtest, 
-	bool PrintICtest
+	bool PrintICtest,
+	bool PrintPDL
 	){
 		ExcelCommons::InitExcelOLE();
 		QString ColorString=QString("%1,%2,%3").arg(BackgrndCol.red()).arg(BackgrndCol.green()).arg(BackgrndCol.blue());
 		int NumOfCols=
-			PrintDates+PrintOutstanding+PrintInterest+PrintPrincipal+PrintTotalFlow+PrintDeferred+PrintOCtest+PrintICtest;
+			PrintDates + PrintOutstanding + PrintInterest + PrintPrincipal + PrintTotalFlow + PrintDeferred + PrintOCtest + PrintICtest + (2 * PrintPDL);
 		int Numrows= source.GetCashFlow().Count();
 		SAFEARRAYBOUND  Bound[2];
 		Bound[0].lLbound   = 1;
@@ -520,6 +521,18 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 					pdFreq++;
 				}
 			}
+			if (PrintPDL) {
+				for (DWORD i = 0; i < Numrows; i++) {
+					pdFreq->vt = VT_R8;
+					pdFreq->dblVal = source.GetCashFlow().GetPDLOutstanding(i);
+					pdFreq++;
+				}
+				for (DWORD i = 0; i < Numrows; i++) {
+					pdFreq->vt = VT_R8;
+					pdFreq->dblVal = source.GetCashFlow().GetPDLCured(i);
+					pdFreq++;
+				}
+			}
 			SafeArrayUnaccessData(saData);
 		}
 
@@ -528,8 +541,8 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 
 		static DISPID dispid = 0;
 		DISPPARAMS Params;
-		VARIANTARG Command[15];
-		int CurrentCmdIndex=15-1;
+		VARIANTARG Command[16];
+		int CurrentCmdIndex=16-1;
 		if(!ExcelCommons::pExcelDisp)return S_FALSE;
 		try
 		{
@@ -559,6 +572,8 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 			Command[CurrentCmdIndex--].boolVal=PrintOCtest;
 			Command[CurrentCmdIndex].vt = VT_BOOL;
 			Command[CurrentCmdIndex--].boolVal=PrintICtest;
+			Command[CurrentCmdIndex].vt = VT_BOOL;
+			Command[CurrentCmdIndex--].boolVal = PrintPDL;
 			Command[CurrentCmdIndex].vt = VT_R8;
 			Command[CurrentCmdIndex--].dblVal=source.GetMinIClevel();
 			Command[CurrentCmdIndex].vt = VT_R8;
@@ -567,7 +582,7 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 			
 			Params.rgdispidNamedArgs = NULL;
 			Params.rgvarg=Command;
-			Params.cArgs = 15;
+			Params.cArgs = 16;
 			Params.cNamedArgs = 0;
 			if(dispid == 0)
 			{

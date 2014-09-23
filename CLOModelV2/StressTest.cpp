@@ -25,6 +25,7 @@ StressTest::StressTest(QObject* parent)
 	, UseFastVersion(false)
 {
 	BaseCalculator = new MtgCalculator(this);
+	BaseCalculator->SetOverrideAssumptions(true);
 	StressDimension[0]=ChangingCDR;
 	StressDimension[1]=ChangingLS;
 	connect(BaseCalculator, SIGNAL(Calculated()), this, SLOT(StartStresses()));
@@ -43,18 +44,18 @@ StressTest::~StressTest(){
 	ResetLoans();
 	if(ProgressForm) ProgressForm->deleteLater();
 }
-const QList<Mortgage*>& StressTest::GetLoans()const {
+const QHash<qint32, Mortgage*>& StressTest::GetLoans()const {
 	return BaseCalculator->GetLoans();
 }
 const Mortgage* StressTest::GetLoans(int index)const{
-	const QList<Mortgage*>& TempLoans = BaseCalculator->GetLoans();
+	auto TempLoans = BaseCalculator->GetLoans();
 	if (index<0 || index >= TempLoans.size()) return NULL;
-	return TempLoans.at(index);
+	return *(TempLoans.constBegin()+index);
 }
 Mortgage* StressTest::GetLoans(int index){
-	QList<Mortgage*>& TempLoans = BaseCalculator->GetLoans();
+	auto TempLoans = BaseCalculator->GetLoans();
 	if (index<0 || index >= TempLoans.size()) return NULL;
-	return TempLoans[index];
+	return *(TempLoans.begin() + index);
 }
 void StressTest::SetXSpann(const QList<QString>& a){
 	XSpann.clear();
@@ -118,7 +119,7 @@ void StressTest::RunStressTest() {
 	if (UseFastVersion) {
 		QString CheckLoans = BaseCalculator->ReadyToCalculate();
 		if (CheckLoans.isEmpty()) {
-			if(!BaseCalculator->StartCalculation())
+			if(!BaseCalculator->StartCalculation(false))
 				QMessageBox::critical(0, "Invalid Input", "A base rate in the loans is invalid");
 		}
 		else QMessageBox::critical(0, "Invalid Input", "The following Inputs are missing or invalid:\n" + CheckLoans);

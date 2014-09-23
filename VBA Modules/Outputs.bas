@@ -13,6 +13,7 @@ Public Sub PrintTranche( _
     PrintDeferred As Boolean, _
     PrintOCtest As Boolean, _
     PrintICtest As Boolean, _
+    PrintPDL As Boolean, _
     TargetICtest As Double, _
     TargetOCtest As Double _
 )
@@ -66,6 +67,14 @@ Public Sub PrintTranche( _
     If (PrintICtest) Then
         TargetCell.Offset(0, ColOffset).Value = "IC Test"
         TargetCell.Offset(0, ColOffset).EntireColumn.ColumnWidth = 8
+        ColOffset = ColOffset + 1
+    End If
+    If (PrintPDL) Then
+        TargetCell.Offset(0, ColOffset).Value = "PDL Outstanding"
+        TargetCell.Offset(0, ColOffset).EntireColumn.ColumnWidth = 12
+        ColOffset = ColOffset + 1
+        TargetCell.Offset(0, ColOffset).Value = "PDL Cured"
+        TargetCell.Offset(0, ColOffset).EntireColumn.ColumnWidth = 12
         ColOffset = ColOffset + 1
     End If
     Dim TempOff As Integer
@@ -135,6 +144,14 @@ Public Sub PrintTranche( _
             Else
                 TargetCell.Offset(i, ColOffset).NumberFormat = "[<10]0%;[>=10]""Infinity"""
             End If
+            ColOffset = ColOffset + 1
+        End If
+        If (PrintPDL) Then
+            TargetCell.Offset(i, ColOffset).Value = Data(i, ColOffset)
+            TargetCell.Offset(i, ColOffset).NumberFormat = "_-* #,##0_-;-* #,##0_-;_-* "" - ""??_-;_-@_-"
+            ColOffset = ColOffset + 1
+            TargetCell.Offset(i, ColOffset).Value = Data(i, ColOffset)
+            TargetCell.Offset(i, ColOffset).NumberFormat = "_-* #,##0_-;-* #,##0_-;_-* "" - ""??_-;_-@_-"
             ColOffset = ColOffset + 1
         End If
     Next i
@@ -851,7 +868,8 @@ Public Sub PlotAnnualExcess( _
         With .Axes(xlValue)
             .HasDisplayUnitLabel = False
             .DisplayUnit = xlNone
-            .MinimumScaleIsAuto = True
+            .MinimumScale = 0
+            '.MinimumScaleIsAuto = True
             .MaximumScaleIsAuto = True
             .TickLabels.NumberFormat = "0.00%"
         End With
@@ -1073,7 +1091,8 @@ Public Sub PlotCPRLS( _
             .AxisTitle.Caption = "CPR"
             .HasDisplayUnitLabel = False
             .DisplayUnit = xlNone
-            .MinimumScaleIsAuto = True
+            .MinimumScale = 0
+            '.MinimumScaleIsAuto = True
             .MaximumScaleIsAuto = True
             .TickLabels.NumberFormat = "0.00%"
         End With
@@ -1082,7 +1101,8 @@ Public Sub PlotCPRLS( _
             .AxisTitle.Caption = "LR"
             .HasDisplayUnitLabel = False
             .DisplayUnit = xlNone
-            .MinimumScaleIsAuto = True
+            .MinimumScale = 0
+            '.MinimumScaleIsAuto = True
             .MaximumScaleIsAuto = True
             .TickLabels.NumberFormat = "0.00%"
         End With

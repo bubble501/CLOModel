@@ -19,6 +19,8 @@
 #include <QTextEdit>
 #include <QVBoxLayout>
 #include <QTime>
+#include <QTextStream>
+#include <QDomDocument>
 #endif
 
 
@@ -60,6 +62,33 @@ int main(int argc, char *argv[]) {
 	file.close();
 	}*/
 
+	/*Waterfall TempWtf;
+	MtgCalculator TempLoans;
+	QFile file("\\\\synserver2\\Company Share\\24AM\\Monitoring\\Model Results\\AQUIL 2006-1X.clom");
+	file.open(QIODevice::ReadOnly);
+	qint32 VersionChecker;
+	QDataStream out(&file);
+	out.setVersion(QDataStream::Qt_5_3);
+	out >> VersionChecker;
+	if (VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) {
+		file.close();
+		return 1;
+	}
+	{QDate Junk; out >> Junk; }
+	{bool Junk; out >> Junk; }
+	{bool Junk; out >> Junk; }
+	TempWtf.SetLoadProtocolVersion(VersionChecker); out >> TempWtf;
+	TempWtf.SetLoadProtocolVersion(VersionChecker); out >> TempWtf;
+	TempLoans.SetLoadProtocolVersion(VersionChecker); out >> TempLoans;
+	file.close();
+	//TempWtf.CalculateTranchesCashFlows();
+	QString Testing = (*(TempLoans.GetLoans().begin()))->GetProperty("Issuer");
+	Testing = (*(TempLoans.GetLoans().begin()))->GetProperty("Facility");
+	Testing = (*(TempLoans.GetLoans().begin()))->GetProperty("Price");
+	Testing = (*(TempLoans.GetLoans().begin()))->GetProperty("Mezzanine");
+	Testing = (*(TempLoans.GetLoans().begin()))->GetProperty("Industry");
+	Testing = (*(TempLoans.GetLoans().begin()))->GetProperty("Country");*/
+
 
 
 	Waterfall TempWtf, TempCallWaterfall;
@@ -80,7 +109,7 @@ int main(int argc, char *argv[]) {
 	out >> TempCallWaterfall;
 	file.close();
 	//TempWtf.CalculateTranchesCashFlows();
-	double Testing=TempWtf.GetTranche(0)->GetDiscountMargin(100.0);
+	double Testing=TempWtf.GetTranche(2)->GetDiscountMargin(100.0);
 	
 
 	/*Tranche TempTrnch;

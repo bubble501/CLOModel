@@ -249,8 +249,8 @@ void StandaloneStress::Start(){
 			TmpMtg.SetLoadProtocolVersion(VersionChecker);
 			out >> TmpMtg;
 			StartDate = TmpMtg.GetStartDate();
-			for (int i = 0; i < TmpMtg.Count(); i++) {
-				Stresser->AddLoan(*(TmpMtg.GetLoans().at(i)));
+			for (auto i = TmpMtg.GetLoans().constBegin(); i != TmpMtg.GetLoans().constEnd(); ++i) {
+				Stresser->AddLoan(*(i.value()));
 			}
 		}
 		file.close();

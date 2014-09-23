@@ -1,5 +1,6 @@
 #include "StressWorker.h"
-StressWorker::StressWorker(int IDx,int IDy, const QString& Xs,const QString& Ys,const QString& Cp,const QList<Mortgage*>& Mtgs,const Waterfall& Stct,const QDate& StDt,StressTest::StressVariability Xv,StressTest::StressVariability Yv,QObject* parent)
+#include "MtgCalculator.h"
+StressWorker::StressWorker(int IDx,int IDy, const QString& Xs,const QString& Ys,const QString& Cp,const QHash<qint32,Mortgage*>& Mtgs,const Waterfall& Stct,const QDate& StDt,StressTest::StressVariability Xv,StressTest::StressVariability Yv,QObject* parent)
 	:QObject(parent)
 	,XSpann(Xs)
 	,YSpann(Ys)
@@ -12,8 +13,12 @@ StressWorker::StressWorker(int IDx,int IDy, const QString& Xs,const QString& Ys,
 	StressDimension[1]=Yv;
 	Identity[0]=IDx;
 	Identity[1]=IDy;
-	for(QList<Mortgage*>::const_iterator i=Mtgs.begin();i!=Mtgs.end();i++)
-		Loans.append(**i);
+	Loans = new MtgCalculator();
+	Loans->SetLoans(Mtgs);
+	Loans->SetSequentialComputation(true);
+	Loans->SetOverrideAssumptions(true);
+	Loans->SetStartDate(StartDate);
+	connect(Loans, &MtgCalculator::Calculated, this, &StressWorker::LoansCalculated);
 }
 StressWorker::StressWorker(int IDx, int IDy, const QString& Xs, const QString& Ys, const QString& Cp, const MtgCashFlow& Mtgs, const Waterfall& Stct, const QDate& StDt, StressTest::StressVariability Xv, StressTest::StressVariability Yv, QObject* parent)
 :QObject(parent)
@@ -23,6 +28,7 @@ StressWorker::StressWorker(int IDx, int IDy, const QString& Xs, const QString& Y
 , LocalStructure(Stct)
 , StartDate(StDt)
 , BaseCashFlows(Mtgs)
+, Loans(NULL)
 , UseFastVersion(true)
 {
 	StressDimension[0] = Xv;
@@ -85,69 +91,72 @@ void StressWorker::WorkFast() {
 		emit ScenarioCalculated(Identity[0], Identity[1], Waterfall());
 }
 void StressWorker::WorkSlow(){
-	MtgCashFlow TotalFlow;
-	for(QList<Mortgage>::iterator i=Loans.begin();i!=Loans.end();i++){
 		if(StressDimension[0]==StressTest::ChangingCDR){
 			if(StressDimension[1]==StressTest::ChangingLS){
-				i->CalculateCashFlows(StartDate,ConstantPar, XSpann, YSpann );
-				if(i==Loans.begin()){
-					LocalStructure.GetReinvestmentTest().SetCPR(ConstantPar);
-					LocalStructure.GetReinvestmentTest().SetCDR(XSpann);
-					LocalStructure.GetReinvestmentTest().SetLS(YSpann);
-				}
+				Loans->SetCPRass(ConstantPar);
+				Loans->SetCDRass(XSpann);
+				Loans->SetLSass(YSpann);
+				LocalStructure.GetReinvestmentTest().SetCPR(ConstantPar);
+				LocalStructure.GetReinvestmentTest().SetCDR(XSpann);
+				LocalStructure.GetReinvestmentTest().SetLS(YSpann);
+				
 			}
 			else {
-				i->CalculateCashFlows(StartDate,YSpann, XSpann, ConstantPar );
-				if(i==Loans.begin()){
-					LocalStructure.GetReinvestmentTest().SetCPR(YSpann);
-					LocalStructure.GetReinvestmentTest().SetCDR(XSpann);
-					LocalStructure.GetReinvestmentTest().SetLS(ConstantPar);
-				}
+				Loans->SetCPRass(YSpann);
+				Loans->SetCDRass(XSpann);
+				Loans->SetLSass(ConstantPar);
+				LocalStructure.GetReinvestmentTest().SetCPR(YSpann);
+				LocalStructure.GetReinvestmentTest().SetCDR(XSpann);
+				LocalStructure.GetReinvestmentTest().SetLS(ConstantPar);
 			}
 
 		}
 		else if(StressDimension[0]==StressTest::ChangingLS){
 			if(StressDimension[1]==StressTest::ChangingCDR){
-				i->CalculateCashFlows(StartDate,ConstantPar,YSpann,XSpann);
-				if(i==Loans.begin()){
-					LocalStructure.GetReinvestmentTest().SetCPR(ConstantPar);
-					LocalStructure.GetReinvestmentTest().SetCDR(YSpann);
-					LocalStructure.GetReinvestmentTest().SetLS(XSpann);
-				}
+				Loans->SetCPRass(ConstantPar);
+				Loans->SetCDRass(YSpann);
+				Loans->SetLSass(XSpann);
+				LocalStructure.GetReinvestmentTest().SetCPR(ConstantPar);
+				LocalStructure.GetReinvestmentTest().SetCDR(YSpann);
+				LocalStructure.GetReinvestmentTest().SetLS(XSpann);
 			}
 			else {
-				i->CalculateCashFlows(StartDate,YSpann, ConstantPar, XSpann );
-				if(i==Loans.begin()){
-					LocalStructure.GetReinvestmentTest().SetCPR(YSpann);
-					LocalStructure.GetReinvestmentTest().SetCDR(ConstantPar);
-					LocalStructure.GetReinvestmentTest().SetLS(XSpann);
-				}
+				Loans->SetCPRass(YSpann);
+				Loans->SetCDRass(ConstantPar);
+				Loans->SetLSass(XSpann);
+				LocalStructure.GetReinvestmentTest().SetCPR(YSpann);
+				LocalStructure.GetReinvestmentTest().SetCDR(ConstantPar);
+				LocalStructure.GetReinvestmentTest().SetLS(XSpann);
 			}
 		}
 		else if(StressDimension[0]==StressTest::ChangingCPR){
 			if(StressDimension[1]==StressTest::ChangingCDR){
-				i->CalculateCashFlows(StartDate,XSpann,YSpann,ConstantPar);
-				if(i==Loans.begin()){
-					LocalStructure.GetReinvestmentTest().SetCPR(XSpann);
-					LocalStructure.GetReinvestmentTest().SetCDR(YSpann);
-					LocalStructure.GetReinvestmentTest().SetLS(ConstantPar);
-				}
+				Loans->SetCPRass(XSpann);
+				Loans->SetCDRass(YSpann);
+				Loans->SetLSass(ConstantPar);
+				LocalStructure.GetReinvestmentTest().SetCPR(XSpann);
+				LocalStructure.GetReinvestmentTest().SetCDR(YSpann);
+				LocalStructure.GetReinvestmentTest().SetLS(ConstantPar);
+				
 			}
 			else{
-				i->CalculateCashFlows(StartDate,XSpann, ConstantPar, YSpann );
-				if(i==Loans.begin()){
-					LocalStructure.GetReinvestmentTest().SetCPR(XSpann);
-					LocalStructure.GetReinvestmentTest().SetCDR(ConstantPar);
-					LocalStructure.GetReinvestmentTest().SetLS(YSpann);
-				}
+				Loans->SetCPRass(XSpann);
+				Loans->SetCDRass(ConstantPar);
+				Loans->SetLSass(YSpann);
+				LocalStructure.GetReinvestmentTest().SetCPR(XSpann);
+				LocalStructure.GetReinvestmentTest().SetCDR(ConstantPar);
+				LocalStructure.GetReinvestmentTest().SetLS(YSpann);
 			}
 		}
-		TotalFlow+=i->GetCashFlow();
-	}
+		if(!Loans->StartCalculation(true))
+			emit ScenarioCalculated(Identity[0], Identity[1], Waterfall());
+}
+
+void StressWorker::LoansCalculated() {
 	LocalStructure.ResetMtgFlows();
-	LocalStructure.AddMortgagesFlows(TotalFlow);
-	if(LocalStructure.CalculateTranchesCashFlows())
-		emit ScenarioCalculated(Identity[0],Identity[1],LocalStructure);
-	else
+	LocalStructure.AddMortgagesFlows(Loans->GetResult());
+	if (LocalStructure.CalculateTranchesCashFlows())
 		emit ScenarioCalculated(Identity[0], Identity[1], LocalStructure);
+	else
+		emit ScenarioCalculated(Identity[0], Identity[1], Waterfall());
 }

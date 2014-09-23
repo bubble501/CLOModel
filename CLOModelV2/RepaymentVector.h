@@ -17,7 +17,7 @@ protected:
 	QString RepaymentMethodsToString(RepaymentMethods a) const { return RepaymentMethodsToString(static_cast<int>(a)); }
 	RepaymentMethods StringToRepaymentMethods(const QString& a) const;
 	virtual void UnpackVector();
-	virtual bool IsValid() const;
+	virtual bool IsValid() const override;
 	static RepaymentMethods ConvertRepayment(QChar a);
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 public:

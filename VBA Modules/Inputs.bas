@@ -8,6 +8,7 @@ Declare Function CLOReturnRate Lib "C:\Visual Studio Projects\CLOModelV2\Win32\R
 Declare Sub StressTargetChanged Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
 Declare Sub InspectStress Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
 Declare Sub InspectWaterfall Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
+Declare Function GetAssumption Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
 Public Sub GetInputFromStructure( _
     MortgagesSheet As String, _
     InputsSheet As String, _
@@ -20,7 +21,7 @@ Public Sub GetInputFromStructure( _
     Optional StressTestSheet As String _
 )
     Application.ScreenUpdating = False
-    Dim i As Long, j As Long
+    Dim i As Long, j As Long, propCounter As Long
     ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     'Fields to search
     Dim MaturityStart As Range
@@ -44,7 +45,6 @@ Public Sub GetInputFromStructure( _
     Dim SeniorExpensesFixedCell As Range
     Dim SeniorFeesFixedCell As Range
     Dim JuniorFeesFixedCell As Range
-    Dim UseTurboCell As Range
     Dim CCCcurveCell As Range
     Dim CCCvalueCell As Range
     Dim CCClimitCell As Range
@@ -116,7 +116,28 @@ Public Sub GetInputFromStructure( _
     Dim BaseCaseCall As Range
     Dim StartingDefJunFees As Range
     Dim GICInterestCell As Range
+    Dim GICBaseRateCell As Range
+    Dim ReinvestementWindowCell As Range
+    Dim DealDaycountCell As Range
+    'loans assumptions
+    Dim IssuerProperty As Range
+    Dim FacilityProperty As Range
+    Dim CountryProperty As Range
+    Dim IndustryProperty As Range
+    Dim MezzanineProperty As Range
+    Dim PriceProperty As Range
+    Dim LoanDayCountHead As Range
+    Dim StartingAdditionalProp As Range
     On Error Resume Next
+    Set IssuerProperty = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("IssuerProperty"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set FacilityProperty = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("FacilityProperty"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set CountryProperty = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("CountryProperty"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set IndustryProperty = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("IndustryProperty"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set MezzanineProperty = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("MezzanineProperty"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set PriceProperty = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("PriceProperty"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set LoanDayCountHead = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("LoanDayCountHead"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set StartingAdditionalProp = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("StartingAdditionalProp"), LookAt:=xlWhole, LookIn:=xlValues)
+    ''''''''''''''''''''''''''''''''''''''''''''''''''''
     Set HaircutVecStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("HaircutVecHeader"), LookAt:=xlWhole, LookIn:=xlValues)
     Set StartingDefJunFees = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("StartingDefJunFees"), LookAt:=xlWhole, LookIn:=xlValues)
     Set GICInterestCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("GICInterestCell"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -151,6 +172,9 @@ Public Sub GetInputFromStructure( _
     Set CurrentDeferredCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("CurrentDeferredCell"), LookAt:=xlWhole, LookIn:=xlValues)
     Set UseForwardCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("UseForwardCell"), LookAt:=xlWhole, LookIn:=xlValues)
     Set DayCountHead = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("DayCountHead"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set GICBaseRateCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("GICBaseRateCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set DealDaycountCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("DealDaycountCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set ReinvestementWindowCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("ReinvestementWindowCell"), LookAt:=xlWhole, LookIn:=xlValues)
     On Error GoTo 0
     Set BaseIndexHead = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("BaseIndexHead"), LookAt:=xlWhole, LookIn:=xlValues)
     Set MaturityStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("MaturityHeader"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -185,7 +209,6 @@ Public Sub GetInputFromStructure( _
     Set SeniorExpensesCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SeniorExpensesField"), LookAt:=xlWhole, LookIn:=xlValues)
     Set SeniorFeesCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SeniorFeesField"), LookAt:=xlWhole, LookIn:=xlValues)
     Set JuniorFeesCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("JuniorFeesField"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set UseTurboCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("UseTurboField"), LookAt:=xlWhole, LookIn:=xlValues)
     Set CCCcurveCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("CCCcurveField"), LookAt:=xlWhole, LookIn:=xlValues)
     Set CCCvalueCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("CCCvalueField"), LookAt:=xlWhole, LookIn:=xlValues)
     Set CCClimitCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("CCClimitField"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -257,6 +280,39 @@ ReferenceRateFromBBg:
             Else
                 Call AddInput(AllTheInputs, CStr(HaircutVecStart.Offset(i, 0).Value))
             End If
+            If (LoanDayCountHead Is Nothing) Then
+                Call AddInput(AllTheInputs, "1128")
+            Else
+               If (IsEmpty(LoanDayCountHead.Offset(i, 0)) Or LoanDayCountHead.Offset(i, 0).Value = "") Then
+                    Call AddInput(AllTheInputs, "1128")
+               Else
+                    Call AddInput(AllTheInputs, CStr(LoanDayCountHead.Offset(i, 0).Value))
+               End If
+            End If
+            'Loans Properties
+            Dim PropertyString As String
+            PropertyString = ""
+            If Not (IssuerProperty Is Nothing) Then PropertyString = PropertyString & "Issuer#=#" & CStr(IssuerProperty.Offset(i, 0).Value) & "#,#"
+            If Not (FacilityProperty Is Nothing) Then PropertyString = PropertyString & "Facility#=#" & CStr(FacilityProperty.Offset(i, 0).Value) & "#,#"
+            If Not (CountryProperty Is Nothing) Then PropertyString = PropertyString & "Country#=#" & CStr(CountryProperty.Offset(i, 0).Value) & "#,#"
+            If Not (IndustryProperty Is Nothing) Then PropertyString = PropertyString & "Industry#=#" & CStr(IndustryProperty.Offset(i, 0).Value) & "#,#"
+            If Not (MezzanineProperty Is Nothing) Then PropertyString = PropertyString & "Mezzanine#=#" & CStr(MezzanineProperty.Offset(i, 0).Value) & "#,#"
+            If Not (PriceProperty Is Nothing) Then PropertyString = PropertyString & "Price#=#" & CStr(PriceProperty.Offset(i, 0).Value) & "#,#"
+            If Not (StartingAdditionalProp Is Nothing) Then
+                propCounter = 1
+                Do While (True)
+                    If Not (IsEmpty(StartingAdditionalProp.Offset(i, propCounter)) Or StartingAdditionalProp.Offset(i, propCounter).Value = "") Then
+                        PropertyString = PropertyString & _
+                                        Replace(CStr(StartingAdditionalProp.Offset(0, propCounter).Value), " ", "") & _
+                                        "#=#" & _
+                                        CStr(StartingAdditionalProp.Offset(i, propCounter).Value) & "#,#"
+                    Else
+                        Exit Do
+                    End If
+                    propCounter = propCounter + 1
+                Loop
+            End If
+            Call AddInput(AllTheInputs, Left(PropertyString, Len(PropertyString) - 3))
         End If
         i = i + 1
     Loop
@@ -287,18 +343,6 @@ ReferenceRateFromBBg:
         Call AddInput(AllTheInputs, Format(PrevIPDCell.Offset(0, 1).Value, "yyyy-mm-dd"))
         Call AddInput(AllTheInputs, CStr(InterestBaseCell.Offset(0, 1).Value))
         Call AddInput(AllTheInputs, CStr(IPDfrequencyCell.Offset(0, 1)))
-'        On Error GoTo SpreadFromBBg
-'            If (IsEmpty(RefRateStart.Offset(i, 0)) Or RefRateStart.Offset(i, 0) = "") Then
-'                Call AddInput(AllTheInputs, Application.WorksheetFunction.VLookup(InterestBaseCell.Offset(0, 1).Value, Range(BaseIndexesStart, BaseIndexesStart.End(xlDown).Offset(0, 1)), 2, False))
-'            Else
-'                Call AddInput(AllTheInputs, Application.WorksheetFunction.VLookup(RefRateStart.Offset(i, 0).Value, Range(BaseIndexesStart, BaseIndexesStart.End(xlDown).Offset(0, 1)), 2, False))
-'            End If
-'        If False Then
-'SpreadFromBBg:
-'            Call AddInput(AllTheInputs, -1#)
-'            Resume Next
-'        End If
-'        On Error GoTo 0
         Call AddInput(AllTheInputs, OCLimitStart.Offset(i, 0).Value)
         Call AddInput(AllTheInputs, ICLimitStart.Offset(i, 0).Value)
         Call AddInput(AllTheInputs, CDbl(BondPriceStart.Offset(i, 0).Value))
@@ -313,9 +357,9 @@ DefaultExchange:
         Call AddInput(AllTheInputs, Format(SettleDateCell.Offset(0, 1).Value, "yyyy-mm-dd"))
         'Call AddInput(AllTheInputs, AccruedIntrStart.Offset(i, 0).Value)
         If (DayCountHead Is Nothing) Then
-            Call AddInput(AllTheInputs, 102)
+            Call AddInput(AllTheInputs, "102")
         Else
-            Call AddInput(AllTheInputs, CLng(DayCountHead.Offset(i, 0).Value))
+            Call AddInput(AllTheInputs, CStr(DayCountHead.Offset(i, 0).Value))
         End If
         If (CurrentDeferredCell Is Nothing) Then
             Call AddInput(AllTheInputs, 0#)
@@ -325,63 +369,8 @@ DefaultExchange:
         
         i = i + 1
     Loop
-'    Dim NumBases As Long
-'    NumBases = Range(BaseIndexesStart, BaseIndexesStart.End(xlDown)).Count - 1
-'    Call AddInput(AllTheInputs, NumBases)
-'    For i = 1 To NumBases
-'        Call AddInput(AllTheInputs, CStr(BaseIndexesStart.Offset(i, 0).Value))
-'        Call AddInput(AllTheInputs, BaseIndexesStart.Offset(i, 1).Value)
-'    Next i
-    Dim LocalUseFwd As Boolean
-    If (UseForwardCell Is Nothing) Then
-        Call AddInput(AllTheInputs, False)
-        LocalUseFwd = False
-    Else
-        Call AddInput(AllTheInputs, CBool(UseForwardCell.Offset(0, 1).Value))
-        LocalUseFwd = CBool(UseForwardCell.Offset(0, 1).Value)
-    End If
+
     
-    On Error GoTo ExtraSheetMissing
-    If (Sheets(FieldsLabels("ForwardCurvesSheet")).Visible = xlSheetVisible) Then
-        Dim CountFwd As Long
-        Dim countDates As Long
-        CountFwd = 0
-        Do While (True)
-            If (IsEmpty(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(1, (CountFwd * 2) + 1))) Then Exit Do
-            CountFwd = CountFwd + 1
-        Loop
-        Call AddInput(AllTheInputs, CountFwd)
-        CountFwd = 0
-        Do While (True)
-            If (IsEmpty(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(1, (CountFwd * 2) + 1))) Then Exit Do
-            Call AddInput(AllTheInputs, CStr(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(1, (CountFwd * 2) + 1)))
-            If LocalUseFwd Then
-                countDates = 0
-                Do While (True)
-                    If IsEmpty(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(3 + countDates, (CountFwd * 2) + 1)) Then Exit Do
-                Loop
-                Call AddInput(AllTheInputs, countDates)
-                countDates = 0
-                Do While (True)
-                    If IsEmpty(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(3 + countDates, (CountFwd * 2) + 1)) Then Exit Do
-                    Call AddInput(AllTheInputs, Format(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(3 + countDates, (CountFwd * 2) + 1).Value, "yyyy-mm-dd"))
-                    Call AddInput(AllTheInputs, CDbl(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(3 + countDates, (CountFwd * 2) + 2).Value))
-                    countDates = countDates + 1
-                Loop
-            Else
-                Call AddInput(AllTheInputs, CDbl(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(3, (CountFwd * 2) + 2).Value))
-            End If
-            CountFwd = CountFwd + 1
-        Loop
-    Else
-        Call AddInput(AllTheInputs, CLng(0))
-    End If
-    If False Then
-ExtraSheetMissing:
-        Call AddInput(AllTheInputs, CLng(0))
-        Resume Next
-    End If
-    On Error GoTo 0
     
     If (IsEmpty(WaterfallStart.Offset(2, 0))) Then
         Call AddInput(AllTheInputs, CLng(0))
@@ -412,6 +401,16 @@ ExtraSheetMissing:
     Else
         Call AddInput(AllTheInputs, CStr(GICInterestCell.Offset(0, 1).Value))
     End If
+    If (GICBaseRateCell Is Nothing) Then
+        Call AddInput(AllTheInputs, "ZERO")
+    Else
+        Call AddInput(AllTheInputs, CStr(GICBaseRateCell.Offset(0, 1).Value))
+    End If
+    If (DealDaycountCell Is Nothing) Then
+        Call AddInput(AllTheInputs, "102")
+    Else
+        Call AddInput(AllTheInputs, CStr(DealDaycountCell.Offset(0, 1).Value))
+    End If
     Call AddInput(AllTheInputs, CStr(SeniorExpensesCell.Offset(0, 1).Value))
     Call AddInput(AllTheInputs, CStr(SeniorFeesCell.Offset(0, 1).Value))
     Call AddInput(AllTheInputs, CStr(JuniorFeesCell.Offset(0, 1).Value))
@@ -434,14 +433,13 @@ ExtraSheetMissing:
     Call AddInput(AllTheInputs, CStr(IPDfrequencyCell.Offset(0, 1)))
     Call AddInput(AllTheInputs, Format(FirstIPDcell.Offset(0, 1), "yyyy-mm-dd"))
     Call AddInput(AllTheInputs, Format(PrevIPDCell.Offset(0, 1), "yyyy-mm-dd"))
-    Call AddInput(AllTheInputs, UseTurboCell.Offset(0, 1).Value)
     Call AddInput(AllTheInputs, CStr(CCCcurveCell.Offset(0, 1).Value))
     Call AddInput(AllTheInputs, CCCvalueCell.Offset(0, 1).Value)
     Call AddInput(AllTheInputs, CCClimitCell.Offset(0, 1).Value)
     Call AddInput(AllTheInputs, Format(CallDateCell.Offset(0, 1).Value, "yyyy-mm-dd"))
     Call AddInput(AllTheInputs, CallMultiplierCell.Offset(0, 1).Value)
     Call AddInput(AllTheInputs, CallReserveCell.Offset(0, 1).Value)
-    Call AddInput(AllTheInputs, CallValueCell.Offset(0, 1).Value)
+    Call AddInput(AllTheInputs, CStr(CallValueCell.Offset(0, 1).Value))
     ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     'Reserve fund
     Call AddInput(AllTheInputs, CLng(2))
@@ -543,6 +541,12 @@ ExtraSheetMissing:
     Else
         Call AddInput(AllTheInputs, CStr(ReinvestmentDelayCell.Offset(0, 1).Value))
     End If
+    If (ReinvestementWindowCell Is Nothing) Then
+        Call AddInput(AllTheInputs, "1")
+    Else
+        Call AddInput(AllTheInputs, CStr(ReinvestementWindowCell.Offset(0, 1).Value))
+    End If
+    
     If (ReinvestmentPriceCell Is Nothing) Then
         Call AddInput(AllTheInputs, "100")
     Else
@@ -594,6 +598,58 @@ ExtraSheetMissing:
     Call AddInput(AllTheInputs, InputsSheet + "!" + Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("LossCallOutputCell"), LookAt:=xlWhole, LookIn:=xlValues).Offset(1, 0).Address)
     Call AddInput(AllTheInputs, InputsSheet + "!" + Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("CEcell"), LookAt:=xlWhole, LookIn:=xlValues).Offset(1, 0).Address)
     Call AddInput(AllTheInputs, CallerPath)
+    
+    Dim LocalUseFwd As Boolean
+    If (UseForwardCell Is Nothing) Then
+        Call AddInput(AllTheInputs, False)
+        LocalUseFwd = False
+    Else
+        Call AddInput(AllTheInputs, CBool(UseForwardCell.Offset(0, 1).Value))
+        LocalUseFwd = CBool(UseForwardCell.Offset(0, 1).Value)
+    End If
+    
+    On Error GoTo ExtraSheetMissing
+    If (Sheets(FieldsLabels("ForwardCurvesSheet")).Visible = xlSheetVisible) Then
+        Dim CountFwd As Long
+        Dim countDates As Long
+        CountFwd = 0
+        Do While (True)
+            If (IsEmpty(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(2, (CountFwd * 2) + 1))) Then Exit Do
+            CountFwd = CountFwd + 1
+        Loop
+        Call AddInput(AllTheInputs, CountFwd)
+        CountFwd = 0
+        Do While (True)
+            If (IsEmpty(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(2, (CountFwd * 2) + 1))) Then Exit Do
+            Call AddInput(AllTheInputs, CStr(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(2, (CountFwd * 2) + 1)))
+            If LocalUseFwd Then
+                countDates = 0
+                Do While (True)
+                    If IsEmpty(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(4 + countDates, (CountFwd * 2) + 1)) Then Exit Do
+                    countDates = countDates + 1
+                Loop
+                Call AddInput(AllTheInputs, countDates)
+                countDates = 0
+                Do While (True)
+                    If IsEmpty(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(4 + countDates, (CountFwd * 2) + 1)) Then Exit Do
+                    Call AddInput(AllTheInputs, Format(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(4 + countDates, (CountFwd * 2) + 1).Value, "yyyy-mm-dd"))
+                    Call AddInput(AllTheInputs, CDbl(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(4 + countDates, (CountFwd * 2) + 2).Value))
+                    countDates = countDates + 1
+                Loop
+            Else
+                Call AddInput(AllTheInputs, CDbl(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(4, (CountFwd * 2) + 2).Value))
+            End If
+            CountFwd = CountFwd + 1
+        Loop
+    Else
+        Call AddInput(AllTheInputs, CLng(0))
+    End If
+    If False Then
+ExtraSheetMissing:
+        Call AddInput(AllTheInputs, CLng(0))
+        Resume Next
+    End If
+    On Error GoTo 0
     Call AddInput(AllTheInputs, RunStressTest)
     If RunStressTest Then
         Call AddInput(AllTheInputs, CStr(StressCPRCell.Offset(1, 0).Value))
@@ -688,7 +744,6 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
     a.Add "Senior management fees fixed", "SeniorFeesFieldFixed"
     a.Add "Junior management fees fixed", "JuniorFeesFieldFixed"
     a.Add "Junior fees deferred coupon", "JuniorFeesCouponField"
-    a.Add "Use Turbo feature", "UseTurboField"
     a.Add "CCC curve", "CCCcurveField"
     a.Add "CCC value", "CCCvalueField"
     a.Add "CCC limit", "CCClimitField"
@@ -766,7 +821,19 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
     a.Add "Base Case To Call", "BaseCaseCall"
     a.Add "Current deferred junior fees", "StartingDefJunFees"
     a.Add "GIC Interest", "GICInterestCell"
+    a.Add "GIC Base Rate", "GICBaseRateCell"
     a.Add "Forward Curves", "ForwardCurvesSheet"
+    a.Add "Deal Day Count Convention", "DealDaycountCell"
+    a.Add "Day count", "LoanDayCountHead"
+    'Loans Properties
+     a.Add "Issuer", "IssuerProperty"
+     a.Add "Facility", "FacilityProperty"
+     a.Add "Country", "CountryProperty"
+     a.Add "Industry", "IndustryProperty"
+     a.Add "Mezzanine", "MezzanineProperty"
+     a.Add "Price", "PriceProperty"
+     a.Add "Additional Properties", "StartingAdditionalProp"
+     a.Add "Reinvestement Window", "ReinvestementWindowCell"
 End Sub
 
 Private Function FromStringToInterestType(a As String) As Long
@@ -812,6 +879,12 @@ Private Function FromStringToPriorty(a As String) As Long
             FromStringToPriorty = 14
         Case UCase("Redeem Pro-Rata")
             FromStringToPriorty = 15
+        Case UCase("Turbo")
+            FromStringToPriorty = 16
+        Case UCase("Cure PDL")
+            FromStringToPriorty = 17
+        Case UCase("Fees From XS")
+            FromStringToPriorty = 18
         Case Else
             GoTo FromStringToPriorty_Error
     End Select
@@ -891,4 +964,42 @@ Public Sub SeparateWaterfall( _
     Loop
     Call InspectWaterfall(Params)
 End Sub
+Public Function GetLoanAssumption(Loan As String, Column As Long, refDate As Date)
+Attribute GetLoanAssumption.VB_Description = "Get Assumptions for Loans"
+Attribute GetLoanAssumption.VB_ProcData.VB_Invoke_Func = " \n14"
+'Column
+'0-Loan Identifier
+'1-Senior Price
+'2-Sub Price
+'3-Default
+'4-Senior Haircut Amt
+'5-Senior Haircut Period
+'6-Sub Haircut Amt
+'7-Sub Haircut Period
+'8-Prepay Month
+'9-View (1=Positive, 0=Neutral, -1=Uncertain, 2=Negative
+    If (Column < 0 Or Column > 9) Then
+        GetLoanAssumption = ""
+        Exit Function
+    End If
+    Dim result() As Variant
+    ReDim result(0 To 2)
+    result(0) = Loan
+    result(1) = Column
+    result(2) = Format(refDate, "yyyy-mm-dd")
+    Dim response As Double
+    response = GetAssumption(result)
+    If (Column = 3) Then
+        If (response > 0#) Then
+            GetLoanAssumption = True
+        Else
+            GetLoanAssumption = False
+        End If
+    ElseIf (response < 0) Or (Column >= 4 And response = 0) Then
+        GetLoanAssumption = ""
+    Else
+        GetLoanAssumption = response
+    End If
+End Function
+
 

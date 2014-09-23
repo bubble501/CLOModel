@@ -53,7 +53,8 @@ It will call the VBA function PrintTranche passing it the following arguments:
 		bool PrintTotalFlow  = false, 
 		bool PrintDeferred  = true, 
 		bool PrintOCtest  = true, 
-		bool PrintICtest  = true
+		bool PrintICtest  = true,
+		bool PrintPDL = false
 	);
 /*!
 \brief Sends the information of the loans cash flows to excel to be charted

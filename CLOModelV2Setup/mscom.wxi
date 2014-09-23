@@ -1,0 +1,222 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Auto-generated file for mscomct2.ocx built by heat.exe -->
+<Include xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<?if $(var.Platform) = x64 ?>
+		<?define SystemDir = "SysWOW64" ?>
+	<?else ?>
+		<?define SystemDir = "system32" ?>
+	<?endif ?>
+    <Fragment>
+        <DirectoryRef Id="TARGETDIR">
+            <Directory Id="dirB091174D6D2E72C3D2E1A2E7D76A4334" Name="$(var.SystemDir)" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirB091174D6D2E72C3D2E1A2E7D76A4334">
+            <Component Id="MSCOM2" Guid="{2FD6C763-3F05-4945-BE6B-F0BA775ECAA5}">
+                <File Id="fil87F2E23A7E4239576591D2679C499E76" KeyPath="yes" Source="C:\Windows\SysWOW64\mscomct2.ocx">
+                    <Class Id="{586A6352-87C8-11D1-8BE3-0000F8754DA1}" Context="InprocServer32" Description="Animation General Property Page Object" />
+                    <Class Id="{586A6353-87C8-11D1-8BE3-0000F8754DA1}" Context="InprocServer32" Description="UpDown General Property Page Object" />
+                    <Class Id="{586A6354-87C8-11D1-8BE3-0000F8754DA1}" Context="InprocServer32" Description="UpDown Scrolling Property Page Object" />
+                    <Class Id="{586A6355-87C8-11D1-8BE3-0000F8754DA1}" Context="InprocServer32" Description="UpDown Buddy Property Page Object" />
+                    <Class Id="{586A6356-87C8-11D1-8BE3-0000F8754DA1}" Context="InprocServer32" Description="MonthView General Property Page Object" />
+                    <Class Id="{586A6357-87C8-11D1-8BE3-0000F8754DA1}" Context="InprocServer32" Description="Date and Time Picker General Property Page Object" />
+                    <Class Id="{586A6359-87C8-11D1-8BE3-0000F8754DA1}" Context="InprocServer32" Description="Flat Scrollbar General Property Page Object" />
+                    <TypeLib Id="{86CF1D34-0C5F-11D2-A9FC-0000F8754DA1}" Control="yes" Description="Microsoft Windows Common Controls-2 6.0 (SP6)" HelpDirectory="dirB091174D6D2E72C3D2E1A2E7D76A4334" Language="0" MajorVersion="2" MinorVersion="0">
+                        <Class Id="{20DD1B9E-87C4-11D1-8BE3-0000F8754DA1}" Context="InprocServer32" Description="Microsoft Date and Time Picker Control 6.0 (SP6)" ThreadingModel="apartment" Version="2.0" Programmable="yes" SafeForScripting="yes" SafeForInitializing="yes" Control="yes">
+                            <ProgId Id="MSComCtl2.DTPicker.2" Description="Microsoft Date and Time Picker Control 6.0 (SP6)">
+                                <ProgId Id="MSComCtl2.DTPicker" Description="Microsoft Date and Time Picker Control 6.0 (SP6)" />
+                            </ProgId>
+                        </Class>
+                        <Class Id="{232E456A-87C3-11D1-8BE3-0000F8754DA1}" Context="InprocServer32" Description="Microsoft MonthView Control 6.0 (SP6)" ThreadingModel="apartment" Version="2.0" Programmable="yes" SafeForScripting="yes" SafeForInitializing="yes" Control="yes">
+                            <ProgId Id="MSComCtl2.MonthView.2" Description="Microsoft MonthView Control 6.0 (SP6)">
+                                <ProgId Id="MSComCtl2.MonthView" Description="Microsoft MonthView Control 6.0 (SP6)" />
+                            </ProgId>
+                        </Class>
+                        <Class Id="{603C7E80-87C2-11D1-8BE3-0000F8754DA1}" Context="InprocServer32" Description="Microsoft UpDown Control 6.0 (SP6)" ThreadingModel="apartment" Version="2.0" Programmable="yes" SafeForScripting="yes" SafeForInitializing="yes" Control="yes">
+                            <ProgId Id="MSComCtl2.UpDown.2" Description="Microsoft UpDown Control 6.0 (SP6)">
+                                <ProgId Id="MSComCtl2.UpDown" Description="Microsoft UpDown Control 6.0 (SP6)" />
+                            </ProgId>
+                        </Class>
+                        <Class Id="{B09DE715-87C1-11D1-8BE3-0000F8754DA1}" Context="InprocServer32" Description="Microsoft Animation Control 6.0 (SP6)" ThreadingModel="apartment" Version="2.0" Programmable="yes" SafeForScripting="yes" SafeForInitializing="yes" Control="yes">
+                            <ProgId Id="MSComCtl2.Animation.2" Description="Microsoft Animation Control 6.0 (SP6)">
+                                <ProgId Id="MSComCtl2.Animation" Description="Microsoft Animation Control 6.0 (SP6)" />
+                            </ProgId>
+                        </Class>
+                        <Class Id="{FE38753A-44A3-11D1-B5B7-0000C09000C4}" Context="InprocServer32" Description="Microsoft Flat Scrollbar Control 6.0 (SP6)" ThreadingModel="apartment" Version="2.0" Programmable="yes" SafeForScripting="yes" SafeForInitializing="yes" Control="yes">
+                            <ProgId Id="MSComCtl2.FlatScrollBar.2" Description="Microsoft Flat Scrollbar Control 6.0 (SP6)">
+                                <ProgId Id="MSComCtl2.FlatScrollBar" Description="Microsoft Flat Scrollbar Control 6.0 (SP6)" />
+                            </ProgId>
+                        </Class>
+                        <Interface Id="{20DD1B9B-87C4-11D1-8BE3-0000F8754DA1}" Name="IDTPicker" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
+                        <Interface Id="{20DD1B9D-87C4-11D1-8BE3-0000F8754DA1}" Name="DDTPickerEvents" ProxyStubClassId32="{00020420-0000-0000-C000-000000000046}" />
+                        <Interface Id="{232E4565-87C3-11D1-8BE3-0000F8754DA1}" Name="IMonthView" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
+                        <Interface Id="{232E4569-87C3-11D1-8BE3-0000F8754DA1}" Name="DMonthViewEvents" ProxyStubClassId32="{00020420-0000-0000-C000-000000000046}" />
+                        <Interface Id="{2334D2B1-713E-11CF-8AE5-00AA00C00905}" Name="IVBDataObject" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
+                        <Interface Id="{2334D2B3-713E-11CF-8AE5-00AA00C00905}" Name="IVBDataObjectFiles" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
+                        <Interface Id="{603C7E7E-87C2-11D1-8BE3-0000F8754DA1}" Name="IUpDown" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
+                        <Interface Id="{603C7E7F-87C2-11D1-8BE3-0000F8754DA1}" Name="DUpDownEvents" ProxyStubClassId32="{00020420-0000-0000-C000-000000000046}" />
+                        <Interface Id="{B09DE713-87C1-11D1-8BE3-0000F8754DA1}" Name="IAnimation" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
+                        <Interface Id="{B09DE714-87C1-11D1-8BE3-0000F8754DA1}" Name="DAnimationEvents" ProxyStubClassId32="{00020420-0000-0000-C000-000000000046}" />
+                        <Interface Id="{FE387538-44A3-11D1-B5B7-0000C09000C4}" Name="IFlatSB" ProxyStubClassId32="{00020424-0000-0000-C000-000000000046}" />
+                        <Interface Id="{FE387539-44A3-11D1-B5B7-0000C09000C4}" Name="DFlatSBEvents" ProxyStubClassId32="{00020420-0000-0000-C000-000000000046}" />
+                    </TypeLib>
+                </File>
+                <RegistryValue Root="HKCR" Key="CLSID\{1906F94F-8256-480A-8CDF-60821592CB4B}\Implemented Categories\{0DE86A52-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{1906F94F-8256-480A-8CDF-60821592CB4B}\Implemented Categories\{0DE86A53-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{1906F94F-8256-480A-8CDF-60821592CB4B}\Implemented Categories\{0DE86A57-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{1906F94F-8256-480A-8CDF-60821592CB4B}\Implemented Categories\{40FC6ED5-2438-11CF-A3DB-080036F12502}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{1906F94F-8256-480A-8CDF-60821592CB4B}\Implemented Categories\{7DD95801-9882-11CF-9FA9-00AA006C42C4}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{1906F94F-8256-480A-8CDF-60821592CB4B}\Implemented Categories\{7DD95802-9882-11CF-9FA9-00AA006C42C4}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{1906F94F-8256-480A-8CDF-60821592CB4B}\InprocServer32" Value="[!fil87F2E23A7E4239576591D2679C499E76]" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{1906F94F-8256-480A-8CDF-60821592CB4B}\InprocServer32" Name="ThreadingModel" Value="Apartment" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{1906F94F-8256-480A-8CDF-60821592CB4B}\MiscStatus\1" Value="131473" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{1906F94F-8256-480A-8CDF-60821592CB4B}\MiscStatus" Value="0" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{1906F94F-8256-480A-8CDF-60821592CB4B}\ProgID" Value="MSComCtl2.Animation.2" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{1906F94F-8256-480A-8CDF-60821592CB4B}\Programmable" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{1906F94F-8256-480A-8CDF-60821592CB4B}\ToolboxBitmap32" Value="[!fil87F2E23A7E4239576591D2679C499E76], 2" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{1906F94F-8256-480A-8CDF-60821592CB4B}\TypeLib" Value="{86CF1D34-0C5F-11D2-A9FC-0000F8754DA1}" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{1906F94F-8256-480A-8CDF-60821592CB4B}\Version" Value="2.0" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{1906F94F-8256-480A-8CDF-60821592CB4B}\VersionIndependentProgID" Value="MSComCtl2.Animation" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{1906F94F-8256-480A-8CDF-60821592CB4B}" Value="Microsoft Animation Control 6.0 (SP6)" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{20DD1B9E-87C4-11D1-8BE3-0000F8754DA1}\Implemented Categories\{0DE86A52-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{20DD1B9E-87C4-11D1-8BE3-0000F8754DA1}\Implemented Categories\{0DE86A53-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{20DD1B9E-87C4-11D1-8BE3-0000F8754DA1}\Implemented Categories\{0DE86A57-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{20DD1B9E-87C4-11D1-8BE3-0000F8754DA1}\Implemented Categories\{40FC6ED4-2438-11CF-A3DB-080036F12502}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{20DD1B9E-87C4-11D1-8BE3-0000F8754DA1}\Implemented Categories\{40FC6ED5-2438-11CF-A3DB-080036F12502}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{20DD1B9E-87C4-11D1-8BE3-0000F8754DA1}\MiscStatus\1" Value="131473" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{20DD1B9E-87C4-11D1-8BE3-0000F8754DA1}\MiscStatus" Value="0" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{20DD1B9E-87C4-11D1-8BE3-0000F8754DA1}\ToolboxBitmap32" Value="[!fil87F2E23A7E4239576591D2679C499E76], 8" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{232E456A-87C3-11D1-8BE3-0000F8754DA1}\Implemented Categories\{0DE86A52-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{232E456A-87C3-11D1-8BE3-0000F8754DA1}\Implemented Categories\{0DE86A53-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{232E456A-87C3-11D1-8BE3-0000F8754DA1}\Implemented Categories\{0DE86A57-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{232E456A-87C3-11D1-8BE3-0000F8754DA1}\Implemented Categories\{40FC6ED4-2438-11CF-A3DB-080036F12502}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{232E456A-87C3-11D1-8BE3-0000F8754DA1}\Implemented Categories\{40FC6ED5-2438-11CF-A3DB-080036F12502}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{232E456A-87C3-11D1-8BE3-0000F8754DA1}\MiscStatus\1" Value="131473" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{232E456A-87C3-11D1-8BE3-0000F8754DA1}\MiscStatus" Value="0" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{232E456A-87C3-11D1-8BE3-0000F8754DA1}\ToolboxBitmap32" Value="[!fil87F2E23A7E4239576591D2679C499E76], 5" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{3D8152C1-0CFD-4968-9684-794046886E31}\Implemented Categories\{0DE86A52-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{3D8152C1-0CFD-4968-9684-794046886E31}\Implemented Categories\{0DE86A53-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{3D8152C1-0CFD-4968-9684-794046886E31}\Implemented Categories\{0DE86A57-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{3D8152C1-0CFD-4968-9684-794046886E31}\Implemented Categories\{40FC6ED5-2438-11CF-A3DB-080036F12502}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{3D8152C1-0CFD-4968-9684-794046886E31}\Implemented Categories\{7DD95801-9882-11CF-9FA9-00AA006C42C4}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{3D8152C1-0CFD-4968-9684-794046886E31}\Implemented Categories\{7DD95802-9882-11CF-9FA9-00AA006C42C4}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{3D8152C1-0CFD-4968-9684-794046886E31}\InprocServer32" Value="[!fil87F2E23A7E4239576591D2679C499E76]" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{3D8152C1-0CFD-4968-9684-794046886E31}\InprocServer32" Name="ThreadingModel" Value="Apartment" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{3D8152C1-0CFD-4968-9684-794046886E31}\MiscStatus\1" Value="131473" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{3D8152C1-0CFD-4968-9684-794046886E31}\MiscStatus" Value="0" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{3D8152C1-0CFD-4968-9684-794046886E31}\ProgID" Value="MSComCtl2.Animation.2" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{3D8152C1-0CFD-4968-9684-794046886E31}\Programmable" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{3D8152C1-0CFD-4968-9684-794046886E31}\ToolboxBitmap32" Value="[!fil87F2E23A7E4239576591D2679C499E76], 2" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{3D8152C1-0CFD-4968-9684-794046886E31}\TypeLib" Value="{86CF1D34-0C5F-11D2-A9FC-0000F8754DA1}" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{3D8152C1-0CFD-4968-9684-794046886E31}\Version" Value="2.0" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{3D8152C1-0CFD-4968-9684-794046886E31}\VersionIndependentProgID" Value="MSComCtl2.Animation" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{3D8152C1-0CFD-4968-9684-794046886E31}" Value="Microsoft Animation Control 6.0 (SP6)" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{4D588145-A84B-4100-85D7-FD2EA1D19831}\Implemented Categories\{0DE86A52-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{4D588145-A84B-4100-85D7-FD2EA1D19831}\Implemented Categories\{0DE86A53-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{4D588145-A84B-4100-85D7-FD2EA1D19831}\Implemented Categories\{0DE86A57-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{4D588145-A84B-4100-85D7-FD2EA1D19831}\Implemented Categories\{40FC6ED5-2438-11CF-A3DB-080036F12502}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{4D588145-A84B-4100-85D7-FD2EA1D19831}\Implemented Categories\{7DD95801-9882-11CF-9FA9-00AA006C42C4}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{4D588145-A84B-4100-85D7-FD2EA1D19831}\Implemented Categories\{7DD95802-9882-11CF-9FA9-00AA006C42C4}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{4D588145-A84B-4100-85D7-FD2EA1D19831}\InprocServer32" Value="[!fil87F2E23A7E4239576591D2679C499E76]" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{4D588145-A84B-4100-85D7-FD2EA1D19831}\InprocServer32" Name="ThreadingModel" Value="Apartment" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{4D588145-A84B-4100-85D7-FD2EA1D19831}\MiscStatus\1" Value="131473" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{4D588145-A84B-4100-85D7-FD2EA1D19831}\MiscStatus" Value="0" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{4D588145-A84B-4100-85D7-FD2EA1D19831}\ProgID" Value="MSComCtl2.DTPicker.2" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{4D588145-A84B-4100-85D7-FD2EA1D19831}\Programmable" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{4D588145-A84B-4100-85D7-FD2EA1D19831}\ToolboxBitmap32" Value="[!fil87F2E23A7E4239576591D2679C499E76], 8" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{4D588145-A84B-4100-85D7-FD2EA1D19831}\TypeLib" Value="{86CF1D34-0C5F-11D2-A9FC-0000F8754DA1}" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{4D588145-A84B-4100-85D7-FD2EA1D19831}\Version" Value="2.0" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{4D588145-A84B-4100-85D7-FD2EA1D19831}\VersionIndependentProgID" Value="MSComCtl2.DTPicker" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{4D588145-A84B-4100-85D7-FD2EA1D19831}" Value="Microsoft Date and Time Picker Control 6.0 (SP6)" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{603C7E80-87C2-11D1-8BE3-0000F8754DA1}\Implemented Categories\{0DE86A52-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{603C7E80-87C2-11D1-8BE3-0000F8754DA1}\Implemented Categories\{0DE86A53-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{603C7E80-87C2-11D1-8BE3-0000F8754DA1}\Implemented Categories\{0DE86A57-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{603C7E80-87C2-11D1-8BE3-0000F8754DA1}\Implemented Categories\{40FC6ED4-2438-11CF-A3DB-080036F12502}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{603C7E80-87C2-11D1-8BE3-0000F8754DA1}\Implemented Categories\{40FC6ED5-2438-11CF-A3DB-080036F12502}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{603C7E80-87C2-11D1-8BE3-0000F8754DA1}\MiscStatus\1" Value="131473" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{603C7E80-87C2-11D1-8BE3-0000F8754DA1}\MiscStatus" Value="0" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{603C7E80-87C2-11D1-8BE3-0000F8754DA1}\ToolboxBitmap32" Value="[!fil87F2E23A7E4239576591D2679C499E76], 1" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{B09DE715-87C1-11D1-8BE3-0000F8754DA1}\Implemented Categories\{0DE86A52-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{B09DE715-87C1-11D1-8BE3-0000F8754DA1}\Implemented Categories\{0DE86A53-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{B09DE715-87C1-11D1-8BE3-0000F8754DA1}\Implemented Categories\{0DE86A57-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{B09DE715-87C1-11D1-8BE3-0000F8754DA1}\Implemented Categories\{40FC6ED4-2438-11CF-A3DB-080036F12502}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{B09DE715-87C1-11D1-8BE3-0000F8754DA1}\Implemented Categories\{40FC6ED5-2438-11CF-A3DB-080036F12502}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{B09DE715-87C1-11D1-8BE3-0000F8754DA1}\MiscStatus\1" Value="131473" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{B09DE715-87C1-11D1-8BE3-0000F8754DA1}\MiscStatus" Value="0" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{B09DE715-87C1-11D1-8BE3-0000F8754DA1}\ToolboxBitmap32" Value="[!fil87F2E23A7E4239576591D2679C499E76], 2" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CEDFFAFD-3C2F-4552-9FD3-3DC4299057FD}\Implemented Categories\{0DE86A52-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CEDFFAFD-3C2F-4552-9FD3-3DC4299057FD}\Implemented Categories\{0DE86A53-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CEDFFAFD-3C2F-4552-9FD3-3DC4299057FD}\Implemented Categories\{0DE86A57-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CEDFFAFD-3C2F-4552-9FD3-3DC4299057FD}\Implemented Categories\{40FC6ED5-2438-11CF-A3DB-080036F12502}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CEDFFAFD-3C2F-4552-9FD3-3DC4299057FD}\Implemented Categories\{7DD95801-9882-11CF-9FA9-00AA006C42C4}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CEDFFAFD-3C2F-4552-9FD3-3DC4299057FD}\Implemented Categories\{7DD95802-9882-11CF-9FA9-00AA006C42C4}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CEDFFAFD-3C2F-4552-9FD3-3DC4299057FD}\InprocServer32" Value="[!fil87F2E23A7E4239576591D2679C499E76]" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CEDFFAFD-3C2F-4552-9FD3-3DC4299057FD}\InprocServer32" Name="ThreadingModel" Value="Apartment" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CEDFFAFD-3C2F-4552-9FD3-3DC4299057FD}\MiscStatus\1" Value="131473" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CEDFFAFD-3C2F-4552-9FD3-3DC4299057FD}\MiscStatus" Value="0" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CEDFFAFD-3C2F-4552-9FD3-3DC4299057FD}\ProgID" Value="MSComCtl2.UpDown.2" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CEDFFAFD-3C2F-4552-9FD3-3DC4299057FD}\Programmable" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CEDFFAFD-3C2F-4552-9FD3-3DC4299057FD}\ToolboxBitmap32" Value="[!fil87F2E23A7E4239576591D2679C499E76], 1" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CEDFFAFD-3C2F-4552-9FD3-3DC4299057FD}\TypeLib" Value="{86CF1D34-0C5F-11D2-A9FC-0000F8754DA1}" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CEDFFAFD-3C2F-4552-9FD3-3DC4299057FD}\Version" Value="2.0" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CEDFFAFD-3C2F-4552-9FD3-3DC4299057FD}\VersionIndependentProgID" Value="MSComCtl2.UpDown" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CEDFFAFD-3C2F-4552-9FD3-3DC4299057FD}" Value="Microsoft UpDown Control 6.0 (SP6)" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CFA7636D-CAA1-4F18-868F-8720624C8B86}\Implemented Categories\{0DE86A52-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CFA7636D-CAA1-4F18-868F-8720624C8B86}\Implemented Categories\{0DE86A53-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CFA7636D-CAA1-4F18-868F-8720624C8B86}\Implemented Categories\{0DE86A57-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CFA7636D-CAA1-4F18-868F-8720624C8B86}\Implemented Categories\{40FC6ED5-2438-11CF-A3DB-080036F12502}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CFA7636D-CAA1-4F18-868F-8720624C8B86}\Implemented Categories\{7DD95801-9882-11CF-9FA9-00AA006C42C4}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CFA7636D-CAA1-4F18-868F-8720624C8B86}\Implemented Categories\{7DD95802-9882-11CF-9FA9-00AA006C42C4}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CFA7636D-CAA1-4F18-868F-8720624C8B86}\InprocServer32" Value="[!fil87F2E23A7E4239576591D2679C499E76]" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CFA7636D-CAA1-4F18-868F-8720624C8B86}\InprocServer32" Name="ThreadingModel" Value="Apartment" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CFA7636D-CAA1-4F18-868F-8720624C8B86}\MiscStatus\1" Value="139665" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CFA7636D-CAA1-4F18-868F-8720624C8B86}\MiscStatus" Value="0" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CFA7636D-CAA1-4F18-868F-8720624C8B86}\ProgID" Value="MSComCtl2.FlatScrollBar.2" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CFA7636D-CAA1-4F18-868F-8720624C8B86}\Programmable" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CFA7636D-CAA1-4F18-868F-8720624C8B86}\ToolboxBitmap32" Value="[!fil87F2E23A7E4239576591D2679C499E76], 10" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CFA7636D-CAA1-4F18-868F-8720624C8B86}\TypeLib" Value="{86CF1D34-0C5F-11D2-A9FC-0000F8754DA1}" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CFA7636D-CAA1-4F18-868F-8720624C8B86}\Version" Value="2.0" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CFA7636D-CAA1-4F18-868F-8720624C8B86}\VersionIndependentProgID" Value="MSComCtl2.FlatScrollBar" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{CFA7636D-CAA1-4F18-868F-8720624C8B86}" Value="Microsoft Flat Scrollbar Control 6.0 (SP6)" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{F1651457-356D-4CA2-989D-701606A4C828}\Implemented Categories\{0DE86A52-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{F1651457-356D-4CA2-989D-701606A4C828}\Implemented Categories\{0DE86A53-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{F1651457-356D-4CA2-989D-701606A4C828}\Implemented Categories\{0DE86A57-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{F1651457-356D-4CA2-989D-701606A4C828}\Implemented Categories\{40FC6ED5-2438-11CF-A3DB-080036F12502}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{F1651457-356D-4CA2-989D-701606A4C828}\Implemented Categories\{7DD95801-9882-11CF-9FA9-00AA006C42C4}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{F1651457-356D-4CA2-989D-701606A4C828}\Implemented Categories\{7DD95802-9882-11CF-9FA9-00AA006C42C4}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{F1651457-356D-4CA2-989D-701606A4C828}\InprocServer32" Value="[!fil87F2E23A7E4239576591D2679C499E76]" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{F1651457-356D-4CA2-989D-701606A4C828}\InprocServer32" Name="ThreadingModel" Value="Apartment" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{F1651457-356D-4CA2-989D-701606A4C828}\MiscStatus\1" Value="131473" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{F1651457-356D-4CA2-989D-701606A4C828}\MiscStatus" Value="0" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{F1651457-356D-4CA2-989D-701606A4C828}\ProgID" Value="MSComCtl2.MonthView.2" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{F1651457-356D-4CA2-989D-701606A4C828}\Programmable" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{F1651457-356D-4CA2-989D-701606A4C828}\ToolboxBitmap32" Value="[!fil87F2E23A7E4239576591D2679C499E76], 5" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{F1651457-356D-4CA2-989D-701606A4C828}\TypeLib" Value="{86CF1D34-0C5F-11D2-A9FC-0000F8754DA1}" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{F1651457-356D-4CA2-989D-701606A4C828}\Version" Value="2.0" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{F1651457-356D-4CA2-989D-701606A4C828}\VersionIndependentProgID" Value="MSComCtl2.MonthView" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{F1651457-356D-4CA2-989D-701606A4C828}" Value="Microsoft MonthView Control 6.0 (SP6)" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{FE38753A-44A3-11D1-B5B7-0000C09000C4}\Implemented Categories\{0DE86A52-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{FE38753A-44A3-11D1-B5B7-0000C09000C4}\Implemented Categories\{0DE86A53-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{FE38753A-44A3-11D1-B5B7-0000C09000C4}\Implemented Categories\{0DE86A57-2BAA-11CF-A229-00AA003D7352}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{FE38753A-44A3-11D1-B5B7-0000C09000C4}\Implemented Categories\{40FC6ED4-2438-11CF-A3DB-080036F12502}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{FE38753A-44A3-11D1-B5B7-0000C09000C4}\Implemented Categories\{40FC6ED5-2438-11CF-A3DB-080036F12502}" Value="" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{FE38753A-44A3-11D1-B5B7-0000C09000C4}\MiscStatus\1" Value="139665" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{FE38753A-44A3-11D1-B5B7-0000C09000C4}\MiscStatus" Value="0" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="CLSID\{FE38753A-44A3-11D1-B5B7-0000C09000C4}\ToolboxBitmap32" Value="[!fil87F2E23A7E4239576591D2679C499E76], 10" Type="string" Action="write" />
+                <RegistryValue Root="HKLM" Key="Software\Microsoft\Internet Explorer\ActiveX Compatibility\{1906F94F-8256-480A-8CDF-60821592CB4B}" Name="Compatibility Flags" Value="1024" Type="integer" Action="write" />
+                <RegistryValue Root="HKLM" Key="Software\Microsoft\Internet Explorer\ActiveX Compatibility\{1906F94F-8256-480A-8CDF-60821592CB4B}" Name="AlternateCLSID" Value="{3D8152C1-0CFD-4968-9684-794046886E31}" Type="string" Action="write" />
+                <RegistryValue Root="HKLM" Key="Software\Microsoft\Internet Explorer\ActiveX Compatibility\{20DD1B9E-87C4-11D1-8BE3-0000F8754DA1}" Name="Compatibility Flags" Value="1024" Type="integer" Action="write" />
+                <RegistryValue Root="HKLM" Key="Software\Microsoft\Internet Explorer\ActiveX Compatibility\{20DD1B9E-87C4-11D1-8BE3-0000F8754DA1}" Name="AlternateCLSID" Value="{4D588145-A84B-4100-85D7-FD2EA1D19831}" Type="string" Action="write" />
+                <RegistryValue Root="HKLM" Key="Software\Microsoft\Internet Explorer\ActiveX Compatibility\{232E456A-87C3-11D1-8BE3-0000F8754DA1}" Name="Compatibility Flags" Value="1024" Type="integer" Action="write" />
+                <RegistryValue Root="HKLM" Key="Software\Microsoft\Internet Explorer\ActiveX Compatibility\{232E456A-87C3-11D1-8BE3-0000F8754DA1}" Name="AlternateCLSID" Value="{F1651457-356D-4CA2-989D-701606A4C828}" Type="string" Action="write" />
+                <RegistryValue Root="HKLM" Key="Software\Microsoft\Internet Explorer\ActiveX Compatibility\{603C7E80-87C2-11D1-8BE3-0000F8754DA1}" Name="Compatibility Flags" Value="1024" Type="integer" Action="write" />
+                <RegistryValue Root="HKLM" Key="Software\Microsoft\Internet Explorer\ActiveX Compatibility\{603C7E80-87C2-11D1-8BE3-0000F8754DA1}" Name="AlternateCLSID" Value="{CEDFFAFD-3C2F-4552-9FD3-3DC4299057FD}" Type="string" Action="write" />
+                <RegistryValue Root="HKLM" Key="Software\Microsoft\Internet Explorer\ActiveX Compatibility\{B09DE715-87C1-11D1-8BE3-0000F8754DA1}" Name="Compatibility Flags" Value="1024" Type="integer" Action="write" />
+                <RegistryValue Root="HKLM" Key="Software\Microsoft\Internet Explorer\ActiveX Compatibility\{B09DE715-87C1-11D1-8BE3-0000F8754DA1}" Name="AlternateCLSID" Value="{3D8152C1-0CFD-4968-9684-794046886E31}" Type="string" Action="write" />
+                <RegistryValue Root="HKLM" Key="Software\Microsoft\Internet Explorer\ActiveX Compatibility\{FE38753A-44A3-11D1-B5B7-0000C09000C4}" Name="Compatibility Flags" Value="1024" Type="integer" Action="write" />
+                <RegistryValue Root="HKLM" Key="Software\Microsoft\Internet Explorer\ActiveX Compatibility\{FE38753A-44A3-11D1-B5B7-0000C09000C4}" Name="AlternateCLSID" Value="{CFA7636D-CAA1-4F18-868F-8720624C8B86}" Type="string" Action="write" />
+            </Component>
+        </DirectoryRef>
+    </Fragment>
+</Include>

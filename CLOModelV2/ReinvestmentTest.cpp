@@ -11,6 +11,7 @@ void ReinvestmentTest::SetupReinvBond(
 	const QString& AnnuityVec,
 	const QString& ReinvPric,
 	const QString& ReinvDel,
+	const QString& ReinvSpr,
 	const QString& FloatingBase,
 	const QString& RecoveryLag,
 	const QString& Delinquency,
@@ -29,6 +30,7 @@ void ReinvestmentTest::SetupReinvBond(
 	m_RecoveryLag = RecoveryLag;
 	m_Delinquency = Delinquency;
 	m_DelinquencyLag = DelinquencyLag;
+	m_ReinvestmentSpreadOverTime = ReinvSpr;
 }
 void ReinvestmentTest::SetupTest(
 	const QDate& ReinvPer
@@ -55,6 +57,7 @@ ReinvestmentTest::ReinvestmentTest()
 	, m_RecoveryLag("0")
 	, m_Delinquency("0")
 	, m_DelinquencyLag("0")
+	, m_ReinvestmentSpreadOverTime("0")
 {
 	ReinvestmentShare[InReinvShare]=0.0;
 	ReinvestmentShare[InRedempShare]=0.0;
@@ -75,6 +78,7 @@ ReinvestmentTest::ReinvestmentTest(const ReinvestmentTest& a)
 	, m_RecoveryLag(a.m_RecoveryLag)
 	, m_Delinquency(a.m_Delinquency)
 	, m_DelinquencyLag(a.m_DelinquencyLag)
+	, m_ReinvestmentSpreadOverTime(a.m_ReinvestmentSpreadOverTime)
 {
 		ReinvestmentShare[InReinvShare]=a.ReinvestmentShare[InReinvShare];
 		ReinvestmentShare[InRedempShare]=a.ReinvestmentShare[InRedempShare];
@@ -98,6 +102,7 @@ ReinvestmentTest& ReinvestmentTest::operator=(const ReinvestmentTest& a){
 	m_RecoveryLag = a.m_RecoveryLag;
 	m_Delinquency = a.m_Delinquency;
 	m_DelinquencyLag = a.m_DelinquencyLag;
+	m_ReinvestmentSpreadOverTime = a.m_ReinvestmentSpreadOverTime;
 	return *this;
 }
 void ReinvestmentTest::CalculateBondCashFlows(double Size, QDate StartDate, int Period){
@@ -106,32 +111,57 @@ void ReinvestmentTest::CalculateBondCashFlows(double Size, QDate StartDate, int 
 		CPRAssumption.GetAnchorDate().isNull()
 		, CDRAssumption.GetAnchorDate().isNull()
 		, LSAssumption.GetAnchorDate().isNull()
+		, m_RecoveryLag.GetAnchorDate().isNull()
+		, m_Delinquency.GetAnchorDate().isNull()
+		, m_DelinquencyLag.GetAnchorDate().isNull()
 	};
 	if (NullDates[0]) CPRAssumption.SetAnchorDate(StartDate.addMonths(-Period));
 	if (NullDates[1]) CDRAssumption.SetAnchorDate(StartDate.addMonths(-Period));
 	if (NullDates[2]) LSAssumption.SetAnchorDate(StartDate.addMonths(-Period));
+	if (NullDates[3]) m_RecoveryLag.SetAnchorDate(StartDate.addMonths(-Period));
+	if (NullDates[4]) m_Delinquency.SetAnchorDate(StartDate.addMonths(-Period));
+	if (NullDates[5]) m_DelinquencyLag.SetAnchorDate(StartDate.addMonths(-Period));
 	double CurrentPrice;
 	int CurrentDelay = ReinvestmentDelay.GetValue(StartDate);
-	if (ReinvestmentPrice.GetAnchorDate().isNull()) CurrentPrice = ReinvestmentPrice.GetValue(Period + CurrentDelay);
-	else CurrentPrice = ReinvestmentPrice.GetValue(StartDate.addMonths(CurrentDelay));
-	ReinvestmentBond.SetSize(Size / qMax(CurrentPrice,0.01));
-	if (WALAssumption.GetAnchorDate().isNull()) ReinvestmentBond.SetMaturityDate(StartDate.addDays(RoundUp(365.25*WALAssumption.GetValue(Period + CurrentDelay))));
-	else ReinvestmentBond.SetMaturityDate(StartDate.addDays(RoundUp(365.25*WALAssumption.GetValue(StartDate.addMonths(CurrentDelay)))));
-	ReinvestmentBond.CalculateCashFlows(
-		StartDate.addMonths(CurrentDelay)
-		, CPRAssumption
-		, CDRAssumption
-		, LSAssumption
-		, m_RecoveryLag
-		, m_Delinquency
-		, m_DelinquencyLag
-	);
-	for (int DelayIter = 0; DelayIter < CurrentDelay; DelayIter++) {
-		ReinvestmentBond.AddCashFlow(StartDate.addMonths(DelayIter), Size, MtgCashFlow::AmountOutstandingFlow);
+	int currentSpread = m_ReinvestmentSpreadOverTime.GetValue(StartDate);
+	Size /= static_cast<double>(currentSpread);
+	MtgCashFlow ResultingFlows;
+	for (int SpreadIter = 0; SpreadIter < currentSpread; SpreadIter++) {
+		if (ReinvestmentPrice.GetAnchorDate().isNull()) CurrentPrice = ReinvestmentPrice.GetValue(Period + CurrentDelay + SpreadIter);
+		else CurrentPrice = ReinvestmentPrice.GetValue(StartDate.addMonths(CurrentDelay + SpreadIter));
+		ReinvestmentBond.SetProperty("Price", QString("%1").arg(CurrentPrice));
+		ReinvestmentBond.SetSize(Size / qMax(CurrentPrice, 0.01));
+		if (WALAssumption.GetAnchorDate().isNull()) ReinvestmentBond.SetMaturityDate(StartDate.addMonths(CurrentDelay + SpreadIter).addDays(RoundUp(365.25*WALAssumption.GetValue(Period + CurrentDelay + SpreadIter))));
+		else ReinvestmentBond.SetMaturityDate(StartDate.addMonths(CurrentDelay + SpreadIter).addDays(RoundUp(365.25*WALAssumption.GetValue(StartDate.addMonths(CurrentDelay + SpreadIter)))));
+		ReinvestmentBond.CalculateCashFlows(
+			StartDate.addMonths(CurrentDelay + SpreadIter)
+			, CPRAssumption
+			, CDRAssumption
+			, LSAssumption
+			, m_RecoveryLag
+			, m_Delinquency
+			, m_DelinquencyLag
+			, true
+			);
+		for (int DelayIter = 0; DelayIter < CurrentDelay + SpreadIter; DelayIter++) {
+			ReinvestmentBond.AddCashFlow(StartDate.addMonths(DelayIter), Size, MtgCashFlow::MtgFlowType::AmountOutstandingFlow);
+		}
+		ResultingFlows.AddFlow(ReinvestmentBond.GetCashFlow());
+		ReinvestmentBond.ResetFlows();
 	}
+	ReinvestmentBond.AddCashFlow(ResultingFlows);
 	if (NullDates[0]) CPRAssumption.RemoveAnchorDate();
 	if (NullDates[1]) CDRAssumption.RemoveAnchorDate();
 	if (NullDates[2]) LSAssumption.RemoveAnchorDate();
+	if (NullDates[3]) m_RecoveryLag.RemoveAnchorDate();
+	if (NullDates[4]) m_Delinquency.RemoveAnchorDate();
+	if (NullDates[5]) m_DelinquencyLag.RemoveAnchorDate();
+}
+void ReinvestmentTest::SetMissingAnchors(const QDate& a) {
+	if (WALAssumption.GetAnchorDate().isNull()) WALAssumption.SetAnchorDate(a);
+	if (ReinvestmentPrice.GetAnchorDate().isNull()) ReinvestmentPrice.SetAnchorDate(a);
+	if (ReinvestmentDelay.GetAnchorDate().isNull()) ReinvestmentDelay.SetAnchorDate(a);
+	if (m_ReinvestmentSpreadOverTime.GetAnchorDate().isNull()) m_ReinvestmentSpreadOverTime.SetAnchorDate(a);
 }
 const MtgCashFlow& ReinvestmentTest::GetBondCashFlow() const{
 	return ReinvestmentBond.GetCashFlow();
@@ -157,6 +187,7 @@ QDataStream& operator<<(QDataStream & stream, const ReinvestmentTest& flows){
 		<< flows.m_RecoveryLag
 		<< flows.m_Delinquency
 		<< flows.m_DelinquencyLag
+		<< flows.m_ReinvestmentSpreadOverTime
 	;
 	return stream;
 }
@@ -178,9 +209,13 @@ QDataStream& ReinvestmentTest::LoadOldVersion(QDataStream& stream) {
 	m_RecoveryLag.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_RecoveryLag;
 	m_Delinquency.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_Delinquency;
 	m_DelinquencyLag.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_DelinquencyLag;
+	m_ReinvestmentSpreadOverTime.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_ReinvestmentSpreadOverTime;
 	ResetProtocolVersion();
 	return stream;
 }
-QDataStream& operator>>(QDataStream & stream, ReinvestmentTest& flows){
+
+
+
+QDataStream& operator>>(QDataStream & stream, ReinvestmentTest& flows) {
 	return flows.LoadOldVersion(stream);
 }

@@ -29,12 +29,12 @@ public:
 		, const QString& dayCnt = QString::number(static_cast<qint16>(DayCountConvention::CompN30360))
 		);
 #ifndef NO_BLOOMBERG
-	void AddTranche(const QString& Name,int ProRataGroup, double MinOC=0.0, double MinIC=0.0, double Price=100.0,double FxRate= 1.0,const QString& BbgExt="Mtge");
+	void AddTranche(const QString& Name, const QString& ProRataGroup, double MinOC = 0.0, double MinIC = 0.0, double Price = 100.0, double FxRate = 1.0, const QString& BbgExt = "Mtge");
 #endif
 	void AddTranche(
 		const QString& Name
 		, const QString& ISIN
-		, int ProRataGroup
+		, const QString& ProRataGroup
 		, double OrigAmnt
 		, const QString& Crncy
 		, double OutstandingAmt
@@ -80,7 +80,7 @@ public:
 	void SetGICinterest(const QString& a) { Structure.SetGICinterest(a); }
 	void SetGICBaseRate(const QString& a) { Structure.SetGICBaseRate(a); }
 	void SetDealDayCountConvention(const QString&  val) { Structure.SetDealDayCountConvention(val); }
-	void SetupReinvestmentTest(const QDate& ReinvPer,double TstLvl, double IIshare,double IRshare,double OIshare,double ORshare){Structure.SetupReinvestmentTest(ReinvPer,TstLvl,IIshare,IRshare,OIshare,ORshare);}
+	void SetReinvestementPeriod(const QDate& ReinvPer) { Structure.SetReinvestementPeriod(ReinvPer); }
 	void SetupReinvBond(
 		const QString& IntrVec
 		, const QString& CPRVec

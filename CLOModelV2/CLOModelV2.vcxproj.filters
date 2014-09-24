@@ -212,6 +212,9 @@
     <ClInclude Include="DayCountVect.h">
       <Filter>Header Files\Vectors</Filter>
     </ClInclude>
+    <ClInclude Include="Seniority.h">
+      <Filter>Header Files\DealStructure</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Resources.qrc">
@@ -545,6 +548,9 @@
     </ClCompile>
     <ClCompile Include="DayCountVect.cpp">
       <Filter>Source Files\Vectors</Filter>
+    </ClCompile>
+    <ClCompile Include="Seniority.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

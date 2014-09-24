@@ -171,7 +171,7 @@ namespace ManagedCLO {
 		\arg ORshare Share redemption of notes after reinvestment period in a scalar form (0.5=50%)
 		*/
 		void SetupTest(DateTime ReinvPer,double TstLvl, double IIshare,double IRshare,double OIshare,double ORshare){
-			Unmanaged->SetupTest(DateTime2QDate(ReinvPer),TstLvl,IIshare,IRshare,OIshare,ORshare);
+			Unmanaged->SetReinvestementPeriod(DateTime2QDate(ReinvPer),TstLvl,IIshare,IRshare,OIshare,ORshare);
 		}
 		/*!
 		\brief Calculate the reinvestment bond cash flows

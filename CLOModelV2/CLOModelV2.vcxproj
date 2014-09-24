@@ -87,6 +87,7 @@
     <ClInclude Include="ReinvestmentTest.h" />
     <ClInclude Include="RepaymentVector.h" />
     <ClInclude Include="ReserveFund.h" />
+    <ClInclude Include="Seniority.h" />
     <ClInclude Include="Tranche.h" />
     <ClInclude Include="TrancheCashFlow.h" />
     <ClInclude Include="Waterfall.h" />
@@ -388,6 +389,7 @@
     <ClCompile Include="ReinvestmentTest.cpp" />
     <ClCompile Include="RepaymentVector.cpp" />
     <ClCompile Include="ReserveFund.cpp" />
+    <ClCompile Include="Seniority.cpp" />
     <ClCompile Include="StressTest.cpp" />
     <ClCompile Include="StressThread.cpp" />
     <ClCompile Include="StressViewer.cpp" />

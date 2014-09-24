@@ -67,7 +67,7 @@ void CentralUnit::AddLoan(
 	if(Stresser)Stresser->AddLoan(TempMtg);
 }
 #ifndef NO_BLOOMBERG
-void CentralUnit::AddTranche(const QString& Name,int ProRataGroup, double MinOC, double MinIC, double Price,double FxRate,const QString& BbgExt){
+void CentralUnit::AddTranche(const QString& Name, const QString& ProRataGroup, double MinOC, double MinIC, double Price, double FxRate, const QString& BbgExt) {
 	Tranche TempTrnch;
 	TempTrnch.SetTrancheName(Name);
 	TempTrnch.SetProrataGroup(ProRataGroup);
@@ -84,7 +84,7 @@ void CentralUnit::AddTranche(const QString& Name,int ProRataGroup, double MinOC,
 void CentralUnit::AddTranche(
 	const QString& Name
 	, const QString& ISIN
-	, int ProRataGroup
+	, const QString& ProRataGroup
 	, double OrigAmnt
 	, const QString& Crncy
 	, double OutstandingAmt
@@ -134,9 +134,11 @@ void CentralUnit::AddTranche(
 }
 void CentralUnit::AddWaterfallStep(WatFalPrior::WaterfallStepType Tpe,int GrpTgt, int RdmpGrp, double RdmpShare){
 	WatFalPrior TempStep;
-	TempStep.SetGroupTarget(GrpTgt);
-	TempStep.SetRedemptionGroup(RdmpGrp);
-	TempStep.SetRedemptionShare(RdmpShare);
+	TempStep.SetParameter(WatFalPrior::wstParameters::SeniorityGroup, GrpTgt);
+	TempStep.SetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel, 0);
+	TempStep.SetParameter(WatFalPrior::wstParameters::RedemptionGroup, RdmpGrp);
+	TempStep.SetParameter(WatFalPrior::wstParameters::RedemptionGroupLevel, 0);
+	TempStep.SetParameter(WatFalPrior::wstParameters::RedemptionShare, RdmpShare);
 	TempStep.SetPriorityType(Tpe);
 	Structure.AddStep(TempStep);
 	if(Stresser)Stresser->SetStructure(Structure);

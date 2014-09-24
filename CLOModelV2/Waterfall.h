@@ -88,14 +88,14 @@ private:
 	double m_StartingDeferredJunFees;
 	GenericCashFlow m_GICflows;
 	DayCountVector m_DealDayCountConvention;
-	int FindMostJuniorLevel() const;
+	int FindMostJuniorLevel(int SeliorityScaleLevel) const;
 	void SortByProRataGroup();
-	double GroupOutstanding(int GroupTarget)const;
-	double GroupWACoupon(int GroupTarget, const QDate& Period, qint32 CouponType=0)const;
-	double GroupWACoupon(int GroupTarget, const QDate& Period, QList<qint32> CouponTypes)const;
-	double RedeemNotes(double AvailableFunds, int GroupTarget, const QDate& PeriodIndex);
-	double RedeemProRata(double AvailableFunds, const QDate& PeriodIndex, QList<int> Groups);
-	double RedeemSequential(double AvailableFunds, const QDate& PeriodIndex, int MaxGroup = -1);
+	double GroupOutstanding(int GroupTarget, int SeliorityScaleLevel)const;
+	double GroupWACoupon(int GroupTarget, int SeliorityScaleLevel, const QDate& Period, qint32 CouponType = 0)const;
+	double GroupWACoupon(int GroupTarget, int SeliorityScaleLevel, const QDate& Period, QList<qint32> CouponTypes)const;
+	double RedeemNotes(double AvailableFunds, int GroupTarget, int SeliorityScaleLevel, const QDate& PeriodIndex);
+	double RedeemProRata(double AvailableFunds, const QDate& PeriodIndex, QList<int> Groups, int SeliorityScaleLevel);
+	double RedeemSequential(double AvailableFunds, const QDate& PeriodIndex, int SeliorityScaleLevel, int MaxGroup = -1 );
 	int FindTrancheIndex(const QString& Tranchename)const;
 	void FillAllDates();
 protected:
@@ -204,7 +204,7 @@ public:
 	void SetFirstIPDdate(const QDate& a){m_FirstIPDdate=a;}
 	void SetLastIPDdate(const QDate& a){m_LastIPDdate=a;}
 	void SetCallDate(const QDate& a){m_CallDate=a;}
-	void SetupReinvestmentTest(const QDate& ReinvPer,double TstLvl, double IIshare,double IRshare,double OIshare,double ORshare);
+	void SetReinvestementPeriod(const QDate& ReinvPer);
 	void SetupReinvBond(
 		const QString& IntrVec
 		, const QString& CPRVec

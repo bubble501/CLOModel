@@ -411,12 +411,6 @@ double Tranche::GetIRR(double NewPrice)const{
 	}
 	return qMax(0.0,CalculateIRR(FlowsDates,FlowsValues,m_DayCount));
 }
-bool Tranche::operator>(const Tranche& a) const {
-	return ProrataGroup>a.ProrataGroup;
-}
-bool Tranche::operator<(const Tranche& a) const {
-	return ProrataGroup<a.ProrataGroup;
-}
 double Tranche::GetCurrentOutstanding()const{
 	if(CashFlow.Count()==0) return OutstandingAmt;
 	return CashFlow.GetAmountOutstanding(CashFlow.Count()-1);

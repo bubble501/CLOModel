@@ -40,10 +40,10 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		}
 	}
 	{//Tranches
-		QString DayCnt,TrName, Curr, BasRt, TrancheISIN, IPDfrq/*,RefRtVal*/;
+		QString DayCnt, TrName, Curr, BasRt, TrancheISIN, IPDfrq, ProRat;
 		QList<QString> RefRt, coup;
 		QList<Tranche::TrancheInterestType>IntrTpe;
-		int ProRat, TempSize;
+		int TempSize;
 		double origOut,currOut,OClim,IClim,Price,Exchan,startingDeferred/*,coup*/;
 		QDate PrevIPD,SettDate;
 		NumElements=pdFreq++->intVal;
@@ -52,7 +52,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			RefRt.clear(); coup.clear(); IntrTpe.clear();
 			TrName=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			TrancheISIN=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
-			ProRat=pdFreq->intVal; pdFreq++;
+			ProRat = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 			origOut=pdFreq->dblVal;pdFreq++;
 			Curr=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			currOut=pdFreq->dblVal;pdFreq++;
@@ -141,14 +141,8 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		}
 		{// Reinvestment Test
 			QDate ReinPer;
-			double ReinvLim,IISha,IRsha,OIsha,ORsha;
 			ReinPer=QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd");pdFreq++;
-			ReinvLim=pdFreq->dblVal;pdFreq++;
-			IRsha=pdFreq->dblVal;pdFreq++;
-			IISha=pdFreq->dblVal;pdFreq++;
-			ORsha=pdFreq->dblVal;pdFreq++;
-			OIsha=pdFreq->dblVal;pdFreq++;
-			TempUnit.SetupReinvestmentTest(ReinPer,ReinvLim,IISha,IRsha,OIsha,ORsha);
+			TempUnit.SetReinvestementPeriod(ReinPer);
 			QString Intr, CPR, CDR, LS, WAL, Delay, Timespread, Pric, Frq, BaseVal, ReinvBondAnnuit,RecLag,Dlq,DlqLag;
 			Intr=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			CPR=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
@@ -452,27 +446,6 @@ void __stdcall InspectStress(LPSAFEARRAY *ArrayData){
 	SitRep.show();
 	SitRep.SetStructure(TempStructure);
 	SitRep.ShowCallStructure(false);
-	ComputationLoop.exec();	
-}
-void __stdcall InspectWaterfall(LPSAFEARRAY *ArrayData){
-	char *argv[] = {"NoArgumnets"};
-	int argc = sizeof(argv) / sizeof(char*) - 1;
-	QApplication ComputationLoop(argc,argv);
-	WaterfallViewer SitRep;
-	SitRep.show();
-	VARIANT HUGEP *pdFreq;
-	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
-	if (!SUCCEEDED(hr)) return;
-	int NumSteps=pdFreq->intVal;pdFreq++;
-	for(int i=0;i<NumSteps;i++){
-		WatFalPrior TempStep;
-		TempStep.SetPriorityType(WatFalPrior::WaterfallStepType(pdFreq->intVal));pdFreq++;
-		TempStep.SetGroupTarget(pdFreq->intVal);pdFreq++;
-		TempStep.SetRedemptionGroup(pdFreq->intVal);pdFreq++;
-		TempStep.SetRedemptionShare(pdFreq->dblVal);pdFreq++;
-		SitRep.AddStep(TempStep);
-	}
-	SafeArrayUnaccessData(*ArrayData);
 	ComputationLoop.exec();	
 }
 

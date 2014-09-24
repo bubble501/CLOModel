@@ -1,46 +1,64 @@
 #ifndef WatFalPrior_h__
 #define WatFalPrior_h__
 #include <QDataStream>
+#include <QVariant>
+#include <QHash>
 #include "BackwardCompatibilityInterface.h"
 class WatFalPrior : public BackwardInterface {
 public:
 	//! Enum defining the different types of waterfall steps
-	enum WaterfallStepType{
-		wst_SeniorExpenses, /*!< Senior Expenses*/
-		wst_SeniorFees, /*!< Senior Fees*/
-		wst_Interest, /*!< Interest Payment*/
-		wst_Principal,  /*!< Notes Redemption*/
-		wst_OCTest,  /*!< Over Collateralization test. Considered part of the interest waterfall*/
-		wst_OCTestPrinc, /*!< Over Collateralization test. Considered part of the principal waterfall*/
-		wst_ICTest, /*!< Interest Coverage test. Considered part of the interest waterfall*/
-		wst_ICTestPrinc, /*!< Interest Coverage test. Considered part of the principal waterfall*/
-		wst_DeferredInterest, /*!< Payment of deferred interest. Considered part of the interest waterfall*/
-		wst_DeferredPrinc, /*!< Payment of deferred interest. Considered part of the principal waterfall*/
-		wst_juniorFees, /*!< Junior Fees*/
-		wst_ReinvestmentTest, /*!< Reinvestment Test*/
-		wst_Excess, /*!< Excess Spread*/
-		wst_ReinvestPrincipal, /*!< Reinvest all available principal during the reinvestment period*/
-		wst_ReserveReplenish, /*!< Replenish the reserve fund*/
-		wst_RedeemProRata, /*!< Use principal to redeem bonds pro-rata*/
-		wst_Turbo,  /*!< Use interest to redeem a class of notes*/
-		wst_PDL,  /*!< Cure Outstanding PDL*/
-		wst_FeesFromExcess /*!< Junior Fees as percentage of excess spread*/
+	enum class WaterfallStepType: qint16{
+		wst_SeniorExpenses = 0, /*!< Senior Expenses*/
+		wst_SeniorFees = 1, /*!< Senior Fees*/
+		wst_Interest = 2, /*!< Interest Payment*/
+		wst_Principal = 3,  /*!< Notes Redemption*/
+		wst_OCTest = 4,  /*!< Over Collateralization test. Considered part of the interest waterfall*/
+		wst_OCTestPrinc = 5, /*!< Over Collateralization test. Considered part of the principal waterfall*/
+		wst_ICTest = 6, /*!< Interest Coverage test. Considered part of the interest waterfall*/
+		wst_ICTestPrinc = 7, /*!< Interest Coverage test. Considered part of the principal waterfall*/
+		wst_DeferredInterest = 8, /*!< Payment of deferred interest. Considered part of the interest waterfall*/
+		wst_DeferredPrinc = 9, /*!< Payment of deferred interest. Considered part of the principal waterfall*/
+		wst_juniorFees = 10, /*!< Junior Fees*/
+		//wst_ReinvestmentTest=11, /*!< Reinvestment Test*/ Obsolete
+		wst_Excess = 12, /*!< Excess Spread*/
+		wst_ReinvestPrincipal = 13, /*!< Reinvest all available principal during the reinvestment period*/
+		wst_ReserveReplenish = 14, /*!< Replenish the reserve fund*/
+		//wst_RedeemProRata = 15, /*!< Use principal to redeem bonds pro-rata*/ Obsolete
+		wst_Turbo = 16,  /*!< Use interest to redeem a class of notes*/
+		wst_PDL = 17,  /*!< Cure Outstanding PDL*/
+		wst_FeesFromExcess = 18 /*!< Junior Fees as percentage of excess spread*/
 	};
-	int GetGroupTarget()const{return GroupTarget;}
-	int GetRedemptionGroup()const{return RedemptionGroup;}
-	double GetRedemptionShare() const{return RedemptionShare;}
+	enum class wstParameters : qint32 {
+		SeniorityGroup
+		, SeniorityGroupLevel
+		, RedemptionGroup
+		, RedemptionGroupLevel
+		, RedemptionShare
+		, AdditionalCollateralShare
+		, SourceOfFunding
+		, CouponIndex
+		, TestTargetOverride
+		, IRRtoEquityTarget
+		, ReserveIndex
+	};
+	QVariant GetParameter(qint32 ParameterType) const { return Parameters.value(ParameterType, QVariant()); }
+	bool HasParameter(qint32 ParameterType) const { return Parameters.contains(ParameterType); }
+	void SetParameter(qint32 ParameterType, QVariant val) { Parameters[ParameterType] = val; }
+	QVariant GetParameter(wstParameters ParameterType) const { return GetParameter(static_cast<qint32>(ParameterType)); }
+	bool HasParameter(wstParameters ParameterType)const { return HasParameter(static_cast<qint32>(ParameterType)); }
+	void SetParameter(wstParameters ParameterType, QVariant val) { SetParameter(static_cast<qint32>(ParameterType), val); }
+	void RemoveParameter(qint32 ParameterType) { Parameters.remove(ParameterType); }
+	void RemoveParameter(wstParameters ParameterType) { RemoveParameter(static_cast<qint32>(ParameterType)); }
+	void ClearParameters() { Parameters.clear(); }
+	void SetParameters(const QHash<qint32, QVariant>& a) { Parameters = a; }
 	WaterfallStepType GetPriorityType() const{return PriorityType;}
-	void SetGroupTarget(int a){if(a>0) GroupTarget=a;}
-	void SetRedemptionGroup(int a){if(a>=0) RedemptionGroup=a;}
-	void SetRedemptionShare(double a){if(a>=0.0 && a<=1.0) RedemptionShare=a;}
 	void SetPriorityType(WaterfallStepType a){PriorityType=a;}
+	QString ReadyToCalculate() const;
 	WatFalPrior();
 	WatFalPrior(const WatFalPrior& a);
 	WatFalPrior& operator=(const WatFalPrior& a);
 private:
-	int GroupTarget;
-	int RedemptionGroup;
-	double RedemptionShare;
+	QHash<qint32, QVariant> Parameters;
 	WaterfallStepType PriorityType;
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;

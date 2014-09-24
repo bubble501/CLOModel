@@ -55,7 +55,20 @@ public:
 		, const QString& DayCount = QString::number(static_cast<qint16>(DayCountConvention::ACT360))
 	);
 	void AddTranche(const Tranche& a) { Structure.AddTranche(a);	if (Stresser)Stresser->SetStructure(Structure); }
-	void AddWaterfallStep(WatFalPrior::WaterfallStepType Tpe, int GrpTgt, int RdmpGrp=0, double RdmpShare=0.0);
+	void CentralUnit::AddWaterfallStep(
+		WatFalPrior::WaterfallStepType Tpe
+		, int ArgSeniorityGroup
+		, int ArgSeniorityGroupLevel
+		, int ArgRedemptionGroup
+		, int ArgRedemptionGroupLevel
+		, double ArgRedemptionShare
+		, double ArgAdditionalCollateralShare
+		, int ArgSourceofFunding
+		, int ArgCouponIndex
+		, double ArgTestTargetOverride
+		, double ArgIRRtoEquityTarget
+		, int ArgReserveIndex
+	);
 	void SetSeniorExpenses(const QString& a){Structure.SetSeniorExpenses(a);}
 	void SetSeniorFees(const QString& a) { Structure.SetSeniorFees(a); }
 	void SetJuniorFees(const QString& a) { Structure.SetJuniorFees(a); }

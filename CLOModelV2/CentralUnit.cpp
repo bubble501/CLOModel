@@ -132,13 +132,32 @@ void CentralUnit::AddTranche(
 	Structure.AddTranche(TempTrnch);
 	if(Stresser)Stresser->SetStructure(Structure);
 }
-void CentralUnit::AddWaterfallStep(WatFalPrior::WaterfallStepType Tpe,int GrpTgt, int RdmpGrp, double RdmpShare){
+void CentralUnit::AddWaterfallStep(
+	WatFalPrior::WaterfallStepType Tpe
+	, int ArgSeniorityGroup
+	, int ArgSeniorityGroupLevel
+	, int ArgRedemptionGroup
+	, int ArgRedemptionGroupLevel
+	, double ArgRedemptionShare
+	, double ArgAdditionalCollateralShare
+	, int ArgSourceofFunding
+	, int ArgCouponIndex
+	, double ArgTestTargetOverride
+	, double ArgIRRtoEquityTarget
+	, int ArgReserveIndex
+	){
 	WatFalPrior TempStep;
-	TempStep.SetParameter(WatFalPrior::wstParameters::SeniorityGroup, GrpTgt);
-	TempStep.SetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel, 0);
-	TempStep.SetParameter(WatFalPrior::wstParameters::RedemptionGroup, RdmpGrp);
-	TempStep.SetParameter(WatFalPrior::wstParameters::RedemptionGroupLevel, 0);
-	TempStep.SetParameter(WatFalPrior::wstParameters::RedemptionShare, RdmpShare);
+	if (ArgSeniorityGroup!=-1) TempStep.SetParameter(WatFalPrior::wstParameters::SeniorityGroup, ArgSeniorityGroup);
+	if (ArgSeniorityGroupLevel != -1) TempStep.SetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel, ArgSeniorityGroupLevel);
+	if (ArgRedemptionGroup != -1) TempStep.SetParameter(WatFalPrior::wstParameters::RedemptionGroup, ArgRedemptionGroup);
+	if (ArgRedemptionGroupLevel != -1) TempStep.SetParameter(WatFalPrior::wstParameters::RedemptionGroupLevel, ArgRedemptionGroupLevel);
+	if (ArgRedemptionShare != -1.0) TempStep.SetParameter(WatFalPrior::wstParameters::RedemptionShare, ArgRedemptionShare);
+	if (ArgAdditionalCollateralShare != -1.0) TempStep.SetParameter(WatFalPrior::wstParameters::AdditionalCollateralShare, ArgAdditionalCollateralShare);
+	if (ArgSourceofFunding != -1) TempStep.SetParameter(WatFalPrior::wstParameters::SourceOfFunding, ArgSourceofFunding);
+	if (ArgCouponIndex != -1) TempStep.SetParameter(WatFalPrior::wstParameters::CouponIndex, ArgCouponIndex);
+	if (ArgTestTargetOverride != -1.0) TempStep.SetParameter(WatFalPrior::wstParameters::TestTargetOverride, ArgTestTargetOverride);
+	if (ArgIRRtoEquityTarget != -1.0) TempStep.SetParameter(WatFalPrior::wstParameters::IRRtoEquityTarget, ArgIRRtoEquityTarget);
+	if (ArgReserveIndex != -1) TempStep.SetParameter(WatFalPrior::wstParameters::ReserveIndex, ArgReserveIndex);
 	TempStep.SetPriorityType(Tpe);
 	Structure.AddStep(TempStep);
 	if(Stresser)Stresser->SetStructure(Structure);

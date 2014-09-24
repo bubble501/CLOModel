@@ -17,6 +17,7 @@ public:
 	bool SetSeniorityScale(const QString& a);
 	QString ToString() const;
 	Seniority() :m_CurrnetLevel(-1){}
+	Seniority(const QString& a) :m_CurrnetLevel(-1) { SetSeniorityScale(a); }
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 	friend QDataStream& operator<<(QDataStream & stream, const Seniority& flows);

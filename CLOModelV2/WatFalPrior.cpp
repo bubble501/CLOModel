@@ -18,7 +18,7 @@ QString WatFalPrior::ReadyToCalculate() const {
 	case WatFalPrior::WaterfallStepType::wst_SeniorExpenses:
 	case WatFalPrior::WaterfallStepType::wst_SeniorFees:
 	case WatFalPrior::WaterfallStepType::wst_juniorFees:
-		if (!HasParameter(wstParameters::SourceOfFunding)) Result += "Expenses and Fees need a Source of Funding Parameter\n";
+		if (GetParameter(wstParameters::SourceOfFunding).toInt()<1 || GetParameter(wstParameters::SourceOfFunding).toInt()>2) Result += "Expenses and Fees Source of Funding Parameter\n";
 	break;
 	case WatFalPrior::WaterfallStepType::wst_Interest:
 		if (!HasParameter(wstParameters::SeniorityGroup)) Result += "Interest needs a Seniority Group Parameter\n";
@@ -30,29 +30,26 @@ QString WatFalPrior::ReadyToCalculate() const {
 		if (!HasParameter(wstParameters::SeniorityGroupLevel)) Result += "Principal needs a Seniority Group Level Parameter\n";
 	break;
 	case WatFalPrior::WaterfallStepType::wst_OCTest:
-	case WatFalPrior::WaterfallStepType::wst_OCTestPrinc:
 		if (!HasParameter(wstParameters::SeniorityGroup)) Result += "OC Test needs a Seniority Group Parameter\n";
 		if (!HasParameter(wstParameters::SeniorityGroupLevel)) Result += "OC Test needs a Seniority Group Level Parameter\n";
-		if (HasParameter(wstParameters::RedemptionGroup) || HasParameter(wstParameters::RedemptionGroupLevel)) {
-			if (!HasParameter(wstParameters::RedemptionGroup)) Result += "OC Test needs a Redemption Group Parameter\n";
+		if (HasParameter(wstParameters::RedemptionGroup)) {
 			if (!HasParameter(wstParameters::RedemptionGroupLevel)) Result += "OC Test needs a Redemption Group Level Parameter\n";
 			if (!HasParameter(wstParameters::RedemptionShare)) Result += "OC Test needs a Redemption Share Parameter\n";
 		}
 		break;
 	case WatFalPrior::WaterfallStepType::wst_ICTest:
-	case WatFalPrior::WaterfallStepType::wst_ICTestPrinc:
 		if (!HasParameter(wstParameters::SeniorityGroup)) Result += "IC Test needs a Seniority Group Parameter\n";
 		if (!HasParameter(wstParameters::SeniorityGroupLevel)) Result += "IC Test needs a Seniority Group Level Parameter\n";
 		if (!HasParameter(wstParameters::CouponIndex)) Result += "IC Test needs a Coupon Index Parameter\n";
 		break;
-	case WatFalPrior::WaterfallStepType::wst_DeferredPrinc:
 	case WatFalPrior::WaterfallStepType::wst_DeferredInterest:
 		if (!HasParameter(wstParameters::SeniorityGroup)) Result += "Deferred Interest needs a Seniority Group Parameter\n";
 		if (!HasParameter(wstParameters::SeniorityGroupLevel)) Result += "Deferred Interest needs a Seniority Group Level Parameter\n";
 		if (!HasParameter(wstParameters::CouponIndex)) Result += "Deferred Interest needs a Coupon Index Parameter\n";	
 		break;
 	case WatFalPrior::WaterfallStepType::wst_Excess:
-		if (HasParameter(wstParameters::RedemptionGroup) || HasParameter(wstParameters::RedemptionGroupLevel)) {
+		if (!HasParameter(wstParameters::SourceOfFunding)) Result += "Excess Spread needs a Source of Funding Parameter\n";
+		if (HasParameter(wstParameters::RedemptionGroup)) {
 			if (!HasParameter(wstParameters::RedemptionGroup)) Result += "Excess Spread needs a Redemption Group Parameter\n";
 			if (!HasParameter(wstParameters::RedemptionGroupLevel)) Result += "Excess Spread needs a Redemption Group Level Parameter\n";
 		}
@@ -73,8 +70,7 @@ QString WatFalPrior::ReadyToCalculate() const {
 	case WatFalPrior::WaterfallStepType::wst_PDL:
 		if (!HasParameter(wstParameters::SeniorityGroup)) Result += "PDL Cure needs a Seniority Group Parameter\n";
 		if (!HasParameter(wstParameters::SeniorityGroupLevel)) Result += "PDL Cure needs a Seniority Group Level Parameter\n";
-		if (HasParameter(wstParameters::RedemptionGroup) || HasParameter(wstParameters::RedemptionGroupLevel)) {
-			if (!HasParameter(wstParameters::RedemptionGroup)) Result += "PDL Cure needs a Redemption Group Parameter\n";
+		if (HasParameter(wstParameters::RedemptionGroup)) {
 			if (!HasParameter(wstParameters::RedemptionGroupLevel)) Result += "PDL Cure needs a Redemption Group Level Parameter\n";
 			if (!HasParameter(wstParameters::RedemptionShare)) Result += "PDL Cure needs a Redemption Share Parameter\n";
 		}

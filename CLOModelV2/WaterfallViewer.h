@@ -12,7 +12,20 @@ public:
 	WaterfallViewer(QWidget* parent=0);
 	void ResetSteps();
 	void AddStep(const WatFalPrior& a);
-	void AddStep(WatFalPrior::WaterfallStepType Step,int GroupTarget,int RedemptionGroup,double RedemptionShare);
+	void AddStep(
+		WatFalPrior::WaterfallStepType Step
+		, int ArgSeniorityGroup
+		, int ArgSeniorityGroupLevel
+		, int ArgRedemptionGroup
+		, int ArgRedemptionGroupLevel
+		, double ArgRedemptionShare
+		, double ArgAdditionalCollateralShare
+		, int ArgSourceofFunding
+		, int ArgCouponIndex
+		, double ArgTestTargetOverride
+		, double ArgIRRtoEquityTarget
+		, int ArgReserveIndex
+	);
 	void SetWaterfall(const Waterfall& a);
 private:
 	QTableWidget* InterestTable;

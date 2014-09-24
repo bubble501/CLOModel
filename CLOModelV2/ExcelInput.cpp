@@ -80,15 +80,23 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	}
 	
 	{ //Waterfall Steps
-		int Prior,GrpTg, RedTg;
-		double RedSh;
+		int Prior, ArgSeniorityGroup, ArgSeniorityGroupLevel, ArgRedemptionGroup, ArgRedemptionGroupLevel, ArgSourceofFunding, ArgCouponIndex, ArgReserveIndex;
+		double ArgRedemptionShare, ArgAdditionalCollateralShare, ArgTestTargetOverride, ArgIRRtoEquityTarget;
 		NumElements=pdFreq++->intVal;
 		for(int i=0;i<NumElements;i++){
 			Prior=pdFreq->intVal; pdFreq++;
-			GrpTg=pdFreq->intVal; pdFreq++;
-			RedTg=pdFreq->intVal; pdFreq++;
-			RedSh=pdFreq->dblVal;pdFreq++;
-			TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType(Prior),GrpTg,RedTg,RedSh);
+			ArgSeniorityGroup = pdFreq->intVal; pdFreq++;
+			ArgSeniorityGroupLevel = pdFreq->intVal; pdFreq++;
+			ArgRedemptionGroup = pdFreq->intVal; pdFreq++;
+			ArgRedemptionGroupLevel = pdFreq->intVal; pdFreq++;
+			ArgSourceofFunding = pdFreq->intVal; pdFreq++;
+			ArgCouponIndex = pdFreq->intVal; pdFreq++;
+			ArgReserveIndex = pdFreq->intVal; pdFreq++;
+			ArgRedemptionShare = pdFreq->dblVal; pdFreq++;
+			ArgAdditionalCollateralShare = pdFreq->dblVal; pdFreq++;
+			ArgTestTargetOverride = pdFreq->dblVal; pdFreq++;
+			ArgIRRtoEquityTarget = pdFreq->dblVal; pdFreq++;
+			TempUnit.AddWaterfallStep(static_cast<WatFalPrior::WaterfallStepType>(Prior), ArgSeniorityGroup, ArgSeniorityGroupLevel, ArgRedemptionGroup, ArgRedemptionGroupLevel, ArgRedemptionShare, ArgAdditionalCollateralShare, ArgSourceofFunding, ArgCouponIndex, ArgTestTargetOverride, ArgIRRtoEquityTarget, ArgReserveIndex);
 		}
 	}
 	{ //General Inputs

@@ -13,11 +13,11 @@ public:
 		wst_Interest = 2, /*!< Interest Payment*/
 		wst_Principal = 3,  /*!< Notes Redemption*/
 		wst_OCTest = 4,  /*!< Over Collateralization test. Considered part of the interest waterfall*/
-		wst_OCTestPrinc = 5, /*!< Over Collateralization test. Considered part of the principal waterfall*/
+		//wst_OCTestPrinc = 5, /*!< Over Collateralization test. Considered part of the principal waterfall*/ Obsolete
 		wst_ICTest = 6, /*!< Interest Coverage test. Considered part of the interest waterfall*/
-		wst_ICTestPrinc = 7, /*!< Interest Coverage test. Considered part of the principal waterfall*/
+		//wst_ICTestPrinc = 7, /*!< Interest Coverage test. Considered part of the principal waterfall*/ Obsolete
 		wst_DeferredInterest = 8, /*!< Payment of deferred interest. Considered part of the interest waterfall*/
-		wst_DeferredPrinc = 9, /*!< Payment of deferred interest. Considered part of the principal waterfall*/
+		//wst_DeferredPrinc = 9, /*!< Payment of deferred interest. Considered part of the principal waterfall*/ Obsolete
 		wst_juniorFees = 10, /*!< Junior Fees*/
 		//wst_ReinvestmentTest=11, /*!< Reinvestment Test*/ Obsolete
 		wst_Excess = 12, /*!< Excess Spread*/

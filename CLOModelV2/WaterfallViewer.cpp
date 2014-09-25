@@ -95,7 +95,7 @@ void WaterfallViewer::AddStep(
 	AddStep(TempStep);
 }
 void WaterfallViewer::AddStep(const WatFalPrior& a){
-	switch(a.GetPriorityType()){
+	/*switch(a.GetPriorityType()){
 	case WatFalPrior::WaterfallStepType::wst_SeniorExpenses:
 		if(a.GetRedemptionGroup()==1){
 			InterestTable->setRowCount(InterestTable->rowCount()+1);
@@ -249,7 +249,7 @@ void WaterfallViewer::AddStep(const WatFalPrior& a){
 	break;
 	default:
 		QMessageBox::critical(this,"Invalid Step","The step you tried to add is invalid.\nPlease check the Waterfall");
-	}
+	}*/
 }
 void WaterfallViewer::SetWaterfall(const Waterfall& a){
 	for(int i=0;i<a.GetStepsCount();i++){

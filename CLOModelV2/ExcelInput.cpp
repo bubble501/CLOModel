@@ -83,23 +83,25 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		int Prior, ArgSeniorityGroup, ArgSeniorityGroupLevel, ArgRedemptionGroup, ArgRedemptionGroupLevel, ArgSourceofFunding, ArgCouponIndex, ArgReserveIndex;
 		double ArgRedemptionShare, ArgAdditionalCollateralShare, ArgTestTargetOverride, ArgIRRtoEquityTarget;
 		NumElements=pdFreq++->intVal;
+		LOGDEBUG(QString("Numero Steps: %1").arg(NumElements));
 		for(int i=0;i<NumElements;i++){
 			Prior=pdFreq->intVal; pdFreq++;
 			ArgSeniorityGroup = pdFreq->intVal; pdFreq++;
 			ArgSeniorityGroupLevel = pdFreq->intVal; pdFreq++;
 			ArgRedemptionGroup = pdFreq->intVal; pdFreq++;
 			ArgRedemptionGroupLevel = pdFreq->intVal; pdFreq++;
-			ArgSourceofFunding = pdFreq->intVal; pdFreq++;
-			ArgCouponIndex = pdFreq->intVal; pdFreq++;
-			ArgReserveIndex = pdFreq->intVal; pdFreq++;
 			ArgRedemptionShare = pdFreq->dblVal; pdFreq++;
 			ArgAdditionalCollateralShare = pdFreq->dblVal; pdFreq++;
+			ArgSourceofFunding = pdFreq->intVal; pdFreq++;
+			ArgCouponIndex = pdFreq->intVal; pdFreq++;
 			ArgTestTargetOverride = pdFreq->dblVal; pdFreq++;
 			ArgIRRtoEquityTarget = pdFreq->dblVal; pdFreq++;
+			ArgReserveIndex = pdFreq->intVal; pdFreq++;
 			TempUnit.AddWaterfallStep(static_cast<WatFalPrior::WaterfallStepType>(Prior), ArgSeniorityGroup, ArgSeniorityGroupLevel, ArgRedemptionGroup, ArgRedemptionGroupLevel, ArgRedemptionShare, ArgAdditionalCollateralShare, ArgSourceofFunding, ArgCouponIndex, ArgTestTargetOverride, ArgIRRtoEquityTarget, ArgReserveIndex);
 		}
 	}
 	{ //General Inputs
+		LOGDEBUG(QString("General Inputs"));
 		TempUnit.SetDealName(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
 		TempUnit.SetStartingDeferredJunFees(pdFreq->dblVal); pdFreq++;
 		TempUnit.SetGICinterest(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;

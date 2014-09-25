@@ -665,12 +665,9 @@ bool Waterfall::CalculateTranchesCashFlows(){
 				m_GICflows.AddFlow(CurrentDate, m_PrincipalAvailable.GetScheduled()*TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
 				m_GICflows.AddFlow(CurrentDate, m_PrincipalAvailable.GetPrepay()*TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
 				foreach(const ReserveFund* SingleRes, m_Reserves) {
-					m_GICflows.AddFlow(CurrentDate, SingleRes->GetReserveFundCurrent()*TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
+					m_GICflows.AddFlow(CurrentDate, SingleRes->GetReserveFundCurrent()*TotalPayable, 1+static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
 				}
-				m_InterestAvailable +=
-					m_GICflows.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow))
-					+ m_GICflows.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow))
-				;
+				m_InterestAvailable +=m_GICflows.GetTotalFlow(CurrentDate);
 			}
 			m_PrincipalAvailable.AddScheduled(m_MortgagesPayments.GetScheduled(i));
 			m_PrincipalAvailable.AddPrepay(m_MortgagesPayments.GetPrepay(i));
@@ -1261,7 +1258,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		CheckResults -= m_InterestAvailable;
 		CheckResults -= m_PrincipalAvailable.Total();
 		if (qAbs(CheckResults) >= 1.0) {
-			PrintToTempFile("ReturnFalse.txt", QString("Cash Flows Dont Match, Diff: %1").arg(CheckResults));
+			PrintToTempFile("ReturnFalse.txt", QString("Cash Flows don't Match, Diff: %1").arg(CheckResults));
 			return false;
 		}
 		return true;

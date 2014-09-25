@@ -419,3 +419,369 @@ Public Function ShowDayCount(Target As String, CurrentDcnt As Integer) As String
     DayCountForm.TargetAddress = Target
     ShowDayCount = DayCountForm.ShowForm
 End Function
+
+Public Sub NewWaterfallStepChanged(Target As Range, ByRef allFields As Collection)
+    'Dim PrincipalWatStart As Long
+    'PrincipalWatStart = Target.Parent.Cells.Find(what:="Interest Waterfall", LookAt:=xlWhole, LookIn:=xlFormulas).Column
+    
+    Dim FirstStep As Range
+    Set FirstStep = Target.Parent.Cells.Find(what:=allFields("StepHead"), LookAt:=xlWhole, LookIn:=xlFormulas)
+    Dim LastStep As Range
+    Set LastStep = Target.Parent.Cells.Find(what:=allFields("StepHead"), SearchDirection:=xlPrevious, LookAt:=xlWhole, LookIn:=xlFormulas)
+    
+    Dim SeniorityGroupHead As Long
+    Dim SeniorityGroupLevelHead As Long
+    Dim AdditionalCollateralShareHead As Long
+    Dim RedemptionShareHead As Long
+    Dim RedemptionGroupLevelHead As Long
+    Dim RedemptionGroupHead As Long
+    Dim SourceOfFundingHead As Long
+    Dim CouponIndexHead As Long
+    Dim TestTargetOverrideHead As Long
+    Dim IRRtoEquityTargetHead As Long
+    Dim ReserveIndexHead As Long
+    
+    SeniorityGroupHead = 1
+    SeniorityGroupLevelHead = 2
+    RedemptionGroupHead = 3
+    RedemptionGroupLevelHead = 4
+    RedemptionShareHead = 5
+    AdditionalCollateralShareHead = 6
+    SourceOfFundingHead = 7
+    CouponIndexHead = 8
+    TestTargetOverrideHead = 9
+    IRRtoEquityTargetHead = 10
+    ReserveIndexHead = 11
+    
+'     SeniorityGroupHead = Target.Parent.Cells.Find(what:=allFields("SeniorityGroupHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+'     SeniorityGroupLevelHead = Target.Parent.Cells.Find(what:=allFields("SeniorityGroupLevelHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+'     RedemptionGroupHead = Target.Parent.Cells.Find(what:=allFields("RedemptionGroupHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+'     RedemptionGroupLevelHead = Target.Parent.Cells.Find(what:=allFields("RedemptionGroupLevelHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+'     RedemptionShareHead = Target.Parent.Cells.Find(what:=allFields("RedemptionShareHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+'     AdditionalCollateralShareHead = Target.Parent.Cells.Find(what:=allFields("AdditionalCollateralShareHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+'     SourceOfFundingHead = Target.Parent.Cells.Find(what:=allFields("SourceOfFundingHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+'     CouponIndexHead = Target.Parent.Cells.Find(what:=allFields("CouponIndexHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+'     TestTargetOverrideHead = Target.Parent.Cells.Find(what:=allFields("TestTargetOverrideHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+'     IRRtoEquityTargetHead = Target.Parent.Cells.Find(what:=allFields("IRRtoEquityTargetHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+'     ReserveIndexHead = Target.Parent.Cells.Find(what:=allFields("ReserveIndexHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+    
+
+    If Not IsEmpty(Target) Then
+        Target.Offset(1, 0).Locked = False
+        Target.Offset(1, 0).EntireRow.Hidden = False
+    End If
+    With Target.Offset(0, 1).Resize(1, ReserveIndexHead)
+            .ClearContents
+            .NumberFormat = ";;;"
+            .Interior.Color = RGB(191, 191, 191)
+            .Locked = True
+            .ClearComments
+    End With
+    Select Case UCase(Target.Value)
+    Case UCase("Senior Expenses"), UCase("Senior Management Fees"), UCase("Junior management fees")
+        If (Target.Row > LastStep.Row) Then
+            Target.Offset(0, SourceOfFundingHead).Value = 2
+        Else
+            Target.Offset(0, SourceOfFundingHead).Value = 1
+        End If
+    Case UCase("Reinvestment")
+        With Target.Offset(0, SourceOfFundingHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "[=1]""Unscheduled"";[=2]""Scheduled"";""All Principal"""
+            .Value = 3
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, AdditionalCollateralShareHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0%"
+            .Value = 1
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+    Case UCase("IC")
+        If (Target.Row > LastStep.Row) Then
+            Target.Offset(0, SourceOfFundingHead).Value = 2
+        Else
+            Target.Offset(0, SourceOfFundingHead).Value = 1
+        End If
+        With Target.Offset(0, TestTargetOverrideHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0%"
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, SeniorityGroupHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0"
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, SeniorityGroupLevelHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0"
+            .Value = 1
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, CouponIndexHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0"
+            .Value = 1
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+     Case UCase("Deferred")
+        If (Target.Row > LastStep.Row) Then
+            Target.Offset(0, SourceOfFundingHead).Value = 2
+        Else
+            Target.Offset(0, SourceOfFundingHead).Value = 1
+        End If
+        With Target.Offset(0, SeniorityGroupHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0"
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, SeniorityGroupLevelHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0"
+            .Value = 1
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, CouponIndexHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0"
+            .Value = 1
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+    Case UCase("Interest")
+        With Target.Offset(0, SeniorityGroupHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0"
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, SeniorityGroupLevelHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0"
+            .Value = 1
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, CouponIndexHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0"
+            .Value = 1
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+    Case UCase("Principal")
+        With Target.Offset(0, SeniorityGroupHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0"
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, SeniorityGroupLevelHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0"
+            .Value = 1
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+    Case UCase("OC")
+        If (Target.Row > LastStep.Row) Then
+            Target.Offset(0, SourceOfFundingHead).Value = 2
+        Else
+            Target.Offset(0, SourceOfFundingHead).Value = 1
+        End If
+        With Target.Offset(0, SeniorityGroupHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0"
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, SeniorityGroupLevelHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0"
+            .Value = 1
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, RedemptionGroupHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0"
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, RedemptionGroupLevelHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0"
+            .Value = 1
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, RedemptionShareHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0%"
+            .Value = 0
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, AdditionalCollateralShareHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0%"
+            .Value = 0
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, TestTargetOverrideHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0%"
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+    Case UCase("Excess")
+        If (Target.Row > LastStep.Row) Then
+            Target.Offset(0, SourceOfFundingHead).Value = 2
+        Else
+            Target.Offset(0, SourceOfFundingHead).Value = 1
+        End If
+        With Target.Offset(0, RedemptionGroupHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0"
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, RedemptionGroupLevelHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0"
+            .Value = 1
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, RedemptionShareHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0%"
+            .Value = 1
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+    Case UCase("Replenish Reserve")
+        If (Target.Row > LastStep.Row) Then
+            Target.Offset(0, SourceOfFundingHead).Value = 2
+        Else
+            Target.Offset(0, SourceOfFundingHead).Value = 1
+        End If
+        With Target.Offset(0, ReserveIndexHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0"
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+    Case UCase("Turbo")
+        With Target.Offset(0, RedemptionGroupHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0"
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, RedemptionGroupLevelHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0"
+            .Value = 1
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, RedemptionShareHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0%"
+            .Value = 1
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+    Case UCase("Fees From XS")
+        If (Target.Row > LastStep.Row) Then
+            Target.Offset(0, SourceOfFundingHead).Value = 2
+        Else
+            Target.Offset(0, SourceOfFundingHead).Value = 1
+        End If
+        With Target.Offset(0, RedemptionShareHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0%"
+            .Value = 0.2
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, IRRtoEquityTargetHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0%"
+            .Value = 0.12
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+    Case UCase("Cure PDL")
+        With Target.Offset(0, SeniorityGroupHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0"
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, SeniorityGroupLevelHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0"
+            .Value = 1
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+         With Target.Offset(0, RedemptionGroupHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0"
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, RedemptionGroupLevelHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0"
+            .Value = 1
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, RedemptionShareHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0%"
+            .Value = 0
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+    End Select
+    
+End Sub
+
+
+Private Sub AddValidation()
+Dim ValidationString As String
+ValidationString = "Senior Expenses"
+ValidationString = ValidationString & ",Senior Management Fees"
+ValidationString = ValidationString & ",Reinvestment"
+'ValidationString = ValidationString & ",Interest"
+ValidationString = ValidationString & ",Principal"
+ValidationString = ValidationString & ",OC"
+ValidationString = ValidationString & ",IC"
+ValidationString = ValidationString & ",Deferred"
+ValidationString = ValidationString & ",Junior management fees"
+ValidationString = ValidationString & ",Excess"
+ValidationString = ValidationString & ",Replenish Reserve"
+'ValidationString = ValidationString & ",Turbo"
+ValidationString = ValidationString & ",Fees From XS"
+ValidationString = ValidationString & ",Cure PDL"
+'With Sheets("Waterfall").Range("A3:A500").Validation
+With Sheets("Waterfall").Range("A503:A1000").Validation
+    .Delete
+    .Add Type:=xlValidateList, AlertStyle:=xlValidAlertStop, Formula1:=ValidationString
+End With
+End Sub
+

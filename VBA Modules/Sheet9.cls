@@ -8,11 +8,11 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Private Sub Worksheet_Change(ByVal Target As Range)
-    If Not Intersect(Target, Me.Range("E25:E150")) Is Nothing Then
-        Me.Unprotect
-        Call WaterfallStepChanged(Target)
-        Me.Protect AllowFormattingCells:=True, AllowFormattingColumns:=True, AllowFormattingRows:=True
-    ElseIf Not Intersect(Target, Me.Range("A4:A19")) Is Nothing Then
+'    If Not Intersect(Target, Me.Range("E25:E150")) Is Nothing Then
+'        Me.Unprotect
+'        Call WaterfallStepChanged(Target)
+'        Me.Protect AllowFormattingCells:=True, AllowFormattingColumns:=True, AllowFormattingRows:=True
+    If Not Intersect(Target, Me.Range("A4:A19")) Is Nothing Then
         Me.Shapes("GhostButton").Visible = _
             Application.WorksheetFunction.CountBlank(Me.Range("A4:A19")) = 16
         Me.Shapes("ImportFromOldButton").Visible = _

@@ -7,7 +7,7 @@ Declare Function CLOWALife Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Relea
 Declare Function CLOReturnRate Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
 Declare Sub StressTargetChanged Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
 Declare Sub InspectStress Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
-Declare Sub InspectWaterfall Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
+'Declare Sub InspectWaterfall Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
 Declare Function GetAssumption Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
 Public Sub GetInputFromStructure( _
     MortgagesSheet As String, _
@@ -38,7 +38,7 @@ Public Sub GetInputFromStructure( _
     Dim BondPriceStart As Range
     Dim OCLimitStart As Range
     Dim ICLimitStart As Range
-    Dim WaterfallStart As Range
+    'Dim WaterfallStart As Range
     Dim SeniorExpensesCell As Range
     Dim SeniorFeesCell As Range
     Dim JuniorFeesCell As Range
@@ -128,6 +128,38 @@ Public Sub GetInputFromStructure( _
     Dim PriceProperty As Range
     Dim LoanDayCountHead As Range
     Dim StartingAdditionalProp As Range
+    'New Waterfall
+    Dim WaterfallSheet As Worksheet
+    Dim FirstStep As Range
+    Dim LastStep As Range
+    Dim SeniorityGroupHead As Long
+    Dim SeniorityGroupLevelHead As Long
+    Dim AdditionalCollateralShareHead As Long
+    Dim RedemptionShareHead As Long
+    Dim RedemptionGroupLevelHead As Long
+    Dim RedemptionGroupHead As Long
+    Dim SourceOfFundingHead As Long
+    Dim CouponIndexHead As Long
+    Dim TestTargetOverrideHead As Long
+    Dim IRRtoEquityTargetHead As Long
+    Dim ReserveIndexHead As Long
+    
+    Set WaterfallSheet = Sheets(FieldsLabels("WaterfallSheet"))
+     Set FirstStep = WaterfallSheet.Cells.Find(what:=FieldsLabels("StepHead"), LookAt:=xlWhole, LookIn:=xlFormulas)
+    Set LastStep = WaterfallSheet.Cells.Find(what:=FieldsLabels("StepHead"), SearchDirection:=xlPrevious, LookAt:=xlWhole, LookIn:=xlFormulas)
+    SeniorityGroupHead = WaterfallSheet.Cells.Find(what:=FieldsLabels("SeniorityGroupHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+    SeniorityGroupLevelHead = WaterfallSheet.Cells.Find(what:=FieldsLabels("SeniorityGroupLevelHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+    RedemptionGroupHead = WaterfallSheet.Cells.Find(what:=FieldsLabels("RedemptionGroupHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+    RedemptionGroupLevelHead = WaterfallSheet.Cells.Find(what:=FieldsLabels("RedemptionGroupLevelHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+    RedemptionShareHead = WaterfallSheet.Cells.Find(what:=FieldsLabels("RedemptionShareHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+    AdditionalCollateralShareHead = WaterfallSheet.Cells.Find(what:=FieldsLabels("AdditionalCollateralShareHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+    SourceOfFundingHead = WaterfallSheet.Cells.Find(what:=FieldsLabels("SourceOfFundingHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+    CouponIndexHead = WaterfallSheet.Cells.Find(what:=FieldsLabels("CouponIndexHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+    TestTargetOverrideHead = WaterfallSheet.Cells.Find(what:=FieldsLabels("TestTargetOverrideHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+    IRRtoEquityTargetHead = WaterfallSheet.Cells.Find(what:=FieldsLabels("IRRtoEquityTargetHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+    ReserveIndexHead = WaterfallSheet.Cells.Find(what:=FieldsLabels("ReserveIndexHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+   
+    ''''''''''''''''''''''''''''''''''''''''''''''''''''
     On Error Resume Next
     Set IssuerProperty = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("IssuerProperty"), LookAt:=xlWhole, LookIn:=xlValues)
     Set FacilityProperty = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("FacilityProperty"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -205,7 +237,7 @@ Public Sub GetInputFromStructure( _
     'Set AccruedIntrStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("IntrAccrHead"), LookAt:=xlWhole, LookIn:=xlValues)
     Set TrancheCouponStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("TrancheCouponHead"), LookAt:=xlWhole, LookIn:=xlValues)
     Set RefRateStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("RefRateHead"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set WaterfallStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("WaterfallHeader"), LookAt:=xlWhole, LookIn:=xlValues)
+    'Set WaterfallStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("WaterfallHeader"), LookAt:=xlWhole, LookIn:=xlValues)
     Set SeniorExpensesCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SeniorExpensesField"), LookAt:=xlWhole, LookIn:=xlValues)
     Set SeniorFeesCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SeniorFeesField"), LookAt:=xlWhole, LookIn:=xlValues)
     Set JuniorFeesCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("JuniorFeesField"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -330,7 +362,7 @@ ReferenceRateFromBBg:
         Else
             Call AddInput(AllTheInputs, CStr(IsinFldsStart.Offset(i, 0).Value))
         End If
-        Call AddInput(AllTheInputs, CLng(BondRataStart.Offset(i, 0).Value))
+        Call AddInput(AllTheInputs, CStr(BondRataStart.Offset(i, 0).Value))
         Call AddInput(AllTheInputs, OriginalOutStart.Offset(i, 0).Value)
         Call AddInput(AllTheInputs, CStr(CurrencyStart.Offset(i, 0).Value))
         Call AddInput(AllTheInputs, CurrentOutStart.Offset(i, 0).Value)
@@ -370,22 +402,152 @@ DefaultExchange:
         i = i + 1
     Loop
 
-    
-    
-    If (IsEmpty(WaterfallStart.Offset(2, 0))) Then
+    'New Waterfall
+    If (IsEmpty(FirstStep.Offset(1, 0)) And IsEmpty(LastStep.Offset(1, 0))) Then
         Call AddInput(AllTheInputs, CLng(0))
     Else
-        Call AddInput(AllTheInputs, CLng(WaterfallStart.Offset(2, 0).End(xlDown).Row - WaterfallStart.Row - 1))
+        Call AddInput(AllTheInputs, CLng(FirstStep.End(xlDown).Row - FirstStep.Row + LastStep.End(xlDown).Row - LastStep.Row))
     End If
     i = 1
+    'Interest Waterfall
     Do While (True)
-        If IsEmpty(WaterfallStart.Offset(i + 1, 0)) Then Exit Do
-        Call AddInput(AllTheInputs, FromStringToPriorty(WaterfallStart.Offset(i + 1, 0).Value))
-        Call AddInput(AllTheInputs, CLng(WaterfallStart.Offset(i + 1, 1).Value))
-        Call AddInput(AllTheInputs, CLng(WaterfallStart.Offset(i + 1, 2).Value))
-        Call AddInput(AllTheInputs, WaterfallStart.Offset(i + 1, 3).Value)
+        If IsEmpty(FirstStep.Offset(i, 0)) Then Exit Do
+        Call AddInput(AllTheInputs, FromStringToPriorty(FirstStep.Offset(i, 0).Value))
+        If IsEmpty(FirstStep.Offset(i, SeniorityGroupHead)) Then
+            Call AddInput(AllTheInputs, CLng(-1))
+        Else
+            Call AddInput(AllTheInputs, CLng(FirstStep.Offset(i, SeniorityGroupHead).Value))
+        End If
+        If IsEmpty(FirstStep.Offset(i, SeniorityGroupLevelHead)) Then
+            Call AddInput(AllTheInputs, CLng(-1))
+        Else
+            Call AddInput(AllTheInputs, CLng(FirstStep.Offset(i, SeniorityGroupLevelHead).Value) - 1)
+        End If
+         If IsEmpty(FirstStep.Offset(i, RedemptionGroupHead)) Then
+            Call AddInput(AllTheInputs, CLng(-1))
+        Else
+            Call AddInput(AllTheInputs, CLng(FirstStep.Offset(i, RedemptionGroupHead).Value))
+        End If
+        If IsEmpty(FirstStep.Offset(i, RedemptionGroupLevelHead)) Then
+            Call AddInput(AllTheInputs, CLng(-1))
+        Else
+            Call AddInput(AllTheInputs, CLng(FirstStep.Offset(i, RedemptionGroupLevelHead).Value) - 1)
+        End If
+        If IsEmpty(FirstStep.Offset(i, RedemptionShareHead)) Then
+            Call AddInput(AllTheInputs, CDbl(-1#))
+        Else
+            Call AddInput(AllTheInputs, CDbl(FirstStep.Offset(i, RedemptionShareHead).Value))
+        End If
+        If IsEmpty(FirstStep.Offset(i, AdditionalCollateralShareHead)) Then
+            Call AddInput(AllTheInputs, CDbl(-1#))
+        Else
+            Call AddInput(AllTheInputs, CDbl(FirstStep.Offset(i, AdditionalCollateralShareHead).Value))
+        End If
+        If IsEmpty(FirstStep.Offset(i, SourceOfFundingHead)) Then
+            Call AddInput(AllTheInputs, CLng(-1))
+        Else
+            Call AddInput(AllTheInputs, CLng(FirstStep.Offset(i, SourceOfFundingHead).Value))
+        End If
+        If IsEmpty(FirstStep.Offset(i, CouponIndexHead)) Then
+            Call AddInput(AllTheInputs, CLng(-1))
+        Else
+            Call AddInput(AllTheInputs, CLng(FirstStep.Offset(i, CouponIndexHead).Value) - 1)
+        End If
+        If IsEmpty(FirstStep.Offset(i, TestTargetOverrideHead)) Then
+            Call AddInput(AllTheInputs, CDbl(-1#))
+        Else
+            Call AddInput(AllTheInputs, CDbl(FirstStep.Offset(i, TestTargetOverrideHead).Value))
+        End If
+        If IsEmpty(FirstStep.Offset(i, IRRtoEquityTargetHead)) Then
+            Call AddInput(AllTheInputs, CDbl(-1#))
+        Else
+            Call AddInput(AllTheInputs, CDbl(FirstStep.Offset(i, IRRtoEquityTargetHead).Value))
+        End If
+        If IsEmpty(FirstStep.Offset(i, ReserveIndexHead)) Then
+            Call AddInput(AllTheInputs, CLng(-1))
+        Else
+            Call AddInput(AllTheInputs, CLng(FirstStep.Offset(i, ReserveIndexHead).Value))
+        End If
         i = i + 1
     Loop
+    'Principal waterfall
+    i = 1
+    Do While (True)
+        If IsEmpty(LastStep.Offset(i, 0)) Then Exit Do
+        Call AddInput(AllTheInputs, FromStringToPriorty(LastStep.Offset(i, 0).Value))
+        If IsEmpty(LastStep.Offset(i, SeniorityGroupHead)) Then
+            Call AddInput(AllTheInputs, CLng(-1))
+        Else
+            Call AddInput(AllTheInputs, CLng(LastStep.Offset(i, SeniorityGroupHead).Value))
+        End If
+        If IsEmpty(LastStep.Offset(i, SeniorityGroupLevelHead)) Then
+            Call AddInput(AllTheInputs, CLng(-1))
+        Else
+            Call AddInput(AllTheInputs, CLng(LastStep.Offset(i, SeniorityGroupLevelHead).Value) - 1)
+        End If
+         If IsEmpty(LastStep.Offset(i, RedemptionGroupHead)) Then
+            Call AddInput(AllTheInputs, CLng(-1))
+        Else
+            Call AddInput(AllTheInputs, CLng(LastStep.Offset(i, RedemptionGroupHead).Value))
+        End If
+        If IsEmpty(LastStep.Offset(i, RedemptionGroupLevelHead)) Then
+            Call AddInput(AllTheInputs, CLng(-1))
+        Else
+            Call AddInput(AllTheInputs, CLng(LastStep.Offset(i, RedemptionGroupLevelHead).Value) - 1)
+        End If
+        If IsEmpty(LastStep.Offset(i, RedemptionShareHead)) Then
+            Call AddInput(AllTheInputs, CDbl(-1#))
+        Else
+            Call AddInput(AllTheInputs, CDbl(LastStep.Offset(i, RedemptionShareHead).Value))
+        End If
+        If IsEmpty(LastStep.Offset(i, AdditionalCollateralShareHead)) Then
+            Call AddInput(AllTheInputs, CDbl(-1#))
+        Else
+            Call AddInput(AllTheInputs, CDbl(LastStep.Offset(i, AdditionalCollateralShareHead).Value))
+        End If
+        If IsEmpty(LastStep.Offset(i, SourceOfFundingHead)) Then
+            Call AddInput(AllTheInputs, CLng(-1))
+        Else
+            Call AddInput(AllTheInputs, CLng(LastStep.Offset(i, SourceOfFundingHead).Value))
+        End If
+        If IsEmpty(LastStep.Offset(i, CouponIndexHead)) Then
+            Call AddInput(AllTheInputs, CLng(-1))
+        Else
+            Call AddInput(AllTheInputs, CLng(LastStep.Offset(i, CouponIndexHead).Value) - 1)
+        End If
+        If IsEmpty(LastStep.Offset(i, TestTargetOverrideHead)) Then
+            Call AddInput(AllTheInputs, CDbl(-1#))
+        Else
+            Call AddInput(AllTheInputs, CDbl(LastStep.Offset(i, TestTargetOverrideHead).Value))
+        End If
+        If IsEmpty(LastStep.Offset(i, IRRtoEquityTargetHead)) Then
+            Call AddInput(AllTheInputs, CDbl(-1#))
+        Else
+            Call AddInput(AllTheInputs, CDbl(LastStep.Offset(i, IRRtoEquityTargetHead).Value))
+        End If
+        If IsEmpty(LastStep.Offset(i, ReserveIndexHead)) Then
+            Call AddInput(AllTheInputs, CLng(-1))
+        Else
+            Call AddInput(AllTheInputs, CLng(LastStep.Offset(i, ReserveIndexHead).Value))
+        End If
+        i = i + 1
+    Loop
+'    If (IsEmpty(WaterfallStart.Offset(2, 0))) Then
+'        Call AddInput(AllTheInputs, CLng(0))
+'    Else
+'        Call AddInput(AllTheInputs, CLng(WaterfallStart.Offset(2, 0).End(xlDown).Row - WaterfallStart.Row - 1))
+'    End If
+'    i = 1
+'    Do While (True)
+'        If IsEmpty(WaterfallStart.Offset(i + 1, 0)) Then Exit Do
+'        Call AddInput(AllTheInputs, FromStringToPriorty(WaterfallStart.Offset(i + 1, 0).Value))
+'        Call AddInput(AllTheInputs, CLng(WaterfallStart.Offset(i + 1, 1).Value))
+'        Call AddInput(AllTheInputs, CLng(WaterfallStart.Offset(i + 1, 2).Value))
+'        Call AddInput(AllTheInputs, WaterfallStart.Offset(i + 1, 3).Value)
+'        i = i + 1
+'    Loop
+    
+    
     If (DealNameCell Is Nothing) Then
         Call AddInput(AllTheInputs, "")
     Else
@@ -526,11 +688,11 @@ DefaultExchange:
     End If
     Call AddInput(AllTheInputs, SaveBaseCase)
     Call AddInput(AllTheInputs, Format(ReinvestPeriodCell.Offset(0, 1).Value, "yyyy-mm-dd"))
-    Call AddInput(AllTheInputs, ReinvestLimitCell.Offset(0, 1).Value)
-    Call AddInput(AllTheInputs, ReinvestTableCell.Offset(1, 1).Value)
-    Call AddInput(AllTheInputs, ReinvestTableCell.Offset(1, 2).Value)
-    Call AddInput(AllTheInputs, ReinvestTableCell.Offset(2, 1).Value)
-    Call AddInput(AllTheInputs, ReinvestTableCell.Offset(2, 2).Value)
+    'Call AddInput(AllTheInputs, ReinvestLimitCell.Offset(0, 1).Value)
+    'Call AddInput(AllTheInputs, ReinvestTableCell.Offset(1, 1).Value)
+    'Call AddInput(AllTheInputs, ReinvestTableCell.Offset(1, 2).Value)
+    'Call AddInput(AllTheInputs, ReinvestTableCell.Offset(2, 1).Value)
+    'Call AddInput(AllTheInputs, ReinvestTableCell.Offset(2, 2).Value)
     Call AddInput(AllTheInputs, CStr(ReinvestSpreadCell.Offset(0, 1).Value))
     Call AddInput(AllTheInputs, CStr(CPRcell.Offset(0, 1).Value))
     Call AddInput(AllTheInputs, CStr(CDRcell.Offset(0, 1).Value))
@@ -834,6 +996,23 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
      a.Add "Price", "PriceProperty"
      a.Add "Additional Properties", "StartingAdditionalProp"
      a.Add "Reinvestement Window", "ReinvestementWindowCell"
+     'New waterfall steps
+     a.Add "Waterfall", "WaterfallSheet"
+    a.Add "Interest Waterfall", "InterestWaterfallHead"
+    a.Add "Principal Waterfall", "PrincipalWaterfallHead"
+    a.Add "Step", "StepHead"
+    a.Add "Seniority Group", "SeniorityGroupHead"
+    a.Add "Seniority Group Level", "SeniorityGroupLevelHead"
+    a.Add "Redemption Group", "RedemptionGroupHead"
+    a.Add "Redemption Group Level", "RedemptionGroupLevelHead"
+    a.Add "Redemption Share", "RedemptionShareHead"
+    a.Add "Additional Collateral Share", "AdditionalCollateralShareHead"
+    a.Add "Source of Funding", "SourceOfFundingHead"
+    a.Add "Coupon Index", "CouponIndexHead"
+    a.Add "Test Target Override", "TestTargetOverrideHead"
+    a.Add "IRR to Equity Target", "IRRtoEquityTargetHead"
+    a.Add "Reserve Index", "ReserveIndexHead"
+     
 End Sub
 
 Private Function FromStringToInterestType(a As String) As Long
@@ -843,6 +1022,9 @@ Private Function FromStringToInterestType(a As String) As Long
         FromStringToInterestType = 1
     End If
 End Function
+
+
+
 Private Function FromStringToPriorty(a As String) As Long
     
    On Error GoTo FromStringToPriorty_Error
@@ -859,26 +1041,27 @@ Private Function FromStringToPriorty(a As String) As Long
             FromStringToPriorty = 3
         Case UCase("OC")
             FromStringToPriorty = 4
-        Case UCase("OC from Principal")
-            FromStringToPriorty = 5
+'        Case UCase("OC from Principal")
+'            FromStringToPriorty = 5
         Case UCase("IC")
             FromStringToPriorty = 6
-        Case UCase("IC from Principal")
-            FromStringToPriorty = 7
+'        Case UCase("IC from Principal")
+'            FromStringToPriorty = 7
         Case UCase("Deferred")
             FromStringToPriorty = 8
-        Case UCase("Deferred from Principal")
-            FromStringToPriorty = 9
+'        Case UCase("Deferred from Principal")
+'            FromStringToPriorty = 9
         Case UCase("Excess")
             FromStringToPriorty = 12
         Case UCase("Junior management fees")
             FromStringToPriorty = 10
         Case UCase("Reinvestment test")
-            FromStringToPriorty = 11
+'            FromStringToPriorty = 11
+             FromStringToPriorty = 4
         Case UCase("Replenish Reserve")
             FromStringToPriorty = 14
-        Case UCase("Redeem Pro-Rata")
-            FromStringToPriorty = 15
+'        Case UCase("Redeem Pro-Rata")
+'            FromStringToPriorty = 15
         Case UCase("Turbo")
             FromStringToPriorty = 16
         Case UCase("Cure PDL")
@@ -962,7 +1145,7 @@ Public Sub SeparateWaterfall( _
         index = index + 1
         i = i + 1
     Loop
-    Call InspectWaterfall(Params)
+    'Call InspectWaterfall(Params)
 End Sub
 Public Function GetLoanAssumption(Loan As String, Column As Long, refDate As Date)
 Attribute GetLoanAssumption.VB_Description = "Get Assumptions for Loans"

@@ -23,7 +23,6 @@ protected:
 	friend QDataStream& operator<<(QDataStream & stream, const Seniority& flows);
 	friend QDataStream& operator>>(QDataStream & stream, Seniority& flows);
 };
-Q_DECLARE_METATYPE(Seniority)
 QDataStream& operator<<(QDataStream & stream, const Seniority& flows);
 QDataStream& operator>>(QDataStream & stream, Seniority& flows);
 

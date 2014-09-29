@@ -82,6 +82,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	{ //Waterfall Steps
 		int Prior, ArgSeniorityGroup, ArgSeniorityGroupLevel, ArgRedemptionGroup, ArgRedemptionGroupLevel, ArgSourceofFunding, ArgCouponIndex, ArgReserveIndex;
 		double ArgRedemptionShare, ArgAdditionalCollateralShare, ArgTestTargetOverride, ArgIRRtoEquityTarget;
+		QString ArgTrigger;
 		NumElements=pdFreq++->intVal;
 		LOGDEBUG(QString("Numero Steps: %1").arg(NumElements));
 		for(int i=0;i<NumElements;i++){
@@ -97,7 +98,8 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			ArgTestTargetOverride = pdFreq->dblVal; pdFreq++;
 			ArgIRRtoEquityTarget = pdFreq->dblVal; pdFreq++;
 			ArgReserveIndex = pdFreq->intVal; pdFreq++;
-			TempUnit.AddWaterfallStep(static_cast<WatFalPrior::WaterfallStepType>(Prior), ArgSeniorityGroup, ArgSeniorityGroupLevel, ArgRedemptionGroup, ArgRedemptionGroupLevel, ArgRedemptionShare, ArgAdditionalCollateralShare, ArgSourceofFunding, ArgCouponIndex, ArgTestTargetOverride, ArgIRRtoEquityTarget, ArgReserveIndex);
+			ArgTrigger = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+			TempUnit.AddWaterfallStep(static_cast<WatFalPrior::WaterfallStepType>(Prior), ArgSeniorityGroup, ArgSeniorityGroupLevel, ArgRedemptionGroup, ArgRedemptionGroupLevel, ArgRedemptionShare, ArgAdditionalCollateralShare, ArgSourceofFunding, ArgCouponIndex, ArgTestTargetOverride, ArgIRRtoEquityTarget, ArgReserveIndex, ArgTrigger);
 		}
 	}
 	{ //General Inputs

@@ -68,7 +68,9 @@ public:
 		, double ArgTestTargetOverride
 		, double ArgIRRtoEquityTarget
 		, int ArgReserveIndex
+		, const QString& ArgTrigger
 	);
+	void SetTrigger(qint32 key, QSharedPointer<AbstractTrigger> val) { Structure.SetTrigger(key, val); }
 	void SetSeniorExpenses(const QString& a){Structure.SetSeniorExpenses(a);}
 	void SetSeniorFees(const QString& a) { Structure.SetSeniorFees(a); }
 	void SetJuniorFees(const QString& a) { Structure.SetJuniorFees(a); }

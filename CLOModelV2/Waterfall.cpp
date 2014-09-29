@@ -5,7 +5,9 @@
 #include <qmath.h>
 #include "Waterfall.h"
 #include "QBbgWorker.h"
-
+#include "DateTrigger.h"
+#include <QStack>
+#include "DateTrigger.h"
 const WatFalPrior* Waterfall::GetStep(int Index)const {
 	if(Index<0 || Index>=m_WaterfallStesps.size()) return NULL;
 	return m_WaterfallStesps.at(Index);
@@ -198,6 +200,7 @@ Waterfall::~Waterfall(){
 	ResetSteps();
 	ResetTranches();
 	RemoveReserve();
+	ResetTriggers();
 }
 void Waterfall::ResetSteps(){
 	for(QList<WatFalPrior*>::iterator i=m_WaterfallStesps.begin();i!=m_WaterfallStesps.end();i++){
@@ -464,6 +467,8 @@ void Waterfall::SetupReinvBond(
 }
 void Waterfall::SetReinvestementPeriod(const QDate& ReinvPer){
 	m_ReinvestmentTest.SetReinvestementPeriod(ReinvPer);
+	QSharedPointer<AbstractTrigger> TempReinvTrigger(new DateTrigger(QDate(ReinvPer.year(),ReinvPer.month(),1), DateTrigger::TriggerSide::BeforeIncluding,"Reinvestment Period"));
+	SetTrigger(0, TempReinvTrigger);
 }
 double Waterfall::RedeemNotes(double AvailableFunds, int GroupTarget, int SeliorityScaleLevel, const QDate& TargetDate) {
 	if(AvailableFunds<0.01) return 0.0;
@@ -744,6 +749,9 @@ bool Waterfall::CalculateTranchesCashFlows(){
 				CheckResults -= TotalPayable*m_MortgagesPayments.GetAmountOut(i);
 			}
 			foreach(WatFalPrior* SingleStep,m_WaterfallStesps){//Cycle through the steps of the waterfall
+				if (SingleStep->HasParameter(WatFalPrior::wstParameters::Trigger)) {
+					if (!TriggerPassing(SingleStep->GetParameter(WatFalPrior::wstParameters::Trigger).toString(), i)) continue;
+				}
 				switch(SingleStep->GetPriorityType()){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				case WatFalPrior::WaterfallStepType::wst_SeniorExpenses:
@@ -1308,6 +1316,11 @@ QDataStream& operator<<(QDataStream & stream, const Waterfall& flows){
 	;
 	foreach(const WatFalPrior* SingleStep, flows.m_WaterfallStesps)
 		stream << (*SingleStep);
+	stream << flows.m_Triggers.size();
+	for (auto i = flows.m_Triggers.constBegin(); i != flows.m_Triggers.constEnd(); ++i) {
+		if (i.key()==0) continue; //Reinvestment period is saved already
+		stream << static_cast<quint8>(i.value()->GetTriggerType()) << i.key() << *(i.value());
+	}
 	stream << flows.m_Tranches.size();
 	foreach(const Tranche* SingleTranche,flows.m_Tranches)
 		stream << (*SingleTranche);	
@@ -1341,6 +1354,8 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream){
 	m_TotalSeniorFees.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_TotalSeniorFees;
 	m_TotalJuniorFees.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_TotalJuniorFees;
 	m_ReinvestmentTest.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_ReinvestmentTest;
+	ResetTriggers();
+	SetReinvestementPeriod(m_ReinvestmentTest.GetReinvestmentPeriod());
 	stream >> m_CCCTestLimit;
 	m_CCCcurve.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_CCCcurve;
 	stream >> m_CCChaircut
@@ -1376,6 +1391,24 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream){
 		stream >> TempStep;
 		AddStep(TempStep);
 	}
+	//Triggers
+	{
+		quint8 TempChar;
+		qint32 TempKey;
+		QSharedPointer<AbstractTrigger> TempTrig;
+		stream >> TempInt;
+		for (int i = 0; i < TempInt; i++) {
+			stream >> TempChar >> TempKey;
+			switch (static_cast<AbstractTrigger::TriggerType>(TempChar)) {
+			case AbstractTrigger::TriggerType::DateTrigger: 
+				TempTrig.reset(new DateTrigger());
+				stream >> (*(TempTrig.dynamicCast<DateTrigger>())); 
+				break;
+			}
+			m_Triggers.insert(TempKey, TempTrig);
+		}
+	}
+
 	stream >> TempInt;
 	ResetTranches();
 	for (int i = 0; i < TempInt; i++) {
@@ -1469,6 +1502,11 @@ QString Waterfall::ReadyToCalculate()const{
 	}
 	foreach(const WatFalPrior* SingleStep, m_WaterfallStesps) {
 		Result += SingleStep->ReadyToCalculate();
+		if (SingleStep->HasParameter(WatFalPrior::wstParameters::Trigger)) {
+			if (!ValidTriggerStructure(SingleStep->GetParameter(WatFalPrior::wstParameters::Trigger).toString())) {
+				Result += QString("%1 - Trigger Not Valid\n").arg(static_cast<quint32>(SingleStep->GetPriorityType()));
+			}
+		}
 	}
 	if (!Result.isEmpty()) return Result.left(Result.size() - 1);
 	return Result;
@@ -1639,3 +1677,81 @@ void Waterfall::GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool Download
 		(*i)->GetBaseRatesDatabase(Values, DownloadAll);
 }
 #endif
+
+void Waterfall::SetTrigger(qint32 key, QSharedPointer<AbstractTrigger> val) {
+	m_Triggers[key] = val;
+}
+
+bool Waterfall::ValidTriggerStructure(const QString& TriggerStructure)const {
+	QString AdjStructure = InfixToPostfix(TriggerStructure);
+	if (AdjStructure.isEmpty()) { 
+		LOGDEBUG("Failed in Postfix"); 
+		return false; 
+	}
+	QRegExp SignleTriggers(QString("\\b") + NegateChar + "?(\\d+)\\b");
+	if (SignleTriggers.indexIn(AdjStructure) < 0) return false;
+	QStringList CapturedTriggers = SignleTriggers.capturedTexts();
+	for (auto i = CapturedTriggers.constBegin()+1;i!=CapturedTriggers.constEnd();++i){
+		if (!m_Triggers.contains(i->toUInt())) {
+			LOGDEBUG("Failed Finding Trigger");
+			return false;
+		}
+	}
+	return true;
+}
+
+bool Waterfall::TriggerPassing(const QString& TriggerStructure, int PeriodIndex) const {
+	QString AdjStructure = InfixToPostfix(TriggerStructure);
+	if (AdjStructure.isEmpty()) return false;
+	QRegExp SignleTriggers(QString("\\b") + NegateChar +"?(\\d+)\\b");
+	QHash<quint32, bool> SignleResults;
+	if (SignleTriggers.indexIn(AdjStructure) < 0) return false;
+	QStringList CapturedTriggers = SignleTriggers.capturedTexts();
+	for (auto i = CapturedTriggers.constBegin() + 1; i != CapturedTriggers.constEnd(); ++i) {
+		quint32 CurrentTrigger = i->toUInt();
+		if (!m_Triggers.contains(CurrentTrigger)) 	return false;
+		if (!SignleResults.contains(CurrentTrigger))
+			SignleResults.insert(CurrentTrigger, EvaluateTrigger(CurrentTrigger, PeriodIndex));
+	}
+	QStack<bool> PolishStack;
+	QStringList PolishParts = AdjStructure.split(' ');
+	SignleTriggers.setPattern(NegateChar+QString("?\\d+"));
+	foreach(const QString& SinglePart, PolishParts) {
+		if (SignleTriggers.exactMatch(SinglePart)) {
+			if (SinglePart.at(0) == QString(NegateChar).replace(QRegExp("\\+"), "")) {
+				PolishStack.push(!SignleResults.value(SinglePart.mid(1).toUInt()));
+			}
+			else
+				PolishStack.push(SignleResults.value(SinglePart.toUInt()));
+		}
+		else {
+			switch (SinglePart.at(0).toLatin1()) {
+			case '+': PolishStack.push(PolishStack.pop() || PolishStack.pop()); break;
+			case '*': PolishStack.push(PolishStack.pop() && PolishStack.pop()); break;
+			case '-': PolishStack.push(!(PolishStack.pop() || PolishStack.pop())); break;
+			case '/': PolishStack.push(!(PolishStack.pop() && PolishStack.pop())); break;
+			default: return false;
+			}
+		}
+	}
+	return PolishStack.pop();
+}
+
+bool Waterfall::EvaluateTrigger(quint32 TrigID, int PeriodIndex) const {
+	const QSharedPointer<AbstractTrigger> CurrentTrigger = m_Triggers.value(TrigID, QSharedPointer<AbstractTrigger>());
+	if (!CurrentTrigger) return false;
+	switch (CurrentTrigger->GetTriggerType()) {
+	case AbstractTrigger::TriggerType::DateTrigger:
+		return CurrentTrigger.dynamicCast<DateTrigger>()->Passing(m_MortgagesPayments.GetDate(PeriodIndex));
+	default:
+		return false;
+	}
+}
+
+void Waterfall::ResetTriggers() {
+	m_Triggers.clear();
+	if (!m_ReinvestmentTest.GetReinvestmentPeriod().isNull()){
+		QSharedPointer<AbstractTrigger> TempReinvTrigger(new DateTrigger(m_ReinvestmentTest.GetReinvestmentPeriod().addDays(-m_ReinvestmentTest.GetReinvestmentPeriod().day()+1), DateTrigger::TriggerSide::BeforeIncluding, "Reinvestment Period"));
+		SetTrigger(0, TempReinvTrigger);
+	}
+}

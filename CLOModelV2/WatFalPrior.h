@@ -40,6 +40,7 @@ public:
 		, TestTargetOverride
 		, IRRtoEquityTarget
 		, ReserveIndex
+		, Trigger
 	};
 	QVariant GetParameter(qint32 ParameterType) const { return Parameters.value(ParameterType, QVariant()); }
 	bool HasParameter(qint32 ParameterType) const { return Parameters.contains(ParameterType); }

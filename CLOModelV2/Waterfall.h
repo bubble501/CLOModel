@@ -11,6 +11,8 @@
 #include "IntegerVector.h"
 #include "ReserveFund.h"
 #include "DayCountVect.h"
+#include <QSharedPointer>
+#include "AbstractTrigger.h"
 class PrincipalRecip {
 protected:
 	double m_Scheduled;
@@ -88,6 +90,7 @@ private:
 	double m_StartingDeferredJunFees;
 	GenericCashFlow m_GICflows;
 	DayCountVector m_DealDayCountConvention;
+	QHash <qint32, QSharedPointer<AbstractTrigger> > m_Triggers;
 	int FindMostJuniorLevel(int SeliorityScaleLevel) const;
 	void SortByProRataGroup();
 	double GroupOutstanding(int GroupTarget, int SeliorityScaleLevel)const;
@@ -98,6 +101,9 @@ private:
 	double RedeemSequential(double AvailableFunds, const QDate& PeriodIndex, int SeliorityScaleLevel, int MaxGroup = -1 );
 	int FindTrancheIndex(const QString& Tranchename)const;
 	void FillAllDates();
+	bool TriggerPassing(const QString& TriggerStructure, int PeriodIndex) const;
+	bool EvaluateTrigger(quint32 TrigID, int PeriodIndex)const;
+	bool ValidTriggerStructure(const QString& TriggerStructure)const;
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 public:
@@ -174,7 +180,11 @@ public:
 	const double& GetStartingDeferredJunFees() const { return m_StartingDeferredJunFees; }
 	QString GetGICBaseRate() const { return m_GICBaseRate.GetVector(); }
 	const DayCountVector& GetDealDayCountConvention() const { return m_DealDayCountConvention; }
+	const QSharedPointer<AbstractTrigger> GetTrigger(qint32 key) const { return m_Triggers.value(key, QSharedPointer<AbstractTrigger>()); }
+	QSharedPointer<AbstractTrigger> GetTrigger(qint32 key) { if (m_Triggers.contains(key)) return m_Triggers[key]; return QSharedPointer<AbstractTrigger>(); }
 	//////////////////////////////////////////////////////////////////////////
+	void SetTrigger(qint32 key, QSharedPointer<AbstractTrigger> val);
+	void RemoveTrigger(qint32 key) { m_Triggers.remove(key); }
 	void SetDealDayCountConvention(const QString&  val) { m_DealDayCountConvention = val; }
 	void SetGICBaseRate(const QString& a) { m_GICBaseRate = a; }
 	void SetStartingDeferredJunFees(const double& val) { m_StartingDeferredJunFees = val; }
@@ -242,6 +252,7 @@ public:
 #endif
 	friend QDataStream& operator<<(QDataStream & stream, const Waterfall& flows);
 	friend QDataStream& operator>>(QDataStream & stream, Waterfall& flows);
+	void ResetTriggers();
 };
 Q_DECLARE_METATYPE(Waterfall)
 QDataStream& operator<<(QDataStream & stream, const Waterfall& flows);

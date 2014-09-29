@@ -10,6 +10,8 @@
 #include "BloombergVector.h"
 #include "DayCountVect.h"
 #include <boost/math/tools/roots.hpp>
+#include <QStack>
+#include "AbstractTrigger.h"
 int MonthDiff(const QDate& FutureDte,const QDate& PresentDte){
 	int Result;
 	Result=(FutureDte.year()-PresentDte.year())*12;
@@ -324,3 +326,55 @@ double GetLoanAssumption(const QString& LoanName, int columnIndex, QDate RefDate
 	}
 }
 
+QString InfixToPostfix(const QString& a) {
+	const QChar AdjNegateChar = QString(NegateChar).replace(QRegExp("\\+"), "").at(0);
+	QRegExp CheckValidNumber(NegateChar + QString("?\\d+"));
+	QString Spaced("");
+	for (auto i = a.constBegin(); i != a.constEnd(); ++i) {
+		if (i->isSpace()) continue;
+		if (Spaced.isEmpty()) {
+			Spaced.append(*i);
+		}
+		else  {
+			if (!(i->isDigit() && ((i - 1)->isDigit() || *(i - 1) == AdjNegateChar))) Spaced.append(' ');
+				Spaced.append(*i);
+		}
+	}
+	const QString ops("-+/*");
+	QStack<qint32> s;
+	QString sb("");
+	QStringList parts = Spaced.split(QRegExp("\\s"));
+	foreach(const QString& token, parts) {
+		int idx = ops.indexOf(token.at(0));
+		if (idx != -1 && token.size() == 1) {
+			if (s.isEmpty())
+				s.push(idx);
+			else {
+				while (!s.isEmpty()) {
+					int prec2 = s.top() / 2;
+					int prec1 = idx / 2;
+					if (prec2 > prec1 || (prec2 == prec1))
+						sb.append(ops.at(s.pop())).append(' ');
+					else break;
+				}
+				s.push(idx);
+			}
+		}
+		else if (token.at(0) == '(') {
+			s.push(-2);
+		}
+		else if (token.at(0) == ')') {
+			while (s.top() != -2)
+				sb.append(ops.at(s.pop())).append(' ');
+			s.pop();
+		}
+		else{
+			if (!CheckValidNumber.exactMatch(token)) 
+				return QString();
+			sb.append(token).append(' ');
+		}
+	}
+	while (!s.isEmpty())
+		sb.append(ops.at(s.pop())).append(' ');
+	return sb.trimmed();
+}

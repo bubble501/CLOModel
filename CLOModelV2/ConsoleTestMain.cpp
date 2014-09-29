@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
 	//return a.exec();
 
 	Waterfall TempWtf, TempCallWaterfall;
-	QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/.BaseCase.clo");
+	QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/.BaseCase.clo");
 	file.open(QIODevice::ReadOnly);
 	qint32 VersionChecker;
 	QDataStream out(&file);
@@ -40,5 +40,10 @@ int main(int argc, char *argv[]) {
 	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempCallWaterfall;
 	file.close();
+	//TempWtf.SetReinvestementPeriod(TempWtf.GetReinvestmentTest().GetReinvestmentPeriod());
+	TempWtf.GetTranche(0)->GetDiscountMargin(100.0);
 	TempWtf.CalculateTranchesCashFlows();
+
+
+
 }

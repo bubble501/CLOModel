@@ -121,7 +121,7 @@ void ConsoleTestObj::BBVALTest() {
 	TempUnit.AddTranche(
 		"BBVAL 2007-1 A1"
 		, "ES0314209000"
-		, 1
+		, "1"
 		, 750000000.0
 		, "EUR"
 		, 34083075.00
@@ -138,13 +138,13 @@ void ConsoleTestObj::BBVALTest() {
 		, 100.0
 		, 1.0
 		, "Mtge"
-		, static_cast<DayCountConvention>(102)
+		, "102"
 		);
 	TempCoup.clear(); TempCoup << "20";
 	TempUnit.AddTranche(
 		"BBVAL 2007-1 A2"
 		, "ES0314209018"
-		, 1
+		, "1"
 		, 1606200000.0
 		, "EUR"
 		, 72992313.42
@@ -161,13 +161,13 @@ void ConsoleTestObj::BBVALTest() {
 		, 100.0
 		, 1.0
 		, "Mtge"
-		, static_cast<DayCountConvention>(102)
+		, "102"
 		);
 	TempCoup.clear(); TempCoup << "41";
 	TempUnit.AddTranche(
 		"BBVAL 2007-1 B"
 		, "ES0314209026"
-		, 2
+		, "2"
 		, 82500000.0
 		, "EUR"
 		, 82500000.0
@@ -184,13 +184,13 @@ void ConsoleTestObj::BBVALTest() {
 		, 100.0
 		, 1.0
 		, "Mtge"
-		, static_cast<DayCountConvention>(102)
+		, "102"
 		);
 	TempCoup.clear(); TempCoup << "80";
 	TempUnit.AddTranche(
 		"BBVAL 2007-1 C"
 		, "ES0314209034"
-		, 3
+		, "3"
 		, 61300000.0
 		, "EUR"
 		, 61300000.0
@@ -207,11 +207,11 @@ void ConsoleTestObj::BBVALTest() {
 		, 100.0
 		, 1.0
 		, "Mtge"
-		, static_cast<DayCountConvention>(102)
+		, "102"
 		);
 	TempUnit.GetBaseRatesDatabase(ConstantBaseRateTable());
 	//Waterfall
-	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_SeniorExpenses, 0, 1, 0.0);
+	/*TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_SeniorExpenses, 0, 1, 0.0);
 	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_SeniorFees, 0, 1, 0.0);
 	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_Interest, 1, 1, 0.0);
 	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_OCTest, 1, 0, 0.0);
@@ -228,7 +228,7 @@ void ConsoleTestObj::BBVALTest() {
 	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_OCTestPrinc, 3, 0, 0.0);
 	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_ReserveReplenish, 1, 1, 0.0);
 	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_ReserveReplenish, 1, 2, 0.0);
-	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_Excess, 0, 0, 0.0);
+	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_Excess, 0, 0, 0.0);*/
 
 
 	//Other Inputs
@@ -256,7 +256,7 @@ void ConsoleTestObj::BBVALTest() {
 
 	TempUnit.SetBaseCaseToCall(false);
 	TempUnit.SetSaveBaseCase(true);
-	TempUnit.SetupReinvestmentTest(QDate(2009, 5, 26), 1.0, 0.0, 0.0, 0.0, 0.0);
+	TempUnit.SetReinvestementPeriod(QDate(2009, 5, 26));
 	TempUnit.SetupReinvBond("1", "4.79", "5", "80", "5", "1", "I", "100", "0", "EUR003M", "0", "0", "0");
 	TempUnit.SetSchedPrincAvailable(/*16018445.0*/0.0);
 	TempUnit.SetInterestAvailable(0.0);
@@ -1540,7 +1540,7 @@ void ConsoleTestObj::SlateTest() {
 	TempUnit.AddTranche(
 		"SLATE A"
 		, ""
-		, 1
+		, "1"
 		, 164000352.477
 		, "GBP"
 		, 164000352.477
@@ -1557,13 +1557,13 @@ void ConsoleTestObj::SlateTest() {
 		, 100.0
 		, 1.0
 		, "Mtge"
-		, static_cast<DayCountConvention>(102)
+		, "102"
 		);
 	TempCoup.clear(); TempCoup << "100";
 	TempUnit.AddTranche(
 		"SLATE Z"
 		, ""
-		, 2
+		, "2"
 		, 36000077
 		, "GBP"
 		, 36000077
@@ -1580,13 +1580,13 @@ void ConsoleTestObj::SlateTest() {
 		, 100.0
 		, 1.0
 		, "Mtge"
-		, static_cast<DayCountConvention>(102)
+		, "102"
 		);
 	TempCoup.clear(); TempCoup << "250";
 	TempUnit.AddTranche(
 		"Sub Loan"
 		, ""
-		, 3
+		, "3"
 		, 4000000.0
 		, "EUR"
 		, 4000000.0
@@ -1603,7 +1603,7 @@ void ConsoleTestObj::SlateTest() {
 		, 100.0
 		, 1.0
 		, "Mtge"
-		, static_cast<DayCountConvention>(102)
+		, "102"
 		);
 	/*ConstantBaseRateTable LiborCurve;
 	LiborCurve.SetValue("LIBOR", 0.0053);*/
@@ -1734,7 +1734,7 @@ void ConsoleTestObj::SlateTest() {
 	LiborCurve.SetValue("LIBOR", BloombergVector(LiborDates, LiborValues));
 	
 	//Waterfall
-	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_SeniorExpenses, 0, 1, 0.0);
+	/*TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_SeniorExpenses, 0, 1, 0.0);
 	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_SeniorFees, 0, 1, 0.0);
 	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_Interest, 1, 1, 0.0);
 	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_OCTest, 1, 0, 0.0);
@@ -1755,7 +1755,7 @@ void ConsoleTestObj::SlateTest() {
 	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_Principal, 3, 0, 0.0);
 	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_juniorFees, 0, 2, 0.0);
 
-	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_Excess, 0, 2, 0.0);
+	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_Excess, 0, 2, 0.0);*/
 
 
 	//Other Inputs
@@ -1784,7 +1784,7 @@ void ConsoleTestObj::SlateTest() {
 
 	TempUnit.SetBaseCaseToCall(true);
 	TempUnit.SetSaveBaseCase(false);
-	TempUnit.SetupReinvestmentTest(QDate(2019, 8, 1), 999999999.0, 0.0, 0.0, 0.0, 1.0);
+	TempUnit.SetReinvestementPeriod(QDate(2019, 8, 1));
 	TempUnit.SetupReinvBond("1", "5", "0.25", "25", "5", "1", "I", "100", "0", "LIBOR", "6", "1.5", "0");
 	TempUnit.SetSchedPrincAvailable(0.0);
 	TempUnit.SetInterestAvailable(0.0);

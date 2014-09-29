@@ -145,6 +145,7 @@ void CentralUnit::AddWaterfallStep(
 	, double ArgTestTargetOverride
 	, double ArgIRRtoEquityTarget
 	, int ArgReserveIndex
+	, const QString& ArgTrigger
 	){
 	WatFalPrior TempStep;
 	if (ArgSeniorityGroup!=-1) TempStep.SetParameter(WatFalPrior::wstParameters::SeniorityGroup, ArgSeniorityGroup);
@@ -158,6 +159,7 @@ void CentralUnit::AddWaterfallStep(
 	if (ArgTestTargetOverride != -1.0) TempStep.SetParameter(WatFalPrior::wstParameters::TestTargetOverride, ArgTestTargetOverride);
 	if (ArgIRRtoEquityTarget != -1.0) TempStep.SetParameter(WatFalPrior::wstParameters::IRRtoEquityTarget, ArgIRRtoEquityTarget);
 	if (ArgReserveIndex != -1) TempStep.SetParameter(WatFalPrior::wstParameters::ReserveIndex, ArgReserveIndex);
+	if (!ArgTrigger.isEmpty()) TempStep.SetParameter(WatFalPrior::wstParameters::Trigger, ArgTrigger);
 	TempStep.SetPriorityType(Tpe);
 	Structure.AddStep(TempStep);
 	if(Stresser)Stresser->SetStructure(Structure);

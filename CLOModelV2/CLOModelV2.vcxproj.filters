@@ -90,6 +90,12 @@
     <Filter Include="Header Files\Common Items">
       <UniqueIdentifier>{cfa50875-80bb-4374-995c-124a8b96952f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Triggers">
+      <UniqueIdentifier>{797f0adf-67ff-4ae6-8776-afa391fed3c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Triggers">
+      <UniqueIdentifier>{a296f77e-60c0-467f-9550-e3c375edf3f2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="quazip\crypt.h">
@@ -214,6 +220,12 @@
     </ClInclude>
     <ClInclude Include="Seniority.h">
       <Filter>Header Files\DealStructure</Filter>
+    </ClInclude>
+    <ClInclude Include="AbstractTrigger.h">
+      <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="DateTrigger.h">
+      <Filter>Header Files\Triggers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -549,8 +561,14 @@
     <ClCompile Include="DayCountVect.cpp">
       <Filter>Source Files\Vectors</Filter>
     </ClCompile>
+    <ClCompile Include="DateTrigger.cpp">
+      <Filter>Source Files\Triggers</Filter>
+    </ClCompile>
     <ClCompile Include="Seniority.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Deal Structure</Filter>
+    </ClCompile>
+    <ClCompile Include="AbstractTrigger.cpp">
+      <Filter>Source Files\Triggers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

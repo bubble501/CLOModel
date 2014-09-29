@@ -12,6 +12,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AbstarctBbgVect.h" />
+    <ClInclude Include="AbstractTrigger.h" />
+    <ClInclude Include="DateTrigger.h" />
     <ClInclude Include="DayCountVect.h" />
     <ClInclude Include="GenericCashFlow.h" />
     <ClInclude Include="BaseRateTable.h" />
@@ -235,6 +237,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AbstarctBbgVect.cpp" />
+    <ClCompile Include="AbstractTrigger.cpp" />
+    <ClCompile Include="DateTrigger.cpp" />
     <ClCompile Include="DayCountVect.cpp" />
     <ClCompile Include="GenericCashFlow.cpp" />
     <ClCompile Include="BaseRateTable.cpp" />

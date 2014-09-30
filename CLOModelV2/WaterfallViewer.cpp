@@ -65,17 +65,38 @@ void WaterfallViewer::ResetSteps(){
 	InterestTable->setRowCount(0);
 	PrincipalTable->setRowCount(0);
 }
-void WaterfallViewer::AddStep(WatFalPrior::WaterfallStepType Step,int GroupTarget,int RedemptionGroup,double RedemptionShare){
+void WaterfallViewer::AddStep(
+	WatFalPrior::WaterfallStepType Step
+	, int ArgSeniorityGroup
+	, int ArgSeniorityGroupLevel
+	, int ArgRedemptionGroup
+	, int ArgRedemptionGroupLevel
+	, double ArgRedemptionShare
+	, double ArgAdditionalCollateralShare
+	, int ArgSourceofFunding
+	, int ArgCouponIndex
+	, double ArgTestTargetOverride
+	, double ArgIRRtoEquityTarget
+	, int ArgReserveIndex
+	){
 	WatFalPrior TempStep;
 	TempStep.SetPriorityType(Step);
-	TempStep.SetGroupTarget(GroupTarget);
-	TempStep.SetRedemptionGroup(RedemptionGroup);
-	TempStep.SetRedemptionShare(RedemptionShare);
+	TempStep.SetParameter(WatFalPrior::wstParameters::SeniorityGroup, ArgSeniorityGroup);
+	TempStep.SetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel, ArgSeniorityGroupLevel);
+	TempStep.SetParameter(WatFalPrior::wstParameters::RedemptionGroup, ArgRedemptionGroup);
+	TempStep.SetParameter(WatFalPrior::wstParameters::RedemptionGroupLevel, ArgRedemptionGroupLevel);
+	TempStep.SetParameter(WatFalPrior::wstParameters::RedemptionShare, ArgRedemptionShare);
+	TempStep.SetParameter(WatFalPrior::wstParameters::AdditionalCollateralShare, ArgAdditionalCollateralShare);
+	TempStep.SetParameter(WatFalPrior::wstParameters::SourceOfFunding, ArgSourceofFunding);
+	TempStep.SetParameter(WatFalPrior::wstParameters::CouponIndex, ArgCouponIndex);
+	TempStep.SetParameter(WatFalPrior::wstParameters::TestTargetOverride, ArgTestTargetOverride);
+	TempStep.SetParameter(WatFalPrior::wstParameters::IRRtoEquityTarget, ArgIRRtoEquityTarget);
+	TempStep.SetParameter(WatFalPrior::wstParameters::ReserveIndex, ArgReserveIndex);
 	AddStep(TempStep);
 }
 void WaterfallViewer::AddStep(const WatFalPrior& a){
-	switch(a.GetPriorityType()){
-	case WatFalPrior::wst_SeniorExpenses:
+	/*switch(a.GetPriorityType()){
+	case WatFalPrior::WaterfallStepType::wst_SeniorExpenses:
 		if(a.GetRedemptionGroup()==1){
 			InterestTable->setRowCount(InterestTable->rowCount()+1);
 			InterestTable->setItem(InterestTable->rowCount()-1,0,new QTableWidgetItem("Senior Expenses"));
@@ -85,7 +106,7 @@ void WaterfallViewer::AddStep(const WatFalPrior& a){
 			PrincipalTable->setItem(PrincipalTable->rowCount()-1,0,new QTableWidgetItem("Senior Expenses"));
 		}
 	break;
-	case WatFalPrior::wst_SeniorFees:
+	case WatFalPrior::WaterfallStepType::wst_SeniorFees:
 		if(a.GetRedemptionGroup()==1){
 			InterestTable->setRowCount(InterestTable->rowCount()+1);
 			InterestTable->setItem(InterestTable->rowCount()-1,0,new QTableWidgetItem("Senior Fees"));
@@ -95,17 +116,17 @@ void WaterfallViewer::AddStep(const WatFalPrior& a){
 			PrincipalTable->setItem(PrincipalTable->rowCount()-1,0,new QTableWidgetItem("Senior Fees"));
 		}
 	break;
-	case WatFalPrior::wst_Interest:
+	case WatFalPrior::WaterfallStepType::wst_Interest:
 		InterestTable->setRowCount(InterestTable->rowCount()+1);
 		InterestTable->setItem(InterestTable->rowCount()-1,0,new QTableWidgetItem("Interest"));
 		InterestTable->setItem(InterestTable->rowCount()-1,1,new QTableWidgetItem(QString("%1").arg(a.GetGroupTarget())));
 	break;
-	case WatFalPrior::wst_Principal:
+	case WatFalPrior::WaterfallStepType::wst_Principal:
 		PrincipalTable->setRowCount(PrincipalTable->rowCount()+1);
 		PrincipalTable->setItem(PrincipalTable->rowCount()-1,0,new QTableWidgetItem("Principal"));
 		PrincipalTable->setItem(PrincipalTable->rowCount()-1,1,new QTableWidgetItem(QString("%1").arg(a.GetGroupTarget())));
 	break;
-	case WatFalPrior::wst_OCTest:
+	case WatFalPrior::WaterfallStepType::wst_OCTest:
 		InterestTable->setRowCount(InterestTable->rowCount()+1);
 		InterestTable->setItem(InterestTable->rowCount()-1,0,new QTableWidgetItem("OC Test"));
 		InterestTable->setItem(InterestTable->rowCount()-1,1,new QTableWidgetItem(QString("%1").arg(a.GetGroupTarget())));
@@ -113,37 +134,38 @@ void WaterfallViewer::AddStep(const WatFalPrior& a){
 			InterestTable->setItem(InterestTable->rowCount()-1,2,new QTableWidgetItem(QString("%1").arg(a.GetRedemptionGroup())));
 			InterestTable->setItem(InterestTable->rowCount()-1,3,new QTableWidgetItem(QString("%1%").arg(a.GetRedemptionShare()*100)));
 		}
-	break;
-	case WatFalPrior::wst_OCTestPrinc:
-		PrincipalTable->setRowCount(PrincipalTable->rowCount()+1);
-		PrincipalTable->setItem(PrincipalTable->rowCount()-1,0,new QTableWidgetItem("OC Test"));
-		PrincipalTable->setItem(PrincipalTable->rowCount()-1,1,new QTableWidgetItem(QString("%1").arg(a.GetGroupTarget())));
-		if(a.GetRedemptionGroup()>0){
-			PrincipalTable->setItem(PrincipalTable->rowCount()-1,2,new QTableWidgetItem(QString("%1").arg(a.GetRedemptionGroup())));
-			PrincipalTable->setItem(PrincipalTable->rowCount()-1,3,new QTableWidgetItem(QString("%1%").arg(a.GetRedemptionShare()*100)));
+		else {
+			PrincipalTable->setRowCount(PrincipalTable->rowCount() + 1);
+			PrincipalTable->setItem(PrincipalTable->rowCount() - 1, 0, new QTableWidgetItem("OC Test"));
+			PrincipalTable->setItem(PrincipalTable->rowCount() - 1, 1, new QTableWidgetItem(QString("%1").arg(a.GetGroupTarget())));
+			if (a.GetRedemptionGroup() > 0) {
+				PrincipalTable->setItem(PrincipalTable->rowCount() - 1, 2, new QTableWidgetItem(QString("%1").arg(a.GetRedemptionGroup())));
+				PrincipalTable->setItem(PrincipalTable->rowCount() - 1, 3, new QTableWidgetItem(QString("%1%").arg(a.GetRedemptionShare() * 100)));
+			}
 		}
-	break;
-	case WatFalPrior::wst_ICTest:
+		
+		break;
+	case WatFalPrior::WaterfallStepType::wst_ICTest:
 		InterestTable->setRowCount(InterestTable->rowCount()+1);
 		InterestTable->setItem(InterestTable->rowCount()-1,0,new QTableWidgetItem("IC Test"));
 		InterestTable->setItem(InterestTable->rowCount()-1,1,new QTableWidgetItem(QString("%1").arg(a.GetGroupTarget())));
 	break;
-	case WatFalPrior::wst_ICTestPrinc:
+	case WatFalPrior::WaterfallStepType::wst_ICTestPrinc:
 		PrincipalTable->setRowCount(PrincipalTable->rowCount()+1);
 		PrincipalTable->setItem(PrincipalTable->rowCount()-1,0,new QTableWidgetItem("IC Test"));
 		PrincipalTable->setItem(PrincipalTable->rowCount()-1,1,new QTableWidgetItem(QString("%1").arg(a.GetGroupTarget())));
 	break;
-	case WatFalPrior::wst_DeferredInterest:
+	case WatFalPrior::WaterfallStepType::wst_DeferredInterest:
 		InterestTable->setRowCount(InterestTable->rowCount()+1);
 		InterestTable->setItem(InterestTable->rowCount()-1,0,new QTableWidgetItem("Deferred Interest"));
 		InterestTable->setItem(InterestTable->rowCount()-1,1,new QTableWidgetItem(QString("%1").arg(a.GetGroupTarget())));
 	break;
-	case WatFalPrior::wst_DeferredPrinc:
+	case WatFalPrior::WaterfallStepType::wst_DeferredPrinc:
 		PrincipalTable->setRowCount(PrincipalTable->rowCount()+1);
 		PrincipalTable->setItem(PrincipalTable->rowCount()-1,0,new QTableWidgetItem("Deferred Interest"));
 		PrincipalTable->setItem(PrincipalTable->rowCount()-1,1,new QTableWidgetItem(QString("%1").arg(a.GetGroupTarget())));
 	break;
-	case WatFalPrior::wst_juniorFees:
+	case WatFalPrior::WaterfallStepType::wst_juniorFees:
 		if(a.GetRedemptionGroup()==1){
 			InterestTable->setRowCount(InterestTable->rowCount()+1);
 			InterestTable->setItem(InterestTable->rowCount()-1,0,new QTableWidgetItem("Junior Fees"));
@@ -153,7 +175,7 @@ void WaterfallViewer::AddStep(const WatFalPrior& a){
 			PrincipalTable->setItem(PrincipalTable->rowCount()-1,0,new QTableWidgetItem("Junior Fees"));
 		}
 	break;
-	case WatFalPrior::wst_ReserveReplenish:
+	case WatFalPrior::WaterfallStepType::wst_ReserveReplenish:
 		if(a.GetRedemptionGroup()==1){
 			InterestTable->setRowCount(InterestTable->rowCount()+1);
 			InterestTable->setItem(InterestTable->rowCount()-1,0,new QTableWidgetItem("Reserve Fund Replenishment"));
@@ -165,13 +187,13 @@ void WaterfallViewer::AddStep(const WatFalPrior& a){
 			PrincipalTable->setItem(PrincipalTable->rowCount()-1,1,new QTableWidgetItem(QString("Reserve %1").arg(a.GetGroupTarget())));
 		}
 	break;
-	case WatFalPrior::wst_ReinvestmentTest:
+	case WatFalPrior::WaterfallStepType::wst_ReinvestmentTest:
 		InterestTable->setRowCount(InterestTable->rowCount()+1);
 		InterestTable->setItem(InterestTable->rowCount()-1,0,new QTableWidgetItem("Reinvestment Test"));
 		InterestTable->setItem(InterestTable->rowCount()-1,1,new QTableWidgetItem(QString("%1").arg(a.GetGroupTarget())));
 		if(a.GetRedemptionGroup()>0) InterestTable->setItem(InterestTable->rowCount()-1,2,new QTableWidgetItem(QString("%1").arg(a.GetRedemptionGroup())));
 	break;
-	case WatFalPrior::wst_Excess:
+	case WatFalPrior::WaterfallStepType::wst_Excess:
 		InterestTable->setRowCount(InterestTable->rowCount()+1);
 		InterestTable->setItem(InterestTable->rowCount()-1,0,new QTableWidgetItem("Excess Spread"));
 		InterestTable->setItem(InterestTable->rowCount()-1,2,new QTableWidgetItem(QString("%1").arg(a.GetRedemptionGroup())));
@@ -179,26 +201,26 @@ void WaterfallViewer::AddStep(const WatFalPrior& a){
 		PrincipalTable->setItem(PrincipalTable->rowCount()-1,0,new QTableWidgetItem("Excess Spread"));
 		PrincipalTable->setItem(PrincipalTable->rowCount()-1,2,new QTableWidgetItem(QString("%1").arg(a.GetRedemptionGroup())));
 		break;
-	case WatFalPrior::wst_ReinvestPrincipal:
+	case WatFalPrior::WaterfallStepType::wst_ReinvestPrincipal:
 		PrincipalTable->setRowCount(PrincipalTable->rowCount()+1);
 		PrincipalTable->setItem(PrincipalTable->rowCount()-1,0,new QTableWidgetItem("Reinvest"));
 		if (a.GetRedemptionGroup() == 1) PrincipalTable->setItem(PrincipalTable->rowCount() - 1, 2, new QTableWidgetItem("Unscheduled"));
 		else if (a.GetRedemptionGroup() == 2) PrincipalTable->setItem(PrincipalTable->rowCount() - 1, 2, new QTableWidgetItem("Scheduled"));
 		else PrincipalTable->setItem(PrincipalTable->rowCount() - 1, 2, new QTableWidgetItem("All Principal"));
 	break;
-	case WatFalPrior::wst_RedeemProRata:
+	case WatFalPrior::WaterfallStepType::wst_RedeemProRata:
 		PrincipalTable->setRowCount(PrincipalTable->rowCount() + 1);
 		PrincipalTable->setItem(PrincipalTable->rowCount() - 1, 0, new QTableWidgetItem("Redeem Pro rata"));
 		PrincipalTable->setItem(PrincipalTable->rowCount() - 1, 1, new QTableWidgetItem(QString("From Seniority %1").arg(qMin(a.GetRedemptionGroup(), a.GetGroupTarget()))));
 		PrincipalTable->setItem(PrincipalTable->rowCount() - 1, 2, new QTableWidgetItem(QString("To Seniority %1").arg(qMax(a.GetRedemptionGroup(), a.GetGroupTarget()))));
 	break;
-	case WatFalPrior::wst_Turbo:
+	case WatFalPrior::WaterfallStepType::wst_Turbo:
 		InterestTable->setRowCount(InterestTable->rowCount() + 1);
 		InterestTable->setItem(InterestTable->rowCount() - 1, 0, new QTableWidgetItem("Turbo Redemption"));
 		InterestTable->setItem(InterestTable->rowCount() - 1, 2, new QTableWidgetItem(QString("%1").arg(a.GetRedemptionGroup())));
 		InterestTable->setItem(InterestTable->rowCount() - 1, 3, new QTableWidgetItem(QString("%1%").arg(a.GetRedemptionShare() * 100)));
 	break;
-	case WatFalPrior::wst_PDL:
+	case WatFalPrior::WaterfallStepType::wst_PDL:
 		InterestTable->setRowCount(InterestTable->rowCount() + 1);
 		InterestTable->setItem(InterestTable->rowCount() - 1, 0, new QTableWidgetItem("Cure PDL"));
 		InterestTable->setItem(InterestTable->rowCount() - 1, 1, new QTableWidgetItem(QString("%1").arg(a.GetGroupTarget())));
@@ -207,7 +229,7 @@ void WaterfallViewer::AddStep(const WatFalPrior& a){
 			InterestTable->setItem(InterestTable->rowCount() - 1, 3, new QTableWidgetItem(QString("%1%").arg(a.GetRedemptionShare() * 100)));
 		}
 	break;
-	case WatFalPrior::wst_FeesFromExcess:
+	case WatFalPrior::WaterfallStepType::wst_FeesFromExcess:
 		if (a.GetRedemptionGroup() == 1 || a.GetRedemptionGroup()==3) {
 			InterestTable->setRowCount(InterestTable->rowCount() + 1);
 			InterestTable->setItem(InterestTable->rowCount() - 1, 0, new QTableWidgetItem("Junior Fees from Excess Spread"));
@@ -227,7 +249,7 @@ void WaterfallViewer::AddStep(const WatFalPrior& a){
 	break;
 	default:
 		QMessageBox::critical(this,"Invalid Step","The step you tried to add is invalid.\nPlease check the Waterfall");
-	}
+	}*/
 }
 void WaterfallViewer::SetWaterfall(const Waterfall& a){
 	for(int i=0;i<a.GetStepsCount();i++){

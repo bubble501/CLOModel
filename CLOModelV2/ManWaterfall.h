@@ -474,7 +474,7 @@ namespace ManagedCLO {
 		\arg OIshare Share toward acquiring new collateral after reinvestment period in a scalar form (0.5=50%)
 		\arg ORshare Share redemption of notes after reinvestment period in a scalar form (0.5=50%)
 		*/
-		void SetupReinvestmentTest(DateTime ReinvPer,double TstLvl, double IIshare,double IRshare,double OIshare,double ORshare){Unmanaged->SetupReinvestmentTest(DateTime2QDate(ReinvPer),TstLvl,IIshare,IRshare,OIshare,ORshare);}
+		void SetupReinvestmentTest(DateTime ReinvPer,double TstLvl, double IIshare,double IRshare,double OIshare,double ORshare){Unmanaged->SetReinvestementPeriod(DateTime2QDate(ReinvPer),TstLvl,IIshare,IRshare,OIshare,ORshare);}
 		/*!
 		\brief Define the characteristics of the bond bought using the reinvestment funds
 		\arg IntrVec A Bloomberg vector defining the coupon or the margin paid by the bond

@@ -11,6 +11,10 @@
 #include <QSettings>
 #include <QApplication>
 #include <QTextStream>
+#include "DateTrigger.h"
+#include "VectorTrigger.h"
+#include "PoolSizeTrigger.h"
+#include "TrancheTrigger.h"
 void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	bool RunStress;
 	CentralUnit TempUnit;
@@ -40,10 +44,10 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		}
 	}
 	{//Tranches
-		QString DayCnt,TrName, Curr, BasRt, TrancheISIN, IPDfrq/*,RefRtVal*/;
+		QString DayCnt, TrName, Curr, BasRt, TrancheISIN, IPDfrq, ProRat;
 		QList<QString> RefRt, coup;
 		QList<Tranche::TrancheInterestType>IntrTpe;
-		int ProRat, TempSize;
+		int TempSize;
 		double origOut,currOut,OClim,IClim,Price,Exchan,startingDeferred/*,coup*/;
 		QDate PrevIPD,SettDate;
 		NumElements=pdFreq++->intVal;
@@ -52,7 +56,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			RefRt.clear(); coup.clear(); IntrTpe.clear();
 			TrName=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			TrancheISIN=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
-			ProRat=pdFreq->intVal; pdFreq++;
+			ProRat = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 			origOut=pdFreq->dblVal;pdFreq++;
 			Curr=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			currOut=pdFreq->dblVal;pdFreq++;
@@ -80,18 +84,66 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	}
 	
 	{ //Waterfall Steps
-		int Prior,GrpTg, RedTg;
-		double RedSh;
-		NumElements=pdFreq++->intVal;
+		int Prior, ArgSeniorityGroup, ArgSeniorityGroupLevel, ArgRedemptionGroup, ArgRedemptionGroupLevel, ArgSourceofFunding, ArgCouponIndex, ArgReserveIndex;
+		double ArgRedemptionShare, ArgAdditionalCollateralShare, ArgTestTargetOverride, ArgIRRtoEquityTarget;
+		QString ArgTrigger;
+		NumElements = pdFreq->intVal; pdFreq++;
+		LOGDEBUG(QString("Numero Steps: %1").arg(NumElements));
 		for(int i=0;i<NumElements;i++){
 			Prior=pdFreq->intVal; pdFreq++;
-			GrpTg=pdFreq->intVal; pdFreq++;
-			RedTg=pdFreq->intVal; pdFreq++;
-			RedSh=pdFreq->dblVal;pdFreq++;
-			TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType(Prior),GrpTg,RedTg,RedSh);
+			ArgSeniorityGroup = pdFreq->intVal; pdFreq++;
+			ArgSeniorityGroupLevel = pdFreq->intVal; pdFreq++;
+			ArgRedemptionGroup = pdFreq->intVal; pdFreq++;
+			ArgRedemptionGroupLevel = pdFreq->intVal; pdFreq++;
+			ArgRedemptionShare = pdFreq->dblVal; pdFreq++;
+			ArgAdditionalCollateralShare = pdFreq->dblVal; pdFreq++;
+			ArgSourceofFunding = pdFreq->intVal; pdFreq++;
+			ArgCouponIndex = pdFreq->intVal; pdFreq++;
+			ArgTestTargetOverride = pdFreq->dblVal; pdFreq++;
+			ArgIRRtoEquityTarget = pdFreq->dblVal; pdFreq++;
+			ArgReserveIndex = pdFreq->intVal; pdFreq++;
+			ArgTrigger = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+			TempUnit.AddWaterfallStep(static_cast<WatFalPrior::WaterfallStepType>(Prior), ArgSeniorityGroup, ArgSeniorityGroupLevel, ArgRedemptionGroup, ArgRedemptionGroupLevel, ArgRedemptionShare, ArgAdditionalCollateralShare, ArgSourceofFunding, ArgCouponIndex, ArgTestTargetOverride, ArgIRRtoEquityTarget, ArgReserveIndex, ArgTrigger);
+		}
+	}
+	{ //Triggers
+		int TriggerCount,TriggerTpe;
+		TriggerCount = pdFreq->intVal; pdFreq++;
+		QSharedPointer<AbstractTrigger> TempTrigger;
+		for (int i = 0; i < TriggerCount; i++) {
+			TriggerTpe = pdFreq->intVal; pdFreq++;
+			switch (TriggerTpe) {
+			case static_cast<int>(AbstractTrigger::TriggerType::DateTrigger) :
+				TempTrigger.reset(new DateTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+				TempTrigger.dynamicCast<DateTrigger>()->SetLimitDate(QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal), "yyyy-MM-dd")); pdFreq++;
+				TempTrigger.dynamicCast<DateTrigger>()->SetSide(static_cast<DateTrigger::TriggerSide>(pdFreq->intVal)); pdFreq++;
+				TempUnit.SetTrigger(i + 1, TempTrigger);
+				break;
+			case static_cast<int>(AbstractTrigger::TriggerType::VectorTrigger) :
+				TempTrigger.reset(new VectorTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+				TempTrigger.dynamicCast<VectorTrigger>()->SetTrigVector(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+				TempUnit.SetTrigger(i + 1, TempTrigger);
+				break;
+			case static_cast<int>(AbstractTrigger::TriggerType::PoolSizeTrigger) :
+				TempTrigger.reset(new PoolSizeTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+				TempTrigger.dynamicCast<PoolSizeTrigger>()->SetTargetSize(pdFreq->dblVal); pdFreq++;
+				TempTrigger.dynamicCast<PoolSizeTrigger>()->SetSide(static_cast<PoolSizeTrigger::TriggerSide>(pdFreq->intVal)); pdFreq++;
+				TempUnit.SetTrigger(i + 1, TempTrigger);
+				break;
+			case static_cast<int>(AbstractTrigger::TriggerType::TrancheTrigger) :
+				TempTrigger.reset(new TrancheTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+				TempTrigger.dynamicCast<TrancheTrigger>()->SetTargetSeniority(pdFreq->intVal); pdFreq++;
+				TempTrigger.dynamicCast<TrancheTrigger>()->SetTargetSeniorityLevel(pdFreq->intVal); pdFreq++;
+				TempTrigger.dynamicCast<TrancheTrigger>()->SetTargetSize(pdFreq->dblVal); pdFreq++;
+				TempTrigger.dynamicCast<TrancheTrigger>()->SetSenioritySide(static_cast<TrancheTrigger::TriggerSenioritySide>(pdFreq->intVal)); pdFreq++;
+				TempTrigger.dynamicCast<TrancheTrigger>()->SetSizeSide(static_cast<TrancheTrigger::TriggerSizeSide>(pdFreq->intVal)); pdFreq++;
+				TempUnit.SetTrigger(i + 1, TempTrigger);
+				break;
+			}
 		}
 	}
 	{ //General Inputs
+		LOGDEBUG(QString("General Inputs"));
 		TempUnit.SetDealName(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
 		TempUnit.SetStartingDeferredJunFees(pdFreq->dblVal); pdFreq++;
 		TempUnit.SetGICinterest(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
@@ -141,14 +193,8 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		}
 		{// Reinvestment Test
 			QDate ReinPer;
-			double ReinvLim,IISha,IRsha,OIsha,ORsha;
 			ReinPer=QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd");pdFreq++;
-			ReinvLim=pdFreq->dblVal;pdFreq++;
-			IRsha=pdFreq->dblVal;pdFreq++;
-			IISha=pdFreq->dblVal;pdFreq++;
-			ORsha=pdFreq->dblVal;pdFreq++;
-			OIsha=pdFreq->dblVal;pdFreq++;
-			TempUnit.SetupReinvestmentTest(ReinPer,ReinvLim,IISha,IRsha,OIsha,ORsha);
+			TempUnit.SetReinvestementPeriod(ReinPer);
 			QString Intr, CPR, CDR, LS, WAL, Delay, Timespread, Pric, Frq, BaseVal, ReinvBondAnnuit,RecLag,Dlq,DlqLag;
 			Intr=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			CPR=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
@@ -452,27 +498,6 @@ void __stdcall InspectStress(LPSAFEARRAY *ArrayData){
 	SitRep.show();
 	SitRep.SetStructure(TempStructure);
 	SitRep.ShowCallStructure(false);
-	ComputationLoop.exec();	
-}
-void __stdcall InspectWaterfall(LPSAFEARRAY *ArrayData){
-	char *argv[] = {"NoArgumnets"};
-	int argc = sizeof(argv) / sizeof(char*) - 1;
-	QApplication ComputationLoop(argc,argv);
-	WaterfallViewer SitRep;
-	SitRep.show();
-	VARIANT HUGEP *pdFreq;
-	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
-	if (!SUCCEEDED(hr)) return;
-	int NumSteps=pdFreq->intVal;pdFreq++;
-	for(int i=0;i<NumSteps;i++){
-		WatFalPrior TempStep;
-		TempStep.SetPriorityType(WatFalPrior::WaterfallStepType(pdFreq->intVal));pdFreq++;
-		TempStep.SetGroupTarget(pdFreq->intVal);pdFreq++;
-		TempStep.SetRedemptionGroup(pdFreq->intVal);pdFreq++;
-		TempStep.SetRedemptionShare(pdFreq->dblVal);pdFreq++;
-		SitRep.AddStep(TempStep);
-	}
-	SafeArrayUnaccessData(*ArrayData);
 	ComputationLoop.exec();	
 }
 

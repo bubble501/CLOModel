@@ -29,12 +29,12 @@ public:
 		, const QString& dayCnt = QString::number(static_cast<qint16>(DayCountConvention::CompN30360))
 		);
 #ifndef NO_BLOOMBERG
-	void AddTranche(const QString& Name,int ProRataGroup, double MinOC=0.0, double MinIC=0.0, double Price=100.0,double FxRate= 1.0,const QString& BbgExt="Mtge");
+	void AddTranche(const QString& Name, const QString& ProRataGroup, double MinOC = 0.0, double MinIC = 0.0, double Price = 100.0, double FxRate = 1.0, const QString& BbgExt = "Mtge");
 #endif
 	void AddTranche(
 		const QString& Name
 		, const QString& ISIN
-		, int ProRataGroup
+		, const QString& ProRataGroup
 		, double OrigAmnt
 		, const QString& Crncy
 		, double OutstandingAmt
@@ -54,8 +54,23 @@ public:
 		, const QString& BbgExt = "Mtge"
 		, const QString& DayCount = QString::number(static_cast<qint16>(DayCountConvention::ACT360))
 	);
+	void SetTrigger(qint32 key,const QSharedPointer<AbstractTrigger>& val) { Structure.SetTrigger(key, val); }
 	void AddTranche(const Tranche& a) { Structure.AddTranche(a);	if (Stresser)Stresser->SetStructure(Structure); }
-	void AddWaterfallStep(WatFalPrior::WaterfallStepType Tpe, int GrpTgt, int RdmpGrp=0, double RdmpShare=0.0);
+	void CentralUnit::AddWaterfallStep(
+		WatFalPrior::WaterfallStepType Tpe
+		, int ArgSeniorityGroup
+		, int ArgSeniorityGroupLevel
+		, int ArgRedemptionGroup
+		, int ArgRedemptionGroupLevel
+		, double ArgRedemptionShare
+		, double ArgAdditionalCollateralShare
+		, int ArgSourceofFunding
+		, int ArgCouponIndex
+		, double ArgTestTargetOverride
+		, double ArgIRRtoEquityTarget
+		, int ArgReserveIndex
+		, const QString& ArgTrigger
+	);
 	void SetSeniorExpenses(const QString& a){Structure.SetSeniorExpenses(a);}
 	void SetSeniorFees(const QString& a) { Structure.SetSeniorFees(a); }
 	void SetJuniorFees(const QString& a) { Structure.SetJuniorFees(a); }
@@ -80,7 +95,7 @@ public:
 	void SetGICinterest(const QString& a) { Structure.SetGICinterest(a); }
 	void SetGICBaseRate(const QString& a) { Structure.SetGICBaseRate(a); }
 	void SetDealDayCountConvention(const QString&  val) { Structure.SetDealDayCountConvention(val); }
-	void SetupReinvestmentTest(const QDate& ReinvPer,double TstLvl, double IIshare,double IRshare,double OIshare,double ORshare){Structure.SetupReinvestmentTest(ReinvPer,TstLvl,IIshare,IRshare,OIshare,ORshare);}
+	void SetReinvestementPeriod(const QDate& ReinvPer) { Structure.SetReinvestementPeriod(ReinvPer); }
 	void SetupReinvBond(
 		const QString& IntrVec
 		, const QString& CPRVec

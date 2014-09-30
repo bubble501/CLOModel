@@ -79,7 +79,7 @@ Public Sub getStructureFromBloomberg()
     Sheets("Liabilities + input").Unprotect
     Dim FieldsLabels As New Collection
     Call PopulateDafaultLabels(FieldsLabels)
-    Call StructureFromBloomberg(FieldsLabels, "Liabilities + input")
+    'Call StructureFromBloomberg(FieldsLabels, "Liabilities + input")
     Sheets("Liabilities + input").Protect UserInterfaceOnly:=True, AllowFormattingCells:=True
 End Sub
 
@@ -249,3 +249,5 @@ Sub Forward_Curves_Check()
     End If
     Application.ScreenUpdating = True
 End Sub
+
+

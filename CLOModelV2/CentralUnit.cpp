@@ -67,7 +67,7 @@ void CentralUnit::AddLoan(
 	if(Stresser)Stresser->AddLoan(TempMtg);
 }
 #ifndef NO_BLOOMBERG
-void CentralUnit::AddTranche(const QString& Name,int ProRataGroup, double MinOC, double MinIC, double Price,double FxRate,const QString& BbgExt){
+void CentralUnit::AddTranche(const QString& Name, const QString& ProRataGroup, double MinOC, double MinIC, double Price, double FxRate, const QString& BbgExt) {
 	Tranche TempTrnch;
 	TempTrnch.SetTrancheName(Name);
 	TempTrnch.SetProrataGroup(ProRataGroup);
@@ -84,7 +84,7 @@ void CentralUnit::AddTranche(const QString& Name,int ProRataGroup, double MinOC,
 void CentralUnit::AddTranche(
 	const QString& Name
 	, const QString& ISIN
-	, int ProRataGroup
+	, const QString& ProRataGroup
 	, double OrigAmnt
 	, const QString& Crncy
 	, double OutstandingAmt
@@ -132,11 +132,34 @@ void CentralUnit::AddTranche(
 	Structure.AddTranche(TempTrnch);
 	if(Stresser)Stresser->SetStructure(Structure);
 }
-void CentralUnit::AddWaterfallStep(WatFalPrior::WaterfallStepType Tpe,int GrpTgt, int RdmpGrp, double RdmpShare){
+void CentralUnit::AddWaterfallStep(
+	WatFalPrior::WaterfallStepType Tpe
+	, int ArgSeniorityGroup
+	, int ArgSeniorityGroupLevel
+	, int ArgRedemptionGroup
+	, int ArgRedemptionGroupLevel
+	, double ArgRedemptionShare
+	, double ArgAdditionalCollateralShare
+	, int ArgSourceofFunding
+	, int ArgCouponIndex
+	, double ArgTestTargetOverride
+	, double ArgIRRtoEquityTarget
+	, int ArgReserveIndex
+	, const QString& ArgTrigger
+	){
 	WatFalPrior TempStep;
-	TempStep.SetGroupTarget(GrpTgt);
-	TempStep.SetRedemptionGroup(RdmpGrp);
-	TempStep.SetRedemptionShare(RdmpShare);
+	if (ArgSeniorityGroup!=-1) TempStep.SetParameter(WatFalPrior::wstParameters::SeniorityGroup, ArgSeniorityGroup);
+	if (ArgSeniorityGroupLevel != -1) TempStep.SetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel, ArgSeniorityGroupLevel);
+	if (ArgRedemptionGroup != -1) TempStep.SetParameter(WatFalPrior::wstParameters::RedemptionGroup, ArgRedemptionGroup);
+	if (ArgRedemptionGroupLevel != -1) TempStep.SetParameter(WatFalPrior::wstParameters::RedemptionGroupLevel, ArgRedemptionGroupLevel);
+	if (ArgRedemptionShare != -1.0) TempStep.SetParameter(WatFalPrior::wstParameters::RedemptionShare, ArgRedemptionShare);
+	if (ArgAdditionalCollateralShare != -1.0) TempStep.SetParameter(WatFalPrior::wstParameters::AdditionalCollateralShare, ArgAdditionalCollateralShare);
+	if (ArgSourceofFunding != -1) TempStep.SetParameter(WatFalPrior::wstParameters::SourceOfFunding, ArgSourceofFunding);
+	if (ArgCouponIndex != -1) TempStep.SetParameter(WatFalPrior::wstParameters::CouponIndex, ArgCouponIndex);
+	if (ArgTestTargetOverride != -1.0) TempStep.SetParameter(WatFalPrior::wstParameters::TestTargetOverride, ArgTestTargetOverride);
+	if (ArgIRRtoEquityTarget != -1.0) TempStep.SetParameter(WatFalPrior::wstParameters::IRRtoEquityTarget, ArgIRRtoEquityTarget);
+	if (ArgReserveIndex != -1) TempStep.SetParameter(WatFalPrior::wstParameters::ReserveIndex, ArgReserveIndex);
+	if (!ArgTrigger.isEmpty()) TempStep.SetParameter(WatFalPrior::wstParameters::Trigger, ArgTrigger);
 	TempStep.SetPriorityType(Tpe);
 	Structure.AddStep(TempStep);
 	if(Stresser)Stresser->SetStructure(Structure);

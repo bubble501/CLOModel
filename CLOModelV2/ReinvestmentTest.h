@@ -7,18 +7,10 @@
 #include "IntegerVector.h"
 class ReinvestmentTest : public BackwardInterface{
 public:
-	enum ShareType{
-		InReinvShare,
-		InRedempShare,
-		OutReinvShare,
-		OutRedempShare
-	};
 	ReinvestmentTest();
 	ReinvestmentTest(const ReinvestmentTest& a);
 	ReinvestmentTest& operator=(const ReinvestmentTest& a);
 	const QDate& GetReinvestmentPeriod() const {return ReinvestmentPeriod;}
-	double GetTestLevel() const{return ReinvestmentTestLevel;}
-	double GetShare(ShareType Tpe)const{return ReinvestmentShare[Tpe];}
 	const Mortgage& GetReinvestmentBond() const {return ReinvestmentBond;}
 	QString GetCPRAssumption() const {return CPRAssumption.GetVector();}
 	QString GetCDRAssumption() const {return CDRAssumption.GetVector();}
@@ -43,7 +35,7 @@ public:
 		, const QString& DelinquencyLag = "0"
 	);
 	void SetMissingAnchors(const QDate& a);
-	void SetupTest(const QDate& ReinvPer,double TstLvl, double IIshare,double IRshare,double OIshare,double ORshare);
+	void SetReinvestementPeriod(const QDate& ReinvPer);
 	void CalculateBondCashFlows(double Size, QDate StartDate, int Period=0);
 	const MtgCashFlow& GetBondCashFlow() const;
 	void SetCPR(const QString& a);
@@ -61,8 +53,6 @@ public:
 	friend QDataStream& operator>>(QDataStream & stream, ReinvestmentTest& flows);
 protected:
 	QDate ReinvestmentPeriod;
-	double ReinvestmentTestLevel;
-	double ReinvestmentShare[4];
 	Mortgage ReinvestmentBond;
 	BloombergVector CPRAssumption;
 	BloombergVector CDRAssumption;

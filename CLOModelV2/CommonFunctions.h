@@ -12,6 +12,7 @@ template<typename T> class QList;
 //#define SaveLoanTape
 //#define DebugLogging
 int MonthDiff(const QDate& FutureDte,const QDate& PresentDte);
+QString InfixToPostfix(const QString& a);
 enum class DayCountConvention : qint16 {
 	Invalid = 0
 	//Simple

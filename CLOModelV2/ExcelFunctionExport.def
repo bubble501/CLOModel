@@ -6,5 +6,4 @@ EXPORTS
 	CLOWALife
 	StressTargetChanged
 	InspectStress
-	InspectWaterfall
 	GetAssumption

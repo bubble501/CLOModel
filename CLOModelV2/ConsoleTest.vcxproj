@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AbstarctBbgVect.cpp" />
+    <ClCompile Include="AbstractTrigger.cpp" />
     <ClCompile Include="BaseRateTable.cpp" />
     <ClCompile Include="BaseRateVect.cpp" />
     <ClCompile Include="BloombergVector.cpp" />
@@ -29,6 +30,7 @@
     <ClCompile Include="CommonFunctions.cpp" />
     <ClCompile Include="ConsoleTestMain.cpp" />
     <ClCompile Include="ConsoleTestObj.cpp" />
+    <ClCompile Include="DateTrigger.cpp" />
     <ClCompile Include="DayCountVect.cpp" />
     <ClCompile Include="ExcelCommons.cpp" />
     <ClCompile Include="ExcelInput.cpp" />
@@ -202,6 +204,7 @@
     <ClCompile Include="MtgCalculator.cpp" />
     <ClCompile Include="MtgCalculatorThread.cpp" />
     <ClCompile Include="MtgCashFlow.cpp" />
+    <ClCompile Include="PoolSizeTrigger.cpp" />
     <ClCompile Include="ProgressWidget.cpp" />
     <ClCompile Include="QBbgRequest.cpp" />
     <ClCompile Include="QBbgResultsIterator.cpp" />
@@ -224,6 +227,7 @@
     <ClCompile Include="ReinvestmentTest.cpp" />
     <ClCompile Include="RepaymentVector.cpp" />
     <ClCompile Include="ReserveFund.cpp" />
+    <ClCompile Include="Seniority.cpp" />
     <ClCompile Include="StressTest.cpp" />
     <ClCompile Include="StressThread.cpp" />
     <ClCompile Include="StressViewer.cpp" />
@@ -231,7 +235,9 @@
     <ClCompile Include="SummaryView.cpp" />
     <ClCompile Include="Tranche.cpp" />
     <ClCompile Include="TrancheCashFlow.cpp" />
+    <ClCompile Include="TrancheTrigger.cpp" />
     <ClCompile Include="TrancheViewer.cpp" />
+    <ClCompile Include="VectorTrigger.cpp" />
     <ClCompile Include="Waterfall.cpp" />
     <ClCompile Include="WaterfallCalcThread.cpp" />
     <ClCompile Include="WaterfallCalculator.cpp" />
@@ -1881,7 +1887,13 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AbstractTrigger.h" />
+    <ClInclude Include="DateTrigger.h" />
     <ClInclude Include="DayCountVect.h" />
+    <ClInclude Include="PoolSizeTrigger.h" />
+    <ClInclude Include="Seniority.h" />
+    <ClInclude Include="TrancheTrigger.h" />
+    <ClInclude Include="VectorTrigger.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{BE4A81A8-9729-4AD3-94EF-CC732836D1C9}</ProjectGuid>

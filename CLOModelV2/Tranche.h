@@ -10,6 +10,7 @@
 #include <QHash>
 #include "BaseRateTable.h"
 #include "DayCountVect.h"
+#include "Seniority.h"
 class  Tranche : public BackwardInterface {
 public:
 	//! Enum defining what type of coupon the tranche is paying
@@ -31,7 +32,7 @@ private:
 	mutable QHash<qint32, BloombergVector*> ReferenceRateValue;
 	double Price;
 	QString BloombergExtension;
-	int ProrataGroup;
+	Seniority ProrataGroup;
 	TrancheCashFlow CashFlow;
 	double MinOClevel;
 	double MinIClevel;
@@ -53,8 +54,6 @@ public:
 	Tranche(const Tranche& a);
 	~Tranche();
 	Tranche& operator=(const Tranche& a);
-	bool operator<(const Tranche& a)const;
-	bool operator>(const Tranche& a)const;
 	const QHash<qint32, BloombergVector*>& GetRefRateValues() const { return ReferenceRateValue; }
 	const double& GetStartingDeferredInterest() const { return CashFlow.GetStartingDeferredInterest(); }
 	void SetStartingDeferredInterest(const double& val) { CashFlow.SetStartingDeferredInterest(val); }
@@ -80,7 +79,8 @@ public:
 	double GetReferenceRateValue(const QDate& index, qint32 CoupIndex /*= 0*/) const;
 	double GetPrice() const {return Price;}
 	const QString& GetBloombergExtension() const{return BloombergExtension;}
-	int GetProrataGroup() const{return ProrataGroup;}
+	const Seniority& GetProrataGroup() const{return ProrataGroup;}
+	quint32 GetProrataGroup(int SeliorityScaleLevel) const { return ProrataGroup.GetSeniorityAtLevel(SeliorityScaleLevel); }
 	const TrancheCashFlow& GetCashFlow() const {return CashFlow;}
 	TrancheCashFlow& GetCashFlow() {return CashFlow;}
 	double GetMinOClevel() const {return MinOClevel;}
@@ -110,7 +110,7 @@ public:
 	void SetDayCount(QString val) { m_DayCount = val; }
 	void SetPrice(double a){if(a>0) Price=a;}
 	void SetBloombergExtension(const QString& a);
-	void SetProrataGroup(int a){if(a>0) ProrataGroup=a;}
+	void SetProrataGroup(const QString& a){ProrataGroup.SetSeniorityScale(a);}
 	void SetCashFlow(const TrancheCashFlow& a){CashFlow=a;}
 	void SetMinOClevel(double a){if(a>0.0 || a==-1.0) MinOClevel=a;}
 	void SetMinIClevel(double a){if(a>0.0 || a==-1.0) MinIClevel=a;}

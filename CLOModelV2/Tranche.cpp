@@ -8,7 +8,7 @@ Tranche::Tranche()
 	, Currency("GBP")
 	, Price(100)
 	, BloombergExtension("Mtge")
-	, ProrataGroup(1)
+	, ProrataGroup("1")
 	, MinIClevel(-1.0)
 	, MinOClevel(-1.0)
 	, ExchangeRate(1.0)
@@ -410,12 +410,6 @@ double Tranche::GetIRR(double NewPrice)const{
 		FlowsValues.append(CashFlow.GetTotalFlow(i));
 	}
 	return qMax(0.0,CalculateIRR(FlowsDates,FlowsValues,m_DayCount));
-}
-bool Tranche::operator>(const Tranche& a) const {
-	return ProrataGroup>a.ProrataGroup;
-}
-bool Tranche::operator<(const Tranche& a) const {
-	return ProrataGroup<a.ProrataGroup;
 }
 double Tranche::GetCurrentOutstanding()const{
 	if(CashFlow.Count()==0) return OutstandingAmt;

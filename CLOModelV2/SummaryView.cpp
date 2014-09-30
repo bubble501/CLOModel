@@ -265,7 +265,7 @@ void SummaryView::DisplayStructure(){
 	ResetPricesLabel();
 	for (int i=0;i<Structure.GetTranchesCount();i++){
 		StructureTable->setItem(i,0,new QTableWidgetItem(Structure.GetTranche(i)->GetTrancheName()));
-		StructureTable->setItem(i,1,new QTableWidgetItem(QString("%1").arg(Structure.GetTranche(i)->GetProrataGroup())));
+		StructureTable->setItem(i,1,new QTableWidgetItem(Structure.GetTranche(i)->GetProrataGroup().ToString()));
 		StructureTable->setItem(i,2,new QTableWidgetItem(Structure.GetTranche(i)->GetCurrency()));
 		StructureTable->setItem(i,3,new QTableWidgetItem(Commarize(Structure.GetTranche(i)->GetOriginalAmount())));
 		StructureTable->setItem(i,4,new QTableWidgetItem(Commarize(Structure.GetTranche(i)->GetOutstandingAmt())));
@@ -289,7 +289,7 @@ void SummaryView::DisplayStructure(){
 		for(int j=0;j<StructureTable->columnCount();j++){
 			if(j!=10)
 				StructureTable->item(i,j)->setBackgroundColor(
-					Structure.GetTranche(i)->GetProrataGroup()%2==0 ? QColor(235,241,222) : QColor(216,228,188)
+					Structure.GetTranche(i)->GetProrataGroup(0)%2==0 ? QColor(235,241,222) : QColor(216,228,188)
 				);
 		}
 	}

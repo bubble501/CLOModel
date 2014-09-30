@@ -32,20 +32,12 @@ void ReinvestmentTest::SetupReinvBond(
 	m_DelinquencyLag = DelinquencyLag;
 	m_ReinvestmentSpreadOverTime = ReinvSpr;
 }
-void ReinvestmentTest::SetupTest(
+void ReinvestmentTest::SetReinvestementPeriod(
 	const QDate& ReinvPer
-	,double TstLvl
-	,double IIshare
-	,double IRshare
-	,double OIshare
-	,double ORshare
+
 ){
 	ReinvestmentPeriod=ReinvPer;
-	ReinvestmentTestLevel=TstLvl;
-	if(IIshare>=0.0 && IIshare<=1.0) ReinvestmentShare[InReinvShare]=IIshare;
-	if(IRshare>=0.0 && IRshare<=1.0) ReinvestmentShare[InRedempShare]=IRshare;
-	if(OIshare>=0.0 && OIshare<=1.0) ReinvestmentShare[OutReinvShare]=OIshare;
-	if(ORshare>=0.0 && ORshare<=1.0) ReinvestmentShare[OutRedempShare]=ORshare;
+
 }
 ReinvestmentTest::ReinvestmentTest()
 	:CDRAssumption("0")
@@ -59,10 +51,6 @@ ReinvestmentTest::ReinvestmentTest()
 	, m_DelinquencyLag("0")
 	, m_ReinvestmentSpreadOverTime("0")
 {
-	ReinvestmentShare[InReinvShare]=0.0;
-	ReinvestmentShare[InRedempShare]=0.0;
-	ReinvestmentShare[OutReinvShare]=0.0;
-	ReinvestmentShare[OutRedempShare]=0.0;
 	WALAssumption.SetDivisor(1.0);
 }
 ReinvestmentTest::ReinvestmentTest(const ReinvestmentTest& a)
@@ -72,7 +60,6 @@ ReinvestmentTest::ReinvestmentTest(const ReinvestmentTest& a)
 	,WALAssumption(a.WALAssumption)
 	,ReinvestmentBond(a.ReinvestmentBond)
 	,ReinvestmentPeriod(a.ReinvestmentPeriod)
-	,ReinvestmentTestLevel(a.ReinvestmentTestLevel)
 	, ReinvestmentDelay(a.ReinvestmentDelay)
 	, ReinvestmentPrice(a.ReinvestmentPrice)
 	, m_RecoveryLag(a.m_RecoveryLag)
@@ -80,23 +67,14 @@ ReinvestmentTest::ReinvestmentTest(const ReinvestmentTest& a)
 	, m_DelinquencyLag(a.m_DelinquencyLag)
 	, m_ReinvestmentSpreadOverTime(a.m_ReinvestmentSpreadOverTime)
 {
-		ReinvestmentShare[InReinvShare]=a.ReinvestmentShare[InReinvShare];
-		ReinvestmentShare[InRedempShare]=a.ReinvestmentShare[InRedempShare];
-		ReinvestmentShare[OutReinvShare]=a.ReinvestmentShare[OutReinvShare];
-		ReinvestmentShare[OutRedempShare]=a.ReinvestmentShare[OutRedempShare];
 }
 ReinvestmentTest& ReinvestmentTest::operator=(const ReinvestmentTest& a){
-	ReinvestmentShare[InReinvShare]=a.ReinvestmentShare[InReinvShare];
-	ReinvestmentShare[InRedempShare]=a.ReinvestmentShare[InRedempShare];
-	ReinvestmentShare[OutReinvShare]=a.ReinvestmentShare[OutReinvShare];
-	ReinvestmentShare[OutRedempShare]=a.ReinvestmentShare[OutRedempShare];
 	CDRAssumption=a.CDRAssumption;
 	CPRAssumption=a.CPRAssumption;
 	LSAssumption=a.LSAssumption;
 	WALAssumption=a.WALAssumption;
 	ReinvestmentBond=a.ReinvestmentBond;
 	ReinvestmentPeriod=a.ReinvestmentPeriod;
-	ReinvestmentTestLevel=a.ReinvestmentTestLevel;
 	ReinvestmentDelay = a.ReinvestmentDelay;
 	ReinvestmentPrice = a.ReinvestmentPrice;
 	m_RecoveryLag = a.m_RecoveryLag;
@@ -172,11 +150,6 @@ void ReinvestmentTest::SetLS(const QString& a){LSAssumption=a;}
 QDataStream& operator<<(QDataStream & stream, const ReinvestmentTest& flows){
 	stream 
 		<< flows.ReinvestmentPeriod
-		<< flows.ReinvestmentTestLevel
-		<< flows.ReinvestmentShare[0]
-		<< flows.ReinvestmentShare[1]
-		<< flows.ReinvestmentShare[2]
-		<< flows.ReinvestmentShare[3]
 		<< flows.ReinvestmentBond
 		<< flows.CPRAssumption
 		<< flows.CDRAssumption
@@ -193,12 +166,7 @@ QDataStream& operator<<(QDataStream & stream, const ReinvestmentTest& flows){
 }
 QDataStream& ReinvestmentTest::LoadOldVersion(QDataStream& stream) {
 	stream
-		>> ReinvestmentPeriod
-		>> ReinvestmentTestLevel
-		>> ReinvestmentShare[0]
-		>> ReinvestmentShare[1]
-		>> ReinvestmentShare[2]
-		>> ReinvestmentShare[3];
+		>> ReinvestmentPeriod;
 	ReinvestmentBond.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> ReinvestmentBond;
 	CPRAssumption.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> CPRAssumption;
 	CDRAssumption.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> CDRAssumption;

@@ -11,6 +11,7 @@ Option Explicit
 Private Sub Worksheet_Change(ByVal Target As Range)
     If Not Intersect(Target, Me.Range("f25:m150")) Is Nothing Then
         Dim singleCell
+        Application.ScreenUpdating = False
         Me.Unprotect
         Application.EnableEvents = False
         For Each singleCell In Target
@@ -18,6 +19,7 @@ Private Sub Worksheet_Change(ByVal Target As Range)
         Next singleCell
         Application.EnableEvents = True
         Me.Protect AllowFormattingCells:=True, AllowFormattingColumns:=True, AllowFormattingRows:=True
+        Application.ScreenUpdating = True
     ElseIf Not Intersect(Target, Me.Range("A4:A19")) Is Nothing Then
         Me.Shapes("GhostButton").Visible = _
             Application.WorksheetFunction.CountBlank(Me.Range("A4:A19")) = 16

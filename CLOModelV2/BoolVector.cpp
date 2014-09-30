@@ -42,13 +42,13 @@ void BoolVector::UnpackVector(){
 		TempStr.replace(QRegExp("\\D"),"");
 		StepLen=TempStr.toInt();
 		for (int j=0;j<StepLen;j++){
-			m_VectVal.append(StringParts.at(i - 1).at(0)=='T');
+			m_VectVal.append(StringParts.at(i - 1).at(0) == 'T' || StringParts.at(i - 1).at(0) == 'Y');
 		}
 	}
 	m_VectVal.append(StringParts.last().at(0).toLatin1());
 }
 bool BoolVector::IsValid() const{
-	return AbstarctBbgVect::IsValid("[TF]", false);
+	return AbstarctBbgVect::IsValid("[TFNY]", false);
 }
 
 bool BoolVector::GetValue(const QDate& index)const{

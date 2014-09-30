@@ -6,6 +6,7 @@
 #include "Waterfall.h"
 #include "QBbgWorker.h"
 #include "DateTrigger.h"
+#include "VectorTrigger.h"
 #include <QStack>
 const WatFalPrior* Waterfall::GetStep(int Index)const {
 	if(Index<0 || Index>=m_WaterfallStesps.size()) return NULL;
@@ -1318,12 +1319,7 @@ QDataStream& operator<<(QDataStream & stream, const Waterfall& flows){
 	stream << static_cast<qint32>( flows.m_Triggers.size() - 1);
 	for (auto i = flows.m_Triggers.constBegin(); i != flows.m_Triggers.constEnd(); ++i) {
 		if (i.key()==0) continue; //Reinvestment period is saved already
-		stream << static_cast<quint8>(i.value()->GetTriggerType()) << i.key();
-		switch (i.value()->GetTriggerType()) {
-		case AbstractTrigger::TriggerType::DateTrigger:
-			stream << (*(i.value().dynamicCast<DateTrigger>()));
-		}
-		
+		stream << static_cast<quint8>(i.value()->GetTriggerType()) << i.key() << *(i.value());
 	}
 	stream << static_cast<qint32>(flows.m_Tranches.size());
 	foreach(const Tranche* SingleTranche,flows.m_Tranches)
@@ -1406,6 +1402,9 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream){
 			switch (static_cast<AbstractTrigger::TriggerType>(TempChar)) {
 			case AbstractTrigger::TriggerType::DateTrigger: 
 				TempTrig.reset(new DateTrigger());
+				break;
+			case AbstractTrigger::TriggerType::VectorTrigger:
+				TempTrig.reset(new VectorTrigger());
 				break;
 			}
 			TempTrig->SetLoadProtocolVersion(m_LoadProtocolVersion);
@@ -1512,6 +1511,9 @@ QString Waterfall::ReadyToCalculate()const{
 				Result += QString("%1 - Trigger Not Valid\n").arg(static_cast<quint32>(SingleStep->GetPriorityType()));
 			}
 		}
+	}
+	foreach(const QSharedPointer<AbstractTrigger>& SingleTrig, m_Triggers) {
+		Result += SingleTrig->ReadyToCalculate();
 	}
 	if (!Result.isEmpty()) return Result.left(Result.size() - 1);
 	return Result;
@@ -1748,6 +1750,12 @@ bool Waterfall::EvaluateTrigger(quint32 TrigID, int PeriodIndex, const QDate& Cu
 	switch (CurrentTrigger->GetTriggerType()) {
 	case AbstractTrigger::TriggerType::DateTrigger:
 		return CurrentTrigger.dynamicCast<DateTrigger>()->Passing(CurrentIPD);
+	case AbstractTrigger::TriggerType::VectorTrigger:{
+		QSharedPointer<VectorTrigger> TempTrig = CurrentTrigger.dynamicCast<VectorTrigger>();
+		if (TempTrig->HasAnchor())
+			return TempTrig->Passing(CurrentIPD);
+		return TempTrig->Passing(PeriodIndex);
+	}	
 	default:
 		return false;
 	}

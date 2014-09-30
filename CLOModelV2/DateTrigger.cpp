@@ -42,7 +42,11 @@ DateTrigger::DateTrigger(const QDate& dte, TriggerSide sd , const QString& lab )
 
 DateTrigger::DateTrigger(const QString& lab) 
 	:AbstractTrigger(TriggerType::DateTrigger, lab)
-	, m_Side(TriggerSide::AfterExcluding) 
+	, m_Side(TriggerSide::Invalid) 
 {
 
+}
+QString DateTrigger::ReadyToCalculate() const {
+	if (m_LimitDate.isNull() || m_Side == TriggerSide::Invalid) return "Trigger " + m_TriggerLabel + " is invalid\n";
+	return QString();
 }

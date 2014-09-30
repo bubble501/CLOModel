@@ -12,6 +12,7 @@
 #include <QApplication>
 #include <QTextStream>
 #include "DateTrigger.h"
+#include "VectorTrigger.h"
 void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	bool RunStress;
 	CentralUnit TempUnit;
@@ -114,6 +115,11 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 				TempTrigger.reset(new DateTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
 				TempTrigger.dynamicCast<DateTrigger>()->SetLimitDate(QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal), "yyyy-MM-dd")); pdFreq++;
 				TempTrigger.dynamicCast<DateTrigger>()->SetSide(static_cast<DateTrigger::TriggerSide>(pdFreq->intVal)); pdFreq++;
+				TempUnit.SetTrigger(i + 1, TempTrigger);
+				break;
+			case static_cast<int>(AbstractTrigger::TriggerType::VectorTrigger) :
+				TempTrigger.reset(new VectorTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+				TempTrigger.dynamicCast<VectorTrigger>()->SetTrigVector(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
 				TempUnit.SetTrigger(i + 1, TempTrigger);
 				break;
 			}

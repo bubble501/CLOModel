@@ -41,10 +41,13 @@ int main(int argc, char *argv[]) {
 	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempCallWaterfall;
 	file.close();
-	TempWtf.CalculateTranchesCashFlows();
-	
-
-	
 
 
+	QFile file2("c:/Temp/TestStream");
+	file2.open(QIODevice::WriteOnly);
+	QDataStream out2(&file2);
+	out2.setVersion(QDataStream::Qt_5_3);
+	out2 << TempWtf;
+	file2.close();
+	file2.remove();
 }

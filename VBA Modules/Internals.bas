@@ -425,17 +425,21 @@ Dim TempString As String
 AdjTriggerType = FromStringToTriggerType(Target.Offset(0, -Target.Column + LeftCol).Value)
     Select Case Target.Column - LeftCol
         Case 0 'Trigger Type Changed
+            Target.Resize(1, 16378).Validation.Delete
             Select Case UCase(Target.Value)
                 Case UCase("Date Trigger")
                     Target.Resize(1, 4).Locked = False
                     Target.Offset(0, 1).Value = "Trigger Label"
                     Target.Offset(0, 2).Value = DateValue("2000-01-01")
-                    Target.Offset(0, 2).Validation.Delete
                     Target.Offset(0, 2).Validation.Add xlValidateDate, xlValidAlertStop, xlGreaterEqual, DateValue("2000-01-01")
                     With Target.Offset(0, 3)
                         .Value = 5
                         .NumberFormat = """Before Including"""
                     End With
+                Case UCase("Vector Trigger")
+                    Target.Resize(1, 3).Locked = False
+                    Target.Offset(0, 1).Value = "Trigger Label"
+                    Target.Offset(0, 2).Value = "Y"
                 Case Else
                     With Target.Offset(0, 1).Resize(1, 16378)
                        .ClearContents

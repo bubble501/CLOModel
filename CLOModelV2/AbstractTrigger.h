@@ -7,6 +7,7 @@ class AbstractTrigger : public BackwardInterface{
 public:
 	enum class TriggerType : quint8 {
 		DateTrigger
+		,VectorTrigger
 	};
 protected:
 	TriggerType m_TriggerType;
@@ -18,6 +19,7 @@ public:
 	TriggerType GetTriggerType() const { return m_TriggerType; }
 	const QString& GetTriggerLabel() const { return m_TriggerLabel; }
 	void SetTriggerLabel(const QString& lab) { m_TriggerLabel = lab; }
+	virtual QString ReadyToCalculate() const = 0;
 	friend QDataStream& operator<<(QDataStream & stream, const AbstractTrigger& flows);
 	friend QDataStream& operator>>(QDataStream & stream, AbstractTrigger& flows);
 };

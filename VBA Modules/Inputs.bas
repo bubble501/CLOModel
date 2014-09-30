@@ -561,6 +561,10 @@ DefaultExchange:
                 Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
                 Call AddInput(AllTheInputs, Format(TriggerStart.Offset(i, 2).Value, "yyyy-mm-dd"))
                 Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 3).Value))
+            Case 1 'Vector Trigger
+                Call AddInput(AllTheInputs, CLng(1))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 2).Value))
             Case Else
                 Exit Sub
         End Select
@@ -1062,6 +1066,8 @@ Public Function FromStringToTriggerType(a As String) As Long
     Select Case UCase(a)
         Case "DATE TRIGGER"
             FromStringToTriggerType = 0
+        Case "VECTOR TRIGGER"
+            FromStringToTriggerType = 1
         Case ""
             Exit Function
         Case Else

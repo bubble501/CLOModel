@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
 	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempCallWaterfall;
 	file.close();
-	TempWtf.SetTrigger(1, QSharedPointer<AbstractTrigger>(new PoolSizeTrigger(75000000.0, PoolSizeTrigger::TriggerSide::SmallerOrEqual, "Test Trigger")));
+	//TempWtf.SetTrigger(1, QSharedPointer<AbstractTrigger>(new PoolSizeTrigger(75000000.0, PoolSizeTrigger::TriggerSide::SmallerOrEqual, "Test Trigger")));
 	TempWtf.CalculateTranchesCashFlows();
 	
 }

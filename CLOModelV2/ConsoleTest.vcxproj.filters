@@ -334,11 +334,14 @@
     <ClCompile Include="AbstractTrigger.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
-    <ClCompile Include="PoolSizeTrigger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="VectorTrigger.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="TrancheTrigger.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="PoolSizeTrigger.cpp">
+      <Filter>Source Files\Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -542,11 +545,14 @@
     <ClInclude Include="Seniority.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
-    <ClInclude Include="PoolSizeTrigger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="VectorTrigger.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="PoolSizeTrigger.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="TrancheTrigger.h">
+      <Filter>Header Files\Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

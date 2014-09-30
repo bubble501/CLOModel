@@ -233,6 +233,9 @@
     <ClInclude Include="PoolSizeTrigger.h">
       <Filter>Header Files\Triggers</Filter>
     </ClInclude>
+    <ClInclude Include="TrancheTrigger.h">
+      <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Resources.qrc">
@@ -580,6 +583,9 @@
       <Filter>Source Files\Triggers</Filter>
     </ClCompile>
     <ClCompile Include="PoolSizeTrigger.cpp">
+      <Filter>Source Files\Triggers</Filter>
+    </ClCompile>
+    <ClCompile Include="TrancheTrigger.cpp">
       <Filter>Source Files\Triggers</Filter>
     </ClCompile>
   </ItemGroup>

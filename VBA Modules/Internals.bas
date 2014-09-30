@@ -435,13 +435,14 @@ AdjTriggerType = FromStringToTriggerType(Target.Offset(0, -Target.Column + LeftC
                     With Target.Offset(0, 3)
                         .Value = 5
                         .NumberFormat = """Before Including"""
+                        .Validation.Add xlValidateList, xlValidAlertStop, xlBetween, "1,2,4,5,6"
                     End With
                 Case UCase("Vector Trigger")
                     Target.Resize(1, 3).Locked = False
                     Target.Offset(0, 1).Value = "Trigger Label"
                     Target.Offset(0, 2).Value = "Y"
                 Case UCase("Pool Size Trigger")
-                     Target.Resize(1, 4).Locked = False
+                    Target.Resize(1, 4).Locked = False
                     Target.Offset(0, 1).Value = "Trigger Label"
                     Target.Offset(0, 2).Value = 0
                     Target.Offset(0, 2).Validation.Add xlValidateDecimal, xlValidAlertStop, xlGreaterEqual, 0#
@@ -449,6 +450,26 @@ AdjTriggerType = FromStringToTriggerType(Target.Offset(0, -Target.Column + LeftC
                     With Target.Offset(0, 3)
                         .Value = 6
                         .NumberFormat = """Smaller or Equal"""
+                        .Validation.Add xlValidateList, xlValidAlertStop, xlBetween, "1,2,4,5,6"
+                    End With
+                Case UCase("Tranche Trigger")
+                    Target.Resize(1, 7).Locked = False
+                    Target.Offset(0, 1).Value = "Trigger Label"
+                    Target.Offset(0, 2).Value = 1
+                    Target.Offset(0, 3).Value = 1
+                    Target.Offset(0, 2).Resize(1, 2).Validation.Add xlValidateWholeNumber, xlValidAlertStop, xlGreater, 0#
+                    Target.Offset(0, 4).Value = 0#
+                    Target.Offset(0, 4).Validation.Add xlValidateDecimal, xlValidAlertStop, xlGreaterEqual, 0#
+                    Target.Offset(0, 4).NumberFormat = "_-* #,##0_-;-* #,##0_-;_-* "" - ""??_-;_-@_-"
+                    With Target.Offset(0, 5)
+                        .Value = 1
+                        .NumberFormat = """Senior"""
+                        .Validation.Add xlValidateList, xlValidAlertStop, xlBetween, "1,2,4,5,6"
+                    End With
+                    With Target.Offset(0, 6)
+                        .Value = 6
+                        .NumberFormat = """Smaller or Equal"""
+                        .Validation.Add xlValidateList, xlValidAlertStop, xlBetween, "1,2,4,5,6"
                     End With
                 Case Else
                     With Target.Offset(0, 1).Resize(1, 16378)
@@ -491,6 +512,46 @@ AdjTriggerType = FromStringToTriggerType(Target.Offset(0, -Target.Column + LeftC
                     End If
                     Target.NumberFormat = TempString
                 Case 2
+                    TempString = ""
+                    If (CLng(Target.Value) And 1) > 0 Then
+                        TempString = """Bigger"
+                    ElseIf (CLng(Target.Value) And 2) > 0 Then
+                        TempString = """Smaller"
+                    End If
+                    If (CLng(Target.Value) And 4) > 0 Then
+                        If (TempString = "") Then
+                            TempString = """Exactly"""
+                        Else
+                            TempString = TempString & " or Equal"""
+                        End If
+                    Else
+                         If (TempString <> "") Then TempString = TempString & """"
+                    End If
+                    Target.NumberFormat = TempString
+            End Select
+        Case 5
+            Select Case AdjTriggerType
+                Case 3
+                    TempString = ""
+                    If (CLng(Target.Value) And 1) > 0 Then
+                        TempString = """Senior"
+                    ElseIf (CLng(Target.Value) And 2) > 0 Then
+                        TempString = """Junior"
+                    End If
+                    If (CLng(Target.Value) And 4) > 0 Then
+                        If (TempString = "") Then
+                            TempString = """Exactly"""
+                        Else
+                            TempString = TempString & " or Equal"""
+                        End If
+                    Else
+                         If (TempString <> "") Then TempString = TempString & """"
+                    End If
+                    Target.NumberFormat = TempString
+            End Select
+        Case 6
+            Select Case AdjTriggerType
+                Case 3
                     TempString = ""
                     If (CLng(Target.Value) And 1) > 0 Then
                         TempString = """Bigger"

@@ -14,6 +14,7 @@
 #include "DateTrigger.h"
 #include "VectorTrigger.h"
 #include "PoolSizeTrigger.h"
+#include "TrancheTrigger.h"
 void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	bool RunStress;
 	CentralUnit TempUnit;
@@ -129,9 +130,17 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 				TempTrigger.dynamicCast<PoolSizeTrigger>()->SetSide(static_cast<PoolSizeTrigger::TriggerSide>(pdFreq->intVal)); pdFreq++;
 				TempUnit.SetTrigger(i + 1, TempTrigger);
 				break;
+			case static_cast<int>(AbstractTrigger::TriggerType::TrancheTrigger) :
+				TempTrigger.reset(new TrancheTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+				TempTrigger.dynamicCast<TrancheTrigger>()->SetTargetSeniority(pdFreq->intVal); pdFreq++;
+				TempTrigger.dynamicCast<TrancheTrigger>()->SetTargetSeniorityLevel(pdFreq->intVal); pdFreq++;
+				TempTrigger.dynamicCast<TrancheTrigger>()->SetTargetSize(pdFreq->dblVal); pdFreq++;
+				TempTrigger.dynamicCast<TrancheTrigger>()->SetSenioritySide(static_cast<TrancheTrigger::TriggerSenioritySide>(pdFreq->intVal)); pdFreq++;
+				TempTrigger.dynamicCast<TrancheTrigger>()->SetSizeSide(static_cast<TrancheTrigger::TriggerSizeSide>(pdFreq->intVal)); pdFreq++;
+				TempUnit.SetTrigger(i + 1, TempTrigger);
+				break;
 			}
 		}
-
 	}
 	{ //General Inputs
 		LOGDEBUG(QString("General Inputs"));

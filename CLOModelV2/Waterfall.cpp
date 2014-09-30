@@ -8,6 +8,7 @@
 #include "DateTrigger.h"
 #include "VectorTrigger.h"
 #include "PoolSizeTrigger.h"
+#include "TrancheTrigger.h"
 #include <QStack>
 const WatFalPrior* Waterfall::GetStep(int Index)const {
 	if(Index<0 || Index>=m_WaterfallStesps.size()) return NULL;
@@ -1410,6 +1411,9 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream){
 			case AbstractTrigger::TriggerType::PoolSizeTrigger:
 				TempTrig.reset(new PoolSizeTrigger());
 				break;
+			case AbstractTrigger::TriggerType::TrancheTrigger:
+				TempTrig.reset(new TrancheTrigger());
+				break;
 			}
 			TempTrig->SetLoadProtocolVersion(m_LoadProtocolVersion);
 			stream >> (*TempTrig);
@@ -1763,6 +1767,8 @@ bool Waterfall::EvaluateTrigger(quint32 TrigID, int PeriodIndex, const QDate& Cu
 	case AbstractTrigger::TriggerType::PoolSizeTrigger:
 		if (PeriodIndex<0 || PeriodIndex>=m_MortgagesPayments.Count()) return false;
 		return CurrentTrigger.dynamicCast<PoolSizeTrigger>()->Passing(m_MortgagesPayments.GetAmountOut(PeriodIndex));
+	case AbstractTrigger::TriggerType::TrancheTrigger:
+		return CurrentTrigger.dynamicCast<TrancheTrigger>()->Passing(m_Tranches);
 	default:
 		return false;
 	}

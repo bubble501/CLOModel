@@ -9,6 +9,7 @@ public:
 		DateTrigger=0
 		,VectorTrigger=1
 		,PoolSizeTrigger=2
+		,TrancheTrigger=3
 	};
 protected:
 	TriggerType m_TriggerType;

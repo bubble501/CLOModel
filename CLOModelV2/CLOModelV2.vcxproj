@@ -93,6 +93,7 @@
     <ClInclude Include="Seniority.h" />
     <ClInclude Include="Tranche.h" />
     <ClInclude Include="TrancheCashFlow.h" />
+    <ClInclude Include="TrancheTrigger.h" />
     <ClInclude Include="VectorTrigger.h" />
     <ClInclude Include="Waterfall.h" />
     <ClInclude Include="WatFalPrior.h" />
@@ -404,6 +405,7 @@
     <ClCompile Include="SummaryView.cpp" />
     <ClCompile Include="Tranche.cpp" />
     <ClCompile Include="TrancheCashFlow.cpp" />
+    <ClCompile Include="TrancheTrigger.cpp" />
     <ClCompile Include="TrancheViewer.cpp" />
     <ClCompile Include="VectorTrigger.cpp" />
     <ClCompile Include="Waterfall.cpp" />

@@ -38,7 +38,7 @@ Public Sub GetInputFromStructure( _
     Dim BondPriceStart As Range
     Dim OCLimitStart As Range
     Dim ICLimitStart As Range
-    'Dim WaterfallStart As Range
+    Dim TriggerStart As Range
     Dim SeniorExpensesCell As Range
     Dim SeniorFeesCell As Range
     Dim JuniorFeesCell As Range
@@ -143,6 +143,7 @@ Public Sub GetInputFromStructure( _
     Dim TestTargetOverrideHead As Long
     Dim IRRtoEquityTargetHead As Long
     Dim ReserveIndexHead As Long
+    Dim TriggersHead As Long
     
     Set WaterfallSheet = Sheets(FieldsLabels("WaterfallSheet"))
      Set FirstStep = WaterfallSheet.Cells.Find(what:=FieldsLabels("StepHead"), LookAt:=xlWhole, LookIn:=xlFormulas)
@@ -158,7 +159,7 @@ Public Sub GetInputFromStructure( _
     TestTargetOverrideHead = WaterfallSheet.Cells.Find(what:=FieldsLabels("TestTargetOverrideHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
     IRRtoEquityTargetHead = WaterfallSheet.Cells.Find(what:=FieldsLabels("IRRtoEquityTargetHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
     ReserveIndexHead = WaterfallSheet.Cells.Find(what:=FieldsLabels("ReserveIndexHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
-   
+    TriggersHead = WaterfallSheet.Cells.Find(what:=FieldsLabels("TriggersHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
     ''''''''''''''''''''''''''''''''''''''''''''''''''''
     On Error Resume Next
     Set IssuerProperty = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("IssuerProperty"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -171,6 +172,7 @@ Public Sub GetInputFromStructure( _
     Set StartingAdditionalProp = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("StartingAdditionalProp"), LookAt:=xlWhole, LookIn:=xlValues)
     ''''''''''''''''''''''''''''''''''''''''''''''''''''
     Set HaircutVecStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("HaircutVecHeader"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set TriggerStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("TriggerStart"), LookAt:=xlWhole, LookIn:=xlValues)
     Set StartingDefJunFees = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("StartingDefJunFees"), LookAt:=xlWhole, LookIn:=xlValues)
     Set GICInterestCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("GICInterestCell"), LookAt:=xlWhole, LookIn:=xlValues)
     Set BaseCaseCall = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("BaseCaseCall"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -468,6 +470,11 @@ DefaultExchange:
         Else
             Call AddInput(AllTheInputs, CLng(FirstStep.Offset(i, ReserveIndexHead).Value))
         End If
+        If IsEmpty(FirstStep.Offset(i, TriggersHead)) Then
+            Call AddInput(AllTheInputs, "")
+        Else
+            Call AddInput(AllTheInputs, CStr(FirstStep.Offset(i, TriggersHead).Value))
+        End If
         i = i + 1
     Loop
     'Principal waterfall
@@ -530,6 +537,33 @@ DefaultExchange:
         Else
             Call AddInput(AllTheInputs, CLng(LastStep.Offset(i, ReserveIndexHead).Value))
         End If
+        If IsEmpty(LastStep.Offset(i, TriggersHead)) Then
+            Call AddInput(AllTheInputs, "")
+        Else
+            Call AddInput(AllTheInputs, CStr(LastStep.Offset(i, TriggersHead).Value))
+        End If
+        i = i + 1
+    Loop
+    
+    'Triggers
+    i = 2
+    Do While True
+        If IsEmpty(TriggerStart.Offset(i, 0)) Then Exit Do
+        i = i + 1
+    Loop
+    Call AddInput(AllTheInputs, CLng(i - 2))
+    i = 2
+    Do While True
+        If IsEmpty(TriggerStart.Offset(i, 0)) Then Exit Do
+        Select Case FromStringToTriggerType(TriggerStart.Offset(i, 0).Value)
+            Case 0 'Date Trigger
+                Call AddInput(AllTheInputs, CLng(0))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
+                Call AddInput(AllTheInputs, Format(TriggerStart.Offset(i, 2).Value, "yyyy-mm-dd"))
+                Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 3).Value))
+            Case Else
+                Exit Sub
+        End Select
         i = i + 1
     Loop
 '    If (IsEmpty(WaterfallStart.Offset(2, 0))) Then
@@ -897,7 +931,7 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
     a.Add "Fixed/Floating", "FixFloatHead"
     a.Add "OC test", "OCLimitHeader"
     a.Add "IC test", "ICLimitHeader"
-    a.Add "Waterfall", "WaterfallHeader"
+    a.Add "Trigger Type", "TriggerStart"
     a.Add "Exchange Rates", "ExcahngeRateTableHead"
     a.Add "Senior expenses rate", "SeniorExpensesField"
     a.Add "Senior management fees rate", "SeniorFeesField"
@@ -1012,7 +1046,7 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
     a.Add "Test Target Override", "TestTargetOverrideHead"
     a.Add "IRR to Equity Target", "IRRtoEquityTargetHead"
     a.Add "Reserve Index", "ReserveIndexHead"
-     
+    a.Add "Triggers", "TriggersHead"
 End Sub
 
 Private Function FromStringToInterestType(a As String) As Long
@@ -1023,6 +1057,23 @@ Private Function FromStringToInterestType(a As String) As Long
     End If
 End Function
 
+Public Function FromStringToTriggerType(a As String) As Long
+    On Error GoTo FromStringToTriggerType_Error
+    Select Case UCase(a)
+        Case "DATE TRIGGER"
+            FromStringToTriggerType = 0
+        Case ""
+            Exit Function
+        Case Else
+            GoTo FromStringToTriggerType_Error
+    End Select
+    On Error GoTo 0
+    Exit Function
+FromStringToTriggerType_Error:
+    Call MsgBox("Invalid trigger type." _
+                & vbCrLf & "Aborting" _
+                , vbCritical, "Error")
+End Function
 
 
 Private Function FromStringToPriorty(a As String) As Long

@@ -7,7 +7,6 @@
 #include "QBbgWorker.h"
 #include "DateTrigger.h"
 #include <QStack>
-#include "DateTrigger.h"
 const WatFalPrior* Waterfall::GetStep(int Index)const {
 	if(Index<0 || Index>=m_WaterfallStesps.size()) return NULL;
 	return m_WaterfallStesps.at(Index);
@@ -467,7 +466,7 @@ void Waterfall::SetupReinvBond(
 }
 void Waterfall::SetReinvestementPeriod(const QDate& ReinvPer){
 	m_ReinvestmentTest.SetReinvestementPeriod(ReinvPer);
-	QSharedPointer<AbstractTrigger> TempReinvTrigger(new DateTrigger(QDate(ReinvPer.year(),ReinvPer.month(),1), DateTrigger::TriggerSide::BeforeIncluding,"Reinvestment Period"));
+	QSharedPointer<AbstractTrigger> TempReinvTrigger(new DateTrigger(ReinvPer, DateTrigger::TriggerSide::BeforeIncluding,"Reinvestment Period"));
 	SetTrigger(0, TempReinvTrigger);
 }
 double Waterfall::RedeemNotes(double AvailableFunds, int GroupTarget, int SeliorityScaleLevel, const QDate& TargetDate) {
@@ -750,7 +749,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 			}
 			foreach(WatFalPrior* SingleStep,m_WaterfallStesps){//Cycle through the steps of the waterfall
 				if (SingleStep->HasParameter(WatFalPrior::wstParameters::Trigger)) {
-					if (!TriggerPassing(SingleStep->GetParameter(WatFalPrior::wstParameters::Trigger).toString(), i)) continue;
+					if (!TriggerPassing(SingleStep->GetParameter(WatFalPrior::wstParameters::Trigger).toString(), i, RollingNextIPD, IsCallPaymentDate)) continue;
 				}
 				switch(SingleStep->GetPriorityType()){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1312,19 +1311,24 @@ QDataStream& operator<<(QDataStream & stream, const Waterfall& flows){
 		<< flows.m_DealDayCountConvention
 		<< flows.m_StartingDeferredJunFees
 		<< flows.m_GICflows
-		<< flows.m_WaterfallStesps.size();
+		<< static_cast<qint32>(flows.m_WaterfallStesps.size());
 	;
 	foreach(const WatFalPrior* SingleStep, flows.m_WaterfallStesps)
 		stream << (*SingleStep);
-	stream << flows.m_Triggers.size();
+	stream << static_cast<qint32>( flows.m_Triggers.size() - 1);
 	for (auto i = flows.m_Triggers.constBegin(); i != flows.m_Triggers.constEnd(); ++i) {
 		if (i.key()==0) continue; //Reinvestment period is saved already
-		stream << static_cast<quint8>(i.value()->GetTriggerType()) << i.key() << *(i.value());
+		stream << static_cast<quint8>(i.value()->GetTriggerType()) << i.key();
+		switch (i.value()->GetTriggerType()) {
+		case AbstractTrigger::TriggerType::DateTrigger:
+			stream << (*(i.value().dynamicCast<DateTrigger>()));
+		}
+		
 	}
-	stream << flows.m_Tranches.size();
+	stream << static_cast<qint32>(flows.m_Tranches.size());
 	foreach(const Tranche* SingleTranche,flows.m_Tranches)
 		stream << (*SingleTranche);	
-	stream << flows.m_CumulativeReserves << flows.m_Reserves.size();
+	stream << flows.m_CumulativeReserves << static_cast<qint32>(flows.m_Reserves.size());
 	for (QList<ReserveFund*>::const_iterator ResIter = flows.m_Reserves.constBegin(); ResIter != flows.m_Reserves.constEnd(); ResIter++)
 		stream << (**ResIter);
 	return stream;
@@ -1384,7 +1388,7 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream){
 	stream >> m_StartingDeferredJunFees;
 	m_GICflows.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_GICflows;
 	stream >> TempInt;
-	;
+	
 	ResetSteps();
 	for (int i = 0; i < TempInt; i++) {
 		TempStep.SetLoadProtocolVersion(m_LoadProtocolVersion);
@@ -1402,9 +1406,10 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream){
 			switch (static_cast<AbstractTrigger::TriggerType>(TempChar)) {
 			case AbstractTrigger::TriggerType::DateTrigger: 
 				TempTrig.reset(new DateTrigger());
-				stream >> (*(TempTrig.dynamicCast<DateTrigger>())); 
 				break;
 			}
+			TempTrig->SetLoadProtocolVersion(m_LoadProtocolVersion);
+			stream >> (*TempTrig);
 			m_Triggers.insert(TempKey, TempTrig);
 		}
 	}
@@ -1700,7 +1705,7 @@ bool Waterfall::ValidTriggerStructure(const QString& TriggerStructure)const {
 	return true;
 }
 
-bool Waterfall::TriggerPassing(const QString& TriggerStructure, int PeriodIndex) const {
+bool Waterfall::TriggerPassing(const QString& TriggerStructure, int PeriodIndex,const QDate& CurrentIPD, bool IsCallDate) const {
 	QString AdjStructure = InfixToPostfix(TriggerStructure);
 	if (AdjStructure.isEmpty()) return false;
 	QRegExp SignleTriggers(QString("\\b") + NegateChar +"?(\\d+)\\b");
@@ -1711,7 +1716,7 @@ bool Waterfall::TriggerPassing(const QString& TriggerStructure, int PeriodIndex)
 		quint32 CurrentTrigger = i->toUInt();
 		if (!m_Triggers.contains(CurrentTrigger)) 	return false;
 		if (!SignleResults.contains(CurrentTrigger))
-			SignleResults.insert(CurrentTrigger, EvaluateTrigger(CurrentTrigger, PeriodIndex));
+			SignleResults.insert(CurrentTrigger, EvaluateTrigger(CurrentTrigger, PeriodIndex,CurrentIPD,IsCallDate));
 	}
 	QStack<bool> PolishStack;
 	QStringList PolishParts = AdjStructure.split(' ');
@@ -1737,12 +1742,12 @@ bool Waterfall::TriggerPassing(const QString& TriggerStructure, int PeriodIndex)
 	return PolishStack.pop();
 }
 
-bool Waterfall::EvaluateTrigger(quint32 TrigID, int PeriodIndex) const {
+bool Waterfall::EvaluateTrigger(quint32 TrigID, int PeriodIndex, const QDate& CurrentIPD, bool IsCallDate) const {
 	const QSharedPointer<AbstractTrigger> CurrentTrigger = m_Triggers.value(TrigID, QSharedPointer<AbstractTrigger>());
 	if (!CurrentTrigger) return false;
 	switch (CurrentTrigger->GetTriggerType()) {
 	case AbstractTrigger::TriggerType::DateTrigger:
-		return CurrentTrigger.dynamicCast<DateTrigger>()->Passing(m_MortgagesPayments.GetDate(PeriodIndex));
+		return CurrentTrigger.dynamicCast<DateTrigger>()->Passing(CurrentIPD);
 	default:
 		return false;
 	}
@@ -1751,7 +1756,7 @@ bool Waterfall::EvaluateTrigger(quint32 TrigID, int PeriodIndex) const {
 void Waterfall::ResetTriggers() {
 	m_Triggers.clear();
 	if (!m_ReinvestmentTest.GetReinvestmentPeriod().isNull()){
-		QSharedPointer<AbstractTrigger> TempReinvTrigger(new DateTrigger(m_ReinvestmentTest.GetReinvestmentPeriod().addDays(-m_ReinvestmentTest.GetReinvestmentPeriod().day()+1), DateTrigger::TriggerSide::BeforeIncluding, "Reinvestment Period"));
+		QSharedPointer<AbstractTrigger> TempReinvTrigger(new DateTrigger(m_ReinvestmentTest.GetReinvestmentPeriod(), DateTrigger::TriggerSide::BeforeIncluding, "Reinvestment Period"));
 		SetTrigger(0, TempReinvTrigger);
 	}
 }

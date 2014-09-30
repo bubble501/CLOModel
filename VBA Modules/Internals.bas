@@ -419,7 +419,60 @@ Public Function ShowDayCount(Target As String, CurrentDcnt As Integer) As String
     DayCountForm.TargetAddress = Target
     ShowDayCount = DayCountForm.ShowForm
 End Function
-
+Public Function TriggerChanged(Target As Range, LeftCol As Long)
+Dim AdjTriggerType As Long
+Dim TempString As String
+AdjTriggerType = FromStringToTriggerType(Target.Offset(0, -Target.Column + LeftCol).Value)
+    Select Case Target.Column - LeftCol
+        Case 0 'Trigger Type Changed
+            Select Case UCase(Target.Value)
+                Case UCase("Date Trigger")
+                    Target.Resize(1, 4).Locked = False
+                    Target.Offset(0, 1).Value = "Trigger Label"
+                    Target.Offset(0, 2).Value = DateValue("2000-01-01")
+                    Target.Offset(0, 2).Validation.Delete
+                    Target.Offset(0, 2).Validation.Add xlValidateDate, xlValidAlertStop, xlGreaterEqual, DateValue("2000-01-01")
+                    With Target.Offset(0, 3)
+                        .Value = 5
+                        .NumberFormat = """Before Including"""
+                    End With
+                Case Else
+                    With Target.Offset(0, 1).Resize(1, 16378)
+                       .ClearContents
+                       .Locked = True
+                    End With
+            End Select
+        Case 2
+            Select Case AdjTriggerType
+                Case 0
+                    If (Target.Value < DateValue("2000-01-01")) Then
+                        Target.Interior.Color = RGB(255, 0, 0)
+                    Else
+                        Target.Interior.Color = RGB(235, 241, 222)
+                    End If
+            End Select
+        Case 3
+            Select Case AdjTriggerType
+                Case 0
+                TempString = ""
+                If (CLng(Target.Value) And 1) > 0 Then
+                    TempString = """Before"
+                ElseIf (CLng(Target.Value) And 2) > 0 Then
+                    TempString = """After"
+                End If
+                If (CLng(Target.Value) And 4) > 0 Then
+                    If (TempString = "") Then
+                        TempString = """Exactly"""
+                    Else
+                        TempString = TempString & " Including"""
+                    End If
+                Else
+                     If (TempString <> "") Then TempString = TempString & " Excluding"""
+                End If
+                Target.NumberFormat = TempString
+            End Select
+    End Select
+End Function
 Public Sub NewWaterfallStepChanged(Target As Range, ByRef allFields As Collection)
     'Dim PrincipalWatStart As Long
     'PrincipalWatStart = Target.Parent.Cells.Find(what:="Interest Waterfall", LookAt:=xlWhole, LookIn:=xlFormulas).Column
@@ -429,6 +482,7 @@ Public Sub NewWaterfallStepChanged(Target As Range, ByRef allFields As Collectio
     Dim LastStep As Range
     Set LastStep = Target.Parent.Cells.Find(what:=allFields("StepHead"), SearchDirection:=xlPrevious, LookAt:=xlWhole, LookIn:=xlFormulas)
     
+    Dim i As Long
     Dim SeniorityGroupHead As Long
     Dim SeniorityGroupLevelHead As Long
     Dim AdditionalCollateralShareHead As Long
@@ -440,6 +494,7 @@ Public Sub NewWaterfallStepChanged(Target As Range, ByRef allFields As Collectio
     Dim TestTargetOverrideHead As Long
     Dim IRRtoEquityTargetHead As Long
     Dim ReserveIndexHead As Long
+    Dim TriggersHead As Long
     
     SeniorityGroupHead = 1
     SeniorityGroupLevelHead = 2
@@ -452,6 +507,7 @@ Public Sub NewWaterfallStepChanged(Target As Range, ByRef allFields As Collectio
     TestTargetOverrideHead = 9
     IRRtoEquityTargetHead = 10
     ReserveIndexHead = 11
+    TriggersHead = 12
     
 '     SeniorityGroupHead = Target.Parent.Cells.Find(what:=allFields("SeniorityGroupHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
 '     SeniorityGroupLevelHead = Target.Parent.Cells.Find(what:=allFields("SeniorityGroupLevelHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
@@ -464,18 +520,25 @@ Public Sub NewWaterfallStepChanged(Target As Range, ByRef allFields As Collectio
 '     TestTargetOverrideHead = Target.Parent.Cells.Find(what:=allFields("TestTargetOverrideHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
 '     IRRtoEquityTargetHead = Target.Parent.Cells.Find(what:=allFields("IRRtoEquityTargetHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
 '     ReserveIndexHead = Target.Parent.Cells.Find(what:=allFields("ReserveIndexHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+'     TriggersHead = Target.Parent.Cells.Find(what:=allFields("TriggersHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
     
 
-    If Not IsEmpty(Target) Then
-        Target.Offset(1, 0).Locked = False
-        Target.Offset(1, 0).EntireRow.Hidden = False
-    End If
+    Target.Offset(1, 0).Locked = IsEmpty(Target)
+    Target.Offset(1, 0).EntireRow.Hidden = IsEmpty(Target)
+   
     With Target.Offset(0, 1).Resize(1, ReserveIndexHead)
             .ClearContents
             .NumberFormat = ";;;"
             .Interior.Color = RGB(191, 191, 191)
             .Locked = True
             .ClearComments
+    End With
+     With Target.Offset(0, TriggersHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "General"
+            .ClearContents
+            .Locked = False
+            .EntireColumn.Hidden = False
     End With
     Select Case UCase(Target.Value)
     Case UCase("Senior Expenses"), UCase("Senior Management Fees"), UCase("Junior management fees")
@@ -644,6 +707,64 @@ Public Sub NewWaterfallStepChanged(Target As Range, ByRef allFields As Collectio
             .Locked = False
             .EntireColumn.Hidden = False
         End With
+    Case UCase("Reinvestment Test")
+        If (Target.Row > LastStep.Row) Then
+            Target.Offset(0, SourceOfFundingHead).Value = 2
+        Else
+            Target.Offset(0, SourceOfFundingHead).Value = 1
+        End If
+        With Target.Offset(0, SeniorityGroupHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0"
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, SeniorityGroupLevelHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0"
+            .Value = 1
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, RedemptionGroupHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0"
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, RedemptionGroupLevelHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0"
+            .Value = 1
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, RedemptionShareHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0%"
+            .Value = 0
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, AdditionalCollateralShareHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0%"
+            .Value = 0
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, TestTargetOverrideHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0%"
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, TriggersHead)
+            .Interior.Color = RGB(191, 191, 191)
+            .NumberFormat = ";;;"
+            .Locked = True
+            .Value = 0
+        End With
     Case UCase("Excess")
         If (Target.Row > LastStep.Row) Then
             Target.Offset(0, SourceOfFundingHead).Value = 2
@@ -757,6 +878,21 @@ Public Sub NewWaterfallStepChanged(Target As Range, ByRef allFields As Collectio
             .Locked = False
             .EntireColumn.Hidden = False
         End With
+        Case ""
+        With Target.Offset(0, TriggersHead)
+            .Interior.Color = RGB(191, 191, 191)
+            .NumberFormat = ";;;"
+            .Locked = True
+            .Value = 0
+        End With
+        For i = 1 To TriggersHead
+            If _
+                FirstStep.Offset(1, i).Resize(500, 1).Locked = True _
+                And LastStep.Offset(1, i).Resize(500, 1).Locked = True _
+            Then
+                FirstStep.Offset(0, i).EntireColumn.Hidden = True
+            End If
+        Next i
     End Select
     
 End Sub

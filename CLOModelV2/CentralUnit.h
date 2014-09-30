@@ -54,6 +54,7 @@ public:
 		, const QString& BbgExt = "Mtge"
 		, const QString& DayCount = QString::number(static_cast<qint16>(DayCountConvention::ACT360))
 	);
+	void SetTrigger(qint32 key,const QSharedPointer<AbstractTrigger>& val) { Structure.SetTrigger(key, val); }
 	void AddTranche(const Tranche& a) { Structure.AddTranche(a);	if (Stresser)Stresser->SetStructure(Structure); }
 	void CentralUnit::AddWaterfallStep(
 		WatFalPrior::WaterfallStepType Tpe
@@ -70,7 +71,6 @@ public:
 		, int ArgReserveIndex
 		, const QString& ArgTrigger
 	);
-	void SetTrigger(qint32 key, QSharedPointer<AbstractTrigger> val) { Structure.SetTrigger(key, val); }
 	void SetSeniorExpenses(const QString& a){Structure.SetSeniorExpenses(a);}
 	void SetSeniorFees(const QString& a) { Structure.SetSeniorFees(a); }
 	void SetJuniorFees(const QString& a) { Structure.SetJuniorFees(a); }

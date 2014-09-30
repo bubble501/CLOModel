@@ -7,12 +7,18 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
+Option Explicit
 Private Sub Worksheet_Change(ByVal Target As Range)
-'    If Not Intersect(Target, Me.Range("E25:E150")) Is Nothing Then
-'        Me.Unprotect
-'        Call WaterfallStepChanged(Target)
-'        Me.Protect AllowFormattingCells:=True, AllowFormattingColumns:=True, AllowFormattingRows:=True
-    If Not Intersect(Target, Me.Range("A4:A19")) Is Nothing Then
+    If Not Intersect(Target, Me.Range("f25:m150")) Is Nothing Then
+        Dim singleCell
+        Me.Unprotect
+        Application.EnableEvents = False
+        For Each singleCell In Target
+            Call TriggerChanged(Me.Range(singleCell.Address), 6) '6 is the colum index of F1
+        Next singleCell
+        Application.EnableEvents = True
+        Me.Protect AllowFormattingCells:=True, AllowFormattingColumns:=True, AllowFormattingRows:=True
+    ElseIf Not Intersect(Target, Me.Range("A4:A19")) Is Nothing Then
         Me.Shapes("GhostButton").Visible = _
             Application.WorksheetFunction.CountBlank(Me.Range("A4:A19")) = 16
         Me.Shapes("ImportFromOldButton").Visible = _
@@ -22,13 +28,19 @@ End Sub
 
 Private Sub Worksheet_SelectionChange(ByVal Target As Range)
     If (Target.Count = 1) And (Not IsEmpty(Target)) And ( _
-        (Not Intersect(Target, Me.Cells.Find("CPR", LookAt:=xlWhole, LookIn:=xlValues).Offset(0, 1)) Is Nothing) Or _
-        (Not Intersect(Target, Me.Cells.Find("CDR", LookAt:=xlWhole, LookIn:=xlValues).Offset(0, 1)) Is Nothing) Or _
-        (Not Intersect(Target, Me.Cells.Find("LS", LookAt:=xlWhole, LookIn:=xlValues).Offset(0, 1)) Is Nothing) Or _
-        (Not Intersect(Target, Me.Cells.Find("CCC curve", LookAt:=xlWhole, LookIn:=xlValues).Offset(0, 1)) Is Nothing) Or _
-        (Not Intersect(Target, Me.Cells.Find("Reinvestment WAL", LookAt:=xlWhole, LookIn:=xlValues).Offset(0, 1)) Is Nothing) Or _
-        (Not Intersect(Target, Me.Cells.Find("Reinvestment Spread", LookAt:=xlWhole, LookIn:=xlValues).Offset(0, 1)) Is Nothing) _
+        (Not Intersect(Target, Me.Range("b32")) Is Nothing) Or _
+        (Not Intersect(Target, Me.Range("b33")) Is Nothing) Or _
+        (Not Intersect(Target, Me.Range("b34")) Is Nothing) Or _
+        (Not Intersect(Target, Me.Range("b35")) Is Nothing) Or _
+        (Not Intersect(Target, Me.Range("b46")) Is Nothing) Or _
+        (Not Intersect(Target, Me.Range("b32")) Is Nothing) _
     ) Then
+'        (Not Intersect(Target, Me.Cells.Find("CPR", LookAt:=xlWhole, LookIn:=xlValues).Offset(0, 1)) Is Nothing) Or _
+'        (Not Intersect(Target, Me.Cells.Find("CDR", LookAt:=xlWhole, LookIn:=xlValues).Offset(0, 1)) Is Nothing) Or _
+'        (Not Intersect(Target, Me.Cells.Find("LS", LookAt:=xlWhole, LookIn:=xlValues).Offset(0, 1)) Is Nothing) Or _
+'        (Not Intersect(Target, Me.Cells.Find("CCC curve", LookAt:=xlWhole, LookIn:=xlValues).Offset(0, 1)) Is Nothing) Or _
+'        (Not Intersect(Target, Me.Cells.Find("Reinvestment WAL", LookAt:=xlWhole, LookIn:=xlValues).Offset(0, 1)) Is Nothing) Or _
+'        (Not Intersect(Target, Me.Cells.Find("Reinvestment Spread", LookAt:=xlWhole, LookIn:=xlValues).Offset(0, 1)) Is Nothing)
         Me.Unprotect
         Me.ChartObjects("BBgVectorPlot").Top = Target.Top - 10
         Me.ChartObjects("BBgVectorPlot").Left = Target.Left + Target.Width + 10

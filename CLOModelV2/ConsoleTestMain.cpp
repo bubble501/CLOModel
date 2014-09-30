@@ -18,6 +18,7 @@
 #include "QBbgWorker.h"
 #include <QTime>
 #include <QTextStream>
+#include "DateTrigger.h"
 int main(int argc, char *argv[]) {
 	//QApplication a(argc, argv);
 	//ConsoleTestObj a;
@@ -40,10 +41,10 @@ int main(int argc, char *argv[]) {
 	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempCallWaterfall;
 	file.close();
-	//TempWtf.SetReinvestementPeriod(TempWtf.GetReinvestmentTest().GetReinvestmentPeriod());
-	TempWtf.GetTranche(0)->GetDiscountMargin(100.0);
 	TempWtf.CalculateTranchesCashFlows();
+	
 
+	
 
 
 }

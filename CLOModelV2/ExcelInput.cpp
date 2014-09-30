@@ -11,6 +11,7 @@
 #include <QSettings>
 #include <QApplication>
 #include <QTextStream>
+#include "DateTrigger.h"
 void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	bool RunStress;
 	CentralUnit TempUnit;
@@ -83,7 +84,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		int Prior, ArgSeniorityGroup, ArgSeniorityGroupLevel, ArgRedemptionGroup, ArgRedemptionGroupLevel, ArgSourceofFunding, ArgCouponIndex, ArgReserveIndex;
 		double ArgRedemptionShare, ArgAdditionalCollateralShare, ArgTestTargetOverride, ArgIRRtoEquityTarget;
 		QString ArgTrigger;
-		NumElements=pdFreq++->intVal;
+		NumElements = pdFreq->intVal; pdFreq++;
 		LOGDEBUG(QString("Numero Steps: %1").arg(NumElements));
 		for(int i=0;i<NumElements;i++){
 			Prior=pdFreq->intVal; pdFreq++;
@@ -101,6 +102,23 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			ArgTrigger = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 			TempUnit.AddWaterfallStep(static_cast<WatFalPrior::WaterfallStepType>(Prior), ArgSeniorityGroup, ArgSeniorityGroupLevel, ArgRedemptionGroup, ArgRedemptionGroupLevel, ArgRedemptionShare, ArgAdditionalCollateralShare, ArgSourceofFunding, ArgCouponIndex, ArgTestTargetOverride, ArgIRRtoEquityTarget, ArgReserveIndex, ArgTrigger);
 		}
+	}
+	{ //Triggers
+		int TriggerCount,TriggerTpe;
+		TriggerCount = pdFreq->intVal; pdFreq++;
+		QSharedPointer<AbstractTrigger> TempTrigger;
+		for (int i = 0; i < TriggerCount; i++) {
+			TriggerTpe = pdFreq->intVal; pdFreq++;
+			switch (TriggerTpe) {
+			case static_cast<int>(AbstractTrigger::TriggerType::DateTrigger) :
+				TempTrigger.reset(new DateTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+				TempTrigger.dynamicCast<DateTrigger>()->SetLimitDate(QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal), "yyyy-MM-dd")); pdFreq++;
+				TempTrigger.dynamicCast<DateTrigger>()->SetSide(static_cast<DateTrigger::TriggerSide>(pdFreq->intVal)); pdFreq++;
+				TempUnit.SetTrigger(i + 1, TempTrigger);
+				break;
+			}
+		}
+
 	}
 	{ //General Inputs
 		LOGDEBUG(QString("General Inputs"));

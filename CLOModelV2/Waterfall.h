@@ -101,8 +101,8 @@ private:
 	double RedeemSequential(double AvailableFunds, const QDate& PeriodIndex, int SeliorityScaleLevel, int MaxGroup = -1 );
 	int FindTrancheIndex(const QString& Tranchename)const;
 	void FillAllDates();
-	bool TriggerPassing(const QString& TriggerStructure, int PeriodIndex) const;
-	bool EvaluateTrigger(quint32 TrigID, int PeriodIndex)const;
+	bool TriggerPassing(const QString& TriggerStructure, int PeriodIndex, const QDate& CurrentIPD, bool IsCallDate) const;
+	bool EvaluateTrigger(quint32 TrigID, int PeriodIndex, const QDate& CurrentIPD, bool IsCallDate)const;
 	bool ValidTriggerStructure(const QString& TriggerStructure)const;
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;

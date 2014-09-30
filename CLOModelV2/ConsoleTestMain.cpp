@@ -19,6 +19,7 @@
 #include <QTime>
 #include <QTextStream>
 #include "DateTrigger.h"
+#include "PoolSizeTrigger.h"
 int main(int argc, char *argv[]) {
 	//QApplication a(argc, argv);
 	//ConsoleTestObj a;
@@ -41,13 +42,7 @@ int main(int argc, char *argv[]) {
 	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempCallWaterfall;
 	file.close();
-
-
-	QFile file2("c:/Temp/TestStream");
-	file2.open(QIODevice::WriteOnly);
-	QDataStream out2(&file2);
-	out2.setVersion(QDataStream::Qt_5_3);
-	out2 << TempWtf;
-	file2.close();
-	file2.remove();
+	TempWtf.SetTrigger(1, QSharedPointer<AbstractTrigger>(new PoolSizeTrigger(75000000.0, PoolSizeTrigger::TriggerSide::SmallerOrEqual, "Test Trigger")));
+	TempWtf.CalculateTranchesCashFlows();
+	
 }

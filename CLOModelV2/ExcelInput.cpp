@@ -13,6 +13,7 @@
 #include <QTextStream>
 #include "DateTrigger.h"
 #include "VectorTrigger.h"
+#include "PoolSizeTrigger.h"
 void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	bool RunStress;
 	CentralUnit TempUnit;
@@ -120,6 +121,12 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			case static_cast<int>(AbstractTrigger::TriggerType::VectorTrigger) :
 				TempTrigger.reset(new VectorTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
 				TempTrigger.dynamicCast<VectorTrigger>()->SetTrigVector(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+				TempUnit.SetTrigger(i + 1, TempTrigger);
+				break;
+			case static_cast<int>(AbstractTrigger::TriggerType::PoolSizeTrigger) :
+				TempTrigger.reset(new PoolSizeTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+				TempTrigger.dynamicCast<PoolSizeTrigger>()->SetTargetSize(pdFreq->dblVal); pdFreq++;
+				TempTrigger.dynamicCast<PoolSizeTrigger>()->SetSide(static_cast<PoolSizeTrigger::TriggerSide>(pdFreq->intVal)); pdFreq++;
 				TempUnit.SetTrigger(i + 1, TempTrigger);
 				break;
 			}

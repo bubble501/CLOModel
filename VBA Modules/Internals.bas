@@ -440,6 +440,16 @@ AdjTriggerType = FromStringToTriggerType(Target.Offset(0, -Target.Column + LeftC
                     Target.Resize(1, 3).Locked = False
                     Target.Offset(0, 1).Value = "Trigger Label"
                     Target.Offset(0, 2).Value = "Y"
+                Case UCase("Pool Size Trigger")
+                     Target.Resize(1, 4).Locked = False
+                    Target.Offset(0, 1).Value = "Trigger Label"
+                    Target.Offset(0, 2).Value = 0
+                    Target.Offset(0, 2).Validation.Add xlValidateDecimal, xlValidAlertStop, xlGreaterEqual, 0#
+                    Target.Offset(0, 2).NumberFormat = "_-* #,##0_-;-* #,##0_-;_-* "" - ""??_-;_-@_-"
+                    With Target.Offset(0, 3)
+                        .Value = 6
+                        .NumberFormat = """Smaller or Equal"""
+                    End With
                 Case Else
                     With Target.Offset(0, 1).Resize(1, 16378)
                        .ClearContents
@@ -449,7 +459,13 @@ AdjTriggerType = FromStringToTriggerType(Target.Offset(0, -Target.Column + LeftC
         Case 2
             Select Case AdjTriggerType
                 Case 0
-                    If (Target.Value < DateValue("2000-01-01")) Then
+                    If (Target.Value < DateValue("2000-01-01") And Not IsEmpty(Target)) Then
+                        Target.Interior.Color = RGB(255, 0, 0)
+                    Else
+                        Target.Interior.Color = RGB(235, 241, 222)
+                    End If
+                Case 2
+                    If (Target.Value < 0 And Not IsEmpty(Target)) Then
                         Target.Interior.Color = RGB(255, 0, 0)
                     Else
                         Target.Interior.Color = RGB(235, 241, 222)
@@ -458,22 +474,39 @@ AdjTriggerType = FromStringToTriggerType(Target.Offset(0, -Target.Column + LeftC
         Case 3
             Select Case AdjTriggerType
                 Case 0
-                TempString = ""
-                If (CLng(Target.Value) And 1) > 0 Then
-                    TempString = """Before"
-                ElseIf (CLng(Target.Value) And 2) > 0 Then
-                    TempString = """After"
-                End If
-                If (CLng(Target.Value) And 4) > 0 Then
-                    If (TempString = "") Then
-                        TempString = """Exactly"""
-                    Else
-                        TempString = TempString & " Including"""
+                    TempString = ""
+                    If (CLng(Target.Value) And 1) > 0 Then
+                        TempString = """Before"
+                    ElseIf (CLng(Target.Value) And 2) > 0 Then
+                        TempString = """After"
                     End If
-                Else
-                     If (TempString <> "") Then TempString = TempString & " Excluding"""
-                End If
-                Target.NumberFormat = TempString
+                    If (CLng(Target.Value) And 4) > 0 Then
+                        If (TempString = "") Then
+                            TempString = """Exactly"""
+                        Else
+                            TempString = TempString & " Including"""
+                        End If
+                    Else
+                         If (TempString <> "") Then TempString = TempString & " Excluding"""
+                    End If
+                    Target.NumberFormat = TempString
+                Case 2
+                    TempString = ""
+                    If (CLng(Target.Value) And 1) > 0 Then
+                        TempString = """Bigger"
+                    ElseIf (CLng(Target.Value) And 2) > 0 Then
+                        TempString = """Smaller"
+                    End If
+                    If (CLng(Target.Value) And 4) > 0 Then
+                        If (TempString = "") Then
+                            TempString = """Exactly"""
+                        Else
+                            TempString = TempString & " or Equal"""
+                        End If
+                    Else
+                         If (TempString <> "") Then TempString = TempString & """"
+                    End If
+                    Target.NumberFormat = TempString
             End Select
     End Select
 End Function

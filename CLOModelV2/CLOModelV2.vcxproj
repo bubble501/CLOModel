@@ -28,6 +28,7 @@
     <ClInclude Include="IRSwap.h" />
     <ClInclude Include="Mortgage.h" />
     <ClInclude Include="MtgCashFlow.h" />
+    <ClInclude Include="PoolSizeTrigger.h" />
     <ClInclude Include="QBbgRequest.h" />
     <ClInclude Include="QBbgResultsIterator.h" />
     <CustomBuild Include="QBbgWorker.h">
@@ -372,6 +373,7 @@
     <ClCompile Include="MtgCalculator.cpp" />
     <ClCompile Include="MtgCalculatorThread.cpp" />
     <ClCompile Include="MtgCashFlow.cpp" />
+    <ClCompile Include="PoolSizeTrigger.cpp" />
     <ClCompile Include="ProgressWidget.cpp" />
     <ClCompile Include="QBbgRequest.cpp" />
     <ClCompile Include="QBbgResultsIterator.cpp" />

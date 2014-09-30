@@ -7,6 +7,7 @@ public:
 	VectorTrigger(const QString& lab = QString());
 	VectorTrigger(const QString& Vec, const QString& lab);
 	VectorTrigger(const BoolVector& Vec, const QString& lab = QString());
+	VectorTrigger(const VectorTrigger& a) : m_TrigVector(a.m_TrigVector), AbstractTrigger(a) {}
 	virtual bool Passing(const QDate& CurrentDate) const;
 	virtual bool Failing(const QDate& CurrentDate) const { return !Passing(CurrentDate); }
 	virtual bool Passing(int VectorIndex) const;

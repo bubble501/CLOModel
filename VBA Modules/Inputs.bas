@@ -565,6 +565,11 @@ DefaultExchange:
                 Call AddInput(AllTheInputs, CLng(1))
                 Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
                 Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 2).Value))
+            Case 2 'Pool Size Trigger
+                Call AddInput(AllTheInputs, CLng(2))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
+                Call AddInput(AllTheInputs, CDbl(TriggerStart.Offset(i, 2).Value))
+                Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 3).Value))
             Case Else
                 Exit Sub
         End Select
@@ -1068,6 +1073,8 @@ Public Function FromStringToTriggerType(a As String) As Long
             FromStringToTriggerType = 0
         Case "VECTOR TRIGGER"
             FromStringToTriggerType = 1
+        Case "POOL SIZE TRIGGER"
+            FromStringToTriggerType = 2
         Case ""
             Exit Function
         Case Else

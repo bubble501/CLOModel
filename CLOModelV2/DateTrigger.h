@@ -14,6 +14,7 @@ public:
 	};
 	DateTrigger(const QString& lab = QString());
 	DateTrigger(const QDate& dte, TriggerSide sd = TriggerSide::Invalid, const QString& lab = QString());
+	DateTrigger(const DateTrigger& a) : m_LimitDate(a.m_LimitDate), m_Side(a.m_Side), AbstractTrigger(a) {}
 	virtual bool Passing(const QDate& CurrentDate) const;
 	virtual bool Failing(const QDate& CurrentDate) const { return !Passing(CurrentDate); }
 	const QDate& GetLimitDate() const { return m_LimitDate; }

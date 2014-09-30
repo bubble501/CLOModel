@@ -334,6 +334,12 @@
     <ClCompile Include="AbstractTrigger.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
+    <ClCompile Include="PoolSizeTrigger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VectorTrigger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Resources.qrc">
@@ -535,6 +541,12 @@
     </ClInclude>
     <ClInclude Include="Seniority.h">
       <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="PoolSizeTrigger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VectorTrigger.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

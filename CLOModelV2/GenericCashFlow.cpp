@@ -69,10 +69,12 @@ void GenericCashFlow::AddFlow(const GenericCashFlow& a) {
 }
 
 void GenericCashFlow::Clear() {
-	for (QMap<QDate, QHash<qint32, double>* >::iterator i = m_CashFlows.begin(); i != m_CashFlows.end(); i++) {
+	for (auto i = m_CashFlows.begin(); i != m_CashFlows.end(); ++i)
 		delete (i.value());
-	}
+	for (auto i = m_Stocks.begin(); i != m_Stocks.end();++i)
+		delete (i.value());
 	m_CashFlows.clear();
+	m_Stocks.clear();
 }
 
 QDate GenericCashFlow::GetDate(int index) const {
@@ -288,6 +290,14 @@ void GenericCashFlow::SetAdjustHolidays(bool val) {
 				i = m_CashFlows.erase(i);
 			}
 		}
+		for (auto i = m_Stocks.begin(); i != m_Stocks.end(); ++i) {
+			for (auto j = i.value()->begin(); j != i.value()->end(); ++j) {
+				while (IsHoliday(j.key())) {
+					i.value()->insert(j.key().addDays(1), j.value());
+					j = i.value()->erase(j);
+				}
+			}
+		}
 	}
 }
 
@@ -314,4 +324,25 @@ bool GenericCashFlow::IsEmpty() const {
 		if (!i.value()->isEmpty()) return false;
 	}
 	return true;
+}
+
+void GenericCashFlow::SetStock(qint32 FlowTpe) {
+	if (m_Stocks.contains(FlowTpe))return;
+	m_Stocks.insert(FlowTpe, new QMap<QDate, double>());
+	double CurrentLevel = 0.0;
+	for (auto i = m_CashFlows.begin(); i != m_CashFlows.end(); ++i) {
+		if (qAbs((*i)->value(FlowTpe,0.0))>=0.01) CurrentLevel += (*i)->value(FlowTpe);
+		m_Stocks[FlowTpe]->insert(i.key(), CurrentLevel);
+	}
+}
+
+double GenericCashFlow::GetStock(const QDate& index, qint32 FlowTpe) const {
+	QHash<qint32, QMap<QDate, double>* >::const_iterator foundit = m_Stocks.find(FlowTpe);
+	if (foundit == m_Stocks.constEnd()) return 0.0;
+	QMap<QDate, double>::const_iterator i;
+	for (i = (*foundit)->constBegin(); i != (*foundit)->constEnd() && i.key() <= index; ++i) {}
+	return (--i).value();
+}
+double GenericCashFlow::GetStock(int index, qint32 FlowTpe)const {
+	return GetStock(GetDate(index), FlowTpe);
 }

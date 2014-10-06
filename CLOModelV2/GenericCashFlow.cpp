@@ -315,3 +315,15 @@ bool GenericCashFlow::IsEmpty() const {
 	}
 	return true;
 }
+
+GenericCashFlow GenericCashFlow::AggregateRange(const QDate& StartDate, const QDate& EndDate) const{
+	GenericCashFlow Results;
+	for (QMap<QDate, QHash<qint32, double>* >::const_iterator i = m_CashFlows.constBegin(); i != m_CashFlows.constEnd() && i.key()<=EndDate; ++i) {
+		if (i.key() >= StartDate) {
+			for (QHash<qint32, double>::const_iterator j = i.value()->constBegin(); j != i.value()->constEnd(); ++j) {
+				Results.AddFlow(EndDate, j.value(), j.key());
+			}
+		}
+	}
+	return Results;
+}

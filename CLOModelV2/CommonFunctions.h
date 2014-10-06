@@ -17,6 +17,7 @@ template<typename T> class QList;
 //#define SAVE_EXCEL_INPUTS
 //#define SaveLoanTape
 //#define DebugLogging
+//#define PrintAggregatedMtgFlows
 
 #ifdef DebugLogging
 #define LOGASSERT(CheckExp,LogMsg) ((CheckExp) ? qt_noop() : PrintToTempFile("DebugLog.log",LogMsg)); Q_ASSERT_X(CheckExp,"LOGASSERT",LogMsg)

@@ -53,7 +53,7 @@ public:
 	virtual double GetTotalFlow(int index) const { return GetTotalFlow(index, QList<qint32>()); }
 	virtual bool IsEmpty() const;
 	virtual QString ToString() const;
-
+	virtual GenericCashFlow AggregateRange(const QDate& StartDate, const QDate& EndDate)const;
 protected:
 	static bool SamePeriod(const QDate& a, const QDate& b, CashFlowAggregation Freq);
 	QMap<QDate, QHash<qint32, double>*	> m_CashFlows;

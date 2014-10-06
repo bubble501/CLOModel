@@ -11,10 +11,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AbstarctBbgVect.cpp" />
+    <ClCompile Include="AbstractBbgVect.cpp" />
+    <ClCompile Include="AbstractTrigger.cpp" />
     <ClCompile Include="BaseRateTable.cpp" />
     <ClCompile Include="BaseRateVect.cpp" />
     <ClCompile Include="BloombergVector.cpp" />
+    <ClCompile Include="DateTrigger.cpp" />
     <ClCompile Include="DayCountVect.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_QBbgWorker.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -23,6 +25,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GenericCashFlow.cpp" />
+    <ClCompile Include="PoolSizeTrigger.cpp" />
     <ClCompile Include="QBbgRequest.cpp" />
     <ClCompile Include="QBbgResultsIterator.cpp" />
     <ClCompile Include="QBbgWorker.cpp" />
@@ -171,6 +174,7 @@
     <ClCompile Include="ReinvestmentTest.cpp" />
     <ClCompile Include="RepaymentVector.cpp" />
     <ClCompile Include="ReserveFund.cpp" />
+    <ClCompile Include="Seniority.cpp" />
     <ClCompile Include="StandaloneViewer.cpp" />
     <ClCompile Include="StandaloneViewMain.cpp" />
     <ClCompile Include="StressTest.cpp" />
@@ -180,7 +184,9 @@
     <ClCompile Include="SummaryView.cpp" />
     <ClCompile Include="Tranche.cpp" />
     <ClCompile Include="TrancheCashFlow.cpp" />
+    <ClCompile Include="TrancheTrigger.cpp" />
     <ClCompile Include="TrancheViewer.cpp" />
+    <ClCompile Include="VectorTrigger.cpp" />
     <ClCompile Include="Waterfall.cpp" />
     <ClCompile Include="WaterfallCalcThread.cpp" />
     <ClCompile Include="WaterfallCalculator.cpp" />
@@ -188,13 +194,15 @@
     <ClCompile Include="WatFalPrior.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AbstarctBbgVect.h" />
+    <ClInclude Include="AbstractBbgVect.h" />
+    <ClInclude Include="AbstractTrigger.h" />
     <ClInclude Include="BackwardCompatibilityInterface.h" />
     <ClInclude Include="BaseRateTable.h" />
     <ClInclude Include="BaseRateVect.h" />
     <ClInclude Include="BloombergVector.h" />
     <ClInclude Include="BoolVector.h" />
     <ClInclude Include="CommonFunctions.h" />
+    <ClInclude Include="DateTrigger.h" />
     <ClInclude Include="DayCountVect.h" />
     <ClInclude Include="ExcelCommons.h" />
     <ClInclude Include="ExcelOutput.h" />
@@ -202,6 +210,7 @@
     <ClInclude Include="IntegerVector.h" />
     <ClInclude Include="Mortgage.h" />
     <ClInclude Include="MtgCashFlow.h" />
+    <ClInclude Include="PoolSizeTrigger.h" />
     <ClInclude Include="QBbgRequest.h" />
     <ClInclude Include="QBbgResultsIterator.h" />
     <CustomBuild Include="QBbgWorker.h">
@@ -221,8 +230,11 @@
     <ClInclude Include="RepaymentVector.h" />
     <ClInclude Include="ReserveFund.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Seniority.h" />
     <ClInclude Include="Tranche.h" />
     <ClInclude Include="TrancheCashFlow.h" />
+    <ClInclude Include="TrancheTrigger.h" />
+    <ClInclude Include="VectorTrigger.h" />
     <ClInclude Include="Waterfall.h" />
     <ClInclude Include="WatFalPrior.h" />
     <CustomBuild Include="WaterfallViewer.h">

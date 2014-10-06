@@ -194,9 +194,6 @@
     <ClCompile Include="GeneratedFiles\qrc_Resources.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
-    <ClCompile Include="AbstarctBbgVect.cpp">
-      <Filter>Source Files\Core Files</Filter>
-    </ClCompile>
     <ClCompile Include="BaseRateVect.cpp">
       <Filter>Source Files\Core Files</Filter>
     </ClCompile>
@@ -326,6 +323,27 @@
     <ClCompile Include="DayCountVect.cpp">
       <Filter>Source Files\Core Files</Filter>
     </ClCompile>
+    <ClCompile Include="AbstractBbgVect.cpp">
+      <Filter>Source Files\Core Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AbstractTrigger.cpp">
+      <Filter>Source Files\Core Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DateTrigger.cpp">
+      <Filter>Source Files\Core Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PoolSizeTrigger.cpp">
+      <Filter>Source Files\Core Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TrancheTrigger.cpp">
+      <Filter>Source Files\Core Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Seniority.cpp">
+      <Filter>Source Files\Core Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VectorTrigger.cpp">
+      <Filter>Source Files\Core Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="quazip\crypt.h">
@@ -366,9 +384,6 @@
     </ClInclude>
     <ClInclude Include="quazip\zip.h">
       <Filter>QuaZIP</Filter>
-    </ClInclude>
-    <ClInclude Include="AbstarctBbgVect.h">
-      <Filter>Header Files\Core Files</Filter>
     </ClInclude>
     <ClInclude Include="BaseRateVect.h">
       <Filter>Header Files\Core Files</Filter>
@@ -446,6 +461,27 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DayCountVect.h">
+      <Filter>Header Files\Core Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AbstractBbgVect.h">
+      <Filter>Header Files\Core Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AbstractTrigger.h">
+      <Filter>Header Files\Core Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PoolSizeTrigger.h">
+      <Filter>Header Files\Core Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TrancheTrigger.h">
+      <Filter>Header Files\Core Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DateTrigger.h">
+      <Filter>Header Files\Core Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Seniority.h">
+      <Filter>Header Files\Core Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VectorTrigger.h">
       <Filter>Header Files\Core Files</Filter>
     </ClInclude>
   </ItemGroup>

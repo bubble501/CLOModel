@@ -90,6 +90,7 @@ private:
 	double m_StartingDeferredJunFees;
 	GenericCashFlow m_GICflows;
 	DayCountVector m_DealDayCountConvention;
+	QDate m_CalledPeriod;
 	QHash <qint32, QSharedPointer<AbstractTrigger> > m_Triggers;
 	int FindMostJuniorLevel(int SeliorityScaleLevel) const;
 	void SortByProRataGroup();
@@ -155,7 +156,7 @@ public:
 	GenericCashFlow& GetReinvested() { return m_Reinvested; }
 	const QDate& GetLastIPDdate() const {return m_LastIPDdate;} 
 	const QDate& GetCallDate() const {return m_CallDate;}
-	QDate GetCalledPeriod() const;
+	const QDate& GetCalledPeriod() const;
 	QDate GetStructureMaturity() const;
 	const WatFalPrior* GetStep(int Index) const;
 	WatFalPrior* GetStep(int Index);
@@ -182,6 +183,9 @@ public:
 	const DayCountVector& GetDealDayCountConvention() const { return m_DealDayCountConvention; }
 	const QSharedPointer<AbstractTrigger> GetTrigger(qint32 key) const { return m_Triggers.value(key, QSharedPointer<AbstractTrigger>()); }
 	QSharedPointer<AbstractTrigger> GetTrigger(qint32 key) { if (m_Triggers.contains(key)) return m_Triggers[key]; return QSharedPointer<AbstractTrigger>(); }
+	GenericCashFlow GetAggregatedReinvestment() const;
+	GenericCashFlow GetAggregatedGIC() const;
+	MtgCashFlow GetAggregatedMtgFlows() const;
 	//////////////////////////////////////////////////////////////////////////
 	void SetTrigger(qint32 key, QSharedPointer<AbstractTrigger> val);
 	void RemoveTrigger(qint32 key) { m_Triggers.remove(key); }

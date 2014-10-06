@@ -4,7 +4,8 @@
 #include <QDate>
 #include "BackwardCompatibilityInterface.h"
 #include <QDataStream>
-class AbstarctBbgVect : public BackwardInterface
+#include <QMetaType>
+class AbstractBbgVect : public BackwardInterface
 {
 protected:
 	QString m_Vector;
@@ -17,13 +18,13 @@ protected:
 public:
 	virtual void Clear();
 	virtual bool SetVector(const QString& Vec);
-	AbstarctBbgVect(){}
-	AbstarctBbgVect(const QString& Vec);
+	AbstractBbgVect(){}
+	AbstractBbgVect(const QString& Vec);
 	virtual void SetAnchorDate(const QDate& Anchor){m_AnchorDate=Anchor;}
 	virtual void RemoveAnchorDate(){m_AnchorDate=QDate();}
 	virtual QString GetVector() const;
 	virtual const QDate& GetAnchorDate() const{return m_AnchorDate;}
-	AbstarctBbgVect& operator=(const QString& a){SetVector(a); return *this;}
+	AbstractBbgVect& operator=(const QString& a){SetVector(a); return *this;}
 	virtual bool IsEmpty() const{return m_Vector.isEmpty();}
 };
 #endif // AbstarctBbgVect_h__

@@ -2,8 +2,8 @@
 #ifndef AnnuityVector_h__
 #define AnnuityVector_h__
 #include <QList>
-#include "AbstarctBbgVect.h"
-class BoolVector : public AbstarctBbgVect
+#include "AbstractBbgVect.h"
+class BoolVector : public AbstractBbgVect
 {
 private:
 	QList<bool> m_VectVal;
@@ -19,12 +19,13 @@ public:
 	bool GetValue(const QDate& index) const;
 	bool GetValue(int index) const;
 	int NumElements() const {return m_VectVal.size();}
-	BoolVector& operator=(const QString& a){AbstarctBbgVect::operator=(a); return *this;}
+	BoolVector& operator=(const QString& a){AbstractBbgVect::operator=(a); return *this;}
 	friend QDataStream& operator<<(QDataStream & stream, const BoolVector& flows);
 	friend QDataStream& operator>>(QDataStream & stream, BoolVector& flows);
 };
 QDataStream& operator<<(QDataStream & stream, const BoolVector& flows);
 QDataStream& operator>>(QDataStream & stream, BoolVector& flows);
+Q_DECLARE_METATYPE(BoolVector)
 #endif // AnnuityVector_h__
 
 

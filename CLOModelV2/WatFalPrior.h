@@ -1,9 +1,12 @@
 #ifndef WatFalPrior_h__
 #define WatFalPrior_h__
 #include <QDataStream>
-#include <QVariant>
+#include <QString>
 #include <QHash>
+#include <QVariant>
 #include "BackwardCompatibilityInterface.h"
+class IntegerVector;
+class BloombergVector;
 class WatFalPrior : public BackwardInterface {
 public:
 	//! Enum defining the different types of waterfall steps
@@ -42,24 +45,28 @@ public:
 		, ReserveIndex
 		, Trigger
 	};
-	QVariant GetParameter(qint32 ParameterType) const { return Parameters.value(ParameterType, QVariant()); }
-	bool HasParameter(qint32 ParameterType) const { return Parameters.contains(ParameterType); }
-	void SetParameter(qint32 ParameterType, QVariant val) { Parameters[ParameterType] = val; }
+	
 	QVariant GetParameter(wstParameters ParameterType) const { return GetParameter(static_cast<qint32>(ParameterType)); }
 	bool HasParameter(wstParameters ParameterType)const { return HasParameter(static_cast<qint32>(ParameterType)); }
-	void SetParameter(wstParameters ParameterType, QVariant val) { SetParameter(static_cast<qint32>(ParameterType), val); }
-	void RemoveParameter(qint32 ParameterType) { Parameters.remove(ParameterType); }
+	void SetParameter(wstParameters ParameterType, const QString& val) { SetParameter(static_cast<qint32>(ParameterType), val); }
 	void RemoveParameter(wstParameters ParameterType) { RemoveParameter(static_cast<qint32>(ParameterType)); }
-	void ClearParameters() { Parameters.clear(); }
-	void SetParameters(const QHash<qint32, QVariant>& a) { Parameters = a; }
+	void ClearParameters();
 	WaterfallStepType GetPriorityType() const{return PriorityType;}
 	void SetPriorityType(WaterfallStepType a){PriorityType=a;}
 	QString ReadyToCalculate() const;
 	WatFalPrior();
+	virtual ~WatFalPrior();
 	WatFalPrior(const WatFalPrior& a);
 	WatFalPrior& operator=(const WatFalPrior& a);
+	QString ToString() const;
 private:
-	QHash<qint32, QVariant> Parameters;
+	void RemoveParameter(qint32 ParameterType);
+	QVariant GetParameter(qint32 ParameterType) const;
+	bool HasParameter(qint32 ParameterType) const;
+	void SetParameter(qint32 ParameterType, const QString& val);
+	QHash<qint32, IntegerVector*> IntParameters;
+	QHash<qint32, BloombergVector*> DoubleParameters;
+	QString TriggerStruc;
 	WaterfallStepType PriorityType;
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;

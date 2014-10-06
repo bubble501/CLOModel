@@ -1,13 +1,13 @@
 #ifndef BaseRateVect_h__
 #define BaseRateVect_h__
-#include "AbstarctBbgVect.h"
+#include "AbstractBbgVect.h"
 #include <QStringList>
 #include <QString>
 #include <QHash>
 #include <QDataStream>
 #include "BloombergVector.h"
 #include "BaseRateTable.h"
-class BaseRateVector : public AbstarctBbgVect{
+class BaseRateVector : public AbstractBbgVect{
 public:
 protected:
 	QStringList m_VectVal;
@@ -33,10 +33,11 @@ public:
 	BloombergVector GetBaseRatesDatabase(ConstantBaseRateTable& ReferencesValues, bool DownloadAll=false) const;
 	BloombergVector GetBaseRatesDatabase(ForwardBaseRateTable& ReferencesValues, bool DownloadAll=false) const;
 #endif 
-	BaseRateVector& operator=(const QString& a){AbstarctBbgVect::operator=(a); return *this;}
+	BaseRateVector& operator=(const QString& a){AbstractBbgVect::operator=(a); return *this;}
 	friend QDataStream& operator<<(QDataStream & stream, const BaseRateVector& flows);
 	friend QDataStream& operator>>(QDataStream & stream, BaseRateVector& flows);
 };
 QDataStream& operator<<(QDataStream & stream, const BaseRateVector& flows);
 QDataStream& operator>>(QDataStream & stream, BaseRateVector& flows);
+Q_DECLARE_METATYPE(BaseRateVector)
 #endif // BaseRateVect_h__

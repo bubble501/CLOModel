@@ -2,7 +2,7 @@
 #define AbstractTrigger_h__
 #include "BackwardCompatibilityInterface.h"
 #include <QString>
-#define NegateChar '!'
+
 class AbstractTrigger : public BackwardInterface{
 public:
 	enum class TriggerType : quint8 {

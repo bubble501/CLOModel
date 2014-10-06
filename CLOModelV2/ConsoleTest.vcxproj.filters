@@ -82,9 +82,6 @@
     <ClCompile Include="quazip\quazipnewinfo.cpp">
       <Filter>quazip</Filter>
     </ClCompile>
-    <ClCompile Include="AbstarctBbgVect.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
     <ClCompile Include="BaseRateTable.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
@@ -343,6 +340,9 @@
     <ClCompile Include="PoolSizeTrigger.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
+    <ClCompile Include="AbstractBbgVect.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Resources.qrc">
@@ -400,9 +400,6 @@
       <Filter>Header Files\Core</Filter>
     </CustomBuild>
     <CustomBuild Include="WaterfallViewer.h">
-      <Filter>Header Files\Core</Filter>
-    </CustomBuild>
-    <CustomBuild Include="AbstarctBbgVect.h">
       <Filter>Header Files\Core</Filter>
     </CustomBuild>
     <CustomBuild Include="BackwardCompatibilityInterface.h">
@@ -530,6 +527,9 @@
     </CustomBuild>
     <CustomBuild Include="ConsoleTestObj.h">
       <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="AbstractBbgVect.h">
+      <Filter>Header Files\Core</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

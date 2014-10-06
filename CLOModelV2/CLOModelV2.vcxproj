@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AbstarctBbgVect.h" />
+    <ClInclude Include="AbstractBbgVect.h" />
     <ClInclude Include="AbstractTrigger.h" />
     <ClInclude Include="DateTrigger.h" />
     <ClInclude Include="DayCountVect.h" />
@@ -239,7 +239,7 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AbstarctBbgVect.cpp" />
+    <ClCompile Include="AbstractBbgVect.cpp" />
     <ClCompile Include="AbstractTrigger.cpp" />
     <ClCompile Include="DateTrigger.cpp" />
     <ClCompile Include="DayCountVect.cpp" />

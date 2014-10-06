@@ -148,7 +148,7 @@ void StressWorker::WorkSlow(){
 				LocalStructure.GetReinvestmentTest().SetLS(YSpann);
 			}
 		}
-		if(!Loans->StartCalculation(true))
+		if(!Loans->StartCalculation(false)) //TODO should be true
 			emit ScenarioCalculated(Identity[0], Identity[1], Waterfall());
 }
 

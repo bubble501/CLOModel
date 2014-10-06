@@ -3,7 +3,7 @@
 #include <QStringList>
 #include "CommonFunctions.h"
 DayCountVector::DayCountVector(const QString& Vec)
-	:AbstarctBbgVect(Vec) {
+	:AbstractBbgVect(Vec) {
 	if (IsValid()) UnpackVector();
 	else {
 		RemoveAnchorDate();
@@ -22,7 +22,7 @@ DayCountVector& DayCountVector::operator=(const DayCountVector& Vec) {
 	return *this;
 }
 DayCountVector::DayCountVector(const QString& Vec, const QDate& Anchor)
-	:AbstarctBbgVect(Vec) {
+	:AbstractBbgVect(Vec) {
 	if (IsValid()) { UnpackVector(); m_AnchorDate = Anchor; }
 	else {
 		RemoveAnchorDate();
@@ -76,11 +76,18 @@ bool DayCountVector::IsValid() const {
 		else i <<= 1;
 	}
 	Result.append(')');
-	return AbstarctBbgVect::IsValid(Result, false);
+	return AbstractBbgVect::IsValid(Result, false);
 }
 DayCountConvention DayCountVector::GetValue(const QDate& index)const {
 	QDate ValidDate(m_AnchorDate);
-	if (m_AnchorDate.isNull()) ValidDate = QDate::currentDate();
+	if (m_AnchorDate.isNull()) { 
+		ValidDate = QDate::currentDate(); 
+		LOGDEBUG("Anchor defaulted to today\n"); 
+	}
+	if (index < m_AnchorDate) { 
+		LOGDEBUG("Requested date before Anchor\n"); 
+		return m_VectVal.first();
+	}
 	return GetValue(MonthDiff(index, ValidDate));
 }
 DayCountConvention DayCountVector::GetValue(int index)const {

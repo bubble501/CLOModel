@@ -164,9 +164,6 @@
     <ClInclude Include="MtgCashFlow.h">
       <Filter>Header Files\Loans</Filter>
     </ClInclude>
-    <ClInclude Include="AbstarctBbgVect.h">
-      <Filter>Header Files\Vectors</Filter>
-    </ClInclude>
     <ClInclude Include="BaseRateVect.h">
       <Filter>Header Files\Vectors</Filter>
     </ClInclude>
@@ -235,6 +232,9 @@
     </ClInclude>
     <ClInclude Include="TrancheTrigger.h">
       <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="AbstractBbgVect.h">
+      <Filter>Header Files\Vectors</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -444,9 +444,6 @@
     <ClCompile Include="quazip\quazipnewinfo.cpp">
       <Filter>QuaZIP</Filter>
     </ClCompile>
-    <ClCompile Include="AbstarctBbgVect.cpp">
-      <Filter>Source Files\Vectors</Filter>
-    </ClCompile>
     <ClCompile Include="BaseRateVect.cpp">
       <Filter>Source Files\Vectors</Filter>
     </ClCompile>
@@ -587,6 +584,9 @@
     </ClCompile>
     <ClCompile Include="TrancheTrigger.cpp">
       <Filter>Source Files\Triggers</Filter>
+    </ClCompile>
+    <ClCompile Include="AbstractBbgVect.cpp">
+      <Filter>Source Files\Vectors</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

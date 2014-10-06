@@ -3,7 +3,7 @@
 #include <QRegExp>
 #include <QStringList>
 BoolVector::BoolVector(const QString& Vec)
-	:AbstarctBbgVect(Vec)
+	:AbstractBbgVect(Vec)
 {
 	if(IsValid()) UnpackVector();
 	else {
@@ -12,7 +12,7 @@ BoolVector::BoolVector(const QString& Vec)
 	}
 }
 BoolVector::BoolVector(const QString& Vec,const QDate& Anchor)
-	:AbstarctBbgVect(Vec)
+	:AbstractBbgVect(Vec)
 {
 	if (IsValid()) {
 		UnpackVector();
@@ -48,12 +48,19 @@ void BoolVector::UnpackVector(){
 	m_VectVal.append(StringParts.last().at(0).toLatin1());
 }
 bool BoolVector::IsValid() const{
-	return AbstarctBbgVect::IsValid("[TFNY]", false);
+	return AbstractBbgVect::IsValid("[TFNY]", false);
 }
 
 bool BoolVector::GetValue(const QDate& index)const{
 	QDate ValidDate(m_AnchorDate);
-	if(m_AnchorDate.isNull()) ValidDate=QDate::currentDate();
+	if (m_AnchorDate.isNull()) { 
+		ValidDate = QDate::currentDate(); 
+		LOGDEBUG("Anchor defaulted to today\n"); 
+	}
+	if (index < m_AnchorDate) { 
+		LOGDEBUG("Requested date before Anchor\n"); 
+		return m_VectVal.first(); 
+	}
 	return GetValue(MonthDiff(index,ValidDate));
 }
 bool BoolVector::GetValue(int index)const{

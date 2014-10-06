@@ -143,6 +143,25 @@ Waterfall::Waterfall(const Waterfall& a)
 	for (QList<ReserveFund*>::const_iterator i = a.m_Reserves.constBegin(); i != a.m_Reserves.constEnd(); i++) {
 		m_Reserves.append(new ReserveFund(**i));
 	}
+	for (auto i = a.m_Triggers.constBegin(); i != a.m_Triggers.constEnd(); ++i) {
+		switch (i.value()->GetTriggerType()) {
+		case AbstractTrigger::TriggerType::DateTrigger:
+			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DateTrigger(*(i.value().dynamicCast<DateTrigger>()))));
+			break;
+		case AbstractTrigger::TriggerType::VectorTrigger:
+			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new VectorTrigger(*(i.value().dynamicCast<VectorTrigger>()))));
+			break;
+		case AbstractTrigger::TriggerType::PoolSizeTrigger:
+			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new PoolSizeTrigger(*(i.value().dynamicCast<PoolSizeTrigger>()))));
+			break;
+		case AbstractTrigger::TriggerType::TrancheTrigger:
+			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new TrancheTrigger(*(i.value().dynamicCast<TrancheTrigger>()))));
+			break;
+		default:
+			break;
+		}
+	}
+
 }
 Waterfall& Waterfall::operator=(const Waterfall& a){
 	m_SeniorExpenses=a.m_SeniorExpenses;
@@ -195,6 +214,25 @@ Waterfall& Waterfall::operator=(const Waterfall& a){
 	RemoveReserve();
 	for (QList<ReserveFund*>::const_iterator i = a.m_Reserves.constBegin(); i != a.m_Reserves.constEnd(); i++) {
 		m_Reserves.append(new ReserveFund(**i));
+	}
+	m_Triggers.clear();
+	for (auto i = a.m_Triggers.constBegin(); i != a.m_Triggers.constEnd(); ++i) {
+		switch (i.value()->GetTriggerType()) {
+		case AbstractTrigger::TriggerType::DateTrigger:
+			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DateTrigger(*(i.value().dynamicCast<DateTrigger>()))));
+			break;
+		case AbstractTrigger::TriggerType::VectorTrigger:
+			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new VectorTrigger(*(i.value().dynamicCast<VectorTrigger>()))));
+			break;
+		case AbstractTrigger::TriggerType::PoolSizeTrigger:
+			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new PoolSizeTrigger(*(i.value().dynamicCast<PoolSizeTrigger>()))));
+			break;
+		case AbstractTrigger::TriggerType::TrancheTrigger:
+			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new TrancheTrigger(*(i.value().dynamicCast<TrancheTrigger>()))));
+			break;
+		default:
+			break;
+		}
 	}
 	return *this;
 }
@@ -706,16 +744,16 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						break;
 					}
 				}
-				if(CurrentDate<=m_ReinvestmentTest.GetReinvestmentPeriod() && ReinvestRightAway && !IsCallPaymentDate){
+				if (TriggerPassing("0", i, RollingNextIPD, IsCallPaymentDate) && ReinvestRightAway && !IsCallPaymentDate) {
 					//during reinvestment period
 					//reinvest
 					if(m_PrincipalAvailable.Total()>0.0){
 						double PayablePrincipal; 
-						if (ReinvestRightAway->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).toInt() == 1){  //Reinvest Prepay Only
+						if (ReinvestRightAway->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 1){  //Reinvest Prepay Only
 							PayablePrincipal = m_PrincipalAvailable.GetPrepay();
 							m_PrincipalAvailable.SetPrepay(0.0);
 						}
-						else if (ReinvestRightAway->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).toInt() == 2) {  //Reinvest scheduled only
+						else if (ReinvestRightAway->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 2) {  //Reinvest scheduled only
 							PayablePrincipal = m_PrincipalAvailable.GetScheduled();
 							m_PrincipalAvailable.SetScheduled(0.0);
 						}
@@ -729,7 +767,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						m_InterestAvailable+=m_ReinvestmentTest.GetBondCashFlow().GetInterest(CurrentDate);
 						m_PrincipalAvailable.AddScheduled(m_ReinvestmentTest.GetBondCashFlow().GetScheduled(CurrentDate));
 						m_PrincipalAvailable.AddPrepay(m_ReinvestmentTest.GetBondCashFlow().GetPrepay(CurrentDate));
-						CheckResults -= m_ReinvestmentTest.GetBondCashFlow().GetScheduled(CurrentDate) + m_ReinvestmentTest.GetBondCashFlow().GetPrepay(CurrentDate) + m_ReinvestmentTest.GetBondCashFlow().GetInterest(CurrentDate);
+						CheckResults -= m_ReinvestmentTest.GetBondCashFlow().GetTotalFlow(CurrentDate);
 					}
 				}
 				continue;
@@ -764,11 +802,11 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					;
 					TotalPayable += m_SeniorExpensesFixed.GetValue(CurrentDate);
 					if(TotalPayable>=0.01){
-						if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).toInt() == 1) {
+						if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 1) {
 							m_TotalSeniorExpenses.AddFlow(CurrentDate, qMin(AvailableInterest, TotalPayable), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
 							AvailableInterest=qMax(0.0,AvailableInterest-TotalPayable);
 						}
-						else if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).toInt() == 2) {
+						else if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 2) {
 							m_TotalSeniorExpenses.AddFlow(CurrentDate, qMin(AvailablePrincipal.Total(), TotalPayable), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
 							AvailablePrincipal-=TotalPayable;
 							if (AvailablePrincipal < 0.0) AvailablePrincipal.Erase();
@@ -784,11 +822,11 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						;
 					TotalPayable += m_SeniorFeesFixed.GetValue(CurrentDate);
 					if(TotalPayable>=0.01){
-						if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).toInt() == 1) {
+						if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 1) {
 							m_TotalSeniorFees.AddFlow(CurrentDate, qMin(AvailableInterest, TotalPayable), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
 							AvailableInterest=qMax(0.0,AvailableInterest-TotalPayable);
 						}
-						else if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).toInt() == 2) {
+						else if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 2) {
 							m_TotalSeniorFees.AddFlow(CurrentDate, qMin(AvailablePrincipal.Total(), TotalPayable), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
 							AvailablePrincipal -= TotalPayable;
 							if (AvailablePrincipal < 0.0) AvailablePrincipal.Erase();
@@ -807,7 +845,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					m_StartingDeferredJunFees = 0.0;
 					TotalPayable += m_JuniorFeesFixed.GetValue(CurrentDate);
 					TotalPayable=qMax(TotalPayable,0.0);
-					if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).toInt() == 1) {
+					if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 1) {
 						m_TotalJuniorFees.AddFlow(CurrentDate, qMin(AvailableInterest, TotalPayable), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
 						m_AnnualizedExcess.AddFlow(CurrentDate, qMin(AvailableInterest, TotalPayable), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
 						if(AvailableInterest<TotalPayable){
@@ -815,7 +853,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						}
 						AvailableInterest -= qMin(AvailableInterest, TotalPayable);
 					}
-					else if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).toInt() == 2) {
+					else if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 2) {
 						m_TotalJuniorFees.AddFlow(CurrentDate, qMin(AvailablePrincipal.Total(), TotalPayable), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
 						m_AnnualizedExcess.AddFlow(CurrentDate, qMin(AvailablePrincipal.Total(), TotalPayable), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
 						if(AvailablePrincipal.Total()<TotalPayable){
@@ -828,13 +866,15 @@ bool Waterfall::CalculateTranchesCashFlows(){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				case WatFalPrior::WaterfallStepType::wst_FeesFromExcess:
 					TotalPayable = 0.0;
-					if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).toInt() & 1) {
-						TotalPayable += AvailableInterest*SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionShare).toDouble();
-						AvailableInterest *= (1.0 - SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionShare).toDouble());
+					if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) & 1) {
+						double RedSh = SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionShare).value<BloombergVector>().GetValue(CurrentDate);
+						TotalPayable += AvailableInterest*RedSh;
+						AvailableInterest *= (1.0 - RedSh);
 					}
-					if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).toInt() >= 2) {
-						TotalPayable += AvailablePrincipal.Total()*SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionShare).toDouble();
-						AvailablePrincipal -= AvailablePrincipal.Total()*SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionShare).toDouble();
+					if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) >= 2) {
+						double RedSh = SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionShare).value<BloombergVector>().GetValue(CurrentDate);
+						TotalPayable += AvailablePrincipal.Total()*RedSh;
+						AvailablePrincipal -= AvailablePrincipal.Total()*RedSh;
 					}
 					m_TotalJuniorFees.AddFlow(CurrentDate, TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow) + 1);
 					m_AnnualizedExcess.AddFlow(CurrentDate, TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow) + 1);
@@ -842,55 +882,56 @@ bool Waterfall::CalculateTranchesCashFlows(){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				case WatFalPrior::WaterfallStepType::wst_ReserveReplenish:
 					{
-					if (SingleStep->GetParameter(WatFalPrior::wstParameters::ReserveIndex).toInt() < 1 || SingleStep->GetParameter(WatFalPrior::wstParameters::ReserveIndex).toInt() > m_Reserves.size()) {
+					int RevIdx = SingleStep->GetParameter(WatFalPrior::wstParameters::ReserveIndex).value<IntegerVector>().GetValue(CurrentDate);
+					if (RevIdx< 0 || RevIdx >= m_Reserves.size()) {
 							PrintToTempFile("ReturnFalse.txt", "Reserve Fund Fail");
 							return false;
 						}
 						double FreedAmnt, StacedRsAmt=0.0;
 						int MostJun=FindMostJuniorLevel(0);
 						
-						if (m_Reserves.at(SingleStep->GetParameter(WatFalPrior::wstParameters::ReserveIndex).toInt() - 1)->GetReserveFundFreed() == 0 || m_Reserves.at(SingleStep->GetParameter(WatFalPrior::wstParameters::ReserveIndex).toInt() - 1)->GetReserveFundFreed()>MostJun)
+						if (m_Reserves.at(RevIdx)->GetReserveFundFreed() == 0 || m_Reserves.at(RevIdx)->GetReserveFundFreed()>MostJun)
 							FreedAmnt=1.0;
 						else{
 							FreedAmnt=0.0;
 							for(int h=0;h<m_Tranches.size();h++){
-								if (m_Tranches.at(h)->GetProrataGroup(0) <= m_Reserves.at(SingleStep->GetParameter(WatFalPrior::wstParameters::ReserveIndex).toInt() - 1)->GetReserveFundFreed())
+								if (m_Tranches.at(h)->GetProrataGroup(0) <= m_Reserves.at(RevIdx)->GetReserveFundFreed())
 									FreedAmnt+=m_Tranches.at(h)->GetCurrentOutstanding();
 							}
 						}
 						if(i<m_MortgagesPayments.Count()-1 && !IsCallPaymentDate && FreedAmnt>0.01){
 							TestTarget=0.0;
-							if (qRound(m_Reserves.at(SingleStep->GetParameter(WatFalPrior::wstParameters::ReserveIndex).toInt() - 1)->GetReserveFundTarget().GetValue(CurrentDate))>MostJun) TestTarget = m_Reserves.at(SingleStep->GetParameter(WatFalPrior::wstParameters::ReserveIndex).toInt() - 1)->GetReserveFundTarget().GetValue(CurrentDate);
+							if (qRound(m_Reserves.at(RevIdx)->GetReserveFundTarget().GetValue(CurrentDate))>MostJun) TestTarget = m_Reserves.at(RevIdx)->GetReserveFundTarget().GetValue(CurrentDate);
 							else{
 								foreach(Tranche* SingleTranche, m_Tranches){
-									if (SingleTranche->GetProrataGroup(0) <= qRound(m_Reserves.at(SingleStep->GetParameter(WatFalPrior::wstParameters::ReserveIndex).toInt() - 1)->GetReserveFundTarget().GetValue(CurrentDate))) TestTarget += SingleTranche->GetCurrentOutstanding();
+									if (SingleTranche->GetProrataGroup(0) <= qRound(m_Reserves.at(RevIdx)->GetReserveFundTarget().GetValue(CurrentDate))) TestTarget += SingleTranche->GetCurrentOutstanding();
 								}
 							}
 							if(m_CumulativeReserves){
-								for (int ResIter = 0; ResIter < SingleStep->GetParameter(WatFalPrior::wstParameters::ReserveIndex).toInt() - 1; ResIter++)
+								for (int ResIter = 0; ResIter < RevIdx; ResIter++)
 									StacedRsAmt += m_Reserves.at(ResIter)->GetReserveFundCurrent();
 							}
-							else StacedRsAmt = m_Reserves.at(SingleStep->GetParameter(WatFalPrior::wstParameters::ReserveIndex).toInt() - 1)->GetReserveFundCurrent();
+							else StacedRsAmt = m_Reserves.at(RevIdx)->GetReserveFundCurrent();
 							TotalPayable = qMax(
-								m_Reserves.at(SingleStep->GetParameter(WatFalPrior::wstParameters::ReserveIndex).toInt() - 1)->GetReserveFundFloor().GetValue(CurrentDate),
-								TestTarget*m_Reserves.at(SingleStep->GetParameter(WatFalPrior::wstParameters::ReserveIndex).toInt() - 1)->GetReserveFundMultiple().GetValue(CurrentDate)
+								m_Reserves.at(RevIdx)->GetReserveFundFloor().GetValue(CurrentDate),
+								TestTarget*m_Reserves.at(RevIdx)->GetReserveFundMultiple().GetValue(CurrentDate)
 								);
-							if (m_Reserves.at(SingleStep->GetParameter(WatFalPrior::wstParameters::ReserveIndex).toInt() - 1)->GetReserveFundCap().GetValue(CurrentDate) > 0.0)
-								TotalPayable = qMin(TotalPayable, m_Reserves.at(SingleStep->GetParameter(WatFalPrior::wstParameters::ReserveIndex).toInt() - 1)->GetReserveFundCap().GetValue(CurrentDate));
+							if (m_Reserves.at(RevIdx)->GetReserveFundCap().GetValue(CurrentDate) > 0.0)
+								TotalPayable = qMin(TotalPayable, m_Reserves.at(RevIdx)->GetReserveFundCap().GetValue(CurrentDate));
 							TotalPayable -= StacedRsAmt;
 
 							if(TotalPayable>=0.01){
-								if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).toInt() == 1) {
-									m_Reserves[SingleStep->GetParameter(WatFalPrior::wstParameters::ReserveIndex).toInt() - 1]->GetReserveFundFlow().AddFlow(CurrentDate, qMin(AvailableInterest, TotalPayable), static_cast<qint32>(ReserveFund::ReserveFlowsType::ReplenishFromInterest));
-									m_Reserves[SingleStep->GetParameter(WatFalPrior::wstParameters::ReserveIndex).toInt() - 1]->GetReserveFundFlow().SetFlow(CurrentDate, qMax(0.0, TotalPayable - AvailableInterest), static_cast<qint32>(ReserveFund::ReserveFlowsType::ShortFall));
-									m_Reserves[SingleStep->GetParameter(WatFalPrior::wstParameters::ReserveIndex).toInt() - 1]->SetReserveFundCurrent(m_Reserves.at(SingleStep->GetParameter(WatFalPrior::wstParameters::ReserveIndex).toInt() - 1)->GetReserveFundCurrent() + qMin(AvailableInterest, TotalPayable));
+								if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 1) {
+									m_Reserves[RevIdx]->GetReserveFundFlow().AddFlow(CurrentDate, qMin(AvailableInterest, TotalPayable), static_cast<qint32>(ReserveFund::ReserveFlowsType::ReplenishFromInterest));
+									m_Reserves[RevIdx]->GetReserveFundFlow().SetFlow(CurrentDate, qMax(0.0, TotalPayable - AvailableInterest), static_cast<qint32>(ReserveFund::ReserveFlowsType::ShortFall));
+									m_Reserves[RevIdx]->SetReserveFundCurrent(m_Reserves.at(RevIdx)->GetReserveFundCurrent() + qMin(AvailableInterest, TotalPayable));
 									AvailableInterest=qMax(0.0,AvailableInterest-TotalPayable);
 								}
-								else if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).toInt() == 2) {
+								else if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 2) {
 
-									m_Reserves[SingleStep->GetParameter(WatFalPrior::wstParameters::ReserveIndex).toInt() - 1]->GetReserveFundFlow().AddFlow(CurrentDate, qMin(AvailablePrincipal.Total(), TotalPayable), static_cast<qint32>(ReserveFund::ReserveFlowsType::ReplenishFromPrincipal));
-									m_Reserves[SingleStep->GetParameter(WatFalPrior::wstParameters::ReserveIndex).toInt() - 1]->GetReserveFundFlow().SetFlow(CurrentDate, qMax(0.0, TotalPayable - AvailablePrincipal.Total()), static_cast<qint32>(ReserveFund::ReserveFlowsType::ShortFall));
-									m_Reserves[SingleStep->GetParameter(WatFalPrior::wstParameters::ReserveIndex).toInt() - 1]->SetReserveFundCurrent(m_Reserves.at(SingleStep->GetParameter(WatFalPrior::wstParameters::ReserveIndex).toInt() - 1)->GetReserveFundCurrent() + qMin(AvailablePrincipal.Total(), TotalPayable));
+									m_Reserves[RevIdx]->GetReserveFundFlow().AddFlow(CurrentDate, qMin(AvailablePrincipal.Total(), TotalPayable), static_cast<qint32>(ReserveFund::ReserveFlowsType::ReplenishFromPrincipal));
+									m_Reserves[RevIdx]->GetReserveFundFlow().SetFlow(CurrentDate, qMax(0.0, TotalPayable - AvailablePrincipal.Total()), static_cast<qint32>(ReserveFund::ReserveFlowsType::ShortFall));
+									m_Reserves[RevIdx]->SetReserveFundCurrent(m_Reserves.at(RevIdx)->GetReserveFundCurrent() + qMin(AvailablePrincipal.Total(), TotalPayable));
 									AvailablePrincipal -= TotalPayable;
 									if (AvailablePrincipal < 0.0) AvailablePrincipal.Erase();
 								}
@@ -903,34 +944,34 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					ProRataBonds.clear();
 					TotalPayable=0.0;
 					for(int h=0;h<m_Tranches.size();h++){
-						if (m_Tranches.at(h)->GetProrataGroup(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).toInt()) == SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).toInt()) {
+						if (m_Tranches.at(h)->GetProrataGroup(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetValue(CurrentDate)) == SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate)) {
 							ProRataBonds.enqueue(h);
-							AdjustedCoupon = AdjustCoupon(m_Tranches.at(h)->GetCoupon(CurrentDate, qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).toInt() - 1, 0)), RollingLastIPD, RollingNextIPD, m_Tranches.at(h)->GetDayCount().GetValue(CurrentDate));
+							AdjustedCoupon = AdjustCoupon(m_Tranches.at(h)->GetCoupon(CurrentDate, qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate) - 1, 0)), RollingLastIPD, RollingNextIPD, m_Tranches.at(h)->GetDayCount().GetValue(CurrentDate));
 							if (m_Tranches.at(h)->GetStartingDeferredInterest()>=0.01) {
 								Solution = m_Tranches.at(h)->GetStartingDeferredInterest();
 							}
 							else
-								Solution = m_Tranches.at(h)->GetCashFlow().GetPreviousFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).toInt() - 1, 0)));
+								Solution = m_Tranches.at(h)->GetCashFlow().GetPreviousFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate) - 1, 0)));
 							TotalPayable+=AdjustedCoupon*(Solution+m_Tranches.at(h)->GetCurrentOutstanding());
-							m_Tranches[h]->AddCashFlow(CurrentDate, Solution, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).toInt() - 1, 0)));
+							m_Tranches[h]->AddCashFlow(CurrentDate, Solution, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate) - 1, 0)));
 						}
 					}
 					while (ProRataBonds.size()>0) {
-						AdjustedCoupon = AdjustCoupon(m_Tranches.at(ProRataBonds.head())->GetCoupon(CurrentDate, qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).toInt() - 1, 0)), RollingLastIPD, RollingNextIPD, m_Tranches.at(ProRataBonds.head())->GetDayCount().GetValue(CurrentDate));
+						AdjustedCoupon = AdjustCoupon(m_Tranches.at(ProRataBonds.head())->GetCoupon(CurrentDate, qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate) - 1, 0)), RollingLastIPD, RollingNextIPD, m_Tranches.at(ProRataBonds.head())->GetDayCount().GetValue(CurrentDate));
 						if (m_Tranches.at(ProRataBonds.head())->GetStartingDeferredInterest() >= 0.01) {
 							Solution = AdjustedCoupon* m_Tranches.at(ProRataBonds.head())->GetStartingDeferredInterest();
 							m_Tranches[ProRataBonds.head()]->SetStartingDeferredInterest(0.0);
 						}
 						else
-							Solution = AdjustedCoupon* m_Tranches.at(ProRataBonds.head())->GetCashFlow().GetPreviousFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).toInt() - 1, 0)));
+							Solution = AdjustedCoupon* m_Tranches.at(ProRataBonds.head())->GetCashFlow().GetPreviousFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate) - 1, 0)));
 						Solution += AdjustedCoupon*(m_Tranches.at(ProRataBonds.head())->GetCurrentOutstanding());
 						if (AvailableInterest >= TotalPayable) {
-							m_Tranches[ProRataBonds.dequeue()]->AddCashFlow(CurrentDate, Solution, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).toInt() - 1, 0)));
+							m_Tranches[ProRataBonds.dequeue()]->AddCashFlow(CurrentDate, Solution, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate) - 1, 0)));
 						}
 						else {
 							int ProrataIndex = ProRataBonds.dequeue();
-							m_Tranches[ProrataIndex]->AddCashFlow(CurrentDate, AvailableInterest*Solution / TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).toInt() - 1, 0)));
-							m_Tranches[ProrataIndex]->AddCashFlow(CurrentDate, Solution - (AvailableInterest*Solution / TotalPayable), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).toInt() - 1, 0)));
+							m_Tranches[ProrataIndex]->AddCashFlow(CurrentDate, AvailableInterest*Solution / TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate) - 1, 0)));
+							m_Tranches[ProrataIndex]->AddCashFlow(CurrentDate, Solution - (AvailableInterest*Solution / TotalPayable), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate) - 1, 0)));
 						}
 					}
 					AvailableInterest = qMax(AvailableInterest - TotalPayable, 0.0);
@@ -940,13 +981,13 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					ProRataBonds.clear();
 					TotalPayable=0.0;
 					for(int h=0;h<m_Tranches.size();h++){
-						if (m_Tranches.at(h)->GetProrataGroup(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).toInt()) == SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).toInt()) {
+						if (m_Tranches.at(h)->GetProrataGroup(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetValue(CurrentDate)) == SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate)) {
 							ProRataBonds.enqueue(h);
-							TotalPayable += m_Tranches.at(h)->GetCashFlow().GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).toInt() - 1, 0)));
+							TotalPayable += m_Tranches.at(h)->GetCashFlow().GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate) - 1, 0)));
 						}
 					}
 					if(TotalPayable>0.0){
-						if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding)==1) {
+						if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 1) {
 							Solution=AvailableInterest;
 							AvailableInterest=qMax(AvailableInterest-TotalPayable,0.0);
 						}
@@ -958,36 +999,36 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						while(ProRataBonds.size()>0){
 							if(Solution>=TotalPayable){
 								int ProrataIndex=ProRataBonds.dequeue();
-								m_Tranches[ProrataIndex]->AddCashFlow(CurrentDate, m_Tranches.at(ProrataIndex)->GetCashFlow().GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).toInt() - 1, 0))), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).toInt() - 1, 0)));
-								m_Tranches[ProrataIndex]->AddCashFlow(CurrentDate, -m_Tranches.at(ProrataIndex)->GetCashFlow().GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).toInt() - 1, 0))), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).toInt() - 1, 0)));
+								m_Tranches[ProrataIndex]->AddCashFlow(CurrentDate, m_Tranches.at(ProrataIndex)->GetCashFlow().GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate) - 1, 0))), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate) - 1, 0)));
+								m_Tranches[ProrataIndex]->AddCashFlow(CurrentDate, -m_Tranches.at(ProrataIndex)->GetCashFlow().GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate) - 1, 0))), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate) - 1, 0)));
 							}
 							else{
 								int ProrataIndex=ProRataBonds.dequeue();
-								m_Tranches[ProrataIndex]->AddCashFlow(CurrentDate, (Solution / TotalPayable)*m_Tranches.at(ProrataIndex)->GetCashFlow().GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).toInt() - 1, 0))), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).toInt() - 1, 0)));
-								m_Tranches[ProrataIndex]->AddCashFlow(CurrentDate, -(Solution / TotalPayable)*m_Tranches.at(ProrataIndex)->GetCashFlow().GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).toInt() - 1, 0))), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).toInt() - 1, 0)));
+								m_Tranches[ProrataIndex]->AddCashFlow(CurrentDate, (Solution / TotalPayable)*m_Tranches.at(ProrataIndex)->GetCashFlow().GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate) - 1, 0))), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate) - 1, 0)));
+								m_Tranches[ProrataIndex]->AddCashFlow(CurrentDate, -(Solution / TotalPayable)*m_Tranches.at(ProrataIndex)->GetCashFlow().GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate) - 1, 0))), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate) - 1, 0)));
 							}
 						}
 					}
 				break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				case  WatFalPrior::WaterfallStepType::wst_Principal:
-					TotalPayable = RedeemNotes(AvailablePrincipal.Total(), SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).toInt(), SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).toInt(), CurrentDate);
+					TotalPayable = RedeemNotes(AvailablePrincipal.Total(), SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate), SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetValue(CurrentDate), CurrentDate);
 					AvailablePrincipal -= AvailablePrincipal.Total() - TotalPayable;
 				break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				case WatFalPrior::WaterfallStepType::wst_Turbo:
 					TotalPayable = RedeemNotes(
-						AvailableInterest*SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionShare).toDouble()
-						, SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).toInt()
-						, SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).toInt()
+						AvailableInterest*SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionShare).value<BloombergVector>().GetValue(CurrentDate)
+						, SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate)
+						, SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetValue(CurrentDate)
 						, CurrentDate
 					);
-					AvailableInterest += TotalPayable - (AvailableInterest*SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionShare).toDouble());
+					AvailableInterest += TotalPayable - (AvailableInterest*SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionShare).value<BloombergVector>().GetValue(CurrentDate));
 				break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				case WatFalPrior::WaterfallStepType::wst_Excess:
-					SolutionDegree = SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).toInt();
-					TestTarget = SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionShare).toInt();
+					SolutionDegree = SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate);
+					TestTarget = SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionShare).value<BloombergVector>().GetValue(CurrentDate);
 					if (SolutionDegree & 1) {
 						m_AnnualizedExcess.AddFlow(CurrentDate, AvailableInterest, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
 						m_EquityIncome.AddFlow(CurrentDate, AvailableInterest, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
@@ -995,11 +1036,11 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					if (SolutionDegree >= 2) {
 						m_EquityIncome.AddFlow(CurrentDate, AvailablePrincipal.Total(), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
 					}
-					if (SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).toInt()>0 && TestTarget>0.0) {
+					if (SingleStep->HasParameter(WatFalPrior::wstParameters::RedemptionGroup) && TestTarget>0.0) {
 						ProRataBonds.clear();
 						TotalPayable=0.0;
 						for(int h=0;h<m_Tranches.size();h++){
-							if (m_Tranches.at(h)->GetProrataGroup(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).toInt()) == SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).toInt()) {
+							if (m_Tranches.at(h)->GetProrataGroup(SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroupLevel).value<IntegerVector>().GetValue(CurrentDate)) == SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroup).value<IntegerVector>().GetValue(CurrentDate)) {
 								ProRataBonds.enqueue(h);
 								TotalPayable+=m_Tranches.at(h)->GetOriginalAmount();
 							}
@@ -1018,10 +1059,10 @@ bool Waterfall::CalculateTranchesCashFlows(){
 							}
 						}
 					}
-
-					if (SolutionDegree >= 2) m_ExcessCashFlow.AddFlow(CurrentDate, (1.0 - TestTarget)*AvailablePrincipal.Total(), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
-					if (SolutionDegree & 1) m_ExcessCashFlow.AddFlow(CurrentDate, (1.0 - TestTarget)* AvailableInterest, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
-					
+					else {
+						if (SolutionDegree >= 2) m_ExcessCashFlow.AddFlow(CurrentDate, (1.0 - TestTarget)*AvailablePrincipal.Total(), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
+						if (SolutionDegree & 1) m_ExcessCashFlow.AddFlow(CurrentDate, (1.0 - TestTarget)* AvailableInterest, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
+					}
 					if (SolutionDegree & 1) AvailableInterest = 0.0;
 					if (SolutionDegree >= 2) AvailablePrincipal.Erase();
 				break;
@@ -1030,9 +1071,9 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					ProRataBonds.clear();
 					TotalPayable = TestTarget = 0.0;
 					for (int h = 0; h < m_Tranches.size(); h++) {
-						if (m_Tranches.at(h)->GetProrataGroup(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).toInt()) <= SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).toInt()) {
+						if (m_Tranches.at(h)->GetProrataGroup(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetValue(CurrentDate)) <= SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate)) {
 							TotalPayable += m_Tranches.at(h)->GetCurrentOutstanding();
-							if (m_Tranches.at(h)->GetProrataGroup(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).toInt()) == SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).toInt()) {
+							if (m_Tranches.at(h)->GetProrataGroup(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetValue(CurrentDate)) == SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate)) {
 								TestTarget += m_Tranches.at(h)->GetCurrentOutstanding();
 								ProRataBonds.enqueue(h);
 							}
@@ -1046,17 +1087,17 @@ bool Waterfall::CalculateTranchesCashFlows(){
 							m_Tranches[SingleBond]->AddCashFlow(CurrentDate, qMin(AvailableInterest, Solution)* m_Tranches.at(SingleBond)->GetCurrentOutstanding() / TestTarget, TrancheCashFlow::TrancheFlowType::PDLCured);
 						}
 						TotalPayable=qMin(AvailableInterest, Solution);
-						if (SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroup).toInt() > 0 && SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionShare).toDouble() > 0.0) {
+						if (!SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroup).value<IntegerVector>().IsEmpty() && SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionShare).value<BloombergVector>().GetValue(CurrentDate) > 0.0) {
 							TotalPayable =
-								(TotalPayable*(1.0 - SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionShare).toDouble()))
+								(TotalPayable*(1.0 - SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionShare).value<BloombergVector>().GetValue(CurrentDate)))
 								+ RedeemNotes(
-									SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionShare).toDouble()*TotalPayable
-									, SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroup).toInt()
-									, SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroupLevel).toInt()
+									SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionShare).value<BloombergVector>().GetValue(CurrentDate)*TotalPayable
+									, SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroup).value<IntegerVector>().GetValue(CurrentDate)
+									, SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroupLevel).value<IntegerVector>().GetValue(CurrentDate)
 									, CurrentDate
 								);
 						}
-						TotalPayable = RedeemSequential(TotalPayable, CurrentDate, SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroupLevel).toInt());
+						TotalPayable = RedeemSequential(TotalPayable, CurrentDate, SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroupLevel).value<IntegerVector>().GetValue(CurrentDate));
 						AvailableInterest += TotalPayable - qMin(AvailableInterest, Solution);
 					}
 				break;
@@ -1065,9 +1106,9 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					ProRataBonds.clear();
 					TotalPayable=0.0;
 					for(int h=0;h<m_Tranches.size();h++){
-						if (m_Tranches.at(h)->GetProrataGroup(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).toInt()) <= SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).toInt()) {
+						if (m_Tranches.at(h)->GetProrataGroup(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetValue(CurrentDate)) <= SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate)) {
 							TotalPayable+=m_Tranches.at(h)->GetCurrentOutstanding();
-							if (m_Tranches.at(h)->GetProrataGroup(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).toInt()) == SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).toInt()) ProRataBonds.enqueue(h);
+							if (m_Tranches.at(h)->GetProrataGroup(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetValue(CurrentDate)) == SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate)) ProRataBonds.enqueue(h);
 						}
 					}
 					TotalPayable=qMax(TotalPayable,0.000001);
@@ -1078,25 +1119,23 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						Solution=m_MortgagesPayments.GetAmountOut(i);
 					Solution+=AvailablePrincipal.Total();
 					if(Solution==0.0) Solution=1.0;
-					if (SingleStep->HasParameter(WatFalPrior::wstParameters::TestTargetOverride)) {
-						TestTarget = SingleStep->GetParameter(WatFalPrior::wstParameters::TestTargetOverride).toDouble();
+					while (ProRataBonds.size() > 0) {
+						if (m_Tranches.at(ProRataBonds.head())->GetCashFlow().GetOCTest(CurrentDate) <= 0.0)
+							m_Tranches[ProRataBonds.head()]->AddCashFlow(CurrentDate, Solution / TotalPayable, TrancheCashFlow::TrancheFlowType::OCFlow);
+						TestTarget = m_Tranches.at(ProRataBonds.dequeue())->GetMinOClevel();
 					}
-					else {
-						while (ProRataBonds.size() > 0) {
-							if (m_Tranches.at(ProRataBonds.head())->GetCashFlow().GetOCTest(CurrentDate) <= 0.0)
-								m_Tranches[ProRataBonds.head()]->AddCashFlow(CurrentDate, Solution / TotalPayable, TrancheCashFlow::TrancheFlowType::OCFlow);
-							TestTarget = m_Tranches.at(ProRataBonds.dequeue())->GetMinOClevel();
-						}
+					if (SingleStep->HasParameter(WatFalPrior::wstParameters::TestTargetOverride)) {
+						TestTarget = SingleStep->GetParameter(WatFalPrior::wstParameters::TestTargetOverride).value<BloombergVector>().GetValue(CurrentDate);
 					}
 					//if it fails redeem notes until cured
 					if (Solution / TotalPayable < TestTarget) {
-						if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding)==1)
+						if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 1)
 							Solution = qMin(TotalPayable - (Solution / TestTarget), AvailableInterest);
 						else
 							Solution = qMin(TotalPayable - (Solution / TestTarget), AvailablePrincipal.Total());
-						TotalPayable = Solution*SingleStep->GetParameter(WatFalPrior::wstParameters::AdditionalCollateralShare).toDouble();
-						Solution *= SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionShare).toDouble();
-						if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding) == 1) 
+						TotalPayable = Solution*SingleStep->GetParameter(WatFalPrior::wstParameters::AdditionalCollateralShare).value<BloombergVector>().GetValue(CurrentDate);
+						Solution *= SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionShare).value<BloombergVector>().GetValue(CurrentDate);
+						if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 1)
 							AvailableInterest -= TotalPayable + Solution;
 						else
 							AvailablePrincipal -= TotalPayable + Solution;
@@ -1104,23 +1143,26 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						if (TotalPayable > 0.0) {
 							m_ReinvestmentTest.CalculateBondCashFlows(TotalPayable, CurrentDate, i);
 							m_MortgagesPayments.AddFlow(m_ReinvestmentTest.GetBondCashFlow());
-							m_Reinvested.AddFlow(CurrentDate, TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
+							if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 1)
+								m_Reinvested.AddFlow(CurrentDate, TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
+							else
+								m_Reinvested.AddFlow(CurrentDate, TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
 							AvailableInterest += m_ReinvestmentTest.GetBondCashFlow().GetInterest(CurrentDate);
 							AvailablePrincipal.AddScheduled(m_ReinvestmentTest.GetBondCashFlow().GetScheduled(CurrentDate));
 							AvailablePrincipal.AddPrepay(m_ReinvestmentTest.GetBondCashFlow().GetPrepay(CurrentDate));
-							CheckResults -= m_ReinvestmentTest.GetBondCashFlow().GetScheduled(CurrentDate) + m_ReinvestmentTest.GetBondCashFlow().GetPrepay(CurrentDate) + m_ReinvestmentTest.GetBondCashFlow().GetInterest(CurrentDate);
+							CheckResults -= m_ReinvestmentTest.GetBondCashFlow().GetTotalFlow(CurrentDate);
 						}
 						//Redeem
-						if (SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroup).toInt() > 0) {
+						if (SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroup).value<IntegerVector>().GetValue(CurrentDate) > 0) {
 							Solution = RedeemNotes(
 								Solution
-								, SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroup).toInt()
-								, SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroupLevel).toInt()
+								, SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroup).value<IntegerVector>().GetValue(CurrentDate)
+								, SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroupLevel).value<IntegerVector>().GetValue(CurrentDate)
 								, CurrentDate
 							);
 						}
-						else Solution = RedeemSequential(Solution, CurrentDate, SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroupLevel).toInt());
-						if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding) == 1)
+						else Solution = RedeemSequential(Solution, CurrentDate, SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroupLevel).value<IntegerVector>().GetValue(CurrentDate));
+						if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 1)
 							AvailableInterest += Solution;
 						else
 							AvailablePrincipal += Solution;
@@ -1134,10 +1176,10 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					TotalPayable = 0.0;
 					Solution = m_InterestAvailable + m_MortgagesPayments.GetAccruedInterest(i) - ((adjSeniorFees + adjSeniorExpenses)*(CurrentAssetSum / static_cast<double>(CurrentAssetCount))) - m_SeniorExpensesFixed.GetValue(CurrentDate) - m_SeniorFeesFixed.GetValue(CurrentDate);
 					for (int h = 0; h < m_Tranches.size(); h++) {
-						if (m_Tranches.at(h)->GetProrataGroup(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).toInt()) <= SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).toInt()) {
-							AdjustedCoupon = AdjustCoupon((m_Tranches.at(h)->GetCoupon(CurrentDate, qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::CouponIndex).toInt() - 1, 0))), RollingNextIPD, RollingNextIPD.addMonths(m_PaymentFrequency.GetValue(RollingNextIPD)), m_Tranches.at(h)->GetDayCount().GetValue(CurrentDate));
-							TotalPayable += AdjustedCoupon*(m_Tranches.at(h)->GetCurrentOutstanding() + m_Tranches.at(h)->GetCashFlow().GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::CouponIndex).toInt() - 1, 0))));
-							if (m_Tranches.at(h)->GetProrataGroup(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).toInt()) == SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).toInt()) ProRataBonds.enqueue(h);
+						if (m_Tranches.at(h)->GetProrataGroup(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetValue(CurrentDate)) <= SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate)) {
+							AdjustedCoupon = AdjustCoupon((m_Tranches.at(h)->GetCoupon(CurrentDate, qMax(SingleStep->GetParameter(WatFalPrior::wstParameters::CouponIndex).value<IntegerVector>().GetValue(CurrentDate) - 1, 0))), RollingNextIPD, RollingNextIPD.addMonths(m_PaymentFrequency.GetValue(RollingNextIPD)), m_Tranches.at(h)->GetDayCount().GetValue(CurrentDate));
+							TotalPayable += AdjustedCoupon*(m_Tranches.at(h)->GetCurrentOutstanding() + m_Tranches.at(h)->GetCashFlow().GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::CouponIndex).value<IntegerVector>().GetValue(CurrentDate) - 1, 0))));
+							if (m_Tranches.at(h)->GetProrataGroup(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetValue(CurrentDate)) == SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate)) ProRataBonds.enqueue(h);
 						}
 					}
 					TotalPayable = qMax(TotalPayable, 0.000001);
@@ -1146,8 +1188,11 @@ bool Waterfall::CalculateTranchesCashFlows(){
 							m_Tranches[ProRataBonds.head()]->AddCashFlow(CurrentDate, Solution / TotalPayable, TrancheCashFlow::TrancheFlowType::ICFlow);
 						TestTarget = m_Tranches.at(ProRataBonds.dequeue())->GetMinIClevel();
 					}
+					if (SingleStep->HasParameter(WatFalPrior::wstParameters::TestTargetOverride)) {
+						TestTarget = SingleStep->GetParameter(WatFalPrior::wstParameters::TestTargetOverride).value<BloombergVector>().GetValue(CurrentDate);
+					}
 					//if it fails redeem senior notes until cured
-					if (Solution / TotalPayable < TestTarget && ((AvailablePrincipal.Total()>0.0 && SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding) == 2) || (AvailableInterest > 0 && SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding) == 1))) {
+					if (Solution / TotalPayable < TestTarget && ((AvailablePrincipal.Total()>0.0 && SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 2) || (AvailableInterest > 0 && SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 1))) {
 						SolutionDegree = 1;
 						InterestPayableBefore = (m_InterestAvailable + m_MortgagesPayments.GetAccruedInterest(i) - ((adjSeniorExpenses + adjSeniorFees) * (CurrentAssetSum / static_cast<double>(CurrentAssetCount))) - m_SeniorExpensesFixed.GetValue(CurrentDate) - m_SeniorFeesFixed.GetValue(CurrentDate)) / TestTarget;
 						TotalPayable = 0;
@@ -1156,23 +1201,23 @@ bool Waterfall::CalculateTranchesCashFlows(){
 							SolutionFound = true;
 							Solution = 0.0;
 							for (int h = 0; h<m_Tranches.size(); h++) {
-								if (m_Tranches.at(h)->GetProrataGroup(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).toInt()) <= SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).toInt() && m_Tranches.at(h)->GetProrataGroup(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).toInt()) >= SolutionDegree) {
-									AdjustedCoupon = AdjustCoupon((m_Tranches.at(h)->GetCoupon(CurrentDate, qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::CouponIndex).toInt() - 1, 0))), RollingNextIPD, RollingNextIPD.addMonths((m_PaymentFrequency.GetValue(RollingNextIPD))), m_Tranches.at(h)->GetDayCount().GetValue(CurrentDate));
-									Solution += AdjustedCoupon*(m_Tranches.at(h)->GetCurrentOutstanding() + m_Tranches.at(h)->GetCashFlow().GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::CouponIndex).toInt() - 1, 0))));
+								if (m_Tranches.at(h)->GetProrataGroup(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetValue(CurrentDate)) <= SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate) && m_Tranches.at(h)->GetProrataGroup(SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetValue(CurrentDate)) >= SolutionDegree) {
+									AdjustedCoupon = AdjustCoupon((m_Tranches.at(h)->GetCoupon(CurrentDate, qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::CouponIndex).value<IntegerVector>().GetValue(CurrentDate) - 1, 0))), RollingNextIPD, RollingNextIPD.addMonths((m_PaymentFrequency.GetValue(RollingNextIPD))), m_Tranches.at(h)->GetDayCount().GetValue(CurrentDate));
+									Solution += AdjustedCoupon*(m_Tranches.at(h)->GetCurrentOutstanding() + m_Tranches.at(h)->GetCashFlow().GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | (qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::CouponIndex).value<IntegerVector>().GetValue(CurrentDate) - 1, 0))));
 								}
 							}
-							if (GroupWACoupon(SolutionDegree, SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).toInt(), CurrentDate, qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::CouponIndex).toInt() - 1, 0))>0.0)
-								TotalPayable = (Solution - InterestPayableBefore) / GroupWACoupon(SolutionDegree, SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).toInt(), CurrentDate, qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::CouponIndex).toInt() - 1, 0));
-							if (TotalPayable > GroupOutstanding(SolutionDegree, SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).toInt()) || GroupWACoupon(SolutionDegree, SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).toInt(), CurrentDate, qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::CouponIndex).toInt() - 1, 0)) <= 0) {
-								if (++SolutionDegree <= SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).toInt()) SolutionFound = false;
+							if (GroupWACoupon(SolutionDegree, SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetValue(CurrentDate), CurrentDate, qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::CouponIndex).value<IntegerVector>().GetValue(CurrentDate) - 1, 0))>0.0)
+								TotalPayable = (Solution - InterestPayableBefore) / GroupWACoupon(SolutionDegree, SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetValue(CurrentDate), CurrentDate, qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::CouponIndex).value<IntegerVector>().GetValue(CurrentDate) - 1, 0));
+							if (TotalPayable > GroupOutstanding(SolutionDegree, SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetValue(CurrentDate)) || GroupWACoupon(SolutionDegree, SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetValue(CurrentDate), CurrentDate, qMin(SingleStep->GetParameter(WatFalPrior::wstParameters::CouponIndex).value<IntegerVector>().GetValue(CurrentDate) - 1, 0)) <= 0) {
+								if (++SolutionDegree <= SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate)) SolutionFound = false;
 								else TotalPayable = 0;
 							}
 							if (SolutionFound) {
-								for (int h = 1; h < SolutionDegree; h++) TotalPayable += GroupOutstanding(h, SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).toInt());
-								if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding) == 2)
-									AvailablePrincipal += RedeemSequential(qMin(TotalPayable, AvailablePrincipal.Total()), CurrentDate, SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).toInt()) - qMin(TotalPayable, AvailablePrincipal.Total());
+								for (int h = 1; h < SolutionDegree; h++) TotalPayable += GroupOutstanding(h, SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetValue(CurrentDate));
+								if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 2)
+									AvailablePrincipal += RedeemSequential(qMin(TotalPayable, AvailablePrincipal.Total()), CurrentDate, SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetValue(CurrentDate)) - qMin(TotalPayable, AvailablePrincipal.Total());
 								else
-									AvailableInterest += RedeemSequential(qMin(TotalPayable, AvailableInterest), CurrentDate, SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).toInt()) - qMin(TotalPayable, AvailableInterest);
+									AvailableInterest += RedeemSequential(qMin(TotalPayable, AvailableInterest), CurrentDate, SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetValue(CurrentDate)) - qMin(TotalPayable, AvailableInterest);
 							}
 						} while (!SolutionFound);
 					}
@@ -1182,16 +1227,16 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					if(CurrentDate<=m_ReinvestmentTest.GetReinvestmentPeriod() && !IsCallPaymentDate){
 						if(AvailablePrincipal.Total()>0.0){
 							double PayablePrincipal;
-							if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).toInt() == 1) {  //Reinvest Prepay Only
-								PayablePrincipal = AvailablePrincipal.GetPrepay()*SingleStep->GetParameter(WatFalPrior::wstParameters::AdditionalCollateralShare).toDouble();
+							if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 1) {  //Reinvest Prepay Only
+								PayablePrincipal = AvailablePrincipal.GetPrepay()*SingleStep->GetParameter(WatFalPrior::wstParameters::AdditionalCollateralShare).value<BloombergVector>().GetValue(CurrentDate);
 								AvailablePrincipal.SetPrepay(AvailablePrincipal.GetPrepay() - PayablePrincipal);
 							}
-							else if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).toInt() == 2) {  //Reinvest scheduled only
-								PayablePrincipal = AvailablePrincipal.GetScheduled()*SingleStep->GetParameter(WatFalPrior::wstParameters::AdditionalCollateralShare).toDouble();
+							else if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 2) {  //Reinvest scheduled only
+								PayablePrincipal = AvailablePrincipal.GetScheduled()*SingleStep->GetParameter(WatFalPrior::wstParameters::AdditionalCollateralShare).value<BloombergVector>().GetValue(CurrentDate);
 								AvailablePrincipal.SetScheduled(AvailablePrincipal.GetScheduled() - PayablePrincipal);
 							}
 							else {
-								PayablePrincipal = AvailablePrincipal.Total()*SingleStep->GetParameter(WatFalPrior::wstParameters::AdditionalCollateralShare).toDouble();
+								PayablePrincipal = AvailablePrincipal.Total()*SingleStep->GetParameter(WatFalPrior::wstParameters::AdditionalCollateralShare).value<BloombergVector>().GetValue(CurrentDate);
 								AvailablePrincipal -= PayablePrincipal;
 							}
 							m_ReinvestmentTest.CalculateBondCashFlows(PayablePrincipal, CurrentDate, i);
@@ -1200,7 +1245,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 							AvailableInterest+=m_ReinvestmentTest.GetBondCashFlow().GetInterest(CurrentDate);
 							AvailablePrincipal.AddScheduled(m_ReinvestmentTest.GetBondCashFlow().GetScheduled(CurrentDate));
 							AvailablePrincipal.AddPrepay(m_ReinvestmentTest.GetBondCashFlow().GetPrepay(CurrentDate));
-							CheckResults -= m_ReinvestmentTest.GetBondCashFlow().GetScheduled(CurrentDate) + m_ReinvestmentTest.GetBondCashFlow().GetPrepay(CurrentDate) + m_ReinvestmentTest.GetBondCashFlow().GetInterest(CurrentDate);
+							CheckResults -= m_ReinvestmentTest.GetBondCashFlow().GetTotalFlow(CurrentDate);
 						}
 					}	
 				break;
@@ -1269,7 +1314,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		CheckResults -= m_PrincipalAvailable.Total();
 		if (qAbs(CheckResults) >= 1.0) {
 			PrintToTempFile("ReturnFalse.txt", QString("Cash Flows don't Match, Diff: %1").arg(CheckResults));
-			return false;
+			//return false;
 		}
 		return true;
 }
@@ -1533,7 +1578,7 @@ double Waterfall::GetEquityReturn(int index)const{
 	int EquityTranche;
 	foreach(WatFalPrior* SingleStep,m_WaterfallStesps){
 		if(SingleStep->GetPriorityType()==WatFalPrior::WaterfallStepType::wst_Excess){
-			EquityTranche = SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroup).toInt();
+			EquityTranche = SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroup).value<IntegerVector>().GetValue(m_EquityIncome.GetDate(index));
 			break;
 		}
 	}
@@ -1561,7 +1606,7 @@ double Waterfall::GetCumulativeEquityReturn(int index)const{
 	int EquityTranche;
 	foreach(WatFalPrior* SingleStep,m_WaterfallStesps){
 		if(SingleStep->GetPriorityType()==WatFalPrior::WaterfallStepType::wst_Excess){
-			EquityTranche = SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroup).toInt();
+			EquityTranche = SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroup).value<IntegerVector>().GetValue(m_EquityIncome.GetDate(index));
 			break;
 		}
 	}
@@ -1595,7 +1640,7 @@ double Waterfall::GetCallEquityRatio(int index)const{
 	int EquityTranche;
 	foreach(WatFalPrior* SingleStep,m_WaterfallStesps){
 		if(SingleStep->GetPriorityType()==WatFalPrior::WaterfallStepType::wst_Excess){
-			EquityTranche = SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroup).toInt();
+			EquityTranche = SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroup).value<IntegerVector>().GetValue(m_CalculatedMtgPayments.GetDate(MtgIndex));
 			break;
 		}
 	}
@@ -1703,7 +1748,7 @@ bool Waterfall::ValidTriggerStructure(const QString& TriggerStructure)const {
 		LOGDEBUG("Failed in Postfix"); 
 		return false; 
 	}
-	QRegExp SignleTriggers(QString("\\b") + NegateChar + "?(\\d+)\\b");
+	QRegExp SignleTriggers(QString("\\b") + NegateTriggerChar + "?(\\d+)\\b");
 	if (SignleTriggers.indexIn(AdjStructure) < 0) return false;
 	QStringList CapturedTriggers = SignleTriggers.capturedTexts();
 	for (auto i = CapturedTriggers.constBegin()+1;i!=CapturedTriggers.constEnd();++i){
@@ -1718,7 +1763,7 @@ bool Waterfall::ValidTriggerStructure(const QString& TriggerStructure)const {
 bool Waterfall::TriggerPassing(const QString& TriggerStructure, int PeriodIndex,const QDate& CurrentIPD, bool IsCallDate) const {
 	QString AdjStructure = InfixToPostfix(TriggerStructure);
 	if (AdjStructure.isEmpty()) return false;
-	QRegExp SignleTriggers(QString("\\b") + NegateChar +"?(\\d+)\\b");
+	QRegExp SignleTriggers(QString("\\b") + NegateTriggerChar +"?(\\d+)\\b");
 	QHash<quint32, bool> SignleResults;
 	if (SignleTriggers.indexIn(AdjStructure) < 0) return false;
 	QStringList CapturedTriggers = SignleTriggers.capturedTexts();
@@ -1730,10 +1775,10 @@ bool Waterfall::TriggerPassing(const QString& TriggerStructure, int PeriodIndex,
 	}
 	QStack<bool> PolishStack;
 	QStringList PolishParts = AdjStructure.split(' ');
-	SignleTriggers.setPattern(NegateChar+QString("?\\d+"));
+	SignleTriggers.setPattern(NegateTriggerChar+QString("?\\d+"));
 	foreach(const QString& SinglePart, PolishParts) {
 		if (SignleTriggers.exactMatch(SinglePart)) {
-			if (SinglePart.at(0) == QString(NegateChar).replace(QRegExp("\\+"), "")) {
+			if (SinglePart.at(0) == QString(NegateTriggerChar).replace(QRegExp("\\+"), "")) {
 				PolishStack.push(!SignleResults.value(SinglePart.mid(1).toUInt()));
 			}
 			else

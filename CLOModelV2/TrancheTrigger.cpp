@@ -30,7 +30,8 @@ QString TrancheTrigger::ReadyToCalculate() const {
 		|| m_SenioritySide == TriggerSenioritySide::Invalid
 		|| m_TargetSeniorityLevel <0
 		|| m_TargetSize<0.0
-	) return "Trigger " + m_TriggerLabel + " is invalid\n";
+	) 
+		return "Trigger " + m_TriggerLabel + " is invalid\n";
 	return QString();
 }
 TrancheTrigger::TrancheTrigger(const TrancheTrigger& a) 

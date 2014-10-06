@@ -1,16 +1,32 @@
 #ifndef CommonFunctions_h__
 #define CommonFunctions_h__
 #include <QtGlobal>
+#include <QMetaType>
+#include <typeinfo>
 class QDate;
 class QString;
 class DayCountVector;
 class BloombergVector;
 template<typename T> class QList;
-#define MaximumIRRIterations 10000//INT_MAX-1
+
+
+#define NegateTriggerChar '!'
 #define MaximumInterestsTypes 8
+#define MaximumIRRIterations 10000//INT_MAX-1
 #define CompoundShift 10
+//#define SAVE_EXCEL_INPUTS
 //#define SaveLoanTape
 //#define DebugLogging
+
+#ifdef DebugLogging
+#define LOGASSERT(CheckExp,LogMsg) ((CheckExp) ? qt_noop() : PrintToTempFile("DebugLog.log",LogMsg)); Q_ASSERT_X(CheckExp,"LOGASSERT",LogMsg)
+#define LOGDEBUG(LogMsg) PrintToTempFile("DebugLog",LogMsg,false)
+#define LOGTOFILE(LogFile,LogMsg) PrintToTempFile(QString(LogFile) + ".log",LogMsg)
+#else
+#define LOGASSERT(CheckExp,LogMsg)
+#define LOGDEBUG(LogMsg)
+#define LOGTOFILE(LogFile,LogMsg)
+#endif
 int MonthDiff(const QDate& FutureDte,const QDate& PresentDte);
 QString InfixToPostfix(const QString& a);
 enum class DayCountConvention : qint16 {
@@ -57,7 +73,14 @@ enum class DayCountConvention : qint16 {
 
 };
 double RoundUp(double a);
-template<class T> bool LessThanPoint(T* a,T* b){return (*a)<(*b);}
+template<class T> void RegisterAsMetaType() {
+	
+	if (!QMetaType::isRegistered(qMetaTypeId<T>())) {
+	int TypeID = qRegisterMetaType<T>(typeid(T).name());
+	qRegisterMetaTypeStreamOperators<T>(typeid(T).name());
+	LOGDEBUG(QString("Meta type registered: %1, ID: %2").arg(typeid(T).name()).arg(TypeID));
+	}
+}
 QString Commarize(double num,unsigned int precision=0);
 double CalculateIRR(const QList<QDate>& Dte, const QList<double>& Flws, const DayCountVector& Daycount, double Guess = 0.05);
 double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, double Interest, const DayCountVector& Daycount);
@@ -72,15 +95,9 @@ bool removeDir(const QString& dirName);
 double GetLoanAssumption(const QString& LoanName, int columnIndex, QDate RefDate);
 void PrintToTempFile(const QString& TempFileName, const QString& Message, bool PrintTime = true);
 bool ValidDayCount(qint16 a);
-#ifdef DebugLogging
-#define LOGASSERT(CheckExp,LogMsg) ((CheckExp) ? qt_noop() : PrintToTempFile("DebugLog.log",LogMsg)); Q_ASSERT_X(CheckExp,"LOGASSERT",LogMsg)
-#define LOGDEBUG(LogMsg) PrintToTempFile("DebugLog",LogMsg,false)
-#define LOGTOFILE(LogFile,LogMsg) PrintToTempFile(QString(LogFile) + ".log",LogMsg)
-#else
-#define LOGASSERT(CheckExp,LogMsg)
-#define LOGDEBUG(LogMsg)
-#define LOGTOFILE(LogFile,LogMsg)
-#endif
+
 
 
 #endif // CommonFunctions_h__
+
+

@@ -251,9 +251,6 @@
     <ClCompile Include="StressTestOverlay.cpp">
       <Filter>Source Files\Managed</Filter>
     </ClCompile>
-    <ClCompile Include="AbstarctBbgVect.cpp">
-      <Filter>Source Files\Vectors</Filter>
-    </ClCompile>
     <ClCompile Include="BaseRateVect.cpp">
       <Filter>Source Files\Vectors</Filter>
     </ClCompile>
@@ -374,6 +371,9 @@
     <ClCompile Include="DayCountVect.cpp">
       <Filter>Source Files\Vectors</Filter>
     </ClCompile>
+    <ClCompile Include="AbstractBbgVect.cpp">
+      <Filter>Source Files\Vectors</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="quazip\crypt.h">
@@ -481,9 +481,6 @@
     <ClInclude Include="ReinvestmentTest.h">
       <Filter>Header Files\Deal Structure</Filter>
     </ClInclude>
-    <ClInclude Include="AbstarctBbgVect.h">
-      <Filter>Header Files\Vectors</Filter>
-    </ClInclude>
     <ClInclude Include="BaseRateVect.h">
       <Filter>Header Files\Vectors</Filter>
     </ClInclude>
@@ -545,6 +542,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DayCountVect.h">
+      <Filter>Header Files\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="AbstractBbgVect.h">
       <Filter>Header Files\Vectors</Filter>
     </ClInclude>
   </ItemGroup>

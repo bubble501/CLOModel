@@ -1,8 +1,8 @@
 #ifndef BloombergVector_h__
 #define BloombergVector_h__
 #include <QList>
-#include "AbstarctBbgVect.h"
-class BloombergVector : public AbstarctBbgVect
+#include "AbstractBbgVect.h"
+class BloombergVector : public AbstractBbgVect
 {
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
@@ -13,17 +13,17 @@ protected:
 	virtual void RepackVector();
 public:
 	QString BloombergSafeVector(QDate CurrentDate=QDate::currentDate()) const;
-	using AbstarctBbgVect::IsEmpty;
+	using AbstractBbgVect::IsEmpty;
 	virtual bool IsEmpty(double Lbound, double Ubound = std::numeric_limits<double>::max())const;
 	static BloombergVector Combine(const BloombergVector& StartVect, const BloombergVector& SwitchVect, quint32 Periods);
 	void Combine(const BloombergVector& SwitchVect, quint32 Periods) { operator=(Combine(*this, SwitchVect, Periods)); }
-	BloombergVector() : m_Divisor(100.0) {}
+	BloombergVector();
 	BloombergVector(const QString& Vec);
 	BloombergVector(const BloombergVector& Vec);
 	BloombergVector(const QString& Vec,const QDate& Anchor);
 	BloombergVector(const QList<double>& Values, const QDate& Anchor = QDate());
 	BloombergVector(const QList<QDate>& Dates, const QList<double>& Values);
-	using::AbstarctBbgVect::SetVector;
+	using::AbstractBbgVect::SetVector;
 	bool SetVector(const QList<double>& Values, const QDate& Anchor);
 	bool SetVector(const QList<double>& Values);
 	bool SetVector(const QList<QDate>& Dates, const QList<double>& Values);
@@ -33,7 +33,7 @@ public:
 	virtual double GetSMM(int index, int Frequency = 12) const;
 	int NumElements() const {return m_VectVal.size();}
 	void SetDivisor(double a) { if (a > 0.0) m_Divisor = a; UnpackVector(); }
-	BloombergVector& operator=(const QString& a){AbstarctBbgVect::operator=(a); return *this;}
+	BloombergVector& operator=(const QString& a){AbstractBbgVect::operator=(a); return *this;}
 	BloombergVector& operator=(const BloombergVector& Vec);
 	BloombergVector operator+(const BloombergVector& Vec) const;
 	BloombergVector operator+(double a) const;
@@ -50,5 +50,6 @@ public:
 };
 QDataStream& operator<<(QDataStream & stream, const BloombergVector& flows);
 QDataStream& operator>>(QDataStream & stream, BloombergVector& flows);
+Q_DECLARE_METATYPE(BloombergVector)
 #endif // BloombergVector_h__
 

@@ -3,7 +3,7 @@
 #include <QRegExp>
 #include <QStringList>
 RepaymentVector::RepaymentVector(const QString& Vec)
-:AbstarctBbgVect(Vec) {
+:AbstractBbgVect(Vec) {
 	if (IsValid()) UnpackVector();
 	else {
 		RemoveAnchorDate();
@@ -11,7 +11,7 @@ RepaymentVector::RepaymentVector(const QString& Vec)
 	}
 }
 RepaymentVector::RepaymentVector(const QString& Vec, const QDate& Anchor)
-: AbstarctBbgVect(Vec) {
+: AbstractBbgVect(Vec) {
 	if (IsValid()) {
 		UnpackVector();
 		m_AnchorDate = Anchor;
@@ -53,12 +53,18 @@ bool RepaymentVector::IsValid() const {
 		PossibleRatesPattern += TempPart;
 	}
 	PossibleRatesPattern += ']';
-	return AbstarctBbgVect::IsValid(PossibleRatesPattern, true);
+	return AbstractBbgVect::IsValid(PossibleRatesPattern, true);
 }
 
 RepaymentVector::RepaymentMethods RepaymentVector::GetValue(const QDate& index)const {
 	QDate ValidDate(m_AnchorDate);
-	if (m_AnchorDate.isNull()) ValidDate = QDate::currentDate();
+	if (m_AnchorDate.isNull()) { 
+		ValidDate = QDate::currentDate(); 
+		LOGDEBUG("Anchor defaulted to today\n"); }
+	if (index < m_AnchorDate) { 
+		LOGDEBUG("Requested date before Anchor\n"); 
+		return m_VectVal.first(); 
+	}
 	return GetValue(MonthDiff(index, ValidDate));
 }
 RepaymentVector::RepaymentMethods RepaymentVector::GetValue(int index)const {

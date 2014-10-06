@@ -416,59 +416,59 @@ DefaultExchange:
         If IsEmpty(FirstStep.Offset(i, 0)) Then Exit Do
         Call AddInput(AllTheInputs, FromStringToPriorty(FirstStep.Offset(i, 0).Value))
         If IsEmpty(FirstStep.Offset(i, SeniorityGroupHead)) Then
-            Call AddInput(AllTheInputs, CLng(-1))
+            Call AddInput(AllTheInputs, "")
         Else
-            Call AddInput(AllTheInputs, CLng(FirstStep.Offset(i, SeniorityGroupHead).Value))
+            Call AddInput(AllTheInputs, CStr(FirstStep.Offset(i, SeniorityGroupHead).Value))
         End If
         If IsEmpty(FirstStep.Offset(i, SeniorityGroupLevelHead)) Then
-            Call AddInput(AllTheInputs, CLng(-1))
+            Call AddInput(AllTheInputs, "")
         Else
-            Call AddInput(AllTheInputs, CLng(FirstStep.Offset(i, SeniorityGroupLevelHead).Value) - 1)
+            Call AddInput(AllTheInputs, CStr(FirstStep.Offset(i, SeniorityGroupLevelHead).Value))
         End If
          If IsEmpty(FirstStep.Offset(i, RedemptionGroupHead)) Then
-            Call AddInput(AllTheInputs, CLng(-1))
+            Call AddInput(AllTheInputs, "")
         Else
-            Call AddInput(AllTheInputs, CLng(FirstStep.Offset(i, RedemptionGroupHead).Value))
+            Call AddInput(AllTheInputs, CStr(FirstStep.Offset(i, RedemptionGroupHead).Value))
         End If
         If IsEmpty(FirstStep.Offset(i, RedemptionGroupLevelHead)) Then
-            Call AddInput(AllTheInputs, CLng(-1))
+            Call AddInput(AllTheInputs, "")
         Else
-            Call AddInput(AllTheInputs, CLng(FirstStep.Offset(i, RedemptionGroupLevelHead).Value) - 1)
+            Call AddInput(AllTheInputs, CStr(FirstStep.Offset(i, RedemptionGroupLevelHead).Value))
         End If
         If IsEmpty(FirstStep.Offset(i, RedemptionShareHead)) Then
-            Call AddInput(AllTheInputs, CDbl(-1#))
+            Call AddInput(AllTheInputs, "")
         Else
-            Call AddInput(AllTheInputs, CDbl(FirstStep.Offset(i, RedemptionShareHead).Value))
+            Call AddInput(AllTheInputs, CStr(FirstStep.Offset(i, RedemptionShareHead).Value))
         End If
         If IsEmpty(FirstStep.Offset(i, AdditionalCollateralShareHead)) Then
-            Call AddInput(AllTheInputs, CDbl(-1#))
+            Call AddInput(AllTheInputs, "")
         Else
-            Call AddInput(AllTheInputs, CDbl(FirstStep.Offset(i, AdditionalCollateralShareHead).Value))
+            Call AddInput(AllTheInputs, CStr(FirstStep.Offset(i, AdditionalCollateralShareHead).Value))
         End If
         If IsEmpty(FirstStep.Offset(i, SourceOfFundingHead)) Then
-            Call AddInput(AllTheInputs, CLng(-1))
+            Call AddInput(AllTheInputs, "")
         Else
-            Call AddInput(AllTheInputs, CLng(FirstStep.Offset(i, SourceOfFundingHead).Value))
+            Call AddInput(AllTheInputs, CStr(FirstStep.Offset(i, SourceOfFundingHead).Value))
         End If
         If IsEmpty(FirstStep.Offset(i, CouponIndexHead)) Then
-            Call AddInput(AllTheInputs, CLng(-1))
+            Call AddInput(AllTheInputs, "")
         Else
-            Call AddInput(AllTheInputs, CLng(FirstStep.Offset(i, CouponIndexHead).Value) - 1)
+            Call AddInput(AllTheInputs, CStr(FirstStep.Offset(i, CouponIndexHead).Value))
         End If
         If IsEmpty(FirstStep.Offset(i, TestTargetOverrideHead)) Then
-            Call AddInput(AllTheInputs, CDbl(-1#))
+            Call AddInput(AllTheInputs, "")
         Else
-            Call AddInput(AllTheInputs, CDbl(FirstStep.Offset(i, TestTargetOverrideHead).Value))
+            Call AddInput(AllTheInputs, CStr(FirstStep.Offset(i, TestTargetOverrideHead).Value))
         End If
         If IsEmpty(FirstStep.Offset(i, IRRtoEquityTargetHead)) Then
-            Call AddInput(AllTheInputs, CDbl(-1#))
+            Call AddInput(AllTheInputs, "")
         Else
-            Call AddInput(AllTheInputs, CDbl(FirstStep.Offset(i, IRRtoEquityTargetHead).Value))
+            Call AddInput(AllTheInputs, CStr(FirstStep.Offset(i, IRRtoEquityTargetHead).Value))
         End If
         If IsEmpty(FirstStep.Offset(i, ReserveIndexHead)) Then
-            Call AddInput(AllTheInputs, CLng(-1))
+            Call AddInput(AllTheInputs, "")
         Else
-            Call AddInput(AllTheInputs, CLng(FirstStep.Offset(i, ReserveIndexHead).Value))
+            Call AddInput(AllTheInputs, CStr(FirstStep.Offset(i, ReserveIndexHead).Value))
         End If
         If IsEmpty(FirstStep.Offset(i, TriggersHead)) Then
             Call AddInput(AllTheInputs, "")
@@ -483,59 +483,59 @@ DefaultExchange:
         If IsEmpty(LastStep.Offset(i, 0)) Then Exit Do
         Call AddInput(AllTheInputs, FromStringToPriorty(LastStep.Offset(i, 0).Value))
         If IsEmpty(LastStep.Offset(i, SeniorityGroupHead)) Then
-            Call AddInput(AllTheInputs, CLng(-1))
+            Call AddInput(AllTheInputs, "")
         Else
-            Call AddInput(AllTheInputs, CLng(LastStep.Offset(i, SeniorityGroupHead).Value))
+            Call AddInput(AllTheInputs, CStr(LastStep.Offset(i, SeniorityGroupHead).Value))
         End If
         If IsEmpty(LastStep.Offset(i, SeniorityGroupLevelHead)) Then
-            Call AddInput(AllTheInputs, CLng(-1))
+            Call AddInput(AllTheInputs, "")
         Else
-            Call AddInput(AllTheInputs, CLng(LastStep.Offset(i, SeniorityGroupLevelHead).Value) - 1)
+            Call AddInput(AllTheInputs, CStr(LastStep.Offset(i, SeniorityGroupLevelHead).Value))
         End If
          If IsEmpty(LastStep.Offset(i, RedemptionGroupHead)) Then
-            Call AddInput(AllTheInputs, CLng(-1))
+            Call AddInput(AllTheInputs, "")
         Else
-            Call AddInput(AllTheInputs, CLng(LastStep.Offset(i, RedemptionGroupHead).Value))
+            Call AddInput(AllTheInputs, CStr(LastStep.Offset(i, RedemptionGroupHead).Value))
         End If
         If IsEmpty(LastStep.Offset(i, RedemptionGroupLevelHead)) Then
-            Call AddInput(AllTheInputs, CLng(-1))
+            Call AddInput(AllTheInputs, "")
         Else
-            Call AddInput(AllTheInputs, CLng(LastStep.Offset(i, RedemptionGroupLevelHead).Value) - 1)
+            Call AddInput(AllTheInputs, CStr(LastStep.Offset(i, RedemptionGroupLevelHead).Value))
         End If
         If IsEmpty(LastStep.Offset(i, RedemptionShareHead)) Then
-            Call AddInput(AllTheInputs, CDbl(-1#))
+            Call AddInput(AllTheInputs, "")
         Else
-            Call AddInput(AllTheInputs, CDbl(LastStep.Offset(i, RedemptionShareHead).Value))
+            Call AddInput(AllTheInputs, CStr(LastStep.Offset(i, RedemptionShareHead).Value))
         End If
         If IsEmpty(LastStep.Offset(i, AdditionalCollateralShareHead)) Then
-            Call AddInput(AllTheInputs, CDbl(-1#))
+            Call AddInput(AllTheInputs, "")
         Else
-            Call AddInput(AllTheInputs, CDbl(LastStep.Offset(i, AdditionalCollateralShareHead).Value))
+            Call AddInput(AllTheInputs, CStr(LastStep.Offset(i, AdditionalCollateralShareHead).Value))
         End If
         If IsEmpty(LastStep.Offset(i, SourceOfFundingHead)) Then
-            Call AddInput(AllTheInputs, CLng(-1))
+            Call AddInput(AllTheInputs, "")
         Else
-            Call AddInput(AllTheInputs, CLng(LastStep.Offset(i, SourceOfFundingHead).Value))
+            Call AddInput(AllTheInputs, CStr(LastStep.Offset(i, SourceOfFundingHead).Value))
         End If
         If IsEmpty(LastStep.Offset(i, CouponIndexHead)) Then
-            Call AddInput(AllTheInputs, CLng(-1))
+            Call AddInput(AllTheInputs, "")
         Else
-            Call AddInput(AllTheInputs, CLng(LastStep.Offset(i, CouponIndexHead).Value) - 1)
+            Call AddInput(AllTheInputs, CStr(LastStep.Offset(i, CouponIndexHead).Value))
         End If
         If IsEmpty(LastStep.Offset(i, TestTargetOverrideHead)) Then
-            Call AddInput(AllTheInputs, CDbl(-1#))
+            Call AddInput(AllTheInputs, "")
         Else
-            Call AddInput(AllTheInputs, CDbl(LastStep.Offset(i, TestTargetOverrideHead).Value))
+            Call AddInput(AllTheInputs, CStr(LastStep.Offset(i, TestTargetOverrideHead).Value))
         End If
         If IsEmpty(LastStep.Offset(i, IRRtoEquityTargetHead)) Then
-            Call AddInput(AllTheInputs, CDbl(-1#))
+            Call AddInput(AllTheInputs, "")
         Else
-            Call AddInput(AllTheInputs, CDbl(LastStep.Offset(i, IRRtoEquityTargetHead).Value))
+            Call AddInput(AllTheInputs, CStr(LastStep.Offset(i, IRRtoEquityTargetHead).Value))
         End If
         If IsEmpty(LastStep.Offset(i, ReserveIndexHead)) Then
-            Call AddInput(AllTheInputs, CLng(-1))
+            Call AddInput(AllTheInputs, "")
         Else
-            Call AddInput(AllTheInputs, CLng(LastStep.Offset(i, ReserveIndexHead).Value))
+            Call AddInput(AllTheInputs, CStr(LastStep.Offset(i, ReserveIndexHead).Value))
         End If
         If IsEmpty(LastStep.Offset(i, TriggersHead)) Then
             Call AddInput(AllTheInputs, "")

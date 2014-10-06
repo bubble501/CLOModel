@@ -44,9 +44,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AbstarctBbgVect.h">
-      <Filter>Header Files\Core Files</Filter>
-    </ClInclude>
     <ClInclude Include="BaseRateVect.h">
       <Filter>Header Files\Core Files</Filter>
     </ClInclude>
@@ -156,6 +153,9 @@
       <Filter>Header Files\Core Files</Filter>
     </ClInclude>
     <ClInclude Include="DayCountVect.h">
+      <Filter>Header Files\Core Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AbstractBbgVect.h">
       <Filter>Header Files\Core Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -311,9 +311,6 @@
     </ClCompile>
     <ClCompile Include="GeneratedFiles\qrc_Resources.cpp">
       <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AbstarctBbgVect.cpp">
-      <Filter>Source Files\Core Files</Filter>
     </ClCompile>
     <ClCompile Include="BaseRateVect.cpp">
       <Filter>Source Files\Core Files</Filter>
@@ -481,6 +478,9 @@
       <Filter>Source Files\Core Files</Filter>
     </ClCompile>
     <ClCompile Include="DayCountVect.cpp">
+      <Filter>Source Files\Core Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AbstractBbgVect.cpp">
       <Filter>Source Files\Core Files</Filter>
     </ClCompile>
   </ItemGroup>

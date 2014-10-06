@@ -14,7 +14,7 @@
 
 
 BaseRateVector::BaseRateVector(const QString& Vec)
-	:AbstarctBbgVect(Vec)
+	:AbstractBbgVect(Vec)
 {
 	if(IsValid()) UnpackVector();
 	else {
@@ -35,7 +35,7 @@ BaseRateVector& BaseRateVector::operator=(const BaseRateVector& Vec) {
 	return *this;
 }
 BaseRateVector::BaseRateVector(const QString& Vec,const QDate& Anchor)
-	:AbstarctBbgVect(Vec)
+	:AbstractBbgVect(Vec)
 {
 	if (IsValid()){ UnpackVector(); m_AnchorDate = Anchor;}
 	else {
@@ -45,7 +45,7 @@ BaseRateVector::BaseRateVector(const QString& Vec,const QDate& Anchor)
 	
 }
 bool BaseRateVector::IsValid() const{
-	return AbstarctBbgVect::IsValid("\\S+", true);
+	return AbstractBbgVect::IsValid("\\S+", true);
 }
 void BaseRateVector::UnpackVector(){
 	m_VectVal.clear();
@@ -86,7 +86,14 @@ QDataStream& BaseRateVector::LoadOldVersion(QDataStream& stream) {
 
 QString BaseRateVector::GetValue(const QDate& index)const {
 	QDate ValidDate(m_AnchorDate);
-	if(m_AnchorDate.isNull()) ValidDate=QDate::currentDate();
+	if (m_AnchorDate.isNull()) { 
+		ValidDate = QDate::currentDate(); 
+		LOGDEBUG("Anchor defaulted to today\n"); 
+	}
+	if (index < m_AnchorDate) { 
+		LOGDEBUG("Requested date before Anchor\n"); 
+		return m_VectVal.first(); 
+	}
 	return GetValue(MonthDiff(index,ValidDate));
 }
 QString BaseRateVector::GetValue(int index)const {

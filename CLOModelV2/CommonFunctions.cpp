@@ -327,8 +327,8 @@ double GetLoanAssumption(const QString& LoanName, int columnIndex, QDate RefDate
 }
 
 QString InfixToPostfix(const QString& a) {
-	const QChar AdjNegateChar = QString(NegateChar).replace(QRegExp("\\+"), "").at(0);
-	QRegExp CheckValidNumber(NegateChar + QString("?\\d+"));
+	const QChar AdjNegateChar = QString(NegateTriggerChar).replace(QRegExp("\\+"), "").at(0);
+	QRegExp CheckValidNumber(NegateTriggerChar + QString("?\\d+"));
 	QString Spaced("");
 	for (auto i = a.constBegin(); i != a.constEnd(); ++i) {
 		if (i->isSpace()) continue;

@@ -58,17 +58,17 @@ public:
 	void AddTranche(const Tranche& a) { Structure.AddTranche(a);	if (Stresser)Stresser->SetStructure(Structure); }
 	void CentralUnit::AddWaterfallStep(
 		WatFalPrior::WaterfallStepType Tpe
-		, int ArgSeniorityGroup
-		, int ArgSeniorityGroupLevel
-		, int ArgRedemptionGroup
-		, int ArgRedemptionGroupLevel
-		, double ArgRedemptionShare
-		, double ArgAdditionalCollateralShare
-		, int ArgSourceofFunding
-		, int ArgCouponIndex
-		, double ArgTestTargetOverride
-		, double ArgIRRtoEquityTarget
-		, int ArgReserveIndex
+		, const QString& ArgSeniorityGroup
+		, const QString& ArgSeniorityGroupLevel
+		, const QString& ArgRedemptionGroup
+		, const QString& ArgRedemptionGroupLevel
+		, const QString& ArgRedemptionShare
+		, const QString& ArgAdditionalCollateralShare
+		, const QString& ArgSourceofFunding
+		, const QString& ArgCouponIndex
+		, const QString& ArgTestTargetOverride
+		, const QString& ArgIRRtoEquityTarget
+		, const QString& ArgReserveIndex
 		, const QString& ArgTrigger
 	);
 	void SetSeniorExpenses(const QString& a){Structure.SetSeniorExpenses(a);}

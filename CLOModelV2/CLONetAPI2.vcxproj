@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AbstarctBbgVect.cpp" />
+    <ClCompile Include="AbstractBbgVect.cpp" />
     <ClCompile Include="BaseRateTable.cpp" />
     <ClCompile Include="BaseRateVect.cpp" />
     <ClCompile Include="BloombergVector.cpp" />
@@ -228,7 +228,7 @@
     <ClCompile Include="WatFalPrior.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AbstarctBbgVect.h" />
+    <ClInclude Include="AbstractBbgVect.h" />
     <ClInclude Include="BackwardCompatibilityInterface.h" />
     <ClInclude Include="BaseRateTable.h" />
     <ClInclude Include="BaseRateVect.h" />

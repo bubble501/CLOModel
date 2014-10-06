@@ -7,25 +7,29 @@
 #include <qmath.h>
 #include <boost/math/tools/toms748_solve.hpp>
 BloombergVector::BloombergVector(const QString& Vec)
-	:AbstarctBbgVect(Vec)
+	:AbstractBbgVect(Vec)
 	,m_Divisor(100.0)
 {
+	RegisterAsMetaType<BloombergVector>();
 	if(IsValid()) 
 		UnpackVector();
 	else {
 		RemoveAnchorDate();
 		m_Vector = "";
 	}
+
 }
 BloombergVector::BloombergVector(const QList<QDate>& Dates, const QList<double>& Values) 
 	:m_Divisor(100.0)
 {
 	SetVector(Dates, Values);
+	RegisterAsMetaType<BloombergVector>();
 }
 BloombergVector::BloombergVector(const QList<double>& Values, const QDate& Anchor) 
 	: m_VectVal(Values) 
 	, m_Divisor(100.0)
 {
+	RegisterAsMetaType<BloombergVector>();
 	foreach(double SingleVal, Values) {
 		if (SingleVal < 0.0) {
 			m_VectVal.clear();
@@ -143,15 +147,20 @@ BloombergVector BloombergVector::operator+(double a) const{
 }
 
 BloombergVector::BloombergVector(const QString& Vec,const QDate& Anchor)
-	:AbstarctBbgVect(Vec)
+	:AbstractBbgVect(Vec)
 	, m_Divisor(100.0)
 {
+	RegisterAsMetaType<BloombergVector>();
 	if (IsValid()) {UnpackVector(); m_AnchorDate = Anchor;}
 	else {
 		RemoveAnchorDate();
 		m_Vector = "";
 	}
 	
+}
+
+BloombergVector::BloombergVector() : m_Divisor(100.0) {
+	RegisterAsMetaType<BloombergVector>();
 }
 
 void BloombergVector::RepackVector(){
@@ -227,11 +236,17 @@ void BloombergVector::UnpackVector(){
 	m_VectVal.append(StringParts.last().toDouble() / m_Divisor);
 }
 bool BloombergVector::IsValid() const{
-	return AbstarctBbgVect::IsValid("-?\\d*\\.?\\d+",true);
+	return AbstractBbgVect::IsValid("-?\\d*\\.?\\d+",true);
 }
 double BloombergVector::GetValue(const QDate& index,int Frequency)const{
 	QDate ValidDate(m_AnchorDate);
-	if(m_AnchorDate.isNull()) ValidDate=QDate::currentDate();
+	if (m_AnchorDate.isNull()) {
+		ValidDate = QDate::currentDate();
+		LOGDEBUG("Anchor defaulted to today\n");}
+	if (index < m_AnchorDate) { 
+		LOGDEBUG("Requested date before Anchor\n"); 
+		return m_VectVal.first(); 
+	}
 	return GetValue(MonthDiff(index,ValidDate),Frequency);
 }
 
@@ -292,7 +307,7 @@ BloombergVector BloombergVector::Combine(const BloombergVector& StartVect, const
 }
 
 bool BloombergVector::IsEmpty(double Lbound, double Ubound) const{
-	if (AbstarctBbgVect::IsEmpty()) return true;
+	if (AbstractBbgVect::IsEmpty()) return true;
 	if (Ubound < Lbound) {
 		double TempV = Ubound;
 		Ubound = Lbound;

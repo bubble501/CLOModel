@@ -131,7 +131,8 @@ void StressTest::StartStresses() {
 	//Check that CPR and CDR are Valid
 	if (StressDimension[0] == ChangingCDR || StressDimension[0] == ChangingCPR) {
 		foreach(const QString& SingleScen, XSpann) {
-			if (BloombergVector(SingleScen).IsEmpty(0.0, 1.0)) return;
+			if (BloombergVector(SingleScen).IsEmpty(0.0, 1.0))
+				return;
 		}
 	}
 	if (StressDimension[1] == ChangingCDR || StressDimension[1] == ChangingCPR) {
@@ -140,7 +141,8 @@ void StressTest::StartStresses() {
 		}
 	}
 	if ((StressDimension[0] | StressDimension[1]) != (ChangingCDR | ChangingCPR)) {
-		if (BloombergVector(ConstantPar).IsEmpty(0.0, 1.0)) return;
+		if (BloombergVector(ConstantPar).IsEmpty(0.0, 1.0)) 
+			return;
 	}
 
 

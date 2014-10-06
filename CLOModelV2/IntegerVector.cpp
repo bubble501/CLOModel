@@ -4,8 +4,10 @@
 #include "CommonFunctions.h"
 #include <qmath.h>
 IntegerVector::IntegerVector(const QString& Vec)
-:AbstarctBbgVect(Vec)
+:AbstractBbgVect(Vec)
+, m_Shift(0)
 {
+	RegisterAsMetaType<IntegerVector>();
 	if (IsValid()) UnpackVector();
 	else {
 		RemoveAnchorDate();
@@ -14,6 +16,7 @@ IntegerVector::IntegerVector(const QString& Vec)
 }
 IntegerVector::IntegerVector(const IntegerVector& Vec)
 :m_VectVal(Vec.m_VectVal)
+, m_Shift(Vec.m_Shift)
 {
 	m_Vector = Vec.m_Vector;
 	m_AnchorDate = Vec.m_AnchorDate;
@@ -22,11 +25,14 @@ IntegerVector& IntegerVector::operator=(const IntegerVector& Vec) {
 	m_Vector = Vec.m_Vector;
 	m_AnchorDate = Vec.m_AnchorDate;
 	m_VectVal = Vec.m_VectVal;
+	m_Shift = Vec.m_Shift;
 	return *this;
 }
 IntegerVector::IntegerVector(const QString& Vec, const QDate& Anchor)
-:AbstarctBbgVect(Vec)
+:AbstractBbgVect(Vec)
+, m_Shift(0)
 {
+	RegisterAsMetaType<IntegerVector>();
 	if (IsValid()){ UnpackVector(); m_AnchorDate = Anchor;}
 	else {
 		RemoveAnchorDate();
@@ -64,21 +70,29 @@ void IntegerVector::UnpackVector() {
 	m_VectVal.append(StringParts.last().toInt());
 }
 bool IntegerVector::IsValid() const {
-	return AbstarctBbgVect::IsValid("-?\\d+", true);
+	return AbstractBbgVect::IsValid("-?\\d+", true);
 }
 int IntegerVector::GetValue(const QDate& index)const {
 	QDate ValidDate(m_AnchorDate);
-	if (m_AnchorDate.isNull()) ValidDate = QDate::currentDate();
+	if (m_AnchorDate.isNull()) { 
+		ValidDate = QDate::currentDate(); 
+		LOGDEBUG("Anchor defaulted to today\n"); 
+	}
+	if (index < m_AnchorDate) {
+		LOGDEBUG("Requested date before Anchor\n"); 
+		return m_VectVal.first()+m_Shift;
+	}
 	return GetValue(MonthDiff(index, ValidDate));
 }
 int IntegerVector::GetValue(int index)const {
 	if (m_VectVal.isEmpty() || index < 0) return 0;
-	return m_VectVal.at(qMin(index, m_VectVal.size() - 1));
+	return m_VectVal.at(qMin(index, m_VectVal.size() - 1)) + m_Shift;
 }
 QDataStream& operator<<(QDataStream & stream, const IntegerVector& flows) {
 	stream << flows.m_Vector;
 	stream << flows.m_AnchorDate;
 	stream << flows.m_VectVal;
+	stream << flows.m_Shift;
 	return stream;
 }
 QDataStream& operator>>(QDataStream & stream, IntegerVector& flows) { return flows.LoadOldVersion(stream); }
@@ -87,19 +101,23 @@ QDataStream& IntegerVector::LoadOldVersion(QDataStream& stream) {
 		>> m_Vector
 		>> m_AnchorDate
 		>> m_VectVal
+		>> m_Shift
 		;
 	ResetProtocolVersion();
 	return stream;
 }
-bool IntegerVector::IsEmpty(int Lbound, int Ubound) const {
-	if (AbstarctBbgVect::IsEmpty()) return true;
+bool IntegerVector::IsEmpty(int Lbound, int Ubound, bool IgnoreShift) const {
+	if (AbstractBbgVect::IsEmpty()) return true;
 	if (Ubound < Lbound) {
 		int TempV = Ubound;
 		Ubound = Lbound;
 		Lbound = TempV;
 	}
 	for (QList<int>::const_iterator i = m_VectVal.begin(); i != m_VectVal.end(); i++) {
-		if ((*i) > Ubound || (*i) < Lbound) return true;
+		if (
+			(*i) + (IgnoreShift? 0:m_Shift)> Ubound 
+			|| (*i) + (IgnoreShift ? 0 : m_Shift) < Lbound
+		) return true;
 	}
 	return false;
 }

@@ -67,31 +67,32 @@ void WaterfallViewer::ResetSteps(){
 }
 void WaterfallViewer::AddStep(
 	WatFalPrior::WaterfallStepType Step
-	, int ArgSeniorityGroup
-	, int ArgSeniorityGroupLevel
-	, int ArgRedemptionGroup
-	, int ArgRedemptionGroupLevel
-	, double ArgRedemptionShare
-	, double ArgAdditionalCollateralShare
-	, int ArgSourceofFunding
-	, int ArgCouponIndex
-	, double ArgTestTargetOverride
-	, double ArgIRRtoEquityTarget
-	, int ArgReserveIndex
+	, const QString& ArgSeniorityGroup
+	, const QString& ArgSeniorityGroupLevel
+	, const QString& ArgRedemptionGroup
+	, const QString& ArgRedemptionGroupLevel
+	, const QString& ArgRedemptionShare
+	, const QString& ArgAdditionalCollateralShare
+	, const QString& ArgSourceofFunding
+	, const QString& ArgCouponIndex
+	, const QString& ArgTestTargetOverride
+	, const QString& ArgIRRtoEquityTarget
+	, const QString& ArgReserveIndex
+	, const QString& ArgTrigger
 	){
 	WatFalPrior TempStep;
 	TempStep.SetPriorityType(Step);
-	TempStep.SetParameter(WatFalPrior::wstParameters::SeniorityGroup, ArgSeniorityGroup);
-	TempStep.SetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel, ArgSeniorityGroupLevel);
-	TempStep.SetParameter(WatFalPrior::wstParameters::RedemptionGroup, ArgRedemptionGroup);
-	TempStep.SetParameter(WatFalPrior::wstParameters::RedemptionGroupLevel, ArgRedemptionGroupLevel);
-	TempStep.SetParameter(WatFalPrior::wstParameters::RedemptionShare, ArgRedemptionShare);
-	TempStep.SetParameter(WatFalPrior::wstParameters::AdditionalCollateralShare, ArgAdditionalCollateralShare);
-	TempStep.SetParameter(WatFalPrior::wstParameters::SourceOfFunding, ArgSourceofFunding);
-	TempStep.SetParameter(WatFalPrior::wstParameters::CouponIndex, ArgCouponIndex);
-	TempStep.SetParameter(WatFalPrior::wstParameters::TestTargetOverride, ArgTestTargetOverride);
-	TempStep.SetParameter(WatFalPrior::wstParameters::IRRtoEquityTarget, ArgIRRtoEquityTarget);
-	TempStep.SetParameter(WatFalPrior::wstParameters::ReserveIndex, ArgReserveIndex);
+	if (!ArgSeniorityGroup.isEmpty()) { TempStep.SetParameter(WatFalPrior::wstParameters::SeniorityGroup, ArgSeniorityGroup); }
+	if (!ArgSeniorityGroupLevel.isEmpty()) { TempStep.SetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel, ArgSeniorityGroupLevel); }
+	if (!ArgRedemptionGroup.isEmpty()) { TempStep.SetParameter(WatFalPrior::wstParameters::RedemptionGroup, ArgRedemptionGroup); }
+	if (!ArgRedemptionGroupLevel.isEmpty()) { TempStep.SetParameter(WatFalPrior::wstParameters::RedemptionGroupLevel, ArgRedemptionGroupLevel); }
+	if (!ArgRedemptionShare.isEmpty()) { TempStep.SetParameter(WatFalPrior::wstParameters::RedemptionShare, ArgRedemptionShare); }
+	if (!ArgAdditionalCollateralShare.isEmpty()) { TempStep.SetParameter(WatFalPrior::wstParameters::AdditionalCollateralShare, ArgAdditionalCollateralShare); }
+	if (!ArgSourceofFunding.isEmpty()) { TempStep.SetParameter(WatFalPrior::wstParameters::SourceOfFunding, ArgSourceofFunding); }
+	if (!ArgCouponIndex.isEmpty()) { TempStep.SetParameter(WatFalPrior::wstParameters::CouponIndex, ArgCouponIndex); }
+	if (!ArgTestTargetOverride.isEmpty()) { TempStep.SetParameter(WatFalPrior::wstParameters::TestTargetOverride, ArgTestTargetOverride); }
+	if (!ArgIRRtoEquityTarget.isEmpty()) { TempStep.SetParameter(WatFalPrior::wstParameters::IRRtoEquityTarget, ArgIRRtoEquityTarget); }
+	if (!ArgReserveIndex.isEmpty()) { TempStep.SetParameter(WatFalPrior::wstParameters::ReserveIndex, ArgReserveIndex); }
 	AddStep(TempStep);
 }
 void WaterfallViewer::AddStep(const WatFalPrior& a){

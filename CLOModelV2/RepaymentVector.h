@@ -1,8 +1,8 @@
 #ifndef RepaymentVector_h__
 #define RepaymentVector_h__
 #include <QList>
-#include "AbstarctBbgVect.h"
-class RepaymentVector : public AbstarctBbgVect {
+#include "AbstractBbgVect.h"
+class RepaymentVector : public AbstractBbgVect {
 public:
 	enum RepaymentMethods {
 		Invalid=-1
@@ -30,10 +30,11 @@ public:
 	QString GetValueString(const QDate& index) const { return RepaymentMethodsToString(GetValue(index)); }
 	QString GetValueString(int index) const { return RepaymentMethodsToString(GetValue(index)); }
 	int NumElements() const { return m_VectVal.size(); }
-	RepaymentVector& operator=(const QString& a) { AbstarctBbgVect::operator=(a); return *this; }
+	RepaymentVector& operator=(const QString& a) { AbstractBbgVect::operator=(a); return *this; }
 	friend QDataStream& operator<<(QDataStream & stream, const RepaymentVector& flows);
 	friend QDataStream& operator>>(QDataStream & stream, RepaymentVector& flows);
 };
 QDataStream& operator<<(QDataStream & stream, const RepaymentVector& flows);
 QDataStream& operator>>(QDataStream & stream, RepaymentVector& flows);
+Q_DECLARE_METATYPE(RepaymentVector)
 #endif // RepaymentVector_h__

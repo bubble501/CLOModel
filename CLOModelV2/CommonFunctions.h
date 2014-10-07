@@ -9,7 +9,7 @@ class DayCountVector;
 class BloombergVector;
 template<typename T> class QList;
 
-
+#define SeniorityStringSeparator '-'
 #define NegateTriggerChar '!'
 #define MaximumInterestsTypes 8
 #define MaximumIRRIterations 10000//INT_MAX-1
@@ -75,11 +75,10 @@ enum class DayCountConvention : qint16 {
 };
 double RoundUp(double a);
 template<class T> void RegisterAsMetaType() {
-	
 	if (!QMetaType::isRegistered(qMetaTypeId<T>())) {
-	int TypeID = qRegisterMetaType<T>(typeid(T).name());
-	qRegisterMetaTypeStreamOperators<T>(typeid(T).name());
-	LOGDEBUG(QString("Meta type registered: %1, ID: %2").arg(typeid(T).name()).arg(TypeID));
+		int TypeID = qRegisterMetaType<T>(typeid(T).name());
+		qRegisterMetaTypeStreamOperators<T>(typeid(T).name());
+		LOGDEBUG(QString("Meta type registered: %1, ID: %2").arg(typeid(T).name()).arg(TypeID));
 	}
 }
 QString Commarize(double num,unsigned int precision=0);

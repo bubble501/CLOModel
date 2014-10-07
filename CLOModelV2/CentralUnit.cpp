@@ -24,10 +24,6 @@ CentralUnit::CentralUnit(QObject* parent)
 	for(int i=0;i<NumberOfPlots;i++) PlotIndexes[i]=0;
 	RegisterAsMetaType<Waterfall>();
 	RegisterAsMetaType<MtgCashFlow>();
-	/*if(!QMetaType::isRegistered(qMetaTypeId<Waterfall>()))
-		qRegisterMetaType<Waterfall>("Waterfall");
-	if(!QMetaType::isRegistered(qMetaTypeId<MtgCashFlow>()))
-		qRegisterMetaType<MtgCashFlow>("MtgCashFlow");*/
 	connect(&LoansCalculator,SIGNAL(Calculated()),this,SLOT(CalculationStep2()));
 	connect(this,SIGNAL(LoopStarted()),this,SLOT(CalculationStep1()),Qt::QueuedConnection);
 	ParallWatFalls=new WaterfallCalculator(this);
@@ -98,7 +94,6 @@ void CentralUnit::AddTranche(
 	, const QString& PayFreq
 	, const QDate& SettlementDate
 	, double StartingDeferredInterest
-	//,const QString& RefRteValue
 	, double MinOC
 	, double MinIC
 	, double Price
@@ -123,7 +118,6 @@ void CentralUnit::AddTranche(
 	TempTrnch.SetDefaultRefRate(DefRefRte);
 	TempTrnch.SetPaymentFrequency(PayFreq);
 	TempTrnch.SetSettlementDate(SettlementDate);
-	//TempTrnch.SetReferenceRateValue(RefRteValue);
 	TempTrnch.SetMinIClevel(MinIC);
 	TempTrnch.SetMinOClevel(MinOC);
 	TempTrnch.SetPrice(Price);
@@ -161,6 +155,7 @@ void CentralUnit::AddWaterfallStep(
 	if (!ArgTestTargetOverride.isEmpty()) { TempStep.SetParameter(WatFalPrior::wstParameters::TestTargetOverride, ArgTestTargetOverride); }
 	if (!ArgIRRtoEquityTarget.isEmpty()) { TempStep.SetParameter(WatFalPrior::wstParameters::IRRtoEquityTarget, ArgIRRtoEquityTarget); }
 	if (!ArgReserveIndex.isEmpty()) { TempStep.SetParameter(WatFalPrior::wstParameters::ReserveIndex, ArgReserveIndex); }
+	if (!ArgTrigger.isEmpty()) { TempStep.SetParameter(WatFalPrior::wstParameters::Trigger, ArgTrigger); }
 	TempStep.SetPriorityType(Tpe);
 	LOGDEBUG(TempStep.ToString());
 	Structure.AddStep(TempStep);

@@ -1,7 +1,5 @@
 #include "BackwardCompatibilityInterface.h"
 #include <QList>
-#include <QMetaType>
-#define SeniorityStringSeparator ','
 class Seniority : public BackwardInterface{
 	QList<quint32> m_SeniorityScale;
 	int m_CurrnetLevel;
@@ -12,7 +10,7 @@ public:
 	bool DecreaseLevel() { return SetCurrentLevel(m_CurrnetLevel - 1); }
 	bool SetCurrentLevel(int a);
 	quint32 GetCurrentSeniority() const { return m_SeniorityScale.at(m_CurrnetLevel); }
-	quint32 GetSeniorityAtLevel(int a) const { if (a < 0 || a >= m_SeniorityScale.size()) return 0; return  m_SeniorityScale.at(a); }
+	quint32 GetSeniorityAtLevel(int a) const;
 	bool AddSeniorityLevel(quint32 a);
 	bool SetSeniorityScale(const QString& a);
 	QString ToString() const;

@@ -16,12 +16,13 @@ WatFalPrior::WatFalPrior(const WatFalPrior& a)
 		DoubleParameters.insert(i.key(), new BloombergVector(*(i.value())));
 }
 WatFalPrior& WatFalPrior::operator=(const WatFalPrior& a){
-	TriggerStruc = a.TriggerStruc;
+	ClearParameters();
 	for (auto i = a.IntParameters.constBegin(); i != a.IntParameters.constEnd(); ++i)
 		IntParameters.insert(i.key(), new IntegerVector(*(i.value())));
 	for (auto i = a.DoubleParameters.constBegin(); i != a.DoubleParameters.constEnd(); ++i)
 		DoubleParameters.insert(i.key(), new BloombergVector(*(i.value())));
-	PriorityType=a.PriorityType;
+	PriorityType = a.PriorityType;
+	TriggerStruc = a.TriggerStruc;
 	return *this;
 }
 QString WatFalPrior::ReadyToCalculate() const {
@@ -33,63 +34,75 @@ QString WatFalPrior::ReadyToCalculate() const {
 		if (GetParameter(wstParameters::SourceOfFunding).value<IntegerVector>().IsEmpty(1,2)) Result += "Expenses and Fees Source of Funding Parameter\n";
 	break;
 	case WatFalPrior::WaterfallStepType::wst_Interest:
-		if (!HasParameter(wstParameters::SeniorityGroup)) Result += "Interest needs a Seniority Group Parameter\n";
-		if (!HasParameter(wstParameters::SeniorityGroupLevel)) Result += "Interest needs a Seniority Group Level Parameter\n";
-		if (!HasParameter(wstParameters::CouponIndex)) Result += "Interest needs a Coupon Index Parameter\n";
+		if (GetParameter(wstParameters::SeniorityGroup).value<IntegerVector>().IsEmpty(1)) Result += "Interest needs a Seniority Group Parameter\n";
+		if (GetParameter(wstParameters::SeniorityGroupLevel).value<IntegerVector>().IsEmpty(0)) Result += "Interest needs a Seniority Group Level Parameter\n";
+		if (GetParameter(wstParameters::CouponIndex).value<IntegerVector>().IsEmpty(0)) Result += "Interest needs a Coupon Index Parameter\n";
 	break;
 	case WatFalPrior::WaterfallStepType::wst_Principal:
-		if (!HasParameter(wstParameters::SeniorityGroup)) Result += "Principal needs a Seniority Group Parameter\n";
-		if (!HasParameter(wstParameters::SeniorityGroupLevel)) Result += "Principal needs a Seniority Group Level Parameter\n";
+		if (GetParameter(wstParameters::SeniorityGroup).value<IntegerVector>().IsEmpty(1)) Result += "Principal needs a Seniority Group Parameter\n";
+		if (GetParameter(wstParameters::SeniorityGroupLevel).value<IntegerVector>().IsEmpty(0)) Result += "Principal needs a Seniority Group Level Parameter\n";
 	break;
 	case WatFalPrior::WaterfallStepType::wst_OCTest:
-		if (!HasParameter(wstParameters::SeniorityGroup)) Result += "OC Test needs a Seniority Group Parameter\n";
-		if (!HasParameter(wstParameters::SeniorityGroupLevel)) Result += "OC Test needs a Seniority Group Level Parameter\n";
+		if (GetParameter(wstParameters::SeniorityGroup).value<IntegerVector>().IsEmpty(1)) Result += "OC Test needs a Seniority Group Parameter\n";
+		if (GetParameter(wstParameters::SeniorityGroupLevel).value<IntegerVector>().IsEmpty(0)) Result += "OC Test needs a Seniority Group Level Parameter\n";
 		if (HasParameter(wstParameters::RedemptionGroup)) {
-			if (!HasParameter(wstParameters::RedemptionGroupLevel)) Result += "OC Test needs a Redemption Group Level Parameter\n";
-			if (!HasParameter(wstParameters::RedemptionShare)) Result += "OC Test needs a Redemption Share Parameter\n";
+			if (GetParameter(wstParameters::RedemptionGroup).value<IntegerVector>().IsEmpty(1)) Result += "OC Test needs a Redemption Group Parameter\n";
+			if (GetParameter(wstParameters::RedemptionGroupLevel).value<IntegerVector>().IsEmpty(0)) Result += "OC Test needs a Redemption Group Level Parameter\n";
+			if (GetParameter(wstParameters::RedemptionShare).value<BloombergVector>().IsEmpty(0.0,1.0)) Result += "OC Test needs a Redemption Share Parameter\n";
+		}
+		if (HasParameter(wstParameters::AdditionalCollateralShare)) {
+			if (GetParameter(wstParameters::AdditionalCollateralShare).value<BloombergVector>().IsEmpty(0.0, 1.0)) Result += "OC Test needs an Additional Collateral Share Parameter\n";
+		}
+		if (HasParameter(wstParameters::TestTargetOverride)) {
+			if (GetParameter(wstParameters::TestTargetOverride).value<BloombergVector>().IsEmpty(0.0)) Result += "OC Test needs a target Override Parameter\n";
 		}
 		break;
 	case WatFalPrior::WaterfallStepType::wst_ICTest:
-		if (!HasParameter(wstParameters::SeniorityGroup)) Result += "IC Test needs a Seniority Group Parameter\n";
-		if (!HasParameter(wstParameters::SeniorityGroupLevel)) Result += "IC Test needs a Seniority Group Level Parameter\n";
-		if (!HasParameter(wstParameters::CouponIndex)) Result += "IC Test needs a Coupon Index Parameter\n";
+		if (GetParameter(wstParameters::SeniorityGroup).value<IntegerVector>().IsEmpty(1)) Result += "IC Test needs a Seniority Group Parameter\n";
+		if (GetParameter(wstParameters::SeniorityGroupLevel).value<IntegerVector>().IsEmpty(0)) Result += "IC Test needs a Seniority Group Level Parameter\n";
+		if (GetParameter(wstParameters::CouponIndex).value<IntegerVector>().IsEmpty(0)) Result += "IC Test needs a Coupon Index Parameter\n";
+		if (HasParameter(wstParameters::TestTargetOverride)) {
+			if (GetParameter(wstParameters::TestTargetOverride).value<BloombergVector>().IsEmpty(0.0)) Result += "IC Test needs a target Override Parameter\n";
+		}
 		break;
 	case WatFalPrior::WaterfallStepType::wst_DeferredInterest:
-		if (!HasParameter(wstParameters::SeniorityGroup)) Result += "Deferred Interest needs a Seniority Group Parameter\n";
-		if (!HasParameter(wstParameters::SeniorityGroupLevel)) Result += "Deferred Interest needs a Seniority Group Level Parameter\n";
-		if (!HasParameter(wstParameters::CouponIndex)) Result += "Deferred Interest needs a Coupon Index Parameter\n";	
+		if (GetParameter(wstParameters::SeniorityGroup).value<IntegerVector>().IsEmpty(1)) Result += "Deferred Interest needs a Seniority Group Parameter\n";
+		if (GetParameter(wstParameters::SeniorityGroupLevel).value<IntegerVector>().IsEmpty(0)) Result += "Deferred Interest needs a Seniority Group Level Parameter\n";
+		if (GetParameter(wstParameters::CouponIndex).value<IntegerVector>().IsEmpty(0)) Result += "Deferred Interest needs a Coupon Index Parameter\n";
 		break;
 	case WatFalPrior::WaterfallStepType::wst_Excess:
-		if (!HasParameter(wstParameters::SourceOfFunding)) Result += "Excess Spread needs a Source of Funding Parameter\n";
+		if (GetParameter(wstParameters::SourceOfFunding).value<IntegerVector>().IsEmpty(1,3)) Result += "Excess Spread needs a Source of Funding Parameter\n";
 		if (HasParameter(wstParameters::RedemptionGroup)) {
-			if (!HasParameter(wstParameters::RedemptionGroup)) Result += "Excess Spread needs a Redemption Group Parameter\n";
-			if (!HasParameter(wstParameters::RedemptionGroupLevel)) Result += "Excess Spread needs a Redemption Group Level Parameter\n";
+			if (GetParameter(wstParameters::RedemptionGroup).value<IntegerVector>().IsEmpty(1)) Result += "Excess Spread needs a Redemption Group Parameter\n";
+			if (GetParameter(wstParameters::RedemptionGroupLevel).value<IntegerVector>().IsEmpty(0)) Result += "Excess Spread needs a Redemption Group Level Parameter\n";
+			if (GetParameter(wstParameters::RedemptionShare).value<BloombergVector>().IsEmpty(0.0, 1.0)) Result += "Excess Spread needs a Redemption Share Parameter\n";
 		}
 	break;
 	case WatFalPrior::WaterfallStepType::wst_ReinvestPrincipal:
-		if (!HasParameter(wstParameters::SourceOfFunding)) Result += "Reinvest Principal needs a Source of Funding Parameter\n";
-		if (!HasParameter(wstParameters::AdditionalCollateralShare))Result += "Reinvest Principal needs a Additional Collateral Share Parameter\n";
+		if (GetParameter(wstParameters::SourceOfFunding).value<IntegerVector>().IsEmpty(1, 3)) Result += "Reinvest Principal needs a Source of Funding Parameter\n";
+		if (GetParameter(wstParameters::AdditionalCollateralShare).value<BloombergVector>().IsEmpty(0.0, 1.0)) Result += "Reinvest Principal needs a Additional Collateral Share Parameter\n";
 	break;
 	case WatFalPrior::WaterfallStepType::wst_ReserveReplenish:
-		if (!HasParameter(wstParameters::ReserveIndex)) Result += "Reserve Replenish needs a Reserve Index Parameter\n";
-		if (!HasParameter(wstParameters::SourceOfFunding)) Result += "Reserve Replenish needs a Source of Funding Parameter\n";
+		if (GetParameter(wstParameters::ReserveIndex).value<IntegerVector>().IsEmpty(0)) Result += "Reserve Replenish needs a Reserve Index Parameter\n";
+		if (GetParameter(wstParameters::SourceOfFunding).value<IntegerVector>().IsEmpty(1, 2)) Result += "Reserve Replenish needs a Source of Funding Parameter\n";
 	break;
 	case WatFalPrior::WaterfallStepType::wst_Turbo:
-		if (!HasParameter(wstParameters::RedemptionGroup)) Result += "Turbo needs a Redemption Group Parameter\n";
-		if (!HasParameter(wstParameters::RedemptionGroupLevel)) Result += "Turbo needs a Redemption Group Level Parameter\n";
-		if (!HasParameter(wstParameters::RedemptionShare)) Result += "Turbo needs a Redemption Share Parameter\n";
+		if (GetParameter(wstParameters::RedemptionGroup).value<IntegerVector>().IsEmpty(1)) Result += "Turbo needs a Redemption Group Parameter\n";
+		if (GetParameter(wstParameters::RedemptionGroupLevel).value<IntegerVector>().IsEmpty(0)) Result += "Turbo needs a Redemption Group Level Parameter\n";
+		if (GetParameter(wstParameters::RedemptionShare).value<BloombergVector>().IsEmpty(0.0, 1.0)) Result += "Turbo needs a Redemption Share Parameter\n";
 		break;
 	case WatFalPrior::WaterfallStepType::wst_PDL:
-		if (!HasParameter(wstParameters::SeniorityGroup)) Result += "PDL Cure needs a Seniority Group Parameter\n";
-		if (!HasParameter(wstParameters::SeniorityGroupLevel)) Result += "PDL Cure needs a Seniority Group Level Parameter\n";
+		if (GetParameter(wstParameters::SeniorityGroup).value<IntegerVector>().IsEmpty(1)) Result += "PDL Cure needs a Seniority Group Parameter\n";
+		if (GetParameter(wstParameters::SeniorityGroupLevel).value<IntegerVector>().IsEmpty(0)) Result += "PDL Cure needs a Seniority Group Level Parameter\n";
 		if (HasParameter(wstParameters::RedemptionGroup)) {
-			if (!HasParameter(wstParameters::RedemptionGroupLevel)) Result += "PDL Cure needs a Redemption Group Level Parameter\n";
-			if (!HasParameter(wstParameters::RedemptionShare)) Result += "PDL Cure needs a Redemption Share Parameter\n";
+			if (GetParameter(wstParameters::RedemptionGroup).value<IntegerVector>().IsEmpty(1)) Result += "PDL Cure needs a Redemption Group Parameter\n";
+			if (GetParameter(wstParameters::RedemptionGroupLevel).value<IntegerVector>().IsEmpty(0)) Result += "PDL Cure needs a Redemption Group Level Parameter\n";
+			if (GetParameter(wstParameters::RedemptionShare).value<BloombergVector>().IsEmpty(0.0, 1.0)) Result += "PDL Cure needs a Redemption Share Parameter\n";
 		}
 		break;
 	case WatFalPrior::WaterfallStepType::wst_FeesFromExcess:
-		if (!HasParameter(wstParameters::RedemptionShare)) Result += "Fees from Excess Spread needs a Redemption Share Parameter\n";
-		if (!HasParameter(wstParameters::SourceOfFunding)) Result += "Fees from Excess Spread needs a Source of Funding Parameter\n";
+		if (GetParameter(wstParameters::RedemptionShare).value<BloombergVector>().IsEmpty(0.0, 1.0)) Result += "Fees from Excess Spread needs a Redemption Share Parameter\n";
+		if (GetParameter(wstParameters::SourceOfFunding).value<IntegerVector>().IsEmpty(1, 3)) Result += "Fees from Excess Spread needs a Source of Funding Parameter\n";
 		break;
 	default:
 		break;

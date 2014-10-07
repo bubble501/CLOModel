@@ -49,6 +49,12 @@ QString Seniority::ToString() const {
 	return Result;
 }
 
+quint32 Seniority::GetSeniorityAtLevel(int a) const {
+	if (a < 0) return 0; 
+	if (a >= m_SeniorityScale.size()) return m_SeniorityScale.last(); 
+	return  m_SeniorityScale.at(a);
+}
+
 QDataStream& operator>>(QDataStream & stream, Seniority& flows) {
 	return flows.LoadOldVersion(stream);
 }

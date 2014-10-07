@@ -186,6 +186,7 @@ void WatFalPrior::SetParameter(qint32 ParameterType, const QString& val) {
 		TriggerStruc.replace("nor", "-");
 		TriggerStruc.replace("or", "+");
 		TriggerStruc.replace("not", "!");
+		TriggerStruc.replace("^", "!");
 		TriggerStruc.replace(QRegExp("&?&"), "*");
 		TriggerStruc.replace(QRegExp("|?|"), "*");
 		TriggerStruc.replace(QRegExp("\\s"), "");

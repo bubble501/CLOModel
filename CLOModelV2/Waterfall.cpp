@@ -1215,6 +1215,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					//if it fails redeem notes until cured
 					if (Solution / TotalPayable < TestTarget) {
 						double CurrAddColShare = SingleStep->GetParameter(WatFalPrior::wstParameters::AdditionalCollateralShare).value<BloombergVector>().GetValue(CurrentDate);
+						if (IsCallPaymentDate || i == m_MortgagesPayments.Count() - 1) CurrAddColShare = 0.0;
 						if ((CurrAddColShare*TestTarget) - TestTarget - CurrAddColShare == 0.0) {
 							PrintToTempFile("ReturnFalse.txt", "OC cure denominator is 0");
 							return false;

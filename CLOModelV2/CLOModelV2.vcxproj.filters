@@ -236,6 +236,12 @@
     <ClInclude Include="AbstractBbgVect.h">
       <Filter>Header Files\Vectors</Filter>
     </ClInclude>
+    <ClInclude Include="PrincipalProceeds.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TriggersResults.h">
+      <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Resources.qrc">
@@ -587,6 +593,12 @@
     </ClCompile>
     <ClCompile Include="AbstractBbgVect.cpp">
       <Filter>Source Files\Vectors</Filter>
+    </ClCompile>
+    <ClCompile Include="TriggersResults.cpp">
+      <Filter>Source Files\Triggers</Filter>
+    </ClCompile>
+    <ClCompile Include="PrincipalProceeds.cpp">
+      <Filter>Source Files\Deal Structure</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

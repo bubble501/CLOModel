@@ -13,40 +13,8 @@
 #include "DayCountVect.h"
 #include <QSharedPointer>
 #include "AbstractTrigger.h"
-class PrincipalRecip {
-protected:
-	double m_Scheduled;
-	double m_Prepay;
-public:
-	const double& GetPrepay() const { return m_Prepay; }
-	void SetPrepay(const double& val) { if (qAbs(val) >= 0.01) m_Prepay = val; }
-	void AddPrepay(const double& val) { if (qAbs(val) >= 0.01) m_Prepay += val; }
-	const double& GetScheduled() const { return m_Scheduled; }
-	void SetScheduled(const double& val) { if (qAbs(val) >= 0.01) m_Scheduled = val; }
-	void AddScheduled(const double& val) { if (qAbs(val) >= 0.01) m_Scheduled += val; }
-	PrincipalRecip() :m_Scheduled(0.0), m_Prepay(0.0) {}
-	PrincipalRecip(const PrincipalRecip& a) :m_Scheduled(a.m_Scheduled), m_Prepay(a.m_Prepay) {}
-	PrincipalRecip& operator=(const PrincipalRecip& a) { m_Scheduled = a.m_Scheduled; m_Prepay = a.m_Prepay; return *this; }
-	PrincipalRecip operator-(double a) { PrincipalRecip Result(*this); Result -= a; return Result; }
-	PrincipalRecip& operator-=(double a) { 
-		if (qAbs(a) < 0.01) return *this;
-		if (a < 0.0) return operator+=(-a);
-		double Temp=qMin(a,m_Scheduled); 
-		m_Scheduled -= Temp;
-		m_Prepay -= a - Temp;
-		return *this;
-	}
-	PrincipalRecip& operator+=(double a) { 
-		if (qAbs(a) < 0.01) return *this;
-		if (a < 0.0) return operator-=(-a);
-		m_Scheduled += a;
-		return *this;
-	}
-	PrincipalRecip operator+(double a) { PrincipalRecip Result(*this); Result += a; return Result; }
-	bool operator<(double a){return m_Scheduled<a || m_Prepay<a;}
-	double Total() const { return m_Scheduled + m_Prepay; }
-	void Erase() { m_Scheduled = m_Prepay = 0.0; }
-};
+#include "PrincipalProceeds.h"
+#include "TriggersResults.h"
 class Waterfall : public BackwardInterface{
 private:
 	QList<ReserveFund*> m_Reserves;
@@ -91,7 +59,8 @@ private:
 	GenericCashFlow m_GICflows;
 	DayCountVector m_DealDayCountConvention;
 	QDate m_CalledPeriod;
-	QHash <qint32, QSharedPointer<AbstractTrigger> > m_Triggers;
+	TriggersResults m_TriggersResults;
+	QHash <quint32, QSharedPointer<AbstractTrigger> > m_Triggers;
 	int FindMostJuniorLevel(int SeliorityScaleLevel) const;
 	void SortByProRataGroup();
 	double GroupOutstanding(int GroupTarget, int SeliorityScaleLevel)const;
@@ -102,7 +71,7 @@ private:
 	double RedeemSequential(double AvailableFunds, const QDate& PeriodIndex, int SeliorityScaleLevel, int MaxGroup = -1 );
 	int FindTrancheIndex(const QString& Tranchename)const;
 	void FillAllDates();
-	bool TriggerPassing(const QString& TriggerStructure, int PeriodIndex, const QDate& CurrentIPD, bool IsCallDate) const;
+	bool TriggerPassing(const QString& TriggerStructure, int PeriodIndex, const QDate& CurrentIPD, bool IsCallDate);
 	bool EvaluateTrigger(quint32 TrigID, int PeriodIndex, const QDate& CurrentIPD, bool IsCallDate)const;
 	bool ValidTriggerStructure(const QString& TriggerStructure)const;
 protected:
@@ -181,14 +150,16 @@ public:
 	const double& GetStartingDeferredJunFees() const { return m_StartingDeferredJunFees; }
 	QString GetGICBaseRate() const { return m_GICBaseRate.GetVector(); }
 	const DayCountVector& GetDealDayCountConvention() const { return m_DealDayCountConvention; }
-	const QSharedPointer<AbstractTrigger> GetTrigger(qint32 key) const { return m_Triggers.value(key, QSharedPointer<AbstractTrigger>()); }
-	QSharedPointer<AbstractTrigger> GetTrigger(qint32 key) { if (m_Triggers.contains(key)) return m_Triggers[key]; return QSharedPointer<AbstractTrigger>(); }
+	const QSharedPointer<AbstractTrigger> GetTrigger(quint32 key) const { return m_Triggers.value(key, QSharedPointer<AbstractTrigger>()); }
+	QSharedPointer<AbstractTrigger> GetTrigger(quint32 key) { if (m_Triggers.contains(key)) return m_Triggers[key]; return QSharedPointer<AbstractTrigger>(); }
 	GenericCashFlow GetAggregatedReinvestment() const;
 	GenericCashFlow GetAggregatedGIC() const;
 	MtgCashFlow GetAggregatedMtgFlows() const;
 	//////////////////////////////////////////////////////////////////////////
-	void SetTrigger(qint32 key, QSharedPointer<AbstractTrigger> val);
-	void RemoveTrigger(qint32 key) { m_Triggers.remove(key); }
+	const TriggersResults& GetTriggersResults() const { return m_TriggersResults; }
+	void SetTrigger(quint32 key, QSharedPointer<AbstractTrigger> val);
+	void ResetTriggers();
+	void RemoveTrigger(quint32 key) { m_Triggers.remove(key); }
 	void SetDealDayCountConvention(const QString&  val) { m_DealDayCountConvention = val; }
 	void SetGICBaseRate(const QString& a) { m_GICBaseRate = a; }
 	void SetStartingDeferredJunFees(const double& val) { m_StartingDeferredJunFees = val; }
@@ -256,7 +227,6 @@ public:
 #endif
 	friend QDataStream& operator<<(QDataStream & stream, const Waterfall& flows);
 	friend QDataStream& operator>>(QDataStream & stream, Waterfall& flows);
-	void ResetTriggers();
 };
 Q_DECLARE_METATYPE(Waterfall)
 QDataStream& operator<<(QDataStream & stream, const Waterfall& flows);

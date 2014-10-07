@@ -133,6 +133,7 @@ Waterfall::Waterfall(const Waterfall& a)
 	, m_GICBaseRateValue(a.m_GICBaseRateValue)
 	, m_DealDayCountConvention(a.m_DealDayCountConvention)
 	, m_CalledPeriod(a.m_CalledPeriod)
+	, m_TriggersResults(a.m_TriggersResults)
 {
 	m_LoadProtocolVersion = a.m_LoadProtocolVersion;
 	for(QList<Tranche*>::const_iterator i=a.m_Tranches.constBegin();i!=a.m_Tranches.constEnd();i++){
@@ -204,6 +205,8 @@ Waterfall& Waterfall::operator=(const Waterfall& a){
 	m_GICBaseRate = a.m_GICBaseRate;
 	m_GICBaseRateValue = a.m_GICBaseRateValue;
 	m_DealDayCountConvention = a.m_DealDayCountConvention;
+	m_CalledPeriod = a.m_CalledPeriod;
+	m_TriggersResults = a.m_TriggersResults;
 	ResetTranches();
 	for(QList<Tranche*>::const_iterator i=a.m_Tranches.constBegin();i!=a.m_Tranches.constEnd();i++){
 		m_Tranches.append(new Tranche(**i));
@@ -644,6 +647,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 			}
 		}
 		m_CalledPeriod = QDate();
+		m_TriggersResults.ClearResults();
 		PrincipalRecip AvailablePrincipal;
 		double AvailableInterest;
 		double TotalPayable;
@@ -1456,6 +1460,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 QDataStream& operator<<(QDataStream & stream, const Waterfall& flows){
 	stream
 		<< flows.m_CalledPeriod
+		<< flows.m_TriggersResults
 		<< flows.m_SeniorExpenses
 		<< flows.m_SeniorFees
 		<< flows.m_JuniorFees
@@ -1523,6 +1528,7 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream){
 	ReserveFund TempReserve;
 	WatFalPrior TempStep;
 	stream >> m_CalledPeriod;
+	m_TriggersResults.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_TriggersResults;
 	m_SeniorExpenses.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_SeniorExpenses;
 	m_SeniorFees.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_SeniorFees;
 	m_JuniorFees.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_JuniorFees;
@@ -1577,7 +1583,7 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream){
 	//Triggers
 	{
 		quint8 TempChar;
-		qint32 TempKey;
+		quint32 TempKey;
 		QSharedPointer<AbstractTrigger> TempTrig;
 		stream >> TempInt;
 		for (int i = 0; i < TempInt; i++) {
@@ -1851,7 +1857,7 @@ void Waterfall::GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool Download
 }
 #endif
 
-void Waterfall::SetTrigger(qint32 key, QSharedPointer<AbstractTrigger> val) {
+void Waterfall::SetTrigger(quint32 key, QSharedPointer<AbstractTrigger> val) {
 	m_Triggers[key] = val;
 }
 
@@ -1873,29 +1879,31 @@ bool Waterfall::ValidTriggerStructure(const QString& TriggerStructure)const {
 	return true;
 }
 
-bool Waterfall::TriggerPassing(const QString& TriggerStructure, int PeriodIndex,const QDate& CurrentIPD, bool IsCallDate) const {
+bool Waterfall::TriggerPassing(const QString& TriggerStructure, int PeriodIndex,const QDate& CurrentIPD, bool IsCallDate) {
 	QString AdjStructure = InfixToPostfix(TriggerStructure);
 	if (AdjStructure.isEmpty()) return false;
 	QRegExp SignleTriggers(QString("\\b") + NegateTriggerChar +"?(\\d+)\\b");
-	QHash<quint32, bool> SignleResults;
 	if (SignleTriggers.indexIn(AdjStructure) < 0) return false;
 	QStringList CapturedTriggers = SignleTriggers.capturedTexts();
 	for (auto i = CapturedTriggers.constBegin() + 1; i != CapturedTriggers.constEnd(); ++i) {
 		quint32 CurrentTrigger = i->toUInt();
 		if (!m_Triggers.contains(CurrentTrigger)) 	return false;
-		if (!SignleResults.contains(CurrentTrigger))
-			SignleResults.insert(CurrentTrigger, EvaluateTrigger(CurrentTrigger, PeriodIndex,CurrentIPD,IsCallDate));
+		TriggersResults::TrigRes SingleRes = m_TriggersResults.GetResult(CurrentTrigger, CurrentIPD);
+		if (SingleRes == TriggersResults::TrigRes::trNA) {
+			bool TempRes = EvaluateTrigger(CurrentTrigger, PeriodIndex, CurrentIPD, IsCallDate);
+			m_TriggersResults.SetResult(CurrentTrigger, CurrentIPD, TempRes);
+			SingleRes = (TempRes ? TriggersResults::TrigRes::trTrue : TriggersResults::TrigRes::trFalse);
+		}
 	}
 	QStack<bool> PolishStack;
 	QStringList PolishParts = AdjStructure.split(' ');
 	SignleTriggers.setPattern(NegateTriggerChar+QString("?\\d+"));
 	foreach(const QString& SinglePart, PolishParts) {
 		if (SignleTriggers.exactMatch(SinglePart)) {
-			if (SinglePart.at(0) == QString(NegateTriggerChar).replace(QRegExp("\\+"), "")) {
-				PolishStack.push(!SignleResults.value(SinglePart.mid(1).toUInt()));
-			}
+			if (SinglePart.at(0) == QString(NegateTriggerChar).replace(QRegExp("\\+"), "")) 
+				PolishStack.push(m_TriggersResults.GetResult(SinglePart.mid(1).toUInt(), CurrentIPD) != TriggersResults::TrigRes::trTrue);
 			else
-				PolishStack.push(SignleResults.value(SinglePart.toUInt()));
+				PolishStack.push(m_TriggersResults.GetResult(SinglePart.mid(1).toUInt(), CurrentIPD) == TriggersResults::TrigRes::trTrue);
 		}
 		else {
 			switch (SinglePart.at(0).toLatin1()) {

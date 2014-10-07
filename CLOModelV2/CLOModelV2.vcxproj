@@ -29,6 +29,7 @@
     <ClInclude Include="Mortgage.h" />
     <ClInclude Include="MtgCashFlow.h" />
     <ClInclude Include="PoolSizeTrigger.h" />
+    <ClInclude Include="PrincipalProceeds.h" />
     <ClInclude Include="QBbgRequest.h" />
     <ClInclude Include="QBbgResultsIterator.h" />
     <CustomBuild Include="QBbgWorker.h">
@@ -94,6 +95,7 @@
     <ClInclude Include="Tranche.h" />
     <ClInclude Include="TrancheCashFlow.h" />
     <ClInclude Include="TrancheTrigger.h" />
+    <ClInclude Include="TriggersResults.h" />
     <ClInclude Include="VectorTrigger.h" />
     <ClInclude Include="Waterfall.h" />
     <ClInclude Include="WatFalPrior.h" />
@@ -375,6 +377,7 @@
     <ClCompile Include="MtgCalculatorThread.cpp" />
     <ClCompile Include="MtgCashFlow.cpp" />
     <ClCompile Include="PoolSizeTrigger.cpp" />
+    <ClCompile Include="PrincipalProceeds.cpp" />
     <ClCompile Include="ProgressWidget.cpp" />
     <ClCompile Include="QBbgRequest.cpp" />
     <ClCompile Include="QBbgResultsIterator.cpp" />
@@ -407,6 +410,7 @@
     <ClCompile Include="TrancheCashFlow.cpp" />
     <ClCompile Include="TrancheTrigger.cpp" />
     <ClCompile Include="TrancheViewer.cpp" />
+    <ClCompile Include="TriggersResults.cpp" />
     <ClCompile Include="VectorTrigger.cpp" />
     <ClCompile Include="Waterfall.cpp" />
     <ClCompile Include="WaterfallCalcThread.cpp" />

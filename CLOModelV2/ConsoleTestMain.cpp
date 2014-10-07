@@ -43,6 +43,7 @@ int main(int argc, char *argv[]) {
 	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempCallWaterfall;
 	file.close();
+	PrintToTempFile("Calculated MTG Flows", TempWtf.GetCalculatedMtgPayments().ToString(), false);
 	TempWtf.CalculateTranchesCashFlows();
 
 	/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

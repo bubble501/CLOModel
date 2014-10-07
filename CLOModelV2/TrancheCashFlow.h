@@ -17,6 +17,8 @@ public:
 		PrincipalFlow=1,
 		OCFlow=11,
 		ICFlow=12,
+		OCTarget=211,
+		ICTarget=212,
 		DeferredFlow = 1 << (MaximumInterestsTypes+1),
 		PDLOutstanding=201,
 		PDLCured=202

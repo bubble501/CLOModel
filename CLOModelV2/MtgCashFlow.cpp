@@ -5,35 +5,35 @@
 #include <QDataStream>
 #include <qmath.h>
 double MtgCashFlow::GetWAcoupon(int index) const {
-	if (GetFlow(index,MtgFlowType::AmountOutstandingFlow) == 0) return 0.0;
+	if (GetFlow(index,MtgFlowType::AmountOutstandingFlow) == 0.0) return 0.0;
 	return GetFlow(index, MtgFlowType::WACouponFlow) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
 }
 double MtgCashFlow::GetWAcoupon(const QDate& index) const {
-	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0) return 0.0;
+	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0.0) return 0.0;
 	return GetFlow(index, MtgFlowType::WACouponFlow) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
 }
 double MtgCashFlow::GetWAprepayMult(int index) const {
-	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0) return 0.0;
+	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0.0) return 0.0;
 	return GetFlow(index, MtgFlowType::WAPrepayMult) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
 }
 double MtgCashFlow::GetWAprepayMult(const QDate& index) const {
-	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0) return 0.0;
+	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0.0) return 0.0;
 	return GetFlow(index, MtgFlowType::WAPrepayMult) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
 }
 double MtgCashFlow::GetWAlossMult(int index) const {
-	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0) return 0.0;
+	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0.0) return 0.0;
 	return GetFlow(index, MtgFlowType::WALossMult) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
 }
 double MtgCashFlow::GetWAlossMult(const QDate& index) const {
-	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0) return 0.0;
+	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0.0) return 0.0;
 	return GetFlow(index, MtgFlowType::WALossMult) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
 }
 double MtgCashFlow::GetWAPrice(int index) const {
-	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0) return 0.0;
+	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0.0) return 0.0;
 	return GetFlow(index, MtgFlowType::WAPrice) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
 }
 double MtgCashFlow::GetWAPrice(const QDate& index) const {
-	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0) return 0.0;
+	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0.0) return 0.0;
 	return GetFlow(index, MtgFlowType::WAPrice) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
 }
 /*
@@ -120,12 +120,28 @@ MtgCashFlow MtgCashFlow::ApplyScenario(BloombergVector CPRv, BloombergVector CDR
 }
 
 MtgCashFlow::MtgCashFlow() {
+	SetLabel(static_cast<qint32>(MtgFlowType::InterestFlow), "Interest");
+	SetLabel(static_cast<qint32>(MtgFlowType::PrincipalFlow), "Scheduled");
+	SetLabel(static_cast<qint32>(MtgFlowType::PrepaymentFlow), "Prepayment");
+	SetLabel(static_cast<qint32>(MtgFlowType::AmountOutstandingFlow), "Amount Outstanding");
+	SetLabel(static_cast<qint32>(MtgFlowType::WACouponFlow), "WA Coupon");
+	SetLabel(static_cast<qint32>(MtgFlowType::AccruedInterestFlow), "Accrued Interest");
+	SetLabel(static_cast<qint32>(MtgFlowType::LossOnInterestFlow), "Loss on Interest");
+	SetLabel(static_cast<qint32>(MtgFlowType::PrincipalDefault), "Principal Default");
+	SetLabel(static_cast<qint32>(MtgFlowType::PrincipalRecovered), "Principal Recovered");
+	SetLabel(static_cast<qint32>(MtgFlowType::InterestRecovered), "Interest Recovered");
+	SetLabel(static_cast<qint32>(MtgFlowType::LossFlow), "Loss");
+	SetLabel(static_cast<qint32>(MtgFlowType::WAPrepayMult), "WA Prepay Multiplier");
+	SetLabel(static_cast<qint32>(MtgFlowType::WALossMult), "W ALoss Multiplier");
+	SetLabel(static_cast<qint32>(MtgFlowType::WAPrice), "WA Price");
 	Aggregate(Monthly); 
 }
 
-MtgCashFlow::MtgCashFlow(const MtgCashFlow& a) {
-	Aggregate(Monthly); 
-	AddFlow(a);
+MtgCashFlow::MtgCashFlow(const MtgCashFlow& a) 
+	:GenericCashFlow(a)
+{
+	/*Aggregate(Monthly); 
+	AddFlow(a);*/
 }
 double MtgCashFlow::GetTotalFlow(int index) const {
 	QList<qint32> FlowsType;

@@ -1523,7 +1523,7 @@ HRESULT ExcelOutput::PlotCostFunding(
 					CostFundingIter->vt = VT_R8;
 					CostFundingIter->dblVal = TempCalc;
 				}
-				TempCalc=source.GetCalculatedMtgPayments().GetWAcoupon(source.GetTranche(0)->GetCashFlow().GetDate(i));
+				TempCalc = source.GetCalculatedMtgPayments().GetWAcoupon(QDate(source.GetTranche(0)->GetCashFlow().GetDate(i).year(), source.GetTranche(0)->GetCashFlow().GetDate(i).month(),15));
 				if(TempCalc>0.0){
 					LoansCouponIter->vt = VT_R8;
 					LoansCouponIter->dblVal = TempCalc;

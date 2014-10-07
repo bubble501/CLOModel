@@ -711,6 +711,9 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		foreach(Tranche* SingleTranche, m_Tranches) {
 			SingleTranche->GetCashFlow().Clear();
 		}
+		foreach(WatFalPrior* SingleStp, m_WaterfallStesps) {
+			SingleStp->FillMissingAnchors(m_MortgagesPayments.GetDate(0));
+		}
 		for(int i=0;i<m_MortgagesPayments.Count();i++){
 			CurrentDate=m_MortgagesPayments.GetDate(i);
 			if (i > 0) {
@@ -1396,6 +1399,11 @@ bool Waterfall::CalculateTranchesCashFlows(){
 			m_Tranches[i]->SetStartingDeferredInterest(OriginalStartingDeferred[i]);
 		}
 		delete [] OriginalStartingDeferred;
+		foreach(WatFalPrior* SingleStp, m_WaterfallStesps) {
+			SingleStp->ResetMissinAnchors();
+		}
+
+
 		//Check that there is no losses of cash flows
 		TrancheCashFlow CheckTranCashFlow;
 		MtgCashFlow CheckMtgCashFlow;
@@ -1478,8 +1486,7 @@ QDataStream& operator<<(QDataStream & stream, const Waterfall& flows){
 		<< flows.m_CCCTestLimit
 		<< flows.m_CCCcurve
 		<< flows.m_CCChaircut
-		<< flows.m_PrincipalAvailable.GetScheduled()
-		<< flows.m_PrincipalAvailable.GetPrepay()
+		<< flows.m_PrincipalAvailable
 		<< flows.m_InterestAvailable
 		<< flows.m_JuniorFeesCoupon
 		<< flows.m_AnnualizedExcess
@@ -1542,19 +1549,17 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream){
 	m_TotalSeniorExpenses.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_TotalSeniorExpenses;
 	m_TotalSeniorFees.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_TotalSeniorFees;
 	m_TotalJuniorFees.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_TotalJuniorFees;
-	m_ReinvestmentTest.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_ReinvestmentTest;
+	m_ReinvestmentTest.SetLoadProtocolVersion(m_LoadProtocolVersion);  stream >> m_ReinvestmentTest;
 	ResetTriggers();
 	SetReinvestementPeriod(m_ReinvestmentTest.GetReinvestmentPeriod());
 	stream >> m_CCCTestLimit;
 	m_CCCcurve.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_CCCcurve;
-	stream >> m_CCChaircut
-		>> TempDouble;
-	m_PrincipalAvailable.SetScheduled(TempDouble);
-	stream >> TempDouble
+	stream >> m_CCChaircut;
+	m_PrincipalAvailable.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_PrincipalAvailable;
+	stream
 		>> m_InterestAvailable
 		>> m_JuniorFeesCoupon
 	;
-	m_PrincipalAvailable.SetPrepay(TempDouble);
 	m_AnnualizedExcess.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_AnnualizedExcess;
 	m_EquityIncome.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_EquityIncome;
 	stream >> m_FirstIPDdate;

@@ -12,7 +12,20 @@ TrancheCashFlow::TrancheCashFlow(double ThrancheOutstanding)
 	:OutstandingAmt(ThrancheOutstanding)
 	, StartingDeferredInterest(0.0)
 {
-	m_AggregationLevel = Monthly;
+	for (qint32 i = static_cast<qint32>(TrancheFlowType::InterestFlow); i < (static_cast<qint32>(TrancheFlowType::InterestFlow) << 1); ++i) {
+		SetLabel(i, QString("Interest %1").arg(i - static_cast<qint32>(TrancheFlowType::InterestFlow) + 1));
+	}
+	for (qint32 i = static_cast<qint32>(TrancheFlowType::DeferredFlow); i < (static_cast<qint32>(TrancheFlowType::DeferredFlow) << 1); ++i) {
+		SetLabel(i, QString("Deferred Interest %1").arg(i - static_cast<qint32>(TrancheFlowType::DeferredFlow) + 1));
+	}
+	SetLabel(static_cast<qint32>(TrancheFlowType::PrincipalFlow), "Principal");
+	SetLabel(static_cast<qint32>(TrancheFlowType::OCFlow), "OC Test");
+	SetLabel(static_cast<qint32>(TrancheFlowType::ICFlow), "IC Test");
+	SetLabel(static_cast<qint32>(TrancheFlowType::OCTarget), "OC Target");
+	SetLabel(static_cast<qint32>(TrancheFlowType::ICTarget), "IC Target");
+	SetLabel(static_cast<qint32>(TrancheFlowType::PDLOutstanding), "PDL Outstanding");
+	SetLabel(static_cast<qint32>(TrancheFlowType::PDLCured), "PDL Cured");
+	Aggregate(Monthly);
 }
 
 double TrancheCashFlow::GetAmountOutstanding(int index)const{

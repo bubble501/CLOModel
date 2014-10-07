@@ -343,6 +343,12 @@
     <ClCompile Include="AbstractBbgVect.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
+    <ClCompile Include="PrincipalProceeds.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="TriggersResults.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Resources.qrc">
@@ -552,6 +558,12 @@
       <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="TrancheTrigger.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="PrincipalProceeds.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="TriggersResults.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
   </ItemGroup>

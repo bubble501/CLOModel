@@ -4,6 +4,7 @@
 #include <QString>
 #include <QHash>
 #include <QVariant>
+#include <QSet>
 #include "BackwardCompatibilityInterface.h"
 class IntegerVector;
 class BloombergVector;
@@ -45,7 +46,8 @@ public:
 		, ReserveIndex
 		, Trigger
 	};
-	
+	void FillMissingAnchors(const QDate& a);
+	void ResetMissinAnchors();
 	QVariant GetParameter(wstParameters ParameterType) const { return GetParameter(static_cast<qint32>(ParameterType)); }
 	bool HasParameter(wstParameters ParameterType)const { return HasParameter(static_cast<qint32>(ParameterType)); }
 	void SetParameter(wstParameters ParameterType, const QString& val) { SetParameter(static_cast<qint32>(ParameterType), val); }
@@ -68,6 +70,7 @@ private:
 	QHash<qint32, BloombergVector*> DoubleParameters;
 	QString TriggerStruc;
 	WaterfallStepType PriorityType;
+	QSet<qint32> FilledNullAnchors;
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 	friend QDataStream& operator<<(QDataStream & stream, const WatFalPrior& flows);

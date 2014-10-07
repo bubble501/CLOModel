@@ -8,6 +8,7 @@ GenericCashFlow::GenericCashFlow()
 GenericCashFlow::GenericCashFlow(const GenericCashFlow& a)
 	: m_AggregationLevel(a.m_AggregationLevel) 
 	, m_AdjustHolidays(a.m_AdjustHolidays)
+	, m_CashFlowLabels(a.m_CashFlowLabels)
 {
 	AddFlow(a);
 }
@@ -66,6 +67,9 @@ void GenericCashFlow::AddFlow(const GenericCashFlow& a) {
 			AddFlow(i.key(), j.value(), j.key());
 		}
 	}
+	for (auto i = a.m_CashFlowLabels.constBegin(); i != a.m_CashFlowLabels.constEnd(); ++i) {
+		if (!m_CashFlowLabels.contains(i.key())) m_CashFlowLabels.insert(i.key(), i.value());
+	}
 }
 
 void GenericCashFlow::Clear() {
@@ -73,6 +77,7 @@ void GenericCashFlow::Clear() {
 		delete (i.value());
 	}
 	m_CashFlows.clear();
+	ClearLabels();
 }
 
 QDate GenericCashFlow::GetDate(int index) const {
@@ -172,7 +177,7 @@ bool GenericCashFlow::SamePeriod(const QDate& a, const QDate& b, CashFlowAggrega
 	}
 }
 QDataStream& operator<<(QDataStream & stream, const GenericCashFlow& flows) {
-	stream << flows.m_AdjustHolidays << static_cast<qint32>(flows.m_AggregationLevel) << static_cast<qint32>(flows.m_CashFlows.size());
+	stream << flows.m_AdjustHolidays << flows.m_CashFlowLabels << static_cast<qint32>(flows.m_AggregationLevel) << static_cast<qint32>(flows.m_CashFlows.size());
 	for (QMap<QDate, QHash<qint32, double>* >::const_iterator MainIter = flows.m_CashFlows.constBegin(); MainIter != flows.m_CashFlows.constEnd(); ++MainIter) {
 		const QHash<qint32, double>* TempMain = MainIter.value();
 		stream << MainIter.key() << (*TempMain);
@@ -184,7 +189,7 @@ QDataStream& GenericCashFlow::LoadOldVersion(QDataStream& stream) {
 	quint32 TempSize;
 	QDate TempDate;
 	QHash<qint32, double> TempMain;
-	stream >> m_AdjustHolidays >> TempSize;
+	stream >> m_AdjustHolidays >> m_CashFlowLabels >> TempSize;
 	m_AggregationLevel = static_cast<CashFlowAggregation>(TempSize);
 	stream >> TempSize;
 	for (quint32 i = 0; i < TempSize; i++) {
@@ -197,7 +202,11 @@ QDataStream& GenericCashFlow::LoadOldVersion(QDataStream& stream) {
 }
 
 GenericCashFlow& GenericCashFlow::operator=(const GenericCashFlow& a) {
-	Clear(); m_AggregationLevel = a.m_AggregationLevel;  AddFlow(a); return *this;
+	Clear(); 
+	m_AggregationLevel = a.m_AggregationLevel;  
+	AddFlow(a); 
+	m_CashFlowLabels = a.m_CashFlowLabels;
+	return *this;
 }
 
 QDate GenericCashFlow::MaturityDate() const {
@@ -221,7 +230,9 @@ bool GenericCashFlow::operator==(const GenericCashFlow& a) const {
 	return true;
 }
 GenericCashFlow GenericCashFlow::operator+(const GenericCashFlow& a) const {
-	GenericCashFlow Result(*this); Result.AddFlow(a); return Result;
+	GenericCashFlow Result(*this); 
+	Result.AddFlow(a); 
+	return Result;
 }
 
 
@@ -234,7 +245,7 @@ QString GenericCashFlow::ToString() const {
 	QList<qint32> FlowsTypesList = FlowsTypes.toList();
 	qSort(FlowsTypesList);
 	for (QList<qint32>::const_iterator SecIter = FlowsTypesList.constBegin(); SecIter != FlowsTypesList.constEnd(); ++SecIter) {
-		Result += QString("\tFlow %1").arg(*SecIter);
+		Result += '\t'+ m_CashFlowLabels.value(*SecIter, QString("Flow %1").arg(*SecIter));
 	}
 	for (QMap<QDate, QHash<qint32, double>* >::const_iterator MainIter = m_CashFlows.constBegin(); MainIter != m_CashFlows.constEnd(); ++MainIter) {
 		Result += '\n' + MainIter.key().toString("dd-MM-yyyy");

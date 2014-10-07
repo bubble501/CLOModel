@@ -8,6 +8,7 @@ WatFalPrior::WatFalPrior()
 }
 WatFalPrior::WatFalPrior(const WatFalPrior& a)
 	:PriorityType(a.PriorityType)
+	, FilledNullAnchors(a.FilledNullAnchors)
 	, TriggerStruc(a.TriggerStruc)
 {
 	for (auto i = a.IntParameters.constBegin(); i != a.IntParameters.constEnd(); ++i)
@@ -23,6 +24,7 @@ WatFalPrior& WatFalPrior::operator=(const WatFalPrior& a){
 		DoubleParameters.insert(i.key(), new BloombergVector(*(i.value())));
 	PriorityType = a.PriorityType;
 	TriggerStruc = a.TriggerStruc;
+	FilledNullAnchors = a.FilledNullAnchors;
 	return *this;
 }
 QString WatFalPrior::ReadyToCalculate() const {
@@ -125,7 +127,7 @@ QDataStream& WatFalPrior::LoadOldVersion(QDataStream& stream) {
 		TempBV.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> TempBV;
 		DoubleParameters.insert(TempInt, new BloombergVector(TempBV));
 	}
-	stream >> TempInt >> TriggerStruc;
+	stream >> TempInt >> TriggerStruc >> FilledNullAnchors;
 	PriorityType = static_cast<WaterfallStepType>(TempInt);
 	ResetProtocolVersion();
 	return stream;
@@ -178,7 +180,16 @@ void WatFalPrior::SetParameter(qint32 ParameterType, const QString& val) {
 	break;
 	}
 	case wstParameters::Trigger:
-		TriggerStruc = val;
+		TriggerStruc = val.toLower();
+		TriggerStruc.replace("nand", "/");
+		TriggerStruc.replace("and", "*");
+		TriggerStruc.replace("nor", "-");
+		TriggerStruc.replace("or", "+");
+		TriggerStruc.replace("not", "!");
+		TriggerStruc.replace("^", "!");
+		TriggerStruc.replace(QRegExp("&?&"), "*");
+		TriggerStruc.replace(QRegExp("|?|"), "*");
+		TriggerStruc.replace(QRegExp("\\s"), "");
 	break;
 	case wstParameters::SeniorityGroupLevel:
 	case wstParameters::RedemptionGroupLevel:
@@ -232,6 +243,35 @@ QString WatFalPrior::ToString() const {
 	return Result;
 }
 
+void WatFalPrior::FillMissingAnchors(const QDate& a) {
+	for (auto i = IntParameters.begin(); i != IntParameters.end(); ++i) {
+		if (i.value()->GetAnchorDate().isNull()){
+			FilledNullAnchors.insert(i.key());
+			i.value()->SetAnchorDate(a);
+		}
+	}
+	for (auto i = DoubleParameters.begin(); i != DoubleParameters.end(); ++i) {
+		if (i.value()->GetAnchorDate().isNull()) {
+			FilledNullAnchors.insert(i.key());
+			i.value()->SetAnchorDate(a);
+		}
+	}	
+}
+
+void WatFalPrior::ResetMissinAnchors() {
+	for (auto i = IntParameters.begin(); i != IntParameters.end(); ++i) {
+		if (FilledNullAnchors.contains(i.key())) {
+			i.value()->RemoveAnchorDate();
+		}
+	}
+	for (auto i = DoubleParameters.begin(); i != DoubleParameters.end(); ++i) {
+		if (FilledNullAnchors.contains(i.key())) {
+			i.value()->RemoveAnchorDate();
+		}
+	}
+	FilledNullAnchors.clear();
+}
+
 QDataStream& operator>>(QDataStream & stream, WatFalPrior& flows) {
 	return flows.LoadOldVersion(stream);
 }
@@ -244,6 +284,6 @@ QDataStream& operator<<(QDataStream & stream, const WatFalPrior& flows) {
 	for (auto i = flows.DoubleParameters.constBegin(); i != flows.DoubleParameters.constEnd(); ++i) {
 		stream << i.key() << *(i.value());
 	}
-	stream << qint32(flows.PriorityType) << flows.TriggerStruc;
+	stream << qint32(flows.PriorityType) << flows.TriggerStruc << flows.FilledNullAnchors;
 	return stream;
 }

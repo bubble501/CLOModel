@@ -10,6 +10,7 @@
 #include "MtgCalculator.h"
 #include <QMessageBox>
 #include "MtgCashFlow.h"
+#include <QDataStream>
 StressTest::StressTest(QObject* parent)
 	: QObject(parent)
 	, SequentialComputation(false)
@@ -168,6 +169,11 @@ void StressTest::GoToNextScenario() {
 		)
 		, QSharedPointer<Waterfall>(new Waterfall(Structure)));
 	if (!IncreaseCurrentAssumption()) {
+#ifdef PrintExecutionTime
+		QTime TempTime;
+		TempTime.addMSecs(ExecutionTime.elapsed());
+		QMessageBox::information(0, "Computation Time", QString("Stress Test Took: %1 Seconds").arg(ExecutionTime.elapsed() / 1000));
+#endif
 		if (ProgressForm) {
 			ProgressForm->deleteLater();
 		}
@@ -198,121 +204,43 @@ qint32 StressTest::CountScenariosCalculated(int level) {
 	return Result + CountScenariosCalculated(level - 1);
 }
 
-/*
-void StressTest::RecievedData(int IDx,int IDy,const Waterfall& Res){
-		if (!ContinueCalculation) return;
-		Results[XSpann.at(IDx)][YSpann.at(IDy)]=Res;
-		ThreadsStack.erase(ThreadsStack.find(ConcatenateIDs(IDx, IDy)));
-		//ThreadsStack[ConcatenateIDs(IDx,IDy)] = NULL;
-		BeesReturned++;
-		if(SentBees<XSpann.size()*YSpann.size()){
-			if (UseFastVersion) {
-				ThreadsStack[ConcatenateIDs(SentBees / YSpann.size(),SentBees%YSpann.size())] = new StressThread(
-					SentBees / YSpann.size()
-					, SentBees%YSpann.size()
-					, XSpann.at(SentBees / YSpann.size())
-					, YSpann.at(SentBees%YSpann.size())
-					, ConstantPar
-					, BaseCalculator->GetResult()
-					, Structure
-					, StartDate
-					, StressDimension[0]
-					, StressDimension[1]
-					, this
-					);
-			}
-			else {
-				ThreadsStack[ConcatenateIDs(SentBees / YSpann.size(),SentBees%YSpann.size())] = new StressThread(
-					SentBees / YSpann.size()
-					, SentBees%YSpann.size()
-					, XSpann.at(SentBees / YSpann.size())
-					, YSpann.at(SentBees%YSpann.size())
-					, ConstantPar
-					, BaseCalculator->GetLoans()
-					, Structure
-					, StartDate
-					, StressDimension[0]
-					, StressDimension[1]
-					, this
-					);
-			}
-			connect(ThreadsStack[ConcatenateIDs(SentBees / YSpann.size(), SentBees%YSpann.size())], SIGNAL(ScenarioCalculated(int, int, Waterfall)), this, SLOT(RecievedData(int, int, Waterfall)));
-			connect(ThreadsStack[ConcatenateIDs(SentBees / YSpann.size(), SentBees%YSpann.size())], SIGNAL(ScenarioCalculated(int, int, Waterfall)), ThreadsStack[ConcatenateIDs(SentBees / YSpann.size(), SentBees%YSpann.size())], SLOT(stop()));
-			ThreadsStack[ConcatenateIDs(SentBees / YSpann.size(), SentBees%YSpann.size())]->start();
-			SentBees++;
-		}
-		double Testing = 100.0*static_cast<double>(BeesReturned) / static_cast<double>(XSpann.size()*YSpann.size());
-		emit ProgressStatus(100.0*static_cast<double>(BeesReturned)/static_cast<double>(XSpann.size()*YSpann.size()));
-		if (ProgressForm && ShowProgress) ProgressForm->SetValue(BeesReturned + (UseFastVersion ? 1 : 0));
-		
-		//QApplication::processEvents();
-		if(BeesReturned==XSpann.size()*YSpann.size()){
-#ifdef PrintExecutionTime
-			QTime TempTime;
-			TempTime.addMSecs(ExecutionTime.elapsed());
-			QMessageBox::information(0, "Computation Time", QString("Stress Test Took: %1 Seconds").arg(ExecutionTime.elapsed() / 1000));
-#endif
-			ContinueCalculation=false;
-			if(ProgressForm){
-				ProgressForm->deleteLater();
-				ProgressForm=NULL;
-			}
-			emit AllFinished();
-		}
-}*/
-/*
+
+
 QDataStream& operator<<(QDataStream & stream, const StressTest& flows){
 	//Deprecated, use SaveResults(), it's much faster
-	stream
-		<< flows.XSpann
-		<< flows.YSpann
-		<< flows.ConstantPar
-		<< flows.UseFastVersion
-		<< flows.Structure
-		<< flows.StartDate
-		<< qint32(flows.StressDimension[0])
-		<< qint32(flows.StressDimension[1])
-		<< flows.SequentialComputation
-		<< (*(flows.BaseCalculator))
-	;
-	const QList<QString> XKeys = flows.Results.keys();
-	const QList<QString> YKeys = flows.Results.begin()->keys();
-	stream << XKeys;
-	stream << YKeys;
-	for (QList<QString>::const_iterator i = XKeys.begin(); i != XKeys.end();i++) {
-		for (QList<QString>::const_iterator j = YKeys.begin(); j != YKeys.end(); j++) {
-			stream << flows.Results.value(*i).value(*j);
-		}
+	stream << flows.Structure;
+	stream << flows.StartDate;
+	stream << flows.SequentialComputation;
+	stream << flows.ShowProgress;
+	stream << flows.UseFastVersion;
+	for (int i = 0; i < NumStressDimentsions; ++i) {
+		stream << *(flows.m_AssumptionsRef[i]);
+	}
+	stream << static_cast<qint32>(flows.Results.size());
+	for (auto i = flows.Results.constBegin(); i != flows.Results.constEnd(); ++i) {
+		stream << i.key() << *(i.value());
 	}
 	return stream;
 }
+
 QDataStream& StressTest::LoadOldVersion(QDataStream& stream) {
 	qint32 tempint;
-	stream
-		>> XSpann
-		>> YSpann
-		>> ConstantPar
-		>> UseFastVersion
-		;
 	Structure.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> Structure;
 	stream >> StartDate;
-	stream >> tempint;
-	StressDimension[0] = StressTest::StressVariability(tempint);
-	stream >> tempint;
-	StressDimension[1] = StressTest::StressVariability(tempint);
 	stream >> SequentialComputation;
-	BaseCalculator->SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> (*BaseCalculator);
-	QList<QString> XKeys;
-	QList<QString> YKeys;
-	stream >> XKeys;
-	stream >> YKeys;
-	Waterfall TempWaterfall;
-	for (QList<QString>::const_iterator i = XKeys.begin(); i != XKeys.end(); i++) {
-		for (QList<QString>::const_iterator j = YKeys.begin(); j != YKeys.end(); j++) {
-			TempWaterfall.SetLoadProtocolVersion(m_LoadProtocolVersion);
-			stream >> TempWaterfall;
-			Results[*i][*j]=TempWaterfall;
-		}
+	stream >> ShowProgress;
+	stream >> UseFastVersion;
+	for (int i = 0; i < NumStressDimentsions; ++i) {
+		stream >> *(m_AssumptionsRef[i]);
+	}
+	ResetResults();
+	stream >> tempint;
+	AssumptionSet TempAssSet;
+	Waterfall tempWatf;
+	for (qint32 i = 0; i < tempint; i++) {
+		TempAssSet.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> TempAssSet;
+		tempWatf.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> tempWatf;
+		Results.insert(TempAssSet, QSharedPointer<Waterfall>(new Waterfall(tempWatf)));
 	}
 	ResetProtocolVersion();
 	return stream;
@@ -327,38 +255,35 @@ void StressTest::SaveResults(const QString& DestPath)const{
 	if(DestinationPath.at(DestinationPath.size()-1)!='\\') DestinationPath.append('\\');
 	QDir curDir;
 	QStringList FileNames;
-	QString DestinationFull = DestinationPath + QString("\\.StressResult%1%2.fcsr").arg(StressDimension[0] >> 1).arg(StressDimension[1] >> 1);
-	if (curDir.exists(DestinationFull)) {
+	QString DestinationFull = DestinationPath + QString("\\.StressResult.fcsr");
+	/*if (curDir.exists(DestinationFull)) {
 		if (!curDir.remove(DestinationFull)) return;
-	}
+	}*/
 	if(!curDir.exists(DestinationPath+"TempStressResults")) curDir.mkpath(DestinationPath+"TempStressResults");
 	FileNames.append(DestinationPath+"TempStressResults\\VersionIdentifier");
 	QFile file(FileNames.last());
 	if (file.open(QIODevice::WriteOnly)) {
 		QDataStream out(&file);
 		out.setVersion(QDataStream::Qt_5_3);
-		out << qint32(ModelVersionNumber) << ConstantPar << (qint32(StressDimension[0]) >> 1) << (qint32(StressDimension[1]) >> 1) << UseFastVersion;
+		out << qint32(ModelVersionNumber) << StartDate << SequentialComputation << ShowProgress << UseFastVersion << (*BaseCalculator);
 		file.close();
 	}
-	foreach(const QString& SingleX,XSpann){
-		foreach(const QString& SingleY,YSpann){
-			FileNames.append(DestinationPath+"TempStressResults\\"+SingleX+"#,#"+SingleY+".csw");
-			QFile file(FileNames.last());
-			if (file.open(QIODevice::WriteOnly)) {
-				QDataStream out(&file);
-				out.setVersion(QDataStream::Qt_5_3);
-				out << Results.value(SingleX).value(SingleY);
-				file.close();
-			}
+	for (auto i = Results.constBegin(); i != Results.constEnd(); ++i) {
+		FileNames.append(DestinationPath + "TempStressResults\\" + i.key().ToString() + ".csw");
+		QFile file(FileNames.last());
+		if (file.open(QIODevice::WriteOnly)) {
+			QDataStream out(&file);
+			out.setVersion(QDataStream::Qt_5_3);
+			out << *(i.value());
+			file.close();
 		}
 	}
 	JlCompress::compressFiles(DestinationFull, FileNames);
 	removeDir(DestinationPath+"TempStressResults");
-#ifdef Q_WS_WIN
-	SetFileAttributes(DestinationFull.toStdWString().c_str(),FILE_ATTRIBUTE_HIDDEN);
-#endif
 }
-Waterfall StressTest::GetScenarioFromFile(const QString& DestPath,const QString& XScenario,const QString& YScenario){
+
+Waterfall StressTest::GetScenarioFromFile(const QString& DestPath, const QString& CPRscenario, const QString& CDRscenario, const QString& LSscenario, const QString& RecLagScenario, const QString& DelinqScenario, const QString& DelinqLagScenario) {
+	AssumptionSet CurrentKey(CPRscenario, CDRscenario, LSscenario, RecLagScenario, DelinqScenario, DelinqLagScenario);
 	Waterfall Result;
 	qint32 VesionCheck;
 	if(!QFile::exists(DestPath)) return Result;
@@ -385,7 +310,7 @@ Waterfall StressTest::GetScenarioFromFile(const QString& DestPath,const QString&
 		else QMessageBox::critical(0,"Incompatible Version","The stress test data is not compatible with the current model version\nPlease run ALL the stress tests again");
 		return Result;
 	}
-	if(!zip.setCurrentFile(XScenario+"#,#"+YScenario+".csw")) return Result;
+	if (!zip.setCurrentFile(CurrentKey.ToString()+ ".csw")) return Result;
 	TargetFile.open(QIODevice::ReadOnly);
 	QDataStream out(&TargetFile);
 	out.setVersion(QDataStream::Qt_5_3);
@@ -395,9 +320,8 @@ Waterfall StressTest::GetScenarioFromFile(const QString& DestPath,const QString&
 	return Result;
 }
 bool StressTest::LoadResultsFromFile(const QString& DestPath){
-	XSpann.clear();
-	YSpann.clear();
-	qint32 VesionCheck,Temp32;
+	ResetStressTest();
+	qint32 VesionCheck;
 	if(!QFile::exists(DestPath)) return false;
 	QuaZip zip(DestPath);
 	if(!zip.open(QuaZip::mdUnzip)) return false;
@@ -412,15 +336,8 @@ bool StressTest::LoadResultsFromFile(const QString& DestPath){
 			TargetFile.close();
 			throw 1;
 		}
-		out >> ConstantPar;
-		if(!out.atEnd()){
-			out >> Temp32;
-			StressDimension[0]=StressVariability(Temp32);
-			out >> Temp32;
-			StressDimension[1]=StressVariability(Temp32);
-			out >> UseFastVersion;
-		}
-		
+		out >> StartDate >> SequentialComputation >> ShowProgress >> UseFastVersion;
+		BaseCalculator->SetLoadProtocolVersion(VesionCheck); out >> (*BaseCalculator);
 		TargetFile.close();
 	}
 	catch(int ExcCode){
@@ -442,17 +359,25 @@ bool StressTest::LoadResultsFromFile(const QString& DestPath){
 			TargetFile.close();
 			continue;
 		}
-		QStringList Spanns=TargetFile.getActualFileName().left(TargetFile.getActualFileName().lastIndexOf(".")).split("#,#");
-		if(!XSpann.contains(Spanns.at(0))) XSpann.append(Spanns.at(0));
-		if(!YSpann.contains(Spanns.at(1))) YSpann.append(Spanns.at(1));
+		AssumptionSet CurrentAss = TargetFile.getActualFileName().left(TargetFile.getActualFileName().lastIndexOf("."));
+		QStringList Spanns = CurrentAss.ToString().split("#,#");
+		if (Spanns.size() != NumStressDimentsions) {
+			TargetFile.close();
+			return false;
+		}
+		for (int i = 0; i < NumStressDimentsions; ++i) {
+			m_AssumptionsRef[i]->insert(Spanns.at(i));
+		}
 		QDataStream out(&TargetFile);
 		out.setVersion(QDataStream::Qt_5_3);
-		(Results[Spanns.at(0)][Spanns.at(1)]).SetLoadProtocolVersion(VesionCheck);
-		out >> (Results[Spanns.at(0)][Spanns.at(1)]);
+		Waterfall* TempWF = new Waterfall();
+		TempWF->SetLoadProtocolVersion(VesionCheck);
+		out >> (*TempWF);
+		Results.insert(CurrentAss, QSharedPointer<Waterfall>(TempWF));
 		TargetFile.close();
 	}
 	return true;
-}*/
+}
 
 quint32 StressTest::RemoveInvalidScenarios() {
 	quint32 InvalidScen = 0;

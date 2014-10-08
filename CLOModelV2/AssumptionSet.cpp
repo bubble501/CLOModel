@@ -1,9 +1,10 @@
 #include "AssumptionSet.h"
 #include <QHash>
 #include <QStringList>
+
 AssumptionSet::AssumptionSet(
-	const QString& CDRscenario
-	, const QString& CPRscenario
+	const QString& CPRscenario
+	, const QString& CDRscenario
 	, const QString& LSscenario
 	, const QString& RecLagScenario
 	, const QString& DelinqScenario
@@ -43,12 +44,12 @@ AssumptionSet& AssumptionSet::operator=(const AssumptionSet& a) {
 AssumptionSet& AssumptionSet::operator=(const QString& a) {
 	QStringList Parts = a.split("#,#",QString::SkipEmptyParts);
 	if (Parts.size() == 6) {
-		m_CPRscenario = Parts[0];
-		m_CDRscenario = Parts[1];
-		m_LSscenario = Parts[2];
-		m_RecLagScenario = Parts[3];
-		m_DelinqScenario = Parts[4];
-		m_DelinqLagScenario = Parts[5];
+		m_CPRscenario = Parts[0].trimmed().toUpper();
+		m_CDRscenario = Parts[1].trimmed().toUpper();
+		m_LSscenario = Parts[2].trimmed().toUpper();
+		m_RecLagScenario = Parts[3].trimmed().toUpper();
+		m_DelinqScenario = Parts[4].trimmed().toUpper();
+		m_DelinqLagScenario = Parts[5].trimmed().toUpper();
 	}
 	return *this;
 }
@@ -63,6 +64,18 @@ QString AssumptionSet::ToString() const {
 		;
 }
 
+QDataStream& AssumptionSet::LoadOldVersion(QDataStream& stream) {
+	stream
+		>> m_CDRscenario
+		>> m_CPRscenario
+		>> m_LSscenario
+		>> m_RecLagScenario
+		>> m_DelinqScenario
+		>> m_DelinqLagScenario
+	;
+	return stream;
+}
+
 bool operator==(const AssumptionSet &e1, const AssumptionSet &e2) {
 	return
 		e1.m_CDRscenario == e2.m_CDRscenario &&
@@ -75,4 +88,20 @@ bool operator==(const AssumptionSet &e1, const AssumptionSet &e2) {
 }
 uint qHash(const AssumptionSet& key, uint seed) {
 	return qHash(key.ToString(), seed);
+}
+
+QDataStream& operator<<(QDataStream & stream, const AssumptionSet& flows) {
+	stream
+		<< flows.m_CDRscenario
+		<< flows.m_CPRscenario
+		<< flows.m_LSscenario
+		<< flows.m_RecLagScenario
+		<< flows.m_DelinqScenario
+		<< flows.m_DelinqLagScenario
+	;
+	return stream;
+}
+
+QDataStream& operator>>(QDataStream & stream, AssumptionSet& flows) {
+	return flows.LoadOldVersion(stream);
 }

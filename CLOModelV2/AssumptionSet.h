@@ -1,5 +1,6 @@
 #include <QString>
-class AssumptionSet {
+#include "BackwardCompatibilityInterface.h"
+class AssumptionSet : public BackwardInterface{
 protected:
 	QString m_CDRscenario;
 	QString m_CPRscenario;
@@ -7,11 +8,12 @@ protected:
 	QString m_RecLagScenario;
 	QString m_DelinqScenario;
 	QString m_DelinqLagScenario;
+	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 public:
 	AssumptionSet() {}
 	AssumptionSet(
-		const QString& CDRscenario,
 		const QString& CPRscenario,
+		const QString& CDRscenario,
 		const QString& LSscenario,
 		const QString& RecLagScenario,
 		const QString& DelinqScenario,
@@ -36,6 +38,10 @@ public:
 	void SetCPRscenario(const QString& val) { m_CPRscenario = val; }
 	friend uint qHash(const AssumptionSet& key, uint seed);
 	friend bool operator==(const AssumptionSet &e1, const AssumptionSet &e2);
+	friend QDataStream& operator<<(QDataStream & stream, const AssumptionSet& flows);
+	friend QDataStream& operator>>(QDataStream & stream, AssumptionSet& flows);
 };
 bool operator==(const AssumptionSet &e1, const AssumptionSet &e2);
 uint qHash(const AssumptionSet& key, uint seed);
+QDataStream& operator<<(QDataStream & stream, const AssumptionSet& flows);
+QDataStream& operator>>(QDataStream & stream, AssumptionSet& flows);

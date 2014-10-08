@@ -32,13 +32,13 @@ private:
 		, AssDelinqLag = 5
 	};
 	void ResetCurrentAssumption() { for (int i = 0; i < NumStressDimentsions; ++i) CurrentAssumption[i] = 0; }
-	const QSet<QString>* m_AssumptionsRef[NumStressDimentsions];
+	QSet<QString>* m_AssumptionsRef[NumStressDimentsions];
 	bool IncreaseCurrentAssumption(int level = NumStressDimentsions-1);
 	qint32 CountScenariosCalculated(int level = NumStressDimentsions - 1);
-protected:
-	QPointer<ProgressWidget> ProgressForm;
-	MtgCalculator* BaseCalculator;
 	QScopedPointer<MtgCashFlow> BaseFlows;
+	QPointer<ProgressWidget> ProgressForm;
+protected:
+	MtgCalculator* BaseCalculator;
 	QSet<QString> m_CDRscenarios;
 	QSet<QString> m_CPRscenarios;
 	QSet<QString> m_LSscenarios;
@@ -107,8 +107,8 @@ public:
 	void SetStructure(const Waterfall& a){Structure=a;}
 	void SetStartDate(const QDate& a){StartDate=a;}
 	void UseMultithread(bool a=true){SequentialComputation=!a;}
-	void SaveResults(const QString& DestPath)const {}
-	bool LoadResultsFromFile(const QString& DestPath) { return true; }
+	void SaveResults(const QString& DestPath)const;
+	bool LoadResultsFromFile(const QString& DestPath);
 	void SetUseFastVersion(bool a=true) { UseFastVersion = a; }
 	bool GetUseFastVersion() { return UseFastVersion; }
 	const MtgCalculator& GetLoans() const;
@@ -126,7 +126,7 @@ private slots:
 	void HandleError() {}
 	void StoppedCalculation() { ResetStressTest(); }
 protected:
-	virtual QDataStream& LoadOldVersion(QDataStream& stream) override { return stream; }
+	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 signals:
 	void CurrentScenarioCalculated();
 	void ErrorInCalculation();

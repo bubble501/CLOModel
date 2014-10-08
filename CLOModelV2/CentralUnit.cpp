@@ -171,16 +171,66 @@ void CentralUnit::Reset(){
 		Stresser=NULL;
 	}
 }
-/*
-void CentralUnit::SetupStress(const QString& ConstPar,QList<QString> XSpann,QList<QString> YSpann, StressTest::StressVariability Xvar,StressTest::StressVariability Yvar){
+
+void CentralUnit::SetupStress(const QString& ConstPar,QList<QString> XSpann,QList<QString> YSpann, int Xvar,int Yvar){
 	if(!Stresser){
 		Stresser=new StressTest(this);
 	}
-	Stresser->SetConstantPar(ConstPar);
-	Stresser->SetXSpann(XSpann);
-	Stresser->SetYSpann(YSpann);
-	Stresser->SetXVariability(Xvar);
-	Stresser->SetYVariability(Yvar);
+	/*
+	ChangingCDR = 0x1
+	ChangingLS = 0x2
+	ChangingCPR = 0x4
+	*/
+	switch (Xvar) {
+	case 0x1:
+		foreach(const QString& SingleScen, XSpann)
+			{Stresser->AddCDRscenarios(SingleScen);}
+		break;
+	case 0x2:
+		foreach(const QString& SingleScen, XSpann) {
+			Stresser->AddLSscenarios(SingleScen);
+		}
+		break;
+	case 0x4:
+		foreach(const QString& SingleScen, XSpann) {
+			Stresser->AddCPRscenarios(SingleScen);
+		}
+		break;
+	default: 
+		Stresser->deleteLater();
+		Stresser = nullptr;
+		return;
+	}
+	switch (Yvar) {
+	case 0x1:
+		foreach(const QString& SingleScen, YSpann) {
+			Stresser->AddCDRscenarios(SingleScen);
+		}
+		break;
+	case 0x2:
+		foreach(const QString& SingleScen, YSpann) {
+			Stresser->AddLSscenarios(SingleScen);
+		}
+		break;
+	case 0x4:
+		foreach(const QString& SingleScen, YSpann) {
+			Stresser->AddCPRscenarios(SingleScen);
+		}
+		break;
+	default:
+		Stresser->deleteLater();
+		Stresser = nullptr;
+		return;
+	}
+	switch ((~(Xvar | Yvar)) & 0x7) {
+	case 0x1: Stresser->AddCDRscenarios(ConstPar); break;
+	case 0x2: Stresser->AddLSscenarios(ConstPar); break;
+	case 0x4: Stresser->AddCPRscenarios(ConstPar); break;
+	default:
+		Stresser->deleteLater();
+		Stresser = nullptr;
+		return;
+	}
 	Stresser->SetStartDate(PoolCutOff);
 	Structure.SetUseCall(StressToCall);
 	Stresser->SetStructure(Structure);
@@ -188,7 +238,7 @@ void CentralUnit::SetupStress(const QString& ConstPar,QList<QString> XSpann,QLis
 		Stresser->AddLoan(*(i.value()));
 	connect(this,SIGNAL(StressLoopStarted()),Stresser,SLOT(RunStressTest()),Qt::QueuedConnection);
 	connect(Stresser,SIGNAL(AllFinished()),this,SLOT(StressFinished()));
-}*/
+}
 void CentralUnit::Calculate(){
 	char *argv[] = {"NoArgumnets"};
 	int argc = sizeof(argv) / sizeof(char*) - 1;

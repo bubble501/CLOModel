@@ -352,7 +352,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			}
 			TempUnit.SetStressToCall(pdFreq->boolVal);pdFreq++;
 			TempUnit.SetFastStress(pdFreq->boolVal); pdFreq++;
-			//TempUnit.SetupStress(ConstPar,XSpann,YSpann,StressTest::StressVariability(XVar),StressTest::StressVariability(YVar));
+			TempUnit.SetupStress(ConstPar,XSpann,YSpann,XVar,YVar);
 			
 		}
 	}

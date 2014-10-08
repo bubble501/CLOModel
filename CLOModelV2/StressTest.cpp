@@ -1,9 +1,7 @@
 #include "StressTest.h"
 #include "Mortgage.h"
 #include "CommonFunctions.h"
-#include "StressThread.h"
 #include "Waterfall.h"
-#include "ProgressWidget.h"
 #include <QApplication>
 #include <QDir>
 #include <QFile>
@@ -11,103 +9,49 @@
 #include "BloombergVector.h"
 #include "MtgCalculator.h"
 #include <QMessageBox>
-#ifdef Q_WS_WIN
-#include <Windows.h>
-#endif
+#include "MtgCashFlow.h"
 StressTest::StressTest(QObject* parent)
-	:QObject(parent)
-	,SequentialComputation(false)
-	,SentBees(0)
-	,BeesReturned(0)
-	,ContinueCalculation(false)
-	,ProgressForm(NULL)
-	,ShowProgress(true)
+	: QObject(parent)
+	, SequentialComputation(false)
+	, ContinueCalculation(false)
+	, ProgressForm(nullptr)
+	, BaseFlows(nullptr)
+	, ShowProgress(true)
 	, UseFastVersion(false)
 {
 	BaseCalculator = new MtgCalculator(this);
 	BaseCalculator->SetOverrideAssumptions(true);
-	StressDimension[0]=ChangingCDR;
-	StressDimension[1]=ChangingLS;
-	connect(BaseCalculator, SIGNAL(Calculated()), this, SLOT(StartStresses()));
+	ResetCurrentAssumption();
+	connect(this, SIGNAL(CurrentScenarioCalculated()), this, SLOT(GoToNextScenario()),Qt::QueuedConnection);
+	connect(this, SIGNAL(ErrorInCalculation()), this, SLOT(HandleError()), Qt::QueuedConnection);
+	m_AssumptionsRef[AssCPR] = &m_CPRscenarios;
+	m_AssumptionsRef[AssCDR] = &m_CDRscenarios;
+	m_AssumptionsRef[AssLS] = &m_LSscenarios;
+	m_AssumptionsRef[AssRecLag] = &m_RecLagScenarios;
+	m_AssumptionsRef[AssDelinq] = &m_DelinqScenarios;
+	m_AssumptionsRef[AssDelinqLag] = &m_DelinqLagScenarios;
 }
-StressTest::~StressTest(){
-	StressThread* CurrentRunning;
-	for (QHash<quint64, StressThread*>::iterator j = ThreadsStack.begin(); j != ThreadsStack.end(); j++) {
-		CurrentRunning = j.value();
-		if (CurrentRunning) {
-			if (CurrentRunning->isRunning()) {
-				CurrentRunning->exit();
-				CurrentRunning->wait();
-			}
-		}
-	}
+void StressTest::ResetStressTest() {
 	ResetLoans();
-	if(ProgressForm) ProgressForm->deleteLater();
-}
-const QHash<qint32, Mortgage*>& StressTest::GetLoans()const {
-	return BaseCalculator->GetLoans();
-}
-const Mortgage* StressTest::GetLoans(int index)const{
-	auto TempLoans = BaseCalculator->GetLoans();
-	if (index<0 || index >= TempLoans.size()) return NULL;
-	return *(TempLoans.constBegin()+index);
-}
-Mortgage* StressTest::GetLoans(int index){
-	auto TempLoans = BaseCalculator->GetLoans();
-	if (index<0 || index >= TempLoans.size()) return NULL;
-	return *(TempLoans.begin() + index);
-}
-void StressTest::SetXSpann(const QList<QString>& a){
-	XSpann.clear();
-	AddXSpann(a);
-}
-void StressTest::AddXSpann(const QList<QString>& a){
-	foreach(const QString& b,a){
-		AddXSpann(b);
+	ResetResults();
+	if (ProgressForm) {
+		ProgressForm->deleteLater();
 	}
 }
-void StressTest::AddXSpann(const QString& a){
-	if(!BloombergVector(a).IsEmpty())
-		XSpann.append(a);
+const MtgCalculator& StressTest::GetLoans() const {
+	return *BaseCalculator;
 }
-void StressTest::SetYSpann(const QList<QString>& a){
-	YSpann.clear();
-	AddYSpann(a);
-}
-void StressTest::AddYSpann(const QList<QString>& a){
-	foreach(const QString& b,a){
-		AddYSpann(b);
-	}
-}
-void StressTest::AddYSpann(const QString& a){
-	if(!BloombergVector(a).IsEmpty())
-		YSpann.append(a);
-}
-void StressTest::SetConstantPar(const QString& a){
-	if(!BloombergVector(a).IsEmpty())
-		ConstantPar=a;
-}
+
 void StressTest::AddLoan(const Mortgage& a){
 	BaseCalculator->AddLoan(a);
 }
 void StressTest::ResetLoans(){
 	BaseCalculator->Reset();
+	if (BaseFlows) BaseFlows.reset();
 }
 void StressTest::RunStressTest() {
-#ifdef PrintExecutionTime
-	ExecutionTime.start();
-#endif
-	if (ShowProgress) {
-		ProgressForm = new ProgressWidget;
-		connect(ProgressForm, SIGNAL(Cancelled()), this, SLOT(StopCalculation()));
-		ProgressForm->SetValue(0);
-		ProgressForm->SetTitle("Stress Test");
-		ProgressForm->SetMax((XSpann.size()*YSpann.size()) + (UseFastVersion ? 1 : 0));
-		ProgressForm->show();
-	}
-	//QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
-	ContinueCalculation = true;
-	BeesReturned = 0;
+	if (ContinueCalculation) return;
+	if (BaseFlows) 	BaseFlows.reset();
 	BaseCalculator->SetSequentialComputation(SequentialComputation);
 	BaseCalculator->SetStartDate(StartDate);
 	BaseCalculator->SetCDRass("0");
@@ -116,75 +60,145 @@ void StressTest::RunStressTest() {
 	BaseCalculator->SetRecoveryLag("0");
 	BaseCalculator->SetDelinquency("0");
 	BaseCalculator->SetDelinquencyLag("0");
+	QString HardCheks = BaseCalculator->ReadyToCalculate();
+	if (!HardCheks.isEmpty()) {
+		QMessageBox::critical(0, "Invalid Input", "The following Inputs are missing or invalid:\n" + HardCheks);
+		return;
+	}
+	HardCheks = Structure.ReadyToCalculate();
+	if (!HardCheks.isEmpty()) {
+		QMessageBox::critical(0, "Invalid Input", "The following Inputs are missing or invalid:\n" + HardCheks);
+		return;
+	}
+	if (m_CDRscenarios.isEmpty()) m_CDRscenarios.insert("0");
+	if (m_CPRscenarios.isEmpty()) m_CPRscenarios.insert("0");
+	if (m_LSscenarios.isEmpty()) m_LSscenarios.insert("0");
+	if (m_RecLagScenarios.isEmpty()) m_RecLagScenarios.insert("0");
+	if (m_DelinqScenarios.isEmpty()) m_DelinqScenarios.insert("0");
+	if (m_DelinqLagScenarios.isEmpty()) m_DelinqLagScenarios.insert("0");
+	quint32 CheckScen=RemoveInvalidScenarios();
+	if (CheckScen > 0) {
+		if (QMessageBox::warning(
+			0
+			, "Invalid Scenarios"
+			, QString("%1 invalid scenarios detected\nWould you want to run the stress test anyway, ignoring those scenarios?").arg(CheckScen)
+			, QMessageBox::Yes | QMessageBox::No
+			, QMessageBox::Yes
+		) != QMessageBox::Yes) return;
+	}
+	ResetCurrentAssumption();
+	ContinueCalculation = true;
+#ifdef PrintExecutionTime
+	ExecutionTime.start();
+#endif
+	if (ShowProgress) {
+		ProgressForm = new ProgressWidget;
+		connect(ProgressForm, SIGNAL(Cancelled()), this, SLOT(StopCalculation()));
+		ProgressForm->SetValue(0);
+		ProgressForm->SetTitle("Stress Test");
+		ProgressForm->SetMax(10000);
+		ProgressForm->show();
+	}
 	if (UseFastVersion) {
-		QString CheckLoans = BaseCalculator->ReadyToCalculate();
-		if (CheckLoans.isEmpty()) {
-			if(!BaseCalculator->StartCalculation(false))
-				QMessageBox::critical(0, "Invalid Input", "A base rate in the loans is invalid");
+		connect(BaseCalculator, SIGNAL(Calculated()), this, SLOT(BaseForFastCalculated()));
+		if (!BaseCalculator->StartCalculation(false)){ //TODO should be true
+			QMessageBox::critical(0, "Invalid Input", "A base rate in the loans is invalid");
+			return;
 		}
-		else QMessageBox::critical(0, "Invalid Input", "The following Inputs are missing or invalid:\n" + CheckLoans);
 	}
 	else
-		StartStresses();
+		RunCurrentScenario();
 }
-void StressTest::StartStresses() {
-	//Check that CPR and CDR are Valid
-	if (StressDimension[0] == ChangingCDR || StressDimension[0] == ChangingCPR) {
-		foreach(const QString& SingleScen, XSpann) {
-			if (BloombergVector(SingleScen).IsEmpty(0.0, 1.0))
-				return;
-		}
+void StressTest::BaseForFastCalculated() {
+	disconnect(BaseCalculator, SIGNAL(Calculated()), this, SLOT(BaseForFastCalculated()));
+	if (!ContinueCalculation) return StoppedCalculation();
+	BaseFlows.reset(new MtgCashFlow(BaseCalculator->GetResult()));
+	RunCurrentScenario();
+}
+void StressTest::RunCurrentScenario() {
+	if (!ContinueCalculation)  return StoppedCalculation();
+	if (
+		UseFastVersion 
+		&& BaseFlows
+		&& !IntegerVector(*(m_RecLagScenarios.constBegin() + CurrentAssumption[AssRecLag])).IsEmpty(0,0)
+		&& !IntegerVector(*(m_DelinqLagScenarios.constBegin() + CurrentAssumption[AssDelinqLag])).IsEmpty(0, 0)
+		&& !BloombergVector(*(m_DelinqScenarios.constBegin() + CurrentAssumption[AssDelinq])).IsEmpty(0.0, 0.0)
+	) {
+		Structure.ResetMtgFlows();
+		Structure.AddMortgagesFlows(BaseFlows->ApplyScenario(
+			*(m_CPRscenarios.constBegin() + CurrentAssumption[AssCPR])
+			, *(m_CDRscenarios.constBegin() + CurrentAssumption[AssCDR])
+			, *(m_LSscenarios.constBegin() + CurrentAssumption[AssLS])
+		));
+		if (Structure.CalculateTranchesCashFlows()) emit CurrentScenarioCalculated(); 
+		else emit ErrorInCalculation();
 	}
-	if (StressDimension[1] == ChangingCDR || StressDimension[1] == ChangingCPR) {
-		foreach(const QString& SingleScen, YSpann) {
-			if (BloombergVector(SingleScen).IsEmpty(0.0, 1.0)) return;
+	else {
+		connect(BaseCalculator, SIGNAL(Calculated()), this, SLOT(SlowLoansCalculated()), Qt::UniqueConnection);
+		BaseCalculator->SetCPRass(*(m_CPRscenarios.constBegin() + CurrentAssumption[AssCPR]));
+		BaseCalculator->SetCDRass(*(m_CDRscenarios.constBegin() + CurrentAssumption[AssCDR]));
+		BaseCalculator->SetLSass(*(m_LSscenarios.constBegin() + CurrentAssumption[AssLS]));
+		BaseCalculator->SetRecoveryLag(*(m_RecLagScenarios.constBegin() + CurrentAssumption[AssRecLag]));
+		BaseCalculator->SetDelinquency(*(m_DelinqScenarios.constBegin() + CurrentAssumption[AssDelinq]));
+		BaseCalculator->SetDelinquencyLag(*(m_DelinqLagScenarios.constBegin() + CurrentAssumption[AssDelinqLag]));
+		if (!BaseCalculator->StartCalculation(false)) {
+			emit ErrorInCalculation();
 		}
-	}
-	if ((StressDimension[0] | StressDimension[1]) != (ChangingCDR | ChangingCPR)) {
-		if (BloombergVector(ConstantPar).IsEmpty(0.0, 1.0)) 
-			return;
 	}
 
-
-	if (ProgressForm && ShowProgress && UseFastVersion) ProgressForm->SetValue(1);
-	int NumberOfThreads = QThread::idealThreadCount();
-	if(SequentialComputation || NumberOfThreads<1) NumberOfThreads=1;
-	for (SentBees = 0; SentBees < XSpann.size()*YSpann.size() && SentBees < NumberOfThreads; SentBees++) {
-		if (UseFastVersion) {
-			ThreadsStack[ConcatenateIDs(SentBees / YSpann.size(), SentBees%YSpann.size())] = new StressThread(
-				SentBees / YSpann.size()
-				, SentBees%YSpann.size()
-				, XSpann.at(SentBees / YSpann.size())
-				, YSpann.at(SentBees%YSpann.size())
-				, ConstantPar
-				, BaseCalculator->GetResult()
-				, Structure
-				, StartDate
-				, StressDimension[0]
-				, StressDimension[1]
-				, this
-				);
-		}
-		else {
-			ThreadsStack[ConcatenateIDs(SentBees / YSpann.size(), SentBees%YSpann.size())] = new StressThread(
-				SentBees / YSpann.size()
-				, SentBees%YSpann.size()
-				, XSpann.at(SentBees / YSpann.size())
-				, YSpann.at(SentBees%YSpann.size())
-				, ConstantPar
-				, BaseCalculator->GetLoans()
-				, Structure
-				, StartDate
-				, StressDimension[0]
-				, StressDimension[1]
-				, this
-				);
-		}
-		connect(ThreadsStack[ConcatenateIDs(SentBees / YSpann.size(), SentBees%YSpann.size())], SIGNAL(ScenarioCalculated(int, int, Waterfall)), this, SLOT(RecievedData(int, int, Waterfall)));
-		connect(ThreadsStack[ConcatenateIDs(SentBees / YSpann.size(), SentBees%YSpann.size())], SIGNAL(ScenarioCalculated(int, int, Waterfall)), ThreadsStack[ConcatenateIDs(SentBees / YSpann.size(), SentBees%YSpann.size())], SLOT(stop()), Qt::QueuedConnection);
-		ThreadsStack[ConcatenateIDs(SentBees / YSpann.size(), SentBees%YSpann.size())]->start();
-	}
 }
+void StressTest::SlowLoansCalculated() {
+	if (!ContinueCalculation)  return StoppedCalculation();
+	Structure.ResetMtgFlows();
+	Structure.AddMortgagesFlows(BaseCalculator->GetResult());
+	if (Structure.CalculateTranchesCashFlows()) 
+		emit CurrentScenarioCalculated();
+	else 
+		emit ErrorInCalculation();
+}
+void StressTest::GoToNextScenario() {
+	Results.insert(
+		AssumptionSet(
+			*(m_CPRscenarios.constBegin() + CurrentAssumption[AssCPR])
+			, *(m_CDRscenarios.constBegin() + CurrentAssumption[AssCDR])
+			, *(m_LSscenarios.constBegin() + CurrentAssumption[AssLS])
+			, *(m_RecLagScenarios.constBegin() + CurrentAssumption[AssRecLag])
+			, *(m_DelinqScenarios.constBegin() + CurrentAssumption[AssDelinq])
+			, *(m_DelinqLagScenarios.constBegin() + CurrentAssumption[AssDelinqLag])
+		)
+		, QSharedPointer<Waterfall>(new Waterfall(Structure)));
+	if (!IncreaseCurrentAssumption()) {
+		if (ProgressForm) {
+			ProgressForm->deleteLater();
+		}
+		BaseFlows.reset();
+		disconnect(BaseCalculator);
+		emit AllFinished();
+	}
+	double CurrentProgress = static_cast<double>(CountScenariosCalculated()) / static_cast<double>(CountScenarios());
+	if (ProgressForm) ProgressForm->SetValue(static_cast<int>(CurrentProgress*10000.0));
+	emit ProgressStatus(CurrentProgress);
+	RunCurrentScenario();
+}
+
+bool StressTest::IncreaseCurrentAssumption(int level) {
+	if (level >= NumStressDimentsions || level < 0) return false;
+	if (CurrentAssumption[level] == m_AssumptionsRef[level]->size() - 1) {
+		CurrentAssumption[level] = 0;
+		return IncreaseCurrentAssumption(level - 1);
+	}
+	CurrentAssumption[level]++;
+	return true;
+}
+
+qint32 StressTest::CountScenariosCalculated(int level) {
+	if (level >= NumStressDimentsions || level < 0) return 0;
+	qint32 Result = CurrentAssumption[level];
+	for (int i = level + 1; i < NumStressDimentsions && Result>0; ++i) Result *= m_AssumptionsRef[i]->size();
+	return Result + CountScenariosCalculated(level - 1);
+}
+
+/*
 void StressTest::RecievedData(int IDx,int IDy,const Waterfall& Res){
 		if (!ContinueCalculation) return;
 		Results[XSpann.at(IDx)][YSpann.at(IDy)]=Res;
@@ -245,7 +259,8 @@ void StressTest::RecievedData(int IDx,int IDy,const Waterfall& Res){
 			}
 			emit AllFinished();
 		}
-}
+}*/
+/*
 QDataStream& operator<<(QDataStream & stream, const StressTest& flows){
 	//Deprecated, use SaveResults(), it's much faster
 	stream
@@ -306,13 +321,7 @@ QDataStream& operator>>(QDataStream & stream, StressTest& flows) {
 	//Deprecated, use LoadResultsFromFile(), it's much faster
 	return flows.LoadOldVersion(stream);
 }
-void StressTest::StopCalculation(){
-	ContinueCalculation=false;
-	if(ProgressForm){
-		ProgressForm->deleteLater();
-		ProgressForm=NULL;
-	}
-}
+
 void StressTest::SaveResults(const QString& DestPath)const{
 	QString DestinationPath(DestPath.trimmed());
 	if(DestinationPath.at(DestinationPath.size()-1)!='\\') DestinationPath.append('\\');
@@ -443,4 +452,68 @@ bool StressTest::LoadResultsFromFile(const QString& DestPath){
 		TargetFile.close();
 	}
 	return true;
+}*/
+
+quint32 StressTest::RemoveInvalidScenarios() {
+	quint32 InvalidScen = 0;
+	for (auto i = m_CDRscenarios.begin(); i != m_CDRscenarios.end(); ++i) {
+		while (BloombergVector(*i).IsEmpty(0.0, 1.0)){
+			i = m_CDRscenarios.erase(i); ++InvalidScen;
+			if (i == m_CDRscenarios.end()) break;
+		}
+	}
+	for (auto i = m_CPRscenarios.begin(); i != m_CPRscenarios.end(); ++i) {
+		while (BloombergVector(*i).IsEmpty(0.0, 1.0)) {
+			i = m_CPRscenarios.erase(i); ++InvalidScen;
+			if (i == m_CPRscenarios.end()) break;
+		}
+	}
+	for (auto i = m_LSscenarios.begin(); i != m_LSscenarios.end(); ++i) {
+		while (BloombergVector(*i).IsEmpty(0.0, 1.0)) {
+			i = m_LSscenarios.erase(i); ++InvalidScen;
+			if (i == m_LSscenarios.end()) break;
+		}
+	}
+	for (auto i = m_DelinqScenarios.begin(); i != m_DelinqScenarios.end(); ++i) {
+		while (BloombergVector(*i).IsEmpty(0.0, 1.0)) {
+			i = m_DelinqScenarios.erase(i); ++InvalidScen;
+			if (i == m_DelinqScenarios.end()) break;
+		}
+	}
+	for (auto i = m_RecLagScenarios.begin(); i != m_RecLagScenarios.end(); ++i) {
+		while (IntegerVector(*i).IsEmpty(0)) {
+			i = m_RecLagScenarios.erase(i); ++InvalidScen;
+			if (i == m_RecLagScenarios.end()) break;
+		}
+	}
+	for (auto i = m_DelinqLagScenarios.begin(); i != m_DelinqLagScenarios.end(); ++i) {
+		while (IntegerVector(*i).IsEmpty(0)) {
+			i = m_DelinqLagScenarios.erase(i); ++InvalidScen;
+			if (i == m_DelinqLagScenarios.end()) break;
+		}
+	}
+	return InvalidScen;
 }
+
+quint32 StressTest::CountScenarios() const {
+	quint32 Result=1;
+	Result *= m_CDRscenarios.size();
+	Result *= m_CPRscenarios.size();
+	Result *= m_LSscenarios.size();
+	Result *= m_RecLagScenarios.size();
+	Result *= m_DelinqScenarios.size();
+	Result *= m_DelinqLagScenarios.size();
+	return Result;
+}
+
+void StressTest::StopCalculation() {
+	ContinueCalculation = false;
+	if (ProgressForm) {
+		ProgressForm->deleteLater();
+	}
+}
+
+
+
+
+

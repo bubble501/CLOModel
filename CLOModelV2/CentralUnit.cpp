@@ -171,6 +171,7 @@ void CentralUnit::Reset(){
 		Stresser=NULL;
 	}
 }
+/*
 void CentralUnit::SetupStress(const QString& ConstPar,QList<QString> XSpann,QList<QString> YSpann, StressTest::StressVariability Xvar,StressTest::StressVariability Yvar){
 	if(!Stresser){
 		Stresser=new StressTest(this);
@@ -187,7 +188,7 @@ void CentralUnit::SetupStress(const QString& ConstPar,QList<QString> XSpann,QLis
 		Stresser->AddLoan(*(i.value()));
 	connect(this,SIGNAL(StressLoopStarted()),Stresser,SLOT(RunStressTest()),Qt::QueuedConnection);
 	connect(Stresser,SIGNAL(AllFinished()),this,SLOT(StressFinished()));
-}
+}*/
 void CentralUnit::Calculate(){
 	char *argv[] = {"NoArgumnets"};
 	int argc = sizeof(argv) / sizeof(char*) - 1;

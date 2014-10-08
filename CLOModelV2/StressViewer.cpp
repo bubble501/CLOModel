@@ -1,3 +1,4 @@
+/*
 #include "StressViewer.h"
 #include <QTableWidget>
 #include <QLabel>
@@ -125,18 +126,18 @@ bool StressViewer::LoadStress(const QString& filename){
 	UpdateTable();
 	return true;
 }
-/*void StressViewer::AdjustTableSize(){
+/ *void StressViewer::AdjustTableSize(){
 	for(int i=0;i<Table->columnCount();i++){
 		Table->setColumnWidth(i,(Table->width()-Table->verticalScrollBar()->width()-Table->verticalHeader()->width())/Table->columnCount());
 	}
 	for(int i=0;i<Table->rowCount();i++){
 		Table->setRowHeight(i,(Table->height()-Table->horizontalScrollBar()->height()-Table->horizontalHeader()->height())/Table->rowCount());
 	}
-}*/
-/*void StressViewer::resizeEvent(QResizeEvent *event){
+}* /
+/ *void StressViewer::resizeEvent(QResizeEvent *event){
 	Q_UNUSED(event);
 	AdjustTableSize();
-}*/
+}* /
 void StressViewer::UpdateTable(){
 	QTableWidgetItem* TempItem;
 	double lossValue;
@@ -247,4 +248,4 @@ void StressViewer::PriceChanged(double a){
 			}
 		}
 	}
-}
+}*/

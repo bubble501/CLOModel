@@ -1,3 +1,4 @@
+/*
 #include <QWidget>
 #include "Waterfall.h"
 #include "StressTest.h"
@@ -39,4 +40,4 @@ private slots:
 signals:
 	void StressLevelChanged(Waterfall);
 	void Closing();
-};
+};*/

@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
 	//ConsoleTestObj a;
 	//return a.exec();
 
-	Waterfall TempWtf, TempCallWaterfall;
+	/*Waterfall TempWtf, TempCallWaterfall;
 	QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/.BaseCase.clo");
 	//QFile file("C:/Temp/.SavedInputs.clo");
 	file.open(QIODevice::ReadOnly);
@@ -43,9 +43,9 @@ int main(int argc, char *argv[]) {
 	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempCallWaterfall;
 	file.close();
-	TempCallWaterfall.CalculateTranchesCashFlows();
+	TempCallWaterfall.CalculateTranchesCashFlows();*/
 
-	/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	QApplication a(argc, argv);
 	if (!QMetaType::isRegistered(qMetaTypeId<Waterfall>()))
 		qRegisterMetaType<Waterfall>("Waterfall");
@@ -83,14 +83,18 @@ int main(int argc, char *argv[]) {
 
 	TempStress.SetStructure(TempWtf);
 	QList<QString> TempList;
-	TempList << "0" << "10" << "20" << "30" << "40" << "50" << "60" << "70" << "80" << "90" << "100";
-	TempStress.AddYSpann(TempList);
-	TempList << "0.5" << "1" << "1.5" << "2" << "2.5" << "3" << "3.5" << "4" << "4.5" << "5" << "5.5" << "6" << "6.5" << "7" << "7.5" << "8" << "8.5" << "9";
-	TempStress.AddXSpann(TempList);
-	TempStress.SetConstantPar("20 48S 5 12S 10 12S 30");
-	TempStress.RunStressTest();
+	TempList << "0" << "10";// << "20" << "30" << "40" << "50" << "60" << "70" << "80" << "90" << "100";
+	foreach(const QString& tmpstr, TempList)
+		TempStress.AddLSscenarios(tmpstr);
+	TempList.clear();
+	TempList << "0.5" << "1"; //<< "1.5" << "2" << "2.5" << "3" << "3.5" << "4" << "4.5" << "5" << "5.5" << "6" << "6.5" << "7" << "7.5" << "8" << "8.5" << "9";
+	foreach(const QString& tmpstr, TempList)
+		TempStress.AddCDRscenarios(tmpstr);
+	TempStress.AddCPRscenarios("20 48S 5 12S 10 12S 30");
 	TempStress.SetUseFastVersion(true);
-	TempStress.SaveResults("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models");
+	//TempStress.UseMultithread(false);
+	TempStress.SetStartDate(TempWtf.GetCalculatedMtgPayments().GetDate(0));
+	TempStress.RunStressTest();
 	return a.exec();
-	*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }

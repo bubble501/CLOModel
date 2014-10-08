@@ -352,7 +352,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			}
 			TempUnit.SetStressToCall(pdFreq->boolVal);pdFreq++;
 			TempUnit.SetFastStress(pdFreq->boolVal); pdFreq++;
-			TempUnit.SetupStress(ConstPar,XSpann,YSpann,StressTest::StressVariability(XVar),StressTest::StressVariability(YVar));
+			//TempUnit.SetupStress(ConstPar,XSpann,YSpann,StressTest::StressVariability(XVar),StressTest::StressVariability(YVar));
 			
 		}
 	}
@@ -514,7 +514,7 @@ void __stdcall InspectStress(LPSAFEARRAY *ArrayData){
 	int XVar=pdFreq->intVal;pdFreq++;
 	int YVar=pdFreq->intVal;pdFreq++;
 	SafeArrayUnaccessData(*ArrayData);
-	TempStructure=StressTest::GetScenarioFromFile((FolderPath+"\\.StressResult%1%2.fcsr").arg(XVar).arg(YVar),RowHead,ColHead);
+	//TempStructure=StressTest::GetScenarioFromFile((FolderPath+"\\.StressResult%1%2.fcsr").arg(XVar).arg(YVar),RowHead,ColHead);
 	char *argv[] = {"NoArgumnets"};
 	int argc = sizeof(argv) / sizeof(char*) - 1;
 	QApplication ComputationLoop(argc,argv);

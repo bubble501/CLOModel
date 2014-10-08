@@ -163,13 +163,7 @@
     <ClCompile Include="StressTest.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
-    <ClCompile Include="StressThread.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
     <ClCompile Include="StressViewer.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="StressWorker.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
     <ClCompile Include="SummaryView.cpp">
@@ -248,24 +242,6 @@
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_SummaryView.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_StressWorker.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_StressWorker.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_StressViewer.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_StressViewer.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_StressThread.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_StressThread.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_StressTest.cpp">
@@ -349,6 +325,9 @@
     <ClCompile Include="TriggersResults.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
+    <ClCompile Include="AssumptionSet.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Resources.qrc">
@@ -384,13 +363,7 @@
     <CustomBuild Include="StressTest.h">
       <Filter>Header Files\Core</Filter>
     </CustomBuild>
-    <CustomBuild Include="StressThread.h">
-      <Filter>Header Files\Core</Filter>
-    </CustomBuild>
     <CustomBuild Include="StressViewer.h">
-      <Filter>Header Files\Core</Filter>
-    </CustomBuild>
-    <CustomBuild Include="StressWorker.h">
       <Filter>Header Files\Core</Filter>
     </CustomBuild>
     <CustomBuild Include="SummaryView.h">
@@ -564,6 +537,9 @@
       <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="TriggersResults.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="AssumptionSet.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
   </ItemGroup>

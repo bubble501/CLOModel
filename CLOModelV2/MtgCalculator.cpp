@@ -225,6 +225,7 @@ void MtgCalculator::Reset(){
 QString MtgCalculator::ReadyToCalculate()const{
 	QString Result;
 	QString TempStr;
+	if (StartDate.isNull()) Result += "Invalid Start Date\n";
 	for (auto i=Loans.constBegin();i!=Loans.constEnd();i++){
 		TempStr = i.value()->ReadyToCalculate();
 		if(!TempStr.isEmpty()) Result+=TempStr+'\n';

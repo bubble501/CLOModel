@@ -115,7 +115,7 @@ public:
 		Structure.SetupReinvBond(IntrVec, CPRVec, CDRVec, LSVec, WALval, PayFreq, AnnuityVec, ReinvPric, ReinvDel, ReinvSpr, FloatingBase, RecoveryLag, Delinquency, DelinquencyLag);
 	}
 	void Reset();
-	void SetupStress(const QString& ConstPar,QList<QString> XSpann,QList<QString> YSpann, StressTest::StressVariability Xvar=StressTest::ChangingCDR,StressTest::StressVariability Yvar=StressTest::ChangingLS);
+	//void SetupStress(const QString& ConstPar,QList<QString> XSpann,QList<QString> YSpann, StressTest::StressVariability Xvar=StressTest::ChangingCDR,StressTest::StressVariability Yvar=StressTest::ChangingLS);
 	void SetPoolCutOff(const QDate& a);
 	void SetUseCall(bool a){RunCall=a;}
 	const QString& GetMtgOutputAddress() const{return MtgOutputAddress;}

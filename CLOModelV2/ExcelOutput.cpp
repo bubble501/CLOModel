@@ -648,6 +648,7 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 }
 
 
+/*
 HRESULT ExcelOutput::PrintStressTest(const StressTest& stresser, const QString& TrancheTarget, const QString& DestinationAddress, bool SetupConditionalFormatting){
 	if(!stresser.GetResults().begin().value().begin().value().GetTranche(TrancheTarget)) return S_FALSE;
 	int Numrows=stresser.GetXSpann().size();
@@ -721,7 +722,7 @@ HRESULT ExcelOutput::PrintStressTest(const StressTest& stresser, const QString& 
 	SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
 	SysFreeString(Params.rgvarg[Params.cArgs-3].bstrVal);
 	return hr;
-}
+}*/
 HRESULT ExcelOutput::PrintMergedCell(const QString& msg, const QString& TargetCell, int RowDim, int ColDim,const QColor& FillColor){
 	ExcelCommons::InitExcelOLE();
 	QString ColorString=
@@ -2103,6 +2104,7 @@ HRESULT ExcelOutput::PlotCPRLS(
 		SafeArrayUnaccessData(DatesArray);
 		return hr;
 }*/
+/*
 HRESULT ExcelOutput::PlotStressMargin(const StressTest& source,const QString& DestinationSheet,int DestinationIndex,const QString& TrancheTarget, double NewPrice){
 	const QList<QString>& XAlias=source.GetXSpann();
 	const QList<QString>& YAlias=source.GetYSpann();
@@ -2254,4 +2256,4 @@ HRESULT ExcelOutput::PlotStressMargin(const StressTest& source,const QString& De
 		SafeArrayUnaccessData(XHeaders);
 	}
 	return hr;
-}
+}*/

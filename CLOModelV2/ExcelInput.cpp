@@ -481,8 +481,67 @@ double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
 	Tranche TempTranche(*TranchPoint);
 	return TempTranche.GetWALife(StartDate);
 }
-void __stdcall StressTargetChanged(LPSAFEARRAY *ArrayData){
+double __stdcall GetStressLoss(LPSAFEARRAY *ArrayData) {
+	QString FolderPath;
+	QString CPRscenario;
+	QString CDRscenario;
+	QString LSscenario;
+	QString RecLagScenario;
+	QString DelinqScenario;
+	QString DelinqLagScenario;
+	QString TrancheName;
+	VARIANT HUGEP *pdFreq;
+	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
+	if (!SUCCEEDED(hr)) return -1.0;
+	FolderPath = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+	TrancheName = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+	CPRscenario = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+	CDRscenario = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+	LSscenario = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+	RecLagScenario = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+	DelinqScenario = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+	DelinqLagScenario = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+	SafeArrayUnaccessData(*ArrayData);
+	FolderPath += "\\.StressResult.fcsr";
+	if (!QFile::exists(FolderPath))return -1.0;
+	const Tranche* Result=StressTest::GetScenarioFromFile(FolderPath, CPRscenario, CDRscenario, LSscenario, RecLagScenario, DelinqScenario, DelinqLagScenario).GetTranche(TrancheName);
+	if (Result) return Result->GetLossRate();
+	return -1.0;
+}
+double __stdcall GetStressDM(LPSAFEARRAY *ArrayData) {
+	QString FolderPath;
+	QString DestPath;
+	QString CPRscenario;
+	QString CDRscenario;
+	QString LSscenario;
+	QString RecLagScenario;
+	QString DelinqScenario;
+	QString DelinqLagScenario;
+	QString TrancheName;
+	double NewPrice;
+	VARIANT HUGEP *pdFreq;
+	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
+	if (!SUCCEEDED(hr)) return 0.0;
+	FolderPath = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+	TrancheName = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+	DestPath = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+	CPRscenario = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+	CDRscenario = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+	LSscenario = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+	RecLagScenario = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+	DelinqScenario = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+	DelinqLagScenario = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+	NewPrice=pdFreq->dblVal; pdFreq++;
+	SafeArrayUnaccessData(*ArrayData);
+	FolderPath += "\\.StressResult.fcsr";
+	if (!QFile::exists(FolderPath))return 0.0;
+	const Tranche* Result = StressTest::GetScenarioFromFile(FolderPath, CPRscenario, CDRscenario, LSscenario, RecLagScenario, DelinqScenario, DelinqLagScenario).GetTranche(TrancheName);
+	if (Result) return Result->GetDiscountMargin(NewPrice);
+	return 0.0;
+}
 
+/*
+void __stdcall StressTargetChanged(LPSAFEARRAY *ArrayData){
 	StressTest TempStress;
 	VARIANT HUGEP *pdFreq;
 	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
@@ -502,7 +561,8 @@ void __stdcall StressTargetChanged(LPSAFEARRAY *ArrayData){
 	ExcelOutput::PrintStressTest(TempStress,TrancheName,TargetCell,true);
 	if(!PlotSheet.isEmpty() && PlotIndex>0)
 		ExcelOutput::PlotStressMargin(TempStress,PlotSheet,PlotIndex,TrancheName,NewPrice);
-}
+}*/
+/*
 void __stdcall InspectStress(LPSAFEARRAY *ArrayData){
 	Waterfall TempStructure;
 	VARIANT HUGEP *pdFreq;
@@ -523,7 +583,7 @@ void __stdcall InspectStress(LPSAFEARRAY *ArrayData){
 	SitRep.SetStructure(TempStructure);
 	SitRep.ShowCallStructure(false);
 	ComputationLoop.exec();	
-}
+}*/
 
 //Ugly!!!
 double __stdcall GetAssumption(LPSAFEARRAY *ArrayData) {

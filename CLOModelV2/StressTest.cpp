@@ -66,6 +66,11 @@ void StressTest::RunStressTest() {
 		QMessageBox::critical(0, "Invalid Input", "The following Inputs are missing or invalid:\n" + HardCheks);
 		return;
 	}
+	{
+		MtgCashFlow FakeFlow;
+		FakeFlow.AddFlow(QDate(2015, 5, 30), 1000.0, 0);
+		Structure.AddMortgagesFlows(FakeFlow);
+	}
 	HardCheks = Structure.ReadyToCalculate();
 	if (!HardCheks.isEmpty()) {
 		QMessageBox::critical(0, "Invalid Input", "The following Inputs are missing or invalid:\n" + HardCheks);
@@ -97,7 +102,7 @@ void StressTest::RunStressTest() {
 		connect(ProgressForm, SIGNAL(Cancelled()), this, SLOT(StopCalculation()));
 		ProgressForm->SetValue(0);
 		ProgressForm->SetTitle("Stress Test");
-		ProgressForm->SetMax(10000);
+		ProgressForm->SetMax(2*10000);
 		ProgressForm->show();
 	}
 	if (UseFastVersion) {

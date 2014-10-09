@@ -16,6 +16,7 @@
 class MtgCalculator;
 class ProgressWidget;
 class MtgCashFlow;
+class WaterfallCalculator;
 class StressTest:public QObject , public BackwardInterface{
 	Q_OBJECT
 private:
@@ -37,7 +38,9 @@ private:
 	qint32 CountScenariosCalculated(int level = NumStressDimentsions - 1);
 	QScopedPointer<MtgCashFlow> BaseFlows;
 	QPointer<ProgressWidget> ProgressForm;
+	QHash<qint32, AssumptionSet> m_RainbowTable;
 protected:
+	WaterfallCalculator* TranchesCalculator;
 	MtgCalculator* BaseCalculator;
 	QSet<QString> m_CDRscenarios;
 	QSet<QString> m_CPRscenarios;
@@ -123,14 +126,16 @@ private slots:
 	void SlowLoansCalculated();
 	void RunCurrentScenario();
 	void GoToNextScenario();
-	void HandleError() {}
 	void StoppedCalculation() { ResetStressTest(); }
+	void GatherResults();
+	void HandleWtfProgress(double pr);
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 signals:
 	void CurrentScenarioCalculated();
 	void ErrorInCalculation();
 	void ProgressStatus(double);
+	void AllLoansCalculated();
 	void AllFinished();
 
 };

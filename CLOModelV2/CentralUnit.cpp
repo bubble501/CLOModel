@@ -309,7 +309,7 @@ void CentralUnit::CalculationStep2(){
 	}
 	else{
 		ParallWatFalls->ResetWaterfalls();
-		ParallWatFalls->AddWaterfall(Structure);
+		ParallWatFalls->AddWaterfall(Structure,0);
 		CallStructure.ResetMtgFlows();
 		CallStructure=Structure;
 		CallStructure.SetUseCall(true);
@@ -319,7 +319,7 @@ void CentralUnit::CalculationStep2(){
 			QApplication::quit();
 			return;
 		}
-		ParallWatFalls->AddWaterfall(CallStructure);
+		ParallWatFalls->AddWaterfall(CallStructure,1);
 		ParallWatFalls->StartCalculation();
 	}
 
@@ -332,8 +332,8 @@ void CentralUnit::CheckCalculationDone()
 	MtgsProgress=NULL;
 	Tranche TempTranche;
 	if(RunCall){
-		Structure=*(ParallWatFalls->GetWaterfalls().at(0));
-		CallStructure=*(ParallWatFalls->GetWaterfalls().at(1));
+		Structure=*(ParallWatFalls->GetWaterfall(0));
+		CallStructure=*(ParallWatFalls->GetWaterfall(1));
 		if(Structure.GetTranchesCount()==0 || CallStructure.GetTranchesCount()==0){
 			QMessageBox::critical(0, "Error", "Critical error in waterfall calculation");
 			QApplication::quit();

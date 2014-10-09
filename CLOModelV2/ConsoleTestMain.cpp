@@ -83,15 +83,15 @@ int main(int argc, char *argv[]) {
 
 	TempStress.SetStructure(TempWtf);
 	QList<QString> TempList;
-	TempList << "0" << "10";// << "20" << "30" << "40" << "50" << "60" << "70" << "80" << "90" << "100";
+	TempList << "0" << "10" << "20" << "30";// << "40" << "50" << "60" << "70" << "80" << "90" << "100";
 	foreach(const QString& tmpstr, TempList)
 		TempStress.AddLSscenarios(tmpstr);
 	TempList.clear();
-	TempList << "0.5" << "1"; //<< "1.5" << "2" << "2.5" << "3" << "3.5" << "4" << "4.5" << "5" << "5.5" << "6" << "6.5" << "7" << "7.5" << "8" << "8.5" << "9";
+	TempList << "0.5" << "1" << "1.5" << "2";// << "2.5" << "3" << "3.5" << "4" << "4.5" << "5" << "5.5" << "6" << "6.5" << "7" << "7.5" << "8" << "8.5" << "9";
 	foreach(const QString& tmpstr, TempList)
 		TempStress.AddCDRscenarios(tmpstr);
 	TempStress.AddCPRscenarios("20 48S 5 12S 10 12S 30");
-	TempStress.SetUseFastVersion(true);
+	TempStress.SetUseFastVersion(false);
 	//TempStress.UseMultithread(false);
 	TempStress.SetStartDate(TempWtf.GetCalculatedMtgPayments().GetDate(0));
 	TempStress.RunStressTest();

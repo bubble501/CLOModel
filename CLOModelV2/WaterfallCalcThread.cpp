@@ -1,5 +1,5 @@
 #include "WaterfallCalcThread.h"
-WaterfallCalcThread::WaterfallCalcThread(int ID, QObject* parent/* =0 */)
+WaterfallCalcThread::WaterfallCalcThread(int ID, QObject* parent)
 	:QThread(parent)
 	,Identifier(ID)
 {
@@ -9,6 +9,6 @@ void WaterfallCalcThread::run(){
 	if(LocalFall.CalculateTranchesCashFlows())
 		emit Calculated(Identifier,LocalFall);
 	else
-		emit Calculated(Identifier, Waterfall());
+		emit ErrorInCalculation(Identifier);
 	exec();
 }

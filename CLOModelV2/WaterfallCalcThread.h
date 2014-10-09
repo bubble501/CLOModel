@@ -14,6 +14,7 @@ private:
 	int Identifier;
 signals:
 	void Calculated(int,const Waterfall&);
+	void ErrorInCalculation(int);
 public slots:
 	void run();
 	void stop(){exit(0);}

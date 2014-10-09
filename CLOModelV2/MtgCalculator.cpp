@@ -42,6 +42,7 @@ bool MtgCalculator::StartCalculation( bool UseStoredCF) {
 	if (!ThreadPool.isEmpty()) return false;
 	BeesReturned.clear();
 	BeesSent.clear();
+	Result.Clear();
 	{//Check if all base rates are valid
 		bool CheckAgain = false;
 		ConstantBaseRateTable TempTable;

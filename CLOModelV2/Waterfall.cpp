@@ -12,21 +12,21 @@
 #include <QStack>
 #include "AssumptionSet.h"
 const WatFalPrior* Waterfall::GetStep(int Index)const {
-	if(Index<0 || Index>=m_WaterfallStesps.size()) return NULL;
+	if (Index<0 || Index >= m_WaterfallStesps.size()) return nullptr;
 	return m_WaterfallStesps.at(Index);
 }
 WatFalPrior* Waterfall::GetStep(int Index){
-	if(Index<0 || Index>=m_WaterfallStesps.size()) return NULL;
+	if (Index<0 || Index >= m_WaterfallStesps.size()) return nullptr;
 	return m_WaterfallStesps[Index];
 }
 void Waterfall::SetCCCcurve(const QString& a){m_CCCcurve=a;}
 
 const Tranche* Waterfall::GetTranche(int Index) const{
-	if(Index<0 || Index>=m_Tranches.size()) return NULL;
+	if (Index<0 || Index >= m_Tranches.size()) return nullptr;
 	return m_Tranches.at(Index);
 }
 Tranche* Waterfall::GetTranche(int Index){
-	if(Index<0 || Index>=m_Tranches.size()) return NULL;
+	if(Index<0 || Index>=m_Tranches.size()) return nullptr;
 	return m_Tranches[Index];
 }
 const Tranche* Waterfall::GetTranche(const QString& TrancheName) const{

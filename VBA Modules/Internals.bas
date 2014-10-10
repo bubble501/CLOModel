@@ -43,7 +43,7 @@ Public Sub PlotBloobergVector(BbgVct As String, TargetPlot As Chart, Optional St
 End Sub
 Public Sub WaterfallStepChanged(TargetAllCell As Range)
     Dim TempRange As Range
-    Set TempRange = TargetAllCell.Parent.Cells.Find(what:="Pro rata group", LookAt:=xlWhole, LookIn:=xlValues).Offset(1, 0)
+    Set TempRange = TargetAllCell.Parent.Cells.Find(What:="Pro rata group", LookAt:=xlWhole, LookIn:=xlValues).Offset(1, 0)
     Dim TargetCell
     Application.ScreenUpdating = False
     For Each TargetCell In TargetAllCell
@@ -343,11 +343,11 @@ Public Sub AddAccruedColumn()
 Dim AccrIntrCell As Range
 Dim BondNameCell As Range
 On Error Resume Next
-Set AccrIntrCell = Cells.Find(what:="Accrued Interest", LookAt:=xlWhole, LookIn:=xlValues)
+Set AccrIntrCell = Cells.Find(What:="Accrued Interest", LookAt:=xlWhole, LookIn:=xlValues)
 On Error GoTo 0
 If (Not AccrIntrCell Is Nothing) Then Exit Sub
-Set BondNameCell = Cells.Find(what:="Bond", LookAt:=xlWhole, LookIn:=xlValues)
-Set AccrIntrCell = Cells.Find(what:="IC test", LookAt:=xlWhole, LookIn:=xlValues).Offset(0, 1)
+Set BondNameCell = Cells.Find(What:="Bond", LookAt:=xlWhole, LookIn:=xlValues)
+Set AccrIntrCell = Cells.Find(What:="IC test", LookAt:=xlWhole, LookIn:=xlValues).Offset(0, 1)
 With AccrIntrCell
     .Value = "Accrued Interest"
     With .Borders
@@ -576,9 +576,9 @@ Public Sub NewWaterfallStepChanged(Target As Range, ByRef allFields As Collectio
     'PrincipalWatStart = Target.Parent.Cells.Find(what:="Interest Waterfall", LookAt:=xlWhole, LookIn:=xlFormulas).Column
     
     Dim FirstStep As Range
-    Set FirstStep = Target.Parent.Cells.Find(what:=allFields("StepHead"), LookAt:=xlWhole, LookIn:=xlFormulas)
+    Set FirstStep = Target.Parent.Cells.Find(What:=allFields("StepHead"), LookAt:=xlWhole, LookIn:=xlFormulas)
     Dim LastStep As Range
-    Set LastStep = Target.Parent.Cells.Find(what:=allFields("StepHead"), SearchDirection:=xlPrevious, LookAt:=xlWhole, LookIn:=xlFormulas)
+    Set LastStep = Target.Parent.Cells.Find(What:=allFields("StepHead"), SearchDirection:=xlPrevious, LookAt:=xlWhole, LookIn:=xlFormulas)
     
     Dim i As Long
     Dim SeniorityGroupHead As Long
@@ -1019,3 +1019,28 @@ With Sheets("Waterfall").Range("A503:A1000").Validation
 End With
 End Sub
 
+Public Sub ShowProgress(Optional What As String = "")
+With ProgressForm
+    If (Len(What) = 0) Then
+        .WhatImDoing.Caption = "Loading"
+    Else
+        .WhatImDoing.Caption = What
+    End If
+    .LabelProgress.Width = 0
+    .Show vbModeless
+ End With
+ DoEvents
+End Sub
+Public Sub SetProgress(PctDone As Double, Optional What As String = "")
+    With ProgressForm
+        If (Len(What) > 0) Then
+            .WhatImDoing.Caption = What
+        End If
+        .ProgressFrame.Caption = Format(PctDone, "0%")
+        .LabelProgress.Width = PctDone * (.ProgressFrame.Width - 10)
+    End With
+    DoEvents
+End Sub
+Public Sub HideProgress()
+Unload ProgressForm
+End Sub

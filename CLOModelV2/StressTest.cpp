@@ -12,6 +12,7 @@
 #include "MtgCashFlow.h"
 #include <QDataStream>
 #include "WaterfallCalculator.h"
+#include <QBuffer>
 StressTest::StressTest(QObject* parent)
 	: QObject(parent)
 	, SequentialComputation(false)
@@ -280,34 +281,83 @@ QDataStream& operator>>(QDataStream & stream, StressTest& flows) {
 
 void StressTest::SaveResults(const QString& DestPath)const{
 	QString DestinationPath(DestPath.trimmed());
-	if(DestinationPath.at(DestinationPath.size()-1)!='\\') DestinationPath.append('\\');
+	if (*(DestinationPath.end() - 1) != '\\' && *(DestinationPath.end() - 1) != '/') DestinationPath.append('/');
 	QDir curDir;
-	QStringList FileNames;
-	QString DestinationFull = DestinationPath + QString("\\.StressResult.fcsr");
-	if (curDir.exists(DestinationFull)) {
+	QString DestinationFull = DestinationPath + QString(".StressResult.fcsr");
+	QuaZip zip(DestinationFull);
+	QBuffer OldData;
+	quint32 OldCounter = 0;
+	if (QFile::exists(DestinationFull)) {
+		QStringList FileNames;
+		qint32 VesionCheck;
+		FileNames.append("StressTestInputs");
+		for (auto i = Results.constBegin(); i != Results.constEnd(); ++i) FileNames.append(i.key().ToString() + ".csw");
+		if (!zip.open(QuaZip::mdUnzip)) return;
+		OldData.open(QBuffer::ReadWrite);
+		QuaZipFile TargetFile(&zip);
+		QuaZipFileInfo ZipFileInfo;
+		for (bool more = zip.goToFirstFile(); more; more = zip.goToNextFile()) {
+			TargetFile.open(QIODevice::ReadOnly);
+			if (FileNames.contains(TargetFile.getActualFileName())) {
+				TargetFile.close();
+				continue;
+			}
+			QDataStream Reader(&TargetFile);
+			QDataStream Writer(&OldData);
+			Reader.setVersion(QDataStream::Qt_5_3);
+			Writer.setVersion(QDataStream::Qt_5_3);
+			Waterfall TempWF;
+			Reader >> VesionCheck;
+			if (VesionCheck<qint32(MinimumSupportedVersion) || VesionCheck>qint32(ModelVersionNumber)) continue;
+			TempWF.SetLoadProtocolVersion(VesionCheck);
+			Reader >> TempWF;
+			Writer << TargetFile.getActualFileName();
+			if (TargetFile.getFileInfo(&ZipFileInfo)) Writer << ZipFileInfo.dateTime;
+			else Writer << QDateTime::currentDateTime();
+			Writer << TempWF;
+			OldCounter++;
+			TargetFile.close();
+		}
+		OldData.seek(0);
+		OldData.deleteLater();
+		zip.close();
 		if (!curDir.remove(DestinationFull)) return;
 	}
-	if(!curDir.exists(DestinationPath+"TempStressResults")) curDir.mkpath(DestinationPath+"TempStressResults");
-	FileNames.append(DestinationPath+"TempStressResults\\VersionIdentifier");
-	QFile file(FileNames.last());
-	if (file.open(QIODevice::WriteOnly)) {
-		QDataStream out(&file);
-		out.setVersion(QDataStream::Qt_5_3);
-		out << qint32(ModelVersionNumber) << StartDate << SequentialComputation << ShowProgress << UseFastVersion << (*BaseCalculator);
-		file.close();
-	}
-	for (auto i = Results.constBegin(); i != Results.constEnd(); ++i) {
-		FileNames.append(DestinationPath + "TempStressResults\\" + i.key().ToString() + ".csw");
-		QFile file(FileNames.last());
-		if (file.open(QIODevice::WriteOnly)) {
-			QDataStream out(&file);
+	{
+		if (!zip.open(QuaZip::mdCreate)) return;
+		QuaZipFile TargetFile(&zip);
+		QuaZipNewInfo ZipFileInfo("StressTestInputs");
+		if (!TargetFile.open(QIODevice::WriteOnly, ZipFileInfo))return;
+		{
+			QDataStream out(&TargetFile);
 			out.setVersion(QDataStream::Qt_5_3);
-			out << *(i.value());
-			file.close();
+			out << qint32(ModelVersionNumber) << StartDate << SequentialComputation << ShowProgress << UseFastVersion << (*BaseCalculator) << Structure;
+			TargetFile.close();
 		}
+		QDataStream Reader(&OldData);
+		for (; OldCounter > 0;--OldCounter) {
+			Waterfall TempWF;
+			Reader >> ZipFileInfo.name >> ZipFileInfo.dateTime >> TempWF;
+			if (TargetFile.open(QIODevice::WriteOnly, ZipFileInfo)) {
+				QDataStream out(&TargetFile);
+				out.setVersion(QDataStream::Qt_5_3);
+				out << qint32(ModelVersionNumber) << TempWF;
+				TargetFile.close();
+			}
+		}
+		OldData.close();
+		ZipFileInfo.dateTime = QDateTime::currentDateTime();
+		for (auto i = Results.constBegin(); i != Results.constEnd(); ++i) {
+			ZipFileInfo.name = i.key().ToString() + ".csw";
+			if (TargetFile.open(QIODevice::WriteOnly, ZipFileInfo)) {
+				QDataStream out(&TargetFile);
+				out.setVersion(QDataStream::Qt_5_3);
+				out << qint32(ModelVersionNumber) << *(i.value());
+				TargetFile.close();
+			}
+		}
+		zip.close();
 	}
-	JlCompress::compressFiles(DestinationFull, FileNames);
-	removeDir(DestinationPath+"TempStressResults");
 }
 
 Waterfall StressTest::GetScenarioFromFile(const QString& DestPath, const QString& CPRscenario, const QString& CDRscenario, const QString& LSscenario, const QString& RecLagScenario, const QString& DelinqScenario, const QString& DelinqLagScenario) {
@@ -318,30 +368,12 @@ Waterfall StressTest::GetScenarioFromFile(const QString& DestPath, const QString
 	QuaZip zip(DestPath);
 	if(!zip.open(QuaZip::mdUnzip)) return Result;
 	QuaZipFile TargetFile(&zip);
-	try{
-		if(!zip.setCurrentFile("VersionIdentifier")) throw 1;
-		TargetFile.open(QIODevice::ReadOnly);
-		QDataStream out(&TargetFile);
-		out.setVersion(QDataStream::Qt_5_3);
-		out >> VesionCheck;
-		TargetFile.close();
-		if(VesionCheck<qint32(MinimumSupportedVersion) || VesionCheck>qint32(ModelVersionNumber)) throw 1;
-	}
-	catch(int ExcCode){
-		if(!QApplication::instance()){
-			char *argv[] = {"NoArgumnets"};
-			int argc = sizeof(argv) / sizeof(char*) - 1;
-			QApplication ComputationLoop(argc,argv);
-			QMessageBox::critical(0,"Incompatible Version","The stress test data is not compatible with the current model version\nPlease run ALL the stress tests again");
-			QApplication::quit();
-		}
-		else QMessageBox::critical(0,"Incompatible Version","The stress test data is not compatible with the current model version\nPlease run ALL the stress tests again");
-		return Result;
-	}
 	if (!zip.setCurrentFile(CurrentKey.ToString()+ ".csw")) return Result;
 	TargetFile.open(QIODevice::ReadOnly);
 	QDataStream out(&TargetFile);
 	out.setVersion(QDataStream::Qt_5_3);
+	out >> VesionCheck;
+	if (VesionCheck<qint32(MinimumSupportedVersion) || VesionCheck>qint32(ModelVersionNumber)) return Result;
 	Result.SetLoadProtocolVersion(VesionCheck);
 	out >> Result;
 	TargetFile.close();
@@ -355,7 +387,7 @@ bool StressTest::LoadResultsFromFile(const QString& DestPath){
 	if(!zip.open(QuaZip::mdUnzip)) return false;
 	QuaZipFile TargetFile(&zip);
 	try{
-		if(!zip.setCurrentFile("VersionIdentifier")) throw 1;
+		if(!zip.setCurrentFile("StressTestInputs")) throw 1;
 		TargetFile.open(QIODevice::ReadOnly);
 		QDataStream out(&TargetFile);
 		out.setVersion(QDataStream::Qt_5_3);
@@ -366,6 +398,7 @@ bool StressTest::LoadResultsFromFile(const QString& DestPath){
 		}
 		out >> StartDate >> SequentialComputation >> ShowProgress >> UseFastVersion;
 		BaseCalculator->SetLoadProtocolVersion(VesionCheck); out >> (*BaseCalculator);
+		Structure.SetLoadProtocolVersion(VesionCheck); out >> Structure;
 		TargetFile.close();
 	}
 	catch(int ExcCode){
@@ -383,7 +416,7 @@ bool StressTest::LoadResultsFromFile(const QString& DestPath){
 	}
 	for(bool more=zip.goToFirstFile(); more; more=zip.goToNextFile()) {
 		TargetFile.open(QIODevice::ReadOnly);
-		if(TargetFile.getActualFileName()=="VersionIdentifier"){
+		if(TargetFile.getActualFileName()=="StressTestInputs"){
 			TargetFile.close();
 			continue;
 		}
@@ -399,6 +432,8 @@ bool StressTest::LoadResultsFromFile(const QString& DestPath){
 		QDataStream out(&TargetFile);
 		out.setVersion(QDataStream::Qt_5_3);
 		Waterfall* TempWF = new Waterfall();
+		out >> VesionCheck;
+		if (VesionCheck<qint32(MinimumSupportedVersion) || VesionCheck>qint32(ModelVersionNumber)) continue;
 		TempWF->SetLoadProtocolVersion(VesionCheck);
 		out >> (*TempWF);
 		Results.insert(CurrentAss, QSharedPointer<Waterfall>(TempWF));

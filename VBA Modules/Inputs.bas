@@ -5,8 +5,8 @@ Declare Sub RunModel Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLO
 Declare Function CLODiscountMargin Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
 Declare Function CLOWALife Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
 Declare Function CLOReturnRate Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
-Declare Sub StressTargetChanged Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
-Declare Sub InspectStress Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
+Declare Function GetStressLoss Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
+Declare Function GetStressDM Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
 'Declare Sub InspectWaterfall Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
 Declare Function GetAssumption Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
 Public Sub GetInputFromStructure( _
@@ -146,131 +146,131 @@ Public Sub GetInputFromStructure( _
     Dim TriggersHead As Long
     
     Set WaterfallSheet = Sheets(FieldsLabels("WaterfallSheet"))
-     Set FirstStep = WaterfallSheet.Cells.Find(what:=FieldsLabels("StepHead"), LookAt:=xlWhole, LookIn:=xlFormulas)
-    Set LastStep = WaterfallSheet.Cells.Find(what:=FieldsLabels("StepHead"), SearchDirection:=xlPrevious, LookAt:=xlWhole, LookIn:=xlFormulas)
-    SeniorityGroupHead = WaterfallSheet.Cells.Find(what:=FieldsLabels("SeniorityGroupHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
-    SeniorityGroupLevelHead = WaterfallSheet.Cells.Find(what:=FieldsLabels("SeniorityGroupLevelHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
-    RedemptionGroupHead = WaterfallSheet.Cells.Find(what:=FieldsLabels("RedemptionGroupHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
-    RedemptionGroupLevelHead = WaterfallSheet.Cells.Find(what:=FieldsLabels("RedemptionGroupLevelHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
-    RedemptionShareHead = WaterfallSheet.Cells.Find(what:=FieldsLabels("RedemptionShareHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
-    AdditionalCollateralShareHead = WaterfallSheet.Cells.Find(what:=FieldsLabels("AdditionalCollateralShareHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
-    SourceOfFundingHead = WaterfallSheet.Cells.Find(what:=FieldsLabels("SourceOfFundingHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
-    CouponIndexHead = WaterfallSheet.Cells.Find(what:=FieldsLabels("CouponIndexHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
-    TestTargetOverrideHead = WaterfallSheet.Cells.Find(what:=FieldsLabels("TestTargetOverrideHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
-    IRRtoEquityTargetHead = WaterfallSheet.Cells.Find(what:=FieldsLabels("IRRtoEquityTargetHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
-    ReserveIndexHead = WaterfallSheet.Cells.Find(what:=FieldsLabels("ReserveIndexHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
-    TriggersHead = WaterfallSheet.Cells.Find(what:=FieldsLabels("TriggersHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+     Set FirstStep = WaterfallSheet.Cells.Find(What:=FieldsLabels("StepHead"), LookAt:=xlWhole, LookIn:=xlFormulas)
+    Set LastStep = WaterfallSheet.Cells.Find(What:=FieldsLabels("StepHead"), SearchDirection:=xlPrevious, LookAt:=xlWhole, LookIn:=xlFormulas)
+    SeniorityGroupHead = WaterfallSheet.Cells.Find(What:=FieldsLabels("SeniorityGroupHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+    SeniorityGroupLevelHead = WaterfallSheet.Cells.Find(What:=FieldsLabels("SeniorityGroupLevelHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+    RedemptionGroupHead = WaterfallSheet.Cells.Find(What:=FieldsLabels("RedemptionGroupHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+    RedemptionGroupLevelHead = WaterfallSheet.Cells.Find(What:=FieldsLabels("RedemptionGroupLevelHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+    RedemptionShareHead = WaterfallSheet.Cells.Find(What:=FieldsLabels("RedemptionShareHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+    AdditionalCollateralShareHead = WaterfallSheet.Cells.Find(What:=FieldsLabels("AdditionalCollateralShareHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+    SourceOfFundingHead = WaterfallSheet.Cells.Find(What:=FieldsLabels("SourceOfFundingHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+    CouponIndexHead = WaterfallSheet.Cells.Find(What:=FieldsLabels("CouponIndexHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+    TestTargetOverrideHead = WaterfallSheet.Cells.Find(What:=FieldsLabels("TestTargetOverrideHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+    IRRtoEquityTargetHead = WaterfallSheet.Cells.Find(What:=FieldsLabels("IRRtoEquityTargetHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+    ReserveIndexHead = WaterfallSheet.Cells.Find(What:=FieldsLabels("ReserveIndexHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+    TriggersHead = WaterfallSheet.Cells.Find(What:=FieldsLabels("TriggersHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
     ''''''''''''''''''''''''''''''''''''''''''''''''''''
     On Error Resume Next
-    Set IssuerProperty = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("IssuerProperty"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set FacilityProperty = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("FacilityProperty"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set CountryProperty = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("CountryProperty"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set IndustryProperty = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("IndustryProperty"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set MezzanineProperty = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("MezzanineProperty"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set PriceProperty = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("PriceProperty"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set LoanDayCountHead = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("LoanDayCountHead"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set StartingAdditionalProp = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("StartingAdditionalProp"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set IssuerProperty = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("IssuerProperty"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set FacilityProperty = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("FacilityProperty"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set CountryProperty = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("CountryProperty"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set IndustryProperty = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("IndustryProperty"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set MezzanineProperty = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("MezzanineProperty"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set PriceProperty = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("PriceProperty"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set LoanDayCountHead = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("LoanDayCountHead"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set StartingAdditionalProp = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("StartingAdditionalProp"), LookAt:=xlWhole, LookIn:=xlValues)
     ''''''''''''''''''''''''''''''''''''''''''''''''''''
-    Set HaircutVecStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("HaircutVecHeader"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set TriggerStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("TriggerStart"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set StartingDefJunFees = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("StartingDefJunFees"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set GICInterestCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("GICInterestCell"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set BaseCaseCall = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("BaseCaseCall"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set IsinFldsStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("IsinFldsHeader"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set FirstResTargCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("FirstResTargCell"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set FirstResMultCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("FirstResMultCell"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set FirstResFloorCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("FirstResFloorCell"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set FirstResCapCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("FirstResCapCell"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set FirstResCurrCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("FirstResCurrCell"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set FirstResFreedCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("FirstResFreedCell"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set FirstResDestinationCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("FirstResDestinationCell"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set SecondResTargCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SecondResTargCell"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set SecondResMultCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SecondResMultCell"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set SecondResFloorCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SecondResFloorCell"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set SecondResCapCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SecondResCapCell"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set SecondResCurrCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SecondResCurrCell"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set SecondResFreedCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SecondResFreedCell"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set SecondResDestinationCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SecondResDestinationCell"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set UseCumulativeReservesCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("UseCumulativeReservesCell"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set ReinvestmentDelayCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("ReinvestmentDelayCell"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set ReinvestmentPriceCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("ReinvestmentPriceCell"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set DealNameCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("DealNameCell"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set UseFastStressCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("UseFastStressCell"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set SeniorExpensesFixedCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SeniorExpensesFieldFixed"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set SeniorFeesFixedCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SeniorFeesFieldFixed"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set JuniorFeesFixedCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("JuniorFeesFieldFixed"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set ReinvRepayCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("ReinvRepayCell"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set RecovLagCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("RecovLagCell"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set DelinqCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("DelinqCell"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set DelinqLagCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("DelinqLagCell"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set CurrentDeferredCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("CurrentDeferredCell"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set UseForwardCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("UseForwardCell"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set DayCountHead = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("DayCountHead"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set GICBaseRateCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("GICBaseRateCell"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set DealDaycountCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("DealDaycountCell"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set ReinvestementWindowCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("ReinvestementWindowCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set HaircutVecStart = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("HaircutVecHeader"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set TriggerStart = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("TriggerStart"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set StartingDefJunFees = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("StartingDefJunFees"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set GICInterestCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("GICInterestCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set BaseCaseCall = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("BaseCaseCall"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set IsinFldsStart = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("IsinFldsHeader"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set FirstResTargCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("FirstResTargCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set FirstResMultCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("FirstResMultCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set FirstResFloorCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("FirstResFloorCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set FirstResCapCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("FirstResCapCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set FirstResCurrCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("FirstResCurrCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set FirstResFreedCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("FirstResFreedCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set FirstResDestinationCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("FirstResDestinationCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set SecondResTargCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("SecondResTargCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set SecondResMultCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("SecondResMultCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set SecondResFloorCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("SecondResFloorCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set SecondResCapCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("SecondResCapCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set SecondResCurrCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("SecondResCurrCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set SecondResFreedCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("SecondResFreedCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set SecondResDestinationCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("SecondResDestinationCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set UseCumulativeReservesCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("UseCumulativeReservesCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set ReinvestmentDelayCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("ReinvestmentDelayCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set ReinvestmentPriceCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("ReinvestmentPriceCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set DealNameCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("DealNameCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set UseFastStressCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("UseFastStressCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set SeniorExpensesFixedCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("SeniorExpensesFieldFixed"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set SeniorFeesFixedCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("SeniorFeesFieldFixed"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set JuniorFeesFixedCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("JuniorFeesFieldFixed"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set ReinvRepayCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("ReinvRepayCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set RecovLagCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("RecovLagCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set DelinqCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("DelinqCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set DelinqLagCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("DelinqLagCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set CurrentDeferredCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("CurrentDeferredCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set UseForwardCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("UseForwardCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set DayCountHead = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("DayCountHead"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set GICBaseRateCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("GICBaseRateCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set DealDaycountCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("DealDaycountCell"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set ReinvestementWindowCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("ReinvestementWindowCell"), LookAt:=xlWhole, LookIn:=xlValues)
     On Error GoTo 0
-    Set BaseIndexHead = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("BaseIndexHead"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set MaturityStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("MaturityHeader"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set CouponStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("CouponHeader"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set OutstandingStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("OutstandingHeader"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set AnnuityStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("AnnuityHeader"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set FrequencyStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("FrequencyHeader"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set CPRMultiStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("CPRMultiHead"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set LSMultiStart = Sheets(MortgagesSheet).Cells.Find(what:=FieldsLabels("LSMultiHead"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set CPRcell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("CPRfield"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set CDRcell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("CDRfield"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set LScell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("LSfield"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set CurrentOutStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("CurrentOutHead"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set OriginalOutStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("OriginalOutHead"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set CutOffcell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("CutOffField"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set BondStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("BondsNamesHeader"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set BondRataStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("BondRataGroupHeader"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set BondPriceStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("BondPriceHeader"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set OCLimitStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("OCLimitHeader"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set ICLimitStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("ICLimitHeader"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set IPDfrequencyCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("IPDfrequencyField"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set FirstIPDcell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("FirstIPDfield"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set PrevIPDCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("PrevIPDField"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set CurrencyStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("CurrencyHead"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set LossOutputCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("LossOutputHeader"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set LossToCallCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("LossToCallField"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set SettleDateCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SettleDateField"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set BaseIndexHead = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("BaseIndexHead"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set MaturityStart = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("MaturityHeader"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set CouponStart = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("CouponHeader"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set OutstandingStart = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("OutstandingHeader"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set AnnuityStart = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("AnnuityHeader"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set FrequencyStart = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("FrequencyHeader"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set CPRMultiStart = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("CPRMultiHead"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set LSMultiStart = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("LSMultiHead"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set CPRcell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("CPRfield"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set CDRcell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("CDRfield"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set LScell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("LSfield"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set CurrentOutStart = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("CurrentOutHead"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set OriginalOutStart = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("OriginalOutHead"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set CutOffcell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("CutOffField"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set BondStart = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("BondsNamesHeader"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set BondRataStart = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("BondRataGroupHeader"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set BondPriceStart = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("BondPriceHeader"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set OCLimitStart = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("OCLimitHeader"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set ICLimitStart = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("ICLimitHeader"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set IPDfrequencyCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("IPDfrequencyField"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set FirstIPDcell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("FirstIPDfield"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set PrevIPDCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("PrevIPDField"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set CurrencyStart = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("CurrencyHead"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set LossOutputCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("LossOutputHeader"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set LossToCallCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("LossToCallField"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set SettleDateCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("SettleDateField"), LookAt:=xlWhole, LookIn:=xlValues)
     'Set AccruedIntrStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("IntrAccrHead"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set TrancheCouponStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("TrancheCouponHead"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set RefRateStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("RefRateHead"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set TrancheCouponStart = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("TrancheCouponHead"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set RefRateStart = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("RefRateHead"), LookAt:=xlWhole, LookIn:=xlValues)
     'Set WaterfallStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("WaterfallHeader"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set SeniorExpensesCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SeniorExpensesField"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set SeniorFeesCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("SeniorFeesField"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set JuniorFeesCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("JuniorFeesField"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set CCCcurveCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("CCCcurveField"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set CCCvalueCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("CCCvalueField"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set CCClimitCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("CCClimitField"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set CallDateCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("CallDateField"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set CallValueCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("CallValueField"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set CallMultiplierCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("CallMultiplierField"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set CallReserveCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("CallReserveField"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set UseCallStressCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("UseCallStressField"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set ReinvestPeriodCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("ReinvestPeriodField"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set ReinvestLimitCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("ReinvestLimitField"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set ReinvestTableCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("ReinvestTableHead"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set ReinvestSpreadCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("ReinvestSpreadField"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set ReinvPaymFreqCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("ReinvPaymFreqField"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set ReinvestWALCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("ReinvestWALField"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set InterestBaseCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("InterestBaseField"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set AvailPrincCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("AvailPrincField"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set AvailIntrCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("AvailIntrField"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set ExcahngeRateTableStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("ExcahngeRateTableHead"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set SeniorExpensesCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("SeniorExpensesField"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set SeniorFeesCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("SeniorFeesField"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set JuniorFeesCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("JuniorFeesField"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set CCCcurveCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("CCCcurveField"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set CCCvalueCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("CCCvalueField"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set CCClimitCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("CCClimitField"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set CallDateCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("CallDateField"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set CallValueCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("CallValueField"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set CallMultiplierCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("CallMultiplierField"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set CallReserveCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("CallReserveField"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set UseCallStressCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("UseCallStressField"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set ReinvestPeriodCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("ReinvestPeriodField"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set ReinvestLimitCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("ReinvestLimitField"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set ReinvestTableCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("ReinvestTableHead"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set ReinvestSpreadCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("ReinvestSpreadField"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set ReinvPaymFreqCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("ReinvPaymFreqField"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set ReinvestWALCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("ReinvestWALField"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set InterestBaseCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("InterestBaseField"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set AvailPrincCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("AvailPrincField"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set AvailIntrCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("AvailIntrField"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set ExcahngeRateTableStart = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("ExcahngeRateTableHead"), LookAt:=xlWhole, LookIn:=xlValues)
     Set ExcahngeRateTableStart = Range(ExcahngeRateTableStart, ExcahngeRateTableStart.End(xlDown).Offset(0, 1))
-    Set JuniorFeesCouponCell = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("JuniorFeesCouponField"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set FixFloatStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("FixFloatHead"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set JuniorFeesCouponCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("JuniorFeesCouponField"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set FixFloatStart = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("FixFloatHead"), LookAt:=xlWhole, LookIn:=xlValues)
     If (RunStressTest) Then
-        Set StressCPRCell = Sheets(StressTestSheet).Cells.Find(what:=FieldsLabels("StressCPRField"), LookAt:=xlWhole, LookIn:=xlFormulas)
-        Set StressCDRStart = Sheets(StressTestSheet).Cells.Find(what:=FieldsLabels("StressCDRHead"), LookAt:=xlWhole, LookIn:=xlFormulas)
-        Set StressLSStart = Sheets(StressTestSheet).Cells.Find(what:=FieldsLabels("StressLSHead"), LookAt:=xlWhole, LookIn:=xlFormulas)
+        Set StressCPRCell = Sheets(StressTestSheet).Cells.Find(What:=FieldsLabels("StressCPRField"), LookAt:=xlWhole, LookIn:=xlFormulas)
+        Set StressCDRStart = Sheets(StressTestSheet).Cells.Find(What:=FieldsLabels("StressCDRHead"), LookAt:=xlWhole, LookIn:=xlFormulas)
+        Set StressLSStart = Sheets(StressTestSheet).Cells.Find(What:=FieldsLabels("StressLSHead"), LookAt:=xlWhole, LookIn:=xlFormulas)
     End If
     On Error Resume Next
-        Set BaseIndexesStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("BaseIndexesHead"), LookAt:=xlWhole, LookIn:=xlValues)
+        Set BaseIndexesStart = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("BaseIndexesHead"), LookAt:=xlWhole, LookIn:=xlValues)
     On Error GoTo 0
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -807,9 +807,9 @@ DefaultExchange:
     Call AddInput(AllTheInputs, CLng(FieldsLabels("CPRLSPlotIndex")))
     Call AddInput(AllTheInputs, CLng(FieldsLabels("CallToEquityPlotIndex")))
     Call AddInput(AllTheInputs, CLng(FieldsLabels("EquityReturnPlotIndex")))
-    Call AddInput(AllTheInputs, InputsSheet + "!" + Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("LossOutputCell"), LookAt:=xlWhole, LookIn:=xlValues).Offset(1, 0).Address)
-    Call AddInput(AllTheInputs, InputsSheet + "!" + Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("LossCallOutputCell"), LookAt:=xlWhole, LookIn:=xlValues).Offset(1, 0).Address)
-    Call AddInput(AllTheInputs, InputsSheet + "!" + Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("CEcell"), LookAt:=xlWhole, LookIn:=xlValues).Offset(1, 0).Address)
+    Call AddInput(AllTheInputs, InputsSheet + "!" + Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("LossOutputCell"), LookAt:=xlWhole, LookIn:=xlValues).Offset(1, 0).Address)
+    Call AddInput(AllTheInputs, InputsSheet + "!" + Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("LossCallOutputCell"), LookAt:=xlWhole, LookIn:=xlValues).Offset(1, 0).Address)
+    Call AddInput(AllTheInputs, InputsSheet + "!" + Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("CEcell"), LookAt:=xlWhole, LookIn:=xlValues).Offset(1, 0).Address)
     Call AddInput(AllTheInputs, CallerPath)
     
     Dim LocalUseFwd As Boolean
@@ -1179,24 +1179,62 @@ Public Function GetWAL(TrancheName As String, CutOffDate As Date, Price As Doubl
     result(3) = ToCall
     GetWAL = CLOWALife(result)
 End Function
-Public Sub StressTargetEvent(NewTrancheName As String, StressTargetCell As String, Xvar As Long, Yvar As Long, NewPrice As Double, Optional PlotSheet As String = "", Optional PlotIndex As Long = 1)
+Public Sub StressTargetEvent(NewTrancheName As String, StressSheet As String, StressTargetCell As String, Xvar As Long, Yvar As Long, NewPrice As Double, Optional PlotSheet As String = "", Optional PlotIndex As Long = 1)
+    Dim Xspan As Range
+    Dim Yspan As Range
+    Dim i As Long, j As Long
     Dim result(0 To 7) As Variant
     result(0) = Left(ActiveWorkbook.FullName, InStrRev(ActiveWorkbook.FullName, "\"))
     result(1) = NewTrancheName
-    result(2) = StressTargetCell
-    result(3) = Xvar
-    result(4) = Yvar
-    result(5) = NewPrice
-    result(6) = PlotSheet
-    result(7) = PlotIndex
-    Call StressTargetChanged(result)
+    result(5) = "0"
+    result(6) = "0"
+    result(7) = "0"
+    Call ShowProgress("Updating Loss Values")
+    Set Xspan = Range(Sheets(StressSheet).Range(StressTargetCell).Offset(0, -1), Sheets(StressSheet).Range(StressTargetCell).Offset(0, -1).End(xlDown))
+    Set Yspan = Range(Sheets(StressSheet).Range(StressTargetCell).Offset(-1, 0), Sheets(StressSheet).Range(StressTargetCell).Offset(-1, 0).End(xlToRight))
+    Dim LossValues() As Double
+    ReDim LossValues(0 To Xspan.Count - 1, 0 To Yspan.Count - 1)
+    If (Xvar + Yvar = 1) Then
+        result(2) = CStr(Sheets(StressSheet).Range(StressTargetCell).Offset(-1, -1).Value)
+    ElseIf (Xvar + Yvar = 2) Then
+        result(4) = CStr(Sheets(StressSheet).Range(StressTargetCell).Offset(-1, -1).Value)
+    Else
+        result(3) = CStr(Sheets(StressSheet).Range(StressTargetCell).Offset(-1, -1).Value)
+    End If
+    For i = 1 To Xspan.Count
+        If (Xvar = 0) Then
+            result(3) = CStr(Xspan.Cells(i, 1).Value)
+        ElseIf (Xvar = 1) Then
+            result(4) = CStr(Xspan.Cells(i, 1).Value)
+        Else
+            result(2) = CStr(Xspan.Cells(i, 1).Value)
+        End If
+        
+        For j = 1 To Yspan.Count
+            If (Yvar = 0) Then
+                result(3) = CStr(Yspan.Cells(1, j).Value)
+            ElseIf (Yvar = 1) Then
+                result(4) = CStr(Yspan.Cells(1, j).Value)
+            Else
+                result(2) = CStr(Yspan.Cells(1, j).Value)
+            End If
+            LossValues(i - 1, j - 1) = GetStressLoss(result)
+            Call SetProgress((((i - 1) * Yspan.Count) + j) / (Xspan.Count * Yspan.Count))
+        Next j
+    Next i
+    Sheets(StressSheet).Range(StressTargetCell).Resize(Xspan.Count, Yspan.Count) = LossValues
+    Dim SingleCell
+    For Each SingleCell In Sheets(StressSheet).Range(StressTargetCell).Resize(Xspan.Count, Yspan.Count)
+        If (SingleCell.Value = -1#) Then SingleCell.Value = CVErr(xlErrValue)
+    Next SingleCell
+    Call HideProgress
 End Sub
 Public Sub SeparateWaterfall( _
     InputsSheet As String, _
     FieldsLabels As Collection _
 )
     Dim WaterfallStart As Range
-    Set WaterfallStart = Sheets(InputsSheet).Cells.Find(what:=FieldsLabels("WaterfallHeader"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set WaterfallStart = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("WaterfallHeader"), LookAt:=xlWhole, LookIn:=xlValues)
     Dim i As Long, index As Long
     i = 1
     Do While (True)

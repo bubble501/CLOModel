@@ -516,8 +516,11 @@ double __stdcall GetStressLoss(LPSAFEARRAY *ArrayData) {
 		.arg(DelinqLagScenario)
 	);
 	if (!QFile::exists(FolderPath)) { LOGDEBUG("Returned -1"); return -1.0; }
-	Tranche Result=*(StressTest::GetScenarioFromFile(FolderPath, CPRscenario, CDRscenario, LSscenario, RecLagScenario, DelinqScenario, DelinqLagScenario).GetTranche(TrancheName));
-	return Result.GetLossRate();
+	Waterfall TempRes = StressTest::GetScenarioFromFile(FolderPath, CPRscenario, CDRscenario, LSscenario, RecLagScenario, DelinqScenario, DelinqLagScenario);
+	const Tranche* Result = TempRes.GetTranche(TrancheName);
+	if (Result)
+		return Result->GetLossRate();
+	return -1.0;
 }
 double __stdcall GetStressDM(LPSAFEARRAY *ArrayData) {
 	QString FolderPath;

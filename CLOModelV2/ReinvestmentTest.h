@@ -16,7 +16,7 @@ public:
 	QString GetCDRAssumption() const {return CDRAssumption.GetVector();}
 	QString GetLSAssumption() const {return LSAssumption.GetVector();}
 	QString GetWALAssumption() const {return WALAssumption.GetVector();}
-	QString GetReinvDelay()const { return ReinvestmentDelay.GetVector(); }
+	QString GetReinvDelay()const { return m_ReinvestmentDelay.GetVector(); }
 	QString GetReinvPrice()const { return ReinvestmentPrice.GetVector(); }
 	void SetupReinvBond(
 		const QString& IntrVec
@@ -41,12 +41,13 @@ public:
 	void SetCPR(const QString& a);
 	void SetCDR(const QString& a);
 	void SetLS(const QString& a);
+	void SetReinvestmentDelay(const QString& a);
+	void SetRecoveryLag(const QString& a);
+	void SetDelinquency(const QString& a);
+	void SetDelinquencyLag(const QString& a);
 	QString GetDelinquencyLag() const { return m_DelinquencyLag.GetVector(); }
 	QString GetRecoveryLag() const { return m_RecoveryLag.GetVector(); }
 	QString GetDelinquency() const { return m_Delinquency.GetVector(); }
-	void GetDelinquencyLag(const QString& a) { m_DelinquencyLag = a; }
-	void GetRecoveryLag(const QString& a) { m_RecoveryLag = a; }
-	void GetDelinquency(const QString& a) { m_Delinquency = a; }
 	QString GetReinvestmentSpreadOverTime() const { return m_ReinvestmentSpreadOverTime.GetVector(); }
 	void SetReinvestmentSpreadOverTime(const QString& val) { m_ReinvestmentSpreadOverTime = val; }
 	friend QDataStream& operator<<(QDataStream & stream, const ReinvestmentTest& flows);
@@ -59,7 +60,7 @@ protected:
 	BloombergVector LSAssumption;
 	BloombergVector WALAssumption;
 	BloombergVector ReinvestmentPrice;
-	IntegerVector ReinvestmentDelay;
+	IntegerVector m_ReinvestmentDelay;
 	IntegerVector m_RecoveryLag;
 	BloombergVector m_Delinquency;
 	IntegerVector m_DelinquencyLag;

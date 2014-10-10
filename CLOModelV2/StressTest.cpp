@@ -5,7 +5,7 @@
 #include <QApplication>
 #include <QDir>
 #include <QFile>
-#include "quazip/JlCompress.h"
+#include <quazip/JlCompress.h>
 #include "BloombergVector.h"
 #include "MtgCalculator.h"
 #include <QMessageBox>
@@ -157,6 +157,7 @@ void StressTest::RunCurrentScenario() {
 			return;
 		}
 		m_RainbowTable.insert(qHash(CurrentAss, 88), CurrentAss);
+		Structure.SetAssumptions(CurrentAss);
 		TranchesCalculator->AddWaterfall(Structure, qHash(CurrentAss, 88));
 		emit CurrentScenarioCalculated();
 	}
@@ -191,6 +192,7 @@ void StressTest::SlowLoansCalculated() {
 		return;
 	}
 	m_RainbowTable.insert(qHash(CurrentAss, 88), CurrentAss);
+	Structure.SetAssumptions(CurrentAss);
 	TranchesCalculator->AddWaterfall(Structure, qHash(CurrentAss, 88));
 	emit CurrentScenarioCalculated();
 }

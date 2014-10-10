@@ -10,6 +10,7 @@
 #include "PoolSizeTrigger.h"
 #include "TrancheTrigger.h"
 #include <QStack>
+#include "AssumptionSet.h"
 const WatFalPrior* Waterfall::GetStep(int Index)const {
 	if(Index<0 || Index>=m_WaterfallStesps.size()) return NULL;
 	return m_WaterfallStesps.at(Index);
@@ -1979,4 +1980,13 @@ MtgCashFlow Waterfall::GetAggregatedMtgFlows() const {
 		Result.AddFlow(m_CalculatedMtgPayments.AggregateRange(benchFlow.GetDate(i - 1), benchFlow.GetDate(i)));
 	}
 	return Result;
+}
+
+void Waterfall::SetAssumptions(const AssumptionSet& a) {
+	m_ReinvestmentTest.SetCPR(a.GetCPRscenario());
+	m_ReinvestmentTest.SetCDR(a.GetCDRscenario());
+	m_ReinvestmentTest.SetLS(a.GetLSscenario());
+	m_ReinvestmentTest.SetRecoveryLag(a.GetRecLagScenario());
+	m_ReinvestmentTest.SetDelinquency(a.GetDelinqScenario());
+	m_ReinvestmentTest.SetDelinquencyLag(a.GetDelinqLagScenario());
 }

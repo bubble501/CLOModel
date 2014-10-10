@@ -15,6 +15,7 @@
 #include "AbstractTrigger.h"
 #include "PrincipalProceeds.h"
 #include "TriggersResults.h"
+class AssumptionSet;
 class Waterfall : public BackwardInterface{
 private:
 	QList<ReserveFund*> m_Reserves;
@@ -156,6 +157,7 @@ public:
 	GenericCashFlow GetAggregatedGIC() const;
 	MtgCashFlow GetAggregatedMtgFlows() const;
 	//////////////////////////////////////////////////////////////////////////
+	void SetAssumptions(const AssumptionSet& a);
 	const TriggersResults& GetTriggersResults() const { return m_TriggersResults; }
 	void SetTrigger(quint32 key, QSharedPointer<AbstractTrigger> val);
 	void ResetTriggers();

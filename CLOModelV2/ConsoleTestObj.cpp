@@ -1,11 +1,14 @@
 #include "ConsoleTestObj.h"
-
+#include "StressTest.h"
+#include <QSharedPointer>
 ConsoleTestObj::ConsoleTestObj(QObject *parent)
 	: QObject(parent)
+	, TempStress(nullptr)
 {
 	connect(&TempUnit, &CentralUnit::CalculationFinished, this, &ConsoleTestObj::PrintOutput);
 	//BBVALTest();
-	SlateTest();
+	//SlateTest();
+	TestStressTest();
 }
 
 void ConsoleTestObj::BBVALTest() {
@@ -268,9 +271,8 @@ void ConsoleTestObj::BBVALTest() {
 }
 
 void ConsoleTestObj::PrintOutput() {
-	PrintToTempFile("Loans",TempUnit.GetStructure().GetCalculatedMtgPayments().ToString());
-	for (int i = 0; i < TempUnit.GetStructure().GetTranchesCount(); i++) {
-		PrintToTempFile(TempUnit.GetStructure().GetTranche(i)->GetTrancheName(), TempUnit.GetStructure().GetTranche(i)->GetCashFlow().ToString());
+	for (auto i = TempStress->GetResults().constBegin(); i != TempStress->GetResults().constEnd(); ++i) {
+		PrintToTempFile(i.key().ToString(), i.value()->GetTranche(0)->GetCashFlow().ToString(), false);
 	}
 }
 
@@ -1794,4 +1796,52 @@ void ConsoleTestObj::SlateTest() {
 
 	TempUnit.GetBaseRatesDatabase(LiborCurve);
 	TempUnit.Calculate();
+}
+
+void ConsoleTestObj::TestStressTest() {
+	Waterfall TempWtf, TempCallWaterfall;
+	MtgCalculator TempLoanCalc;
+	QFile file("//synserver2/Company Share/24AM/Monitoring/Model Results/HARVT 10X.clom");
+	//QFile file("C:/Temp/.SavedInputs.clo");
+	file.open(QIODevice::ReadOnly);
+	qint32 VersionChecker;
+	QDataStream out(&file);
+	out.setVersion(QDataStream::Qt_5_3);
+	out >> VersionChecker;
+	if (VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) {
+		file.close();
+		return;
+	}
+	{QDate Junk; out >> Junk; }
+	{bool Junk; out >> Junk; }
+	{bool Junk; out >> Junk; }
+	TempWtf.SetLoadProtocolVersion(VersionChecker);
+	out >> TempWtf;
+	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
+	out >> TempCallWaterfall;
+	TempLoanCalc.SetLoadProtocolVersion(VersionChecker);
+	out >> TempLoanCalc;
+	file.close();
+
+	TempStress = new StressTest(this);
+	for (auto i = TempLoanCalc.GetLoans().constBegin(); i != TempLoanCalc.GetLoans().constEnd(); ++i) {
+		TempStress->AddLoan(*(i.value()));
+	}
+
+
+	TempStress->SetStructure(TempWtf);
+	QList<QString> TempList;
+	TempList << "0" << "10" << "20" << "30";// << "40" << "50" << "60" << "70" << "80" << "90" << "100";
+	foreach(const QString& tmpstr, TempList)
+		TempStress->AddLSscenarios(tmpstr);
+	TempList.clear();
+	TempList << "0.5" << "1" << "1.5" << "2";// << "2.5" << "3" << "3.5" << "4" << "4.5" << "5" << "5.5" << "6" << "6.5" << "7" << "7.5" << "8" << "8.5" << "9";
+	foreach(const QString& tmpstr, TempList)
+		TempStress->AddCDRscenarios(tmpstr);
+	TempStress->AddCPRscenarios("20 48S 5 12S 10 12S 30");
+	TempStress->SetUseFastVersion(false);
+	//TempStress.UseMultithread(false);
+	TempStress->SetStartDate(TempWtf.GetCalculatedMtgPayments().GetDate(0));
+	connect(TempStress, SIGNAL(AllFinished()), this, SLOT(PrintOutput()));
+	TempStress->RunStressTest();
 }

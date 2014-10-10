@@ -502,11 +502,22 @@ double __stdcall GetStressLoss(LPSAFEARRAY *ArrayData) {
 	DelinqScenario = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 	DelinqLagScenario = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 	SafeArrayUnaccessData(*ArrayData);
-	FolderPath += "\\.StressResult.fcsr";
-	if (!QFile::exists(FolderPath))return -1.0;
-	const Tranche* Result=StressTest::GetScenarioFromFile(FolderPath, CPRscenario, CDRscenario, LSscenario, RecLagScenario, DelinqScenario, DelinqLagScenario).GetTranche(TrancheName);
-	if (Result) return Result->GetLossRate();
-	return -1.0;
+	if (*(FolderPath.end() - 1) != '\\' && *(FolderPath.end() - 1) != '/') FolderPath += '/';
+	FolderPath += ".StressResult.fcsr";
+	LOGDEBUG(
+		QString("Path: %1\nTranche Name: %2\nCPR: %3\nCDR: %4\nLS: %5\nRecLag: %6\nDelinq: %7\nDelinqLag: %8")
+		.arg(FolderPath)
+		.arg(TrancheName)
+		.arg(CPRscenario)
+		.arg(CDRscenario)
+		.arg(LSscenario)
+		.arg(RecLagScenario)
+		.arg(DelinqScenario)
+		.arg(DelinqLagScenario)
+	);
+	if (!QFile::exists(FolderPath)) { LOGDEBUG("Returned -1"); return -1.0; }
+	Tranche Result=*(StressTest::GetScenarioFromFile(FolderPath, CPRscenario, CDRscenario, LSscenario, RecLagScenario, DelinqScenario, DelinqLagScenario).GetTranche(TrancheName));
+	return Result.GetLossRate();
 }
 double __stdcall GetStressDM(LPSAFEARRAY *ArrayData) {
 	QString FolderPath;
@@ -533,11 +544,11 @@ double __stdcall GetStressDM(LPSAFEARRAY *ArrayData) {
 	DelinqLagScenario = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 	NewPrice=pdFreq->dblVal; pdFreq++;
 	SafeArrayUnaccessData(*ArrayData);
-	FolderPath += "\\.StressResult.fcsr";
+	if (*(FolderPath.end() - 1) != '\\' && *(FolderPath.end() - 1) != '/') FolderPath += '/';
+	FolderPath += ".StressResult.fcsr";
 	if (!QFile::exists(FolderPath))return 0.0;
-	const Tranche* Result = StressTest::GetScenarioFromFile(FolderPath, CPRscenario, CDRscenario, LSscenario, RecLagScenario, DelinqScenario, DelinqLagScenario).GetTranche(TrancheName);
-	if (Result) return Result->GetDiscountMargin(NewPrice);
-	return 0.0;
+	Tranche Result = *(StressTest::GetScenarioFromFile(FolderPath, CPRscenario, CDRscenario, LSscenario, RecLagScenario, DelinqScenario, DelinqLagScenario).GetTranche(TrancheName));
+	return Result.GetDiscountMargin(NewPrice);
 }
 
 /*

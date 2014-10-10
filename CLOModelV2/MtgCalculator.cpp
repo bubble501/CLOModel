@@ -259,7 +259,7 @@ QDataStream& operator<<(QDataStream & stream, const MtgCalculator& flows){
 }
 QDataStream& MtgCalculator::LoadOldVersion(QDataStream& stream) {
 	Reset();
-	qint32 tempInt;
+	qint32 tempInt, TempKey;
 	stream >> tempInt;
 	stream >> m_CPRass;
 	stream >> m_CDRass;
@@ -269,11 +269,11 @@ QDataStream& MtgCalculator::LoadOldVersion(QDataStream& stream) {
 	stream >> m_DelinquencyLag;
 	stream >> StartDate;
 	Mortgage TmpMtg;
-	for (int i = 0; i < tempInt; i++) {
-		stream >> tempInt;
+	for (qint32 i = 0; i < tempInt; i++) {
+		stream >> TempKey;
 		TmpMtg.SetLoadProtocolVersion(m_LoadProtocolVersion);
 		stream >> TmpMtg;
-		AddLoan(TmpMtg, tempInt);
+		AddLoan(TmpMtg, TempKey);
 	}
 	ResetProtocolVersion();
 	return stream;

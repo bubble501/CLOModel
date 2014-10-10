@@ -20,28 +20,18 @@
 #include "CommonFunctions.h"
 #include "BloombergVector.h"
 #include "MtgCalculator.h"
+#include <QSettings>
 StandaloneStress::StandaloneStress(QWidget *parent)
 	: QWidget(parent)
 {
 	setWindowTitle("Standalone Stress Test");
 	setWindowIcon(QIcon(":/Icons/Logo.png"));
-	if(!QMetaType::isRegistered(qMetaTypeId<Waterfall>()))
-		qRegisterMetaType<Waterfall>("Waterfall");
-	if(!QMetaType::isRegistered(qMetaTypeId<MtgCashFlow>()))
-		qRegisterMetaType<MtgCashFlow>("MtgCashFlow");
+	RegisterAsMetaType<Waterfall>();
+	RegisterAsMetaType<MtgCashFlow>();
 	Stresser=new StressTest(this);
 	connect(Stresser,SIGNAL(AllFinished()),this,SLOT(Finished()));
 
 	QVBoxLayout* MainLay=new QVBoxLayout(this);
-	ConstantLabel=new QLabel(this);
-	ConstantLabel->setText("CPR");
-	ConstantLabel->setAlignment(Qt::AlignRight);
-	ConstantEdit=new QLineEdit(this);
-	ConstantEdit->setText("0");
-	StressTypeCombo=new QComboBox(this);
-	StressTypeCombo->addItem("CDR-LS",StressTest::ChangingCDR | StressTest::ChangingLS);
-	StressTypeCombo->addItem("CPR-LS", StressTest::ChangingCPR | StressTest::ChangingLS);
-	StressTypeCombo->addItem("CPR-CDR", StressTest::ChangingCDR | StressTest::ChangingCPR);
 	StressToCallBox=new QCheckBox(this);
 	StressToCallBox->setText("Stress To Call");
 	StressToCallBox->setChecked(false);
@@ -52,41 +42,25 @@ StandaloneStress::StandaloneStress(QWidget *parent)
 	
 	QHBoxLayout* TopLay=new QHBoxLayout;
 	QSpacerItem* TopSpace=new QSpacerItem(20,20,QSizePolicy::Expanding);
-	TopLay->addWidget(StressTypeCombo);
-	TopLay->addItem(TopSpace);
 	TopLay->addWidget(FastStressBox);
 	TopLay->addWidget(StressToCallBox);
-	TopLay->addWidget(ConstantLabel);
-	TopLay->addWidget(ConstantEdit);
+	TopLay->addItem(TopSpace);
+	QLabel* PathLabel = new QLabel(this);
+	PathLabel->setText("Model File:");
+	TopLay->addWidget(PathLabel);
+	PathEdit = new QLineEdit(this);
+	PathEdit->setText("");
+	PathEdit->setToolTip("Path to model clom file");
+	TopLay->addWidget(PathEdit);
+	QPushButton* BrowseButton = new QPushButton(this);
+	BrowseButton->setText("...");
+	connect(BrowseButton, SIGNAL(clicked()), this, SLOT(BrowseFolder()));
+	TopLay->addWidget(BrowseButton);
 	MainLay->addLayout(TopLay);
-	QHBoxLayout* PathLay=new QHBoxLayout;
-	PathEdit=new QLineEdit(this);
-	PathEdit->setText("C:\\Temp");
-	PathEdit->setToolTip("Folder Containing the .Loans.clp and .BaseCase.clo files for the relevant model<br/>Results will be put in this folder");
-	PathLay->addWidget(PathEdit);
-	QPushButton* BrowseButton=new QPushButton(this);
-	BrowseButton->setText("Browse...");
-	connect(BrowseButton,SIGNAL(clicked()),this,SLOT(BrowseFolder()));
-	PathLay->addWidget(BrowseButton);
-	MainLay->addLayout(PathLay);
-	QHBoxLayout *SpinnsLay=new QHBoxLayout;
-	QSpacerItem* SpinnsSpace=new QSpacerItem(20,20,QSizePolicy::Expanding);
-	for(int i=0;i<2;i++){
-		VariablesCountlabel[i]=new QLabel(this);
-		SpinnsLay->addWidget(VariablesCountlabel[i]);
-		VariablesCount[i]=new QSpinBox(this);
-		VariablesCount[i]->setMinimum(1);
-		VariablesCount[i]->setMaximum(99);
-		VariablesCount[i]->setValue(1);
-		SpinnsLay->addWidget(VariablesCount[i]);
-	}
-	VariablesCountlabel[0]->setText("CDR Scenarios");
-	VariablesCountlabel[1]->setText("LS Scenarios");
-	SpinnsLay->addItem(SpinnsSpace);
-	MainLay->addLayout(SpinnsLay);
 
+	
 	QGridLayout *TableLay=new QGridLayout;
-	for(int i=0;i<2;i++){
+	for(int i=0;i<NumStressDimentsions;i++){
 		VariablesList[i]=new QTableWidget(this);
 		VariablesList[i]->setColumnCount(1);
 		VariablesList[i]->setRowCount(1);
@@ -95,20 +69,44 @@ StandaloneStress::StandaloneStress(QWidget *parent)
 		VariablesList[i]->verticalHeader()->hide();
 		VariablesList[i]->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 		VariablesList[i]->setSelectionMode(QAbstractItemView::NoSelection);
-		TableLay->addWidget(VariablesList[i],0,i);
-		QPushButton *TempPasteButton=new QPushButton(this);
-		TempPasteButton->setText("Paste from Clipboard");
-		if(i==0) connect(TempPasteButton,SIGNAL(clicked()),this,SLOT(PasteFirst()));
-		else connect(TempPasteButton,SIGNAL(clicked()),this,SLOT(PasteSecond()));
-		TableLay->addWidget(TempPasteButton,1,i);
+		TableLay->addWidget(VariablesList[i], 1 + (3 * (i / (NumStressDimentsions / 2))), i % (NumStressDimentsions / 2));
+		PasteButton[i]= new QPushButton(this);
+		PasteButton[i]->setText("Paste from Clipboard");
+		TableLay->addWidget(PasteButton[i], 2 + (3 * (i / (NumStressDimentsions / 2))), i % (NumStressDimentsions / 2));
+		QHBoxLayout *SpinnsLay = new QHBoxLayout;
+		VariablesCountlabel[i] = new QLabel(this);
+		SpinnsLay->addWidget(VariablesCountlabel[i]);
+		VariablesCount[i] = new QSpinBox(this);
+		VariablesCount[i]->setMinimum(1);
+		VariablesCount[i]->setMaximum(99);
+		VariablesCount[i]->setValue(1);
+		SpinnsLay->addWidget(VariablesCount[i]);
+		TableLay->addLayout(SpinnsLay, 3 * (i / (NumStressDimentsions / 2)), i % (NumStressDimentsions / 2));
 	}
+	VariablesCountlabel[0]->setText("CPR Scenarios");
+	VariablesCountlabel[1]->setText("CDR Scenarios");
+	VariablesCountlabel[2]->setText("LS Scenarios");
+	VariablesCountlabel[3]->setText("Recovery Lag Scenarios");
+	VariablesCountlabel[4]->setText("Delinquency Scenarios");
+	VariablesCountlabel[5]->setText("Delinquency Lag Scenarios");
 	{
 		QStringList TmpStrList;
-		TmpStrList<< "CDR";
+		TmpStrList << "CPR";
 		VariablesList[0]->setHorizontalHeaderLabels(TmpStrList);
+		TmpStrList<< "CDR";
+		VariablesList[1]->setHorizontalHeaderLabels(TmpStrList);
 		TmpStrList.clear();
 		TmpStrList<< "LS";
-		VariablesList[1]->setHorizontalHeaderLabels(TmpStrList);
+		VariablesList[2]->setHorizontalHeaderLabels(TmpStrList);
+		TmpStrList.clear();
+		TmpStrList << "Recovery Lag";
+		VariablesList[3]->setHorizontalHeaderLabels(TmpStrList);
+		TmpStrList.clear();
+		TmpStrList << "Delinquency";
+		VariablesList[4]->setHorizontalHeaderLabels(TmpStrList);
+		TmpStrList.clear();
+		TmpStrList << "Delinquency Lag";
+		VariablesList[5]->setHorizontalHeaderLabels(TmpStrList);
 	}
 	MainLay->addLayout(TableLay);
 
@@ -120,8 +118,6 @@ StandaloneStress::StandaloneStress(QWidget *parent)
 	BottomLay->addWidget(StartButton);
 	MainLay->addLayout(BottomLay);
 
-	connect(StressTypeCombo,SIGNAL(currentIndexChanged(int)),this,SLOT(ChangeType(int)));
-	connect(ConstantEdit,SIGNAL(editingFinished()),this,SLOT(CheckAllValid()),Qt::QueuedConnection);
 	connect(PathEdit,SIGNAL(editingFinished()),this,SLOT(CheckAllValid()),Qt::QueuedConnection);
 	connect(StartButton,SIGNAL(clicked()),this,SLOT(Start()));
 	for(int i=0;i<2;i++){
@@ -133,37 +129,24 @@ StandaloneStress::StandaloneStress(QWidget *parent)
 
 void StandaloneStress::CheckAllValid(){
 	StartButton->setEnabled(true);
-	ConstantEdit->setStyleSheet("");
 	PathEdit->setStyleSheet("");
 	QDir dir(PathEdit->text());
 	if(!dir.exists() || !QFile::exists(dir.absolutePath()+"/.Loans.clp") || !QFile::exists(dir.absolutePath()+"/.BaseCase.clo")){
 		StartButton->setEnabled(false);
 		PathEdit->setStyleSheet("background-color: red;");
 	}
-	if (StressTypeCombo->currentData() == (StressTest::ChangingCDR | StressTest::ChangingCPR)) {
-		if (BloombergVector(ConstantEdit->text()).IsEmpty()) {
-			StartButton->setEnabled(false);
-			ConstantEdit->setStyleSheet("background-color: red;");
-		}
-	}
-	else {
-		if (BloombergVector(ConstantEdit->text()).IsEmpty(0.0,1.0)) {
-			StartButton->setEnabled(false);
-			ConstantEdit->setStyleSheet("background-color: red;");
-		}
-	}
-	for(int i=0;i<2;i++){
+	for(int i=0;i<NumStressDimentsions;i++){
 		for(int j=0;j<VariablesList[i]->rowCount();j++){
 			if(VariablesList[i]->item(j,0)){
-				if ((StressTypeCombo->currentData() != (StressTest::ChangingCDR | StressTest::ChangingCPR)) && i == 1) {
-					if (BloombergVector(VariablesList[i]->item(j, 0)->text()).IsEmpty()) {
+				if (i<3 || i==4) {
+					if (BloombergVector(VariablesList[i]->item(j, 0)->text()).IsEmpty(0.0, 1.0)) {
 						StartButton->setEnabled(false);
 						VariablesList[i]->item(j, 0)->setBackgroundColor(Qt::red);
 					}
 					else VariablesList[i]->item(j, 0)->setBackgroundColor(Qt::white);
 				}
 				else {
-					if (BloombergVector(VariablesList[i]->item(j, 0)->text()).IsEmpty(0.0, 1.0)) {
+					if (IntegerVector(VariablesList[i]->item(j, 0)->text()).IsEmpty(0)) {
 						StartButton->setEnabled(false);
 						VariablesList[i]->item(j, 0)->setBackgroundColor(Qt::red);
 					}
@@ -174,52 +157,8 @@ void StandaloneStress::CheckAllValid(){
 		}
 	}
 }
-void StandaloneStress::ChangeType(int tpInd){
-	switch(tpInd){
-	case 1:
-		{
-			QStringList TmpStrList;
-			TmpStrList<< "CPR";
-			VariablesList[0]->setHorizontalHeaderLabels(TmpStrList);
-			TmpStrList.clear();
-			TmpStrList<< "LS";
-			VariablesList[1]->setHorizontalHeaderLabels(TmpStrList);
-		}
-		VariablesCountlabel[0]->setText("CPR Scenarios");
-		VariablesCountlabel[1]->setText("LS Scenarios");
-		ConstantLabel->setText("CDR");
-		break;
-	case 2:
-		{
-			QStringList TmpStrList;
-			TmpStrList<< "CPR";
-			VariablesList[0]->setHorizontalHeaderLabels(TmpStrList);
-			TmpStrList.clear();
-			TmpStrList<< "CDR";
-			VariablesList[1]->setHorizontalHeaderLabels(TmpStrList);
-		}
-		VariablesCountlabel[0]->setText("CPR Scenarios");
-		VariablesCountlabel[1]->setText("CDR Scenarios");
-		ConstantLabel->setText("LS");
-		break;
-	case 0:
-	default:
-		{
-			QStringList TmpStrList;
-			TmpStrList<< "CDR";
-			VariablesList[0]->setHorizontalHeaderLabels(TmpStrList);
-			TmpStrList.clear();
-			TmpStrList<< "LS";
-			VariablesList[1]->setHorizontalHeaderLabels(TmpStrList);
-		}
-		VariablesCountlabel[0]->setText("CDR Scenarios");
-		VariablesCountlabel[1]->setText("LS Scenarios");
-		ConstantLabel->setText("CPR");
-	}
-}
 void StandaloneStress::RowsChanged(){
 	int OldNum;
-	
 	for(int i=0;i<2;i++){
 		int Debug=VariablesCount[i]->value();
 		OldNum=VariablesList[i]->rowCount();
@@ -270,27 +209,7 @@ void StandaloneStress::Start(){
 
 
 
-	Stresser->SetConstantPar(ConstantEdit->text());
-	QStringList TempStrLst; 
-	for(int i=0;i<VariablesList[0]->rowCount();i++) TempStrLst.append(VariablesList[0]->item(i,0)->text());
-	Stresser->SetXSpann(TempStrLst);
-	TempStrLst.clear();
-	for(int i=0;i<VariablesList[1]->rowCount();i++) TempStrLst.append(VariablesList[1]->item(i,0)->text());
-	Stresser->SetYSpann(TempStrLst);
-	switch(StressTypeCombo->currentData().toInt()){
-	case StressTest::ChangingCPR | StressTest::ChangingLS:
-		Stresser->SetXVariability(StressTest::ChangingCPR);
-		Stresser->SetYVariability(StressTest::ChangingLS);
-		break;
-	case StressTest::ChangingCPR | StressTest::ChangingCDR:
-		Stresser->SetXVariability(StressTest::ChangingCPR);
-		Stresser->SetYVariability(StressTest::ChangingCDR);
-		break;
-	case StressTest::ChangingCDR | StressTest::ChangingLS:
-	default:
-		Stresser->SetXVariability(StressTest::ChangingCDR);
-		Stresser->SetYVariability(StressTest::ChangingLS);
-	}
+
 	Stresser->SetStartDate(StartDate);
 	TempWaterfall.SetUseCall(StressToCallBox->isChecked());
 	Stresser->SetStructure(TempWaterfall);
@@ -371,9 +290,13 @@ void StandaloneStress::PasteSecond(){
 void StandaloneStress::BrowseFolder(){
 	QDir dir(PathEdit->text());
 	QString StdPath;
-	if (dir.exists()) StdPath=dir.absolutePath();
-	else StdPath=QString();
-	QString SelectedDir = QFileDialog::getExistingDirectory(this, tr("Select Working Directory"),StdPath);
+	if (dir.exists() && !PathEdit->text().isEmpty()) StdPath = dir.absolutePath();
+	else {
+		QSettings ConfigIni(":/Configs/GlobalConfigs.ini", QSettings::IniFormat);
+		ConfigIni.beginGroup("Folders");
+		StdPath=ConfigIni.value("UnifiedResultsFolder", "\\\\synserver2\\Company Share\\24AM\\Monitoring\\Model Results").toString();
+	}
+	QString SelectedDir = QFileDialog::getOpenFileName(this, tr("Select Model File"), StdPath, tr("CLO Model Files (*.clom)"));
 	if(!SelectedDir.isEmpty()) PathEdit->setText(SelectedDir);
 	CheckAllValid();
 }

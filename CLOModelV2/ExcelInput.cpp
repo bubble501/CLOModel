@@ -554,29 +554,6 @@ double __stdcall GetStressDM(LPSAFEARRAY *ArrayData) {
 		return Result->GetDiscountMargin(NewPrice);
 	return 0.0;
 }
-
-/*
-void __stdcall StressTargetChanged(LPSAFEARRAY *ArrayData){
-	StressTest TempStress;
-	VARIANT HUGEP *pdFreq;
-	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
-	if (!SUCCEEDED(hr)) return;
-	QString FolderPath=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
-	QString TrancheName=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
-	QString TargetCell=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
-	int XVar=pdFreq->intVal;pdFreq++;
-	int YVar=pdFreq->intVal;pdFreq++;
-	double NewPrice=pdFreq->dblVal;pdFreq++;
-	QString PlotSheet=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
-	int PlotIndex=pdFreq->intVal;pdFreq++;
-	SafeArrayUnaccessData(*ArrayData);
-	QString Filename=(FolderPath+"\\.StressResult%1%2.fcsr").arg(XVar).arg(YVar);
-	if(!QFile::exists(Filename))return;
-	TempStress.LoadResultsFromFile(Filename);
-	ExcelOutput::PrintStressTest(TempStress,TrancheName,TargetCell,true);
-	if(!PlotSheet.isEmpty() && PlotIndex>0)
-		ExcelOutput::PlotStressMargin(TempStress,PlotSheet,PlotIndex,TrancheName,NewPrice);
-}*/
 /*
 void __stdcall InspectStress(LPSAFEARRAY *ArrayData){
 	Waterfall TempStructure;

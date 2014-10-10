@@ -24,21 +24,20 @@ public:
 private slots:
 	void Start();
 	void Finished();
-	void ChangeType(int tpInd);
 	void CheckAllValid();
 	void RowsChanged();
 	void PasteFirst();
 	void PasteSecond();
 	void BrowseFolder();
 private:
-	QLabel* ConstantLabel;
+	QPushButton *PasteButton[NumStressDimentsions];
 	StressTest *Stresser;
-	QTableWidget* VariablesList[2];
-	QLineEdit* ConstantEdit;
-	QComboBox* StressTypeCombo;
+	QTableWidget* VariablesList[NumStressDimentsions];
+
+	
 	QLineEdit* PathEdit;
-	QLabel* VariablesCountlabel[2];
-	QSpinBox* VariablesCount[2];
+	QLabel* VariablesCountlabel[NumStressDimentsions];
+	QSpinBox* VariablesCount[NumStressDimentsions];
 	QPushButton* StartButton;
 	QCheckBox* StressToCallBox;
 	QCheckBox* FastStressBox;

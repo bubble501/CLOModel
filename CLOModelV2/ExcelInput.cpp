@@ -524,7 +524,6 @@ double __stdcall GetStressLoss(LPSAFEARRAY *ArrayData) {
 }
 double __stdcall GetStressDM(LPSAFEARRAY *ArrayData) {
 	QString FolderPath;
-	QString DestPath;
 	QString CPRscenario;
 	QString CDRscenario;
 	QString LSscenario;
@@ -538,20 +537,22 @@ double __stdcall GetStressDM(LPSAFEARRAY *ArrayData) {
 	if (!SUCCEEDED(hr)) return 0.0;
 	FolderPath = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 	TrancheName = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
-	DestPath = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 	CPRscenario = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 	CDRscenario = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 	LSscenario = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 	RecLagScenario = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 	DelinqScenario = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 	DelinqLagScenario = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
-	NewPrice=pdFreq->dblVal; pdFreq++;
+	NewPrice = pdFreq->dblVal; pdFreq++;
 	SafeArrayUnaccessData(*ArrayData);
 	if (*(FolderPath.end() - 1) != '\\' && *(FolderPath.end() - 1) != '/') FolderPath += '/';
 	FolderPath += ".StressResult.fcsr";
-	if (!QFile::exists(FolderPath))return 0.0;
-	Tranche Result = *(StressTest::GetScenarioFromFile(FolderPath, CPRscenario, CDRscenario, LSscenario, RecLagScenario, DelinqScenario, DelinqLagScenario).GetTranche(TrancheName));
-	return Result.GetDiscountMargin(NewPrice);
+	if (!QFile::exists(FolderPath)) { return 0.0; }
+	Waterfall TempRes = StressTest::GetScenarioFromFile(FolderPath, CPRscenario, CDRscenario, LSscenario, RecLagScenario, DelinqScenario, DelinqLagScenario);
+	const Tranche* Result = TempRes.GetTranche(TrancheName);
+	if (Result)
+		return Result->GetDiscountMargin(NewPrice);
+	return 0.0;
 }
 
 /*

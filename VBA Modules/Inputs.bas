@@ -1182,52 +1182,97 @@ End Function
 Public Sub StressTargetEvent(NewTrancheName As String, StressSheet As String, StressTargetCell As String, Xvar As Long, Yvar As Long, NewPrice As Double, Optional PlotSheet As String = "", Optional PlotIndex As Long = 1)
     Dim Xspan As Range
     Dim Yspan As Range
-    Dim i As Long, j As Long
-    Dim result(0 To 7) As Variant
-    result(0) = Left(ActiveWorkbook.FullName, InStrRev(ActiveWorkbook.FullName, "\"))
-    result(1) = NewTrancheName
-    result(5) = "0"
-    result(6) = "0"
-    result(7) = "0"
-    Call ShowProgress("Updating Loss Values")
+    Dim i As Long, j As Long, k As Long
+    Dim LossInput(0 To 7) As Variant
+    Dim DMInput(0 To 8)
+    DMInput(8) = NewPrice
+    LossInput(0) = Left(ActiveWorkbook.FullName, InStrRev(ActiveWorkbook.FullName, "\"))
+    LossInput(1) = NewTrancheName
+    LossInput(5) = "0"
+    LossInput(6) = "0"
+    LossInput(7) = "0"
+    Call ShowProgress("Updating Stress Values")
     Set Xspan = Range(Sheets(StressSheet).Range(StressTargetCell).Offset(0, -1), Sheets(StressSheet).Range(StressTargetCell).Offset(0, -1).End(xlDown))
     Set Yspan = Range(Sheets(StressSheet).Range(StressTargetCell).Offset(-1, 0), Sheets(StressSheet).Range(StressTargetCell).Offset(-1, 0).End(xlToRight))
     Dim LossValues() As Double
+    Dim MarginValues() As Double
     ReDim LossValues(0 To Xspan.Count - 1, 0 To Yspan.Count - 1)
+    ReDim MarginValues(0 To Xspan.Count - 1, 0 To Yspan.Count - 1)
     If (Xvar + Yvar = 1) Then
-        result(2) = CStr(Sheets(StressSheet).Range(StressTargetCell).Offset(-1, -1).Value)
+        LossInput(2) = CStr(Sheets(StressSheet).Range(StressTargetCell).Offset(-1, -1).Value)
     ElseIf (Xvar + Yvar = 2) Then
-        result(4) = CStr(Sheets(StressSheet).Range(StressTargetCell).Offset(-1, -1).Value)
+        LossInput(4) = CStr(Sheets(StressSheet).Range(StressTargetCell).Offset(-1, -1).Value)
     Else
-        result(3) = CStr(Sheets(StressSheet).Range(StressTargetCell).Offset(-1, -1).Value)
+        LossInput(3) = CStr(Sheets(StressSheet).Range(StressTargetCell).Offset(-1, -1).Value)
     End If
     For i = 1 To Xspan.Count
         If (Xvar = 0) Then
-            result(3) = CStr(Xspan.Cells(i, 1).Value)
+            LossInput(3) = CStr(Xspan.Cells(i, 1).Value)
         ElseIf (Xvar = 1) Then
-            result(4) = CStr(Xspan.Cells(i, 1).Value)
+            LossInput(4) = CStr(Xspan.Cells(i, 1).Value)
         Else
-            result(2) = CStr(Xspan.Cells(i, 1).Value)
+            LossInput(2) = CStr(Xspan.Cells(i, 1).Value)
         End If
         
         For j = 1 To Yspan.Count
             If (Yvar = 0) Then
-                result(3) = CStr(Yspan.Cells(1, j).Value)
+                LossInput(3) = CStr(Yspan.Cells(1, j).Value)
             ElseIf (Yvar = 1) Then
-                result(4) = CStr(Yspan.Cells(1, j).Value)
+                LossInput(4) = CStr(Yspan.Cells(1, j).Value)
             Else
-                result(2) = CStr(Yspan.Cells(1, j).Value)
+                LossInput(2) = CStr(Yspan.Cells(1, j).Value)
             End If
-            LossValues(i - 1, j - 1) = GetStressLoss(result)
+            For k = 0 To 7
+                DMInput(k) = LossInput(k)
+            Next k
+            LossValues(i - 1, j - 1) = GetStressLoss(LossInput)
+            MarginValues(i - 1, j - 1) = GetStressDM(DMInput)
             Call SetProgress((((i - 1) * Yspan.Count) + j) / (Xspan.Count * Yspan.Count))
         Next j
     Next i
+    On Error GoTo no_plot_found
     Sheets(StressSheet).Range(StressTargetCell).Resize(Xspan.Count, Yspan.Count) = LossValues
+    On Error GoTo 0
     Dim SingleCell
     For Each SingleCell In Sheets(StressSheet).Range(StressTargetCell).Resize(Xspan.Count, Yspan.Count)
         If (SingleCell.Value = -1#) Then SingleCell.Value = CVErr(xlErrValue)
     Next SingleCell
+    Dim TargetPlot As Chart
+    Set TargetPlot = Sheets(PlotSheet).ChartObjects(PlotIndex).Chart
+    While (TargetPlot.SeriesCollection.Count > 0)
+        TargetPlot.SeriesCollection(1).Delete
+    Wend
+    Dim TempValue() As Double
+    Dim TempXVal() As Double
+    ReDim TempValue(1 To Xspan.Count)
+    ReDim TempXVal(1 To Xspan.Count)
+    For j = 1 To Xspan.Count
+        TempXVal(j) = Xspan.Cells(j, 1).Value
+    Next j
+    For i = 1 To Yspan.Count
+        For j = 1 To Xspan.Count
+            TempValue(j) = MarginValues(j - 1, i - 1)
+        Next j
+        With TargetPlot.SeriesCollection.NewSeries
+            .Name = Yspan.Cells(1, i)
+            .Values = TempValue
+            .XValues = TempXVal
+        End With
+    Next i
+    With TargetPlot
+        .ChartType = xlSurface
+        .HasLegend = False
+        .HasTitle = True
+        .Axes(xlValue).HasTitle = True
+        .Axes(xlCategory).HasTitle = True
+        .Axes(xlTimeScale).HasTitle = True
+        .ChartTitle.Text = "Discount Margin Sensitivity"
+        .Axes(xlValue).AxisTitle.Caption = "Discount Margin"
+        .Axes(xlCategory).ReversePlotOrder = False
+        .Axes(xlTimeScale).ReversePlotOrder = True
+    End With
     Call HideProgress
+no_plot_found:
 End Sub
 Public Sub SeparateWaterfall( _
     InputsSheet As String, _

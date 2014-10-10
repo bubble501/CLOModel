@@ -449,47 +449,7 @@ End Sub
         End If
     End With
 End Sub
-Public Sub PrintStressTest( _
-    StressValues As Variant, _
-    DestinatAddress As String, _
-    SetupConditionalFormatting As Boolean _
-)
-    Application.ScreenUpdating = False
-    Dim TargetCell As Range
-    Dim DestinationAddress As String
-    DestinationAddress = Right(DestinatAddress, Len(DestinatAddress) - InStr(1, DestinatAddress, "!"))
-    Set TargetCell = Sheets(Left(DestinatAddress, InStr(1, DestinatAddress, "!") - 1)).Cells( _
-            CLng(Left(DestinationAddress, InStr(1, DestinationAddress, ",") - 1)), _
-            CLng(Right(DestinationAddress, Len(DestinationAddress) - InStr(1, DestinationAddress, ","))) _
-        )
-    If (TargetCell.Count > 1) Then Set TargetCell = TargetCell.Cells(1, 1)
-    Dim i As Long, j As Long
-    For i = LBound(StressValues, 1) To UBound(StressValues, 1)
-        For j = LBound(StressValues, 2) To UBound(StressValues, 2)
-            With TargetCell.Offset(i - LBound(StressValues, 1), j - LBound(StressValues, 2))
-                .Value = StressValues(i, j)
-                .NumberFormat = "0.00%"
-            End With
-        Next j
-    Next i
-    Set TargetCell = TargetCell.Resize(UBound(StressValues, 1) - LBound(StressValues, 1) + 1, UBound(StressValues, 2) - LBound(StressValues, 2) + 1)
-    With TargetCell
-        With .Borders
-            .LineStyle = xlContinuous
-            .Weight = xlMedium
-            .ColorIndex = xlAutomatic
-        End With
-        .Borders(xlInsideVertical).Weight = xlThin
-        .Borders(xlInsideHorizontal).Weight = xlThin
-        If (SetupConditionalFormatting) Then
-            .FormatConditions.Delete
-            .Interior.Color = RGB(146, 208, 80)
-            .FormatConditions.Add(xlCellValue, xlGreaterEqual, "1").Interior.Color = RGB(255, 0, 0)
-            .FormatConditions.Add(xlCellValue, xlGreaterEqual, "0.0001").Interior.Color = RGB(255, 192, 0)
-        End If
-    End With
-    Application.ScreenUpdating = True
-End Sub
+
 Public Sub PrintMergedCell(msg As String, DestinatAddress As String, RowSpann As Long, ColSpann As Long, FillColor As String)
     Application.ScreenUpdating = False
     Dim TargetCell As Range
@@ -1003,50 +963,6 @@ Public Sub PlotCostFunding( _
     End If
 End Sub
 
-Public Sub PlotStressMargin( _
-    TargetPlotSheet As String, _
-    TargetPlotIndex As Long, _
-    Values As Variant, _
-    Xvar As Long, _
-    Yvar As Long, _
-    XHeader As Variant, _
-    YHeader As Variant _
-)
-    Dim TargetPlot As Chart
-    Dim i As Long, j As Long
-    Set TargetPlot = Sheets(TargetPlotSheet).ChartObjects(TargetPlotIndex).Chart
-    While (TargetPlot.SeriesCollection.Count > 0)
-        TargetPlot.SeriesCollection(1).Delete
-    Wend
-    Dim TempValue() As Double
-    ReDim TempValue(1 To UBound(Values, 1))
-    ReDim TempXVal(1 To UBound(Values, 1))
-    For j = 1 To UBound(Values, 1)
-        TempXVal(j) = XHeader(j)
-    Next j
-    For i = 1 To UBound(Values, 2)
-        For j = 1 To UBound(Values, 1)
-            TempValue(j) = Values(j, i)
-        Next j
-        With TargetPlot.SeriesCollection.NewSeries
-            .Name = YHeader(i)
-            .Values = TempValue
-            .XValues = TempXVal
-        End With
-    Next i
-    With TargetPlot
-        .ChartType = xlSurface
-        .HasLegend = False
-        .HasTitle = True
-        .Axes(xlValue).HasTitle = True
-        .Axes(xlCategory).HasTitle = True
-        .Axes(xlTimeScale).HasTitle = True
-        .ChartTitle.Text = "Discount Margin Sensitivity"
-        .Axes(xlValue).AxisTitle.Caption = "Discount Margin"
-        .Axes(xlCategory).ReversePlotOrder = False
-        .Axes(xlTimeScale).ReversePlotOrder = True
-    End With
-End Sub
 Public Sub PlotCPRLS( _
     TargetPlotSheet As String, _
     TargetPlotIndex As Long, _

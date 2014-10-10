@@ -18,7 +18,11 @@ Private Sub Worksheet_Change(ByVal Target As Range)
             NewPrice = PriceCell.Value
             Application.ScreenUpdating = False
             Call StressTargetEvent(Me.Range("A1").Value, Me.Name, "C3", 0, 1, NewPrice, Me.Name, 1)
+            Application.ScreenUpdating = True
+            Application.ScreenUpdating = False
             Call StressTargetEvent(Me.Range("A1").Value, Me.Name, "Q3", 2, 1, NewPrice, Me.Name, 2)
+            Application.ScreenUpdating = True
+            Application.ScreenUpdating = False
             Call StressTargetEvent(Me.Range("A1").Value, Me.Name, "AE3", 2, 0, NewPrice, Me.Name, 3)
             Application.ScreenUpdating = True
             Me.Protect UserInterfaceOnly:=True, AllowFormattingCells:=True, AllowFormattingColumns:=True, AllowFormattingRows:=True

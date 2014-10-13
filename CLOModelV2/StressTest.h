@@ -104,7 +104,6 @@ public:
 	const QDate& GetStartDate()const{return StartDate;}
 	const QHash<AssumptionSet, QSharedPointer<Waterfall> > & GetResults() const { return Results; }
 	bool GetUseMultithread()const {return !SequentialComputation;}
-	void ResetResult();
 	void AddLoan(const Mortgage& a);
 	void ResetLoans();
 	void SetStructure(const Waterfall& a){Structure=a;}
@@ -118,6 +117,7 @@ public:
 	static Waterfall GetScenarioFromFile(const QString& DestPath, const QString& CPRscenario, const QString& CDRscenario, const QString& LSscenario, const QString& RecLagScenario, const QString& DelinqScenario, const QString& DelinqLagScenario);
 	quint32 CountScenarios()const;
 	void ResetResults() { Results.clear(); }
+	void ResetScenarios();
 public slots:
 	void RunStressTest();
 	void StopCalculation();

@@ -524,6 +524,10 @@ void StressTest::HandleWtfProgress(double pr) {
 	if (ProgressForm) ProgressForm->SetValue(10000+static_cast<int>(pr*100.0));
 }
 
+void StressTest::ResetScenarios() {
+	for (int i = 0; i < NumStressDimentsions; i++) m_AssumptionsRef[i]->clear();
+}
+
 
 
 

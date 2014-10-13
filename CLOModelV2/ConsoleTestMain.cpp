@@ -20,10 +20,12 @@
 #include <QTextStream>
 #include "DateTrigger.h"
 #include "PoolSizeTrigger.h"
-
+#include "StressViewer.h"
 int main(int argc, char *argv[]) {
 	QApplication a(argc, argv);
-	ConsoleTestObj b;
+	StressViewer b;
+	b.LoadStress("C:/Temp/.StressResult.fcsr");
+	b.show();
 	return a.exec();
 
 	/*Waterfall TempWtf, TempCallWaterfall;

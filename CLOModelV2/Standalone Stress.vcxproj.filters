@@ -158,32 +158,32 @@
     <ClInclude Include="BackwardCompatibilityInterface.h">
       <Filter>Header Files\Core Files</Filter>
     </ClInclude>
+    <ClInclude Include="AssumptionSet.h">
+      <Filter>Header Files\Core Files</Filter>
+    </ClInclude>
     <ClInclude Include="AbstractTrigger.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Core Files</Filter>
     </ClInclude>
     <ClInclude Include="DateTrigger.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Core Files</Filter>
     </ClInclude>
     <ClInclude Include="PoolSizeTrigger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TrancheTrigger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AssumptionSet.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Seniority.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Core Files</Filter>
     </ClInclude>
     <ClInclude Include="PrincipalProceeds.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Core Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Seniority.h">
+      <Filter>Header Files\Core Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TrancheTrigger.h">
+      <Filter>Header Files\Core Files</Filter>
     </ClInclude>
     <ClInclude Include="TriggersResults.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Core Files</Filter>
     </ClInclude>
     <ClInclude Include="VectorTrigger.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Core Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -487,31 +487,31 @@
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="AbstractTrigger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DateTrigger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PoolSizeTrigger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TrancheTrigger.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Core Files</Filter>
     </ClCompile>
     <ClCompile Include="AssumptionSet.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Core Files</Filter>
     </ClCompile>
-    <ClCompile Include="Seniority.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="DateTrigger.cpp">
+      <Filter>Source Files\Core Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PoolSizeTrigger.cpp">
+      <Filter>Source Files\Core Files</Filter>
     </ClCompile>
     <ClCompile Include="PrincipalProceeds.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Core Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Seniority.cpp">
+      <Filter>Source Files\Core Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TrancheTrigger.cpp">
+      <Filter>Source Files\Core Files</Filter>
     </ClCompile>
     <ClCompile Include="TriggersResults.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Core Files</Filter>
     </ClCompile>
     <ClCompile Include="VectorTrigger.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Core Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

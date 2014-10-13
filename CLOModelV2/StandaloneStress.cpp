@@ -21,10 +21,13 @@
 #include "BloombergVector.h"
 #include "MtgCalculator.h"
 #include <QSettings>
+#include <QGroupBox>
 StandaloneStress::StandaloneStress(QWidget *parent)
 	: QWidget(parent)
 {
-	setWindowTitle("Standalone Stress Test");
+	const QString ParamNames[NumStressDimentsions] = { tr("CPR"), tr("CDR"), tr("LS"), tr("Recovery Lag"), tr("Delinquency"), tr("Delinquency Lag") };
+
+	setWindowTitle(tr("Standalone Stress Test"));
 	setWindowIcon(QIcon(":/Icons/Logo.png"));
 	RegisterAsMetaType<Waterfall>();
 	RegisterAsMetaType<MtgCashFlow>();
@@ -33,10 +36,10 @@ StandaloneStress::StandaloneStress(QWidget *parent)
 
 	QVBoxLayout* MainLay=new QVBoxLayout(this);
 	StressToCallBox=new QCheckBox(this);
-	StressToCallBox->setText("Stress To Call");
+	StressToCallBox->setText(tr("Stress To Call"));
 	StressToCallBox->setChecked(false);
 	FastStressBox = new QCheckBox(this);
-	FastStressBox->setText("Fast Stress");
+	FastStressBox->setText(tr("Fast Stress"));
 	FastStressBox->setChecked(true);
 	
 	
@@ -46,13 +49,25 @@ StandaloneStress::StandaloneStress(QWidget *parent)
 	TopLay->addWidget(StressToCallBox);
 	TopLay->addItem(TopSpace);
 	QLabel* PathLabel = new QLabel(this);
-	PathLabel->setText("Model File:");
+	PathLabel->setText(tr("Model File:"));
 	TopLay->addWidget(PathLabel);
-	PathEdit = new QLineEdit(this);
-	PathEdit->setText("");
-	PathEdit->setToolTip("Path to model clom file");
-	TopLay->addWidget(PathEdit);
+	InPathEdit = new QLineEdit(this);
+	InPathEdit->setText("");
+	InPathEdit->setToolTip(tr("Path to model clom file"));
+	TopLay->addWidget(InPathEdit);
 	QPushButton* BrowseButton = new QPushButton(this);
+	BrowseButton->setText("...");
+	connect(BrowseButton, SIGNAL(clicked()), this, SLOT(BrowseModel()));
+	TopLay->addWidget(BrowseButton);
+
+	PathLabel = new QLabel(this);
+	PathLabel->setText(tr("Output Folder:"));
+	TopLay->addWidget(PathLabel);
+	OutPathEdit = new QLineEdit(this);
+	OutPathEdit->setText("");
+	OutPathEdit->setToolTip(tr("Folder where results will be saved"));
+	TopLay->addWidget(OutPathEdit);
+	BrowseButton = new QPushButton(this);
 	BrowseButton->setText("...");
 	connect(BrowseButton, SIGNAL(clicked()), this, SLOT(BrowseFolder()));
 	TopLay->addWidget(BrowseButton);
@@ -60,7 +75,11 @@ StandaloneStress::StandaloneStress(QWidget *parent)
 
 	
 	QGridLayout *TableLay=new QGridLayout;
+	QStringList TmpStrList;
 	for(int i=0;i<NumStressDimentsions;i++){
+		QGroupBox* TempGroup = new QGroupBox(this);
+		QVBoxLayout* GroupLay = new QVBoxLayout(TempGroup);
+		TempGroup->setTitle(ParamNames[i]);
 		VariablesList[i]=new QTableWidget(this);
 		VariablesList[i]->setColumnCount(1);
 		VariablesList[i]->setRowCount(1);
@@ -69,56 +88,38 @@ StandaloneStress::StandaloneStress(QWidget *parent)
 		VariablesList[i]->verticalHeader()->hide();
 		VariablesList[i]->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 		VariablesList[i]->setSelectionMode(QAbstractItemView::NoSelection);
-		TableLay->addWidget(VariablesList[i], 1 + (3 * (i / (NumStressDimentsions / 2))), i % (NumStressDimentsions / 2));
 		PasteButton[i]= new QPushButton(this);
-		PasteButton[i]->setText("Paste from Clipboard");
-		TableLay->addWidget(PasteButton[i], 2 + (3 * (i / (NumStressDimentsions / 2))), i % (NumStressDimentsions / 2));
+		PasteButton[i]->setText(tr("Paste from Clipboard"));
+		connect(PasteButton[i], SIGNAL(clicked()), this, SLOT(PasteClipboard()));
 		QHBoxLayout *SpinnsLay = new QHBoxLayout;
 		VariablesCountlabel[i] = new QLabel(this);
 		SpinnsLay->addWidget(VariablesCountlabel[i]);
 		VariablesCount[i] = new QSpinBox(this);
-		VariablesCount[i]->setMinimum(1);
+		VariablesCount[i]->setMinimum(0);
 		VariablesCount[i]->setMaximum(99);
 		VariablesCount[i]->setValue(1);
+		connect(VariablesCount[i], SIGNAL(valueChanged(int)), this, SLOT(RowsChanged(int)));
 		SpinnsLay->addWidget(VariablesCount[i]);
-		TableLay->addLayout(SpinnsLay, 3 * (i / (NumStressDimentsions / 2)), i % (NumStressDimentsions / 2));
-	}
-	VariablesCountlabel[0]->setText("CPR Scenarios");
-	VariablesCountlabel[1]->setText("CDR Scenarios");
-	VariablesCountlabel[2]->setText("LS Scenarios");
-	VariablesCountlabel[3]->setText("Recovery Lag Scenarios");
-	VariablesCountlabel[4]->setText("Delinquency Scenarios");
-	VariablesCountlabel[5]->setText("Delinquency Lag Scenarios");
-	{
-		QStringList TmpStrList;
-		TmpStrList << "CPR";
-		VariablesList[0]->setHorizontalHeaderLabels(TmpStrList);
-		TmpStrList<< "CDR";
-		VariablesList[1]->setHorizontalHeaderLabels(TmpStrList);
+		GroupLay->addLayout(SpinnsLay);
+		GroupLay->addWidget(VariablesList[i]);
+		GroupLay->addWidget(PasteButton[i]);
+		TableLay->addWidget(TempGroup, i / 3, i % 3);
+		VariablesCountlabel[i]->setText(tr("%1 Scenarios").arg(ParamNames[i]));
 		TmpStrList.clear();
-		TmpStrList<< "LS";
-		VariablesList[2]->setHorizontalHeaderLabels(TmpStrList);
-		TmpStrList.clear();
-		TmpStrList << "Recovery Lag";
-		VariablesList[3]->setHorizontalHeaderLabels(TmpStrList);
-		TmpStrList.clear();
-		TmpStrList << "Delinquency";
-		VariablesList[4]->setHorizontalHeaderLabels(TmpStrList);
-		TmpStrList.clear();
-		TmpStrList << "Delinquency Lag";
-		VariablesList[5]->setHorizontalHeaderLabels(TmpStrList);
+		TmpStrList.append(ParamNames[i]);
+		VariablesList[i]->setHorizontalHeaderLabels(TmpStrList);
 	}
 	MainLay->addLayout(TableLay);
 
 	StartButton=new QPushButton(this);
-	StartButton->setText("Start Stress Test");
+	StartButton->setText(tr("Start Stress Test"));
 	QHBoxLayout *BottomLay=new QHBoxLayout;
 	QSpacerItem* BottomSpace=new QSpacerItem(20,20,QSizePolicy::Expanding);
 	BottomLay->addItem(BottomSpace);
 	BottomLay->addWidget(StartButton);
 	MainLay->addLayout(BottomLay);
 
-	connect(PathEdit,SIGNAL(editingFinished()),this,SLOT(CheckAllValid()),Qt::QueuedConnection);
+	connect(InPathEdit,SIGNAL(editingFinished()),this,SLOT(CheckAllValid()),Qt::QueuedConnection);
 	connect(StartButton,SIGNAL(clicked()),this,SLOT(Start()));
 	for(int i=0;i<2;i++){
 		connect(VariablesList[i],SIGNAL(itemChanged(QTableWidgetItem *)),this,SLOT(CheckAllValid()),Qt::QueuedConnection);
@@ -129,12 +130,35 @@ StandaloneStress::StandaloneStress(QWidget *parent)
 
 void StandaloneStress::CheckAllValid(){
 	StartButton->setEnabled(true);
-	PathEdit->setStyleSheet("");
-	QDir dir(PathEdit->text());
-	if(!dir.exists() || !QFile::exists(dir.absolutePath()+"/.Loans.clp") || !QFile::exists(dir.absolutePath()+"/.BaseCase.clo")){
+	InPathEdit->setStyleSheet("");
+	OutPathEdit->setStyleSheet("");
+	InPathEdit->setToolTip(tr("Path to model clom file"));
+	QDir OutFolder = OutPathEdit->text();
+	if (!OutFolder.exists() && !OutPathEdit->text().isEmpty()) {
 		StartButton->setEnabled(false);
-		PathEdit->setStyleSheet("background-color: red;");
+		OutPathEdit->setStyleSheet("background-color: red;");
 	}
+	QFile ModelFile(InPathEdit->text());
+	if (ModelFile.exists()) {
+		qint32 VersionCheck;
+		bool VersionGood = false;
+		if(ModelFile.open(QIODevice::ReadOnly)) {
+			QDataStream VersionIn(&ModelFile);
+			VersionIn >> VersionCheck;
+			VersionGood = VersionCheck >= MinimumSupportedVersion && VersionCheck <= ModelVersionNumber;
+			ModelFile.close();
+		}
+		if (!VersionGood) {
+			StartButton->setEnabled(false);
+			InPathEdit->setStyleSheet("background-color: red;");
+			InPathEdit->setToolTip(tr("Model Version is invalid"));
+		}
+	}
+	else{
+		StartButton->setEnabled(false);
+		InPathEdit->setStyleSheet("background-color: red;");
+	}
+	
 	for(int i=0;i<NumStressDimentsions;i++){
 		for(int j=0;j<VariablesList[i]->rowCount();j++){
 			if(VariablesList[i]->item(j,0)){
@@ -157,75 +181,75 @@ void StandaloneStress::CheckAllValid(){
 		}
 	}
 }
-void StandaloneStress::RowsChanged(){
-	int OldNum;
-	for(int i=0;i<2;i++){
-		int Debug=VariablesCount[i]->value();
-		OldNum=VariablesList[i]->rowCount();
-		if(OldNum!=VariablesCount[i]->value()) VariablesList[i]->setRowCount(VariablesCount[i]->value());
-		for(;OldNum<VariablesList[i]->rowCount();OldNum++){
-			VariablesList[i]->setItem(OldNum,0,new QTableWidgetItem("0"));
-		}
+
+
+void StandaloneStress::RowsChanged(int NewRows) {
+	int j = -1;
+	for (int i = 0; i < NumStressDimentsions && j < 0; ++i) {
+		if (VariablesCount[i] == sender()) j = i;
 	}
+	if (j < 0) return;
+	int OldRowCount = VariablesList[j]->rowCount();
+	if (OldRowCount > NewRows) {
+		VariablesList[j]->setRowCount(NewRows);
+	}
+	if (OldRowCount < NewRows) {
+		VariablesList[j]->setRowCount(NewRows);
+		for (; OldRowCount < NewRows; ++OldRowCount)
+			VariablesList[j]->setItem(OldRowCount, 0, new QTableWidgetItem("0"));
+	}
+	if (NewRows < 1) VariablesCount[j]->setValue(1);
 }
-void StandaloneStress::Start(){
+
+void StandaloneStress::Start() {
+	QFile ModelFile(InPathEdit->text());
+	qint32 VersionCheck;
 	Waterfall TempWaterfall;
-	//QString Tempstring;
-	BloombergVector TempVector;
-	QDate StartDate;
-	QDir dir(PathEdit->text());
-	{
-		QFile file(dir.absolutePath()+"/.Loans.clp");
-		file.open(QIODevice::ReadOnly);
-		qint32 VersionChecker;
-		QDataStream out(&file);
-		out.setVersion(QDataStream::Qt_5_3);
-		out >> VersionChecker;
-		if (VersionChecker<MinimumSupportedVersion || VersionChecker>ModelVersionNumber) 
-			return;
-		{
-			MtgCalculator TmpMtg;
-			TmpMtg.SetLoadProtocolVersion(VersionChecker);
-			out >> TmpMtg;
-			StartDate = TmpMtg.GetStartDate();
-			for (auto i = TmpMtg.GetLoans().constBegin(); i != TmpMtg.GetLoans().constEnd(); ++i) {
-				Stresser->AddLoan(*(i.value()));
-			}
+	MtgCalculator TmpMtg;
+	if (ModelFile.open(QIODevice::ReadOnly)) {
+		QDataStream ModelIn(&ModelFile);
+		ModelIn >> VersionCheck;
+		if (VersionCheck >= MinimumSupportedVersion && VersionCheck <= ModelVersionNumber) {
+			{QDate Junk; ModelIn >> Junk; } //LiborUpdateDate
+			{bool Junk; ModelIn >> Junk; } //m_UseForwardCurve
+			{bool Junk; ModelIn >> Junk; } //m_BaseCaseToCall
+			TempWaterfall.SetLoadProtocolVersion(VersionCheck); ModelIn >> TempWaterfall; //Structure
+			{Waterfall Junk; Junk.SetLoadProtocolVersion(VersionCheck); ModelIn >> Junk; } //CallStructure
+			TmpMtg.SetLoadProtocolVersion(VersionCheck); ModelIn >> TmpMtg;
 		}
-		file.close();
+		ModelFile.close();
 	}
-	{
-		QFile file(dir.absolutePath() + "/.BaseCase.clo");
-		file.open(QIODevice::ReadOnly);
-		qint32 VersionChecker;
-		QDataStream out(&file);
-		out.setVersion(QDataStream::Qt_5_3);
-		out >> VersionChecker;
-		if (VersionChecker != qint32(ModelVersionNumber)) return;
-		{bool Junk; out >> Junk; }
-		out >> TempWaterfall;
-		file.close();
+	for (auto i = TmpMtg.GetLoans().constBegin(); i != TmpMtg.GetLoans().constEnd(); ++i) {
+		Stresser->AddLoan(*(i.value()));
 	}
+	for (int j = 0; j < VariablesList[0]->rowCount(); j++) Stresser->AddCPRscenarios(VariablesList[0]->item(j, 0)->text());
+	for (int j = 0; j < VariablesList[1]->rowCount(); j++) Stresser->AddCDRscenarios(VariablesList[1]->item(j, 0)->text());
+	for (int j = 0; j < VariablesList[2]->rowCount(); j++) Stresser->AddLSscenarios(VariablesList[2]->item(j, 0)->text());
+	for (int j = 0; j < VariablesList[3]->rowCount(); j++) Stresser->AddRecLagScenarios(VariablesList[3]->item(j, 0)->text());
+	for (int j = 0; j < VariablesList[4]->rowCount(); j++) Stresser->AddDelinqScenarios(VariablesList[4]->item(j, 0)->text());
+	for (int j = 0; j < VariablesList[5]->rowCount(); j++) Stresser->AddDelinqLagScenarios(VariablesList[5]->item(j, 0)->text());
 
-
-
-
-	Stresser->SetStartDate(StartDate);
+	Stresser->SetStartDate(TmpMtg.GetStartDate());
 	TempWaterfall.SetUseCall(StressToCallBox->isChecked());
 	Stresser->SetStructure(TempWaterfall);
 	Stresser->SetUseFastVersion(FastStressBox->isChecked());
 	hide();
-#ifdef _DEBUG
-	//Stresser->UseMultithread(false);
-#endif // _DEBUG
 	Stresser->RunStressTest();
 }
 void StandaloneStress::Finished(){
-	QDir dir(PathEdit->text());
+	QDir dir(OutPathEdit->text());
 	Stresser->SaveResults(dir.absolutePath());
-	if(QMessageBox::information(this,"Finished","Stress Test Finished Successfully")==QMessageBox::Ok) close();
+	if(QMessageBox::information(this,tr("Finished"),tr("Stress Test Finished Successfully"))==QMessageBox::Ok) show();
 }
-void StandaloneStress::PasteFirst(){
+
+
+void StandaloneStress::PasteClipboard(){
+	int j = -1;
+	for (int i = 0; i < NumStressDimentsions && j<0; ++i) {
+		if (PasteButton[i] == sender()) j = i;
+	}
+	if (j < 0) return;
+
 	const QMimeData *mimeData = QApplication::clipboard()->mimeData();
 	if (mimeData->hasHtml()) {
 		QString Test=mimeData->html();
@@ -238,65 +262,47 @@ void StandaloneStress::PasteFirst(){
 			if(CurrIndex<0) break;
 			SingleValues.append(TableCell.capturedTexts().last());
 		}
-		VariablesCount[0]->setValue(qMax(1,SingleValues.size()));
 		if(SingleValues.size()>=1){
-			VariablesList[0]->setRowCount(SingleValues.size());
+			VariablesList[j]->setRowCount(SingleValues.size());
 			for(int i=0;i<SingleValues.size();i++){
-				if(VariablesList[0]->item(i,0)) VariablesList[0]->item(0,0)->setText(SingleValues.at(i));
-				else VariablesList[0]->setItem(i,0,new QTableWidgetItem(SingleValues.at(i)));
+				if(VariablesList[j]->item(i,0)) VariablesList[j]->item(i,0)->setText(SingleValues.at(i));
+				else VariablesList[j]->setItem(i,0,new QTableWidgetItem(SingleValues.at(i)));
 			}
 		}
 		else{
-			VariablesList[0]->setRowCount(1);
-			VariablesList[0]->item(0,0)->setText("0");
+			VariablesList[j]->setRowCount(1);
+			VariablesList[j]->item(0,0)->setText("0");
 		}
+		VariablesCount[j]->setValue(qMax(1, SingleValues.size()));
 	}
 	else{
-		VariablesList[0]->setRowCount(1);
-		VariablesList[0]->item(0,0)->setText("0");
+		VariablesList[j]->setRowCount(1);
+		VariablesList[j]->item(0,0)->setText("0");
+		VariablesCount[j]->setValue(1);
 	}
 }
-void StandaloneStress::PasteSecond(){
-	const QMimeData *mimeData = QApplication::clipboard()->mimeData();
-	if (mimeData->hasHtml()) {
-		QString Test=mimeData->html();
-		QRegExp TableCell("<td.*>(.+)</td>");
-		TableCell.setMinimal(true);
-		int CurrIndex=-1;
-		QStringList SingleValues;
-		while(true){
-			CurrIndex=TableCell.indexIn(Test,CurrIndex+1);
-			if(CurrIndex<0) break;
-			SingleValues.append(TableCell.capturedTexts().last());
-		}
-		VariablesCount[1]->setValue(qMax(1,SingleValues.size()));
-		if(SingleValues.size()>=1){
-			VariablesList[1]->setRowCount(SingleValues.size());
-			for(int i=0;i<SingleValues.size();i++){
-				if(VariablesList[1]->item(i,0)) VariablesList[1]->item(0,0)->setText(SingleValues.at(i));
-				else VariablesList[1]->setItem(i,0,new QTableWidgetItem(SingleValues.at(i)));
-			}
-		}
-		else{
-			VariablesList[1]->setRowCount(1);
-			VariablesList[1]->item(0,0)->setText("0");
-		}
-	}
-	else{
-		VariablesList[1]->setRowCount(1);
-		VariablesList[1]->item(0,0)->setText("0");
-	}
-}
-void StandaloneStress::BrowseFolder(){
-	QDir dir(PathEdit->text());
+
+void StandaloneStress::BrowseModel(){
+	QDir dir(InPathEdit->text());
 	QString StdPath;
-	if (dir.exists() && !PathEdit->text().isEmpty()) StdPath = dir.absolutePath();
+	if (dir.exists() && !InPathEdit->text().isEmpty()) StdPath = dir.absolutePath();
 	else {
 		QSettings ConfigIni(":/Configs/GlobalConfigs.ini", QSettings::IniFormat);
 		ConfigIni.beginGroup("Folders");
 		StdPath=ConfigIni.value("UnifiedResultsFolder", "\\\\synserver2\\Company Share\\24AM\\Monitoring\\Model Results").toString();
 	}
 	QString SelectedDir = QFileDialog::getOpenFileName(this, tr("Select Model File"), StdPath, tr("CLO Model Files (*.clom)"));
-	if(!SelectedDir.isEmpty()) PathEdit->setText(SelectedDir);
+	if(!SelectedDir.isEmpty()) InPathEdit->setText(SelectedDir);
+	CheckAllValid();
+}
+void StandaloneStress::BrowseFolder() {
+	QDir dir(OutPathEdit->text());
+	QString StdPath;
+	if (dir.exists() && !OutPathEdit->text().isEmpty()) StdPath = dir.absolutePath();
+	else {
+		StdPath = QString();
+	}
+	QString SelectedDir = QFileDialog::getExistingDirectory(this, tr("Select Output Folder"), StdPath);
+	if (!SelectedDir.isEmpty()) OutPathEdit->setText(SelectedDir);
 	CheckAllValid();
 }

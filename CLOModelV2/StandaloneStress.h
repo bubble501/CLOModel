@@ -25,17 +25,17 @@ private slots:
 	void Start();
 	void Finished();
 	void CheckAllValid();
-	void RowsChanged();
-	void PasteFirst();
-	void PasteSecond();
+	void RowsChanged(int NewRows);
+	void PasteClipboard();
+	void BrowseModel();
 	void BrowseFolder();
 private:
 	QPushButton *PasteButton[NumStressDimentsions];
 	StressTest *Stresser;
 	QTableWidget* VariablesList[NumStressDimentsions];
 
-	
-	QLineEdit* PathEdit;
+	QLineEdit* OutPathEdit;
+	QLineEdit* InPathEdit;
 	QLabel* VariablesCountlabel[NumStressDimentsions];
 	QSpinBox* VariablesCount[NumStressDimentsions];
 	QPushButton* StartButton;

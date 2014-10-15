@@ -33,9 +33,6 @@
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
-    <Filter Include="QuaZIP">
-      <UniqueIdentifier>{3ff97eb1-b823-4c38-845a-2280d07cb6c6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Bloomberg">
       <UniqueIdentifier>{92eb567b-275d-4857-8be3-8c8696fce5c5}</UniqueIdentifier>
     </Filter>

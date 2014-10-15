@@ -1241,16 +1241,20 @@ bool Waterfall::CalculateTranchesCashFlows(){
 							return false;
 						}
 						NeedToCure = ((TotalPayable*TestTarget) - Solution) / (CurrAddColShare + (CurrentRedemptionShare*TestTarget));
+						double FundsToRedemption,FundsToCollateral;
 						if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 1) {
 							NeedToCure = qMin(NeedToCure, AvailableInterest);
-							AvailableInterest -= NeedToCure;
+							FundsToRedemption = NeedToCure*CurrentRedemptionShare;
+							FundsToCollateral = NeedToCure*CurrAddColShare;
+							AvailableInterest -= FundsToRedemption + FundsToCollateral;
 						}
 						else {
 							NeedToCure = qMin(NeedToCure, AvailablePrincipal.Total());
-							AvailablePrincipal -= NeedToCure;
+							FundsToRedemption = NeedToCure*CurrentRedemptionShare;
+							FundsToCollateral = NeedToCure*CurrAddColShare;
+							AvailablePrincipal -= FundsToRedemption + FundsToCollateral;
 						}
-						double FundsToRedemption = NeedToCure*CurrentRedemptionShare;
-						double FundsToCollateral = NeedToCure*CurrAddColShare;
+						
 						LOGCONDITIONALLY(RollingNextIPD == QDate(2015, 5, 15),
 							QString("Funds to Redemption: %1\nFunds to Collateral: %2\n")
 							.arg(FundsToRedemption)

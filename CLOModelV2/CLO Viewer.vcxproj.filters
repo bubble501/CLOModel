@@ -33,9 +33,6 @@
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
-    <Filter Include="QuaZIP">
-      <UniqueIdentifier>{9b32d85d-2cb7-45aa-80b0-e209c67ff40a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Core Files">
       <UniqueIdentifier>{423400d3-7537-46f8-8a66-f5b3018c28d7}</UniqueIdentifier>
     </Filter>
@@ -44,63 +41,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="quazip\unzip.c">
-      <Filter>QuaZIP</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\zip.c">
-      <Filter>QuaZIP</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_quagzipfile.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_quagzipfile.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_quaziodevice.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_quaziodevice.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_quazipfile.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_quazipfile.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\JlCompress.cpp">
-      <Filter>QuaZIP</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\qioapi.cpp">
-      <Filter>QuaZIP</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\quaadler32.cpp">
-      <Filter>QuaZIP</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\quacrc32.cpp">
-      <Filter>QuaZIP</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\quagzipfile.cpp">
-      <Filter>QuaZIP</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\quaziodevice.cpp">
-      <Filter>QuaZIP</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\quazip.cpp">
-      <Filter>QuaZIP</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\quazipdir.cpp">
-      <Filter>QuaZIP</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\quazipfile.cpp">
-      <Filter>QuaZIP</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\quazipfileinfo.cpp">
-      <Filter>QuaZIP</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\quazipnewinfo.cpp">
-      <Filter>QuaZIP</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_CentralUnit.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
@@ -346,45 +286,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="quazip\crypt.h">
-      <Filter>QuaZIP</Filter>
-    </ClInclude>
-    <ClInclude Include="quazip\ioapi.h">
-      <Filter>QuaZIP</Filter>
-    </ClInclude>
-    <ClInclude Include="quazip\JlCompress.h">
-      <Filter>QuaZIP</Filter>
-    </ClInclude>
-    <ClInclude Include="quazip\quaadler32.h">
-      <Filter>QuaZIP</Filter>
-    </ClInclude>
-    <ClInclude Include="quazip\quachecksum32.h">
-      <Filter>QuaZIP</Filter>
-    </ClInclude>
-    <ClInclude Include="quazip\quacrc32.h">
-      <Filter>QuaZIP</Filter>
-    </ClInclude>
-    <ClInclude Include="quazip\quazip.h">
-      <Filter>QuaZIP</Filter>
-    </ClInclude>
-    <ClInclude Include="quazip\quazip_global.h">
-      <Filter>QuaZIP</Filter>
-    </ClInclude>
-    <ClInclude Include="quazip\quazipdir.h">
-      <Filter>QuaZIP</Filter>
-    </ClInclude>
-    <ClInclude Include="quazip\quazipfileinfo.h">
-      <Filter>QuaZIP</Filter>
-    </ClInclude>
-    <ClInclude Include="quazip\quazipnewinfo.h">
-      <Filter>QuaZIP</Filter>
-    </ClInclude>
-    <ClInclude Include="quazip\unzip.h">
-      <Filter>QuaZIP</Filter>
-    </ClInclude>
-    <ClInclude Include="quazip\zip.h">
-      <Filter>QuaZIP</Filter>
-    </ClInclude>
     <ClInclude Include="BaseRateVect.h">
       <Filter>Header Files\Core Files</Filter>
     </ClInclude>
@@ -495,15 +396,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="quazip\quagzipfile.h">
-      <Filter>QuaZIP</Filter>
-    </CustomBuild>
-    <CustomBuild Include="quazip\quaziodevice.h">
-      <Filter>QuaZIP</Filter>
-    </CustomBuild>
-    <CustomBuild Include="quazip\quazipfile.h">
-      <Filter>QuaZIP</Filter>
-    </CustomBuild>
     <CustomBuild Include="CentralUnit.h">
       <Filter>Header Files\Core Files</Filter>
     </CustomBuild>

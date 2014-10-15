@@ -43,49 +43,6 @@
     <ClInclude Include="QProjectGlobals.h" />
     <ClInclude Include="QSingleBbgRequest.h" />
     <ClInclude Include="QSingleBbgResult.h" />
-    <ClInclude Include="quazip\crypt.h" />
-    <ClInclude Include="quazip\ioapi.h" />
-    <ClInclude Include="quazip\JlCompress.h" />
-    <ClInclude Include="quazip\quaadler32.h" />
-    <ClInclude Include="quazip\quachecksum32.h" />
-    <ClInclude Include="quazip\quacrc32.h" />
-    <CustomBuild Include="quazip\quagzipfile.h">
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing quagzipfile.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB -DQUAZIP_BUILD -DNOMINMAX -DQT_SQL_LIB "-IC:\Boost\Boost-1.55" "-IC:\KDAB\KDChart-2.5.1\include\KDChart" "-IC:\Zlib\include" "-IC:\blp\API\APIv3\C++API\v3.6.2.0\include" "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtSql"</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing quagzipfile.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB -DQUAZIP_BUILD -DNOMINMAX -DQT_SQL_LIB "-IC:\Boost\Boost-1.55" "-IC:\KDAB\KDChart-2.5.1\include\KDChart" "-IC:\Zlib\include" "-IC:\blp\API\APIv3\C++API\v3.6.2.0\include" "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtSql"</Command>
-    </CustomBuild>
-    <CustomBuild Include="quazip\quaziodevice.h">
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing quaziodevice.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB -DQUAZIP_BUILD -DNOMINMAX -DQT_SQL_LIB "-IC:\Boost\Boost-1.55" "-IC:\KDAB\KDChart-2.5.1\include\KDChart" "-IC:\Zlib\include" "-IC:\blp\API\APIv3\C++API\v3.6.2.0\include" "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtSql"</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing quaziodevice.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB -DQUAZIP_BUILD -DNOMINMAX -DQT_SQL_LIB "-IC:\Boost\Boost-1.55" "-IC:\KDAB\KDChart-2.5.1\include\KDChart" "-IC:\Zlib\include" "-IC:\blp\API\APIv3\C++API\v3.6.2.0\include" "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtSql"</Command>
-    </CustomBuild>
-    <ClInclude Include="quazip\quazip.h" />
-    <ClInclude Include="quazip\quazipdir.h" />
-    <CustomBuild Include="quazip\quazipfile.h">
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing quazipfile.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB -DQUAZIP_BUILD -DNOMINMAX -DQT_SQL_LIB "-IC:\Boost\Boost-1.55" "-IC:\KDAB\KDChart-2.5.1\include\KDChart" "-IC:\Zlib\include" "-IC:\blp\API\APIv3\C++API\v3.6.2.0\include" "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtSql"</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing quazipfile.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB -DQUAZIP_BUILD -DNOMINMAX -DQT_SQL_LIB "-IC:\Boost\Boost-1.55" "-IC:\KDAB\KDChart-2.5.1\include\KDChart" "-IC:\Zlib\include" "-IC:\blp\API\APIv3\C++API\v3.6.2.0\include" "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtSql"</Command>
-    </CustomBuild>
-    <ClInclude Include="quazip\quazipfileinfo.h" />
-    <ClInclude Include="quazip\quazipnewinfo.h" />
-    <ClInclude Include="quazip\quazip_global.h" />
-    <ClInclude Include="quazip\unzip.h" />
-    <ClInclude Include="quazip\zip.h" />
     <ClInclude Include="ReinvestmentTest.h" />
     <ClInclude Include="RepaymentVector.h" />
     <ClInclude Include="ReserveFund.h" />
@@ -225,24 +182,6 @@
     <ClCompile Include="AssumptionSet.cpp" />
     <ClCompile Include="DateTrigger.cpp" />
     <ClCompile Include="DayCountVect.cpp" />
-    <ClCompile Include="GeneratedFiles\Debug\moc_quagzipfile.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_quaziodevice.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_quazipfile.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_quagzipfile.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_quaziodevice.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_quazipfile.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="GenericCashFlow.cpp" />
     <ClCompile Include="BaseRateTable.cpp" />
     <ClCompile Include="BaseRateVect.cpp" />
@@ -347,19 +286,6 @@
     <ClCompile Include="QBbgWorker.cpp" />
     <ClCompile Include="QSingleBbgRequest.cpp" />
     <ClCompile Include="QSingleBbgResult.cpp" />
-    <ClCompile Include="quazip\JlCompress.cpp" />
-    <ClCompile Include="quazip\qioapi.cpp" />
-    <ClCompile Include="quazip\quaadler32.cpp" />
-    <ClCompile Include="quazip\quacrc32.cpp" />
-    <ClCompile Include="quazip\quagzipfile.cpp" />
-    <ClCompile Include="quazip\quaziodevice.cpp" />
-    <ClCompile Include="quazip\quazip.cpp" />
-    <ClCompile Include="quazip\quazipdir.cpp" />
-    <ClCompile Include="quazip\quazipfile.cpp" />
-    <ClCompile Include="quazip\quazipfileinfo.cpp" />
-    <ClCompile Include="quazip\quazipnewinfo.cpp" />
-    <ClCompile Include="quazip\unzip.c" />
-    <ClCompile Include="quazip\zip.c" />
     <ClCompile Include="ReinvestmentTest.cpp" />
     <ClCompile Include="RepaymentVector.cpp" />
     <ClCompile Include="ReserveFund.cpp" />

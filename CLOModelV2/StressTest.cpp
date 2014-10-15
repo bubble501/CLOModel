@@ -5,7 +5,8 @@
 #include <QApplication>
 #include <QDir>
 #include <QFile>
-#include <quazip/JlCompress.h>
+#include <quazip.h>
+#include <quazipfile.h>
 #include "BloombergVector.h"
 #include "MtgCalculator.h"
 #include <QMessageBox>

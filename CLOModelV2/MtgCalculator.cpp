@@ -32,7 +32,7 @@ MtgCalculator::~MtgCalculator() {
 	Reset(); 
 }
 void MtgCalculator::AddLoan(const Mortgage& a){
-	Loans.insert(++CurrentIndex,new Mortgage(a));
+	AddLoan(a,CurrentIndex+1);
 }
 void MtgCalculator::AddLoan(const Mortgage& a, qint32 Index) {
 	Loans.insert(Index, new Mortgage(a));
@@ -182,6 +182,9 @@ bool MtgCalculator::StartCalculation( bool UseStoredCF) {
 		CurrentThread->SetStartDate(StartDate);
 		connect(CurrentThread, SIGNAL(Calculated(int, const MtgCashFlow&)), this, SLOT(BeeReturned(int, const MtgCashFlow&)));
 		connect(CurrentThread, SIGNAL(Calculated(int, const MtgCashFlow&)), CurrentThread, SLOT(stop()), Qt::QueuedConnection);
+		connect(CurrentThread, SIGNAL(ErrorCalculation(int)), this, SIGNAL(ErrorInCalculation()));
+		connect(CurrentThread, SIGNAL(ErrorCalculation(int)), this, SLOT(HandleErrorInCalculation(int)));
+		connect(CurrentThread, SIGNAL(ErrorCalculation(int)), CurrentThread, SLOT(stop()), Qt::QueuedConnection);
 		CurrentThread->start();
 		++NumofSent;
 	}

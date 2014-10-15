@@ -71,9 +71,10 @@ void WaterfallCalculator::BeeReturned(int ID,const Waterfall& a){
 		ThreadPool[i.key()] = new WaterfallCalcThread(i.key(), this);
 		ThreadPool[i.key()]->SetWaterfall(*(i.value()));
 		connect(ThreadPool[i.key()], SIGNAL(Calculated(int, const Waterfall&)), this, SLOT(BeeReturned(int, const Waterfall&)));
+		connect(ThreadPool[i.key()], SIGNAL(Calculated(int, const Waterfall&)), ThreadPool[i.key()], SLOT(stop()), Qt::QueuedConnection);
 		connect(ThreadPool[i.key()], SIGNAL(ErrorInCalculation(int)), this, SLOT(HandleErrorCalc(int)));
 		connect(ThreadPool[i.key()], SIGNAL(ErrorInCalculation(int)), this, SIGNAL(ErrorInCalculation(int)));
-		connect(ThreadPool[i.key()], SIGNAL(Calculated(int, const Waterfall&)), ThreadPool[i.key()], SLOT(stop()), Qt::QueuedConnection);
+		connect(ThreadPool[i.key()], SIGNAL(ErrorInCalculation(int)), ThreadPool[i.key()], SLOT(stop()), Qt::QueuedConnection);
 		SentIDs.insert(i.key());
 		ThreadPool[i.key()]->start();
 		break;

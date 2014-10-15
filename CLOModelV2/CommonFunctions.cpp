@@ -381,6 +381,5 @@ QString InfixToPostfix(const QString& a) {
 	}
 	while (!s.isEmpty())
 		sb.append(ops.at(s.pop())).append(' ');
-	LOGDEBUG("Postfix Version: " + sb.trimmed());
 	return sb.trimmed();
 }

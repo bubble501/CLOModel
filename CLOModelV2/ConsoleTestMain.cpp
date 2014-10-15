@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
 	b.show();
 	return a.exec();*/
 
-	Waterfall TempWtf, TempCallWaterfall;
+	/*Waterfall TempWtf, TempCallWaterfall;
 	QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/.BaseCase.clo");
 	//QFile file("C:/Temp/.SavedInputs.clo");
 	file.open(QIODevice::ReadOnly);
@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
 	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempCallWaterfall;
 	file.close();
-	TempCallWaterfall.CalculateTranchesCashFlows();
+	TempCallWaterfall.CalculateTranchesCashFlows();*/
 
 	/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	QApplication a(argc, argv);
@@ -63,9 +63,10 @@ int main(int argc, char *argv[]) {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 
 	
-	/*QApplication a(argc, argv);
-	QFile file("C:/Temp/Wrong 20#,#8#,#100#,#0#,#0#,#0.csw");
+	QApplication a(argc, argv);
+	//QFile file("C:/Temp/Wrong 20#,#8#,#100#,#0#,#0#,#0.csw");
 	//QFile file("C:/Temp/20#,#8#,#100#,#0#,#0#,#0.csw");
+	QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/.BaseCase.clo");
 	file.open(QIODevice::ReadOnly);
 	qint32 VersionChecker;
 	QDataStream out(&file);
@@ -75,13 +76,14 @@ int main(int argc, char *argv[]) {
 	file.close();
 	return 1;
 	}
+	{bool Junk; out >> Junk; }
 	Waterfall TempWtf;
 	TempWtf.SetLoadProtocolVersion(VersionChecker);
 	out >> TempWtf;
 	file.close();
-	//TempWtf.CalculateTranchesCashFlows();
+	TempWtf.CalculateTranchesCashFlows();
 	SummaryView Check;
-	Check.SetStructure(TempWtf);
 	Check.show();
-	return a.exec();*/
+	Check.SetStructure(TempWtf);
+	return a.exec();
 }

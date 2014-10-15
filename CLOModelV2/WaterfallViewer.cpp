@@ -8,6 +8,9 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QScrollBar>
+#ifdef _DEBUG
+#include <QApplication>
+#endif
 WaterfallViewer::WaterfallViewer(QWidget* parent/* =0 */)
 	:QWidget(parent)
 {
@@ -17,9 +20,18 @@ WaterfallViewer::WaterfallViewer(QWidget* parent/* =0 */)
 	QStringList HeadersStrings;
 	HeadersStrings 
 		<< "Step"
-		<< "Group Target"
-		<< "Redemption Target"
+		<< "Seniority Group"
+		<< "Seniority Group Level"
+		<< "Redemption Group"
+		<< "Redemption Group Level"
 		<< "Redemption Share"
+		<< "Additional Collateral Share"
+		<< "Source of Funding"
+		<< "Coupon Index"
+		<< "Test Target Override"
+		<< "IRR to Equity Target"
+		<< "Reserve Index"
+		<< "Triggers"
 	;
 
 	InterestTable=new QTableWidget(this);
@@ -64,6 +76,8 @@ WaterfallViewer::WaterfallViewer(QWidget* parent/* =0 */)
 void WaterfallViewer::ResetSteps(){
 	InterestTable->setRowCount(0);
 	PrincipalTable->setRowCount(0);
+	m_IWUsedCols.clear();
+	m_PWUsedCols.clear();
 }
 void WaterfallViewer::AddStep(
 	WatFalPrior::WaterfallStepType Step
@@ -96,161 +110,247 @@ void WaterfallViewer::AddStep(
 	AddStep(TempStep);
 }
 void WaterfallViewer::AddStep(const WatFalPrior& a){
-	/*switch(a.GetPriorityType()){
+	QTableWidget* ApplicableTable=nullptr;
+	QSet<qint16>* ApplicableUsedCols=nullptr;
+	switch(a.GetPriorityType()){
 	case WatFalPrior::WaterfallStepType::wst_SeniorExpenses:
-		if(a.GetRedemptionGroup()==1){
-			InterestTable->setRowCount(InterestTable->rowCount()+1);
-			InterestTable->setItem(InterestTable->rowCount()-1,0,new QTableWidgetItem("Senior Expenses"));
-		}
-		else{
-			PrincipalTable->setRowCount(PrincipalTable->rowCount()+1);
-			PrincipalTable->setItem(PrincipalTable->rowCount()-1,0,new QTableWidgetItem("Senior Expenses"));
-		}
-	break;
-	case WatFalPrior::WaterfallStepType::wst_SeniorFees:
-		if(a.GetRedemptionGroup()==1){
-			InterestTable->setRowCount(InterestTable->rowCount()+1);
-			InterestTable->setItem(InterestTable->rowCount()-1,0,new QTableWidgetItem("Senior Fees"));
-		}
-		else{
-			PrincipalTable->setRowCount(PrincipalTable->rowCount()+1);
-			PrincipalTable->setItem(PrincipalTable->rowCount()-1,0,new QTableWidgetItem("Senior Fees"));
-		}
-	break;
-	case WatFalPrior::WaterfallStepType::wst_Interest:
-		InterestTable->setRowCount(InterestTable->rowCount()+1);
-		InterestTable->setItem(InterestTable->rowCount()-1,0,new QTableWidgetItem("Interest"));
-		InterestTable->setItem(InterestTable->rowCount()-1,1,new QTableWidgetItem(QString("%1").arg(a.GetGroupTarget())));
-	break;
-	case WatFalPrior::WaterfallStepType::wst_Principal:
-		PrincipalTable->setRowCount(PrincipalTable->rowCount()+1);
-		PrincipalTable->setItem(PrincipalTable->rowCount()-1,0,new QTableWidgetItem("Principal"));
-		PrincipalTable->setItem(PrincipalTable->rowCount()-1,1,new QTableWidgetItem(QString("%1").arg(a.GetGroupTarget())));
-	break;
-	case WatFalPrior::WaterfallStepType::wst_OCTest:
-		InterestTable->setRowCount(InterestTable->rowCount()+1);
-		InterestTable->setItem(InterestTable->rowCount()-1,0,new QTableWidgetItem("OC Test"));
-		InterestTable->setItem(InterestTable->rowCount()-1,1,new QTableWidgetItem(QString("%1").arg(a.GetGroupTarget())));
-		if(a.GetRedemptionGroup()>0){
-			InterestTable->setItem(InterestTable->rowCount()-1,2,new QTableWidgetItem(QString("%1").arg(a.GetRedemptionGroup())));
-			InterestTable->setItem(InterestTable->rowCount()-1,3,new QTableWidgetItem(QString("%1%").arg(a.GetRedemptionShare()*100)));
+		if (a.GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(0) == 1) {
+			ApplicableTable = InterestTable;
+			ApplicableUsedCols = &m_IWUsedCols;
 		}
 		else {
-			PrincipalTable->setRowCount(PrincipalTable->rowCount() + 1);
-			PrincipalTable->setItem(PrincipalTable->rowCount() - 1, 0, new QTableWidgetItem("OC Test"));
-			PrincipalTable->setItem(PrincipalTable->rowCount() - 1, 1, new QTableWidgetItem(QString("%1").arg(a.GetGroupTarget())));
-			if (a.GetRedemptionGroup() > 0) {
-				PrincipalTable->setItem(PrincipalTable->rowCount() - 1, 2, new QTableWidgetItem(QString("%1").arg(a.GetRedemptionGroup())));
-				PrincipalTable->setItem(PrincipalTable->rowCount() - 1, 3, new QTableWidgetItem(QString("%1%").arg(a.GetRedemptionShare() * 100)));
-			}
+			ApplicableTable = PrincipalTable;
+			ApplicableUsedCols = &m_PWUsedCols;
 		}
-		
-		break;
-	case WatFalPrior::WaterfallStepType::wst_ICTest:
-		InterestTable->setRowCount(InterestTable->rowCount()+1);
-		InterestTable->setItem(InterestTable->rowCount()-1,0,new QTableWidgetItem("IC Test"));
-		InterestTable->setItem(InterestTable->rowCount()-1,1,new QTableWidgetItem(QString("%1").arg(a.GetGroupTarget())));
+		ApplicableUsedCols->insert(ciStep);
+		ApplicableTable->setRowCount(ApplicableTable->rowCount() + 1);
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciStep, new QTableWidgetItem("Senior Expenses"));		
 	break;
-	case WatFalPrior::WaterfallStepType::wst_ICTestPrinc:
+	case WatFalPrior::WaterfallStepType::wst_SeniorFees:
+		if (a.GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(0) == 1) {
+			ApplicableTable = InterestTable;
+			ApplicableUsedCols = &m_IWUsedCols;
+		}
+		else {
+			ApplicableTable = PrincipalTable;
+			ApplicableUsedCols = &m_PWUsedCols;
+		}
+		ApplicableUsedCols->insert(ciStep);
+		ApplicableTable->setRowCount(ApplicableTable->rowCount() + 1);
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciStep, new QTableWidgetItem("Senior Fees"));
+	break;
+	case WatFalPrior::WaterfallStepType::wst_Interest:
+		m_IWUsedCols << ciStep << ciSeniorityGroup << ciSeniorityGroupLevel << ciCouponIndex;
+		InterestTable->setRowCount(InterestTable->rowCount()+1);
+		InterestTable->setItem(InterestTable->rowCount() - 1, ciStep, new QTableWidgetItem("Interest"));
+		InterestTable->setItem(InterestTable->rowCount() - 1, ciSeniorityGroup, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetVector()));
+		InterestTable->setItem(InterestTable->rowCount() - 1, ciSeniorityGroupLevel, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetVector()));
+		InterestTable->setItem(InterestTable->rowCount() - 1, ciCouponIndex, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::CouponIndex).value<IntegerVector>().GetVector()));
+	break;
+	case WatFalPrior::WaterfallStepType::wst_Principal:
+		m_PWUsedCols << ciStep << ciSeniorityGroup << ciSeniorityGroupLevel;
 		PrincipalTable->setRowCount(PrincipalTable->rowCount()+1);
-		PrincipalTable->setItem(PrincipalTable->rowCount()-1,0,new QTableWidgetItem("IC Test"));
-		PrincipalTable->setItem(PrincipalTable->rowCount()-1,1,new QTableWidgetItem(QString("%1").arg(a.GetGroupTarget())));
+		PrincipalTable->setItem(PrincipalTable->rowCount() - 1, ciStep, new QTableWidgetItem("Principal"));
+		PrincipalTable->setItem(PrincipalTable->rowCount() - 1, ciSeniorityGroup, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetVector()));
+		PrincipalTable->setItem(PrincipalTable->rowCount() - 1, ciSeniorityGroupLevel, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetVector()));
+	break;
+	case WatFalPrior::WaterfallStepType::wst_OCTest:
+		if (a.GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(0) == 1) {
+			ApplicableTable = InterestTable;
+			ApplicableUsedCols = &m_IWUsedCols;
+		}
+		else {
+			ApplicableTable = PrincipalTable;
+			ApplicableUsedCols = &m_PWUsedCols;
+		}
+		(*ApplicableUsedCols) << ciStep << ciSeniorityGroup << ciSeniorityGroupLevel;
+		ApplicableTable->setRowCount(ApplicableTable->rowCount() + 1);
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciStep, new QTableWidgetItem("OC Test"));
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciSeniorityGroup, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetVector()));
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciSeniorityGroupLevel, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetVector()));
+		if (a.HasParameter(WatFalPrior::wstParameters::RedemptionGroup)) {
+			(*ApplicableUsedCols) << ciRedemptionGroup << ciRedemptionGroupLevel << ciRedemptionShare;
+			ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciRedemptionGroup, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::RedemptionGroup).value<IntegerVector>().GetVector()));
+			ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciRedemptionGroupLevel, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::RedemptionGroupLevel).value<IntegerVector>().GetVector()));
+			ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciRedemptionShare, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::RedemptionShare).value<BloombergVector>().GetVector()));
+		}
+		if (a.HasParameter(WatFalPrior::wstParameters::AdditionalCollateralShare)) {
+			(*ApplicableUsedCols) << ciAdditionalCollateralShare;
+			ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciAdditionalCollateralShare, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::AdditionalCollateralShare).value<BloombergVector>().GetVector()));
+		}		
+		if (a.HasParameter(WatFalPrior::wstParameters::TestTargetOverride)) {
+			(*ApplicableUsedCols) << ciTestTargetOverride;
+			ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciTestTargetOverride, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::TestTargetOverride).value<BloombergVector>().GetVector()));
+		}
+	break;
+	case WatFalPrior::WaterfallStepType::wst_ICTest:
+		if (a.GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(0) == 1) {
+			ApplicableTable = InterestTable;
+			ApplicableUsedCols = &m_IWUsedCols;
+		}
+		else {
+			ApplicableTable = PrincipalTable;
+			ApplicableUsedCols = &m_PWUsedCols;
+		}
+		(*ApplicableUsedCols) << ciStep << ciSeniorityGroup << ciSeniorityGroupLevel << ciCouponIndex;
+		ApplicableTable->setRowCount(ApplicableTable->rowCount() + 1);
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciStep, new QTableWidgetItem("IC Test"));
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciSeniorityGroup, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetVector()));
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciSeniorityGroupLevel, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetVector()));
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciCouponIndex, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::CouponIndex).value<IntegerVector>().GetVector()));
+		if (a.HasParameter(WatFalPrior::wstParameters::TestTargetOverride)) {
+			(*ApplicableUsedCols) << ciTestTargetOverride;
+			ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciTestTargetOverride, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::TestTargetOverride).value<BloombergVector>().GetVector()));
+		}		
 	break;
 	case WatFalPrior::WaterfallStepType::wst_DeferredInterest:
-		InterestTable->setRowCount(InterestTable->rowCount()+1);
-		InterestTable->setItem(InterestTable->rowCount()-1,0,new QTableWidgetItem("Deferred Interest"));
-		InterestTable->setItem(InterestTable->rowCount()-1,1,new QTableWidgetItem(QString("%1").arg(a.GetGroupTarget())));
-	break;
-	case WatFalPrior::WaterfallStepType::wst_DeferredPrinc:
-		PrincipalTable->setRowCount(PrincipalTable->rowCount()+1);
-		PrincipalTable->setItem(PrincipalTable->rowCount()-1,0,new QTableWidgetItem("Deferred Interest"));
-		PrincipalTable->setItem(PrincipalTable->rowCount()-1,1,new QTableWidgetItem(QString("%1").arg(a.GetGroupTarget())));
+		if (a.GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(0) == 1) {
+			ApplicableTable = InterestTable;
+			ApplicableUsedCols = &m_IWUsedCols;
+		}
+		else {
+			ApplicableTable = PrincipalTable;
+			ApplicableUsedCols = &m_PWUsedCols;
+		}
+		(*ApplicableUsedCols) << ciStep << ciSeniorityGroup << ciSeniorityGroupLevel << ciCouponIndex;
+		ApplicableTable->setRowCount(ApplicableTable->rowCount() + 1);
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciStep, new QTableWidgetItem("Deferred Interest"));
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciSeniorityGroup, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetVector()));
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciSeniorityGroupLevel, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetVector()));
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciCouponIndex, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::CouponIndex).value<IntegerVector>().GetVector()));
 	break;
 	case WatFalPrior::WaterfallStepType::wst_juniorFees:
-		if(a.GetRedemptionGroup()==1){
-			InterestTable->setRowCount(InterestTable->rowCount()+1);
-			InterestTable->setItem(InterestTable->rowCount()-1,0,new QTableWidgetItem("Junior Fees"));
+		if (a.GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(0) == 1) {
+			ApplicableTable = InterestTable;
+			ApplicableUsedCols = &m_IWUsedCols;
 		}
-		else{
-			PrincipalTable->setRowCount(PrincipalTable->rowCount()+1);
-			PrincipalTable->setItem(PrincipalTable->rowCount()-1,0,new QTableWidgetItem("Junior Fees"));
+		else {
+			ApplicableTable = PrincipalTable;
+			ApplicableUsedCols = &m_PWUsedCols;
 		}
-	break;
-	case WatFalPrior::WaterfallStepType::wst_ReserveReplenish:
-		if(a.GetRedemptionGroup()==1){
-			InterestTable->setRowCount(InterestTable->rowCount()+1);
-			InterestTable->setItem(InterestTable->rowCount()-1,0,new QTableWidgetItem("Reserve Fund Replenishment"));
-			InterestTable->setItem(InterestTable->rowCount()-1,1,new QTableWidgetItem(QString("Reserve %1").arg(a.GetGroupTarget())));
-		}
-		else{
-			PrincipalTable->setRowCount(PrincipalTable->rowCount()+1);
-			PrincipalTable->setItem(PrincipalTable->rowCount()-1,0,new QTableWidgetItem("Reserve Fund Replenishment"));
-			PrincipalTable->setItem(PrincipalTable->rowCount()-1,1,new QTableWidgetItem(QString("Reserve %1").arg(a.GetGroupTarget())));
-		}
-	break;
-	case WatFalPrior::WaterfallStepType::wst_ReinvestmentTest:
-		InterestTable->setRowCount(InterestTable->rowCount()+1);
-		InterestTable->setItem(InterestTable->rowCount()-1,0,new QTableWidgetItem("Reinvestment Test"));
-		InterestTable->setItem(InterestTable->rowCount()-1,1,new QTableWidgetItem(QString("%1").arg(a.GetGroupTarget())));
-		if(a.GetRedemptionGroup()>0) InterestTable->setItem(InterestTable->rowCount()-1,2,new QTableWidgetItem(QString("%1").arg(a.GetRedemptionGroup())));
-	break;
-	case WatFalPrior::WaterfallStepType::wst_Excess:
-		InterestTable->setRowCount(InterestTable->rowCount()+1);
-		InterestTable->setItem(InterestTable->rowCount()-1,0,new QTableWidgetItem("Excess Spread"));
-		InterestTable->setItem(InterestTable->rowCount()-1,2,new QTableWidgetItem(QString("%1").arg(a.GetRedemptionGroup())));
-		PrincipalTable->setRowCount(PrincipalTable->rowCount()+1);
-		PrincipalTable->setItem(PrincipalTable->rowCount()-1,0,new QTableWidgetItem("Excess Spread"));
-		PrincipalTable->setItem(PrincipalTable->rowCount()-1,2,new QTableWidgetItem(QString("%1").arg(a.GetRedemptionGroup())));
-		break;
-	case WatFalPrior::WaterfallStepType::wst_ReinvestPrincipal:
-		PrincipalTable->setRowCount(PrincipalTable->rowCount()+1);
-		PrincipalTable->setItem(PrincipalTable->rowCount()-1,0,new QTableWidgetItem("Reinvest"));
-		if (a.GetRedemptionGroup() == 1) PrincipalTable->setItem(PrincipalTable->rowCount() - 1, 2, new QTableWidgetItem("Unscheduled"));
-		else if (a.GetRedemptionGroup() == 2) PrincipalTable->setItem(PrincipalTable->rowCount() - 1, 2, new QTableWidgetItem("Scheduled"));
-		else PrincipalTable->setItem(PrincipalTable->rowCount() - 1, 2, new QTableWidgetItem("All Principal"));
-	break;
-	case WatFalPrior::WaterfallStepType::wst_RedeemProRata:
-		PrincipalTable->setRowCount(PrincipalTable->rowCount() + 1);
-		PrincipalTable->setItem(PrincipalTable->rowCount() - 1, 0, new QTableWidgetItem("Redeem Pro rata"));
-		PrincipalTable->setItem(PrincipalTable->rowCount() - 1, 1, new QTableWidgetItem(QString("From Seniority %1").arg(qMin(a.GetRedemptionGroup(), a.GetGroupTarget()))));
-		PrincipalTable->setItem(PrincipalTable->rowCount() - 1, 2, new QTableWidgetItem(QString("To Seniority %1").arg(qMax(a.GetRedemptionGroup(), a.GetGroupTarget()))));
-	break;
-	case WatFalPrior::WaterfallStepType::wst_Turbo:
-		InterestTable->setRowCount(InterestTable->rowCount() + 1);
-		InterestTable->setItem(InterestTable->rowCount() - 1, 0, new QTableWidgetItem("Turbo Redemption"));
-		InterestTable->setItem(InterestTable->rowCount() - 1, 2, new QTableWidgetItem(QString("%1").arg(a.GetRedemptionGroup())));
-		InterestTable->setItem(InterestTable->rowCount() - 1, 3, new QTableWidgetItem(QString("%1%").arg(a.GetRedemptionShare() * 100)));
-	break;
-	case WatFalPrior::WaterfallStepType::wst_PDL:
-		InterestTable->setRowCount(InterestTable->rowCount() + 1);
-		InterestTable->setItem(InterestTable->rowCount() - 1, 0, new QTableWidgetItem("Cure PDL"));
-		InterestTable->setItem(InterestTable->rowCount() - 1, 1, new QTableWidgetItem(QString("%1").arg(a.GetGroupTarget())));
-		if (a.GetRedemptionGroup() > 0) {
-			InterestTable->setItem(InterestTable->rowCount() - 1, 2, new QTableWidgetItem(QString("%1").arg(a.GetRedemptionGroup())));
-			InterestTable->setItem(InterestTable->rowCount() - 1, 3, new QTableWidgetItem(QString("%1%").arg(a.GetRedemptionShare() * 100)));
+		ApplicableUsedCols->insert(ciStep);
+		ApplicableTable->setRowCount(ApplicableTable->rowCount() + 1);
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciStep, new QTableWidgetItem("Junior Fees"));
+		if (a.HasParameter(WatFalPrior::wstParameters::IRRtoEquityTarget)) {
+			ApplicableUsedCols->insert(ciIRRtoEquityTarget);
+			ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciIRRtoEquityTarget, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::IRRtoEquityTarget).value<BloombergVector>().GetVector()));
 		}
 	break;
 	case WatFalPrior::WaterfallStepType::wst_FeesFromExcess:
-		if (a.GetRedemptionGroup() == 1 || a.GetRedemptionGroup()==3) {
-			InterestTable->setRowCount(InterestTable->rowCount() + 1);
-			InterestTable->setItem(InterestTable->rowCount() - 1, 0, new QTableWidgetItem("Junior Fees from Excess Spread"));
-			InterestTable->setItem(InterestTable->rowCount() - 1, 2, new QTableWidgetItem(QString("%1").arg(
-				(a.GetRedemptionGroup() == 1) ? "Excess Interest" : "All Excess"
-				)));
-			InterestTable->setItem(InterestTable->rowCount() - 1, 3, new QTableWidgetItem(QString("%1%").arg(a.GetRedemptionShare() * 100)));
+		for (int FakeIter = 0; FakeIter < 2; ++FakeIter) {
+			ApplicableTable = nullptr;
+			if (FakeIter==0 && (a.GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(0) & 1)) {
+				ApplicableTable = InterestTable;
+				ApplicableUsedCols = &m_IWUsedCols;
+			}
+			if (FakeIter > 0 && (a.GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(0) >=2)) {
+				ApplicableTable = PrincipalTable;
+				ApplicableUsedCols = &m_PWUsedCols;
+			}
+			if (!ApplicableTable) continue;
+			(*ApplicableUsedCols) << ciStep << ciRedemptionShare;
+			ApplicableTable->setRowCount(ApplicableTable->rowCount() + 1);
+			ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciStep, new QTableWidgetItem("Fees from Excess Spread"));
+			ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciRedemptionShare, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::RedemptionShare).value<BloombergVector>().GetVector()));
+
+			if (a.HasParameter(WatFalPrior::wstParameters::IRRtoEquityTarget)) {
+				ApplicableUsedCols->insert(ciIRRtoEquityTarget);
+				ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciIRRtoEquityTarget, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::IRRtoEquityTarget).value<BloombergVector>().GetVector()));
+			}
 		}
-		else if (a.GetRedemptionGroup() == 2 || a.GetRedemptionGroup() == 3) {
-			PrincipalTable->setRowCount(PrincipalTable->rowCount() + 1);
-			PrincipalTable->setItem(PrincipalTable->rowCount() - 1, 0, new QTableWidgetItem("Junior Fees from Excess Spread"));
-			PrincipalTable->setItem(PrincipalTable->rowCount() - 1, 2, new QTableWidgetItem(QString("%1").arg(
-				(a.GetRedemptionGroup() == 2) ? "Excess Principal" : "All Excess"
-				)));
-			PrincipalTable->setItem(PrincipalTable->rowCount() - 1, 3, new QTableWidgetItem(QString("%1%").arg(a.GetRedemptionShare() * 100)));
+	break;
+	case WatFalPrior::WaterfallStepType::wst_ReserveReplenish:
+		if (a.GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(0) == 1) {
+			ApplicableTable = InterestTable;
+			ApplicableUsedCols = &m_IWUsedCols;
+		}
+		else {
+			ApplicableTable = PrincipalTable;
+			ApplicableUsedCols = &m_PWUsedCols;
+		}
+		(*ApplicableUsedCols) << ciStep << ciReserveIndex;
+		ApplicableTable->setRowCount(ApplicableTable->rowCount() + 1);
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciStep, new QTableWidgetItem("Fees from Excess Spread"));
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciReserveIndex, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::ReserveIndex).value<IntegerVector>().GetVector()));
+	break;
+	case WatFalPrior::WaterfallStepType::wst_Excess:
+		for (int FakeIter = 0; FakeIter < 2; ++FakeIter) {
+			ApplicableTable = nullptr;
+			if (FakeIter == 0 && (a.GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(0) & 1)) {
+				ApplicableTable = InterestTable;
+				ApplicableUsedCols = &m_IWUsedCols;
+			}
+			if (FakeIter > 0 && (a.GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(0) >= 2)) {
+				ApplicableTable = PrincipalTable;
+				ApplicableUsedCols = &m_PWUsedCols;
+			}
+			if (!ApplicableTable) continue;
+			(*ApplicableUsedCols) << ciStep;
+			ApplicableTable->setRowCount(ApplicableTable->rowCount() + 1);
+			ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciStep, new QTableWidgetItem("Excess Spread"));
+			if (a.HasParameter(WatFalPrior::wstParameters::RedemptionGroup)) {
+				(*ApplicableUsedCols) << ciRedemptionGroup << ciRedemptionGroupLevel << ciRedemptionShare;
+				ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciRedemptionGroup, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::RedemptionGroup).value<IntegerVector>().GetVector()));
+				ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciRedemptionGroupLevel, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::RedemptionGroupLevel).value<IntegerVector>().GetVector()));
+				ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciRedemptionShare, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::RedemptionShare).value<BloombergVector>().GetVector()));
+			}
+			
+			
+		}
+	break;
+	case WatFalPrior::WaterfallStepType::wst_ReinvestPrincipal:{
+		ApplicableTable = PrincipalTable;
+		ApplicableUsedCols = &m_PWUsedCols;
+		QString FundingString = a.GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetVector();
+		FundingString.replace("1", "Prepayments");
+		FundingString.replace("2", "Scheduled Principal");
+		FundingString.replace("3", "All Principal");
+		(*ApplicableUsedCols) << ciStep << ciSourceofFunding << ciAdditionalCollateralShare;
+		ApplicableTable->setRowCount(ApplicableTable->rowCount() + 1);
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciStep, new QTableWidgetItem("Reinvest"));
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciAdditionalCollateralShare, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::AdditionalCollateralShare).value<BloombergVector>().GetVector()));
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciSourceofFunding, new QTableWidgetItem(FundingString));
+	}
+	break;
+	case WatFalPrior::WaterfallStepType::wst_Turbo:
+		ApplicableTable = InterestTable;
+		ApplicableUsedCols = &m_IWUsedCols;
+		(*ApplicableUsedCols) << ciStep << ciRedemptionGroup << ciRedemptionGroupLevel << ciRedemptionShare;
+		ApplicableTable->setRowCount(ApplicableTable->rowCount() + 1);
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciStep, new QTableWidgetItem("Turbo"));
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciRedemptionGroup, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::RedemptionGroup).value<IntegerVector>().GetVector()));
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciRedemptionGroupLevel, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::RedemptionGroupLevel).value<IntegerVector>().GetVector()));
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciRedemptionShare, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::RedemptionShare).value<BloombergVector>().GetVector()));
+	break;
+	case WatFalPrior::WaterfallStepType::wst_PDL:
+		ApplicableTable = InterestTable;
+		ApplicableUsedCols = &m_IWUsedCols;
+		(*ApplicableUsedCols) << ciStep << ciSeniorityGroup << ciSeniorityGroupLevel;
+		ApplicableTable->setRowCount(ApplicableTable->rowCount() + 1);
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciStep, new QTableWidgetItem("Cure PDL"));
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciSeniorityGroup, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetVector()));
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciSeniorityGroupLevel, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetVector()));
+		if (a.HasParameter(WatFalPrior::wstParameters::RedemptionGroup)) {
+			(*ApplicableUsedCols) << ciRedemptionGroup << ciRedemptionGroupLevel << ciRedemptionShare;
+			ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciRedemptionGroup, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::RedemptionGroup).value<IntegerVector>().GetVector()));
+			ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciRedemptionGroupLevel, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::RedemptionGroupLevel).value<IntegerVector>().GetVector()));
+			ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciRedemptionShare, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::RedemptionShare).value<BloombergVector>().GetVector()));
 		}
 	break;
 	default:
 		QMessageBox::critical(this,"Invalid Step","The step you tried to add is invalid.\nPlease check the Waterfall");
-	}*/
+	}
+	if (a.HasParameter(WatFalPrior::wstParameters::Trigger)) {
+		ApplicableUsedCols->insert(ciTriggers);
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciTriggers, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::Trigger).toString()));
+	}
+	for (int i = 0; i < InterestTable->columnCount(); ++i) {
+		InterestTable->setColumnHidden(i, !m_IWUsedCols.contains(i));
+	}
+	for (int i = 0; i < PrincipalTable->columnCount(); ++i) {
+		PrincipalTable->setColumnHidden(i, !m_PWUsedCols.contains(i));
+	}
+
 }
 void WaterfallViewer::SetWaterfall(const Waterfall& a){
 	for(int i=0;i<a.GetStepsCount();i++){

@@ -21,17 +21,19 @@ StressTest::StressTest(QObject* parent)
 	, BaseFlows(nullptr)
 	, ShowProgress(true)
 	, UseFastVersion(false)
+	, m_ErrorsOccured(false)
 {
 	BaseCalculator = new MtgCalculator(this);
 	BaseCalculator->SetOverrideAssumptions(true);
 	TranchesCalculator = new WaterfallCalculator(this);
 	ResetCurrentAssumption();
 	connect(this, SIGNAL(CurrentScenarioCalculated()), this, SLOT(GoToNextScenario()),Qt::QueuedConnection);
-	connect(this, SIGNAL(ErrorInCalculation()), this, SIGNAL(ErrorInCalculation()), Qt::QueuedConnection);
+	connect(BaseCalculator, SIGNAL(ErrorInCalculation()), this, SLOT(ErrorInCalculation()), Qt::QueuedConnection);
 	connect(this, SIGNAL(AllLoansCalculated()), TranchesCalculator, SLOT(StartCalculation()), Qt::QueuedConnection);
 	connect(TranchesCalculator, SIGNAL(Calculated()), this, SLOT(GatherResults()), Qt::QueuedConnection);
 	connect(TranchesCalculator, SIGNAL(CurrentProgress(double)), this, SLOT(HandleWtfProgress(double)));
-	connect(TranchesCalculator, SIGNAL(ErrorInCalculation(int)), this, SIGNAL(ErrorInCalculation()), Qt::QueuedConnection);
+	connect(TranchesCalculator, SIGNAL(ErrorInCalculation(int)), this, SLOT(ErrorInCalculation()));
+	connect(TranchesCalculator, SIGNAL(ErrorInCalculation(int)), this, SIGNAL(ErrorsOccured()));
 	m_AssumptionsRef[AssCPR] = &m_CPRscenarios;
 	m_AssumptionsRef[AssCDR] = &m_CDRscenarios;
 	m_AssumptionsRef[AssLS] = &m_LSscenarios;
@@ -103,6 +105,7 @@ void StressTest::RunStressTest() {
 	}
 	ResetCurrentAssumption();
 	ContinueCalculation = true;
+	m_ErrorsOccured=false;
 #ifdef PrintExecutionTime
 	ExecutionTime.start();
 #endif
@@ -519,7 +522,10 @@ void StressTest::GatherResults() {
 	if (ProgressForm) {
 		ProgressForm->deleteLater();
 	}
-	emit AllFinished();
+	if (m_ErrorsOccured)
+		emit FinishedWithErrors();
+	else
+		emit AllFinished();
 }
 
 void StressTest::HandleWtfProgress(double pr) {

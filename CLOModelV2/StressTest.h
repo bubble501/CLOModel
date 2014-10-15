@@ -39,6 +39,7 @@ private:
 	QScopedPointer<MtgCashFlow> BaseFlows;
 	QPointer<ProgressWidget> ProgressForm;
 	QHash<uint, AssumptionSet> m_RainbowTable;
+	bool m_ErrorsOccured;
 protected:
 	WaterfallCalculator* TranchesCalculator;
 	MtgCalculator* BaseCalculator;
@@ -129,14 +130,16 @@ private slots:
 	void StoppedCalculation() { ResetStressTest(); }
 	void GatherResults();
 	void HandleWtfProgress(double pr);
+	void ErrorInCalculation() { m_ErrorsOccured = true; }
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 signals:
 	void CurrentScenarioCalculated();
-	void ErrorInCalculation();
 	void ProgressStatus(double);
 	void AllLoansCalculated();
 	void AllFinished();
+	void FinishedWithErrors();
+	void ErrorsOccured();
 
 };
 QDataStream& operator<<(QDataStream & stream, const StressTest& flows);

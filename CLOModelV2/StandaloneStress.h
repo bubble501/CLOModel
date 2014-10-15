@@ -24,6 +24,7 @@ public:
 private slots:
 	void Start();
 	void Finished();
+	void FinishedEroors();
 	void CheckAllValid();
 	void RowsChanged(int NewRows);
 	void PasteClipboard();

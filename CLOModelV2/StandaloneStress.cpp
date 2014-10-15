@@ -127,6 +127,9 @@ StandaloneStress::StandaloneStress(QWidget *parent)
 		connect(VariablesCount[i],SIGNAL(valueChanged(int)),this,SLOT(RowsChanged()),Qt::QueuedConnection);
 	}
 	connect(Stresser, SIGNAL(AllFinished()), this, SLOT(Finished()));
+	connect(Stresser, SIGNAL(FinishedWithErrors()), this, SLOT(FinishedEroors()));
+	connect(Stresser, SIGNAL(ErrorsOccured()), Stresser, SLOT(StopCalculation()));
+	connect(Stresser, SIGNAL(ErrorsOccured()), this, SLOT(FinishedEroors()), Qt::QueuedConnection);
 	CheckAllValid();
 }
 
@@ -246,6 +249,13 @@ void StandaloneStress::Finished(){
 	QDir dir(OutPathEdit->text());
 	Stresser->SaveResults(dir.absolutePath());
 	if(QMessageBox::information(this,tr("Finished"),tr("Stress Test Finished Successfully"))==QMessageBox::Ok) close();
+}
+void StandaloneStress::FinishedEroors() {
+#ifdef _DEBUG
+	QDir dir(OutPathEdit->text());
+	Stresser->SaveResults(dir.absolutePath());
+#endif // _DEBUG
+	if (QMessageBox::critical(this, tr("Finished"), tr("Errors Occured during calculation of stress test\nNo results were saved")) == QMessageBox::Ok) close();
 }
 
 

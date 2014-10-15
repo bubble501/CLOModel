@@ -69,9 +69,11 @@ protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 private slots:
 	void BeeReturned(int,const MtgCashFlow& a);
+	void HandleErrorInCalculation(int a) { BeeReturned(a, MtgCashFlow()); }
 signals:
 	void Calculated();
 	void BeeCalculated(int);
+	void ErrorInCalculation();
 	friend QDataStream& operator<<(QDataStream & stream, const MtgCalculator& flows);
 	friend QDataStream& operator>>(QDataStream & stream, MtgCalculator& flows);
 };

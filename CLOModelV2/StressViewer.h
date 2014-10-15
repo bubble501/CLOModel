@@ -20,6 +20,7 @@ private:
 	QString ParamNames[NumStressDimentsions];
 	QComboBox* DisplayValuesCombo;
 	QDoubleSpinBox* PriceSpin;
+	QLabel* PriceLabel;
 	QList<QString> AvailableAssumptions[NumStressDimentsions];
 	QTableWidget* StressTable;
 	StressTest* StressTarget;
@@ -28,6 +29,8 @@ private:
 	QLabel* ConstParLabel[NumStressDimentsions - 2];
 	QComboBox* VariableParCombo[2];
 	QLabel* VariableParLabel[2];
+	QPropertyAnimation GradientBase;
+	bool PriceToBeSet;
 	enum {
 		AssCPR = 0
 		, AssCDR = 1
@@ -37,11 +40,16 @@ private:
 		, AssDelinqLag = 5
 	};
 protected:
+	const QColor GreenFill;
+	const QColor YellowFill;
+	const QColor RedFill;
+	const QColor GrayFill;
 	void closeEvent(QCloseEvent *event);
+	
 private slots:
-	//void StressStructureChanged();
-	//void TrancheTargetChanged(int NewTarget);
-	void RowColComboChanged();
+	void UpdateCombos();
+	void UpdateTable();
+	void SetPriceChange() { PriceToBeSet = true; }
 signals:
 	//void StressLevelChanged(Waterfall);
 	void Closing();

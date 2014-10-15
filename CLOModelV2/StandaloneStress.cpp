@@ -32,7 +32,7 @@ StandaloneStress::StandaloneStress(QWidget *parent)
 	RegisterAsMetaType<Waterfall>();
 	RegisterAsMetaType<MtgCashFlow>();
 	Stresser=new StressTest(this);
-	connect(Stresser,SIGNAL(AllFinished()),this,SLOT(Finished()));
+	
 
 	QVBoxLayout* MainLay=new QVBoxLayout(this);
 	StressToCallBox=new QCheckBox(this);
@@ -120,11 +120,13 @@ StandaloneStress::StandaloneStress(QWidget *parent)
 	MainLay->addLayout(BottomLay);
 
 	connect(InPathEdit,SIGNAL(editingFinished()),this,SLOT(CheckAllValid()),Qt::QueuedConnection);
+	connect(OutPathEdit, SIGNAL(editingFinished()), this, SLOT(CheckAllValid()), Qt::QueuedConnection);
 	connect(StartButton,SIGNAL(clicked()),this,SLOT(Start()));
 	for(int i=0;i<2;i++){
 		connect(VariablesList[i],SIGNAL(itemChanged(QTableWidgetItem *)),this,SLOT(CheckAllValid()),Qt::QueuedConnection);
 		connect(VariablesCount[i],SIGNAL(valueChanged(int)),this,SLOT(RowsChanged()),Qt::QueuedConnection);
 	}
+	connect(Stresser, SIGNAL(AllFinished()), this, SLOT(Finished()));
 	CheckAllValid();
 }
 
@@ -133,8 +135,8 @@ void StandaloneStress::CheckAllValid(){
 	InPathEdit->setStyleSheet("");
 	OutPathEdit->setStyleSheet("");
 	InPathEdit->setToolTip(tr("Path to model clom file"));
-	QDir OutFolder = OutPathEdit->text();
-	if (!OutFolder.exists() && !OutPathEdit->text().isEmpty()) {
+	QDir OutFolder(OutPathEdit->text());
+	if (!OutFolder.exists() || OutPathEdit->text().isEmpty()) {
 		StartButton->setEnabled(false);
 		OutPathEdit->setStyleSheet("background-color: red;");
 	}
@@ -219,7 +221,8 @@ void StandaloneStress::Start() {
 		}
 		ModelFile.close();
 	}
-	for (auto i = TmpMtg.GetLoans().constBegin(); i != TmpMtg.GetLoans().constEnd(); ++i) {
+	const QHash<qint32, Mortgage*>& SourceLoans = TmpMtg.GetLoans();
+	for (auto i = SourceLoans.constBegin(); i != SourceLoans.constEnd(); ++i) {
 		Stresser->AddLoan(*(i.value()));
 	}
 	for (int j = 0; j < VariablesList[0]->rowCount(); j++) Stresser->AddCPRscenarios(VariablesList[0]->item(j, 0)->text());
@@ -234,12 +237,15 @@ void StandaloneStress::Start() {
 	Stresser->SetStructure(TempWaterfall);
 	Stresser->SetUseFastVersion(FastStressBox->isChecked());
 	hide();
+#ifdef _DEBUG
+	Stresser->UseMultithread(false);
+#endif // _DEBUG
 	Stresser->RunStressTest();
 }
 void StandaloneStress::Finished(){
 	QDir dir(OutPathEdit->text());
 	Stresser->SaveResults(dir.absolutePath());
-	if(QMessageBox::information(this,tr("Finished"),tr("Stress Test Finished Successfully"))==QMessageBox::Ok) show();
+	if(QMessageBox::information(this,tr("Finished"),tr("Stress Test Finished Successfully"))==QMessageBox::Ok) close();
 }
 
 

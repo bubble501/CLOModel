@@ -754,6 +754,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 				//This is not a Tranche payment date
 				foreach(const WatFalPrior* SingleStep,m_WaterfallStesps){
 					if(SingleStep->GetPriorityType()==WatFalPrior::WaterfallStepType::wst_ReinvestPrincipal){
+						//LOGDEBUG("Reinvestment Trigger: " + SingleStep->GetParameter(WatFalPrior::wstParameters::Trigger).toString());
 						if (TriggerPassing(SingleStep->GetParameter(WatFalPrior::wstParameters::Trigger).toString(), i, RollingNextIPD, IsCallPaymentDate) && !IsCallPaymentDate && i<m_MortgagesPayments.Count() - 1) {
 							//If it should, reinvest
 							if (m_PrincipalAvailable.Total() > 0.0) {
@@ -1332,6 +1333,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 				break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				case WatFalPrior::WaterfallStepType::wst_ReinvestPrincipal:
+					LOGDEBUG("Reinvestment Trigger: " + SingleStep->GetParameter(WatFalPrior::wstParameters::Trigger).toString()+m_Triggers.value(5)->ToString());
 					if (!IsCallPaymentDate && i<m_MortgagesPayments.Count()-1) {
 						if(AvailablePrincipal.Total()>0.0){
 							double PayablePrincipal;
@@ -1871,7 +1873,7 @@ bool Waterfall::ValidTriggerStructure(const QString& TriggerStructure)const {
 		LOGDEBUG("Failed in Postfix"); 
 		return false; 
 	}
-	QRegExp SignleTriggers(QString("\\b") + NegateTriggerChar + "?(\\d+)\\b");
+	QRegExp SignleTriggers("\\b(\\d+)\\b");
 	if (SignleTriggers.indexIn(AdjStructure) < 0) return false;
 	QStringList CapturedTriggers = SignleTriggers.capturedTexts();
 	for (auto i = CapturedTriggers.constBegin()+1;i!=CapturedTriggers.constEnd();++i){
@@ -1886,7 +1888,7 @@ bool Waterfall::ValidTriggerStructure(const QString& TriggerStructure)const {
 bool Waterfall::TriggerPassing(const QString& TriggerStructure, int PeriodIndex,const QDate& CurrentIPD, bool IsCallDate) {
 	QString AdjStructure = InfixToPostfix(TriggerStructure);
 	if (AdjStructure.isEmpty()) return false;
-	QRegExp SignleTriggers(QString("\\b") + NegateTriggerChar +"?(\\d+)\\b");
+	QRegExp SignleTriggers("\\b(\\d+)\\b");
 	if (SignleTriggers.indexIn(AdjStructure) < 0) return false;
 	QStringList CapturedTriggers = SignleTriggers.capturedTexts();
 	for (auto i = CapturedTriggers.constBegin() + 1; i != CapturedTriggers.constEnd(); ++i) {
@@ -1901,13 +1903,10 @@ bool Waterfall::TriggerPassing(const QString& TriggerStructure, int PeriodIndex,
 	}
 	QStack<bool> PolishStack;
 	QStringList PolishParts = AdjStructure.split(' ');
-	SignleTriggers.setPattern(NegateTriggerChar+QString("?\\d+"));
+	SignleTriggers.setPattern("\\d+");
 	foreach(const QString& SinglePart, PolishParts) {
 		if (SignleTriggers.exactMatch(SinglePart)) {
-			if (SinglePart.at(0) == QString(NegateTriggerChar).replace(QRegExp("\\+"), "")) 
-				PolishStack.push(m_TriggersResults.GetResult(SinglePart.mid(1).toUInt(), CurrentIPD) != TriggersResults::TrigRes::trTrue);
-			else
-				PolishStack.push(m_TriggersResults.GetResult(SinglePart.mid(1).toUInt(), CurrentIPD) == TriggersResults::TrigRes::trTrue);
+				PolishStack.push(m_TriggersResults.GetResult(SinglePart.toUInt(), CurrentIPD) == TriggersResults::TrigRes::trTrue);
 		}
 		else {
 			switch (SinglePart.at(0).toLatin1()) {
@@ -1915,6 +1914,7 @@ bool Waterfall::TriggerPassing(const QString& TriggerStructure, int PeriodIndex,
 			case '*': PolishStack.push(PolishStack.pop() && PolishStack.pop()); break;
 			case '-': PolishStack.push(!(PolishStack.pop() || PolishStack.pop())); break;
 			case '/': PolishStack.push(!(PolishStack.pop() && PolishStack.pop())); break;
+			case '!': PolishStack.push(!PolishStack.pop());
 			default: return false;
 			}
 		}
@@ -1927,6 +1927,13 @@ bool Waterfall::EvaluateTrigger(quint32 TrigID, int PeriodIndex, const QDate& Cu
 	if (!CurrentTrigger) return false;
 	switch (CurrentTrigger->GetTriggerType()) {
 	case AbstractTrigger::TriggerType::DateTrigger:
+/*
+		LOGCONDITIONALLY(
+			TrigID == 5 && CurrentTrigger.dynamicCast<DateTrigger>()->Passing(CurrentIPD)
+			, "CurrentIPD: " +CurrentIPD.toString("yyyy-MM-dd") 
+			+ "\nTrigger Limit: "+ CurrentTrigger.dynamicCast<DateTrigger>()->GetLimitDate().toString("yyyy-MM-dd") 
+			+ QString("\nTrigger Side: %1").arg(static_cast<quint32>(CurrentTrigger.dynamicCast<DateTrigger>()->GetSide()))
+		);*/
 		return CurrentTrigger.dynamicCast<DateTrigger>()->Passing(CurrentIPD);
 	case AbstractTrigger::TriggerType::VectorTrigger:{
 		QSharedPointer<VectorTrigger> TempTrig = CurrentTrigger.dynamicCast<VectorTrigger>();

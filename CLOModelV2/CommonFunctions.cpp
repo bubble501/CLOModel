@@ -327,8 +327,14 @@ double GetLoanAssumption(const QString& LoanName, int columnIndex, QDate RefDate
 }
 
 QString InfixToPostfix(const QString& a) {
-	const QChar AdjNegateChar = QString(NegateTriggerChar).replace(QRegExp("\\+"), "").at(0);
-	QRegExp CheckValidNumber(NegateTriggerChar + QString("?\\d+"));
+	QString ops("-+/*");
+	{
+		//Prevent two operators one after another
+		QRegExp CheckDoubleOperator('[' + ops + "]\\s*[" + ops + "]",Qt::CaseInsensitive);
+		if (CheckDoubleOperator.indexIn(a) >= 0) return QString();
+	}
+	ops += '!';
+	QRegExp CheckValidNumber("\\d+");
 	QString Spaced("");
 	for (auto i = a.constBegin(); i != a.constEnd(); ++i) {
 		if (i->isSpace()) continue;
@@ -336,11 +342,10 @@ QString InfixToPostfix(const QString& a) {
 			Spaced.append(*i);
 		}
 		else  {
-			if (!(i->isDigit() && ((i - 1)->isDigit() || *(i - 1) == AdjNegateChar))) Spaced.append(' ');
+			if (!(i->isDigit() && ((i - 1)->isDigit()))) Spaced.append(' ');
 				Spaced.append(*i);
 		}
 	}
-	const QString ops("-+/*");
 	QStack<qint32> s;
 	QString sb("");
 	QStringList parts = Spaced.split(QRegExp("\\s"));
@@ -376,5 +381,6 @@ QString InfixToPostfix(const QString& a) {
 	}
 	while (!s.isEmpty())
 		sb.append(ops.at(s.pop())).append(' ');
+	LOGDEBUG("Postfix Version: " + sb.trimmed());
 	return sb.trimmed();
 }

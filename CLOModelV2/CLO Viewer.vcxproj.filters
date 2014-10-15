@@ -143,22 +143,10 @@
     <ClCompile Include="GeneratedFiles\Release\moc_StressTest.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_StressThread.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_StressThread.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_StressViewer.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_StressViewer.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_StressWorker.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_StressWorker.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_SummaryView.cpp">
@@ -231,12 +219,6 @@
       <Filter>Source Files\Core Files</Filter>
     </ClCompile>
     <ClCompile Include="StressTest.cpp">
-      <Filter>Source Files\Core Files</Filter>
-    </ClCompile>
-    <ClCompile Include="StressThread.cpp">
-      <Filter>Source Files\Core Files</Filter>
-    </ClCompile>
-    <ClCompile Include="StressWorker.cpp">
       <Filter>Source Files\Core Files</Filter>
     </ClCompile>
     <ClCompile Include="Tranche.cpp">
@@ -343,6 +325,24 @@
     </ClCompile>
     <ClCompile Include="VectorTrigger.cpp">
       <Filter>Source Files\Core Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ApplyFlowThread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ApplyFlowThread.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ApplyFlowThread.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="AssumptionSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TriggersResults.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PrincipalProceeds.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -484,6 +484,15 @@
     <ClInclude Include="VectorTrigger.h">
       <Filter>Header Files\Core Files</Filter>
     </ClInclude>
+    <ClInclude Include="AssumptionSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TriggersResults.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PrincipalProceeds.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="quazip\quagzipfile.h">
@@ -505,12 +514,6 @@
       <Filter>Header Files\Core Files</Filter>
     </CustomBuild>
     <CustomBuild Include="StressTest.h">
-      <Filter>Header Files\Core Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="StressThread.h">
-      <Filter>Header Files\Core Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="StressWorker.h">
       <Filter>Header Files\Core Files</Filter>
     </CustomBuild>
     <CustomBuild Include="WaterfallCalcThread.h">
@@ -545,6 +548,9 @@
     </CustomBuild>
     <CustomBuild Include="QBbgWorker.h">
       <Filter>Header Files\Core Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ApplyFlowThread.h">
+      <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

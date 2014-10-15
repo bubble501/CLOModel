@@ -38,7 +38,7 @@ private:
 	qint32 CountScenariosCalculated(int level = NumStressDimentsions - 1);
 	QScopedPointer<MtgCashFlow> BaseFlows;
 	QPointer<ProgressWidget> ProgressForm;
-	QHash<qint32, AssumptionSet> m_RainbowTable;
+	QHash<uint, AssumptionSet> m_RainbowTable;
 protected:
 	WaterfallCalculator* TranchesCalculator;
 	MtgCalculator* BaseCalculator;

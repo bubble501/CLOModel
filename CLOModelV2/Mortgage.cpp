@@ -406,7 +406,7 @@ void Mortgage::SetInterest(const QString& a){
 	 }
 	 else {
 		 m_Properties+="#<#" + PropName.trimmed() + "#=#" + Value.trimmed() + "#>#";
-		 LOGDEBUG(m_Properties);
+		 LOGDEBUG("Property Set: "+m_Properties);
 	 }
  }
 

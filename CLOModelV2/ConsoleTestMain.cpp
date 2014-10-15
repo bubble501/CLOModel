@@ -21,14 +21,16 @@
 #include "DateTrigger.h"
 #include "PoolSizeTrigger.h"
 #include "StressViewer.h"
+#include "SummaryView.h"
 int main(int argc, char *argv[]) {
-	QApplication a(argc, argv);
+	/*QApplication a(argc, argv);
 	StressViewer b;
-	b.LoadStress("C:/Temp/.StressResult.fcsr");
+	b.LoadStress("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/.StressResult.fcsr");
+	//b.LoadStress("C:/Temp/StressResult.fcsr");
 	b.show();
-	return a.exec();
+	return a.exec();*/
 
-	/*Waterfall TempWtf, TempCallWaterfall;
+	Waterfall TempWtf, TempCallWaterfall;
 	QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/.BaseCase.clo");
 	//QFile file("C:/Temp/.SavedInputs.clo");
 	file.open(QIODevice::ReadOnly);
@@ -46,7 +48,7 @@ int main(int argc, char *argv[]) {
 	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempCallWaterfall;
 	file.close();
-	TempCallWaterfall.CalculateTranchesCashFlows();*/
+	TempCallWaterfall.CalculateTranchesCashFlows();
 
 	/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	QApplication a(argc, argv);
@@ -59,4 +61,27 @@ int main(int argc, char *argv[]) {
 		).GetTranche("HARVT 10X A"));
 	return a.exec();
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
+
+	
+	/*QApplication a(argc, argv);
+	QFile file("C:/Temp/Wrong 20#,#8#,#100#,#0#,#0#,#0.csw");
+	//QFile file("C:/Temp/20#,#8#,#100#,#0#,#0#,#0.csw");
+	file.open(QIODevice::ReadOnly);
+	qint32 VersionChecker;
+	QDataStream out(&file);
+	out.setVersion(QDataStream::Qt_5_3);
+	out >> VersionChecker;
+	if (VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) {
+	file.close();
+	return 1;
+	}
+	Waterfall TempWtf;
+	TempWtf.SetLoadProtocolVersion(VersionChecker);
+	out >> TempWtf;
+	file.close();
+	//TempWtf.CalculateTranchesCashFlows();
+	SummaryView Check;
+	Check.SetStructure(TempWtf);
+	Check.show();
+	return a.exec();*/
 }

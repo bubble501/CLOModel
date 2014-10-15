@@ -11,13 +11,29 @@
 #include <QTableWidget>
 #include <QTableWidgetItem>
 void StressViewer::closeEvent(QCloseEvent *event){
-	//emit Closing();
+	emit Closing();
 	event->accept();
 }
 
 StressViewer::StressViewer(QWidget* parent/*=0*/)
 	:QWidget(parent)
+#ifdef USE_SOFT_COLOUR
+	, GreenFill(196,215,155)
+	, YellowFill(255,255,204)
+	, RedFill(192, 80, 70)
+	, GrayFill(191, 191,191)
+#else
+	, GreenFill(Qt::green)
+	, YellowFill(Qt::yellow)
+	, RedFill(Qt::red)
+	, GrayFill(Qt::gray)
+#endif
+	, PriceToBeSet(false)
 {
+	GradientBase.setEasingCurve(QEasingCurve::Linear);
+	GradientBase.setDuration(100.0);
+	GradientBase.setKeyValueAt(0.0, QColor(YellowFill));
+	GradientBase.setKeyValueAt(1.0, QColor(GreenFill));
 	ParamNames[0] = tr("CPR");
 	ParamNames[1] = tr("CDR");
 	ParamNames[2] = tr("LS");
@@ -41,11 +57,15 @@ StressViewer::StressViewer(QWidget* parent/*=0*/)
 	TrancheCombo = new QComboBox(this);
 	TopLay->addWidget(TrancheCombo);
 	TopLay->addItem(HSpace);
-	TempLabel = new QLabel(this);
-	TempLabel->setText(tr("Price:"));
-	TopLay->addWidget(TempLabel);
-	TempLabel->hide();
+	PriceLabel = new QLabel(this);
+	PriceLabel->setText(tr("Price:"));
+	TopLay->addWidget(PriceLabel);
+	PriceLabel->hide();
 	PriceSpin = new QDoubleSpinBox(this);
+	PriceSpin->setMinimum(0.01);
+	PriceSpin->setMaximum(300.0);
+	PriceSpin->setDecimals(2);
+	PriceSpin->setSingleStep(0.1);
 	PriceSpin->setValue(100.0);
 	TopLay->addWidget(PriceSpin);
 	PriceSpin->hide();
@@ -75,6 +95,7 @@ StressViewer::StressViewer(QWidget* parent/*=0*/)
 		ConstParLabel[ParamIter]->setText(ParamNames[j]);
 		ConstParLabel[ParamIter]->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 		ConstParCombo[ParamIter] = new QComboBox(this);
+		ConstParCombo[ParamIter]->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 		TopLay->addWidget(ConstParLabel[ParamIter]);
 		TopLay->addWidget(ConstParCombo[ParamIter]);
 		ParamIter++;
@@ -120,9 +141,14 @@ StressViewer::StressViewer(QWidget* parent/*=0*/)
 	CentreLay->addLayout(TableToplay, 0, 1);
 	MainLay->addWidget(ConstGroup);
 
-	connect(TrancheCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(TrancheTargetChanged(int)));
-	connect(VariableParCombo[0], SIGNAL(currentIndexChanged(int)), this, SLOT(RowColComboChanged()));
-	connect(VariableParCombo[1], SIGNAL(currentIndexChanged(int)), this, SLOT(RowColComboChanged()));
+	connect(TrancheCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(SetPriceChange()));
+	connect(TrancheCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateTable()), Qt::QueuedConnection);
+	connect(DisplayValuesCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateTable()), Qt::QueuedConnection);
+	connect(PriceSpin, SIGNAL(valueChanged(double)), this, SLOT(UpdateTable()), Qt::QueuedConnection);
+	connect(VariableParCombo[0], SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateCombos()));
+	connect(VariableParCombo[0], SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateTable()), Qt::QueuedConnection);
+	connect(VariableParCombo[1], SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateCombos()));
+	connect(VariableParCombo[1], SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateTable()), Qt::QueuedConnection);
 
 }
 
@@ -141,80 +167,19 @@ bool StressViewer::LoadStress(const QString& filename) {
 	AvailableAssumptions[AssRecLag] = StressTarget->GetRecLagScenarios().toList();
 	AvailableAssumptions[AssDelinq] = StressTarget->GetDelinqScenarios().toList();
 	AvailableAssumptions[AssDelinqLag] = StressTarget->GetDelinqLagScenarios().toList();
+	for (int i = 0; i < NumStressDimentsions; ++i) qSort(AvailableAssumptions[i].begin(), AvailableAssumptions[i].end(), [](const QString& a, const QString& b) {return BloombergVector(a).GetValue(0) < BloombergVector(b).GetValue(0); });
 	TrancheCombo->clear();
 	for (int i = 0; i < StressTarget->GetStructure().GetTranchesCount(); ++i) {
 		TrancheCombo->addItem(StressTarget->GetStructure().GetTranche(i)->GetTrancheName(), i);
 	}
-	StressTable->setRowCount(AvailableAssumptions[VariableParCombo[0]->currentData().toInt()].size());
-	StressTable->setColumnCount(AvailableAssumptions[VariableParCombo[1]->currentData().toInt()].size());
-	StressTable->setVerticalHeaderLabels(AvailableAssumptions[VariableParCombo[0]->currentData().toInt()]);
-	StressTable->setHorizontalHeaderLabels(AvailableAssumptions[VariableParCombo[1]->currentData().toInt()]);
-	int ParamIter = 0;
-	for (int j = 0; j < NumStressDimentsions; ++j) {
-		if (VariableParCombo[0]->currentData().toInt() == j || VariableParCombo[1]->currentData().toInt() == j) continue;
-		ConstParCombo[ParamIter]->clear();
-		ConstParLabel[ParamIter]->setText(ParamNames[j]);
-		for (auto i = AvailableAssumptions[j].constBegin(); i != AvailableAssumptions[j].constEnd();++i)
-			ConstParCombo[ParamIter]->addItem(*i);
-		ParamIter++;
-	}
-	for (int i = 0; i < StressTable->rowCount(); ++i) {
-		for (int j = 0; j < StressTable->columnCount(); ++j) {
-			QSharedPointer<Waterfall> CurrentRes = StressTarget->GetResults().value(AssembleAssumption(i, j));
-			if (!CurrentRes) {
-				StressTable->setItem(i, j, new QTableWidgetItem("N/A"));
-				continue;
-			}
-			const Tranche* CurrTran = CurrentRes->GetTranche(TrancheCombo->currentText());
-			if (!CurrTran) {
-				StressTable->setItem(i, j, new QTableWidgetItem("N/A"));
-				continue;
-			}
-			switch (DisplayValuesCombo->currentData().toInt()) {
-			case 0:
-				StressTable->setItem(i, j, new QTableWidgetItem(Commarize(
-					CurrTran->GetLossRate()
-					*100.0, 2) + '%'));
-				break;
-			case 1:
-				StressTable->setItem(i, j, new QTableWidgetItem(Commarize(
-					CurrTran->GetDiscountMargin(PriceSpin->value())
-					, 0)));
-				break;
-			case 2:
-				StressTable->setItem(i, j, new QTableWidgetItem(Commarize(
-					CurrTran->GetWALife(CurrTran->GetSettlementDate())
-					, 0)));
-				break;
-			default:
-				StressTable->setItem(i, j, new QTableWidgetItem("N/A"));
-			}
-		}
-	}
+	UpdateCombos();
+	UpdateTable();
 	return true;
-}
-
-void StressViewer::RowColComboChanged() {
-	
-	int ParamIter=0;
-	StressTable->setRowCount(AvailableAssumptions[VariableParCombo[0]->currentData().toInt()].size());
-	StressTable->setColumnCount(AvailableAssumptions[VariableParCombo[1]->currentData().toInt()].size());
-	StressTable->setVerticalHeaderLabels(AvailableAssumptions[VariableParCombo[0]->currentData().toInt()]);
-	StressTable->setHorizontalHeaderLabels(AvailableAssumptions[VariableParCombo[1]->currentData().toInt()]);
-	for (int j = 0; j < NumStressDimentsions; ++j) {
-		if (VariableParCombo[0]->currentData().toInt() == j || VariableParCombo[1]->currentData().toInt() == j) continue;
-		ConstParLabel[ParamIter]->setText(ParamNames[j]);
-		ConstParCombo[ParamIter]->clear();
-		foreach(const QString& a, AvailableAssumptions[j])
-			ConstParCombo[ParamIter]->addItem(a);
-		ParamIter++;
-	}
 }
 
 AssumptionSet StressViewer::AssembleAssumption(int r, int c) const {
 	AssumptionSet Result;
 	int ConstIndex = 0;
-
 	if (VariableParCombo[0]->currentData().toInt() == AssCPR) Result.SetCPRscenario(AvailableAssumptions[AssCPR].at(r));
 	else if (VariableParCombo[1]->currentData().toInt() == AssCPR) Result.SetCPRscenario(AvailableAssumptions[AssCPR].at(c));
 	else Result.SetCPRscenario(ConstParCombo[ConstIndex++]->currentText());
@@ -233,6 +198,116 @@ AssumptionSet StressViewer::AssembleAssumption(int r, int c) const {
 	if (VariableParCombo[0]->currentData().toInt() == AssDelinqLag) Result.SetDelinqLagScenario(AvailableAssumptions[AssDelinqLag].at(r));
 	else if (VariableParCombo[1]->currentData().toInt() == AssDelinqLag) Result.SetDelinqLagScenario(AvailableAssumptions[AssDelinqLag].at(c));
 	else Result.SetDelinqLagScenario(ConstParCombo[ConstIndex++]->currentText());
-
 	return Result;
+}
+
+void StressViewer::UpdateCombos() {
+	StressTable->setRowCount(AvailableAssumptions[VariableParCombo[0]->currentData().toInt()].size());
+	StressTable->setColumnCount(AvailableAssumptions[VariableParCombo[1]->currentData().toInt()].size());
+	StressTable->setVerticalHeaderLabels(AvailableAssumptions[VariableParCombo[0]->currentData().toInt()]);
+	StressTable->setHorizontalHeaderLabels(AvailableAssumptions[VariableParCombo[1]->currentData().toInt()]);
+	int ParamIter = 0;
+	for (int j = 0; j < NumStressDimentsions; ++j) {
+		if (VariableParCombo[0]->currentData().toInt() == j || VariableParCombo[1]->currentData().toInt() == j) continue;
+		ConstParCombo[ParamIter]->clear();
+		ConstParLabel[ParamIter]->setText(ParamNames[j]);
+		for (auto i = AvailableAssumptions[j].constBegin(); i != AvailableAssumptions[j].constEnd(); ++i)
+			ConstParCombo[ParamIter]->addItem(*i);
+		ParamIter++;
+	}
+}
+
+void StressViewer::UpdateTable() {
+	QTableWidgetItem* CurrentItem=nullptr;
+	double CurrentData;
+	double MaxDisc, MinDisc;
+	bool Minset = false;
+	for (int i = 0; i < StressTable->rowCount(); ++i) {
+		for (int j = 0; j < StressTable->columnCount(); ++j) {
+			CurrentItem = nullptr;
+			const QSharedPointer<Waterfall> CurrentRes = StressTarget->GetResults().value(AssembleAssumption(i, j));
+			if (!CurrentRes) {
+				CurrentItem=new QTableWidgetItem("N/A");
+				CurrentItem->setData(Qt::UserRole, "N/A");
+				CurrentItem->setBackgroundColor(GrayFill);
+			}
+			else {
+				const Tranche* const CurrTran = CurrentRes->GetTranche(TrancheCombo->currentText());
+				if (!CurrTran) {
+					CurrentItem = new QTableWidgetItem("N/A");
+					CurrentItem->setData(Qt::UserRole, "N/A");
+					CurrentItem->setBackgroundColor(GrayFill);
+				}
+				else {
+					switch (DisplayValuesCombo->currentData().toInt()) {
+					case 0:
+						CurrentData = CurrTran->GetLossRate();
+						CurrentItem = new QTableWidgetItem(Commarize(CurrentData*100.0, 2) + '%');
+						CurrentItem->setData(Qt::UserRole, CurrentData);
+						if (CurrentData >= 1.0) CurrentItem->setBackgroundColor(RedFill);
+						else if (CurrentData>0.0) CurrentItem->setBackgroundColor(YellowFill);
+						else CurrentItem->setBackgroundColor(GreenFill);
+						break;
+					case 1:
+						if (PriceToBeSet) {PriceSpin->setValue(CurrTran->GetPrice()); PriceToBeSet = false;}
+						CurrentData = CurrTran->GetDiscountMargin(PriceSpin->value());
+						if ((i == 0 && j == 0) || CurrentData>MaxDisc) MaxDisc = CurrentData;
+						if ((!Minset || CurrentData<MinDisc) && CurrentData >= 1.0) { MinDisc = CurrentData; Minset = true; }
+						CurrentItem = new QTableWidgetItem(Commarize(CurrentData, 0));
+						CurrentItem->setData(Qt::UserRole, CurrentData);
+						break;
+					case 2:
+						CurrentData = CurrTran->GetWALife(CurrTran->GetSettlementDate());
+						if ((i == 0 && j == 0) || CurrentData > MaxDisc) MaxDisc = CurrentData;
+						if ((!Minset || CurrentData < MinDisc) && CurrentData>0) { MinDisc = CurrentData; Minset = true; }
+						CurrentItem = new QTableWidgetItem(Commarize(CurrentData, 2));
+						CurrentItem->setData(Qt::UserRole, CurrentData);
+						break;
+					default:
+						CurrentItem = new QTableWidgetItem("N/A");
+						CurrentItem->setData(Qt::UserRole, "N/A");
+						CurrentItem->setBackgroundColor(GrayFill);
+					}
+				}
+			}
+			StressTable->setItem(i, j, CurrentItem);
+		}
+	}
+	for (int i = 0; i < StressTable->rowCount(); i++) {
+		for (int j = 0; j < StressTable->columnCount(); j++) {
+			CurrentItem = StressTable->item(i, j);
+			if (CurrentItem->data(Qt::UserRole).toString() == "N/A") continue;
+			switch (DisplayValuesCombo->currentData().toInt()) {
+			case 1:
+				CurrentData = CurrentItem->data(Qt::UserRole).toDouble();
+				if (CurrentData < 1.0) CurrentItem->setBackgroundColor(RedFill);
+				else {
+					if (MaxDisc - MinDisc < 1.0) GradientBase.setCurrentTime(100.0);
+					else GradientBase.setCurrentTime(100.0*(CurrentData - MinDisc) / (MaxDisc - MinDisc));
+					CurrentItem->setBackgroundColor(GradientBase.currentValue().value<QColor>());
+				}
+				break;
+
+			case 2:
+				CurrentData = CurrentItem->data(Qt::UserRole).toDouble();
+				if (CurrentData <= 0.0) CurrentItem->setBackgroundColor(RedFill);
+				else {
+					if (MaxDisc - MinDisc < 1.0) GradientBase.setCurrentTime(100.0);
+					else GradientBase.setCurrentTime(100.0 - (100.0*(CurrentData - MinDisc) / (MaxDisc - MinDisc)));
+					CurrentItem->setBackgroundColor(GradientBase.currentValue().value<QColor>());
+				}
+				break;
+			default:
+				break;
+			}
+		}
+	}
+	if (DisplayValuesCombo->currentData().toInt() == 1) {
+		PriceSpin->show();
+		PriceLabel->show();
+	}
+	else {
+		PriceSpin->hide();
+		PriceLabel->hide();
+	}
 }

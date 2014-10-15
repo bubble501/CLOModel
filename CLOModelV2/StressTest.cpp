@@ -91,7 +91,7 @@ void StressTest::RunStressTest() {
 	if (m_RecLagScenarios.isEmpty()) m_RecLagScenarios.insert("0");
 	if (m_DelinqScenarios.isEmpty()) m_DelinqScenarios.insert("0");
 	if (m_DelinqLagScenarios.isEmpty()) m_DelinqLagScenarios.insert("0");
-	quint32 CheckScen=RemoveInvalidScenarios();
+	quint32 CheckScen = RemoveInvalidScenarios();
 	if (CheckScen > 0) {
 		if (QMessageBox::warning(
 			0
@@ -153,13 +153,14 @@ void StressTest::RunCurrentScenario() {
 			, CurrentAss.GetCDRscenario()
 			, CurrentAss.GetLSscenario()
 		));
-		if (m_RainbowTable.contains(qHash(CurrentAss, 88))) {
+		uint CurrentHash = qHash(CurrentAss, 88);
+		if (m_RainbowTable.contains(CurrentHash)) {
 			emit ErrorInCalculation();
 			return;
 		}
-		m_RainbowTable.insert(qHash(CurrentAss, 88), CurrentAss);
+		m_RainbowTable.insert(CurrentHash, CurrentAss);
 		Structure.SetAssumptions(CurrentAss);
-		TranchesCalculator->AddWaterfall(Structure, qHash(CurrentAss, 88));
+		TranchesCalculator->AddWaterfall(Structure, CurrentHash);
 		emit CurrentScenarioCalculated();
 	}
 	else {
@@ -197,6 +198,7 @@ void StressTest::SlowLoansCalculated() {
 	TranchesCalculator->AddWaterfall(Structure, qHash(CurrentAss, 88));
 	emit CurrentScenarioCalculated();
 }
+
 void StressTest::GoToNextScenario() {
 	if (!IncreaseCurrentAssumption()) {
 #ifdef PrintExecutionTime
@@ -527,6 +529,8 @@ void StressTest::HandleWtfProgress(double pr) {
 void StressTest::ResetScenarios() {
 	for (int i = 0; i < NumStressDimentsions; i++) m_AssumptionsRef[i]->clear();
 }
+
+
 
 
 

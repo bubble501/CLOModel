@@ -15,6 +15,22 @@ protected:
 	virtual void UnpackVector() = 0;
 	virtual bool ValidAnchorDate() const;
 	virtual bool ExtractAnchorDate();
+	template<class T> T GetValueTemplate(const QList<T>& VecVal, const QDate& index, const T& DefaultValue) const {
+		QDate ValidDate(m_AnchorDate);
+		if (m_AnchorDate.isNull()) {
+			ValidDate = QDate::currentDate();
+			//LOGDEBUG("Anchor defaulted to today\n");
+		}
+		if (index < m_AnchorDate) {
+			//LOGDEBUG("Requested date before Anchor\n");
+			return VecVal.first();
+		}
+		return GetValueTemplate(VecVal, MonthDiff(index, ValidDate), DefaultValue);
+	}
+	template<class T> T GetValueTemplate(const QList<T>& VecVal, int index, const T& DefaultValue)const {
+		if (VecVal.isEmpty() || index < 0) return DefaultValue;
+		return VecVal.at(qMin(index, VecVal.size() - 1));
+	}
 public:
 	virtual void Clear();
 	virtual bool SetVector(const QString& Vec);
@@ -27,5 +43,8 @@ public:
 	AbstractBbgVect& operator=(const QString& a){SetVector(a); return *this;}
 	virtual bool IsEmpty() const{return m_Vector.isEmpty();}
 };
+
+
+
 #endif // AbstarctBbgVect_h__
 

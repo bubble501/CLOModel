@@ -235,7 +235,7 @@ void WatFalPrior::RemoveParameter(qint32 ParameterType) {
 
 QString WatFalPrior::ToString() const {
 	QString Result="Waterfall Step\n";
-	Result += QString("Type: %1\nTrigger Structure: %2").arg(static_cast<qint32>(PriorityType)).arg(TriggerStruc);
+	Result += QString("Type: %1\nTrigger Structure: %2\n").arg(static_cast<qint32>(PriorityType)).arg(TriggerStruc);
 	for (auto i = IntParameters.constBegin(); i != IntParameters.constEnd(); ++i) 
 		Result += QString("Parameter %1: %2\n").arg(i.key()).arg(i.value()->GetVector());
 	for (auto i = DoubleParameters.constBegin(); i != DoubleParameters.constEnd(); ++i)

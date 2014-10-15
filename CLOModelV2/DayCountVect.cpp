@@ -79,20 +79,10 @@ bool DayCountVector::IsValid() const {
 	return AbstractBbgVect::IsValid(Result, false);
 }
 DayCountConvention DayCountVector::GetValue(const QDate& index)const {
-	QDate ValidDate(m_AnchorDate);
-	if (m_AnchorDate.isNull()) { 
-		ValidDate = QDate::currentDate(); 
-		LOGDEBUG("Anchor defaulted to today\n"); 
-	}
-	if (index < m_AnchorDate) { 
-		LOGDEBUG("Requested date before Anchor\n"); 
-		return m_VectVal.first();
-	}
-	return GetValue(MonthDiff(index, ValidDate));
+	return GetValueTemplate(m_VectVal, index, DayCountConvention::Invalid);
 }
 DayCountConvention DayCountVector::GetValue(int index)const {
-	if (m_VectVal.isEmpty() || index < 0) return DayCountConvention::Invalid;
-	return m_VectVal.at(qMin(index, m_VectVal.size() - 1));
+	return GetValueTemplate(m_VectVal, index, DayCountConvention::Invalid);
 }
 QDataStream& operator<<(QDataStream & stream, const DayCountVector& flows) {
 	stream << flows.m_Vector;

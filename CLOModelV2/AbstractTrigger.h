@@ -23,6 +23,7 @@ public:
 	const QString& GetTriggerLabel() const { return m_TriggerLabel; }
 	void SetTriggerLabel(const QString& lab) { m_TriggerLabel = lab; }
 	virtual QString ReadyToCalculate() const = 0;
+	virtual QString ToString() { return "\nLabel: " + m_TriggerLabel + QString("\nTrigger type: %1").arg(static_cast<quint8>(m_TriggerType)); }
 	friend QDataStream& operator<<(QDataStream & stream, const AbstractTrigger& flows);
 	friend QDataStream& operator>>(QDataStream & stream, AbstractTrigger& flows);
 };

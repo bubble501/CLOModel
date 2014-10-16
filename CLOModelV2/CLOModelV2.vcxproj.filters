@@ -93,6 +93,12 @@
     <Filter Include="Source Files\Triggers">
       <UniqueIdentifier>{a296f77e-60c0-467f-9550-e3c375edf3f2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Interfaces">
+      <UniqueIdentifier>{2123874c-4b46-46c4-888b-bd7e2ed49822}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Interfaces">
+      <UniqueIdentifier>{db391cf2-c3c1-40d7-9365-10a7e0238c24}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReinvestmentTest.h">
@@ -158,12 +164,6 @@
     <ClInclude Include="CommonFunctions.h">
       <Filter>Header Files\Common Items</Filter>
     </ClInclude>
-    <ClInclude Include="BackwardCompatibilityInterface.h">
-      <Filter>Header Files\Common Items</Filter>
-    </ClInclude>
-    <ClInclude Include="GenericCashFlow.h">
-      <Filter>Header Files\Common Items</Filter>
-    </ClInclude>
     <ClInclude Include="BaseRateTable.h">
       <Filter>Header Files\Common Items</Filter>
     </ClInclude>
@@ -202,6 +202,18 @@
     </ClInclude>
     <ClInclude Include="PrincipalProceeds.h">
       <Filter>Header Files\DealStructure</Filter>
+    </ClInclude>
+    <ClInclude Include="BackwardCompatibilityInterface.h">
+      <Filter>Header Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="GenericCashFlow.h">
+      <Filter>Header Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="TemplAsyncCalculator.h">
+      <Filter>Header Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="TemplAsyncThread.h">
+      <Filter>Header Files\Interfaces</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -249,6 +261,15 @@
     </CustomBuild>
     <CustomBuild Include="ApplyFlowThread.h">
       <Filter>Header Files\Loans</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ScenarioApplier.h">
+      <Filter>Header Files\Loans</Filter>
+    </CustomBuild>
+    <CustomBuild Include="AbstrAsyncCalculator.h">
+      <Filter>Header Files\Interfaces</Filter>
+    </CustomBuild>
+    <CustomBuild Include="AbstrAsyncThread.h">
+      <Filter>Header Files\Interfaces</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -429,9 +450,6 @@
     <ClCompile Include="BaseRateTable.cpp">
       <Filter>Source Files\Common Items</Filter>
     </ClCompile>
-    <ClCompile Include="GenericCashFlow.cpp">
-      <Filter>Source Files\Common Items</Filter>
-    </ClCompile>
     <ClCompile Include="CommonFunctions.cpp">
       <Filter>Source Files\Common Items</Filter>
     </ClCompile>
@@ -485,6 +503,30 @@
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_ApplyFlowThread.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="ScenarioApplier.cpp">
+      <Filter>Source Files\Loans</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ScenarioApplier.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ScenarioApplier.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_AbstrAsyncCalculator.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_AbstrAsyncThread.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_AbstrAsyncCalculator.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_AbstrAsyncThread.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GenericCashFlow.cpp">
+      <Filter>Source Files\Interfaces</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

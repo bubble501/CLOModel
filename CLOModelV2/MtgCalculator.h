@@ -65,11 +65,13 @@ private:
 	QList<qint32> BeesSent;
 	QList<qint32> BeesReturned;
 	bool SequentialComputation;
+	bool m_ContinueCalculation;
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 private slots:
 	void BeeReturned(int,const MtgCashFlow& a);
 	void HandleErrorInCalculation(int a) { BeeReturned(a, MtgCashFlow()); }
+	void StopCalculation() { m_ContinueCalculation = false; }
 signals:
 	void Calculated();
 	void BeeCalculated(int);

@@ -23,11 +23,15 @@
 #include "StressViewer.h"
 #include "SummaryView.h"
 int main(int argc, char *argv[]) {
+	QApplication a(argc, argv);
+	ConsoleTestObj b;
+	return a.exec();
+
+
 	/*QApplication a(argc, argv);
 	StressViewer b;
-	b.LoadStress("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/.StressResult.fcsr");
-	//b.LoadStress("C:/Temp/StressResult.fcsr");
 	b.show();
+	b.LoadStress("C:/Temp/.StressResult.fcsr");
 	return a.exec();*/
 
 	/*Waterfall TempWtf, TempCallWaterfall;
@@ -63,7 +67,7 @@ int main(int argc, char *argv[]) {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 
 	
-	QApplication a(argc, argv);
+	/*QApplication a(argc, argv);
 	//QFile file("C:/Temp/Wrong 20#,#8#,#100#,#0#,#0#,#0.csw");
 	//QFile file("C:/Temp/20#,#8#,#100#,#0#,#0#,#0.csw");
 	QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/.BaseCase.clo");
@@ -85,5 +89,5 @@ int main(int argc, char *argv[]) {
 	SummaryView Check;
 	Check.show();
 	Check.SetStructure(TempWtf);
-	return a.exec();
+	return a.exec();*/
 }

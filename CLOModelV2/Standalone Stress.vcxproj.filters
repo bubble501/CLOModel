@@ -143,6 +143,12 @@
     <ClInclude Include="VectorTrigger.h">
       <Filter>Header Files\Core Files</Filter>
     </ClInclude>
+    <ClInclude Include="TemplAsyncCalculator.h">
+      <Filter>Header Files\Core Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TemplAsyncThread.h">
+      <Filter>Header Files\Core Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="StandaloneStress.h">
@@ -185,6 +191,12 @@
       <Filter>Header Files\Core Files</Filter>
     </CustomBuild>
     <CustomBuild Include="QBbgWorker.h">
+      <Filter>Header Files\Core Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="AbstrAsyncCalculator.h">
+      <Filter>Header Files\Core Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="AbstrAsyncThread.h">
       <Filter>Header Files\Core Files</Filter>
     </CustomBuild>
   </ItemGroup>
@@ -404,6 +416,18 @@
     </ClCompile>
     <ClCompile Include="VectorTrigger.cpp">
       <Filter>Source Files\Core Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_AbstrAsyncCalculator.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_AbstrAsyncCalculator.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_AbstrAsyncThread.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_AbstrAsyncThread.cpp">
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

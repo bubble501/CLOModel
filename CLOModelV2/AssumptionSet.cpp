@@ -1,7 +1,8 @@
 #include "AssumptionSet.h"
 #include <QHash>
 #include <QStringList>
-
+#include "BloombergVector.h"
+#include "IntegerVector.h"
 AssumptionSet::AssumptionSet(
 	const QString& CPRscenario
 	, const QString& CDRscenario
@@ -74,6 +75,16 @@ QDataStream& AssumptionSet::LoadOldVersion(QDataStream& stream) {
 		>> m_DelinqLagScenario
 	;
 	return stream;
+}
+
+bool AssumptionSet::IsValid() const {
+	if (BloombergVector(m_CDRscenario).IsEmpty(0.0, 1.0)) return false;
+	if (BloombergVector(m_CPRscenario).IsEmpty(0.0, 1.0)) return false;
+	if (BloombergVector(m_LSscenario).IsEmpty(0.0, 1.0)) return false;
+	if (BloombergVector(m_DelinqScenario).IsEmpty(0.0, 1.0)) return false;
+	if (IntegerVector(m_RecLagScenario).IsEmpty(0)) return false;
+	if (IntegerVector(m_DelinqLagScenario).IsEmpty(0)) return false;
+	return true;
 }
 
 bool operator==(const AssumptionSet &e1, const AssumptionSet &e2) {

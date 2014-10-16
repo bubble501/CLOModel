@@ -1,3 +1,5 @@
+#ifndef AssumptionSet_h__
+#define AssumptionSet_h__
 #include <QString>
 #include "BackwardCompatibilityInterface.h"
 class AssumptionSet : public BackwardInterface{
@@ -36,6 +38,7 @@ public:
 	void SetLSscenario(const QString& val) { m_LSscenario = val; }
 	const QString& GetCPRscenario() const { return m_CPRscenario; }
 	void SetCPRscenario(const QString& val) { m_CPRscenario = val; }
+	bool IsValid() const;
 	friend uint qHash(const AssumptionSet& key, uint seed);
 	friend bool operator==(const AssumptionSet &e1, const AssumptionSet &e2);
 	friend QDataStream& operator<<(QDataStream & stream, const AssumptionSet& flows);
@@ -45,3 +48,4 @@ bool operator==(const AssumptionSet &e1, const AssumptionSet &e2);
 uint qHash(const AssumptionSet& key, uint seed);
 QDataStream& operator<<(QDataStream & stream, const AssumptionSet& flows);
 QDataStream& operator>>(QDataStream & stream, AssumptionSet& flows);
+#endif // AssumptionSet_h__

@@ -17,6 +17,7 @@ class MtgCalculator;
 class ProgressWidget;
 class MtgCashFlow;
 class WaterfallCalculator;
+class ScenarioApplier;
 class StressTest:public QObject , public BackwardInterface{
 	Q_OBJECT
 private:
@@ -36,13 +37,13 @@ private:
 	QSet<QString>* m_AssumptionsRef[NumStressDimentsions];
 	bool IncreaseCurrentAssumption(int level = NumStressDimentsions-1);
 	qint32 CountScenariosCalculated(int level = NumStressDimentsions - 1);
-	QScopedPointer<MtgCashFlow> BaseFlows;
 	QPointer<ProgressWidget> ProgressForm;
 	QHash<uint, AssumptionSet> m_RainbowTable;
 	bool m_ErrorsOccured;
 protected:
 	WaterfallCalculator* TranchesCalculator;
 	MtgCalculator* BaseCalculator;
+	ScenarioApplier* BaseApplier;
 	QSet<QString> m_CDRscenarios;
 	QSet<QString> m_CPRscenarios;
 	QSet<QString> m_LSscenarios;
@@ -58,6 +59,7 @@ protected:
 	bool UseFastVersion;
 	quint32 RemoveInvalidScenarios();
 	void ResetStressTest();
+	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 	friend QDataStream& operator<<(QDataStream & stream, const StressTest& flows);
 	friend QDataStream& operator>>(QDataStream & stream, StressTest& flows);
 public:
@@ -125,14 +127,16 @@ public slots:
 private slots:
 	void BaseForFastCalculated();
 	void SlowLoansCalculated();
+	void FastLoansCalculated();
 	void RunCurrentScenario();
 	void GoToNextScenario();
 	void StoppedCalculation() { ResetStressTest(); }
 	void GatherResults();
-	void HandleWtfProgress(double pr);
 	void ErrorInCalculation() { m_ErrorsOccured = true; }
-protected:
-	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
+	void UpdateProgress(double pr);
+	void ReachedWaterfallCalc() { m_CurrentProgressShift = 2 * 10000; UpdateProgress(0.0); }
+private:
+	int m_CurrentProgressShift;
 signals:
 	void CurrentScenarioCalculated();
 	void ProgressStatus(double);

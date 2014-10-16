@@ -14,6 +14,7 @@
 MtgCalculator::MtgCalculator(QObject* parent)
 	:QObject(parent)
 	,SequentialComputation(false)
+	, m_ContinueCalculation(false)
 	, CurrentIndex(0)
 {
 
@@ -35,11 +36,16 @@ void MtgCalculator::AddLoan(const Mortgage& a){
 	AddLoan(a,CurrentIndex+1);
 }
 void MtgCalculator::AddLoan(const Mortgage& a, qint32 Index) {
+	auto FoundLn = Loans.find(Index);
+	if (FoundLn != Loans.end()) {
+		delete FoundLn.value();
+		Loans.erase(FoundLn);
+	}
 	Loans.insert(Index, new Mortgage(a));
 	if (CurrentIndex < Index)CurrentIndex = Index;
 }
 bool MtgCalculator::StartCalculation( bool UseStoredCF) {
-	if (!ThreadPool.isEmpty()) return false;
+	if (m_ContinueCalculation) return false;
 	BeesReturned.clear();
 	BeesSent.clear();
 	Result.Clear();
@@ -56,6 +62,7 @@ bool MtgCalculator::StartCalculation( bool UseStoredCF) {
 			if (i.value()->GetFloatingRateValue().IsEmpty()) return false;
 		}
 	}
+	m_ContinueCalculation = true;
 	if (UseStoredCF){//Check if CF are available
 		QString DealName,TrancheName;
 		bool CashFound=false;
@@ -196,9 +203,11 @@ void MtgCalculator::BeeReturned(int Ident,const MtgCashFlow& a){
 	ThreadPool.erase(ThreadPool.find(Ident));
 	emit BeeCalculated(BeesReturned.size());
 	if (BeesReturned.size() == Loans.size()) {
+		m_ContinueCalculation = false;
 		emit Calculated();
 		return;
 	}
+	if (!m_ContinueCalculation)return;
 	MtgCalculatorThread* CurrentThread;
 	for (auto SingleLoan = Loans.constBegin(); SingleLoan != Loans.constEnd(); ++SingleLoan) {
 		if (BeesSent.contains(SingleLoan.key())) continue;
@@ -215,11 +224,15 @@ void MtgCalculator::BeeReturned(int Ident,const MtgCashFlow& a){
 		CurrentThread->SetStartDate(StartDate);
 		connect(CurrentThread, SIGNAL(Calculated(int, const MtgCashFlow&)), this, SLOT(BeeReturned(int, const MtgCashFlow&)));
 		connect(CurrentThread, SIGNAL(Calculated(int, const MtgCashFlow&)), CurrentThread, SLOT(stop()), Qt::QueuedConnection);
+		connect(CurrentThread, SIGNAL(ErrorCalculation(int)), this, SIGNAL(ErrorInCalculation()));
+		connect(CurrentThread, SIGNAL(ErrorCalculation(int)), this, SLOT(HandleErrorInCalculation(int)));
+		connect(CurrentThread, SIGNAL(ErrorCalculation(int)), CurrentThread, SLOT(stop()), Qt::QueuedConnection);
 		CurrentThread->start();
 		return;
 	}
 }
 void MtgCalculator::Reset(){
+	m_ContinueCalculation = false;
 	for (auto i=Loans.begin();i!=Loans.end();i++){
 		delete i.value();
 	}
@@ -247,6 +260,7 @@ QString MtgCalculator::ReadyToCalculate()const{
 QDataStream& operator<<(QDataStream & stream, const MtgCalculator& flows){
 	stream 
 		<< static_cast<qint32>(flows.Loans.size())
+		<< flows.SequentialComputation
 		<< flows.m_CPRass
 		<< flows.m_CDRass
 		<< flows.m_LSass
@@ -264,6 +278,7 @@ QDataStream& MtgCalculator::LoadOldVersion(QDataStream& stream) {
 	Reset();
 	qint32 tempInt, TempKey;
 	stream >> tempInt;
+	stream >> SequentialComputation;
 	stream >> m_CPRass;
 	stream >> m_CDRass;
 	stream >> m_LSass;

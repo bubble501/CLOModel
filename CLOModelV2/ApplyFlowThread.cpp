@@ -1,14 +1,15 @@
 #include "ApplyFlowThread.h"
 ApplyFlowThread::ApplyFlowThread(int ID, QObject* parent)
-	:QThread(parent)
-	, Identifier(ID) {
-	connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
+	:TemplAsyncThread<MtgCashFlow>(ID,parent)
+{
+	
 }
 void ApplyFlowThread::run() {
-	emit Calculated(Identifier, BaseFlow->ApplyScenario(
+	m_Result= BaseFlow->ApplyScenario(
 		AssumptionsToApply.GetCPRscenario()
 		, AssumptionsToApply.GetCDRscenario()
 		, AssumptionsToApply.GetLSscenario()
-	));
+	);
+	emit AnonimCalculated(Identifier);
 	exec();
 }

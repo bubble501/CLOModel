@@ -7,10 +7,10 @@ ConsoleTestObj::ConsoleTestObj(QObject *parent)
 	, TempStress(nullptr)
 	, Tested(nullptr)
 {
-	//connect(&TempUnit, &CentralUnit::CalculationFinished, this, &ConsoleTestObj::PrintOutput);
+	connect(&TempUnit, &CentralUnit::CalculationFinished, this, &ConsoleTestObj::PrintOutput);
 	//BBVALTest();
-	SlateTest();
-	//TestApplier();
+	//SlateTest();
+	TestApplier();
 	//TestStressTest();
 }
 
@@ -1872,8 +1872,9 @@ void ConsoleTestObj::TestApplier() {
 	{bool Junk; out >> Junk; }
 	TempWtf.SetLoadProtocolVersion(VersionChecker);
 	out >> TempWtf;
+	TempWtf.CalculateTranchesCashFlows();
 
-	Tested = new ScenarioApplier(this);
+	/*Tested = new ScenarioApplier(this);
 
 	Tested->SetBaseFlows(TempWtf.GetMortgagesPayments());
 	AssumptionSet CurrentAss;
@@ -1894,7 +1895,7 @@ void ConsoleTestObj::TestApplier() {
 	connect(Tested, SIGNAL(Calculated()), this, SLOT(PrintOutput()));
 	connect(Tested, SIGNAL(Progress(double)), this, SLOT(ConsoleProgress(double)));
 	Tested->SetSequentialComputation(true);
-	Tested->StartCalculation();
+	Tested->StartCalculation();*/
 }
 
 void ConsoleTestObj::ConsoleProgress(double pr) {

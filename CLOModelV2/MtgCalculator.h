@@ -1,23 +1,35 @@
 #ifndef MtgCalculator_h__
 #define MtgCalculator_h__
 #include <QDate>
-#include <QObject>
+#include "TemplAsyncCalculator.h"
 #include <QList>
 #include "MtgCashFlow.h"
 #include "CommonFunctions.h"
 #include "BaseRateTable.h"
+#include "MtgCalculatorThread.h"
 class Mortgage;
 class MtgCashFlow;
-class MtgCalculatorThread;
-class MtgCalculator : public QObject, public BackwardInterface{
+class MtgCalculator : public TemplAsyncCalculator <MtgCalculatorThread,MtgCashFlow>{
 	Q_OBJECT
+public slots:
+	virtual bool StartCalculation() override;
+protected:
+	virtual void BeeReturned(int Ident, const MtgCashFlow& a) override;
 public:
-	MtgCalculator(QObject* parent=0);
-	~MtgCalculator();
-	void AddLoan(const Mortgage& a);
+	virtual QString ReadyToCalculate() const override;
+	MtgCalculator(QObject* parent = 0);
+	virtual ~MtgCalculator() { Reset(); }
+	virtual void Reset() override;
+	virtual void ClearResults() override;
+	virtual int NumBees() const override { return Loans.size(); }
+	void AddLoan(const Mortgage& a, qint32 Index);
+	const QHash<qint32, Mortgage*>& GetLoans() const { return Loans; }
+	QHash<qint32, Mortgage*>& GetLoans() { return Loans; }
 	void SetLoans(const QHash<qint32, Mortgage*>& a);
 	void SetStartDate(const QDate& a){StartDate=a;}
-	bool StartCalculation(bool UseStoredCF = true);
+	const QDate& GetStartDate()const { return StartDate; }
+	bool GetUseStoredCashFlows() const { return m_UseStoredCashFlows; }
+	void SetUseStoredCashFlows(bool val) { m_UseStoredCashFlows = val; }
 	const QString& GetCPRass() const { return m_CPRass; }
 	void SetCPRass(const QString& val) { m_CPRass = val; }
 	const QString& GetCDRass() const { return m_CDRass; }
@@ -32,27 +44,16 @@ public:
 	void SetDelinquencyLag(const QString& val) { m_DelinquencyLag = val; }
 	void CompileReferenceRateValue(ForwardBaseRateTable& Values);
 	void CompileReferenceRateValue(ConstantBaseRateTable& Values);
+	void ClearLoans();
 #ifndef NO_DATABASE
 	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll=false);
 	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll=false);
 #endif
-
-	const QDate& GetStartDate()const {return StartDate;}
-	const QHash<qint32, Mortgage*>& GetLoans() const { return Loans; }
-	QHash<qint32, Mortgage*>& GetLoans() { return Loans; }
-	const MtgCashFlow& GetResult()const{return Result;}
-	void Reset();
-	QString ReadyToCalculate()const;
-	int Count() const{return Loans.size();}
-	void SetSequentialComputation(bool a){SequentialComputation=a;}
-	bool GetSequentialComputation()const {return SequentialComputation;}
 	void SetOverrideAssumptions(bool a) { m_OverrideAssumptions = a; }
 	bool GetOverrideAssumptions()const { return m_OverrideAssumptions; }
+	const MtgCashFlow& GetAggregatedResults()const { return m_AggregatedRes; }
 private:
-	void AddLoan(const Mortgage& a, qint32 Index);
-	QHash<qint32, MtgCalculatorThread*> ThreadPool;
 	QHash<qint32, Mortgage*> Loans;
-	qint32 CurrentIndex;
 	QString m_CPRass;
 	QString m_CDRass;
 	QString m_LSass;
@@ -60,22 +61,12 @@ private:
 	QString m_Delinquency;
 	QString m_DelinquencyLag;
 	bool m_OverrideAssumptions;
+	bool m_UseStoredCashFlows;
 	QDate StartDate;
-	MtgCashFlow Result;
-	QList<qint32> BeesSent;
-	QList<qint32> BeesReturned;
-	bool SequentialComputation;
-	bool m_ContinueCalculation;
+	MtgCashFlow m_AggregatedRes;
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
-private slots:
-	void BeeReturned(int,const MtgCashFlow& a);
-	void HandleErrorInCalculation(int a) { BeeReturned(a, MtgCashFlow()); }
-	void StopCalculation() { m_ContinueCalculation = false; }
 signals:
-	void Calculated();
-	void BeeCalculated(int);
-	void ErrorInCalculation();
 	friend QDataStream& operator<<(QDataStream & stream, const MtgCalculator& flows);
 	friend QDataStream& operator>>(QDataStream & stream, MtgCalculator& flows);
 };

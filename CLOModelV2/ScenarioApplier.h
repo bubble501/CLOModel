@@ -23,13 +23,13 @@ public:
 	virtual void AddAssumption(const AssumptionSet& a, qint32 idx);
 	using  TemplAsyncCalculator<ApplyFlowThread, MtgCashFlow>::GetResult;
 	const MtgCashFlow* GetResult(const AssumptionSet& a)const { return GetResult(FindAssumption(a)); }
-	QString ReadyToCalculate() const;
+	virtual QString ReadyToCalculate() const override;
 	virtual void Reset() override;
 	virtual int NumBees() const override { return m_Scenarios.size(); }
 public slots:
 	virtual bool StartCalculation() override;
 protected:
-	void BeeReturned(int Ident, const MtgCashFlow& a) override;
+	virtual void BeeReturned(int Ident, const MtgCashFlow& a) override;
 	MtgCashFlow m_BaseFlows;
 	QHash<qint32, AssumptionSet*> m_Scenarios;
 	qint32 FindAssumption(const AssumptionSet& a)const;

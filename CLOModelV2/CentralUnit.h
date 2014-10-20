@@ -14,7 +14,7 @@ class CentralUnit : public QObject{
 public:
 	~CentralUnit();
 	CentralUnit(QObject* parent=0);
-	void AddLoan(const Mortgage& TempMtg) { LoansCalculator.AddLoan(TempMtg);	if (Stresser)Stresser->AddLoan(TempMtg); }
+	void AddLoan(const Mortgage& TempMtg) {LoansCalculator.AddLoan(TempMtg,LoansCalculator.NumBees());}
 	void AddLoan(
 		const QDate& Maturity
 		, double Size

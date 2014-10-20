@@ -62,7 +62,7 @@ const MtgCalculator& StressTest::GetLoans() const {
 }
 
 void StressTest::AddLoan(const Mortgage& a){
-	BaseCalculator->AddLoan(a);
+	BaseCalculator->AddLoan(a,BaseCalculator->NumBees());
 }
 void StressTest::ResetLoans(){
 	BaseCalculator->Reset();
@@ -133,7 +133,7 @@ void StressTest::RunStressTest() {
 	}
 	if (UseFastVersion) {
 		connect(BaseCalculator, SIGNAL(Calculated()), this, SLOT(BaseForFastCalculated()));
-		if (!BaseCalculator->StartCalculation(false)){ //TODO should be true
+		if (!BaseCalculator->StartCalculation()){
 			QMessageBox::critical(0, "Invalid Input", "A base rate in the loans is invalid");
 			return;
 		}
@@ -144,7 +144,7 @@ void StressTest::RunStressTest() {
 void StressTest::BaseForFastCalculated() {
 	disconnect(BaseCalculator, SIGNAL(Calculated()), this, SLOT(BaseForFastCalculated()));
 	if (!ContinueCalculation) return StoppedCalculation();
-	BaseApplier->SetBaseFlows(BaseCalculator->GetResult());
+	BaseApplier->SetBaseFlows(BaseCalculator->GetAggregatedResults());
 	RunCurrentScenario();
 }
 void StressTest::RunCurrentScenario() {
@@ -178,7 +178,7 @@ void StressTest::RunCurrentScenario() {
 		BaseCalculator->SetRecoveryLag(CurrentAss.GetRecLagScenario());
 		BaseCalculator->SetDelinquency(CurrentAss.GetDelinqScenario());
 		BaseCalculator->SetDelinquencyLag(CurrentAss.GetDelinqLagScenario());
-		if (!BaseCalculator->StartCalculation(false)) {
+		if (!BaseCalculator->StartCalculation()) {
 			emit ErrorInCalculation();
 		}
 	}
@@ -187,7 +187,7 @@ void StressTest::RunCurrentScenario() {
 void StressTest::SlowLoansCalculated() {
 	if (!ContinueCalculation)  return StoppedCalculation();
 	Structure.ResetMtgFlows();
-	Structure.AddMortgagesFlows(BaseCalculator->GetResult());
+	Structure.AddMortgagesFlows(BaseCalculator->GetAggregatedResults());
 	AssumptionSet CurrentAss(
 		*(m_CPRscenarios.constBegin() + CurrentAssumption[AssCPR])
 		, *(m_CDRscenarios.constBegin() + CurrentAssumption[AssCDR])

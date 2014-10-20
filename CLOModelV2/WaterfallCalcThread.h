@@ -8,7 +8,7 @@ class WaterfallCalcThread : public TemplAsyncThread<Waterfall> {
 public:
 	WaterfallCalcThread(int ID,QObject* parent=0);
 	void SetWaterfall(const Waterfall& a){LocalFall=a;}
-private:
+protected:
 	Waterfall LocalFall;
 signals:
 	void Calculated(int,const Waterfall&);

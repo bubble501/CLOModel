@@ -11,7 +11,7 @@ public:
 	WaterfallCalculator(QObject* parent=0);
 	virtual ~WaterfallCalculator() { Reset(); }
 	void AddWaterfall(const Waterfall& a, qint32 ID);
-	QString ReadyToCalculate() const;
+	virtual QString ReadyToCalculate() const override;
 	virtual int NumBees() const override { return m_Cascades.size(); }
 	virtual void Reset() override;
 	virtual void ClearWaterfalls();
@@ -19,6 +19,6 @@ public slots:
 	virtual bool StartCalculation() override;
 protected:
 	QHash<qint32, Waterfall*> m_Cascades;
-	void BeeReturned(int Ident, const Waterfall& a) override;
+	virtual void BeeReturned(int Ident, const Waterfall& a) override;
 };
 #endif // WaterfallCalculator_h__

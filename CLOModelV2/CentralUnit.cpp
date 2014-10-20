@@ -61,7 +61,7 @@ void CentralUnit::AddLoan(
 		if (KeyVal.size() != 2) continue;
 		TempMtg.SetProperty(KeyVal.first(), KeyVal.at(1));
 	}
-	LoansCalculator.AddLoan(TempMtg);
+	LoansCalculator.AddLoan(TempMtg,LoansCalculator.NumBees());
 }
 #ifndef NO_BLOOMBERG
 void CentralUnit::AddTranche(const QString& Name, const QString& ProRataGroup, double MinOC, double MinIC, double Price, double FxRate, const QString& BbgExt) {
@@ -271,11 +271,11 @@ void CentralUnit::CalculationStep1(){
 	MtgsProgress=new ProgressWidget;
 	MtgsProgress->SetValue(0);
 	MtgsProgress->SetTitle("Calculating Loans");
-	MtgsProgress->SetMax(LoansCalculator.Count());
+	MtgsProgress->SetMax(LoansCalculator.NumBees());
 	connect(&LoansCalculator,SIGNAL(BeeCalculated(int)),MtgsProgress,SLOT(SetValue(int)));
 	MtgsProgress->show();
 	QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
-	if (!LoansCalculator.StartCalculation(true)) {
+	if (!LoansCalculator.StartCalculation()) {
 		QMessageBox::critical(0, "Invalid Input", "A base rate in the loans is invalid");
 		QApplication::quit();
 		return;
@@ -287,7 +287,7 @@ void CentralUnit::CalculationStep2(){
 	MtgsProgress->SetMax(1);
 	QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 	Structure.ResetMtgFlows();
-	Structure.AddMortgagesFlows(LoansCalculator.GetResult());
+	Structure.AddMortgagesFlows(LoansCalculator.GetAggregatedResults());
 	Structure.SetUseCall(false);
 	QString TmpStr=Structure.ReadyToCalculate();
 	if(!TmpStr.isEmpty()){

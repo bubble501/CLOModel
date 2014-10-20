@@ -26,6 +26,7 @@ bool WaterfallCalculator::StartCalculation() {
 		CurrentThread->start();
 		++NumofSent;
 	}
+	return true;
 }
 void WaterfallCalculator::BeeReturned(int Ident, const Waterfall& a) {
 	TemplAsyncCalculator <WaterfallCalcThread, Waterfall > ::BeeReturned(Ident, a);

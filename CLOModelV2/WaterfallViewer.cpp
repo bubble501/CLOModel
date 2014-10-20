@@ -341,8 +341,14 @@ void WaterfallViewer::AddStep(const WatFalPrior& a){
 		QMessageBox::critical(this,"Invalid Step","The step you tried to add is invalid.\nPlease check the Waterfall");
 	}
 	if (a.HasParameter(WatFalPrior::wstParameters::Trigger)) {
+		QString TriggerString = a.GetParameter(WatFalPrior::wstParameters::Trigger).toString();
+		TriggerString.replace("*", " AND ");
+		TriggerString.replace("+", " OR ");
+		TriggerString.replace("/", " NAND ");
+		TriggerString.replace("-", " NOR ");
+		TriggerString.replace("!", "NOT ");
 		ApplicableUsedCols->insert(ciTriggers);
-		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciTriggers, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::Trigger).toString()));
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciTriggers, new QTableWidgetItem(TriggerString));
 	}
 	for (int i = 0; i < InterestTable->columnCount(); ++i) {
 		InterestTable->setColumnHidden(i, !m_IWUsedCols.contains(i));

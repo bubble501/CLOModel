@@ -12,7 +12,11 @@ class TemplAsyncCalculator : public AbstrAsyncCalculator {
 public:
 	TemplAsyncCalculator(QObject* parent = 0);
 	virtual ~TemplAsyncCalculator();
-	virtual void SetSequentialComputation(bool a) { m_SequentialComputation = a; }
+	virtual void SetSequentialComputation(bool a) { 
+		#ifndef DebugLogging
+			m_SequentialComputation = a;
+		#endif		
+	}
 	virtual bool GetSequentialComputation()const { return m_SequentialComputation; }
 	virtual void Reset();
 	virtual void ClearResults();
@@ -73,7 +77,11 @@ void TemplAsyncCalculator<ThreadType, ResultType>::ClearResults() {
 template <typename ThreadType, typename ResultType>
 TemplAsyncCalculator<ThreadType, ResultType>::TemplAsyncCalculator(QObject* parent)
 	:AbstrAsyncCalculator(parent)
-	, m_SequentialComputation(false)
+	#ifndef DebugLogging
+		, m_SequentialComputation(false)
+	#else
+		, m_SequentialComputation(true)
+	#endif		
 	, BeesReturned(0) {
 	static_assert(std::is_base_of<QThread, TemplAsyncThread<ResultType> >::value, "ThreadType must inherit from TemplAsyncThread");
 	static_assert(std::is_object<ThreadType>::value, "ThreadType can't be a reference or pointer");
@@ -101,7 +109,11 @@ void TemplAsyncCalculator<ThreadType, ResultType>::Reset() {
 	m_ThreadPool.clear();
 	ClearResults();
 	BeesSent.clear();
-	m_SequentialComputation = false;
+	#ifndef DebugLogging
+		m_SequentialComputation = false;
+	#else
+		m_SequentialComputation=true;
+	#endif
 	BeesReturned = 0;
 }
 template <typename ThreadType, typename ResultType>

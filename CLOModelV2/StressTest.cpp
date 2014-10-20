@@ -31,7 +31,7 @@ StressTest::StressTest(QObject* parent)
 	BaseApplier = new ScenarioApplier(this);
 	ResetCurrentAssumption();
 	connect(this, SIGNAL(CurrentScenarioCalculated()), this, SLOT(GoToNextScenario()),Qt::QueuedConnection);
-	connect(BaseCalculator, SIGNAL(ErrorInCalculation()), this, SLOT(ErrorInCalculation()), Qt::QueuedConnection);
+	connect(BaseCalculator, SIGNAL(BeeError(int)), this, SLOT(ErrorInCalculation()), Qt::QueuedConnection);
 	connect(this, SIGNAL(AllLoansCalculated()), TranchesCalculator, SLOT(StartCalculation()), Qt::QueuedConnection);
 	//connect(this, SIGNAL(AllLoansCalculated()), this, SLOT(ReachedWaterfallCalc()));
 	

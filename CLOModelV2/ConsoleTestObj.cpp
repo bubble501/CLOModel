@@ -10,8 +10,8 @@ ConsoleTestObj::ConsoleTestObj(QObject *parent)
 	connect(&TempUnit, &CentralUnit::CalculationFinished, this, &ConsoleTestObj::PrintOutput);
 	//BBVALTest();
 	//SlateTest();
-	TestApplier();
-	//TestStressTest();
+	//TestApplier();
+	TestStressTest();
 }
 
 void ConsoleTestObj::BBVALTest() {
@@ -274,12 +274,13 @@ void ConsoleTestObj::BBVALTest() {
 }
 
 void ConsoleTestObj::PrintOutput() {
-	/*const QHash<qint32, MtgCashFlow*>& res = Tested->GetResults();
+	if (!Tested) return;
+	const QHash<qint32, MtgCashFlow*>& res = Tested->GetResults();
 	MtgCashFlow TotRes;
 	for (QHash<qint32, MtgCashFlow*>::const_iterator i = res.constBegin(); i != res.constEnd(); ++i) {
 		TotRes.AddFlow(*(i.value()));
 	}
-	PrintToTempFile("ApplierRes", TotRes.ToString(), false);*/
+	PrintToTempFile("ApplierRes", TotRes.ToString(), false);
 }
 
 

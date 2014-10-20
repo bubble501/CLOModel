@@ -16,7 +16,7 @@ template<typename T> class QList;
 #define USE_SOFT_COLOUR //Uses softer color in stress test table rather than pure RGB(255,0,0) style ones
 //#define SAVE_EXCEL_INPUTS
 //#define SaveLoanTape
-//#define DebugLogging
+#define DebugLogging
 //#define PrintAggregatedMtgFlows
 
 #ifdef DebugLogging

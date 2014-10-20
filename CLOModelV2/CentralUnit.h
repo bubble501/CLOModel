@@ -6,6 +6,7 @@
 #include "Waterfall.h"
 #include "StressTest.h"
 #include "BaseRateTable.h"
+#include <QPointer>
 #define NumberOfPlots 9
 class WaterfallCalculator;
 class ProgressWidget;
@@ -160,7 +161,7 @@ private:
 	MtgCalculator LoansCalculator;
 	Waterfall Structure;
 	Waterfall CallStructure;
-	StressTest* Stresser;
+	QPointer<StressTest> Stresser;
 	QDate PoolCutOff;
 	bool RunCall;
 	bool RunStress;

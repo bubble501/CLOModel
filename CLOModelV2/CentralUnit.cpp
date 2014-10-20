@@ -13,8 +13,8 @@
 #include <QStringList>
 CentralUnit::CentralUnit(QObject* parent)
 	:QObject(parent)
-	,Stresser(NULL)
-	,MtgsProgress(NULL)
+	,Stresser(nullptr)
+	,MtgsProgress(nullptr)
 	,RunCall(false)
 	,UseFastStress(false)
 	, m_UseForwardCurve(false)
@@ -29,7 +29,7 @@ CentralUnit::CentralUnit(QObject* parent)
 	ParallWatFalls=new WaterfallCalculator(this);
 	connect(ParallWatFalls,SIGNAL(Calculated()),this,SLOT(CheckCalculationDone()));
 }
-void CentralUnit::SetPoolCutOff(const QDate& a){PoolCutOff=a; if(Stresser) Stresser->SetStartDate(PoolCutOff);}
+void CentralUnit::SetPoolCutOff(const QDate& a){PoolCutOff=a;}
 void CentralUnit::SetFolderPath(const QString& a){FolderPath=a;}
 void CentralUnit::AddLoan(
 	const QDate& Maturity
@@ -75,7 +75,6 @@ void CentralUnit::AddTranche(const QString& Name, const QString& ProRataGroup, d
 	TempTrnch.SetBloombergExtension(BbgExt);
 	TempTrnch.GetDataFromBloomberg();
 	Structure.AddTranche(TempTrnch);
-	if(Stresser)Stresser->SetStructure(Structure);
 }
 #endif
 void CentralUnit::AddTranche(
@@ -125,7 +124,6 @@ void CentralUnit::AddTranche(
 	TempTrnch.SetDayCount(DayCount);
 	TempTrnch.SetStartingDeferredInterest(StartingDeferredInterest);
 	Structure.AddTranche(TempTrnch);
-	if(Stresser)Stresser->SetStructure(Structure);
 }
 void CentralUnit::AddWaterfallStep(
 	WatFalPrior::WaterfallStepType Tpe
@@ -167,7 +165,6 @@ void CentralUnit::Reset(){
 	Structure.ResetReserve();
 	if(Stresser){
 		Stresser->deleteLater();
-		Stresser=NULL;
 	}
 }
 
@@ -197,7 +194,7 @@ void CentralUnit::SetupStress(const QString& ConstPar,QList<QString> XSpann,QLis
 		break;
 	default: 
 		Stresser->deleteLater();
-		Stresser = nullptr;
+		PrintToTempFile("Error In Calculation", "Invalid Stress Dimension");
 		return;
 	}
 	switch (Yvar) {
@@ -218,7 +215,7 @@ void CentralUnit::SetupStress(const QString& ConstPar,QList<QString> XSpann,QLis
 		break;
 	default:
 		Stresser->deleteLater();
-		Stresser = nullptr;
+		PrintToTempFile("Error In Calculation", "Invalid Stress Dimension");
 		return;
 	}
 	switch ((~(Xvar | Yvar)) & 0x7) {
@@ -227,13 +224,15 @@ void CentralUnit::SetupStress(const QString& ConstPar,QList<QString> XSpann,QLis
 	case 0x4: Stresser->AddCPRscenarios(ConstPar); break;
 	default:
 		Stresser->deleteLater();
-		Stresser = nullptr;
+		PrintToTempFile("Error In Calculation", "Invalid Stress Dimension");
 		return;
 	}
 	Stresser->SetStartDate(PoolCutOff);
 	Structure.SetUseCall(StressToCall);
 	Stresser->SetStructure(Structure);
-	for (auto i = LoansCalculator.GetLoans().constBegin(); i != LoansCalculator.GetLoans().constEnd(); i++)
+	const auto& TempLoans = LoansCalculator.GetLoans();
+	LOGDEBUG(QString("Loans in stress test: %1\nTranches in Stress: %2").arg(TempLoans.size()).arg(Stresser->GetStructure().GetTranchesCount()));
+	for (auto i = TempLoans.constBegin(); i != TempLoans.constEnd(); ++i)
 		Stresser->AddLoan(*(i.value()));
 	connect(this,SIGNAL(StressLoopStarted()),Stresser,SLOT(RunStressTest()),Qt::QueuedConnection);
 	connect(Stresser,SIGNAL(AllFinished()),this,SLOT(StressFinished()));
@@ -558,7 +557,8 @@ void CentralUnit::CheckCalculationDone()
 	QApplication::quit();
 }
 void CentralUnit::StressFinished(){
-	Stresser->SaveResults(FolderPath);
+	if (Stresser)
+		Stresser->SaveResults(FolderPath);
 	QApplication::quit();
 }
 CentralUnit::~CentralUnit(){

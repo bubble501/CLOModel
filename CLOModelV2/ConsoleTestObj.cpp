@@ -274,12 +274,12 @@ void ConsoleTestObj::BBVALTest() {
 }
 
 void ConsoleTestObj::PrintOutput() {
-	const QHash<qint32, MtgCashFlow*>& res = Tested->GetResults();
+	/*const QHash<qint32, MtgCashFlow*>& res = Tested->GetResults();
 	MtgCashFlow TotRes;
 	for (QHash<qint32, MtgCashFlow*>::const_iterator i = res.constBegin(); i != res.constEnd(); ++i) {
 		TotRes.AddFlow(*(i.value()));
 	}
-	PrintToTempFile("ApplierRes", TotRes.ToString(), false);
+	PrintToTempFile("ApplierRes", TotRes.ToString(), false);*/
 }
 
 

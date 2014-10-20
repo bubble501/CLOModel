@@ -15,6 +15,7 @@
 #include "WaterfallCalculator.h"
 #include "ScenarioApplier.h"
 #include <QBuffer>
+#include "PhasedProgressWidget.h"
 StressTest::StressTest(QObject* parent)
 	: QObject(parent)
 	, SequentialComputation(false)
@@ -23,7 +24,6 @@ StressTest::StressTest(QObject* parent)
 	, ShowProgress(true)
 	, UseFastVersion(false)
 	, m_ErrorsOccured(false)
-	, m_CurrentProgressShift(0)
 {
 	BaseCalculator = new MtgCalculator(this);
 	BaseCalculator->SetOverrideAssumptions(true);
@@ -33,14 +33,13 @@ StressTest::StressTest(QObject* parent)
 	connect(this, SIGNAL(CurrentScenarioCalculated()), this, SLOT(GoToNextScenario()),Qt::QueuedConnection);
 	connect(BaseCalculator, SIGNAL(ErrorInCalculation()), this, SLOT(ErrorInCalculation()), Qt::QueuedConnection);
 	connect(this, SIGNAL(AllLoansCalculated()), TranchesCalculator, SLOT(StartCalculation()), Qt::QueuedConnection);
-	connect(this, SIGNAL(AllLoansCalculated()), this, SLOT(ReachedWaterfallCalc()));
+	//connect(this, SIGNAL(AllLoansCalculated()), this, SLOT(ReachedWaterfallCalc()));
 	
 	connect(TranchesCalculator, SIGNAL(Calculated()), this, SLOT(GatherResults()), Qt::QueuedConnection);
-	connect(TranchesCalculator, SIGNAL(CurrentProgress(double)), this, SLOT(UpdateProgress(double)));
 	connect(TranchesCalculator, SIGNAL(ErrorInCalculation(int)), this, SLOT(ErrorInCalculation()));
 	connect(TranchesCalculator, SIGNAL(ErrorInCalculation(int)), this, SIGNAL(ErrorsOccured()));
 
-	connect(BaseApplier, SIGNAL(Progress(double)), this, SLOT(UpdateProgress(double)));
+	
 	connect(BaseApplier, SIGNAL(Calculated()), this, SLOT(FastLoansCalculated()), Qt::QueuedConnection);
 	connect(BaseApplier, SIGNAL(BeeError(int)), this, SIGNAL(ErrorsOccured()));
 	connect(BaseApplier, SIGNAL(BeeError(int)), this, SLOT(ErrorInCalculation()));
@@ -53,7 +52,6 @@ StressTest::StressTest(QObject* parent)
 	m_AssumptionsRef[AssDelinqLag] = &m_DelinqLagScenarios;
 }
 void StressTest::ResetStressTest() {
-	m_CurrentProgressShift = 0;
 	ResetLoans();
 	ResetResults();
 	if (ProgressForm) {
@@ -110,8 +108,8 @@ void StressTest::RunStressTest() {
 	if (CheckScen > 0) {
 		if (QMessageBox::warning(
 			0
-			, "Invalid Scenarios"
-			, QString("%1 invalid scenarios detected\nWould you want to run the stress test anyway, ignoring those scenarios?").arg(CheckScen)
+			, tr("Invalid Scenarios")
+			, tr("%1 invalid scenarios detected\nWould you want to run the stress test anyway, ignoring those scenarios?").arg(CheckScen)
 			, QMessageBox::Yes | QMessageBox::No
 			, QMessageBox::Yes
 		) != QMessageBox::Yes) return;
@@ -119,17 +117,20 @@ void StressTest::RunStressTest() {
 	ResetCurrentAssumption();
 	ContinueCalculation = true;
 	m_ErrorsOccured=false;
-	m_CurrentProgressShift = 0;
 #ifdef PrintExecutionTime
 	ExecutionTime.start();
 #endif
 	if (ShowProgress) {
-		ProgressForm = new ProgressWidget;
-		connect(ProgressForm, SIGNAL(Cancelled()), this, SLOT(StopCalculation()));
-		ProgressForm->SetValue(0);
-		ProgressForm->SetTitle("Stress Test");
-		ProgressForm->SetMax(3*10000);
+		ProgressForm = new PhasedProgressWidget();
+		ProgressForm->AddPhase(tr("Calculating full assets cash flows"),0,CountScenarios());
+		ProgressForm->AddPhase(tr("Applying scenarios to aggregated cash flows"), 0, 0);
+		ProgressForm->AddPhase(tr("Calculating liabilities cash flows"), 0, 100);
+		ProgressForm->SetTotalProgressLabel(tr("Stress Test"));
 		ProgressForm->show();
+		connect(ProgressForm, SIGNAL(Cancelled()), this, SLOT(StopCalculation()));
+		connect(this, SIGNAL(AllLoansCalculated()), ProgressForm, SLOT(NextPhase()), Qt::QueuedConnection);
+		connect(TranchesCalculator, SIGNAL(CurrentProgress(double)), ProgressForm, SLOT(SetPhaseProgress(double)));
+		connect(BaseApplier, SIGNAL(Progress(double)), ProgressForm, SLOT(SetPhaseProgress(double)));
 	}
 	if (UseFastVersion) {
 		connect(BaseCalculator, SIGNAL(Calculated()), this, SLOT(BaseForFastCalculated()));
@@ -163,7 +164,12 @@ void StressTest::RunCurrentScenario() {
 		&& !IntegerVector(CurrentAss.GetDelinqLagScenario()).IsEmpty(0, 0)
 		&& !BloombergVector(CurrentAss.GetDelinqScenario()).IsEmpty(0.0, 0.0)
 	) {
+		if (ProgressForm) {
+			ProgressForm->SetPhaseMax(1, 100);
+			ProgressForm->SetPhaseMax(0, ProgressForm->GetPhaseMax(0) -1);
+		}
 		BaseApplier->AddAssumption(CurrentAss);
+		emit CurrentScenarioCalculated();
 	}
 	else {
 		connect(BaseCalculator, SIGNAL(Calculated()), this, SLOT(SlowLoansCalculated()), Qt::UniqueConnection);
@@ -191,6 +197,8 @@ void StressTest::SlowLoansCalculated() {
 		, *(m_DelinqScenarios.constBegin() + CurrentAssumption[AssDelinq])
 		, *(m_DelinqLagScenarios.constBegin() + CurrentAssumption[AssDelinqLag])
 		);
+	if (ProgressForm)
+		ProgressForm->SetPhaseProgress(ProgressForm->GetPhaseProgress() + 1);
 	if (m_RainbowTable.contains(qHash(CurrentAss, 88))) {
 		emit ErrorInCalculation();
 		return;
@@ -209,17 +217,14 @@ void StressTest::GoToNextScenario() {
 		QMessageBox::information(0, "Computation Time", QString("Stress Test Took: %1 Seconds").arg(ExecutionTime.elapsed() / 1000));
 #endif
 		disconnect(BaseCalculator);
-		m_CurrentProgressShift = 10000;
-		UpdateProgress(0.0);
+		if (ProgressForm) ProgressForm->NextPhase();
 		if (BaseApplier->NumBees() > 0) {
 			BaseApplier->StartCalculation();
 		}
-		else 
+		else {
 			emit AllLoansCalculated();
+		}
 		return;
-		double CurrentProgress = static_cast<double>(CountScenariosCalculated()) / static_cast<double>(CountScenarios());
-		UpdateProgress(CurrentProgress*10000.0);
-		emit ProgressStatus(CurrentProgress);
 	}
 	RunCurrentScenario();
 }
@@ -492,14 +497,13 @@ quint32 StressTest::RemoveInvalidScenarios() {
 }
 
 quint32 StressTest::CountScenarios() const {
-	quint32 Result=1;
-	Result *= m_CDRscenarios.size();
-	Result *= m_CPRscenarios.size();
-	Result *= m_LSscenarios.size();
-	Result *= m_RecLagScenarios.size();
-	Result *= m_DelinqScenarios.size();
-	Result *= m_DelinqLagScenarios.size();
-	return Result;
+	return
+		m_CDRscenarios.size()
+		* m_CPRscenarios.size()
+		* m_LSscenarios.size()
+		* m_RecLagScenarios.size()
+		* m_DelinqScenarios.size()
+		* m_DelinqLagScenarios.size();
 }
 
 void StressTest::StopCalculation() {
@@ -536,10 +540,6 @@ void StressTest::ResetScenarios() {
 }
 
 
-void StressTest::UpdateProgress(double pr) {
-	if (ProgressForm) 
-		ProgressForm->SetValue(m_CurrentProgressShift + static_cast<int>(pr*100.0));
-}
 
 void StressTest::FastLoansCalculated() {
 	uint CurrentHash;

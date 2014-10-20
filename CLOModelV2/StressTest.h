@@ -14,7 +14,7 @@
 #include <QSharedPointer>
 #include <QPointer>
 class MtgCalculator;
-class ProgressWidget;
+class PhasedProgressWidget;
 class MtgCashFlow;
 class WaterfallCalculator;
 class ScenarioApplier;
@@ -37,7 +37,7 @@ private:
 	QSet<QString>* m_AssumptionsRef[NumStressDimentsions];
 	bool IncreaseCurrentAssumption(int level = NumStressDimentsions-1);
 	qint32 CountScenariosCalculated(int level = NumStressDimentsions - 1);
-	QPointer<ProgressWidget> ProgressForm;
+	QPointer<PhasedProgressWidget> ProgressForm;
 	QHash<uint, AssumptionSet> m_RainbowTable;
 	bool m_ErrorsOccured;
 protected:
@@ -133,13 +133,8 @@ private slots:
 	void StoppedCalculation() { ResetStressTest(); }
 	void GatherResults();
 	void ErrorInCalculation() { m_ErrorsOccured = true; }
-	void UpdateProgress(double pr);
-	void ReachedWaterfallCalc() { m_CurrentProgressShift = 2 * 10000; UpdateProgress(0.0); }
-private:
-	int m_CurrentProgressShift;
 signals:
 	void CurrentScenarioCalculated();
-	void ProgressStatus(double);
 	void AllLoansCalculated();
 	void AllFinished();
 	void FinishedWithErrors();

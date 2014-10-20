@@ -30,6 +30,7 @@ public slots:
 	bool NextPhase();
 	void SetPhaseProgress(int val);
 	void SetPhaseProgress(double val);
+	void show();
 private slots:
 	void UpdateTotalProgress();
 signals:

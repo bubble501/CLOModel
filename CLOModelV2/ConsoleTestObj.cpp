@@ -9,9 +9,9 @@ ConsoleTestObj::ConsoleTestObj(QObject *parent)
 {
 	//connect(&TempUnit, &CentralUnit::CalculationFinished, this, &ConsoleTestObj::PrintOutput);
 	//BBVALTest();
-	//SlateTest();
+	SlateTest();
 	//TestApplier();
-	TestStressTest();
+	//TestStressTest();
 }
 
 void ConsoleTestObj::BBVALTest() {
@@ -1884,13 +1884,13 @@ void ConsoleTestObj::TestApplier() {
 
 	CurrentAss.SetLSscenario("10");
 	CurrentAss.SetCDRscenario("1");
-	Tested->AddAssumption(CurrentAss);
+	Tested->AddAssumption(CurrentAss,0);
 	CurrentAss.SetCDRscenario("2");
-	Tested->AddAssumption(CurrentAss);
+	Tested->AddAssumption(CurrentAss,1);
 	CurrentAss.SetLSscenario("20");
-	Tested->AddAssumption(CurrentAss);
+	Tested->AddAssumption(CurrentAss,2);
 	CurrentAss.SetCDRscenario("1");
-	Tested->AddAssumption(CurrentAss);
+	Tested->AddAssumption(CurrentAss,3);
 	connect(Tested, SIGNAL(Calculated()), this, SLOT(PrintOutput()));
 	connect(Tested, SIGNAL(Progress(double)), this, SLOT(ConsoleProgress(double)));
 	Tested->SetSequentialComputation(true);

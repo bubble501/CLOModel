@@ -36,10 +36,9 @@ StressTest::StressTest(QObject* parent)
 	//connect(this, SIGNAL(AllLoansCalculated()), this, SLOT(ReachedWaterfallCalc()));
 	
 	connect(TranchesCalculator, SIGNAL(Calculated()), this, SLOT(GatherResults()), Qt::QueuedConnection);
-	connect(TranchesCalculator, SIGNAL(ErrorInCalculation(int)), this, SLOT(ErrorInCalculation()));
-	connect(TranchesCalculator, SIGNAL(ErrorInCalculation(int)), this, SIGNAL(ErrorsOccured()));
+	connect(TranchesCalculator, SIGNAL(BeeError(int)), this, SLOT(ErrorInCalculation()));
+	connect(TranchesCalculator, SIGNAL(BeeError(int)), this, SIGNAL(ErrorsOccured()));
 
-	
 	connect(BaseApplier, SIGNAL(Calculated()), this, SLOT(FastLoansCalculated()), Qt::QueuedConnection);
 	connect(BaseApplier, SIGNAL(BeeError(int)), this, SIGNAL(ErrorsOccured()));
 	connect(BaseApplier, SIGNAL(BeeError(int)), this, SLOT(ErrorInCalculation()));
@@ -129,7 +128,7 @@ void StressTest::RunStressTest() {
 		ProgressForm->show();
 		connect(ProgressForm, SIGNAL(Cancelled()), this, SLOT(StopCalculation()));
 		connect(this, SIGNAL(AllLoansCalculated()), ProgressForm, SLOT(NextPhase()), Qt::QueuedConnection);
-		connect(TranchesCalculator, SIGNAL(CurrentProgress(double)), ProgressForm, SLOT(SetPhaseProgress(double)));
+		connect(TranchesCalculator, SIGNAL(Progress(double)), ProgressForm, SLOT(SetPhaseProgress(double)));
 		connect(BaseApplier, SIGNAL(Progress(double)), ProgressForm, SLOT(SetPhaseProgress(double)));
 	}
 	if (UseFastVersion) {
@@ -168,7 +167,7 @@ void StressTest::RunCurrentScenario() {
 			ProgressForm->SetPhaseMax(1, 100);
 			ProgressForm->SetPhaseMax(0, ProgressForm->GetPhaseMax(0) -1);
 		}
-		BaseApplier->AddAssumption(CurrentAss);
+		BaseApplier->AddAssumption(CurrentAss,BaseApplier->NumBees());
 		emit CurrentScenarioCalculated();
 	}
 	else {
@@ -508,7 +507,7 @@ quint32 StressTest::CountScenarios() const {
 
 void StressTest::StopCalculation() {
 	ContinueCalculation = false;
-	TranchesCalculator->Stop();
+	TranchesCalculator->StopCalculation();
 	if (ProgressForm) {
 		ProgressForm->deleteLater();
 	}
@@ -516,7 +515,8 @@ void StressTest::StopCalculation() {
 
 void StressTest::GatherResults() {
 	Results.clear();
-	const QHash<qint32, Waterfall*>& CalcRes = TranchesCalculator->GetWaterfalls();
+	TranchesCalculator->ClearWaterfalls();
+	const QHash<qint32, Waterfall*>& CalcRes = TranchesCalculator->GetResults();
 	for (auto i = CalcRes.constBegin(); i != CalcRes.constEnd(); ++i) {
 		auto MatchingAssumption = m_RainbowTable.constFind(i.key());
 		if (MatchingAssumption != m_RainbowTable.constEnd()) {
@@ -525,7 +525,7 @@ void StressTest::GatherResults() {
 			);
 		}
 	}
-	TranchesCalculator->ResetWaterfalls();
+	TranchesCalculator->ClearResults();
 	if (ProgressForm) {
 		ProgressForm->deleteLater();
 	}

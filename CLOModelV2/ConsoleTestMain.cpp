@@ -23,9 +23,9 @@
 #include "StressViewer.h"
 #include "SummaryView.h"
 int main(int argc, char *argv[]) {
-	QApplication a(argc, argv);
+	//QApplication a(argc, argv);
 	ConsoleTestObj b;
-	return a.exec();
+	//return a.exec();
 
 
 	/*QApplication a(argc, argv);

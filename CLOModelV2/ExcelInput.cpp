@@ -578,7 +578,7 @@ void __stdcall InspectStress(LPSAFEARRAY *ArrayData){
 }*/
 
 //Ugly!!!
-double __stdcall GetAssumption(LPSAFEARRAY *ArrayData) {
+double __stdcall GetLoansAssumption(LPSAFEARRAY *ArrayData) {
 	ExcelCommons::InitExcelOLE();
 	int ColumnIndex;
 	VARIANT HUGEP *pdFreq;

@@ -79,6 +79,7 @@ TemplAsyncCalculator<ThreadType, ResultType>::TemplAsyncCalculator(QObject* pare
 	static_assert(std::is_object<ThreadType>::value, "ThreadType can't be a reference or pointer");
 	static_assert(std::is_default_constructible<ResultType>::value, "ResultType must implement a default constructor");
 	static_assert(std::is_base_of<BackwardInterface, ResultType >::value, "ResultType must inherit from BackwardInterface");
+	RegisterAsMetaType<ResultType>();
 }
 template <typename ThreadType, typename ResultType>
 TemplAsyncCalculator<ThreadType, ResultType>::~TemplAsyncCalculator() {
@@ -133,7 +134,7 @@ void TemplAsyncCalculator<ThreadType, ResultType>::BeeReturned(int Ident, const 
 		delete FindRe.value();
 		m_Result.erase(FindRe);
 	}
-	m_Result.insert(Ident, new MtgCashFlow(a));
+	m_Result.insert(Ident, new ResultType(a));
 	m_ThreadPool.remove(Ident);
 	emit BeeCalculated(++BeesReturned);
 	emit Progress(static_cast<double>(BeesReturned) / static_cast<double>(NumBees()));

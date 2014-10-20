@@ -4,6 +4,6 @@ EXPORTS
 	CLODiscountMargin
 	CLOReturnRate
 	CLOWALife
-	GetAssumption
+	GetLoansAssumption
 	GetStressLoss
 	GetStressDM

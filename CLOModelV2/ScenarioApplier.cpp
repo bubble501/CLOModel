@@ -4,7 +4,6 @@
 #include <QDir>
 ScenarioApplier::ScenarioApplier(QObject* parent) 
 	: TemplAsyncCalculator<ApplyFlowThread, MtgCashFlow>(parent)
-	, m_CurrentAutoIndex(0)
 {}
 
 void ScenarioApplier::AddAssumption(const AssumptionSet& a, qint32 idx) {
@@ -14,7 +13,6 @@ void ScenarioApplier::AddAssumption(const AssumptionSet& a, qint32 idx) {
 		m_Scenarios.erase(FoundAss);
 	}
 	m_Scenarios.insert(idx, new AssumptionSet(a));
-	if (m_CurrentAutoIndex < idx) m_CurrentAutoIndex = idx;
 }
 
 bool ScenarioApplier::StartCalculation() {
@@ -54,7 +52,6 @@ void ScenarioApplier::BeeReturned(int Ident, const MtgCashFlow& a) {
 }
 void ScenarioApplier::Reset() {
 	ClearScenarios();
-	m_CurrentAutoIndex = 0;
 	TemplAsyncCalculator<ApplyFlowThread, MtgCashFlow>::Reset();
 }
 void ScenarioApplier::ClearScenarios() {

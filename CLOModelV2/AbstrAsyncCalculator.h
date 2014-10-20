@@ -10,7 +10,7 @@ public:
 	AbstrAsyncCalculator(QObject* parent = 0) :QObject(parent), m_ContinueCalculation(false){}
 protected:
 	bool m_ContinueCalculation;
-protected slots:
+public slots:
 	virtual void StopCalculation() { m_ContinueCalculation = false; }
 	virtual bool StartCalculation()=0;
 signals:

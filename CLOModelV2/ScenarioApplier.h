@@ -14,13 +14,13 @@ class ScenarioApplier : public TemplAsyncCalculator<ApplyFlowThread, MtgCashFlow
 	Q_OBJECT
 public:
 	ScenarioApplier(QObject* parent = 0);
+	virtual ~ScenarioApplier() { Reset(); }
 	const MtgCashFlow& GetBaseFlows() const { return m_BaseFlows; }
 	virtual void SetBaseFlows(const MtgCashFlow& val) { m_BaseFlows = val; }
 	virtual void ClearScenarios();
 	virtual const AssumptionSet* GetAssumption(qint32 idx)const { return m_Scenarios.value(idx, nullptr); }
 	virtual QList<qint32> GetAssumptionKeys()const { return m_Scenarios.keys(); }
 	virtual void AddAssumption(const AssumptionSet& a, qint32 idx);
-	virtual void AddAssumption(const AssumptionSet& a) { AddAssumption(a, m_CurrentAutoIndex+1); }
 	using  TemplAsyncCalculator<ApplyFlowThread, MtgCashFlow>::GetResult;
 	const MtgCashFlow* GetResult(const AssumptionSet& a)const { return GetResult(FindAssumption(a)); }
 	QString ReadyToCalculate() const;
@@ -28,8 +28,6 @@ public:
 	virtual int NumBees() const override { return m_Scenarios.size(); }
 public slots:
 	virtual bool StartCalculation() override;
-private:
-	qint32 m_CurrentAutoIndex;
 protected:
 	void BeeReturned(int Ident, const MtgCashFlow& a) override;
 	MtgCashFlow m_BaseFlows;

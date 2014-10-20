@@ -1,22 +1,22 @@
 #ifndef WaterfallCalcThread_h__
 #define WaterfallCalcThread_h__
 
-#include <QThread>
+#include <TemplAsyncThread.h>
 #include "Waterfall.h"
-class WaterfallCalcThread : public QThread{
+class WaterfallCalcThread : public TemplAsyncThread<Waterfall> {
 	Q_OBJECT
 public:
 	WaterfallCalcThread(int ID,QObject* parent=0);
 	void SetWaterfall(const Waterfall& a){LocalFall=a;}
-
 private:
 	Waterfall LocalFall;
-	int Identifier;
 signals:
 	void Calculated(int,const Waterfall&);
-	void ErrorInCalculation(int);
-public slots:
-	void run();
-	void stop(){exit(0);}
+protected slots:
+	virtual void EmitFromAnonim()override {
+		emit Calculated(Identifier, LocalFall);
+	}
+public slots :
+	void run() override;
 };
 #endif // WaterfallCalcThread_h__

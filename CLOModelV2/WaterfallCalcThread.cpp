@@ -1,14 +1,11 @@
 #include "WaterfallCalcThread.h"
 WaterfallCalcThread::WaterfallCalcThread(int ID, QObject* parent)
-	:QThread(parent)
-	,Identifier(ID)
-{
-	connect(this,SIGNAL(finished()),this,SLOT(deleteLater()));
-}
+	:TemplAsyncThread<Waterfall>(ID,parent)
+{}
 void WaterfallCalcThread::run(){
 	if(LocalFall.CalculateTranchesCashFlows())
-		emit Calculated(Identifier,LocalFall);
+		emit AnonimCalculated(Identifier);
 	else
-		emit ErrorInCalculation(Identifier);
+		emit ErrorCalculation(Identifier);
 	exec();
 }

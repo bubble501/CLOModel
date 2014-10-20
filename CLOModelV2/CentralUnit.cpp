@@ -62,7 +62,6 @@ void CentralUnit::AddLoan(
 		TempMtg.SetProperty(KeyVal.first(), KeyVal.at(1));
 	}
 	LoansCalculator.AddLoan(TempMtg);
-	if(Stresser)Stresser->AddLoan(TempMtg);
 }
 #ifndef NO_BLOOMBERG
 void CentralUnit::AddTranche(const QString& Name, const QString& ProRataGroup, double MinOC, double MinIC, double Price, double FxRate, const QString& BbgExt) {
@@ -308,7 +307,7 @@ void CentralUnit::CalculationStep2(){
 		CheckCalculationDone();
 	}
 	else{
-		ParallWatFalls->ResetWaterfalls();
+		ParallWatFalls->ClearResults();
 		ParallWatFalls->AddWaterfall(Structure,0);
 		CallStructure.ResetMtgFlows();
 		CallStructure=Structure;
@@ -332,8 +331,8 @@ void CentralUnit::CheckCalculationDone()
 	MtgsProgress=NULL;
 	Tranche TempTranche;
 	if(RunCall){
-		Structure=*(ParallWatFalls->GetWaterfall(0));
-		CallStructure=*(ParallWatFalls->GetWaterfall(1));
+		Structure=*(ParallWatFalls->GetResult(0));
+		CallStructure = *(ParallWatFalls->GetResult(1));
 		if(Structure.GetTranchesCount()==0 || CallStructure.GetTranchesCount()==0){
 			QMessageBox::critical(0, "Error", "Critical error in waterfall calculation");
 			QApplication::quit();

@@ -6,11 +6,13 @@
 #include <QPushButton>
 #include <QCloseEvent>
 #include <QGroupBox>
+#include <QIcon>
 PhasedProgressWidget::PhasedProgressWidget(QWidget *parent)
 	: QDialog(parent)
 	, m_PhaseEqual(false)
 	, m_CurrentPhase(-1)
 {
+	setWindowIcon(QIcon(":/Icons/Logo.png"));
 	QGroupBox *TotalGroup=new QGroupBox(this);
 	TotalGroup->setTitle(tr("Total"));
 	QVBoxLayout* TotalLay = new QVBoxLayout(TotalGroup);
@@ -118,8 +120,6 @@ void PhasedProgressWidget::SetEqualLenghtPhases(bool val) {
 }
 
 void PhasedProgressWidget::UpdateTotalProgress() {
-	setMinimumWidth(minimumHeight() * 2);
-	setFixedSize(minimumSize());
 	double TotalRes;
 	if (m_PhaseEqual) {
 		TotalRes = 100.0*(
@@ -133,9 +133,9 @@ void PhasedProgressWidget::UpdateTotalProgress() {
 		double CurrentSum = 0.0;
 		double TotalSum = 0.0;
 		for (int i = 0; i < m_Mins.size(); ++i) {
-			TotalSum += static_cast<double>(m_PhaseProgress->maximum() - m_PhaseProgress->minimum());
-			if (i<m_CurrentPhase) CurrentSum += static_cast<double>(m_PhaseProgress->maximum() - m_PhaseProgress->minimum());
-			else if (i == m_CurrentPhase) CurrentSum += static_cast<double>(m_PhaseProgress->value() - m_PhaseProgress->minimum());
+			TotalSum += static_cast<double>(m_Maxs.at(i) - m_Mins.at(i));
+			if (i<m_CurrentPhase) CurrentSum += static_cast<double>(m_Maxs.at(i) - m_Mins.at(i));
+			else if (i == m_CurrentPhase) CurrentSum += static_cast<double>(m_PhaseProgress->value() - m_Mins.at(i));
 		}
 		TotalRes = 100.0*CurrentSum / TotalSum;
 	}
@@ -183,6 +183,12 @@ int PhasedProgressWidget::GetPhaseProgress() const {
 
 int PhasedProgressWidget::GetTotalProgress() const {
 	return m_TotalProgress->value();
+}
+
+void PhasedProgressWidget::show() {
+	QDialog::show();
+	if (minimumHeight()>0)
+		setFixedSize(minimumHeight() * 2, minimumHeight());
 }
 
 

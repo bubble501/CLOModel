@@ -23,9 +23,9 @@
 #include "StressViewer.h"
 #include "SummaryView.h"
 int main(int argc, char *argv[]) {
-	QApplication a(argc, argv);
+	/*QApplication a(argc, argv);
 	ConsoleTestObj b;
-	return a.exec();
+	return a.exec();*/
 
 
 	/*QApplication a(argc, argv);
@@ -66,11 +66,11 @@ int main(int argc, char *argv[]) {
 	return a.exec();
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 
-/*
+
 	
 	QApplication a(argc, argv);
 	//QFile file("C:/Temp/Wrong 20#,#8#,#100#,#0#,#0#,#0.csw");
-	QFile file("C:/Temp/20#,#8#,#100#,#0#,#0#,#0.csw");
+	/*QFile file("C:/Temp/20#,#8#,#100#,#0#,#0#,#0.csw");
 	//QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/.BaseCase.clo");
 	file.open(QIODevice::ReadOnly);
 	qint32 VersionChecker;
@@ -80,15 +80,17 @@ int main(int argc, char *argv[]) {
 	if (VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) {
 	file.close();
 	return 1;
-	}
+	}*/
 	//{bool Junk; out >> Junk; }
 	Waterfall TempWtf;
-	TempWtf.SetLoadProtocolVersion(VersionChecker);
-	out >> TempWtf;
-	file.close();
+	Tranche TempTr;
+	TempWtf.AddTranche(TempTr);
+// 	TempWtf.SetLoadProtocolVersion(VersionChecker);
+// 	out >> TempWtf;
+// 	file.close();
 	//TempWtf.CalculateTranchesCashFlows();
 	SummaryView Check;
 	Check.show();
 	Check.SetStructure(TempWtf);
-	return a.exec();*/
+	return a.exec();
 }

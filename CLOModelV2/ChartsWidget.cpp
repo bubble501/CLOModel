@@ -43,8 +43,7 @@ void ChartsWidget::ResetCharts(){
 }
 void ChartsWidget::PlotStructure(const Waterfall& a){
 	ResetCharts();
-	if(a.GetTranchesCount()<1) return;
-	{//Loans
+	if (a.GetCalculatedMtgPayments().Count() >0){//Loans
 		QStringList DatesLabels;
 		ChartsModels.append(new QStandardItemModel(a.GetCalculatedMtgPayments().Count(),1,this));
 		for(int i=0;i<a.GetCalculatedMtgPayments().Count();i++){
@@ -129,7 +128,7 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		ChartsArea->addWidget(Charts.last());
 		ChartsList->addItem("Loans");
 	}
-	{//Notes Outstanding
+	if(a.GetTranchesCount()>0){if (a.GetTranche(0)->GetCashFlow().Count()>0) {//Notes Outstanding
 		QStringList DatesLabels;
 		QStringList TranchesLabels;
 		ChartsModels.append(new QStandardItemModel(a.GetTranche(0)->GetCashFlow().Count(),a.GetTranchesCount(),this));
@@ -233,8 +232,8 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		Charts.last()->addHeaderFooter(ChartTile);
 		ChartsArea->addWidget(Charts.last());
 		ChartsList->addItem("Notes Outstanding");
-	}
-	{//OC Test
+	}}
+	if(a.GetTranchesCount()>0){if (a.GetTranche(0)->GetCashFlow().Count()>0){//OC Test
 		QStringList DatesLabels;
 		QStringList TranchesLabels;
 		int ColumnsCount=0;
@@ -344,8 +343,8 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		Charts.last()->addHeaderFooter(ChartTile);
 		ChartsArea->addWidget(Charts.last());
 		ChartsList->addItem("OC Test");
-	}
-	{//IC Test
+	}}
+	if(a.GetTranchesCount()>0){if (a.GetTranche(0)->GetCashFlow().Count()>0){//IC Test
 		QStringList DatesLabels;
 		QStringList TranchesLabels;
 		int ColumnsCount=0;
@@ -453,9 +452,9 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		Charts.last()->addHeaderFooter(ChartTile);
 		ChartsArea->addWidget(Charts.last());
 		ChartsList->addItem("IC Test");
-	}
+	}}
 
-	{//Annualized Excess Spread
+	if(a.GetTranchesCount()>0){if (a.GetTranche(0)->GetCashFlow().Count()>0){//Annualized Excess Spread
 		QStringList DatesLabels;
 		ChartsModels.append(new QStandardItemModel(a.GetTranche(0)->GetCashFlow().Count(),1,this));
 		for(int i=0;i<a.GetTranche(0)->GetCashFlow().Count();i++){
@@ -531,9 +530,9 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		Charts.last()->addHeaderFooter(ChartTile);
 		ChartsArea->addWidget(Charts.last());
 		ChartsList->addItem("Annualized Excess Spread");
-	}
+	}}
 
-	{//WA Cost of Funding
+	if(a.GetTranchesCount()>0 && a.GetCalculatedMtgPayments().Count()>0){if (a.GetTranche(0)->GetCashFlow().Count()>0){//WA Cost of Funding
 		QStringList DatesLabels;
 		ChartsModels.append(new QStandardItemModel(a.GetTranche(0)->GetCashFlow().Count(),2,this));
 		for(int i=0;i<a.GetTranche(0)->GetCashFlow().Count();i++){
@@ -639,9 +638,9 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		Charts.last()->addHeaderFooter(ChartTile);
 		ChartsArea->addWidget(Charts.last());
 		ChartsList->addItem("Costs and Revenues");
-	}
+	}}
 
-	{//Call Value to Equity
+	if(a.GetTranchesCount()>0 && a.GetCalculatedMtgPayments().Count()>0){if (a.GetTranche(0)->GetCashFlow().Count()>0){//Call Value to Equity
 		QStringList DatesLabels;
 		ChartsModels.append(new QStandardItemModel(a.GetTranche(0)->GetCashFlow().Count(),1,this));
 		for(int i=0;i<a.GetTranche(0)->GetCashFlow().Count();i++){
@@ -680,9 +679,9 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		Charts.last()->addHeaderFooter(ChartTile);
 		ChartsArea->addWidget(Charts.last());
 		ChartsList->addItem("Pool Call Value to Equity Ratio");
-	}
+	}}
 
-	{//CPR and Loss Rate
+	if (a.GetCalculatedMtgPayments().Count() >0) {//CPR and Loss Rate
 		QStringList DatesLabels;
 		double TempValue;
 		ChartsModels.append(new QStandardItemModel(a.GetCalculatedMtgPayments().Count(),1,this));
@@ -764,7 +763,7 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		ChartsArea->addWidget(Charts.last());
 		ChartsList->addItem("CPR and LR");
 	}
-	{//Equity Return
+	if(a.GetTranchesCount()>0 && a.GetCalculatedMtgPayments().Count()>0){if (a.GetTranche(0)->GetCashFlow().Count()>0){//Equity Return
 		QStringList DatesLabels;
 		double TempValue;
 		ChartsModels.append(new QStandardItemModel(a.GetTranche(0)->GetCashFlow().Count(),1,this));
@@ -885,8 +884,8 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		plane3->setGridAttributes(Qt::Vertical,ga);
 		ChartsArea->addWidget(Charts.last());
 		ChartsList->addItem("Equity Return");
-	}
-	{//Reserve Funds
+	}}
+	if (a.GetNumReserves() >0){//Reserve Funds
 		QStringList DatesLabels;
 		QStringList ReserveLabels;
 		ReserveLabels << "Actual Reserve" << "Target Reserve";

@@ -193,6 +193,11 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 				RFcurrent=pdFreq->dblVal; pdFreq++;
 				RFfree=pdFreq->intVal; pdFreq++;
 				RFtoIntres=pdFreq->boolVal; pdFreq++;
+				if (
+					(!BloombergVector(RFtarget).IsEmpty(0.001) && !BloombergVector(RFmultiple).IsEmpty(0.001))
+					|| !BloombergVector(RFfloor).IsEmpty(0.001)
+					|| RFcurrent>0.0
+				)
 				TempUnit.AddReserveFund(RFtarget, RFmultiple, RFfloor, RFcap, RFcurrent, RFfree, RFtoIntres);
 			}
 			bool CumRes=pdFreq->boolVal; pdFreq++;

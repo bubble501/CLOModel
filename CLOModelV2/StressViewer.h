@@ -50,7 +50,8 @@ private slots:
 	void UpdateCombos();
 	void UpdateTable();
 	void SetPriceChange() { PriceToBeSet = true; }
+	void SetStressLevel(int r, int c);
 signals:
-	//void StressLevelChanged(Waterfall);
+	void StressLevelChanged(Waterfall);
 	void Closing();
 };

@@ -31,11 +31,11 @@ int main(int argc, char *argv[]) {
 	/*QApplication a(argc, argv);
 	StressViewer b;
 	b.show();
-	b.LoadStress("C:/Temp/.StressResult.fcsr");
+	b.LoadStress("C:/Temp/StressResult.fcsr");
 	return a.exec();*/
 
 	/*Waterfall TempWtf, TempCallWaterfall;
-	QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/.BaseCase.clo");
+	QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/BaseCase.clo");
 	//QFile file("C:/Temp/.SavedInputs.clo");
 	file.open(QIODevice::ReadOnly);
 	qint32 VersionChecker;
@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
 	RegisterAsMetaType<MtgCashFlow>();
 
 	Tranche TeResult = *( StressTest::GetScenarioFromFile(
-		"Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/.StressResult.fcsr"
+		"Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/StressResult.fcsr"
 		, "20", "0.5", "0", "0", "0", "0"
 		).GetTranche("HARVT 10X A"));
 	return a.exec();
@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
 	QApplication a(argc, argv);
 	//QFile file("C:/Temp/Wrong 20#,#8#,#100#,#0#,#0#,#0.csw");
 	/*QFile file("C:/Temp/20#,#8#,#100#,#0#,#0#,#0.csw");
-	//QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/.BaseCase.clo");
+	//QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/BaseCase.clo");
 	file.open(QIODevice::ReadOnly);
 	qint32 VersionChecker;
 	QDataStream out(&file);

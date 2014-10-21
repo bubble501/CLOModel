@@ -131,6 +131,7 @@ StressViewer::StressViewer(QWidget* parent/*=0*/)
 	StressTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	StressTable->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	StressTable->setSelectionMode(QAbstractItemView::SingleSelection);
+	StressTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	CentreLay->addWidget(StressTable, 1, 1);
 	QHBoxLayout* TableToplay = new QHBoxLayout;
 	HSpace = new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -141,14 +142,16 @@ StressViewer::StressViewer(QWidget* parent/*=0*/)
 	CentreLay->addLayout(TableToplay, 0, 1);
 	MainLay->addWidget(ConstGroup);
 
-	connect(TrancheCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(SetPriceChange()));
-	connect(TrancheCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateTable()), Qt::QueuedConnection);
-	connect(DisplayValuesCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateTable()), Qt::QueuedConnection);
+	connect(TrancheCombo, SIGNAL(currentTextChanged(QString)), this, SLOT(SetPriceChange()));
+	connect(TrancheCombo, SIGNAL(currentTextChanged(QString)), this, SLOT(UpdateTable()), Qt::QueuedConnection);
+	connect(DisplayValuesCombo, SIGNAL(currentTextChanged(QString)), this, SLOT(UpdateTable()), Qt::QueuedConnection);
 	connect(PriceSpin, SIGNAL(valueChanged(double)), this, SLOT(UpdateTable()), Qt::QueuedConnection);
-	connect(VariableParCombo[0], SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateCombos()));
-	connect(VariableParCombo[0], SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateTable()), Qt::QueuedConnection);
-	connect(VariableParCombo[1], SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateCombos()));
-	connect(VariableParCombo[1], SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateTable()), Qt::QueuedConnection);
+	connect(VariableParCombo[0], SIGNAL(currentTextChanged(QString)), this, SLOT(UpdateCombos()));
+	connect(VariableParCombo[0], SIGNAL(currentTextChanged(QString)), this, SLOT(UpdateTable()), Qt::QueuedConnection);
+	connect(VariableParCombo[1], SIGNAL(currentTextChanged(QString)), this, SLOT(UpdateCombos()));
+	connect(VariableParCombo[1], SIGNAL(currentTextChanged(QString)), this, SLOT(UpdateTable()), Qt::QueuedConnection);
+	connect(StressTable, &QTableWidget::cellDoubleClicked, this, &StressViewer::SetStressLevel, Qt::QueuedConnection);
+	for (int j = 0; j < NumStressDimentsions - 2; ++j) connect(ConstParCombo[j], SIGNAL(currentTextChanged(QString)), this, SLOT(UpdateTable()), Qt::QueuedConnection);
 
 }
 
@@ -208,6 +211,18 @@ void StressViewer::UpdateCombos() {
 	StressTable->setHorizontalHeaderLabels(AvailableAssumptions[VariableParCombo[1]->currentData().toInt()]);
 	int ParamIter = 0;
 	for (int j = 0; j < NumStressDimentsions; ++j) {
+		if (VariableParCombo[0]->currentData().toInt() != j) {
+			if (VariableParCombo[1]->findData(j) < 0) {
+				VariableParCombo[1]->addItem(ParamNames[j], j);
+			}
+		}
+		else VariableParCombo[1]->removeItem(VariableParCombo[1]->findData(j));
+		if (VariableParCombo[1]->currentData().toInt() != j) {
+			if (VariableParCombo[0]->findData(j) < 0) {
+				VariableParCombo[0]->addItem(ParamNames[j], j);
+			}
+		}
+		else VariableParCombo[0]->removeItem(VariableParCombo[0]->findData(j));
 		if (VariableParCombo[0]->currentData().toInt() == j || VariableParCombo[1]->currentData().toInt() == j) continue;
 		ConstParCombo[ParamIter]->clear();
 		ConstParLabel[ParamIter]->setText(ParamNames[j]);
@@ -215,6 +230,7 @@ void StressViewer::UpdateCombos() {
 			ConstParCombo[ParamIter]->addItem(*i);
 		ParamIter++;
 	}
+	for (int j = 0; j < 2; ++j) VariableParCombo[j]->model()->sort(0);
 }
 
 void StressViewer::UpdateTable() {
@@ -310,4 +326,8 @@ void StressViewer::UpdateTable() {
 		PriceSpin->hide();
 		PriceLabel->hide();
 	}
+}
+void StressViewer::SetStressLevel(int r, int c) {
+	QSharedPointer<Waterfall> TempWat = StressTarget->GetResults().value(AssembleAssumption(r, c), QSharedPointer<Waterfall>(nullptr));
+	if (TempWat) emit StressLevelChanged(*TempWat);
 }

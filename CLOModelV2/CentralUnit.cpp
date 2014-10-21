@@ -361,7 +361,7 @@ void CentralUnit::CheckCalculationDone()
 		}
 	}
 	#endif
-	QString Filename=FolderPath+"\\.BaseCase.clo";
+	QString Filename=FolderPath+"\\BaseCase.clo";
 	QFile file(Filename);
 	if (file.open(QIODevice::WriteOnly)) {
 		QDataStream out(&file);

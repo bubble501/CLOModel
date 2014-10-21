@@ -1,6 +1,7 @@
 #ifndef StandaloneViewer_h__
 #define StandaloneViewer_h__
 #include <QMainWindow>
+#include <QStringList>
 #include "Waterfall.h"
 #define MaxRecentFiles 10
 class QMenu;

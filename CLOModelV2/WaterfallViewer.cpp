@@ -35,6 +35,7 @@ WaterfallViewer::WaterfallViewer(QWidget* parent/* =0 */)
 	;
 
 	InterestTable=new QTableWidget(this);
+	InterestTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	InterestTable->setRowCount(0);
 	InterestTable->setColumnCount(HeadersStrings.size());
 	InterestTable->setHorizontalHeaderLabels(HeadersStrings);
@@ -52,6 +53,7 @@ WaterfallViewer::WaterfallViewer(QWidget* parent/* =0 */)
 	InterestLay->addWidget(InterestTable);
 
 	PrincipalTable=new QTableWidget(this);
+	PrincipalTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	PrincipalTable->setRowCount(0);
 	PrincipalTable->setColumnCount(HeadersStrings.size());
 	PrincipalTable->setHorizontalHeaderLabels(HeadersStrings);

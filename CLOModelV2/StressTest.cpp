@@ -554,14 +554,32 @@ void StressTest::FastLoansCalculated() {
 			return;
 		}
 		m_RainbowTable.insert(CurrentHash, *CurrentAss);
+		Structure.ResetMtgFlows();
+		Structure.AddMortgagesFlows(*(BaseApplier->GetResult(SingleKey)));
 		Structure.SetAssumptions(*CurrentAss);
 		TranchesCalculator->AddWaterfall(Structure, CurrentHash);
 	}
 	emit AllLoansCalculated();
 }
 
-
-
+#ifndef NO_DATABASE
+void StressTest::GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll) {
+	Structure.GetBaseRatesDatabase(Values, DownloadAll);
+	BaseCalculator->GetBaseRatesDatabase(Values, DownloadAll);
+}
+void StressTest::GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll) {
+	Structure.GetBaseRatesDatabase(Values, DownloadAll);
+	BaseCalculator->GetBaseRatesDatabase(Values, DownloadAll);
+}
+#endif
+void StressTest::CompileBaseRates(ConstantBaseRateTable& Values) {
+	Structure.CompileReferenceRateValue(Values);
+	BaseCalculator->CompileReferenceRateValue(Values);
+}
+void StressTest::CompileBaseRates(ForwardBaseRateTable& Values) {
+	Structure.CompileReferenceRateValue(Values);
+	BaseCalculator->CompileReferenceRateValue(Values);
+}
 
 
 

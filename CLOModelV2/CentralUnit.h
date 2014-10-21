@@ -156,7 +156,8 @@ public:
 	const Waterfall& GetStructure() { return Structure; }
 	const Waterfall& GetCallStructure() { return CallStructure; }
 private:
-	ProgressWidget* MtgsProgress;
+	AbstractBaseRateTable* LastRateTable;
+	QPointer<ProgressWidget> MtgsProgress;
 	WaterfallCalculator* ParallWatFalls;
 	MtgCalculator LoansCalculator;
 	Waterfall Structure;

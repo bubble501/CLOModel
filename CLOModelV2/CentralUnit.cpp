@@ -20,6 +20,7 @@ CentralUnit::CentralUnit(QObject* parent)
 	, m_UseForwardCurve(false)
 	, m_SaveBaseCase(true)
 	, m_BaseCaseToCall(true)
+	, LastRateTable(nullptr)
 {
 	for(int i=0;i<NumberOfPlots;i++) PlotIndexes[i]=0;
 	RegisterAsMetaType<Waterfall>();
@@ -29,7 +30,7 @@ CentralUnit::CentralUnit(QObject* parent)
 	ParallWatFalls=new WaterfallCalculator(this);
 	connect(ParallWatFalls,SIGNAL(Calculated()),this,SLOT(CheckCalculationDone()));
 }
-void CentralUnit::SetPoolCutOff(const QDate& a){PoolCutOff=a;}
+void CentralUnit::SetPoolCutOff(const QDate& a) { PoolCutOff = a; if (Stresser) Stresser->SetStartDate(PoolCutOff); }
 void CentralUnit::SetFolderPath(const QString& a){FolderPath=a;}
 void CentralUnit::AddLoan(
 	const QDate& Maturity
@@ -62,6 +63,7 @@ void CentralUnit::AddLoan(
 		TempMtg.SetProperty(KeyVal.first(), KeyVal.at(1));
 	}
 	LoansCalculator.AddLoan(TempMtg,LoansCalculator.NumBees());
+	if (Stresser)Stresser->AddLoan(TempMtg);
 }
 #ifndef NO_BLOOMBERG
 void CentralUnit::AddTranche(const QString& Name, const QString& ProRataGroup, double MinOC, double MinIC, double Price, double FxRate, const QString& BbgExt) {
@@ -75,6 +77,7 @@ void CentralUnit::AddTranche(const QString& Name, const QString& ProRataGroup, d
 	TempTrnch.SetBloombergExtension(BbgExt);
 	TempTrnch.GetDataFromBloomberg();
 	Structure.AddTranche(TempTrnch);
+	if (Stresser)Stresser->SetStructure(Structure);
 }
 #endif
 void CentralUnit::AddTranche(
@@ -124,6 +127,7 @@ void CentralUnit::AddTranche(
 	TempTrnch.SetDayCount(DayCount);
 	TempTrnch.SetStartingDeferredInterest(StartingDeferredInterest);
 	Structure.AddTranche(TempTrnch);
+	if (Stresser)Stresser->SetStructure(Structure);
 }
 void CentralUnit::AddWaterfallStep(
 	WatFalPrior::WaterfallStepType Tpe
@@ -156,6 +160,7 @@ void CentralUnit::AddWaterfallStep(
 	TempStep.SetPriorityType(Tpe);
 	LOGDEBUG(TempStep.ToString());
 	Structure.AddStep(TempStep);
+	if(Stresser)Stresser->SetStructure(Structure);
 }
 void CentralUnit::Reset(){
 	LoansCalculator.Reset();
@@ -163,9 +168,9 @@ void CentralUnit::Reset(){
 	Structure.ResetSteps();
 	Structure.ResetTranches();
 	Structure.ResetReserve();
-	if(Stresser){
-		Stresser->deleteLater();
-	}
+	if(Stresser) Stresser->deleteLater();
+	if (LastRateTable) { delete LastRateTable; LastRateTable = nullptr; }
+	if (MtgsProgress) MtgsProgress->deleteLater();
 }
 
 void CentralUnit::SetupStress(const QString& ConstPar,QList<QString> XSpann,QList<QString> YSpann, int Xvar,int Yvar){
@@ -234,6 +239,10 @@ void CentralUnit::SetupStress(const QString& ConstPar,QList<QString> XSpann,QLis
 	LOGDEBUG(QString("Loans in stress test: %1\nTranches in Stress: %2").arg(TempLoans.size()).arg(Stresser->GetStructure().GetTranchesCount()));
 	for (auto i = TempLoans.constBegin(); i != TempLoans.constEnd(); ++i)
 		Stresser->AddLoan(*(i.value()));
+	if (LastRateTable) {
+		if (m_UseForwardCurve) Stresser->CompileBaseRates(*(dynamic_cast<ForwardBaseRateTable*>(LastRateTable)));
+		else Stresser->CompileBaseRates(*(dynamic_cast<ConstantBaseRateTable*>(LastRateTable)));
+	}
 	connect(this,SIGNAL(StressLoopStarted()),Stresser,SLOT(RunStressTest()),Qt::QueuedConnection);
 	connect(Stresser,SIGNAL(AllFinished()),this,SLOT(StressFinished()));
 }
@@ -327,7 +336,6 @@ void CentralUnit::CheckCalculationDone()
 	MtgsProgress->SetValue(1);
 	QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 	if(MtgsProgress) MtgsProgress->deleteLater();
-	MtgsProgress=NULL;
 	Tranche TempTranche;
 	if(RunCall){
 		Structure=*(ParallWatFalls->GetResult(0));
@@ -563,6 +571,7 @@ void CentralUnit::StressFinished(){
 }
 CentralUnit::~CentralUnit(){
 	if(MtgsProgress) MtgsProgress->deleteLater();
+	if (LastRateTable) delete LastRateTable;
 }
 void CentralUnit::CompileBaseRates(ConstantBaseRateTable& Values) {
 	m_OverrideConstants = Values;
@@ -571,6 +580,8 @@ void CentralUnit::CompileBaseRates(ConstantBaseRateTable& Values) {
 	LoansCalculator.CompileReferenceRateValue(Values);
 	LiborUpdateDate = Values.GetUpdateDate();
 	m_UseForwardCurve = false;
+	if (LastRateTable) delete LastRateTable;
+	LastRateTable = new ConstantBaseRateTable(Values);
 }
 void CentralUnit::CompileBaseRates(ForwardBaseRateTable& Values) {
 	m_OverrideForwards = Values;
@@ -579,6 +590,8 @@ void CentralUnit::CompileBaseRates(ForwardBaseRateTable& Values) {
 	LoansCalculator.CompileReferenceRateValue(Values);
 	LiborUpdateDate = Values.GetUpdateDate();
 	m_UseForwardCurve = true;
+	if (LastRateTable) delete LastRateTable;
+	LastRateTable = new ForwardBaseRateTable(Values);
 }
 #ifndef NO_DATABASE
 void CentralUnit::GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll)  {
@@ -588,6 +601,8 @@ void CentralUnit::GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool Downl
 	LoansCalculator.GetBaseRatesDatabase(Values, DownloadAll);
 	LiborUpdateDate = Values.GetUpdateDate();
 	m_UseForwardCurve = false;
+	if (LastRateTable) delete LastRateTable;
+	LastRateTable = new ConstantBaseRateTable(Values);
 }
 void CentralUnit::GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll)  {
 	m_OverrideForwards = Values;
@@ -596,5 +611,7 @@ void CentralUnit::GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool Downlo
 	LoansCalculator.GetBaseRatesDatabase(Values, DownloadAll);
 	LiborUpdateDate = Values.GetUpdateDate();
 	m_UseForwardCurve = true;
+	if (LastRateTable) delete LastRateTable;
+	LastRateTable = new ForwardBaseRateTable(Values);
 }
 #endif

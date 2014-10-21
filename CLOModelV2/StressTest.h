@@ -121,6 +121,12 @@ public:
 	quint32 CountScenarios()const;
 	void ResetResults() { Results.clear(); }
 	void ResetScenarios();
+	void CompileBaseRates(ConstantBaseRateTable& Values);
+	void CompileBaseRates(ForwardBaseRateTable& Values);
+#ifndef NO_DATABASE
+	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll = false);
+	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll = false);
+#endif
 public slots:
 	void RunStressTest();
 	void StopCalculation();

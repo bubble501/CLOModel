@@ -57,19 +57,10 @@ bool RepaymentVector::IsValid() const {
 }
 
 RepaymentVector::RepaymentMethods RepaymentVector::GetValue(const QDate& index)const {
-	QDate ValidDate(m_AnchorDate);
-	if (m_AnchorDate.isNull()) { 
-		ValidDate = QDate::currentDate(); 
-		LOGDEBUG("Anchor defaulted to today\n"); }
-	if (index < m_AnchorDate) { 
-		LOGDEBUG("Requested date before Anchor\n"); 
-		return m_VectVal.first(); 
-	}
-	return GetValue(MonthDiff(index, ValidDate));
+	return GetValueTemplate(m_VectVal, index, RepaymentMethods::Invalid);
 }
 RepaymentVector::RepaymentMethods RepaymentVector::GetValue(int index)const {
-	if (m_VectVal.isEmpty() || index < 0) return Invalid;
-	return m_VectVal.at(qMin(index, m_VectVal.size() - 1));
+	return GetValueTemplate(m_VectVal, index, RepaymentMethods::Invalid);
 }
 QDataStream& operator<<(QDataStream & stream, const RepaymentVector& flows) {
 	stream << flows.m_Vector;

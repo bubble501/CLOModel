@@ -22,6 +22,7 @@ public:
 	const DateTrigger::TriggerSide& GetSide() const { return m_Side; }
 	void SetSide(const DateTrigger::TriggerSide& val) { m_Side = val; }
 	virtual QString ReadyToCalculate() const override;
+	virtual QString ToString() { return AbstractTrigger::ToString() + "\nLimit Date: " + m_LimitDate.toString("yyyy-MM-dd") + QString("\nSide: %1").arg(static_cast<quint8>(m_Side)); }
 protected:
 	virtual QDataStream& WriteToStream(QDataStream& stream) const override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;

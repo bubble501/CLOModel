@@ -152,8 +152,11 @@
 			<Component Id="ZLib" Guid="D8D49DFE-5B0F-427F-932B-34FABC1B107F">
 				<File Id="ZlibLib" Name="zlib1.dll" Source="C:\Zlib\zlib1.dll" KeyPath="yes" />
 			</Component>
+			<Component Id="QuaZip" Guid="8DF682B3-2186-49FC-B714-5F79C71C1137">
+				<File Id="QuaZipLib" Name="QuaZip.dll" Source="C:\Quazip\lib\QuaZip.dll" KeyPath="yes" />
+			</Component>
 			<Component Id="BloombergAPI" Guid="1D169B22-9620-49D9-A620-0C3FFB61C551">
-				<File Id="BloombergLib" Name="blpapi3_32.dll" Source="C:\blp\API\APIv3\C++API\v3.6.2.0\bin\blpapi3_32.dll" KeyPath="yes" />
+				<File Id="BloombergLib" Name="blpapi3_32.dll" Source="C:\blp\API\APIv3\C++API\v3.7.5.1\lib\blpapi3_32.dll" KeyPath="yes" />
 			</Component>
 		</ComponentGroup>
 		<ComponentGroup Id="RequiredPlugins" Directory="PLUGINSDIR">

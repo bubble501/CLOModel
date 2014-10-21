@@ -10,22 +10,23 @@
 #include "PoolSizeTrigger.h"
 #include "TrancheTrigger.h"
 #include <QStack>
+#include "AssumptionSet.h"
 const WatFalPrior* Waterfall::GetStep(int Index)const {
-	if(Index<0 || Index>=m_WaterfallStesps.size()) return NULL;
+	if (Index<0 || Index >= m_WaterfallStesps.size()) return nullptr;
 	return m_WaterfallStesps.at(Index);
 }
 WatFalPrior* Waterfall::GetStep(int Index){
-	if(Index<0 || Index>=m_WaterfallStesps.size()) return NULL;
+	if (Index<0 || Index >= m_WaterfallStesps.size()) return nullptr;
 	return m_WaterfallStesps[Index];
 }
 void Waterfall::SetCCCcurve(const QString& a){m_CCCcurve=a;}
 
 const Tranche* Waterfall::GetTranche(int Index) const{
-	if(Index<0 || Index>=m_Tranches.size()) return NULL;
+	if (Index<0 || Index >= m_Tranches.size()) return nullptr;
 	return m_Tranches.at(Index);
 }
 Tranche* Waterfall::GetTranche(int Index){
-	if(Index<0 || Index>=m_Tranches.size()) return NULL;
+	if(Index<0 || Index>=m_Tranches.size()) return nullptr;
 	return m_Tranches[Index];
 }
 const Tranche* Waterfall::GetTranche(const QString& TrancheName) const{
@@ -753,6 +754,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 				//This is not a Tranche payment date
 				foreach(const WatFalPrior* SingleStep,m_WaterfallStesps){
 					if(SingleStep->GetPriorityType()==WatFalPrior::WaterfallStepType::wst_ReinvestPrincipal){
+						//LOGDEBUG("Reinvestment Trigger: " + SingleStep->GetParameter(WatFalPrior::wstParameters::Trigger).toString());
 						if (TriggerPassing(SingleStep->GetParameter(WatFalPrior::wstParameters::Trigger).toString(), i, RollingNextIPD, IsCallPaymentDate) && !IsCallPaymentDate && i<m_MortgagesPayments.Count() - 1) {
 							//If it should, reinvest
 							if (m_PrincipalAvailable.Total() > 0.0) {
@@ -1196,46 +1198,59 @@ bool Waterfall::CalculateTranchesCashFlows(){
 							if (m_Tranches.at(h)->GetProrataGroup(CurrSenGrpLvl) == CurrSenGrp) ProRataBonds.enqueue(h);
 						}
 					}
-					TotalPayable = qMax(TotalPayable, 0.000001);
 					//CCC test
 					if (m_CCCcurve.GetValue(CurrentDate)>m_CCCTestLimit)
 						Solution = (1.0 - ((m_CCCcurve.GetValue(CurrentDate) - m_CCCTestLimit)*m_CCChaircut))*m_MortgagesPayments.GetAmountOut(i);
 					else
 						Solution = m_MortgagesPayments.GetAmountOut(i);
 					Solution += AvailablePrincipal.Total();
+					
+					if (Solution + TotalPayable<=0.0) continue; 
 					if (Solution == 0.0) Solution = 1.0;
-					while (ProRataBonds.size() > 0) {
-						if (m_Tranches.at(ProRataBonds.head())->GetCashFlow().GetOCTest(CurrentDate) <= 0.0)
-							m_Tranches[ProRataBonds.head()]->AddCashFlow(CurrentDate, Solution / TotalPayable, TrancheCashFlow::TrancheFlowType::OCFlow);
-						TestTarget = m_Tranches.at(ProRataBonds.dequeue())->GetMinOClevel();
-					}
+					TotalPayable = qMax(TotalPayable, 0.000001);
+					TestTarget = -1.0;
 					if (SingleStep->HasParameter(WatFalPrior::wstParameters::TestTargetOverride)) {
 						TestTarget = SingleStep->GetParameter(WatFalPrior::wstParameters::TestTargetOverride).value<BloombergVector>().GetValue(CurrentDate);
 					}
+					while (ProRataBonds.size() > 0) {
+						if (m_Tranches.at(ProRataBonds.head())->GetCashFlow().GetOCTest(CurrentDate) <= 0.0)
+							m_Tranches[ProRataBonds.head()]->AddCashFlow(CurrentDate, Solution / TotalPayable, TrancheCashFlow::TrancheFlowType::OCFlow);
+						if (TestTarget<0.0) TestTarget = m_Tranches.at(ProRataBonds.head())->GetMinOClevel();
+						if (m_Tranches.at(ProRataBonds.head())->GetCashFlow().GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::OCTarget)) <= 0.0)
+							m_Tranches[ProRataBonds.head()]->AddCashFlow(CurrentDate, TestTarget, TrancheCashFlow::TrancheFlowType::OCTarget);
+						ProRataBonds.dequeue();
+					}
+					
 					//if it fails redeem notes until cured
+					if (TestTarget==0.0) continue;
 					if (Solution / TotalPayable < TestTarget) {
 						double CurrAddColShare = SingleStep->GetParameter(WatFalPrior::wstParameters::AdditionalCollateralShare).value<BloombergVector>().GetValue(CurrentDate);
+						double CurrentRedemptionShare = SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionShare).value<BloombergVector>().GetValue(CurrentDate);
+						double NeedToCure;
 						if (IsCallPaymentDate || i == m_MortgagesPayments.Count() - 1) CurrAddColShare = 0.0;
-						if ((CurrAddColShare*TestTarget) - TestTarget - CurrAddColShare == 0.0) {
+						if (CurrAddColShare + (CurrentRedemptionShare*TestTarget) == 0.0) {
 							PrintToTempFile("ReturnFalse.txt", "OC cure denominator is 0");
 							return false;
 						}
-						Solution = (Solution - (TotalPayable*TestTarget)) / ((CurrAddColShare*TestTarget) - TestTarget - CurrAddColShare);
-						if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 1)
-							Solution = qMin(Solution, AvailableInterest);
-						else
-							Solution = qMin(Solution, AvailablePrincipal.Total());
-						TotalPayable = Solution*CurrAddColShare;
-						Solution *= SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionShare).value<BloombergVector>().GetValue(CurrentDate);
-						if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 1)
-							AvailableInterest -= TotalPayable + Solution;
-						else
-							AvailablePrincipal -= TotalPayable + Solution;
+						NeedToCure = ((TotalPayable*TestTarget) - Solution) / (CurrAddColShare + (CurrentRedemptionShare*TestTarget));
+						double FundsToRedemption,FundsToCollateral;
+						if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 1) {
+							NeedToCure = qMin(NeedToCure, AvailableInterest);
+							FundsToRedemption = NeedToCure*CurrentRedemptionShare;
+							FundsToCollateral = NeedToCure*CurrAddColShare;
+							AvailableInterest -= FundsToRedemption + FundsToCollateral;
+						}
+						else {
+							NeedToCure = qMin(NeedToCure, AvailablePrincipal.Total());
+							FundsToRedemption = NeedToCure*CurrentRedemptionShare;
+							FundsToCollateral = NeedToCure*CurrAddColShare;
+							AvailablePrincipal -= FundsToRedemption + FundsToCollateral;
+						}
 						//reinvest
 						if (TotalPayable > 0.0) {
-							m_ReinvestmentTest.CalculateBondCashFlows(TotalPayable, CurrentDate, i);
+							m_ReinvestmentTest.CalculateBondCashFlows(FundsToCollateral, CurrentDate, i);
 							m_MortgagesPayments.AddFlow(m_ReinvestmentTest.GetBondCashFlow());
-							m_Reinvested.AddFlow(CurrentDate, TotalPayable,
+							m_Reinvested.AddFlow(CurrentDate, FundsToCollateral,
 								(SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 1 ?
 								static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow)
 								: static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow)
@@ -1247,18 +1262,18 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						}
 						//Redeem
 						if (!SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroup).value<IntegerVector>().IsEmpty()) {
-							Solution = RedeemNotes(
-								Solution
+							FundsToRedemption = RedeemNotes(
+								FundsToRedemption
 								, CurrRedGrp
 								, CurrRedGrpLvl
 								, CurrentDate
 								);
 						}
-						else Solution = RedeemSequential(Solution, CurrentDate, CurrRedGrpLvl );
+						else FundsToRedemption = RedeemSequential(FundsToRedemption, CurrentDate, CurrRedGrpLvl);
 						if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 1)
-							AvailableInterest += Solution;
+							AvailableInterest += FundsToRedemption;
 						else
-							AvailablePrincipal += Solution;
+							AvailablePrincipal += FundsToRedemption;
 					}
 				}
 				break;
@@ -1289,13 +1304,17 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						}
 					}
 					TotalPayable = qMax(TotalPayable, 0.000001);
+					TestTarget = -1.0;
+					if (SingleStep->HasParameter(WatFalPrior::wstParameters::TestTargetOverride)) {
+						TestTarget = SingleStep->GetParameter(WatFalPrior::wstParameters::TestTargetOverride).value<BloombergVector>().GetValue(CurrentDate);
+					}
 					while (ProRataBonds.size()>0) {
 						if (m_Tranches.at(ProRataBonds.head())->GetCashFlow().GetICTest(CurrentDate) <= 0.0)
 							m_Tranches[ProRataBonds.head()]->AddCashFlow(CurrentDate, Solution / TotalPayable, TrancheCashFlow::TrancheFlowType::ICFlow);
-						TestTarget = m_Tranches.at(ProRataBonds.dequeue())->GetMinIClevel();
-					}
-					if (SingleStep->HasParameter(WatFalPrior::wstParameters::TestTargetOverride)) {
-						TestTarget = SingleStep->GetParameter(WatFalPrior::wstParameters::TestTargetOverride).value<BloombergVector>().GetValue(CurrentDate);
+						if (TestTarget<0.0) TestTarget = m_Tranches.at(ProRataBonds.head())->GetMinIClevel();
+						if (m_Tranches.at(ProRataBonds.head())->GetCashFlow().GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::ICTarget)) <= 0.0)
+							m_Tranches[ProRataBonds.head()]->AddCashFlow(CurrentDate, TestTarget, TrancheCashFlow::TrancheFlowType::ICTarget);
+						ProRataBonds.dequeue();
 					}
 					//if it fails redeem senior notes until cured
 					if (Solution / TotalPayable < TestTarget && ((AvailablePrincipal.Total()>0.0 && SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 2) || (AvailableInterest > 0 && SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 1))) {
@@ -1331,6 +1350,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 				break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				case WatFalPrior::WaterfallStepType::wst_ReinvestPrincipal:
+					LOGDEBUG("Reinvestment Trigger: " + SingleStep->GetParameter(WatFalPrior::wstParameters::Trigger).toString()+m_Triggers.value(5)->ToString());
 					if (!IsCallPaymentDate && i<m_MortgagesPayments.Count()-1) {
 						if(AvailablePrincipal.Total()>0.0){
 							double PayablePrincipal;
@@ -1579,6 +1599,7 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream){
 	
 	ResetSteps();
 	for (int i = 0; i < TempInt; i++) {
+		TempStep.ClearParameters();
 		TempStep.SetLoadProtocolVersion(m_LoadProtocolVersion);
 		stream >> TempStep;
 		AddStep(TempStep);
@@ -1870,7 +1891,7 @@ bool Waterfall::ValidTriggerStructure(const QString& TriggerStructure)const {
 		LOGDEBUG("Failed in Postfix"); 
 		return false; 
 	}
-	QRegExp SignleTriggers(QString("\\b") + NegateTriggerChar + "?(\\d+)\\b");
+	QRegExp SignleTriggers("\\b(\\d+)\\b");
 	if (SignleTriggers.indexIn(AdjStructure) < 0) return false;
 	QStringList CapturedTriggers = SignleTriggers.capturedTexts();
 	for (auto i = CapturedTriggers.constBegin()+1;i!=CapturedTriggers.constEnd();++i){
@@ -1885,7 +1906,7 @@ bool Waterfall::ValidTriggerStructure(const QString& TriggerStructure)const {
 bool Waterfall::TriggerPassing(const QString& TriggerStructure, int PeriodIndex,const QDate& CurrentIPD, bool IsCallDate) {
 	QString AdjStructure = InfixToPostfix(TriggerStructure);
 	if (AdjStructure.isEmpty()) return false;
-	QRegExp SignleTriggers(QString("\\b") + NegateTriggerChar +"?(\\d+)\\b");
+	QRegExp SignleTriggers("\\b(\\d+)\\b");
 	if (SignleTriggers.indexIn(AdjStructure) < 0) return false;
 	QStringList CapturedTriggers = SignleTriggers.capturedTexts();
 	for (auto i = CapturedTriggers.constBegin() + 1; i != CapturedTriggers.constEnd(); ++i) {
@@ -1900,13 +1921,10 @@ bool Waterfall::TriggerPassing(const QString& TriggerStructure, int PeriodIndex,
 	}
 	QStack<bool> PolishStack;
 	QStringList PolishParts = AdjStructure.split(' ');
-	SignleTriggers.setPattern(NegateTriggerChar+QString("?\\d+"));
+	SignleTriggers.setPattern("\\d+");
 	foreach(const QString& SinglePart, PolishParts) {
 		if (SignleTriggers.exactMatch(SinglePart)) {
-			if (SinglePart.at(0) == QString(NegateTriggerChar).replace(QRegExp("\\+"), "")) 
-				PolishStack.push(m_TriggersResults.GetResult(SinglePart.mid(1).toUInt(), CurrentIPD) != TriggersResults::TrigRes::trTrue);
-			else
-				PolishStack.push(m_TriggersResults.GetResult(SinglePart.mid(1).toUInt(), CurrentIPD) == TriggersResults::TrigRes::trTrue);
+				PolishStack.push(m_TriggersResults.GetResult(SinglePart.toUInt(), CurrentIPD) == TriggersResults::TrigRes::trTrue);
 		}
 		else {
 			switch (SinglePart.at(0).toLatin1()) {
@@ -1914,6 +1932,7 @@ bool Waterfall::TriggerPassing(const QString& TriggerStructure, int PeriodIndex,
 			case '*': PolishStack.push(PolishStack.pop() && PolishStack.pop()); break;
 			case '-': PolishStack.push(!(PolishStack.pop() || PolishStack.pop())); break;
 			case '/': PolishStack.push(!(PolishStack.pop() && PolishStack.pop())); break;
+			case '!': PolishStack.push(!PolishStack.pop()); break;
 			default: return false;
 			}
 		}
@@ -1926,6 +1945,13 @@ bool Waterfall::EvaluateTrigger(quint32 TrigID, int PeriodIndex, const QDate& Cu
 	if (!CurrentTrigger) return false;
 	switch (CurrentTrigger->GetTriggerType()) {
 	case AbstractTrigger::TriggerType::DateTrigger:
+/*
+		LOGCONDITIONALLY(
+			TrigID == 5 && CurrentTrigger.dynamicCast<DateTrigger>()->Passing(CurrentIPD)
+			, "CurrentIPD: " +CurrentIPD.toString("yyyy-MM-dd") 
+			+ "\nTrigger Limit: "+ CurrentTrigger.dynamicCast<DateTrigger>()->GetLimitDate().toString("yyyy-MM-dd") 
+			+ QString("\nTrigger Side: %1").arg(static_cast<quint32>(CurrentTrigger.dynamicCast<DateTrigger>()->GetSide()))
+		);*/
 		return CurrentTrigger.dynamicCast<DateTrigger>()->Passing(CurrentIPD);
 	case AbstractTrigger::TriggerType::VectorTrigger:{
 		QSharedPointer<VectorTrigger> TempTrig = CurrentTrigger.dynamicCast<VectorTrigger>();
@@ -1979,4 +2005,13 @@ MtgCashFlow Waterfall::GetAggregatedMtgFlows() const {
 		Result.AddFlow(m_CalculatedMtgPayments.AggregateRange(benchFlow.GetDate(i - 1), benchFlow.GetDate(i)));
 	}
 	return Result;
+}
+
+void Waterfall::SetAssumptions(const AssumptionSet& a) {
+	m_ReinvestmentTest.SetCPR(a.GetCPRscenario());
+	m_ReinvestmentTest.SetCDR(a.GetCDRscenario());
+	m_ReinvestmentTest.SetLS(a.GetLSscenario());
+	m_ReinvestmentTest.SetRecoveryLag(a.GetRecLagScenario());
+	m_ReinvestmentTest.SetDelinquency(a.GetDelinqScenario());
+	m_ReinvestmentTest.SetDelinquencyLag(a.GetDelinqLagScenario());
 }

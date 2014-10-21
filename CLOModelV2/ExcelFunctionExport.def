@@ -4,6 +4,6 @@ EXPORTS
 	CLODiscountMargin
 	CLOReturnRate
 	CLOWALife
-	StressTargetChanged
-	InspectStress
-	GetAssumption
+	GetLoansAssumption
+	GetStressLoss
+	GetStressDM

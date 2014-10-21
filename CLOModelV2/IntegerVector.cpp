@@ -73,20 +73,10 @@ bool IntegerVector::IsValid() const {
 	return AbstractBbgVect::IsValid("-?\\d+", true);
 }
 int IntegerVector::GetValue(const QDate& index)const {
-	QDate ValidDate(m_AnchorDate);
-	if (m_AnchorDate.isNull()) { 
-		ValidDate = QDate::currentDate(); 
-		LOGDEBUG("Anchor defaulted to today\n"); 
-	}
-	if (index < m_AnchorDate) {
-		LOGDEBUG("Requested date before Anchor\n"); 
-		return m_VectVal.first()+m_Shift;
-	}
-	return GetValue(MonthDiff(index, ValidDate));
+	return GetValueTemplate(m_VectVal, index, 0) + m_Shift;
 }
 int IntegerVector::GetValue(int index)const {
-	if (m_VectVal.isEmpty() || index < 0) return 0;
-	return m_VectVal.at(qMin(index, m_VectVal.size() - 1)) + m_Shift;
+	return GetValueTemplate(m_VectVal, index, 0) + m_Shift;
 }
 QDataStream& operator<<(QDataStream & stream, const IntegerVector& flows) {
 	stream << flows.m_Vector;

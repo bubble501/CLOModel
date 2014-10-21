@@ -1,11 +1,17 @@
 #include "ConsoleTestObj.h"
-
+#include "StressTest.h"
+#include <QSharedPointer>
+#include "ScenarioApplier.h"
 ConsoleTestObj::ConsoleTestObj(QObject *parent)
 	: QObject(parent)
+	, TempStress(nullptr)
+	, Tested(nullptr)
 {
 	connect(&TempUnit, &CentralUnit::CalculationFinished, this, &ConsoleTestObj::PrintOutput);
 	//BBVALTest();
-	SlateTest();
+	//SlateTest();
+	//TestApplier();
+	TestStressTest();
 }
 
 void ConsoleTestObj::BBVALTest() {
@@ -268,10 +274,13 @@ void ConsoleTestObj::BBVALTest() {
 }
 
 void ConsoleTestObj::PrintOutput() {
-	PrintToTempFile("Loans",TempUnit.GetStructure().GetCalculatedMtgPayments().ToString());
-	for (int i = 0; i < TempUnit.GetStructure().GetTranchesCount(); i++) {
-		PrintToTempFile(TempUnit.GetStructure().GetTranche(i)->GetTrancheName(), TempUnit.GetStructure().GetTranche(i)->GetCashFlow().ToString());
+	if (!Tested) return;
+	const QHash<qint32, MtgCashFlow*>& res = Tested->GetResults();
+	MtgCashFlow TotRes;
+	for (QHash<qint32, MtgCashFlow*>::const_iterator i = res.constBegin(); i != res.constEnd(); ++i) {
+		TotRes.AddFlow(*(i.value()));
 	}
+	PrintToTempFile("ApplierRes", TotRes.ToString(), false);
 }
 
 
@@ -1794,4 +1803,102 @@ void ConsoleTestObj::SlateTest() {
 
 	TempUnit.GetBaseRatesDatabase(LiborCurve);
 	TempUnit.Calculate();
+}
+
+void ConsoleTestObj::TestStressTest() {
+	Waterfall TempWtf, TempCallWaterfall;
+	MtgCalculator TempLoanCalc;
+	QFile file("//synserver2/Company Share/24AM/Monitoring/Model Results/HARVT 10X.clom");
+	//QFile file("C:/Temp/.SavedInputs.clo");
+	file.open(QIODevice::ReadOnly);
+	qint32 VersionChecker;
+	QDataStream out(&file);
+	out.setVersion(QDataStream::Qt_5_3);
+	out >> VersionChecker;
+	if (VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) {
+		qDebug() << "Invalid Version\n";
+		file.close();
+		return;
+	}
+	{QDate Junk; out >> Junk; }
+	{bool Junk; out >> Junk; }
+	{bool Junk; out >> Junk; }
+	TempWtf.SetLoadProtocolVersion(VersionChecker);
+	out >> TempWtf;
+	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
+	out >> TempCallWaterfall;
+	TempLoanCalc.SetLoadProtocolVersion(VersionChecker);
+	out >> TempLoanCalc;
+	file.close();
+
+	TempStress = new StressTest(this);
+	for (auto i = TempLoanCalc.GetLoans().constBegin(); i != TempLoanCalc.GetLoans().constEnd(); ++i) {
+		TempStress->AddLoan(*(i.value()));
+	}
+
+
+	TempStress->SetStructure(TempWtf);
+	QList<QString> TempList;
+	TempList << "0" << "10";
+	//TempList << "20" << "30";// << "40" << "50" << "60" << "70" << "80" << "90" << "100";
+	foreach(const QString& tmpstr, TempList)
+		TempStress->AddLSscenarios(tmpstr);
+	TempList.clear();
+	TempList << "0.5" << "1";
+	//TempList << "1.5" << "2";// << "2.5" << "3" << "3.5" << "4" << "4.5" << "5" << "5.5" << "6" << "6.5" << "7" << "7.5" << "8" << "8.5" << "9";
+	foreach(const QString& tmpstr, TempList)
+		TempStress->AddCDRscenarios(tmpstr);
+	TempStress->AddCPRscenarios("20 48S 5 12S 10 12S 30");
+	TempStress->SetUseFastVersion(true);
+	//TempStress.UseMultithread(false);
+	TempStress->SetStartDate(TempWtf.GetCalculatedMtgPayments().GetDate(0));
+	connect(TempStress, SIGNAL(AllFinished()), this, SLOT(PrintOutput()));
+	TempStress->RunStressTest();
+}
+
+void ConsoleTestObj::TestApplier() {
+	Waterfall TempWtf;
+	QFile file("//synserver2/Company Share/24AM/Monitoring/Model Results/HARVT 10X.clom");
+	file.open(QIODevice::ReadOnly);
+	qint32 VersionChecker;
+	QDataStream out(&file);
+	out.setVersion(QDataStream::Qt_5_3);
+	out >> VersionChecker;
+	if (VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) {
+		file.close();
+		return;
+	}
+	{QDate Junk; out >> Junk; }
+	{bool Junk; out >> Junk; }
+	{bool Junk; out >> Junk; }
+	TempWtf.SetLoadProtocolVersion(VersionChecker);
+	out >> TempWtf;
+	TempWtf.CalculateTranchesCashFlows();
+
+	/*Tested = new ScenarioApplier(this);
+
+	Tested->SetBaseFlows(TempWtf.GetMortgagesPayments());
+	AssumptionSet CurrentAss;
+	CurrentAss.SetDelinqScenario("0");
+	CurrentAss.SetDelinqLagScenario("0");
+	CurrentAss.SetRecLagScenario("0");
+	CurrentAss.SetCPRscenario("20");
+
+	CurrentAss.SetLSscenario("10");
+	CurrentAss.SetCDRscenario("1");
+	Tested->AddAssumption(CurrentAss,0);
+	CurrentAss.SetCDRscenario("2");
+	Tested->AddAssumption(CurrentAss,1);
+	CurrentAss.SetLSscenario("20");
+	Tested->AddAssumption(CurrentAss,2);
+	CurrentAss.SetCDRscenario("1");
+	Tested->AddAssumption(CurrentAss,3);
+	connect(Tested, SIGNAL(Calculated()), this, SLOT(PrintOutput()));
+	connect(Tested, SIGNAL(Progress(double)), this, SLOT(ConsoleProgress(double)));
+	Tested->SetSequentialComputation(true);
+	Tested->StartCalculation();*/
+}
+
+void ConsoleTestObj::ConsoleProgress(double pr) {
+	qDebug() << QString::number(pr*100.0, 'f', 2) << '\n';
 }

@@ -20,12 +20,21 @@
 #include <QTextStream>
 #include "DateTrigger.h"
 #include "PoolSizeTrigger.h"
+#include "StressViewer.h"
+#include "SummaryView.h"
 int main(int argc, char *argv[]) {
-	//QApplication a(argc, argv);
-	//ConsoleTestObj a;
-	//return a.exec();
+	/*QApplication a(argc, argv);
+	ConsoleTestObj b;
+	return a.exec();*/
 
-	Waterfall TempWtf, TempCallWaterfall;
+
+	/*QApplication a(argc, argv);
+	StressViewer b;
+	b.show();
+	b.LoadStress("C:/Temp/.StressResult.fcsr");
+	return a.exec();*/
+
+	/*Waterfall TempWtf, TempCallWaterfall;
 	QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/.BaseCase.clo");
 	//QFile file("C:/Temp/.SavedInputs.clo");
 	file.open(QIODevice::ReadOnly);
@@ -43,54 +52,45 @@ int main(int argc, char *argv[]) {
 	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempCallWaterfall;
 	file.close();
-	TempCallWaterfall.CalculateTranchesCashFlows();
+	TempCallWaterfall.CalculateTranchesCashFlows();*/
 
 	/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	QApplication a(argc, argv);
-	if (!QMetaType::isRegistered(qMetaTypeId<Waterfall>()))
-		qRegisterMetaType<Waterfall>("Waterfall");
-	if (!QMetaType::isRegistered(qMetaTypeId<MtgCashFlow>()))
-		qRegisterMetaType<MtgCashFlow>("MtgCashFlow");
-	Waterfall TempWtf, TempCallWaterfall;
-	MtgCalculator TempLoanCalc;
-	QFile file("//synserver2/Company Share/24AM/Monitoring/Model Results/HARVT 10X.clom");
-	//QFile file("C:/Temp/.SavedInputs.clo");
+	RegisterAsMetaType<Waterfall>();
+	RegisterAsMetaType<MtgCashFlow>();
+
+	Tranche TeResult = *( StressTest::GetScenarioFromFile(
+		"Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/.StressResult.fcsr"
+		, "20", "0.5", "0", "0", "0", "0"
+		).GetTranche("HARVT 10X A"));
+	return a.exec();
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
+
+
+	
+	QApplication a(argc, argv);
+	//QFile file("C:/Temp/Wrong 20#,#8#,#100#,#0#,#0#,#0.csw");
+	/*QFile file("C:/Temp/20#,#8#,#100#,#0#,#0#,#0.csw");
+	//QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/.BaseCase.clo");
 	file.open(QIODevice::ReadOnly);
 	qint32 VersionChecker;
 	QDataStream out(&file);
 	out.setVersion(QDataStream::Qt_5_3);
 	out >> VersionChecker;
 	if (VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) {
-		file.close();
-		return 1;
-	}
-	{QDate Junk; out >> Junk; }
-	{bool Junk; out >> Junk; }
-	{bool Junk; out >> Junk; }
-	TempWtf.SetLoadProtocolVersion(VersionChecker);
-	out >> TempWtf;
-	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
-	out >> TempCallWaterfall;
-	TempLoanCalc.SetLoadProtocolVersion(VersionChecker);
-	out >> TempLoanCalc;
 	file.close();
-	
-	StressTest TempStress;
-	for (auto i = TempLoanCalc.GetLoans().constBegin(); i != TempLoanCalc.GetLoans().constEnd(); ++i) {
-		TempStress.AddLoan(*(i.value()));
-	}
-	
-
-	TempStress.SetStructure(TempWtf);
-	QList<QString> TempList;
-	TempList << "0" << "10" << "20" << "30" << "40" << "50" << "60" << "70" << "80" << "90" << "100";
-	TempStress.AddYSpann(TempList);
-	TempList << "0.5" << "1" << "1.5" << "2" << "2.5" << "3" << "3.5" << "4" << "4.5" << "5" << "5.5" << "6" << "6.5" << "7" << "7.5" << "8" << "8.5" << "9";
-	TempStress.AddXSpann(TempList);
-	TempStress.SetConstantPar("20 48S 5 12S 10 12S 30");
-	TempStress.RunStressTest();
-	TempStress.SetUseFastVersion(true);
-	TempStress.SaveResults("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models");
+	return 1;
+	}*/
+	//{bool Junk; out >> Junk; }
+	Waterfall TempWtf;
+	Tranche TempTr;
+	TempWtf.AddTranche(TempTr);
+// 	TempWtf.SetLoadProtocolVersion(VersionChecker);
+// 	out >> TempWtf;
+// 	file.close();
+	//TempWtf.CalculateTranchesCashFlows();
+	SummaryView Check;
+	Check.show();
+	Check.SetStructure(TempWtf);
 	return a.exec();
-	*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }

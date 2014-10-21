@@ -13,13 +13,14 @@
 #include <QStringList>
 CentralUnit::CentralUnit(QObject* parent)
 	:QObject(parent)
-	,Stresser(NULL)
-	,MtgsProgress(NULL)
+	,Stresser(nullptr)
+	,MtgsProgress(nullptr)
 	,RunCall(false)
 	,UseFastStress(false)
 	, m_UseForwardCurve(false)
 	, m_SaveBaseCase(true)
 	, m_BaseCaseToCall(true)
+	, LastRateTable(nullptr)
 {
 	for(int i=0;i<NumberOfPlots;i++) PlotIndexes[i]=0;
 	RegisterAsMetaType<Waterfall>();
@@ -29,7 +30,7 @@ CentralUnit::CentralUnit(QObject* parent)
 	ParallWatFalls=new WaterfallCalculator(this);
 	connect(ParallWatFalls,SIGNAL(Calculated()),this,SLOT(CheckCalculationDone()));
 }
-void CentralUnit::SetPoolCutOff(const QDate& a){PoolCutOff=a; if(Stresser) Stresser->SetStartDate(PoolCutOff);}
+void CentralUnit::SetPoolCutOff(const QDate& a) { PoolCutOff = a; if (Stresser) Stresser->SetStartDate(PoolCutOff); }
 void CentralUnit::SetFolderPath(const QString& a){FolderPath=a;}
 void CentralUnit::AddLoan(
 	const QDate& Maturity
@@ -61,8 +62,8 @@ void CentralUnit::AddLoan(
 		if (KeyVal.size() != 2) continue;
 		TempMtg.SetProperty(KeyVal.first(), KeyVal.at(1));
 	}
-	LoansCalculator.AddLoan(TempMtg);
-	if(Stresser)Stresser->AddLoan(TempMtg);
+	LoansCalculator.AddLoan(TempMtg,LoansCalculator.NumBees());
+	if (Stresser)Stresser->AddLoan(TempMtg);
 }
 #ifndef NO_BLOOMBERG
 void CentralUnit::AddTranche(const QString& Name, const QString& ProRataGroup, double MinOC, double MinIC, double Price, double FxRate, const QString& BbgExt) {
@@ -76,7 +77,7 @@ void CentralUnit::AddTranche(const QString& Name, const QString& ProRataGroup, d
 	TempTrnch.SetBloombergExtension(BbgExt);
 	TempTrnch.GetDataFromBloomberg();
 	Structure.AddTranche(TempTrnch);
-	if(Stresser)Stresser->SetStructure(Structure);
+	if (Stresser)Stresser->SetStructure(Structure);
 }
 #endif
 void CentralUnit::AddTranche(
@@ -126,7 +127,7 @@ void CentralUnit::AddTranche(
 	TempTrnch.SetDayCount(DayCount);
 	TempTrnch.SetStartingDeferredInterest(StartingDeferredInterest);
 	Structure.AddTranche(TempTrnch);
-	if(Stresser)Stresser->SetStructure(Structure);
+	if (Stresser)Stresser->SetStructure(Structure);
 }
 void CentralUnit::AddWaterfallStep(
 	WatFalPrior::WaterfallStepType Tpe
@@ -159,6 +160,7 @@ void CentralUnit::AddWaterfallStep(
 	TempStep.SetPriorityType(Tpe);
 	LOGDEBUG(TempStep.ToString());
 	Structure.AddStep(TempStep);
+	if(Stresser)Stresser->SetStructure(Structure);
 }
 void CentralUnit::Reset(){
 	LoansCalculator.Reset();
@@ -166,25 +168,81 @@ void CentralUnit::Reset(){
 	Structure.ResetSteps();
 	Structure.ResetTranches();
 	Structure.ResetReserve();
-	if(Stresser){
-		Stresser->deleteLater();
-		Stresser=NULL;
-	}
+	if(Stresser) Stresser->deleteLater();
+	if (LastRateTable) { delete LastRateTable; LastRateTable = nullptr; }
+	if (MtgsProgress) MtgsProgress->deleteLater();
 }
-void CentralUnit::SetupStress(const QString& ConstPar,QList<QString> XSpann,QList<QString> YSpann, StressTest::StressVariability Xvar,StressTest::StressVariability Yvar){
+
+void CentralUnit::SetupStress(const QString& ConstPar,QList<QString> XSpann,QList<QString> YSpann, int Xvar,int Yvar){
 	if(!Stresser){
 		Stresser=new StressTest(this);
 	}
-	Stresser->SetConstantPar(ConstPar);
-	Stresser->SetXSpann(XSpann);
-	Stresser->SetYSpann(YSpann);
-	Stresser->SetXVariability(Xvar);
-	Stresser->SetYVariability(Yvar);
+	/*
+	ChangingCDR = 0x1
+	ChangingLS = 0x2
+	ChangingCPR = 0x4
+	*/
+	switch (Xvar) {
+	case 0x1:
+		foreach(const QString& SingleScen, XSpann)
+			{Stresser->AddCDRscenarios(SingleScen);}
+		break;
+	case 0x2:
+		foreach(const QString& SingleScen, XSpann) {
+			Stresser->AddLSscenarios(SingleScen);
+		}
+		break;
+	case 0x4:
+		foreach(const QString& SingleScen, XSpann) {
+			Stresser->AddCPRscenarios(SingleScen);
+		}
+		break;
+	default: 
+		Stresser->deleteLater();
+		PrintToTempFile("Error In Calculation", "Invalid Stress Dimension");
+		return;
+	}
+	switch (Yvar) {
+	case 0x1:
+		foreach(const QString& SingleScen, YSpann) {
+			Stresser->AddCDRscenarios(SingleScen);
+		}
+		break;
+	case 0x2:
+		foreach(const QString& SingleScen, YSpann) {
+			Stresser->AddLSscenarios(SingleScen);
+		}
+		break;
+	case 0x4:
+		foreach(const QString& SingleScen, YSpann) {
+			Stresser->AddCPRscenarios(SingleScen);
+		}
+		break;
+	default:
+		Stresser->deleteLater();
+		PrintToTempFile("Error In Calculation", "Invalid Stress Dimension");
+		return;
+	}
+	switch ((~(Xvar | Yvar)) & 0x7) {
+	case 0x1: Stresser->AddCDRscenarios(ConstPar); break;
+	case 0x2: Stresser->AddLSscenarios(ConstPar); break;
+	case 0x4: Stresser->AddCPRscenarios(ConstPar); break;
+	default:
+		Stresser->deleteLater();
+		PrintToTempFile("Error In Calculation", "Invalid Stress Dimension");
+		return;
+	}
 	Stresser->SetStartDate(PoolCutOff);
 	Structure.SetUseCall(StressToCall);
 	Stresser->SetStructure(Structure);
-	for (auto i = LoansCalculator.GetLoans().constBegin(); i != LoansCalculator.GetLoans().constEnd(); i++)
+	const auto& TempLoans = LoansCalculator.GetLoans();
+	LOGDEBUG(QString("Loans in stress test: %1\nTranches in Stress: %2").arg(TempLoans.size()).arg(Stresser->GetStructure().GetTranchesCount()));
+	for (auto i = TempLoans.constBegin(); i != TempLoans.constEnd(); ++i)
 		Stresser->AddLoan(*(i.value()));
+	if (LastRateTable) {
+		if (m_UseForwardCurve) Stresser->CompileBaseRates(*(dynamic_cast<ForwardBaseRateTable*>(LastRateTable)));
+		else Stresser->CompileBaseRates(*(dynamic_cast<ConstantBaseRateTable*>(LastRateTable)));
+	}
 	connect(this,SIGNAL(StressLoopStarted()),Stresser,SLOT(RunStressTest()),Qt::QueuedConnection);
 	connect(Stresser,SIGNAL(AllFinished()),this,SLOT(StressFinished()));
 }
@@ -221,11 +279,11 @@ void CentralUnit::CalculationStep1(){
 	MtgsProgress=new ProgressWidget;
 	MtgsProgress->SetValue(0);
 	MtgsProgress->SetTitle("Calculating Loans");
-	MtgsProgress->SetMax(LoansCalculator.Count());
+	MtgsProgress->SetMax(LoansCalculator.NumBees());
 	connect(&LoansCalculator,SIGNAL(BeeCalculated(int)),MtgsProgress,SLOT(SetValue(int)));
 	MtgsProgress->show();
 	QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
-	if (!LoansCalculator.StartCalculation(true)) {
+	if (!LoansCalculator.StartCalculation()) {
 		QMessageBox::critical(0, "Invalid Input", "A base rate in the loans is invalid");
 		QApplication::quit();
 		return;
@@ -237,7 +295,7 @@ void CentralUnit::CalculationStep2(){
 	MtgsProgress->SetMax(1);
 	QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 	Structure.ResetMtgFlows();
-	Structure.AddMortgagesFlows(LoansCalculator.GetResult());
+	Structure.AddMortgagesFlows(LoansCalculator.GetAggregatedResults());
 	Structure.SetUseCall(false);
 	QString TmpStr=Structure.ReadyToCalculate();
 	if(!TmpStr.isEmpty()){
@@ -257,8 +315,8 @@ void CentralUnit::CalculationStep2(){
 		CheckCalculationDone();
 	}
 	else{
-		ParallWatFalls->ResetWaterfalls();
-		ParallWatFalls->AddWaterfall(Structure);
+		ParallWatFalls->ClearResults();
+		ParallWatFalls->AddWaterfall(Structure,0);
 		CallStructure.ResetMtgFlows();
 		CallStructure=Structure;
 		CallStructure.SetUseCall(true);
@@ -268,7 +326,7 @@ void CentralUnit::CalculationStep2(){
 			QApplication::quit();
 			return;
 		}
-		ParallWatFalls->AddWaterfall(CallStructure);
+		ParallWatFalls->AddWaterfall(CallStructure,1);
 		ParallWatFalls->StartCalculation();
 	}
 
@@ -278,11 +336,10 @@ void CentralUnit::CheckCalculationDone()
 	MtgsProgress->SetValue(1);
 	QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 	if(MtgsProgress) MtgsProgress->deleteLater();
-	MtgsProgress=NULL;
 	Tranche TempTranche;
 	if(RunCall){
-		Structure=*(ParallWatFalls->GetWaterfalls().at(0));
-		CallStructure=*(ParallWatFalls->GetWaterfalls().at(1));
+		Structure=*(ParallWatFalls->GetResult(0));
+		CallStructure = *(ParallWatFalls->GetResult(1));
 		if(Structure.GetTranchesCount()==0 || CallStructure.GetTranchesCount()==0){
 			QMessageBox::critical(0, "Error", "Critical error in waterfall calculation");
 			QApplication::quit();
@@ -508,11 +565,13 @@ void CentralUnit::CheckCalculationDone()
 	QApplication::quit();
 }
 void CentralUnit::StressFinished(){
-	Stresser->SaveResults(FolderPath);
+	if (Stresser)
+		Stresser->SaveResults(FolderPath);
 	QApplication::quit();
 }
 CentralUnit::~CentralUnit(){
 	if(MtgsProgress) MtgsProgress->deleteLater();
+	if (LastRateTable) delete LastRateTable;
 }
 void CentralUnit::CompileBaseRates(ConstantBaseRateTable& Values) {
 	m_OverrideConstants = Values;
@@ -521,6 +580,8 @@ void CentralUnit::CompileBaseRates(ConstantBaseRateTable& Values) {
 	LoansCalculator.CompileReferenceRateValue(Values);
 	LiborUpdateDate = Values.GetUpdateDate();
 	m_UseForwardCurve = false;
+	if (LastRateTable) delete LastRateTable;
+	LastRateTable = new ConstantBaseRateTable(Values);
 }
 void CentralUnit::CompileBaseRates(ForwardBaseRateTable& Values) {
 	m_OverrideForwards = Values;
@@ -529,6 +590,8 @@ void CentralUnit::CompileBaseRates(ForwardBaseRateTable& Values) {
 	LoansCalculator.CompileReferenceRateValue(Values);
 	LiborUpdateDate = Values.GetUpdateDate();
 	m_UseForwardCurve = true;
+	if (LastRateTable) delete LastRateTable;
+	LastRateTable = new ForwardBaseRateTable(Values);
 }
 #ifndef NO_DATABASE
 void CentralUnit::GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll)  {
@@ -538,6 +601,8 @@ void CentralUnit::GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool Downl
 	LoansCalculator.GetBaseRatesDatabase(Values, DownloadAll);
 	LiborUpdateDate = Values.GetUpdateDate();
 	m_UseForwardCurve = false;
+	if (LastRateTable) delete LastRateTable;
+	LastRateTable = new ConstantBaseRateTable(Values);
 }
 void CentralUnit::GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll)  {
 	m_OverrideForwards = Values;
@@ -546,5 +611,7 @@ void CentralUnit::GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool Downlo
 	LoansCalculator.GetBaseRatesDatabase(Values, DownloadAll);
 	LiborUpdateDate = Values.GetUpdateDate();
 	m_UseForwardCurve = true;
+	if (LastRateTable) delete LastRateTable;
+	LastRateTable = new ForwardBaseRateTable(Values);
 }
 #endif

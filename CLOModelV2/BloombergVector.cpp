@@ -239,21 +239,33 @@ bool BloombergVector::IsValid() const{
 	return AbstractBbgVect::IsValid("-?\\d*\\.?\\d+",true);
 }
 double BloombergVector::GetValue(const QDate& index,int Frequency)const{
-	QDate ValidDate(m_AnchorDate);
-	if (m_AnchorDate.isNull()) {
-		ValidDate = QDate::currentDate();
-		LOGDEBUG("Anchor defaulted to today\n");}
-	if (index < m_AnchorDate) { 
-		LOGDEBUG("Requested date before Anchor\n"); 
-		return m_VectVal.first(); 
-	}
-	return GetValue(MonthDiff(index,ValidDate),Frequency);
+	if (Frequency<1) return 0.0;
+	double Result = GetValueTemplate(m_VectVal, index, 0.0);
+	if (Frequency != 12)
+		return qPow(1.0 + Result, static_cast<double>(Frequency) / 12.0) - 1.0;
+	return Result;
 }
 
 double BloombergVector::GetValue(int index,int Frequency)const{
-	if(m_VectVal.isEmpty() || index<0 || Frequency<1) return 0.0;
-	if(Frequency==12) return m_VectVal.at(qMin(index,m_VectVal.size()-1));
-	return qPow(1.0+m_VectVal.at(qMin(index,m_VectVal.size()-1)),static_cast<double>(Frequency)/12.0)-1.0;
+	if (Frequency<1) return 0.0;
+	double Result = GetValueTemplate(m_VectVal, index, 0.0);
+	if(Frequency!=12) 
+		return qPow(1.0 + Result, static_cast<double>(Frequency) / 12.0) - 1.0;
+	return Result;
+}
+double BloombergVector::GetSMM(const QDate& index, int Frequency)const {
+	if (Frequency < 1) return 0.0;
+	double Result = GetValueTemplate(m_VectVal, index, 0.0);
+	if (Frequency != 12)
+		return 1.0 - qPow(1.0 - Result, static_cast<double>(Frequency) / 12.0);
+	return Result;
+}
+double BloombergVector::GetSMM(int index, int Frequency)const {
+	if (Frequency < 1) return 0.0;
+	double Result = GetValueTemplate(m_VectVal, index, 0.0);
+	if (Frequency != 12) 
+		return 1.0 - qPow(1.0 - Result, static_cast<double>(Frequency) / 12.0);
+	return Result;
 }
 QDataStream& operator<<(QDataStream & stream, const BloombergVector& flows){
 	stream << flows.m_Vector
@@ -326,14 +338,4 @@ QString BloombergVector::BloombergSafeVector(QDate CurrentDate) const {
 	Shorter.m_VectVal.erase(Shorter.m_VectVal.begin(), Shorter.m_VectVal.begin() + MonthDiff(CurrentDate, m_AnchorDate));
 	Shorter.RepackVector();
 	return Shorter.m_Vector;
-}
-double BloombergVector::GetSMM(const QDate& index, int Frequency)const {
-	QDate ValidDate(m_AnchorDate);
-	if (m_AnchorDate.isNull()) ValidDate = QDate::currentDate();
-	return GetSMM(MonthDiff(index, ValidDate), Frequency);
-}
-double BloombergVector::GetSMM(int index, int Frequency)const {
-	if (m_VectVal.isEmpty() || index < 0 || Frequency < 1) return 0.0;
-	if (Frequency == 12) return m_VectVal.at(qMin(index, m_VectVal.size() - 1));
-	return 1.0 - qPow(1.0 - m_VectVal.at(qMin(index, m_VectVal.size() - 1)), static_cast<double>(Frequency) / 12.0);
 }

@@ -10,10 +10,10 @@ class BloombergVector;
 template<typename T> class QList;
 
 #define SeniorityStringSeparator '-'
-#define NegateTriggerChar '!'
 #define MaximumInterestsTypes 8
-#define MaximumIRRIterations 10000//INT_MAX-1
+#define MaximumIRRIterations 10000 //INT_MAX-1
 #define CompoundShift 10
+#define USE_SOFT_COLOUR //Uses softer color in stress test table rather than pure RGB(255,0,0) style ones
 //#define SAVE_EXCEL_INPUTS
 //#define SaveLoanTape
 //#define DebugLogging
@@ -22,11 +22,13 @@ template<typename T> class QList;
 #ifdef DebugLogging
 #define LOGASSERT(CheckExp,LogMsg) ((CheckExp) ? qt_noop() : PrintToTempFile("DebugLog.log",LogMsg)); Q_ASSERT_X(CheckExp,"LOGASSERT",LogMsg)
 #define LOGDEBUG(LogMsg) PrintToTempFile("DebugLog",LogMsg,false)
-#define LOGTOFILE(LogFile,LogMsg) PrintToTempFile(QString(LogFile) + ".log",LogMsg)
+#define LOGTOFILE(LogFile,LogMsg) PrintToTempFile(LogFile,LogMsg)
+#define LOGCONDITIONALLY(Condition,LogMsg) ((Condition) ? PrintToTempFile("ConditionalLog",LogMsg): qt_noop());
 #else
 #define LOGASSERT(CheckExp,LogMsg)
 #define LOGDEBUG(LogMsg)
 #define LOGTOFILE(LogFile,LogMsg)
+#define LOGCONDITIONALLY(Condition,LogMsg)
 #endif
 int MonthDiff(const QDate& FutureDte,const QDate& PresentDte);
 QString InfixToPostfix(const QString& a);

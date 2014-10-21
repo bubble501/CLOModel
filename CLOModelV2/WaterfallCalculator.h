@@ -1,29 +1,24 @@
 #ifndef WaterfallCalculator_h__
 #define WaterfallCalculator_h__
-#include <QObject>
+#include "TemplAsyncCalculator.h"
 #include <QHash>
+#include <QSet>
 #include "Waterfall.h"
-class WaterfallCalcThread;
-class WaterfallCalculator : public QObject{
+#include "WaterfallCalcThread.h"
+class WaterfallCalculator : public TemplAsyncCalculator <WaterfallCalcThread, Waterfall>{
 	Q_OBJECT
 public:
 	WaterfallCalculator(QObject* parent=0);
-	~WaterfallCalculator();
-	void AddWaterfall(const Waterfall& a);
-	void ResetWaterfalls();
-	const QList<Waterfall*>& GetWaterfalls() const{return Cascades;}
-	void StartCalculation();
-	void SetSequentialComputation(bool a){SequentialComputation=a;}
-	bool GetSequentialComputation()const {return SequentialComputation;}
-private:
-	QHash<int, WaterfallCalcThread*> ThreadPool;
-	QList<Waterfall*> Cascades;
-	int BeesReturned;
-	int BeesSent;
-	bool SequentialComputation;
-private slots:
-	void BeeReturned(int ID,const Waterfall& a);
-signals:
-	void Calculated();
+	virtual ~WaterfallCalculator() { Reset(); }
+	void AddWaterfall(const Waterfall& a, qint32 ID);
+	virtual QString ReadyToCalculate() const override;
+	virtual int NumBees() const override { return m_Cascades.size(); }
+	virtual void Reset() override;
+	virtual void ClearWaterfalls();
+public slots:
+	virtual bool StartCalculation() override;
+protected:
+	QHash<qint32, Waterfall*> m_Cascades;
+	virtual void BeeReturned(int Ident, const Waterfall& a) override;
 };
 #endif // WaterfallCalculator_h__

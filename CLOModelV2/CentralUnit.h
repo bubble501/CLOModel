@@ -6,6 +6,7 @@
 #include "Waterfall.h"
 #include "StressTest.h"
 #include "BaseRateTable.h"
+#include <QPointer>
 #define NumberOfPlots 9
 class WaterfallCalculator;
 class ProgressWidget;
@@ -14,7 +15,7 @@ class CentralUnit : public QObject{
 public:
 	~CentralUnit();
 	CentralUnit(QObject* parent=0);
-	void AddLoan(const Mortgage& TempMtg) { LoansCalculator.AddLoan(TempMtg);	if (Stresser)Stresser->AddLoan(TempMtg); }
+	void AddLoan(const Mortgage& TempMtg) {LoansCalculator.AddLoan(TempMtg,LoansCalculator.NumBees());}
 	void AddLoan(
 		const QDate& Maturity
 		, double Size
@@ -115,7 +116,7 @@ public:
 		Structure.SetupReinvBond(IntrVec, CPRVec, CDRVec, LSVec, WALval, PayFreq, AnnuityVec, ReinvPric, ReinvDel, ReinvSpr, FloatingBase, RecoveryLag, Delinquency, DelinquencyLag);
 	}
 	void Reset();
-	void SetupStress(const QString& ConstPar,QList<QString> XSpann,QList<QString> YSpann, StressTest::StressVariability Xvar=StressTest::ChangingCDR,StressTest::StressVariability Yvar=StressTest::ChangingLS);
+	void SetupStress(const QString& ConstPar, QList<QString> XSpann, QList<QString> YSpann, int Xvar = 0x1, int Yvar = 0x2);
 	void SetPoolCutOff(const QDate& a);
 	void SetUseCall(bool a){RunCall=a;}
 	const QString& GetMtgOutputAddress() const{return MtgOutputAddress;}
@@ -155,12 +156,13 @@ public:
 	const Waterfall& GetStructure() { return Structure; }
 	const Waterfall& GetCallStructure() { return CallStructure; }
 private:
-	ProgressWidget* MtgsProgress;
+	AbstractBaseRateTable* LastRateTable;
+	QPointer<ProgressWidget> MtgsProgress;
 	WaterfallCalculator* ParallWatFalls;
 	MtgCalculator LoansCalculator;
 	Waterfall Structure;
 	Waterfall CallStructure;
-	StressTest* Stresser;
+	QPointer<StressTest> Stresser;
 	QDate PoolCutOff;
 	bool RunCall;
 	bool RunStress;

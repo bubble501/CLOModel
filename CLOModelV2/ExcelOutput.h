@@ -142,12 +142,6 @@ It will call the VBA function PrintMortgagesRepLines passing it the following ar
 		bool PrintLoss  = true,
 		bool PrintLossOnInterest  = true
 	);
-	HRESULT PrintStressTest(
-		const StressTest& stresser,
-		const QString& TrancheTarget,
-		const QString& DestinationAddress,
-		bool SetupConditionalFormatting  = false
-	);
 	HRESULT PrintMergedCell(const QString& msg, const QString& TargetCell, int RowDim=1, int ColDim=1 ,const QColor& FillColor=Qt::white);
 	HRESULT PrintColumn(const QString& Title, const QList<double>& Values ,const QString& TargetCell,const QString& ValFormat="0.00",const QColor& FillColor=Qt::white);
 	HRESULT PrintDataColumn(const QList<double>& Values ,const QString& TargetCell,const QString& ValFormat="0.00");
@@ -156,7 +150,6 @@ It will call the VBA function PrintMortgagesRepLines passing it the following ar
 	HRESULT PlotICTest(const Waterfall& source,const QString& DestinationSheet,int DestinationIndex,const QDate& CallDate);
 	HRESULT PlotAnnualExcess(const Waterfall& source,const QString& DestinationSheet,int DestinationIndex,const QDate& CallDate);
 	HRESULT PlotCostFunding(const Waterfall& source,const QString& DestinationSheet,int DestinationIndex,const QDate& CallDate);
-	HRESULT PlotStressMargin(const StressTest& source,const QString& DestinationSheet,int DestinationIndex,const QString& TrancheTarget, double NewPrice);
 	HRESULT PlotCallToEquity(const Waterfall& source,const QString& DestinationSheet,int DestinationIndex,const QDate& CallDate);
 	HRESULT PlotCPRLS(const Waterfall& source,const QString& DestinationSheet,int DestinationIndex);
 	HRESULT PlotEquityReturn(const Waterfall& source,const QString& DestinationSheet,int DestinationIndex);

@@ -30,14 +30,19 @@ void TrancheViewer::SetTranche(const Tranche& a){
 	MainTable->setRowCount(0);
 	const auto& Temp = a.GetCashFlow();
 	MainTable->setRowCount(a.GetCashFlow().Count());
-	bool EmptyIC = a.GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::ICFlow));
-	bool EmptyOC = a.GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::OCFlow));
-	bool EmptyPDL = a.GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PDLOutstanding))
+	int EmptyDeferred=0;
+	for (qint32 i = static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow);i < (static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) << 1); ++i) {
+		if (a.GetCashFlow().HasFlowType(i)) EmptyDeferred++;
+	}
+	bool EmptyIC = !a.GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::ICFlow));
+	bool EmptyOC = !a.GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::OCFlow));
+	bool EmptyPDL = !a.GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PDLOutstanding))
 		&&
-		a.GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PDLCured))
+		!a.GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PDLCured))
 	;
 
-	MainTable->setColumnCount(5
+	MainTable->setColumnCount(4
+		+ EmptyDeferred
 		+ (EmptyIC ? 0:1)
 		+ (EmptyOC ? 0 : 1)
 		+ (EmptyPDL ? 0 : 2)
@@ -47,8 +52,10 @@ void TrancheViewer::SetTranche(const Tranche& a){
 		<< "Date"
 		<< "Outstanding"
 		<< "Interest"
-		<< "Principal"
-		<< "Cumulative Deferred Interest";
+		<< "Principal";
+	for (int i = 0; i < EmptyDeferred; i++) {
+		HeadersStrings.append(QString("Cumulative Deferred Interest %1").arg(i + 1));
+	}
 	if (!EmptyOC) HeadersStrings.append("OC Test");
 	if (!EmptyIC) HeadersStrings.append("IC Test");
 	if (!EmptyPDL) {HeadersStrings.append("Outstanding PDL"); HeadersStrings.append("PDL Cured");}
@@ -60,25 +67,32 @@ void TrancheViewer::SetTranche(const Tranche& a){
 		MainTable->setItem(i, ColumnIter++, new QTableWidgetItem(Commarize(a.GetCashFlow().GetAmountOutstanding(i))));
 		MainTable->setItem(i, ColumnIter++, new QTableWidgetItem(Commarize(a.GetCashFlow().GetInterest(i))));
 		MainTable->setItem(i, ColumnIter++, new QTableWidgetItem(Commarize(a.GetCashFlow().GetPrincipal(i))));
-		MainTable->setItem(i, ColumnIter++, new QTableWidgetItem(Commarize(a.GetCashFlow().GetDeferred(i))));
-		if (!EmptyIC) {
-			if (a.GetCashFlow().GetICTest(i)>10.0)
-				MainTable->setItem(i, ColumnIter++, new QTableWidgetItem("Infinity"));
-			else {
-				MainTable->setItem(i, ColumnIter++, new QTableWidgetItem(QString::number(a.GetCashFlow().GetICTest(i)*100.0, 'f', 0) + '%'));
-				if (a.GetCashFlow().GetICTest(i) < a.GetMinIClevel() && a.GetMinIClevel() > 0.0)
-					MainTable->item(i, ColumnIter++)->setTextColor(QColor(Qt::red));
-			}
+		for (qint32 j = static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow); j < (static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) << 1); ++j) {
+			if (a.GetCashFlow().HasFlowType(j)) MainTable->setItem(i, ColumnIter++, new QTableWidgetItem(Commarize(a.GetCashFlow().GetFlow(i, j))));
 		}
 		if (!EmptyOC) {
 			if (a.GetCashFlow().GetOCTest(i) > 10.0)
 				MainTable->setItem(i, ColumnIter++, new QTableWidgetItem("Infinity"));
 			else {
-				MainTable->setItem(i, ColumnIter++, new QTableWidgetItem(QString::number(a.GetCashFlow().GetOCTest(i)*100.0, 'f', 0) + '%'));
+				MainTable->setItem(i, ColumnIter, new QTableWidgetItem(QString::number(a.GetCashFlow().GetOCTest(i)*100.0, 'f', 0) + '%'));
 				if (a.GetCashFlow().GetOCTest(i) < a.GetMinOClevel() && a.GetMinOClevel() > 0.0)
-					MainTable->item(i, ColumnIter++)->setTextColor(QColor(Qt::red));
+					MainTable->item(i, ColumnIter)->setTextColor(QColor(Qt::red));
+				ColumnIter++;
 			}
 		}
+		if (!EmptyIC) {
+			if (a.GetCashFlow().GetICTest(i)>10.0)
+				MainTable->setItem(i, ColumnIter++, new QTableWidgetItem("Infinity"));
+			else {
+				MainTable->setItem(i, ColumnIter, new QTableWidgetItem(QString::number(a.GetCashFlow().GetICTest(i)*100.0, 'f', 0) + '%'));
+				if (a.GetCashFlow().GetICTest(i) < a.GetMinIClevel() && a.GetMinIClevel() > 0.0)
+					MainTable->item(i, ColumnIter)->setTextColor(QColor(Qt::red));
+				ColumnIter++;
+			}
+		}
+
+		
+
 		if (!EmptyPDL) {
 			MainTable->setItem(i, ColumnIter++, new QTableWidgetItem(Commarize(a.GetCashFlow().GetPDLOutstanding(i))));
 			MainTable->setItem(i, ColumnIter++, new QTableWidgetItem(Commarize(a.GetCashFlow().GetPDLCured(i))));

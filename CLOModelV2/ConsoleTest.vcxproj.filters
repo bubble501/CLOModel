@@ -29,9 +29,6 @@
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
-    <Filter Include="quazip">
-      <UniqueIdentifier>{2e2b8d5b-f334-4a95-84d4-4a74368570d8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Core">
       <UniqueIdentifier>{64a1c378-9c5d-46f6-b501-8eaf227a741b}</UniqueIdentifier>
     </Filter>
@@ -42,45 +39,6 @@
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\qrc_Resources.cpp">
       <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\unzip.c">
-      <Filter>quazip</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\zip.c">
-      <Filter>quazip</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\JlCompress.cpp">
-      <Filter>quazip</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\qioapi.cpp">
-      <Filter>quazip</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\quaadler32.cpp">
-      <Filter>quazip</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\quacrc32.cpp">
-      <Filter>quazip</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\quagzipfile.cpp">
-      <Filter>quazip</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\quaziodevice.cpp">
-      <Filter>quazip</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\quazip.cpp">
-      <Filter>quazip</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\quazipdir.cpp">
-      <Filter>quazip</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\quazipfile.cpp">
-      <Filter>quazip</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\quazipfileinfo.cpp">
-      <Filter>quazip</Filter>
-    </ClCompile>
-    <ClCompile Include="quazip\quazipnewinfo.cpp">
-      <Filter>quazip</Filter>
     </ClCompile>
     <ClCompile Include="BaseRateTable.cpp">
       <Filter>Source Files\Core</Filter>
@@ -163,13 +121,7 @@
     <ClCompile Include="StressTest.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
-    <ClCompile Include="StressThread.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
     <ClCompile Include="StressViewer.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="StressWorker.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
     <ClCompile Include="SummaryView.cpp">
@@ -202,24 +154,6 @@
     <ClCompile Include="ConsoleTestMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_quazipfile.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_quazipfile.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_quaziodevice.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_quaziodevice.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_quagzipfile.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_quagzipfile.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_WaterfallViewer.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
@@ -248,24 +182,6 @@
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_SummaryView.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_StressWorker.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_StressWorker.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_StressViewer.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_StressViewer.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_StressThread.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_StressThread.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_StressTest.cpp">
@@ -349,19 +265,55 @@
     <ClCompile Include="TriggersResults.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
+    <ClCompile Include="AssumptionSet.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_StressViewer.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_AbstrAsyncCalculator.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_AbstrAsyncCalculator.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_AbstrAsyncThread.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_AbstrAsyncThread.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ScenarioApplier.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ScenarioApplier.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="ScenarioApplier.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ApplyFlowThread.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ApplyFlowThread.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="ApplyFlowThread.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_PhasedProgressWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_PhasedProgressWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="PhasedProgressWidget.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Resources.qrc">
       <Filter>Resource Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="quazip\quagzipfile.h">
-      <Filter>quazip</Filter>
-    </CustomBuild>
-    <CustomBuild Include="quazip\quaziodevice.h">
-      <Filter>quazip</Filter>
-    </CustomBuild>
-    <CustomBuild Include="quazip\quazipfile.h">
-      <Filter>quazip</Filter>
     </CustomBuild>
     <CustomBuild Include="CentralUnit.h">
       <Filter>Header Files\Core</Filter>
@@ -384,13 +336,7 @@
     <CustomBuild Include="StressTest.h">
       <Filter>Header Files\Core</Filter>
     </CustomBuild>
-    <CustomBuild Include="StressThread.h">
-      <Filter>Header Files\Core</Filter>
-    </CustomBuild>
     <CustomBuild Include="StressViewer.h">
-      <Filter>Header Files\Core</Filter>
-    </CustomBuild>
-    <CustomBuild Include="StressWorker.h">
       <Filter>Header Files\Core</Filter>
     </CustomBuild>
     <CustomBuild Include="SummaryView.h">
@@ -492,49 +438,25 @@
     <CustomBuild Include="Resources\GlobalConfigs.ini">
       <Filter>Resource Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="quazip\crypt.h">
-      <Filter>quazip</Filter>
-    </CustomBuild>
-    <CustomBuild Include="quazip\ioapi.h">
-      <Filter>quazip</Filter>
-    </CustomBuild>
-    <CustomBuild Include="quazip\JlCompress.h">
-      <Filter>quazip</Filter>
-    </CustomBuild>
-    <CustomBuild Include="quazip\quaadler32.h">
-      <Filter>quazip</Filter>
-    </CustomBuild>
-    <CustomBuild Include="quazip\quachecksum32.h">
-      <Filter>quazip</Filter>
-    </CustomBuild>
-    <CustomBuild Include="quazip\quacrc32.h">
-      <Filter>quazip</Filter>
-    </CustomBuild>
-    <CustomBuild Include="quazip\quazip.h">
-      <Filter>quazip</Filter>
-    </CustomBuild>
-    <CustomBuild Include="quazip\quazip_global.h">
-      <Filter>quazip</Filter>
-    </CustomBuild>
-    <CustomBuild Include="quazip\quazipdir.h">
-      <Filter>quazip</Filter>
-    </CustomBuild>
-    <CustomBuild Include="quazip\quazipfileinfo.h">
-      <Filter>quazip</Filter>
-    </CustomBuild>
-    <CustomBuild Include="quazip\quazipnewinfo.h">
-      <Filter>quazip</Filter>
-    </CustomBuild>
-    <CustomBuild Include="quazip\unzip.h">
-      <Filter>quazip</Filter>
-    </CustomBuild>
-    <CustomBuild Include="quazip\zip.h">
-      <Filter>quazip</Filter>
-    </CustomBuild>
     <CustomBuild Include="ConsoleTestObj.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="AbstractBbgVect.h">
+      <Filter>Header Files\Core</Filter>
+    </CustomBuild>
+    <CustomBuild Include="AbstrAsyncCalculator.h">
+      <Filter>Header Files\Core</Filter>
+    </CustomBuild>
+    <CustomBuild Include="AbstrAsyncThread.h">
+      <Filter>Header Files\Core</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ScenarioApplier.h">
+      <Filter>Header Files\Core</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ApplyFlowThread.h">
+      <Filter>Header Files\Core</Filter>
+    </CustomBuild>
+    <CustomBuild Include="PhasedProgressWidget.h">
       <Filter>Header Files\Core</Filter>
     </CustomBuild>
   </ItemGroup>
@@ -564,6 +486,15 @@
       <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="TriggersResults.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="AssumptionSet.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="TemplAsyncCalculator.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="TemplAsyncThread.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
   </ItemGroup>

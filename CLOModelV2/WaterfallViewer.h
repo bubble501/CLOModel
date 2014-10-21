@@ -2,11 +2,13 @@
 #define WaterfallViewer_h__
 #include <QWidget>
 #include "WatFalPrior.h"
+#include <QSet>
 class QTableWidget;
 class QLabel;
 class Waterfall;
 class IntegerVector;
 class BloombergVector;
+
 class WaterfallViewer : public QWidget{
 	Q_OBJECT
 public:
@@ -30,9 +32,26 @@ public:
 	);
 	void SetWaterfall(const Waterfall& a);
 private:
+	enum CloumnsIndexes {
+		ciStep
+		, ciSeniorityGroup
+		, ciSeniorityGroupLevel
+		, ciRedemptionGroup
+		, ciRedemptionGroupLevel
+		, ciRedemptionShare
+		, ciAdditionalCollateralShare
+		, ciSourceofFunding
+		, ciCouponIndex
+		, ciTestTargetOverride
+		, ciIRRtoEquityTarget
+		, ciReserveIndex
+		, ciTriggers
+	};
 	QTableWidget* InterestTable;
 	QTableWidget* PrincipalTable;
 	QLabel* InterestLabel;
 	QLabel* PrincipalLabel;
+	QSet<qint16> m_IWUsedCols;
+	QSet<qint16> m_PWUsedCols;
 };
 #endif // WaterfallViewer_h__

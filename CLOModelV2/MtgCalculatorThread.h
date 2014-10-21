@@ -1,10 +1,10 @@
 #ifndef MtgCalculatorThread_h__
 #define MtgCalculatorThread_h__
-#include <QThread>
+#include "TemplAsyncThread.h"
 #include "Mortgage.h"
-class MtgCalculatorThread : public QThread{
+class MtgCalculatorThread : public TemplAsyncThread <MtgCashFlow>{
 	Q_OBJECT
-private:
+protected:
 	int m_ID;
 	Mortgage Loan;
 	QString CPRass;
@@ -30,7 +30,6 @@ public:
 	const QString& GetCPR() const { return CPRass; }
 	const QString& GetCDR() const { return CDRass; }
 	const QString& GetCLR() const { return LSass; }
-	
 	const QString& GetRecoveryLag() const { return RecoveryLag; }
 	const QString& GetDelinquency() const { return Delinquency; }
 	const QString& GetDelinquencyLag() const { return DelinquencyLag; }
@@ -39,9 +38,11 @@ public:
 	bool GetOverrideAssumptions()const { return m_OverrideAssumptions; }
 signals:
 	void Calculated(int,const MtgCashFlow&);
-	void ErrorCalculation(int);
+protected slots:
+	virtual void EmitFromAnonim()override {
+		emit Calculated(Identifier, Loan.GetCashFlow());
+	}
 public slots:
 	void run();
-	void stop(){exit(0);}
 };
 #endif // MtgCalculatorThread_h__

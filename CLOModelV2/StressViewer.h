@@ -2,41 +2,55 @@
 #include "Waterfall.h"
 #include "StressTest.h"
 #include <QPropertyAnimation>
+#include <QSet>
+#include <QString>
 class QTableWidget;
 class QLabel;
 class QComboBox;
 class QDoubleSpinBox;
+class QTableModel;
 class StressViewer : public QWidget{
 	Q_OBJECT
 public:
 	StressViewer(QWidget* parent=0);
 	bool LoadStress(const QString& filename);
-	QString GetFirstName() const{return StressTarget.GetResults().value(StressTarget.GetXSpann().first()).value(StressTarget.GetYSpann().first()).GetDealName();}
+	QString GetFirstName() const;
 private:
-	QTableWidget* Table;
-	QLabel* TypeLabel;
-	QComboBox* TypeCombo;
-	QLabel* TrancheLabel;
-	QLabel* XDimLabel;
-	QLabel* YDimLabel;
-	QLabel* ConstParLabel;
-	QComboBox* TrancheCombo;
-	StressTest StressTarget;
-	QLabel* PriceLabel;
+	AssumptionSet AssembleAssumption(int r, int c) const;
+	QString ParamNames[NumStressDimentsions];
+	QComboBox* DisplayValuesCombo;
 	QDoubleSpinBox* PriceSpin;
-	int TrancheTarg;
-	int TypeTarg;
+	QLabel* PriceLabel;
+	QList<QString> AvailableAssumptions[NumStressDimentsions];
+	QTableWidget* StressTable;
+	StressTest* StressTarget;
+	QComboBox* TrancheCombo;
+	QComboBox* ConstParCombo[NumStressDimentsions-2];
+	QLabel* ConstParLabel[NumStressDimentsions - 2];
+	QComboBox* VariableParCombo[2];
+	QLabel* VariableParLabel[2];
 	QPropertyAnimation GradientBase;
+	bool PriceToBeSet;
+	enum {
+		AssCPR = 0
+		, AssCDR = 1
+		, AssLS = 2
+		, AssRecLag = 3
+		, AssDelinq = 4
+		, AssDelinqLag = 5
+	};
 protected:
-	//void resizeEvent(QResizeEvent *event);
+	const QColor GreenFill;
+	const QColor YellowFill;
+	const QColor RedFill;
+	const QColor GrayFill;
 	void closeEvent(QCloseEvent *event);
+	
 private slots:
-	void TableTargetChanged(int a){TypeTarg=a; UpdateTable();}
-	void TrancheTargetChanged(int a){TrancheTarg=a; UpdateTable();}
+	void UpdateCombos();
 	void UpdateTable();
-	void CellSelected(int r,int c);
-	void PriceChanged(double a);
+	void SetPriceChange() { PriceToBeSet = true; }
 signals:
-	void StressLevelChanged(Waterfall);
+	//void StressLevelChanged(Waterfall);
 	void Closing();
 };

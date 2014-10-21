@@ -55,6 +55,11 @@ QString WatFalPrior::ReadyToCalculate() const {
 		if (HasParameter(wstParameters::AdditionalCollateralShare)) {
 			if (GetParameter(wstParameters::AdditionalCollateralShare).value<BloombergVector>().IsEmpty(0.0, 1.0)) Result += "OC Test needs an Additional Collateral Share Parameter\n";
 		}
+		if (HasParameter(wstParameters::AdditionalCollateralShare) && HasParameter(wstParameters::RedemptionShare)) {
+			BloombergVector ACS = GetParameter(wstParameters::AdditionalCollateralShare).value<BloombergVector>();
+			BloombergVector RS = GetParameter(wstParameters::RedemptionShare).value<BloombergVector>();
+			if ((RS + ACS).IsEmpty(0.00001, 1.0)) Result += "OC Test's Additional Collateral Share Parameter and Redemption Share parameters must sum to a value greater than 0 and below 100% at all times\n";
+		}
 		if (HasParameter(wstParameters::TestTargetOverride)) {
 			if (GetParameter(wstParameters::TestTargetOverride).value<BloombergVector>().IsEmpty(0.0)) Result += "OC Test needs a target Override Parameter\n";
 		}
@@ -235,7 +240,7 @@ void WatFalPrior::RemoveParameter(qint32 ParameterType) {
 
 QString WatFalPrior::ToString() const {
 	QString Result="Waterfall Step\n";
-	Result += QString("Type: %1\nTrigger Structure: %2").arg(static_cast<qint32>(PriorityType)).arg(TriggerStruc);
+	Result += QString("Type: %1\nTrigger Structure: %2\n").arg(static_cast<qint32>(PriorityType)).arg(TriggerStruc);
 	for (auto i = IntParameters.constBegin(); i != IntParameters.constEnd(); ++i) 
 		Result += QString("Parameter %1: %2\n").arg(i.key()).arg(i.value()->GetVector());
 	for (auto i = DoubleParameters.constBegin(); i != DoubleParameters.constEnd(); ++i)

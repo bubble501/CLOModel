@@ -1,58 +1,61 @@
 #include "WaterfallCalculator.h"
-#include "WaterfallCalcThread.h"
-WaterfallCalculator::WaterfallCalculator(QObject* parent/* =0 */)
-	:QObject(parent)
-	,BeesReturned(0)
-	,BeesSent(0)
-	,SequentialComputation(false)
+WaterfallCalculator::WaterfallCalculator(QObject* parent)
+	:TemplAsyncCalculator <WaterfallCalcThread, Waterfall>(parent)
 {}
-WaterfallCalculator::~WaterfallCalculator() { 
-	WaterfallCalcThread* CurrentRunning;
-	for (QHash<int, WaterfallCalcThread*>::iterator j = ThreadPool.begin(); j != ThreadPool.end(); j++) {
-		CurrentRunning = *j;
-		if (CurrentRunning) {
-			if (CurrentRunning->isRunning()) {
-				CurrentRunning->exit();
-				CurrentRunning->wait();
-			}
-		}
+void WaterfallCalculator::AddWaterfall(const Waterfall& a, qint32 ID) {
+	if (m_Cascades.contains(ID)) {
+		delete m_Cascades[ID];
 	}
-	ResetWaterfalls(); 
+	m_Cascades[ID] = new Waterfall(a);
 }
-void WaterfallCalculator::ResetWaterfalls(){
-	for (QList<Waterfall*>::iterator i=Cascades.begin();i!=Cascades.end();i++){
-		delete *i;
+bool WaterfallCalculator::StartCalculation() {
+	if (m_ContinueCalculation) return false;
+	BeesReturned = 0;
+	BeesSent.clear();
+	if (!ReadyToCalculate().isEmpty()) return false;
+	m_ContinueCalculation = true;
+	int NumberOfThreads = QThread::idealThreadCount();
+	if (m_SequentialComputation || NumberOfThreads < 1) NumberOfThreads = 1;
+	int NumofSent = 0;
+	WaterfallCalcThread* CurrentThread;
+	for (auto SingleWaterfall = m_Cascades.begin(); SingleWaterfall != m_Cascades.end(); ++SingleWaterfall) {
+		if (NumofSent >= NumberOfThreads) break;
+		if (BeesSent.contains(SingleWaterfall.key())) continue;
+		CurrentThread = AddThread(SingleWaterfall.key());
+		CurrentThread->SetWaterfall(*(SingleWaterfall.value()));
+		CurrentThread->start();
+		++NumofSent;
 	}
-	Cascades.clear();
+	return true;
 }
-void WaterfallCalculator::AddWaterfall(const Waterfall& a){
-	Cascades.append(new Waterfall(a));
-}
-void WaterfallCalculator::StartCalculation(){
-	BeesReturned=0;
-	int NumberOfThreads=QThread::idealThreadCount();
-	if(SequentialComputation || NumberOfThreads<1) NumberOfThreads=1;
-	for(BeesSent=0;BeesSent<Cascades.size() && BeesSent<NumberOfThreads;BeesSent++){
-		ThreadPool[BeesSent]= new WaterfallCalcThread(BeesSent, this);
-		ThreadPool[BeesSent]->SetWaterfall(*(Cascades.at(BeesSent)));
-		connect(ThreadPool[BeesSent], SIGNAL(Calculated(int, const Waterfall&)), this, SLOT(BeeReturned(int, const Waterfall&)));
-		connect(ThreadPool[BeesSent], SIGNAL(Calculated(int, const Waterfall&)), ThreadPool[BeesSent], SLOT(stop()), Qt::QueuedConnection);
-		ThreadPool[BeesSent]->start();
-	}
-}
-void WaterfallCalculator::BeeReturned(int ID,const Waterfall& a){
-	(Cascades[ID])->operator=(a);
-	ThreadPool.erase(ThreadPool.find(ID));
-	BeesReturned++;
-	if(BeesReturned==Cascades.size()){
-		emit Calculated();
+void WaterfallCalculator::BeeReturned(int Ident, const Waterfall& a) {
+	TemplAsyncCalculator <WaterfallCalcThread, Waterfall > ::BeeReturned(Ident, a);
+	if (!m_ContinueCalculation) return;
+	WaterfallCalcThread* CurrentThread;
+	for (auto SingleWaterfall = m_Cascades.begin(); SingleWaterfall != m_Cascades.end(); ++SingleWaterfall) {
+		if (BeesSent.contains(SingleWaterfall.key())) continue;
+		CurrentThread = AddThread(SingleWaterfall.key());
+		CurrentThread->SetWaterfall(*(SingleWaterfall.value()));
+		CurrentThread->start();
 		return;
 	}
-	if(BeesSent>=Cascades.size()) return;
-	ThreadPool[BeesSent] = new WaterfallCalcThread(BeesSent, this);
-	ThreadPool[BeesSent]->SetWaterfall(*(Cascades.at(BeesSent)));
-	connect(ThreadPool[BeesSent], SIGNAL(Calculated(int, const Waterfall&)), this, SLOT(BeeReturned(int, const Waterfall&)));
-	connect(ThreadPool[BeesSent], SIGNAL(Calculated(int, const Waterfall&)), ThreadPool[BeesSent], SLOT(stop()), Qt::QueuedConnection);
-	ThreadPool[BeesSent]->start();
-	BeesSent++;
+}
+QString WaterfallCalculator::ReadyToCalculate() const {
+	QString Res = "";
+	for (auto i = m_Cascades.constBegin(); i != m_Cascades.constEnd(); ++i) {
+		Res += i.value()->ReadyToCalculate();
+	}
+	return Res;
+}
+
+void WaterfallCalculator::Reset() {
+	ClearWaterfalls();
+	TemplAsyncCalculator<WaterfallCalcThread, Waterfall>::Reset();
+}
+
+void WaterfallCalculator::ClearWaterfalls() {
+	for (auto i = m_Cascades.begin(); i != m_Cascades.end(); ++i) {
+		delete i.value();
+	}
+	m_Cascades.clear();
 }

@@ -310,6 +310,9 @@
     <ClCompile Include="PhasedProgressWidget.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
+    <ClCompile Include="DelinquencyTrigger.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Resources.qrc">
@@ -495,6 +498,9 @@
       <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="TemplAsyncThread.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="DelinquencyTrigger.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
   </ItemGroup>

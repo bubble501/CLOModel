@@ -10,6 +10,7 @@ public:
 		,VectorTrigger=1
 		,PoolSizeTrigger=2
 		,TrancheTrigger=3
+		,DelinquencyTrigger=4
 	};
 protected:
 	TriggerType m_TriggerType;

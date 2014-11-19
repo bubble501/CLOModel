@@ -578,6 +578,10 @@ DefaultExchange:
                 Call AddInput(AllTheInputs, CDbl(TriggerStart.Offset(i, 4).Value))
                 Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 5).Value))
                 Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 6).Value))
+            Case 4 'Delinquency Trigger
+                Call AddInput(AllTheInputs, CLng(4))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 2).Value))
             Case Else
                 Exit Sub
         End Select
@@ -1085,6 +1089,8 @@ Public Function FromStringToTriggerType(a As String) As Long
             FromStringToTriggerType = 2
         Case "TRANCHE TRIGGER"
             FromStringToTriggerType = 3
+        Case "DELINQUENCY TRIGGER"
+            FromStringToTriggerType = 4
         Case ""
             Exit Function
         Case Else
@@ -1328,7 +1334,7 @@ Attribute GetLoanAssumption.VB_ProcData.VB_Invoke_Func = " \n14"
     result(1) = Column
     result(2) = Format(refDate, "yyyy-mm-dd")
     Dim response As Double
-    response = GetAssumption(result)
+    response = GetLoansAssumption(result)
     If (Column = 3) Then
         If (response > 0#) Then
             GetLoanAssumption = True

@@ -9,7 +9,7 @@ void TriggersResults::ClearResults() {
 TriggersResults::TrigRes TriggersResults::GetResult(quint32 TrigType, const QDate& RefDate)const {
 	const QMap<QDate, bool>* Tempmap = m_Results.value(TrigType, nullptr);
 	if (Tempmap) {
-		QMap<QDate, bool>::const_iterator MapIter = Tempmap->find(RefDate);
+		QMap<QDate, bool>::const_iterator MapIter = Tempmap->constFind(RefDate);
 		if (MapIter == Tempmap->constEnd()) return TrigRes::trNA;
 		return (MapIter.value() ? TrigRes::trTrue : TrigRes::trFalse);
 	}

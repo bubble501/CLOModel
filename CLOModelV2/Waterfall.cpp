@@ -11,6 +11,7 @@
 #include "TrancheTrigger.h"
 #include <QStack>
 #include "AssumptionSet.h"
+#include "DelinquencyTrigger.h"
 const WatFalPrior* Waterfall::GetStep(int Index)const {
 	if (Index<0 || Index >= m_WaterfallStesps.size()) return nullptr;
 	return m_WaterfallStesps.at(Index);
@@ -160,6 +161,9 @@ Waterfall::Waterfall(const Waterfall& a)
 		case AbstractTrigger::TriggerType::TrancheTrigger:
 			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new TrancheTrigger(*(i.value().dynamicCast<TrancheTrigger>()))));
 			break;
+		case AbstractTrigger::TriggerType::DelinquencyTrigger:
+			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DelinquencyTrigger(*(i.value().dynamicCast<DelinquencyTrigger>()))));
+			break;
 		default:
 			break;
 		}
@@ -234,6 +238,9 @@ Waterfall& Waterfall::operator=(const Waterfall& a){
 			break;
 		case AbstractTrigger::TriggerType::TrancheTrigger:
 			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new TrancheTrigger(*(i.value().dynamicCast<TrancheTrigger>()))));
+			break;
+		case AbstractTrigger::TriggerType::DelinquencyTrigger:
+			m_Triggers.insert(i.key(), QSharedPointer<DelinquencyTrigger>(new DelinquencyTrigger(*(i.value().dynamicCast<DelinquencyTrigger>()))));
 			break;
 		default:
 			break;
@@ -1350,7 +1357,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 				break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				case WatFalPrior::WaterfallStepType::wst_ReinvestPrincipal:
-					LOGDEBUG("Reinvestment Trigger: " + SingleStep->GetParameter(WatFalPrior::wstParameters::Trigger).toString()+m_Triggers.value(5)->ToString());
+					LOGDEBUG("Reinvestment Trigger: " + SingleStep->GetParameter(WatFalPrior::wstParameters::Trigger).toString());
 					if (!IsCallPaymentDate && i<m_MortgagesPayments.Count()-1) {
 						if(AvailablePrincipal.Total()>0.0){
 							double PayablePrincipal;
@@ -1625,6 +1632,9 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream){
 			case AbstractTrigger::TriggerType::TrancheTrigger:
 				TempTrig.reset(new TrancheTrigger());
 				break;
+			case AbstractTrigger::TriggerType::DelinquencyTrigger:
+				TempTrig.reset(new DelinquencyTrigger());
+				break;
 			}
 			TempTrig->SetLoadProtocolVersion(m_LoadProtocolVersion);
 			stream >> (*TempTrig);
@@ -1891,10 +1901,17 @@ bool Waterfall::ValidTriggerStructure(const QString& TriggerStructure)const {
 		LOGDEBUG("Failed in Postfix"); 
 		return false; 
 	}
-	QRegExp SignleTriggers("\\b(\\d+)\\b");
-	if (SignleTriggers.indexIn(AdjStructure) < 0) return false;
-	QStringList CapturedTriggers = SignleTriggers.capturedTexts();
-	for (auto i = CapturedTriggers.constBegin()+1;i!=CapturedTriggers.constEnd();++i){
+	QRegExp SignleTriggers("(\\d+)");
+	QStringList CapturedTriggers;
+	{
+		int pos = 0;
+		while ((pos = SignleTriggers.indexIn(AdjStructure, pos)) >= 0) {
+			CapturedTriggers.append(SignleTriggers.cap(1));
+			pos += SignleTriggers.matchedLength();
+		}
+	}
+	if (CapturedTriggers.isEmpty()) return false;
+	for (auto i = CapturedTriggers.constBegin();i!=CapturedTriggers.constEnd();++i){
 		if (!m_Triggers.contains(i->toUInt())) {
 			LOGDEBUG("Failed Finding Trigger");
 			return false;
@@ -1906,10 +1923,18 @@ bool Waterfall::ValidTriggerStructure(const QString& TriggerStructure)const {
 bool Waterfall::TriggerPassing(const QString& TriggerStructure, int PeriodIndex,const QDate& CurrentIPD, bool IsCallDate) {
 	QString AdjStructure = InfixToPostfix(TriggerStructure);
 	if (AdjStructure.isEmpty()) return false;
-	QRegExp SignleTriggers("\\b(\\d+)\\b");
-	if (SignleTriggers.indexIn(AdjStructure) < 0) return false;
-	QStringList CapturedTriggers = SignleTriggers.capturedTexts();
-	for (auto i = CapturedTriggers.constBegin() + 1; i != CapturedTriggers.constEnd(); ++i) {
+	//QRegExp SignleTriggers("\\b(\\d+)\\b");
+	QRegExp SignleTriggers("(\\d+)");
+	QStringList CapturedTriggers;
+	{
+		int pos = 0;
+		while ((pos = SignleTriggers.indexIn(AdjStructure, pos)) >= 0) {
+			CapturedTriggers.append(SignleTriggers.cap(1));
+			pos += SignleTriggers.matchedLength();
+		}
+	}
+	if (CapturedTriggers.isEmpty()) return false;
+	for (auto i = CapturedTriggers.constBegin(); i != CapturedTriggers.constEnd(); ++i) {
 		quint32 CurrentTrigger = i->toUInt();
 		if (!m_Triggers.contains(CurrentTrigger)) 	return false;
 		TriggersResults::TrigRes SingleRes = m_TriggersResults.GetResult(CurrentTrigger, CurrentIPD);
@@ -1945,13 +1970,6 @@ bool Waterfall::EvaluateTrigger(quint32 TrigID, int PeriodIndex, const QDate& Cu
 	if (!CurrentTrigger) return false;
 	switch (CurrentTrigger->GetTriggerType()) {
 	case AbstractTrigger::TriggerType::DateTrigger:
-/*
-		LOGCONDITIONALLY(
-			TrigID == 5 && CurrentTrigger.dynamicCast<DateTrigger>()->Passing(CurrentIPD)
-			, "CurrentIPD: " +CurrentIPD.toString("yyyy-MM-dd") 
-			+ "\nTrigger Limit: "+ CurrentTrigger.dynamicCast<DateTrigger>()->GetLimitDate().toString("yyyy-MM-dd") 
-			+ QString("\nTrigger Side: %1").arg(static_cast<quint32>(CurrentTrigger.dynamicCast<DateTrigger>()->GetSide()))
-		);*/
 		return CurrentTrigger.dynamicCast<DateTrigger>()->Passing(CurrentIPD);
 	case AbstractTrigger::TriggerType::VectorTrigger:{
 		QSharedPointer<VectorTrigger> TempTrig = CurrentTrigger.dynamicCast<VectorTrigger>();
@@ -1964,6 +1982,15 @@ bool Waterfall::EvaluateTrigger(quint32 TrigID, int PeriodIndex, const QDate& Cu
 		return CurrentTrigger.dynamicCast<PoolSizeTrigger>()->Passing(m_MortgagesPayments.GetAmountOut(PeriodIndex));
 	case AbstractTrigger::TriggerType::TrancheTrigger:
 		return CurrentTrigger.dynamicCast<TrancheTrigger>()->Passing(m_Tranches);
+	case AbstractTrigger::TriggerType::DelinquencyTrigger:{
+		bool TempRes;
+		bool NullAnch = CurrentTrigger.dynamicCast<DelinquencyTrigger>()->GetTarget().GetAnchorDate().isNull();
+		if (NullAnch) CurrentTrigger.dynamicCast<DelinquencyTrigger>()->SetAnchorDate(m_MortgagesPayments.GetDate(0));
+		LOGDEBUG("Date: " + m_MortgagesPayments.GetDate(PeriodIndex).toString("dd-MM-yyyy"));
+		TempRes = CurrentTrigger.dynamicCast<DelinquencyTrigger>()->Passing(m_MortgagesPayments.GetDelinquentShare(PeriodIndex), m_MortgagesPayments.GetDate(PeriodIndex));
+		if (NullAnch) CurrentTrigger.dynamicCast<DelinquencyTrigger>()->RemoveAnchorDate();
+		return TempRes;
+	}
 	default:
 		return false;
 	}
@@ -1982,7 +2009,7 @@ GenericCashFlow Waterfall::GetAggregatedReinvestment() const {
 	Result.AddFlow(m_Reinvested.AggregateRange(m_Reinvested.GetDate(0), m_FirstIPDdate));
 	const TrancheCashFlow& benchFlow = m_Tranches.first()->GetCashFlow();
 	for (int i = 1; i < benchFlow.Count(); ++i) {
-		Result.AddFlow(m_Reinvested.AggregateRange(benchFlow.GetDate(i - 1), benchFlow.GetDate(i)));
+		Result.AddFlow(m_Reinvested.AggregateRange(benchFlow.GetDate(i - 1).addDays(1), benchFlow.GetDate(i)));
 	}
 	return Result;
 }

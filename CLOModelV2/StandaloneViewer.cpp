@@ -106,8 +106,9 @@ void StandaloneViewer::openRecentFile(){
 }
 void StandaloneViewer::updateRecentFileActions()
 {
-	for (auto i = recentFiles.begin(); i != recentFiles.end(); ++i) {
-		while (!QFile::exists(*i) && i != recentFiles.end()) i=recentFiles.erase(i);
+	for (auto i = recentFiles.begin(); i != recentFiles.end();) {
+		if (!QFile::exists(*i)) i=recentFiles.erase(i);
+		else ++i;
 	}
 	for (int j = 0; j < MaxRecentFiles; ++j) {
 		if (j < recentFiles.count()) {

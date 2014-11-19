@@ -149,6 +149,9 @@
     <ClInclude Include="TemplAsyncThread.h">
       <Filter>Header Files\Core Files</Filter>
     </ClInclude>
+    <ClInclude Include="DelinquencyTrigger.h">
+      <Filter>Header Files\Core Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="StandaloneStress.h">
@@ -464,6 +467,9 @@
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_ApplyFlowThread.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="DelinquencyTrigger.cpp">
+      <Filter>Source Files\Core Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

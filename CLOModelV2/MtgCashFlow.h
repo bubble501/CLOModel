@@ -26,7 +26,8 @@ public:
 		LossFlow = 10,
 		WAPrepayMult = 129,
 		WALossMult = 130,
-		WAPrice = 131
+		WAPrice = 131,
+		DelinquentOutstanding=106
 	};
 	virtual MtgCashFlow ApplyScenario(BloombergVector CPRv, BloombergVector CDRv, BloombergVector LSv) const;
 	virtual MtgCashFlow ApplyScenario(const QString& CPRv, const QString& CDRv, const QString& LSv) const { return ApplyScenario(BloombergVector(CPRv), BloombergVector(CDRv), BloombergVector(LSv)); }
@@ -40,6 +41,8 @@ public:
 	double GetAmountOut(int index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::AmountOutstandingFlow)); }
 	double GetAccruedInterest(int index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::AccruedInterestFlow)); }
 	double GetLossOnInterest(int index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::LossOnInterestFlow)); }
+	double GetDelinquent(int index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::DelinquentOutstanding)); }
+	double GetDelinquentShare(int index)const { return GetDelinquent(index) / GetAmountOut(index); }
 	double GetWAcoupon(int index) const;
 	double GetWAprepayMult(int index) const;
 	double GetWAlossMult(int index) const;
@@ -55,6 +58,8 @@ public:
 	double GetAmountOut(const QDate& index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::AmountOutstandingFlow)); }
 	double GetAccruedInterest(const QDate& index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::AccruedInterestFlow)); }
 	double GetLossOnInterest(const QDate& index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::LossOnInterestFlow)); }
+	double GetDelinquent(const QDate& index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::DelinquentOutstanding)); }
+	double GetDelinquentShare(const QDate& index)const { return GetDelinquent(index) / GetAmountOut(index); }
 	double GetWAcoupon(const QDate& index) const;
 	double GetWAprepayMult(const QDate& index) const;
 	double GetWAlossMult(const QDate& index) const;
@@ -62,6 +67,7 @@ public:
 	double GetDefaults(const QDate& index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::PrincipalDefault)); }
 	double GetRecoveries(const QDate& index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::PrincipalRecovered)); }
 	double GetInterestRecoveries(const QDate& index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::InterestRecovered)); }
+
 	virtual double GetTotalFlow(int index)const override;
 	virtual double GetTotalFlow(const QDate& a)const override;
 

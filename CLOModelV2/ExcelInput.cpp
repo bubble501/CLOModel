@@ -15,6 +15,7 @@
 #include "VectorTrigger.h"
 #include "PoolSizeTrigger.h"
 #include "TrancheTrigger.h"
+#include "DelinquencyTrigger.h"
 void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	bool RunStress;
 	CentralUnit TempUnit;
@@ -150,6 +151,11 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 				TempTrigger.dynamicCast<TrancheTrigger>()->SetTargetSize(pdFreq->dblVal); pdFreq++;
 				TempTrigger.dynamicCast<TrancheTrigger>()->SetSenioritySide(static_cast<TrancheTrigger::TriggerSenioritySide>(pdFreq->intVal)); pdFreq++;
 				TempTrigger.dynamicCast<TrancheTrigger>()->SetSizeSide(static_cast<TrancheTrigger::TriggerSizeSide>(pdFreq->intVal)); pdFreq++;
+				TempUnit.SetTrigger(i + 1, TempTrigger);
+				break;
+			case static_cast<int>(AbstractTrigger::TriggerType::DelinquencyTrigger) :
+				TempTrigger.reset(new DelinquencyTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+				TempTrigger.dynamicCast<DelinquencyTrigger>()->SetTarget(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
 				TempUnit.SetTrigger(i + 1, TempTrigger);
 				break;
 			}

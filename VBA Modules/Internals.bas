@@ -471,6 +471,10 @@ AdjTriggerType = FromStringToTriggerType(Target.Offset(0, -Target.Column + LeftC
                         .NumberFormat = """Smaller or Equal"""
                         .Validation.Add xlValidateList, xlValidAlertStop, xlBetween, "1,2,4,5,6"
                     End With
+                Case UCase("Delinquency Trigger")
+                    Target.Resize(1, 3).Locked = False
+                    Target.Offset(0, 1).Value = "Trigger Label"
+                    Target.Offset(0, 2).Value = "0"
                 Case Else
                     With Target.Offset(0, 1).Resize(1, 16378)
                        .ClearContents

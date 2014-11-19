@@ -1410,6 +1410,8 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		m_CalculatedMtgPayments=m_MortgagesPayments;
 		m_MortgagesPayments=OriginalMtgFlows;
 		FillAllDates();
+		m_MortgagesPayments.FillWAL();
+		m_CalculatedMtgPayments.FillWAL();
 		if (NullCCCanchor[0]) m_CCCcurve.RemoveAnchorDate();
 		if (NullCCCanchor[1]) m_PaymentFrequency.RemoveAnchorDate();
 		if (NullCCCanchor[2]) m_SeniorExpenses.RemoveAnchorDate();

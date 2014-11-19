@@ -132,8 +132,10 @@ MtgCashFlow::MtgCashFlow() {
 	SetLabel(static_cast<qint32>(MtgFlowType::InterestRecovered), "Interest Recovered");
 	SetLabel(static_cast<qint32>(MtgFlowType::LossFlow), "Loss");
 	SetLabel(static_cast<qint32>(MtgFlowType::WAPrepayMult), "WA Prepay Multiplier");
-	SetLabel(static_cast<qint32>(MtgFlowType::WALossMult), "W ALoss Multiplier");
+	SetLabel(static_cast<qint32>(MtgFlowType::WALossMult), "WA Loss Multiplier");
 	SetLabel(static_cast<qint32>(MtgFlowType::WAPrice), "WA Price");
+	SetLabel(static_cast<qint32>(MtgFlowType::WALlevel), "WAL");
+	SetLabel(static_cast<qint32>(MtgFlowType::DelinquentOutstanding), "Delinquent");
 	Aggregate(Monthly); 
 }
 
@@ -154,4 +156,23 @@ double MtgCashFlow::GetTotalFlow(const QDate& a) const {
 	QList<qint32> FlowsType;
 	
 	return GenericCashFlow::GetTotalFlow(a, FlowsType);
+}
+
+void MtgCashFlow::FillWAL() {
+	RemoveFlow(static_cast<qint32>(MtgFlowType::WALlevel));
+	for (auto i = m_CashFlows.constBegin(); i != m_CashFlows.constEnd(); ++i) {
+		AddFlow(i.key(), CalculateWAL(i.key()), MtgFlowType::WALlevel);
+	}
+}
+double MtgCashFlow::CalculateWAL(const QDate& StartDate) const {
+	double RunningSum = 0.0, Result = 0.0, CurrentPrinc;
+	for (auto i = m_CashFlows.constFind(StartDate); i != m_CashFlows.constEnd(); ++i) {
+		CurrentPrinc = i.value()->value(static_cast<qint32>(MtgFlowType::PrincipalFlow),0);
+		if (CurrentPrinc > 0) {
+			RunningSum += CurrentPrinc;
+			Result += CurrentPrinc*static_cast<double>(StartDate.daysTo(i.key())) / 365.25;
+		}
+	}
+	if (RunningSum <= 0) return 0.0;
+	return Result / RunningSum;
 }

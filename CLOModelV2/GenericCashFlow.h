@@ -34,6 +34,7 @@ public:
 	virtual double GetPreviousFlow(int index, qint32 FlowTpe) const;
 	virtual double GetPreviousFlow(const QDate& index, qint32 FlowTpe) const;
 	virtual void Clear();
+	virtual void RemoveFlow(qint32 FlowTpe);
 	virtual void RemoveAllFlows() { Clear(); }
 	virtual void ResetFlows() { Clear(); }
 	virtual QDate MaturityDate() const;

@@ -77,7 +77,6 @@ void GenericCashFlow::Clear() {
 		delete (i.value());
 	}
 	m_CashFlows.clear();
-	ClearLabels();
 }
 
 QDate GenericCashFlow::GetDate(int index) const {
@@ -337,4 +336,10 @@ GenericCashFlow GenericCashFlow::AggregateRange(const QDate& StartDate, const QD
 		}
 	}
 	return Results;
+}
+
+void GenericCashFlow::RemoveFlow(qint32 FlowTpe) {
+	for (auto i = m_CashFlows.begin(); i != m_CashFlows.end(); ++i) {
+		i.value()->remove(FlowTpe);
+	}
 }

@@ -346,7 +346,6 @@ void CentralUnit::CheckCalculationDone()
 			return;
 		}
 	}
-	
 	#ifdef SaveLoanTape
 	{
 		QFile file(FolderPath+"\\.Loans.clp");

@@ -17,11 +17,26 @@ HRESULT ExcelOutput::PrintMortgagesRepLines(
 	bool PrintTotalPrincipal,
 	bool PrintDefaults,
 	bool PrintLoss,
-	bool PrintLossOnInterest
+	bool PrintLossOnInterest,
+	bool PrintDelinquencies,
+	bool PrintWAL
 	){
 		ExcelCommons::InitExcelOLE();
 		int NumOfCols=
-			PrintCounter+PrintDates+PrintOutstanding+PrintInterest+PrintScheduled+PrintPrepay+PrintAccruedInterest+PrintTotalPrincipal+PrintTotalPrincipal+PrintLoss+PrintLossOnInterest+PrintDefaults;
+			PrintCounter
+			+ PrintDates
+			+ PrintOutstanding
+			+ PrintInterest
+			+ PrintScheduled
+			+ PrintPrepay
+			+ PrintAccruedInterest
+			+ PrintTotalPrincipal
+			+ PrintDefaults
+			+ PrintLoss
+			+ PrintLossOnInterest
+			+ PrintDelinquencies
+			+ PrintWAL
+		;
 		int Numrows=source.Count();
 		SAFEARRAYBOUND  Bound[2];
 		Bound[0].lLbound   = 1;
@@ -121,12 +136,26 @@ HRESULT ExcelOutput::PrintMortgagesRepLines(
 					pdFreq++;
 				}
 			}
+			if (PrintDelinquencies) {
+				for (int i = 0; i < Numrows; i++) {
+					pdFreq->vt = VT_R8;
+					pdFreq->dblVal = source.GetDelinquentShare(i);
+					pdFreq++;
+				}
+			}
+			if (PrintWAL) {
+				for (int i = 0; i < Numrows; i++) {
+					pdFreq->vt = VT_R8;
+					pdFreq->dblVal = source.GetWAL(i);
+					pdFreq++;
+				}
+			}
 			SafeArrayUnaccessData(saData);
 		}
 		static DISPID dispid = 0;
 		DISPPARAMS Params;
-		VARIANTARG Command[14];
-		int CurrentCmdIndex=14-1;
+		VARIANTARG Command[16];
+		int CurrentCmdIndex=16-1;
 		if(!ExcelCommons::pExcelDisp)return S_FALSE;
 		try
 		{
@@ -158,10 +187,13 @@ HRESULT ExcelOutput::PrintMortgagesRepLines(
 			Command[CurrentCmdIndex--].boolVal=PrintLoss;
 			Command[CurrentCmdIndex].vt = VT_BOOL;
 			Command[CurrentCmdIndex--].boolVal=PrintLossOnInterest;
-
+			Command[CurrentCmdIndex].vt = VT_BOOL;
+			Command[CurrentCmdIndex--].boolVal = PrintDelinquencies;
+			Command[CurrentCmdIndex].vt = VT_BOOL;
+			Command[CurrentCmdIndex--].boolVal = PrintWAL;
 			Params.rgdispidNamedArgs = NULL;
 			Params.rgvarg=Command;
-			Params.cArgs = 14;
+			Params.cArgs = 16;
 			Params.cNamedArgs = 0;
 			if(dispid == 0)
 			{

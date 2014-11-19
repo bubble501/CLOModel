@@ -52,12 +52,14 @@ SummaryView::SummaryView(QWidget* parent)
 	StructureTable->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	StructureTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 	StructureTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+	StructureTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	MainWidget->addTab(StructureTable,"Structure");
 
 	WatStructView=new WaterfallViewer(this);
 	MainWidget->addTab(WatStructView,"Waterfall Structure");
 
 	MtgTable=new QTableWidget(this);
+	MtgTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	MtgTable->setColumnCount(8);
 	MtgTable->setRowCount(0);
 	HeadersStrings.clear();
@@ -98,6 +100,7 @@ SummaryView::SummaryView(QWidget* parent)
 	MainWidget->addTab(CallTranchesWidget,"Call Tranches Results");
 	
 	ExpensesTable=new QTableWidget(this);
+	ExpensesTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	//ExpensesTable->setColumnCount(6);
 	ExpensesTable->setRowCount(0);
 	HeadersStrings.clear();
@@ -116,6 +119,7 @@ SummaryView::SummaryView(QWidget* parent)
 	MainWidget->addTab(ExpensesTable,"Waterfall Infos");
 
 	ReinvestmentsTable=new QTableWidget(this);
+	ReinvestmentsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	HeadersStrings.clear();
 	HeadersStrings
 		<< "Date"
@@ -132,6 +136,7 @@ SummaryView::SummaryView(QWidget* parent)
 	MainWidget->addTab(ReinvestmentsTable,"Reinvestments");
 
 	GICTable = new QTableWidget(this);
+	GICTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	HeadersStrings.clear();
 	HeadersStrings
 		<< "Date"
@@ -275,7 +280,7 @@ void SummaryView::DisplayStructure(){
 		StructureTable->setItem(i,8,new QTableWidgetItem(Structure.GetTranche(i)->GetReferenceRate(0)));
 		StructureTable->setItem(i,9,new QTableWidgetItem(Structure.GetTranche(i)->GetCouponVector(0)));
 		StructureTable->setItem(i,11,new QTableWidgetItem(Commarize(Structure.GetTranche(i)->GetIRR()*100.0,2U)+'%'));
-		StructureTable->setItem(i,12,new QTableWidgetItem(Commarize(Structure.GetTranche(i)->GetWALife(Structure.GetMortgagesPayments().GetDate(0)),2U)));
+		StructureTable->setItem(i,12,new QTableWidgetItem(Commarize(Structure.GetTranche(i)->GetWALife(Structure.GetTranche(0)->GetSettlementDate()),2U)));
 		StructureTable->setItem(i,13,new QTableWidgetItem(Commarize(Structure.GetTranche(i)->GetDiscountMargin())));
 		StructureTable->setItem(i,14,new QTableWidgetItem(Commarize(Structure.GetTranche(i)->GetLossRate()*100.0,2U)+'%'));
 

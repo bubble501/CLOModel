@@ -15,6 +15,7 @@
 #include "VectorTrigger.h"
 #include "PoolSizeTrigger.h"
 #include "TrancheTrigger.h"
+#include "DelinquencyTrigger.h"
 void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	bool RunStress;
 	CentralUnit TempUnit;
@@ -152,6 +153,11 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 				TempTrigger.dynamicCast<TrancheTrigger>()->SetSizeSide(static_cast<TrancheTrigger::TriggerSizeSide>(pdFreq->intVal)); pdFreq++;
 				TempUnit.SetTrigger(i + 1, TempTrigger);
 				break;
+			case static_cast<int>(AbstractTrigger::TriggerType::DelinquencyTrigger) :
+				TempTrigger.reset(new DelinquencyTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+				TempTrigger.dynamicCast<DelinquencyTrigger>()->SetTarget(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+				TempUnit.SetTrigger(i + 1, TempTrigger);
+				break;
 			}
 		}
 	}
@@ -193,6 +199,11 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 				RFcurrent=pdFreq->dblVal; pdFreq++;
 				RFfree=pdFreq->intVal; pdFreq++;
 				RFtoIntres=pdFreq->boolVal; pdFreq++;
+				if (
+					(!BloombergVector(RFtarget).IsEmpty(0.001) && !BloombergVector(RFmultiple).IsEmpty(0.001))
+					|| !BloombergVector(RFfloor).IsEmpty(0.001)
+					|| RFcurrent>0.0
+				)
 				TempUnit.AddReserveFund(RFtarget, RFmultiple, RFfloor, RFcap, RFcurrent, RFfree, RFtoIntres);
 			}
 			bool CumRes=pdFreq->boolVal; pdFreq++;
@@ -383,7 +394,7 @@ double __stdcall CLOReturnRate(LPSAFEARRAY *ArrayData){
 	double NewPrice=pdFreq->dblVal;pdFreq++;
 	SafeArrayUnaccessData(*ArrayData);
 	Waterfall TempWaterfall;
-	QString Filename=FolderPath+"\\.BaseCase.clo";
+	QString Filename=FolderPath+"\\BaseCase.clo";
 	QFile file(Filename);
 	if(!file.exists()){
 		return 0.0;
@@ -421,7 +432,7 @@ double __stdcall CLODiscountMargin(LPSAFEARRAY *ArrayData){
 	double NewPrice=pdFreq->dblVal;pdFreq++;
 	SafeArrayUnaccessData(*ArrayData);
 	Waterfall TempWaterfall;
-	QString Filename=FolderPath+"\\.BaseCase.clo";
+	QString Filename=FolderPath+"\\BaseCase.clo";
 	QFile file(Filename);
 	if(!file.exists()){
 		return 0.0;
@@ -460,7 +471,7 @@ double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
 	bool ToCall=pdFreq->boolVal;pdFreq++;
 	SafeArrayUnaccessData(*ArrayData);
 	Waterfall TempWaterfall;
-	QString Filename=FolderPath+"\\.BaseCase.clo";
+	QString Filename=FolderPath+"\\BaseCase.clo";
 	QFile file(Filename);
 	if(!file.exists())return 0.0;
 	if (!file.open(QIODevice::ReadOnly))return 0.0;
@@ -503,7 +514,7 @@ double __stdcall GetStressLoss(LPSAFEARRAY *ArrayData) {
 	DelinqLagScenario = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 	SafeArrayUnaccessData(*ArrayData);
 	if (*(FolderPath.end() - 1) != '\\' && *(FolderPath.end() - 1) != '/') FolderPath += '/';
-	FolderPath += ".StressResult.fcsr";
+	FolderPath += "StressResult.fcsr";
 	LOGDEBUG(
 		QString("Path: %1\nTranche Name: %2\nCPR: %3\nCDR: %4\nLS: %5\nRecLag: %6\nDelinq: %7\nDelinqLag: %8")
 		.arg(FolderPath)
@@ -546,7 +557,7 @@ double __stdcall GetStressDM(LPSAFEARRAY *ArrayData) {
 	NewPrice = pdFreq->dblVal; pdFreq++;
 	SafeArrayUnaccessData(*ArrayData);
 	if (*(FolderPath.end() - 1) != '\\' && *(FolderPath.end() - 1) != '/') FolderPath += '/';
-	FolderPath += ".StressResult.fcsr";
+	FolderPath += "StressResult.fcsr";
 	if (!QFile::exists(FolderPath)) { return 0.0; }
 	Waterfall TempRes = StressTest::GetScenarioFromFile(FolderPath, CPRscenario, CDRscenario, LSscenario, RecLagScenario, DelinqScenario, DelinqLagScenario);
 	const Tranche* Result = TempRes.GetTranche(TrancheName);
@@ -554,28 +565,7 @@ double __stdcall GetStressDM(LPSAFEARRAY *ArrayData) {
 		return Result->GetDiscountMargin(NewPrice);
 	return 0.0;
 }
-/*
-void __stdcall InspectStress(LPSAFEARRAY *ArrayData){
-	Waterfall TempStructure;
-	VARIANT HUGEP *pdFreq;
-	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
-	if (!SUCCEEDED(hr)) return;
-	QString FolderPath=QString::fromStdWString(pdFreq->bstrVal);pdFreq++;
-	QString RowHead=QString::fromStdWString(pdFreq->bstrVal);pdFreq++;
-	QString ColHead=QString::fromStdWString(pdFreq->bstrVal);pdFreq++;
-	int XVar=pdFreq->intVal;pdFreq++;
-	int YVar=pdFreq->intVal;pdFreq++;
-	SafeArrayUnaccessData(*ArrayData);
-	//TempStructure=StressTest::GetScenarioFromFile((FolderPath+"\\.StressResult%1%2.fcsr").arg(XVar).arg(YVar),RowHead,ColHead);
-	char *argv[] = {"NoArgumnets"};
-	int argc = sizeof(argv) / sizeof(char*) - 1;
-	QApplication ComputationLoop(argc,argv);
-	SummaryView SitRep;
-	SitRep.show();
-	SitRep.SetStructure(TempStructure);
-	SitRep.ShowCallStructure(false);
-	ComputationLoop.exec();	
-}*/
+
 
 //Ugly!!!
 double __stdcall GetLoansAssumption(LPSAFEARRAY *ArrayData) {
@@ -678,7 +668,8 @@ ArrayData must contain, in order:
 <li>A String containing a Bloomberg-like vector that represents the CPR assumption for the model</li>
 <li>A String containing a Bloomberg-like vector that represents the CDR assumption for the model</li>
 <li>A String containing a Bloomberg-like vector that represents the LS assumption for the model</li>
-<li>A String containing a Bloomberg-like vector that represents the WAL (in years) of the reinvestment bond</li>
+<li>A String containing a Bloomberg-like vector that represents the 
+(in years) of the reinvestment bond</li>
 <li>A Long representing the number of months between two payments made by newly acquired loans (e.g. if the loans pay quarterly this must be 3)</li>
 <li>A String containing the Bloomberg ticker of the of the reference rate for the new loans coming from reinvestment</li>
 <li>A Double containing the principal available amounts currently in the cash account of the issuer</li>

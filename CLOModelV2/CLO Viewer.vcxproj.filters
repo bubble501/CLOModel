@@ -314,6 +314,9 @@
     <ClCompile Include="GeneratedFiles\Release\moc_PhasedProgressWidget.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="DelinquencyTrigger.cpp">
+      <Filter>Source Files\Core Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseRateVect.h">
@@ -428,6 +431,9 @@
       <Filter>Header Files\Core Files</Filter>
     </ClInclude>
     <ClInclude Include="GenericCashFlow.h">
+      <Filter>Header Files\Core Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DelinquencyTrigger.h">
       <Filter>Header Files\Core Files</Filter>
     </ClInclude>
   </ItemGroup>

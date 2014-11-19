@@ -146,26 +146,27 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		AnnualizedExcessLine->setType(KDChart::LineDiagram::Stacked);
 		AnnualizedExcessLine->setModel(ChartsModels.last());
 
-		ChartsModels.append(new QStandardItemModel(a.GetTranche(0)->GetCashFlow().Count(),1,this));
-		QDate TempCallDate=a.GetCalledPeriod();
-		bool CallDatePlaced=false;
-		for(int i=0;i<a.GetTranche(0)->GetCashFlow().Count();i++){
-			QModelIndex TempIndex=ChartsModels.last()->index(i,0);
-			if(a.GetTranche(0)->GetCashFlow().GetDate(i)>=TempCallDate && !CallDatePlaced){
-				ChartsModels.last()->setData(TempIndex,1.0);
-				ChartsModels.last()->setData(TempIndex,"Call Date",Qt::ToolTipRole);
-				CallDatePlaced=true;
+		QDate TempCallDate = a.GetCalledPeriod();
+	
+		ChartsModels.append(new QStandardItemModel(a.GetTranche(0)->GetCashFlow().Count(), 1, this));
+		bool CallDatePlaced = false;
+		for (int i = 0; i < a.GetTranche(0)->GetCashFlow().Count(); i++) {
+			QModelIndex TempIndex = ChartsModels.last()->index(i, 0);
+			if (!TempCallDate.isNull() && a.GetTranche(0)->GetCashFlow().GetDate(i) >= TempCallDate && !CallDatePlaced) {
+				ChartsModels.last()->setData(TempIndex, 1.0);
+				ChartsModels.last()->setData(TempIndex, "Call Date", Qt::ToolTipRole);
+				CallDatePlaced = true;
 			}
-			else ChartsModels.last()->setData(TempIndex,0.0);
+			else ChartsModels.last()->setData(TempIndex, 0.0);
 		}
 		TranchesLabels.clear(); TranchesLabels << "Call Date";
 		ChartsModels.last()->setHorizontalHeaderLabels(TranchesLabels);
-		KDChart::BarDiagram* CallDiagram=new KDChart::BarDiagram;
+		KDChart::BarDiagram* CallDiagram = new KDChart::BarDiagram;
 		CallDiagram->setModel(ChartsModels.last());
-		QBrush TmpCallBrush=CallDiagram->brush(0);
+		QBrush TmpCallBrush = CallDiagram->brush(0);
 		TmpCallBrush.setColor(Qt::lightGray);
 		TmpCallBrush.setStyle(Qt::DiagCrossPattern);
-		CallDiagram->setBrush(0,TmpCallBrush);
+		CallDiagram->setBrush(0, TmpCallBrush);
 
 		for(int j=0;j<a.GetTranchesCount();j++){
 			KDChart::LineAttributes HideMissing=AnnualizedExcessLine->lineAttributes(j);
@@ -267,7 +268,7 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		bool CallDatePlaced=false;
 		for(int i=0;i<a.GetTranche(0)->GetCashFlow().Count();i++){
 			QModelIndex TempIndex=ChartsModels.last()->index(i,0);
-			if(a.GetTranche(0)->GetCashFlow().GetDate(i)>=TempCallDate && !CallDatePlaced){
+			if (!TempCallDate.isNull() && a.GetTranche(0)->GetCashFlow().GetDate(i) >= TempCallDate && !CallDatePlaced) {
 				ChartsModels.last()->setData(TempIndex,1.0);
 				ChartsModels.last()->setData(TempIndex,"Call Date",Qt::ToolTipRole);
 				CallDatePlaced=true;
@@ -382,7 +383,7 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		bool CallDatePlaced=false;
 		for(int i=0;i<a.GetTranche(0)->GetCashFlow().Count();i++){
 			QModelIndex TempIndex=ChartsModels.last()->index(i,0);
-			if(a.GetTranche(0)->GetCashFlow().GetDate(i)>=TempCallDate && !CallDatePlaced){
+			if (!TempCallDate.isNull() && a.GetTranche(0)->GetCashFlow().GetDate(i) >= TempCallDate && !CallDatePlaced) {
 				ChartsModels.last()->setData(TempIndex,1.0);
 				ChartsModels.last()->setData(TempIndex,"Call Date",Qt::ToolTipRole);
 				CallDatePlaced=true;
@@ -471,7 +472,7 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		bool CallDatePlaced=false;
 		for(int i=0;i<a.GetTranche(0)->GetCashFlow().Count();i++){
 			QModelIndex TempIndex=ChartsModels.last()->index(i,0);
-			if(a.GetTranche(0)->GetCashFlow().GetDate(i)>=TempCallDate && !CallDatePlaced){
+			if (!TempCallDate.isNull() && a.GetTranche(0)->GetCashFlow().GetDate(i) >= TempCallDate && !CallDatePlaced) {
 				ChartsModels.last()->setData(TempIndex,1.0);
 				ChartsModels.last()->setData(TempIndex,"Call Date",Qt::ToolTipRole);
 				CallDatePlaced=true;
@@ -559,7 +560,7 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		bool CallDatePlaced=false;
 		for(int i=0;i<a.GetTranche(0)->GetCashFlow().Count();i++){
 			QModelIndex TempIndex=ChartsModels.last()->index(i,0);
-			if(a.GetTranche(0)->GetCashFlow().GetDate(i)>=TempCallDate && !CallDatePlaced){
+			if (!TempCallDate.isNull() && a.GetTranche(0)->GetCashFlow().GetDate(i) >= TempCallDate && !CallDatePlaced) {
 				ChartsModels.last()->setData(TempIndex,1.0);
 				ChartsModels.last()->setData(TempIndex,"Call Date",Qt::ToolTipRole);
 				CallDatePlaced=true;
@@ -796,7 +797,7 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 		bool CallDatePlaced=false;
 		for(int i=0;i<a.GetTranche(0)->GetCashFlow().Count();i++){
 			QModelIndex TempIndex=ChartsModels.last()->index(i,0);
-			if(a.GetTranche(0)->GetCashFlow().GetDate(i)>=TempCallDate && !CallDatePlaced){
+			if (!TempCallDate.isNull() && a.GetTranche(0)->GetCashFlow().GetDate(i) >= TempCallDate && !CallDatePlaced) {
 				ChartsModels.last()->setData(TempIndex,1.0);
 				ChartsModels.last()->setData(TempIndex,"Call Date",Qt::ToolTipRole);
 				CallDatePlaced=true;
@@ -914,7 +915,7 @@ void ChartsWidget::PlotStructure(const Waterfall& a){
 			bool CallDatePlaced=false;
 			for(int i=0;i<a.GetTranche(0)->GetCashFlow().Count();i++){
 				QModelIndex TempIndex=ChartsModels.last()->index(i,0);
-				if(a.GetTranche(0)->GetCashFlow().GetDate(i)>=TempCallDate && !CallDatePlaced){
+				if (!TempCallDate.isNull() && a.GetTranche(0)->GetCashFlow().GetDate(i) >= TempCallDate && !CallDatePlaced) {
 					ChartsModels.last()->setData(TempIndex,1.0);
 					ChartsModels.last()->setData(TempIndex,"Call Date",Qt::ToolTipRole);
 					CallDatePlaced=true;

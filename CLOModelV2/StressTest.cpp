@@ -295,7 +295,7 @@ void StressTest::SaveResults(const QString& DestPath)const{
 	QString DestinationPath(DestPath.trimmed());
 	if (*(DestinationPath.end() - 1) != '\\' && *(DestinationPath.end() - 1) != '/') DestinationPath.append('/');
 	QDir curDir;
-	QString DestinationFull = DestinationPath + QString(".StressResult.fcsr");
+	QString DestinationFull = DestinationPath + QString("StressResult.fcsr");
 	QuaZip zip(DestinationFull);
 	QBuffer OldData;
 	quint32 OldCounter = 0;

@@ -361,7 +361,7 @@ void CentralUnit::CheckCalculationDone()
 		}
 	}
 	#endif
-	QString Filename=FolderPath+"\\.BaseCase.clo";
+	QString Filename=FolderPath+"\\BaseCase.clo";
 	QFile file(Filename);
 	if (file.open(QIODevice::WriteOnly)) {
 		QDataStream out(&file);
@@ -457,13 +457,15 @@ void CentralUnit::CheckCalculationDone()
 		}
 		if (!Structure.GetGICflows().IsEmpty()) {
 			GenericCashFlow TempAggregatedFlows = Structure.GetAggregatedGIC();
-			TempValList.clear(); for (int i = 0; i < Structure.GetTranche(0)->GetCashFlow().Count(); i++) TempValList.append(TempAggregatedFlows.GetFlow(i, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow)) + TempAggregatedFlows.GetFlow(i, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow)));
+			const TrancheCashFlow& TempBaseFlows = Structure.GetTranche(0)->GetCashFlow();
+			TempValList.clear(); for (int i = 0; i < TempBaseFlows.Count(); i++) TempValList.append(TempAggregatedFlows.GetFlow(TempBaseFlows.GetDate(i), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow)) + TempAggregatedFlows.GetFlow(TempBaseFlows.GetDate(i), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow)));
 			ExcelOutput::PrintColumn("GIC Interest", TempValList, ExcelCommons::CellOffset(TranchesOutputAddress, 2, (++ClolumnCount)), "_-* #,##0_-;-* #,##0_-;_-* \" - \"??_-;_-@_-", (Structure.GetTranchesCount() + ClolumnCount) % 2 == 0 ? QColor(235, 241, 222) : QColor(216, 228, 188));
 		}
 		if (!Structure.GetReinvested().IsEmpty()) {
 			LOGDEBUG(Structure.GetReinvested().ToString());
 			GenericCashFlow TempAggregatedFlows = Structure.GetAggregatedReinvestment();
-			TempValList.clear(); for (int i = 0; i < Structure.GetTranche(0)->GetCashFlow().Count(); i++) TempValList.append(TempAggregatedFlows.GetFlow(i, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow)) + TempAggregatedFlows.GetFlow(i, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow)));
+			const TrancheCashFlow& TempBaseFlows = Structure.GetTranche(0)->GetCashFlow();
+			TempValList.clear(); for (int i = 0; i < TempBaseFlows.Count(); i++) TempValList.append(TempAggregatedFlows.GetFlow(TempBaseFlows.GetDate(i), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow)) + TempAggregatedFlows.GetFlow(TempBaseFlows.GetDate(i), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow)));
 			ExcelOutput::PrintColumn("Reinvestments", TempValList, ExcelCommons::CellOffset(TranchesOutputAddress, 2, (++ClolumnCount)), "_-* #,##0_-;-* #,##0_-;_-* \" - \"??_-;_-@_-", (Structure.GetTranchesCount() + ClolumnCount) % 2 == 0 ? QColor(235, 241, 222) : QColor(216, 228, 188));
 		}
 		if (!Structure.GetExcessCashFlow().IsEmpty()) {

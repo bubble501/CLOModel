@@ -9,6 +9,7 @@ TrancheViewer::TrancheViewer(QWidget* parent)
 	:QWidget(parent)
 {
 	MainTable=new QTableWidget(this);
+	MainTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	MainTable->setColumnCount(5);
 	MainTable->setRowCount(0);
 	QStringList HeadersStrings;

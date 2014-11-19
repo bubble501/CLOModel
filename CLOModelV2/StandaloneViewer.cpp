@@ -8,6 +8,7 @@
 #include <QFileInfo>
 #include <QFile>
 #include <QCloseEvent>
+#include <QSettings>
 #include "CommonFunctions.h"
 #include "StressViewer.h"
 StandaloneViewer::StandaloneViewer(QWidget *parent)
@@ -27,6 +28,19 @@ StandaloneViewer::StandaloneViewer(QWidget *parent)
 	StressWindow->hide();
 	createActions();
 	createMenus();
+	QSettings CloModelRegistry(QSettings::IniFormat, QSettings::UserScope, "TwentyFour Asset Management", "CLO Model");
+	CloModelRegistry.beginGroup("ViewerRecentFiles");
+	QString TempName,TempFile;
+	for (int i = 0; i < MaxRecentFiles; i++) {
+		TempName=CloModelRegistry.value(QString("Name%1").arg(i), QString()).toString();
+		TempFile = CloModelRegistry.value(QString("File%1").arg(i), QString()).toString();
+		if (!TempName.isNull() && !TempFile.isNull()) {
+			recentNames.append(TempName);
+			recentFiles.append(TempFile);
+		}
+	}
+	CloModelRegistry.endGroup();
+	updateRecentFileActions();
 }
 //void StandaloneViewer::AdjustTableSizes(){TheViewer->AdjustTableSizes();}
 void StandaloneViewer::createActions(){
@@ -73,14 +87,14 @@ void StandaloneViewer::createMenus()
 }
 void StandaloneViewer::open(){
 	QString fileName = QFileDialog::getOpenFileName(this,
-		tr("Open Base Case"), "./.Basecase.clo",
+		tr("Open Base Case"), "./Basecase.clo",
 		tr("CLO Model Base Case (*.clo)"));
 	if (fileName.isEmpty()) return;
 	LoadFile(fileName);
 }
 void StandaloneViewer::openStress(){
 	QString fileName = QFileDialog::getOpenFileName(this,
-		tr("Open Stress Test"), "./.StressResult01.fcsr",
+		tr("Open Stress Test"), "./StressResult.fcsr",
 		tr("CLO Model Stress Test (*.fcsr)"));
 	if (fileName.isEmpty()) return;
 	LoadFile(fileName);
@@ -92,10 +106,9 @@ void StandaloneViewer::openRecentFile(){
 }
 void StandaloneViewer::updateRecentFileActions()
 {
-	QMutableStringListIterator i(recentFiles);
-	while (i.hasNext()) {
-		if (!QFile::exists(i.next()))
-			i.remove();
+	for (auto i = recentFiles.begin(); i != recentFiles.end();) {
+		if (!QFile::exists(*i)) i=recentFiles.erase(i);
+		else ++i;
 	}
 	for (int j = 0; j < MaxRecentFiles; ++j) {
 		if (j < recentFiles.count()) {
@@ -167,6 +180,13 @@ void StandaloneViewer::HandleStressChange(Waterfall a){
 	TheViewer->ShowCallStructure(false);
 }
 void StandaloneViewer::closeEvent(QCloseEvent *event){
+	QSettings CloModelRegistry(QSettings::IniFormat, QSettings::UserScope, "TwentyFour Asset Management", "CLO Model");
+	CloModelRegistry.beginGroup("ViewerRecentFiles");
+	for (int i = 0; i < MaxRecentFiles && i<recentFiles.size(); i++) {
+		CloModelRegistry.setValue(QString("Name%1").arg(i), recentNames.at(i));
+		CloModelRegistry.setValue(QString("File%1").arg(i), recentFiles.at(i));
+	}
+	CloModelRegistry.endGroup();
 	StressWindow->close();
 	event->accept();
 }

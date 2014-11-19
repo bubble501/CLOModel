@@ -215,6 +215,9 @@
     <ClInclude Include="BaseRateTable.h">
       <Filter>Header Files\Interfaces</Filter>
     </ClInclude>
+    <ClInclude Include="DelinquencyTrigger.h">
+      <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Resources.qrc">
@@ -539,6 +542,9 @@
     </ClCompile>
     <ClCompile Include="BaseRateTable.cpp">
       <Filter>Source Files\Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="DelinquencyTrigger.cpp">
+      <Filter>Source Files\Triggers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

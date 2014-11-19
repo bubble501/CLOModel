@@ -176,3 +176,9 @@ double MtgCashFlow::CalculateWAL(const QDate& StartDate) const {
 	if (RunningSum <= 0) return 0.0;
 	return Result / RunningSum;
 }
+
+MtgCashFlow MtgCashFlow::ScaledCashFlows(double OriginalRefSize, double ResultSize) const {
+	MtgCashFlow Result;
+	Result.AddFlow(GenericCashFlow::ScaledCashFlows(OriginalRefSize, ResultSize));
+	return Result;
+}

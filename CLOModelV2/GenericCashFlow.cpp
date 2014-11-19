@@ -343,3 +343,22 @@ void GenericCashFlow::RemoveFlow(qint32 FlowTpe) {
 		i.value()->remove(FlowTpe);
 	}
 }
+
+GenericCashFlow GenericCashFlow::ScaledCashFlows(double OriginalRefSize, double ResultSize, const QList<qint32>& Groups) const {
+	GenericCashFlow Result;
+	Result.m_AdjustHolidays = m_AdjustHolidays;
+	Result.m_CashFlowLabels = m_CashFlowLabels;
+	Result.m_AggregationLevel = m_AggregationLevel;
+	const double ScaleRatio = OriginalRefSize / ResultSize;
+	for (auto i = m_CashFlows.constBegin(); i != m_CashFlows.constEnd(); ++i) {
+		for (auto j = i.value()->constBegin(); j != i.value()->constEnd(); ++j) {
+			if (Groups.isEmpty() || Groups.contains(j.key())) {
+				Result.AddFlow(i.key(), j.value()*ScaleRatio, j.key());
+			}
+			else {
+				Result.AddFlow(i.key(), j.value(), j.key());
+			}
+		}
+	}
+	return Result;
+}

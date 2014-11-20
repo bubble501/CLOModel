@@ -156,6 +156,7 @@ void WaterfallViewer::AddStep(const WatFalPrior& a){
 		PrincipalTable->setItem(PrincipalTable->rowCount() - 1, ciSeniorityGroup, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetVector()));
 		PrincipalTable->setItem(PrincipalTable->rowCount() - 1, ciSeniorityGroupLevel, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetVector()));
 	break;
+	case WatFalPrior::WaterfallStepType::wst_ReinvestmentTest:
 	case WatFalPrior::WaterfallStepType::wst_OCTest:
 		if (a.GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(0) == 1) {
 			ApplicableTable = InterestTable;
@@ -167,7 +168,7 @@ void WaterfallViewer::AddStep(const WatFalPrior& a){
 		}
 		(*ApplicableUsedCols) << ciStep << ciSeniorityGroup << ciSeniorityGroupLevel;
 		ApplicableTable->setRowCount(ApplicableTable->rowCount() + 1);
-		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciStep, new QTableWidgetItem("OC Test"));
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciStep, new QTableWidgetItem((a.GetPriorityType() == WatFalPrior::WaterfallStepType::wst_OCTest) ? QString("OC Test") : QString("Reinvestment Test")));
 		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciSeniorityGroup, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetVector()));
 		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciSeniorityGroupLevel, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetVector()));
 		if (a.HasParameter(WatFalPrior::wstParameters::RedemptionGroup)) {
@@ -339,6 +340,17 @@ void WaterfallViewer::AddStep(const WatFalPrior& a){
 			ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciRedemptionShare, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::RedemptionShare).value<BloombergVector>().GetVector()));
 		}
 	break;
+	case WatFalPrior::WaterfallStepType::wst_AllocPrepayFees:
+		ApplicableTable = InterestTable;
+		ApplicableUsedCols = &m_IWUsedCols;
+		(*ApplicableUsedCols) << ciStep << ciRedemptionGroup << ciRedemptionGroupLevel << ciRedemptionShare << ciSourceofFunding;
+		ApplicableTable->setRowCount(ApplicableTable->rowCount() + 1);
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciStep, new QTableWidgetItem("Allocate Prepayment Fees"));
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciRedemptionGroup, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::RedemptionGroup).value<IntegerVector>().GetVector()));
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciRedemptionGroupLevel, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::RedemptionGroupLevel).value<IntegerVector>().GetVector()));
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciRedemptionShare, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::RedemptionShare).value<BloombergVector>().GetVector()));
+		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciSourceofFunding, new QTableWidgetItem((a.GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(0) == 1) ? QString("Income") : QString("Redemption")));
+	break;
 	default:
 		QMessageBox::critical(this,"Invalid Step","The step you tried to add is invalid.\nPlease check the Waterfall");
 	}
@@ -349,6 +361,7 @@ void WaterfallViewer::AddStep(const WatFalPrior& a){
 		TriggerString.replace("/", " NAND ");
 		TriggerString.replace("-", " NOR ");
 		TriggerString.replace("!", "NOT ");
+		TriggerString.replace("^", "NOT ");
 		ApplicableUsedCols->insert(ciTriggers);
 		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciTriggers, new QTableWidgetItem(TriggerString));
 	}

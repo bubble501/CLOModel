@@ -1135,8 +1135,7 @@ Private Function FromStringToPriorty(a As String) As Long
         Case UCase("Junior management fees")
             FromStringToPriorty = 10
         Case UCase("Reinvestment test")
-'            FromStringToPriorty = 11
-             FromStringToPriorty = 4
+            FromStringToPriorty = 11
         Case UCase("Replenish Reserve")
             FromStringToPriorty = 14
 '        Case UCase("Redeem Pro-Rata")
@@ -1147,6 +1146,8 @@ Private Function FromStringToPriorty(a As String) As Long
             FromStringToPriorty = 17
         Case UCase("Fees From XS")
             FromStringToPriorty = 18
+        Case UCase("Allocate Prepay fees")
+            FromStringToPriorty = 19
         Case Else
             GoTo FromStringToPriorty_Error
     End Select

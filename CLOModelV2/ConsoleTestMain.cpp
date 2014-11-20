@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
 	b.LoadStress("C:/Temp/StressResult.fcsr");
 	return a.exec();*/
 
-	Waterfall TempWtf, TempCallWaterfall;
+	/*Waterfall TempWtf, TempCallWaterfall;
 	QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/BaseCase.clo");
 	//QFile file("C:/Temp/.SavedInputs.clo");
 	file.open(QIODevice::ReadOnly);
@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
 	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempCallWaterfall;
 	file.close();
-	TempWtf.CalculateTranchesCashFlows();
+	TempWtf.CalculateTranchesCashFlows();*/
 
 	/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	QApplication a(argc, argv);
@@ -66,8 +66,30 @@ int main(int argc, char *argv[]) {
 	return a.exec();
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 
-
-	
+	Waterfall TempWtf, TempCallWaterfall;
+	MtgCalculator TempMtg;
+	QFile file("Z:/24AM/Monitoring/Model Results/HARVT 10X.clom");
+	file.open(QIODevice::ReadOnly);
+	qint32 VersionChecker;
+	QDataStream out(&file);
+	out.setVersion(QDataStream::Qt_5_3);
+	out >> VersionChecker;
+	if (VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) {
+		file.close();
+		return 1;
+	}
+	{QDate Junk; out >> Junk; }
+	{bool Junk; out >> Junk; }
+	{bool Junk; out >> Junk; }
+	TempWtf.SetLoadProtocolVersion(VersionChecker);
+	out >> TempWtf;
+	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
+	out >> TempCallWaterfall;
+	TempMtg.SetLoadProtocolVersion(VersionChecker);
+	out >> TempMtg;
+	file.close();
+	TempWtf.CalculateTranchesCashFlows();
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/*QApplication a(argc, argv);
 	//QFile file("C:/Temp/Wrong 20#,#8#,#100#,#0#,#0#,#0.csw");
 	/ *QFile file("C:/Temp/20#,#8#,#100#,#0#,#0#,#0.csw");

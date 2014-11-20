@@ -340,9 +340,8 @@ ReferenceRateFromBBg:
                                         Replace(CStr(StartingAdditionalProp.Offset(0, propCounter).Value), " ", "") & _
                                         "#=#" & _
                                         CStr(StartingAdditionalProp.Offset(i, propCounter).Value) & "#,#"
-                    Else
-                        Exit Do
                     End If
+                    If (IsEmpty(StartingAdditionalProp.Offset(0, propCounter)) Or StartingAdditionalProp.Offset(0, propCounter).Value = "") Then Exit Do
                     propCounter = propCounter + 1
                 Loop
             End If

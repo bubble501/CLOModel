@@ -77,6 +77,18 @@ void Mortgage::SetInterest(const QString& a){
 	 QDate AdjStartDate(StartDate.year(), StartDate.month(), 15);
 	 MtgCashFlow DelinquenciesFlows; //Delinquencies will be calculated separately and joined at the end
 	 m_CashFlows.Clear();
+	 qint32 MaturityExtension=0;
+	 double StartingHaircut = 0.0;
+	 if (HasProperty("MaturityExtension")) MaturityExtension = GetProperty("MaturityExtension").toInt();
+	 if (HasProperty("StartingHaircut")) StartingHaircut = GetProperty("StartingHaircut").toDouble();
+	 if (!OverrideProperties) {
+		 if (HasProperty("CPR")) CPRVec = GetProperty("CPR");
+		 if (HasProperty("CDR")) CDRVec = GetProperty("CDR");
+		 if (HasProperty("LS")) LossVec = GetProperty("LS");
+		 if (HasProperty("RecoveryLag")) RecoveryLag = GetProperty("RecoveryLag");
+		 if (HasProperty("Delinquency")) Delinquency = GetProperty("Delinquency");
+		 if (HasProperty("DelinquencyLag")) DelinquencyLag = GetProperty("DelinquencyLag");
+	 }
 	 if (
 		 CPRVec.IsEmpty(0.0, 1.0)
 		 || CDRVec.IsEmpty(0.0, 1.0)
@@ -84,8 +96,12 @@ void Mortgage::SetInterest(const QString& a){
 		 || RecoveryLag.IsEmpty(0)
 		 || Delinquency.IsEmpty(0.0, 1.0)
 		 || DelinquencyLag.IsEmpty(0)
+		 || MaturityExtension<0
+		 || StartingHaircut<0.0
+		 || StartingHaircut>1.0
 		 ) return false;
-	 QDate AdjMaturityDate = QDate(m_MaturityDate.year(), m_MaturityDate.month(), 15);
+	 
+	 QDate AdjMaturityDate = QDate(m_MaturityDate.year(), m_MaturityDate.month(), 15).addMonths(MaturityExtension);
 
 	 if (CPRVec.GetAnchorDate().isNull()) CPRVec.SetAnchorDate(AdjStartDate);
 	 if (CDRVec.GetAnchorDate().isNull()) CDRVec.SetAnchorDate(AdjStartDate);
@@ -94,18 +110,11 @@ void Mortgage::SetInterest(const QString& a){
 	 if (Delinquency.GetAnchorDate().isNull()) Delinquency.SetAnchorDate(AdjStartDate);
 	 if (DelinquencyLag.GetAnchorDate().isNull()) DelinquencyLag.SetAnchorDate(AdjStartDate);
 	 m_CashFlows.AddFlow(AdjStartDate, m_Size* Delinquency.GetValue(AdjStartDate), MtgCashFlow::MtgFlowType::DelinquentOutstanding);
-	 if (MonthDiff(m_MaturityDate, StartDate) < 1) {
+	 if (MonthDiff(AdjMaturityDate, StartDate) < 1) {
 		 m_CashFlows.AddFlow(AdjStartDate, m_Size, MtgCashFlow::MtgFlowType::PrincipalFlow);
 		 return true;
 	 }
-	 if (!OverrideProperties){
-		 if (HasProperty("CPR")) CPRVec = GetProperty("CPR");
-		 if (HasProperty("CDR")) CDRVec = GetProperty("CDR");
-		 if (HasProperty("LS")) LossVec = GetProperty("LS");
-		 if (HasProperty("RecoveryLag")) RecoveryLag = GetProperty("RecoveryLag");
-		 if (HasProperty("Delinquency")) Delinquency = GetProperty("Delinquency");
-		 if (HasProperty("DelinquencyLag")) DelinquencyLag = GetProperty("DelinquencyLag");
-	 }
+	 
 	 
 	 //if (!ReadyToCalculate().isEmpty()) return false;
 	 bool NullAnchorDates[] = {
@@ -127,8 +136,8 @@ void Mortgage::SetInterest(const QString& a){
 	 
 	 double CurrentInterest, TempFlow1, TempFlow2;
 	 int TempStep;
-	 double CurrentAmtOut = m_Size*(1.0 - m_HaircutVector.GetValue(AdjStartDate));
-	 m_CashFlows.AddFlow(AdjStartDate, m_Size*m_HaircutVector.GetValue(AdjStartDate), MtgCashFlow::MtgFlowType::LossFlow);
+	 double CurrentAmtOut = m_Size*(1.0 - StartingHaircut);
+	 m_CashFlows.AddFlow(AdjStartDate, m_Size*StartingHaircut, MtgCashFlow::MtgFlowType::LossFlow);
 	 m_CashFlows.AddFlow(AdjStartDate, CurrentAmtOut, MtgCashFlow::MtgFlowType::AmountOutstandingFlow);
 	 m_CashFlows.AddFlow(AdjStartDate, CurrentAmtOut*GetInterest(AdjStartDate), MtgCashFlow::MtgFlowType::WACouponFlow);
 	 QDate NextPaymentDate = AdjStartDate.addMonths(m_PaymentFreq.GetValue(AdjStartDate));
@@ -341,6 +350,8 @@ void Mortgage::SetInterest(const QString& a){
 	if (HasProperty("Delinquency")) { if (BloombergVector(GetProperty("Delinquency")).IsEmpty(0.0, 1.0)) Result += "Loan Delinquency Assumption\n"; }
 	if (HasProperty("DelinquencyLag")) { if (IntegerVector(GetProperty("DelinquencyLag")).IsEmpty(0)) Result += "Loan Delinquency Lag Assumption\n"; }
 	if (HasProperty("Price")) { if (BloombergVector(GetProperty("Price")).IsEmpty(0.0)) Result += "Loan Price\n"; }
+	if (HasProperty("MaturityExtension")) {if (GetProperty("MaturityExtension").toInt() < 0) Result += "Loan Maturity Extension\n";}
+	if (HasProperty("StartingHaircut")) { double TempHC = GetProperty("StartingHaircut").toDouble(); if (TempHC< 0.0 || TempHC>1.0) Result += "Loan Starting Haircut\n"; }
 	if(!Result.isEmpty()) return Result.left(Result.size()-1);
 	return Result;
  }

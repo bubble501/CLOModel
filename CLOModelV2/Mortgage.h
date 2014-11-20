@@ -39,7 +39,6 @@ public:
 	const Mortgage& operator=(const Mortgage& a);
 	const IntegerVector& GetPaymentFreq() const {return m_PaymentFreq;}
 	void SetPaymentFreq(const QString& a) {m_PaymentFreq=a;}
-
 	const BaseRateVector& GetFloatingRateBase() const { return m_FloatRateBase; }
 	const BloombergVector& GetFloatingRateValue() const { return m_FloatingRateBaseValue; }
 	bool GetUseForwardCurve() const { return m_UseForwardCurve; }

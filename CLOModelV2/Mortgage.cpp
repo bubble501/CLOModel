@@ -283,7 +283,7 @@ void Mortgage::SetInterest(const QString& a){
 	 if (NullAnchorDates[3]) m_HaircutVector.RemoveAnchorDate();
 	 if (NullAnchorDates[4]) m_AnnuityVect.RemoveAnchorDate();
 	 if (NullAnchorDates[5]) m_PaymentFreq.RemoveAnchorDate();
-	 
+	 FillDiscountOutstanding();
 	 return true;
  }
  double Mortgage::pmt(double Interest, int Periods, double PresentValue){
@@ -475,4 +475,16 @@ void Mortgage::RemoveProperty(qint32 PropIndex) {
 		if ((pos=TempReg.indexIn(m_Properties, pos)) == -1) return;
 	}
 	return RemoveProperty(TempReg.cap(1));
+}
+
+void Mortgage::FillDiscountOutstanding() {
+	if (!(HasProperty("PurchasePrice") && HasProperty("DiscountLimit"))) return;
+	double PurchPrice = GetProperty("PurchasePrice").toDouble();
+	double DiscountLimit = GetProperty("DiscountLimit").toDouble();
+	if (PurchPrice > 1) PurchPrice /= 100.0;
+	if (DiscountLimit > 1) DiscountLimit /= 100.0;
+	if (PurchPrice >= DiscountLimit) return;
+	for (int i = 0; i < m_CashFlows.Count(); ++i) {
+		m_CashFlows.AddFlow(m_CashFlows.GetDate(i), m_CashFlows.GetAmountOut(i)*PurchPrice, static_cast<qint32>(MtgCashFlow::MtgFlowType::OutstandingForOC));
+	}
 }

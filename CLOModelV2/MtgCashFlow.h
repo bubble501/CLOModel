@@ -30,7 +30,8 @@ public:
 		WALossMult = 130,
 		WAPrice = 131,
 		WALlevel=132,
-		DelinquentOutstanding=106
+		DelinquentOutstanding=106,
+		OutstandingForOC=103
 	};
 	virtual MtgCashFlow ApplyScenario(BloombergVector CPRv, BloombergVector CDRv, BloombergVector LSv) const;
 	virtual MtgCashFlow ApplyScenario(const QString& CPRv, const QString& CDRv, const QString& LSv) const { return ApplyScenario(BloombergVector(CPRv), BloombergVector(CDRv), BloombergVector(LSv)); }
@@ -53,6 +54,7 @@ public:
 	double GetDefaults(int index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::PrincipalDefault)); }
 	double GetRecoveries(int index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::PrincipalRecovered)); }
 	double GetInterestRecoveries(int index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::InterestRecovered)); }
+	double GetOutstandingForOC(int index) const;
 	double GetWAL(const QDate& index) const{ return  GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::WALlevel)); }
 	double GetInterest(const QDate& index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::InterestFlow)); }
 	double GetScheduled(const QDate& index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::PrincipalFlow)); }
@@ -71,6 +73,8 @@ public:
 	double GetDefaults(const QDate& index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::PrincipalDefault)); }
 	double GetRecoveries(const QDate& index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::PrincipalRecovered)); }
 	double GetInterestRecoveries(const QDate& index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::InterestRecovered)); }
+	double GetOutstandingForOC(const QDate& index) const;
+	
 	virtual MtgCashFlow ScaledCashFlows(double OriginalRefSize, double ResultSize)const;
 	virtual double GetTotalFlow(int index)const override;
 	virtual double GetTotalFlow(const QDate& a)const override;

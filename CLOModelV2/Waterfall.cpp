@@ -1207,9 +1207,9 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					}
 					//CCC test
 					if (m_CCCcurve.GetValue(CurrentDate)>m_CCCTestLimit)
-						Solution = (1.0 - ((m_CCCcurve.GetValue(CurrentDate) - m_CCCTestLimit)*m_CCChaircut))*m_MortgagesPayments.GetAmountOut(i);
+						Solution = (1.0 - ((m_CCCcurve.GetValue(CurrentDate) - m_CCCTestLimit)*m_CCChaircut))*m_MortgagesPayments.GetOutstandingForOC(i);
 					else
-						Solution = m_MortgagesPayments.GetAmountOut(i);
+						Solution = m_MortgagesPayments.GetOutstandingForOC(i);
 					Solution += AvailablePrincipal.Total();
 					
 					if (Solution + TotalPayable<=0.0) continue; 

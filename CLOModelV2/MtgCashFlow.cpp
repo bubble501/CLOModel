@@ -51,9 +51,9 @@ MtgCashFlow MtgCashFlow::ApplyScenario(BloombergVector CPRv, BloombergVector CDR
 	if (CPRv.GetAnchorDate().isNull()) CPRv.SetAnchorDate(GetDate(0));
 	if (CDRv.GetAnchorDate().isNull()) CDRv.SetAnchorDate(GetDate(0));
 	if (LSv.GetAnchorDate().isNull()) LSv.SetAnchorDate(GetDate(0));
-
 	Result.AddFlow(SingleDate(GetDate(0)));
 	double ShareOfPrinc, ShareOfIntr, ShareOfAccrIntr, ShareOfLoss, ShareOfLossOnInterest, SumDeltaOut, TempF, ApplicablePrincipal, ApplicableMultiplier;
+	bool HasOCoutstanding = HasFlowType(static_cast<qint32>(MtgFlowType::OutstandingForOC));
 	for (i = 1; i < Count(); i++) {
 
 		ShareOfPrinc = GetFlow(i, MtgFlowType::PrincipalFlow) / GetPreviousFlow(i, MtgFlowType::AmountOutstandingFlow);
@@ -110,6 +110,7 @@ MtgCashFlow MtgCashFlow::ApplyScenario(BloombergVector CPRv, BloombergVector CDR
 		}
 		Result.AddFlow(GetDate(i), ApplicablePrincipal - SumDeltaOut, MtgFlowType::AmountOutstandingFlow);
 		if (GetFlow(i, MtgFlowType::AmountOutstandingFlow) != 0.0) {
+			if (HasOCoutstanding) Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::OutstandingForOC) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::OutstandingForOC);
 			Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::WACouponFlow) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::WACouponFlow);
 			Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::WAPrepayMult) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::WAPrepayMult);
 			Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::WALossMult) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::WALossMult);
@@ -199,4 +200,15 @@ MtgCashFlow MtgCashFlow::ScaledCashFlows(double OriginalRefSize, double ResultSi
 			
 	}
 	return Result;
+}
+
+double MtgCashFlow::GetOutstandingForOC(const QDate& index) const {
+	if (HasFlowType(static_cast<qint32>(MtgFlowType::OutstandingForOC)))
+		return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::OutstandingForOC));
+	return GetAmountOut(index);
+}
+double MtgCashFlow::GetOutstandingForOC(int index) const {
+	if (HasFlowType(static_cast<qint32>(MtgFlowType::OutstandingForOC)))
+		return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::OutstandingForOC));
+	return GetAmountOut(index);
 }

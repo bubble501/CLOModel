@@ -108,6 +108,7 @@ void ReinvestmentTest::CalculateBondCashFlows(double Size, QDate StartDate, int 
 		if (ReinvestmentPrice.GetAnchorDate().isNull()) CurrentPrice = ReinvestmentPrice.GetValue(Period + CurrentDelay + SpreadIter);
 		else CurrentPrice = ReinvestmentPrice.GetValue(StartDate.addMonths(CurrentDelay + SpreadIter));
 		ReinvestmentBond.SetProperty("Price", QString("%1").arg(CurrentPrice*100.0));
+		ReinvestmentBond.SetProperty("PurchasePrice", QString("%1").arg(CurrentPrice*100.0));
 		ReinvestmentBond.SetSize(Size / qMax(CurrentPrice, 0.01));
 		if (WALAssumption.GetAnchorDate().isNull()) ReinvestmentBond.SetMaturityDate(StartDate.addMonths(CurrentDelay + SpreadIter).addDays(RoundUp(365.25*WALAssumption.GetValue(Period + CurrentDelay + SpreadIter))));
 		else ReinvestmentBond.SetMaturityDate(StartDate.addMonths(CurrentDelay + SpreadIter).addDays(RoundUp(365.25*WALAssumption.GetValue(StartDate.addMonths(CurrentDelay + SpreadIter)))));

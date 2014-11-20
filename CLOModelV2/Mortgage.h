@@ -26,6 +26,7 @@ private:
 	IntegerVector m_PaymentFreq;
 	bool m_UseForwardCurve;
 protected:
+	void FillDiscountOutstanding();
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 	double GetInterest(const QDate& a, const QDate& StartAccrue, const QDate& EndAccrue);
 	double GetInterest(int a, const QDate& StartAccrue, const QDate& EndAccrue);

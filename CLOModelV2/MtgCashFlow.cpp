@@ -36,6 +36,15 @@ double MtgCashFlow::GetWAPrice(const QDate& index) const {
 	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0.0) return 0.0;
 	return GetFlow(index, MtgFlowType::WAPrice) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
 }
+double MtgCashFlow::GetWAPrepayFees(int index) const {
+	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0.0) return 0.0;
+	return GetFlow(index, MtgFlowType::WAPrepayFees) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
+}
+double MtgCashFlow::GetWAPrepayFees(const QDate& index) const {
+	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0.0) return 0.0;
+	return GetFlow(index, MtgFlowType::WAPrepayFees) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
+}
+
 /*
 QDataStream& operator<<(QDataStream & stream, const MtgCashFlow& flows) {
 	stream << static_cast<const GenericCashFlow&>(flows);
@@ -86,7 +95,15 @@ MtgCashFlow MtgCashFlow::ApplyScenario(BloombergVector CPRv, BloombergVector CDR
 		else
 			ApplicableMultiplier = GetFlow(i, MtgFlowType::WAPrepayMult) / GetFlow(i, MtgFlowType::AmountOutstandingFlow);
 		ApplicableMultiplier *= CPRv.GetSMM(GetDate(i), 1);
-		Result.AddFlow(GetDate(i), (ApplicablePrincipal - SumDeltaOut)*ApplicableMultiplier, MtgFlowType::PrepaymentFlow);
+		{
+			double PrepayedFlow = (ApplicablePrincipal - SumDeltaOut)*ApplicableMultiplier;
+			Result.AddFlow(GetDate(i), PrepayedFlow, MtgFlowType::PrepaymentFlow);
+			double ApplicFee = GetFlow(i, MtgFlowType::WAPrepayFees);
+			if (GetFlow(i, MtgFlowType::AmountOutstandingFlow) == 0.0) ApplicFee = 0.0;
+			else ApplicFee /= GetFlow(i, MtgFlowType::AmountOutstandingFlow);
+			Result.AddFlow(GetDate(i), PrepayedFlow*ApplicFee, MtgFlowType::PrepaymentFees);
+			Result.AddFlow(GetDate(i), PrepayedFlow*ApplicFee, MtgFlowType::InterestFlow);
+		}
 		SumDeltaOut += (ApplicablePrincipal - SumDeltaOut)*ApplicableMultiplier;
 		Result.AddFlow(GetDate(i), Result.GetAccruedInterest(GetDate(i))*ApplicableMultiplier, MtgFlowType::InterestFlow);
 		Result.AddFlow(GetDate(i), -Result.GetAccruedInterest(GetDate(i))*ApplicableMultiplier, MtgFlowType::AccruedInterestFlow);
@@ -115,6 +132,7 @@ MtgCashFlow MtgCashFlow::ApplyScenario(BloombergVector CPRv, BloombergVector CDR
 			Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::WAPrepayMult) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::WAPrepayMult);
 			Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::WALossMult) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::WALossMult);
 			Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::WAPrice) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::WAPrice);
+			Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::WAPrepayFees) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::WAPrepayFees);
 		}
 	}
 	return Result;
@@ -137,6 +155,9 @@ MtgCashFlow::MtgCashFlow() {
 	SetLabel(static_cast<qint32>(MtgFlowType::WAPrice), "WA Price");
 	SetLabel(static_cast<qint32>(MtgFlowType::WALlevel), "WAL");
 	SetLabel(static_cast<qint32>(MtgFlowType::DelinquentOutstanding), "Delinquent");
+	SetLabel(static_cast<qint32>(MtgFlowType::WAPrepayFees), "WA Prepayment Fees");
+	SetLabel(static_cast<qint32>(MtgFlowType::PrepaymentFees), "Prepayment Fees");
+	SetLabel(static_cast<qint32>(MtgFlowType::OutstandingForOC), "Outstanding for OC Test");
 	Aggregate(Monthly); 
 }
 

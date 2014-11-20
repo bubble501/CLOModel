@@ -72,7 +72,6 @@ public:
 	double GetRecoveries(const QDate& index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::PrincipalRecovered)); }
 	double GetInterestRecoveries(const QDate& index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::InterestRecovered)); }
 	virtual MtgCashFlow ScaledCashFlows(double OriginalRefSize, double ResultSize)const;
-	using GenericCashFlow::ScaledCashFlows;
 	virtual double GetTotalFlow(int index)const override;
 	virtual double GetTotalFlow(const QDate& a)const override;
 

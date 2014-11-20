@@ -161,18 +161,16 @@ bool TrancheCashFlow::GetCashFlowsDatabase(const QString& TrancheID) {
 	return false;
 }
 #endif
-TrancheCashFlow TrancheCashFlow::ScaledCashFlows(double NewSize) const{
-	if (NewSize <= 0.0) return TrancheCashFlow();
-	TrancheCashFlow Result(*this);
-	if (qAbs(NewSize - OutstandingAmt) < 0.01) return Result;
-	Result.SetInitialOutstanding(NewSize);
-	Result.StartingDeferredInterest*=NewSize / OutstandingAmt;
-	for (auto i = Result.m_CashFlows.begin(); i != Result.m_CashFlows.end(); ++i) {
-		for (auto j = i.value()->begin(); j != i.value()->end(); ++j) {
-			if (j.key() != static_cast<qint32>(TrancheFlowType::OCFlow) && j.key() != static_cast<qint32>(TrancheFlowType::ICFlow))
-				j.value() *= NewSize / OutstandingAmt;
-		}
-	}
+TrancheCashFlow TrancheCashFlow::ScaledCashFlows(double NewSize, double OldSize) const {
+	TrancheCashFlow Result;
+	Result.SetInitialOutstanding(OutstandingAmt * NewSize/OldSize);
+	Result.StartingDeferredInterest *= NewSize / OldSize;
+	Result.AddFlow(GenericCashFlow::ScaledCashFlows(OldSize, NewSize, QList<qint32>(), QList<qint32>()
+		 << static_cast<qint32>(TrancheFlowType::OCFlow)
+		 << static_cast<qint32>(TrancheFlowType::ICFlow)
+		 << static_cast<qint32>(TrancheFlowType::OCTarget)
+		 << static_cast<qint32>(TrancheFlowType::ICTarget)
+		));
 	return Result;
 }
 

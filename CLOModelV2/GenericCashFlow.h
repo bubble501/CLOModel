@@ -59,7 +59,7 @@ public:
 	virtual QString GetLabel(qint32 FlowTpe) const { return m_CashFlowLabels.value(FlowTpe, QString()); }
 	virtual void RemoveLabel(qint32 FlowTp) { m_CashFlowLabels.remove(FlowTp); }
 	virtual void ClearLabels() { m_CashFlowLabels.clear(); }
-	virtual GenericCashFlow ScaledCashFlows(double OriginalRefSize, double ResultSize, const QList<qint32>& Groups = QList<qint32>()) const;
+	virtual GenericCashFlow ScaledCashFlows(double OriginalRefSize, double ResultSize, const QList<qint32>& Groups = QList<qint32>(), const QList<qint32>& ExcludeGroups = QList<qint32>()) const;
 protected:
 	static bool SamePeriod(const QDate& a, const QDate& b, CashFlowAggregation Freq);
 	QMap<QDate, QHash<qint32, double>*	> m_CashFlows;

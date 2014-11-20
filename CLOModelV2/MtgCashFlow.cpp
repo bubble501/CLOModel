@@ -179,6 +179,24 @@ double MtgCashFlow::CalculateWAL(const QDate& StartDate) const {
 
 MtgCashFlow MtgCashFlow::ScaledCashFlows(double OriginalRefSize, double ResultSize) const {
 	MtgCashFlow Result;
-	Result.AddFlow(GenericCashFlow::ScaledCashFlows(OriginalRefSize, ResultSize));
+	Result.AddFlow(GenericCashFlow::ScaledCashFlows(OriginalRefSize, ResultSize, QList<qint32>(), QList<qint32>()
+		<< static_cast<qint32>(MtgFlowType::WACouponFlow)
+		<< static_cast<qint32>(MtgFlowType::WAPrepayMult)
+		<< static_cast<qint32>(MtgFlowType::WALossMult)
+		<< static_cast<qint32>(MtgFlowType::WAPrice)
+		<< static_cast<qint32>(MtgFlowType::WALlevel)
+		));
+	double CurrentOut;
+	for (auto i = Result.m_CashFlows.begin(); i != Result.m_CashFlows.end(); ++i) {
+		CurrentOut = GetAmountOut(i.key());
+		if (CurrentOut != 0) {
+			i.value()->operator[](static_cast<qint32>(MtgFlowType::WACouponFlow)) *= i.value()->value(static_cast<qint32>(MtgFlowType::AmountOutstandingFlow), 0.0) / CurrentOut;
+			i.value()->operator[](static_cast<qint32>(MtgFlowType::WAPrepayMult)) *= i.value()->value(static_cast<qint32>(MtgFlowType::AmountOutstandingFlow), 0.0) / CurrentOut;
+			i.value()->operator[](static_cast<qint32>(MtgFlowType::WALossMult)) *= i.value()->value(static_cast<qint32>(MtgFlowType::AmountOutstandingFlow), 0.0) / CurrentOut;
+			i.value()->operator[](static_cast<qint32>(MtgFlowType::WAPrice)) *= i.value()->value(static_cast<qint32>(MtgFlowType::AmountOutstandingFlow), 0.0) / CurrentOut;
+			i.value()->operator[](static_cast<qint32>(MtgFlowType::WALlevel)) *= i.value()->value(static_cast<qint32>(MtgFlowType::AmountOutstandingFlow), 0.0) / CurrentOut;
+		}
+			
+	}
 	return Result;
 }

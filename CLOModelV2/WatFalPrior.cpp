@@ -44,6 +44,7 @@ QString WatFalPrior::ReadyToCalculate() const {
 		if (GetParameter(wstParameters::SeniorityGroup).value<IntegerVector>().IsEmpty(1)) Result += "Principal needs a Seniority Group Parameter\n";
 		if (GetParameter(wstParameters::SeniorityGroupLevel).value<IntegerVector>().IsEmpty(0)) Result += "Principal needs a Seniority Group Level Parameter\n";
 	break;
+	case WatFalPrior::WaterfallStepType::wst_ReinvestmentTest:
 	case WatFalPrior::WaterfallStepType::wst_OCTest:
 		if (GetParameter(wstParameters::SeniorityGroup).value<IntegerVector>().IsEmpty(1)) Result += "OC Test needs a Seniority Group Parameter\n";
 		if (GetParameter(wstParameters::SeniorityGroupLevel).value<IntegerVector>().IsEmpty(0)) Result += "OC Test needs a Seniority Group Level Parameter\n";
@@ -84,6 +85,9 @@ QString WatFalPrior::ReadyToCalculate() const {
 			if (GetParameter(wstParameters::RedemptionGroupLevel).value<IntegerVector>().IsEmpty(0)) Result += "Excess Spread needs a Redemption Group Level Parameter\n";
 			if (GetParameter(wstParameters::RedemptionShare).value<BloombergVector>().IsEmpty(0.0, 1.0)) Result += "Excess Spread needs a Redemption Share Parameter\n";
 		}
+		else {
+			if (HasParameter(wstParameters::RedemptionShare)) Result += "Excess Spread cannot have a Redemption Share Parameter\n";
+		}
 	break;
 	case WatFalPrior::WaterfallStepType::wst_ReinvestPrincipal:
 		if (GetParameter(wstParameters::SourceOfFunding).value<IntegerVector>().IsEmpty(1, 3)) Result += "Reinvest Principal needs a Source of Funding Parameter\n";
@@ -110,9 +114,15 @@ QString WatFalPrior::ReadyToCalculate() const {
 	case WatFalPrior::WaterfallStepType::wst_FeesFromExcess:
 		if (GetParameter(wstParameters::RedemptionShare).value<BloombergVector>().IsEmpty(0.0, 1.0)) Result += "Fees from Excess Spread needs a Redemption Share Parameter\n";
 		if (GetParameter(wstParameters::SourceOfFunding).value<IntegerVector>().IsEmpty(1, 3)) Result += "Fees from Excess Spread needs a Source of Funding Parameter\n";
-		break;
-	default:
-		break;
+	break;
+	case WatFalPrior::WaterfallStepType::wst_AllocPrepayFees:
+		if (GetParameter(wstParameters::RedemptionGroup).value<IntegerVector>().IsEmpty(1)) Result += "Allocation of prepayment fees needs a Redemption Group Parameter\n";
+		if (GetParameter(wstParameters::RedemptionGroupLevel).value<IntegerVector>().IsEmpty(0)) Result += "Allocation of prepayment needs a Redemption Group Level Parameter\n";
+		if (GetParameter(wstParameters::RedemptionShare).value<BloombergVector>().IsEmpty(0.0, 1.0)) Result += "Allocation of prepayment fees needs a Redemption Share Parameter\n";
+		if (GetParameter(wstParameters::SourceOfFunding).value<IntegerVector>().IsEmpty(1, 2)) Result += "Allocation of prepayment fees needs a Source of Funding Parameter\n";
+	break;
+	default: 
+		Result += "Invalid Waterfall Step\n";
 	}
 	return Result;
 }

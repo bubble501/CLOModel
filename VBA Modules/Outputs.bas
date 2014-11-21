@@ -196,7 +196,9 @@ Public Sub PrintMortgagesRepLines( _
     Optional PrintTotalPrincipal As Boolean = False, _
     Optional PrintDefaults As Boolean = True, _
     Optional PrintLoss As Boolean = True, _
-    Optional PrintLossOnInterest As Boolean = True _
+    Optional PrintLossOnInterest As Boolean = True, _
+    Optional PrintDelinquencies As Boolean = True, _
+    Optional PrintWAL As Boolean = True _
 )
     Application.ScreenUpdating = False
     Dim TargetCell As Range
@@ -268,6 +270,16 @@ Public Sub PrintMortgagesRepLines( _
         TargetCell.Offset(0, ColOffset).EntireColumn.ColumnWidth = 12
         ColOffset = ColOffset + 1
     End If
+    If (PrintDelinquencies) Then
+        TargetCell.Offset(0, ColOffset).Value = "Delinquencies"
+        TargetCell.Offset(0, ColOffset).EntireColumn.ColumnWidth = 8
+        ColOffset = ColOffset + 1
+    End If
+    If (PrintWAL) Then
+        TargetCell.Offset(0, ColOffset).Value = "WAL"
+        TargetCell.Offset(0, ColOffset).EntireColumn.ColumnWidth = 8
+        ColOffset = ColOffset + 1
+    End If
     
     
     For i = 1 To UBound(RepLines, 1)
@@ -325,6 +337,16 @@ Public Sub PrintMortgagesRepLines( _
         If (PrintLossOnInterest) Then
             TargetCell.Offset(i, ColOffset).Value = RepLines(i, ColOffset)
             TargetCell.Offset(i, ColOffset).NumberFormat = "_-* #,##0_-;-* #,##0_-;_-* "" - ""??_-;_-@_-"
+            ColOffset = ColOffset + 1
+        End If
+        If (PrintDelinquencies) Then
+            TargetCell.Offset(i, ColOffset).Value = RepLines(i, ColOffset)
+            TargetCell.Offset(i, ColOffset).NumberFormat = "0.00%"
+            ColOffset = ColOffset + 1
+        End If
+        If (PrintWAL) Then
+            TargetCell.Offset(i, ColOffset).Value = RepLines(i, ColOffset)
+            TargetCell.Offset(i, ColOffset).NumberFormat = "0.00"
             ColOffset = ColOffset + 1
         End If
     Next i

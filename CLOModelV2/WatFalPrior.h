@@ -23,14 +23,15 @@ public:
 		wst_DeferredInterest = 8, /*!< Payment of deferred interest. Considered part of the interest waterfall*/
 		//wst_DeferredPrinc = 9, /*!< Payment of deferred interest. Considered part of the principal waterfall*/ Obsolete
 		wst_juniorFees = 10, /*!< Junior Fees*/
-		//wst_ReinvestmentTest=11, /*!< Reinvestment Test*/ Obsolete
+		wst_ReinvestmentTest=11, /*!< Reinvestment Test. It's the same effect as wst_OCTest*/
 		wst_Excess = 12, /*!< Excess Spread*/
 		wst_ReinvestPrincipal = 13, /*!< Reinvest all available principal during the reinvestment period*/
 		wst_ReserveReplenish = 14, /*!< Replenish the reserve fund*/
 		//wst_RedeemProRata = 15, /*!< Use principal to redeem bonds pro-rata*/ Obsolete
 		wst_Turbo = 16,  /*!< Use interest to redeem a class of notes*/
 		wst_PDL = 17,  /*!< Cure Outstanding PDL*/
-		wst_FeesFromExcess = 18 /*!< Junior Fees as percentage of excess spread*/
+		wst_FeesFromExcess = 18, /*!< Junior Fees as percentage of excess spread*/
+		wst_AllocPrepayFees=19  /*!< Allocate proceeds from prepayment fees*/
 	};
 	enum class wstParameters : qint32 {
 		SeniorityGroup

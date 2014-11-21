@@ -36,6 +36,15 @@ double MtgCashFlow::GetWAPrice(const QDate& index) const {
 	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0.0) return 0.0;
 	return GetFlow(index, MtgFlowType::WAPrice) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
 }
+double MtgCashFlow::GetWAPrepayFees(int index) const {
+	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0.0) return 0.0;
+	return GetFlow(index, MtgFlowType::WAPrepayFees) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
+}
+double MtgCashFlow::GetWAPrepayFees(const QDate& index) const {
+	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0.0) return 0.0;
+	return GetFlow(index, MtgFlowType::WAPrepayFees) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
+}
+
 /*
 QDataStream& operator<<(QDataStream & stream, const MtgCashFlow& flows) {
 	stream << static_cast<const GenericCashFlow&>(flows);
@@ -51,9 +60,9 @@ MtgCashFlow MtgCashFlow::ApplyScenario(BloombergVector CPRv, BloombergVector CDR
 	if (CPRv.GetAnchorDate().isNull()) CPRv.SetAnchorDate(GetDate(0));
 	if (CDRv.GetAnchorDate().isNull()) CDRv.SetAnchorDate(GetDate(0));
 	if (LSv.GetAnchorDate().isNull()) LSv.SetAnchorDate(GetDate(0));
-
 	Result.AddFlow(SingleDate(GetDate(0)));
 	double ShareOfPrinc, ShareOfIntr, ShareOfAccrIntr, ShareOfLoss, ShareOfLossOnInterest, SumDeltaOut, TempF, ApplicablePrincipal, ApplicableMultiplier;
+	bool HasOCoutstanding = HasFlowType(static_cast<qint32>(MtgFlowType::OutstandingForOC));
 	for (i = 1; i < Count(); i++) {
 
 		ShareOfPrinc = GetFlow(i, MtgFlowType::PrincipalFlow) / GetPreviousFlow(i, MtgFlowType::AmountOutstandingFlow);
@@ -86,7 +95,15 @@ MtgCashFlow MtgCashFlow::ApplyScenario(BloombergVector CPRv, BloombergVector CDR
 		else
 			ApplicableMultiplier = GetFlow(i, MtgFlowType::WAPrepayMult) / GetFlow(i, MtgFlowType::AmountOutstandingFlow);
 		ApplicableMultiplier *= CPRv.GetSMM(GetDate(i), 1);
-		Result.AddFlow(GetDate(i), (ApplicablePrincipal - SumDeltaOut)*ApplicableMultiplier, MtgFlowType::PrepaymentFlow);
+		{
+			double PrepayedFlow = (ApplicablePrincipal - SumDeltaOut)*ApplicableMultiplier;
+			Result.AddFlow(GetDate(i), PrepayedFlow, MtgFlowType::PrepaymentFlow);
+			double ApplicFee = GetFlow(i, MtgFlowType::WAPrepayFees);
+			if (GetFlow(i, MtgFlowType::AmountOutstandingFlow) == 0.0) ApplicFee = 0.0;
+			else ApplicFee /= GetFlow(i, MtgFlowType::AmountOutstandingFlow);
+			Result.AddFlow(GetDate(i), PrepayedFlow*ApplicFee, MtgFlowType::PrepaymentFees);
+			Result.AddFlow(GetDate(i), PrepayedFlow*ApplicFee, MtgFlowType::InterestFlow);
+		}
 		SumDeltaOut += (ApplicablePrincipal - SumDeltaOut)*ApplicableMultiplier;
 		Result.AddFlow(GetDate(i), Result.GetAccruedInterest(GetDate(i))*ApplicableMultiplier, MtgFlowType::InterestFlow);
 		Result.AddFlow(GetDate(i), -Result.GetAccruedInterest(GetDate(i))*ApplicableMultiplier, MtgFlowType::AccruedInterestFlow);
@@ -110,10 +127,12 @@ MtgCashFlow MtgCashFlow::ApplyScenario(BloombergVector CPRv, BloombergVector CDR
 		}
 		Result.AddFlow(GetDate(i), ApplicablePrincipal - SumDeltaOut, MtgFlowType::AmountOutstandingFlow);
 		if (GetFlow(i, MtgFlowType::AmountOutstandingFlow) != 0.0) {
+			if (HasOCoutstanding) Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::OutstandingForOC) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::OutstandingForOC);
 			Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::WACouponFlow) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::WACouponFlow);
 			Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::WAPrepayMult) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::WAPrepayMult);
 			Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::WALossMult) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::WALossMult);
 			Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::WAPrice) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::WAPrice);
+			Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::WAPrepayFees) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::WAPrepayFees);
 		}
 	}
 	return Result;
@@ -132,8 +151,13 @@ MtgCashFlow::MtgCashFlow() {
 	SetLabel(static_cast<qint32>(MtgFlowType::InterestRecovered), "Interest Recovered");
 	SetLabel(static_cast<qint32>(MtgFlowType::LossFlow), "Loss");
 	SetLabel(static_cast<qint32>(MtgFlowType::WAPrepayMult), "WA Prepay Multiplier");
-	SetLabel(static_cast<qint32>(MtgFlowType::WALossMult), "W ALoss Multiplier");
+	SetLabel(static_cast<qint32>(MtgFlowType::WALossMult), "WA Loss Multiplier");
 	SetLabel(static_cast<qint32>(MtgFlowType::WAPrice), "WA Price");
+	SetLabel(static_cast<qint32>(MtgFlowType::WALlevel), "WAL");
+	SetLabel(static_cast<qint32>(MtgFlowType::DelinquentOutstanding), "Delinquent");
+	SetLabel(static_cast<qint32>(MtgFlowType::WAPrepayFees), "WA Prepayment Fees");
+	SetLabel(static_cast<qint32>(MtgFlowType::PrepaymentFees), "Prepayment Fees");
+	SetLabel(static_cast<qint32>(MtgFlowType::OutstandingForOC), "Outstanding for OC Test");
 	Aggregate(Monthly); 
 }
 
@@ -154,4 +178,58 @@ double MtgCashFlow::GetTotalFlow(const QDate& a) const {
 	QList<qint32> FlowsType;
 	
 	return GenericCashFlow::GetTotalFlow(a, FlowsType);
+}
+
+void MtgCashFlow::FillWAL() {
+	RemoveFlow(static_cast<qint32>(MtgFlowType::WALlevel));
+	for (auto i = m_CashFlows.constBegin(); i != m_CashFlows.constEnd(); ++i) {
+		AddFlow(i.key(), CalculateWAL(i.key()), MtgFlowType::WALlevel);
+	}
+}
+double MtgCashFlow::CalculateWAL(const QDate& StartDate) const {
+	double RunningSum = 0.0, Result = 0.0, CurrentPrinc;
+	for (auto i = m_CashFlows.constFind(StartDate); i != m_CashFlows.constEnd(); ++i) {
+		CurrentPrinc = i.value()->value(static_cast<qint32>(MtgFlowType::PrincipalFlow),0);
+		if (CurrentPrinc > 0) {
+			RunningSum += CurrentPrinc;
+			Result += CurrentPrinc*static_cast<double>(StartDate.daysTo(i.key())) / 365.25;
+		}
+	}
+	if (RunningSum <= 0) return 0.0;
+	return Result / RunningSum;
+}
+
+MtgCashFlow MtgCashFlow::ScaledCashFlows(double OriginalRefSize, double ResultSize) const {
+	MtgCashFlow Result;
+	Result.AddFlow(GenericCashFlow::ScaledCashFlows(OriginalRefSize, ResultSize, QList<qint32>(), QList<qint32>()
+		<< static_cast<qint32>(MtgFlowType::WACouponFlow)
+		<< static_cast<qint32>(MtgFlowType::WAPrepayMult)
+		<< static_cast<qint32>(MtgFlowType::WALossMult)
+		<< static_cast<qint32>(MtgFlowType::WAPrice)
+		<< static_cast<qint32>(MtgFlowType::WALlevel)
+		));
+	double CurrentOut;
+	for (auto i = Result.m_CashFlows.begin(); i != Result.m_CashFlows.end(); ++i) {
+		CurrentOut = GetAmountOut(i.key());
+		if (CurrentOut != 0) {
+			i.value()->operator[](static_cast<qint32>(MtgFlowType::WACouponFlow)) *= i.value()->value(static_cast<qint32>(MtgFlowType::AmountOutstandingFlow), 0.0) / CurrentOut;
+			i.value()->operator[](static_cast<qint32>(MtgFlowType::WAPrepayMult)) *= i.value()->value(static_cast<qint32>(MtgFlowType::AmountOutstandingFlow), 0.0) / CurrentOut;
+			i.value()->operator[](static_cast<qint32>(MtgFlowType::WALossMult)) *= i.value()->value(static_cast<qint32>(MtgFlowType::AmountOutstandingFlow), 0.0) / CurrentOut;
+			i.value()->operator[](static_cast<qint32>(MtgFlowType::WAPrice)) *= i.value()->value(static_cast<qint32>(MtgFlowType::AmountOutstandingFlow), 0.0) / CurrentOut;
+			i.value()->operator[](static_cast<qint32>(MtgFlowType::WALlevel)) *= i.value()->value(static_cast<qint32>(MtgFlowType::AmountOutstandingFlow), 0.0) / CurrentOut;
+		}
+			
+	}
+	return Result;
+}
+
+double MtgCashFlow::GetOutstandingForOC(const QDate& index) const {
+	if (HasFlowType(static_cast<qint32>(MtgFlowType::OutstandingForOC)))
+		return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::OutstandingForOC));
+	return GetAmountOut(index);
+}
+double MtgCashFlow::GetOutstandingForOC(int index) const {
+	if (HasFlowType(static_cast<qint32>(MtgFlowType::OutstandingForOC)))
+		return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::OutstandingForOC));
+	return GetAmountOut(index);
 }

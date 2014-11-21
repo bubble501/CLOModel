@@ -130,8 +130,8 @@ Public Sub WaterfallStepChanged(TargetAllCell As Range)
                 TargetCell.Offset(0, 1).Value = ""
                 TargetCell.Offset(0, 2).AddComment ("Class of notes that will be redeemed")
                 TargetCell.Offset(0, 3).AddComment ("Share of interest that will redeem that tranche")
-                TargetCell.Offset(0, 3).Value = 1#
-                TargetCell.Offset(0, 3).NumberFormat = "0%"
+                TargetCell.Offset(0, 3).Value = "100"
+                TargetCell.Offset(0, 3).NumberFormat = "0"
                 TargetCell.Offset(0, 2).NumberFormat = "0"
             Case UCase("Redeem Pro-Rata")
                 TargetCell.Offset(0, 2).Locked = False
@@ -149,6 +149,15 @@ Public Sub WaterfallStepChanged(TargetAllCell As Range)
                 TargetCell.Offset(0, 3).AddComment ("Share of Excess Toward Fees")
                 TargetCell.Offset(0, 2).NumberFormat = "[=1]""XS Interst"";[=2]""XS Principal"";""All XS"""
                 TargetCell.Offset(0, 3).NumberFormat = "0%"
+            Case UCase("Allocate Prepay Fees")
+                TargetCell.Offset(0, 2).Resize(1, 2).Locked = False
+                TargetCell.Offset(0, 1).Locked = True
+                TargetCell.Offset(0, 1).Value = ""
+                TargetCell.Offset(0, 2).AddComment ("Class of notes that will recieve the fees")
+                TargetCell.Offset(0, 3).AddComment ("Share of fees that will be allocated")
+                TargetCell.Offset(0, 3).Value = "100"
+                TargetCell.Offset(0, 3).NumberFormat = "0"
+                TargetCell.Offset(0, 2).NumberFormat = "0"
             Case ""
                 TargetCell.Offset(0, 1).Resize(1, 3).ClearContents
                 TargetCell.Offset(0, 1).Resize(1, 3).Locked = True
@@ -926,6 +935,34 @@ Public Sub NewWaterfallStepChanged(Target As Range, ByRef allFields As Collectio
             .Locked = False
             .EntireColumn.Hidden = False
         End With
+    Case UCase("Allocate Prepay Fees")
+        With Target.Offset(0, RedemptionGroupHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0"
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, RedemptionGroupLevelHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0"
+            .Value = 1
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, RedemptionShareHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "0"
+            .Value = 100
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
+        With Target.Offset(0, SourceOfFundingHead)
+            .Interior.Color = RGB(235, 241, 222)
+            .NumberFormat = "[=1]""Income"";[=2]""Redemption"";"
+            .Value = 1
+            .Locked = False
+            .EntireColumn.Hidden = False
+        End With
     Case UCase("Fees From XS")
         If (Target.Row > LastStep.Row) Then
             Target.Offset(0, SourceOfFundingHead).Value = 2
@@ -1047,4 +1084,12 @@ Public Sub SetProgress(PctDone As Double, Optional What As String = "")
 End Sub
 Public Sub HideProgress()
 Unload ProgressForm
+End Sub
+Sub DeleteCloFile()
+    Dim FileToDelete As String
+    FileToDelete = Left(ActiveWorkbook.FullName, InStrRev(ActiveWorkbook.FullName, "\")) + "\BaseCase.clo"
+    If (Dir(FileToDelete) <> "") Then
+        SetAttr FileToDelete, vbNormal
+        Kill FileToDelete
+    End If
 End Sub

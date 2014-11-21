@@ -34,6 +34,7 @@ public:
 	virtual double GetPreviousFlow(int index, qint32 FlowTpe) const;
 	virtual double GetPreviousFlow(const QDate& index, qint32 FlowTpe) const;
 	virtual void Clear();
+	virtual void RemoveFlow(qint32 FlowTpe);
 	virtual void RemoveAllFlows() { Clear(); }
 	virtual void ResetFlows() { Clear(); }
 	virtual QDate MaturityDate() const;
@@ -58,6 +59,7 @@ public:
 	virtual QString GetLabel(qint32 FlowTpe) const { return m_CashFlowLabels.value(FlowTpe, QString()); }
 	virtual void RemoveLabel(qint32 FlowTp) { m_CashFlowLabels.remove(FlowTp); }
 	virtual void ClearLabels() { m_CashFlowLabels.clear(); }
+	virtual GenericCashFlow ScaledCashFlows(double OriginalRefSize, double ResultSize, const QList<qint32>& Groups = QList<qint32>(), const QList<qint32>& ExcludeGroups = QList<qint32>()) const;
 protected:
 	static bool SamePeriod(const QDate& a, const QDate& b, CashFlowAggregation Freq);
 	QMap<QDate, QHash<qint32, double>*	> m_CashFlows;

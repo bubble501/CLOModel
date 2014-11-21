@@ -126,7 +126,6 @@ Public Sub GetInputFromStructure( _
     Dim IndustryProperty As Range
     Dim MezzanineProperty As Range
     Dim PriceProperty As Range
-    Dim LoanDayCountHead As Range
     Dim StartingAdditionalProp As Range
     'New Waterfall
     Dim WaterfallSheet As Worksheet
@@ -168,7 +167,6 @@ Public Sub GetInputFromStructure( _
     Set IndustryProperty = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("IndustryProperty"), LookAt:=xlWhole, LookIn:=xlValues)
     Set MezzanineProperty = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("MezzanineProperty"), LookAt:=xlWhole, LookIn:=xlValues)
     Set PriceProperty = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("PriceProperty"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set LoanDayCountHead = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("LoanDayCountHead"), LookAt:=xlWhole, LookIn:=xlValues)
     Set StartingAdditionalProp = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("StartingAdditionalProp"), LookAt:=xlWhole, LookIn:=xlValues)
     ''''''''''''''''''''''''''''''''''''''''''''''''''''
     Set HaircutVecStart = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("HaircutVecHeader"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -314,15 +312,6 @@ ReferenceRateFromBBg:
             Else
                 Call AddInput(AllTheInputs, CStr(HaircutVecStart.Offset(i, 0).Value))
             End If
-            If (LoanDayCountHead Is Nothing) Then
-                Call AddInput(AllTheInputs, "1128")
-            Else
-               If (IsEmpty(LoanDayCountHead.Offset(i, 0)) Or LoanDayCountHead.Offset(i, 0).Value = "") Then
-                    Call AddInput(AllTheInputs, "1128")
-               Else
-                    Call AddInput(AllTheInputs, CStr(LoanDayCountHead.Offset(i, 0).Value))
-               End If
-            End If
             'Loans Properties
             Dim PropertyString As String
             PropertyString = ""
@@ -340,9 +329,8 @@ ReferenceRateFromBBg:
                                         Replace(CStr(StartingAdditionalProp.Offset(0, propCounter).Value), " ", "") & _
                                         "#=#" & _
                                         CStr(StartingAdditionalProp.Offset(i, propCounter).Value) & "#,#"
-                    Else
-                        Exit Do
                     End If
+                    If (IsEmpty(StartingAdditionalProp.Offset(0, propCounter)) Or StartingAdditionalProp.Offset(0, propCounter).Value = "") Then Exit Do
                     propCounter = propCounter + 1
                 Loop
             End If
@@ -1136,8 +1124,7 @@ Private Function FromStringToPriorty(a As String) As Long
         Case UCase("Junior management fees")
             FromStringToPriorty = 10
         Case UCase("Reinvestment test")
-'            FromStringToPriorty = 11
-             FromStringToPriorty = 4
+            FromStringToPriorty = 11
         Case UCase("Replenish Reserve")
             FromStringToPriorty = 14
 '        Case UCase("Redeem Pro-Rata")
@@ -1148,6 +1135,8 @@ Private Function FromStringToPriorty(a As String) As Long
             FromStringToPriorty = 17
         Case UCase("Fees From XS")
             FromStringToPriorty = 18
+        Case UCase("Allocate Prepay fees")
+            FromStringToPriorty = 19
         Case Else
             GoTo FromStringToPriorty_Error
     End Select
@@ -1161,28 +1150,31 @@ FromStringToPriorty_Error:
     End
 End Function
 
-Public Function GetDM(TrancheName As String, Price As Double, Optional ToCall As Boolean = False)
-    Dim result(0 To 3) As Variant
-    result(0) = Left(ActiveWorkbook.FullName, InStrRev(ActiveWorkbook.FullName, "\"))
-    result(1) = TrancheName
-    result(2) = ToCall
-    result(3) = Price
-    GetDM = CLODiscountMargin(result)
-End Function
-Public Function GetIRR(TrancheName As String, Price As Double, Optional ToCall As Boolean = False)
-    Dim result(0 To 3) As Variant
-    result(0) = Left(ActiveWorkbook.FullName, InStrRev(ActiveWorkbook.FullName, "\"))
-    result(1) = TrancheName
-    result(2) = ToCall
-    result(3) = Price
-    GetIRR = CLOReturnRate(result)
-End Function
-Public Function GetWAL(TrancheName As String, CutOffDate As Date, Price As Double, Optional ToCall As Boolean = False)
+Public Function GetDM(TrancheName As String, DealName As String, Price As Double, Optional ToCall As Boolean = False)
     Dim result(0 To 4) As Variant
     result(0) = Left(ActiveWorkbook.FullName, InStrRev(ActiveWorkbook.FullName, "\"))
-    result(1) = TrancheName
-    result(2) = Format(CutOffDate, "yyyy-mm-dd")
+    result(2) = TrancheName
+    result(1) = DealName
     result(3) = ToCall
+    result(4) = Price
+    GetDM = CLODiscountMargin(result)
+End Function
+Public Function GetIRR(TrancheName As String, DealName As String, Price As Double, Optional ToCall As Boolean = False)
+    Dim result(0 To 4) As Variant
+    result(0) = Left(ActiveWorkbook.FullName, InStrRev(ActiveWorkbook.FullName, "\"))
+    result(2) = TrancheName
+    result(1) = DealName
+    result(3) = ToCall
+    result(4) = Price
+    GetIRR = CLOReturnRate(result)
+End Function
+Public Function GetWAL(TrancheName As String, DealName As String, CutOffDate As Date, Price As Double, Optional ToCall As Boolean = False)
+    Dim result(0 To 4) As Variant
+    result(0) = Left(ActiveWorkbook.FullName, InStrRev(ActiveWorkbook.FullName, "\"))
+    result(2) = TrancheName
+    result(1) = DealName
+    result(3) = Format(CutOffDate, "yyyy-mm-dd")
+    result(4) = ToCall
     GetWAL = CLOWALife(result)
 End Function
 Public Sub StressTargetEvent(NewTrancheName As String, StressSheet As String, StressTargetCell As String, Xvar As Long, Yvar As Long, NewPrice As Double, Optional PlotSheet As String = "", Optional PlotIndex As Long = 1)

@@ -140,7 +140,9 @@ It will call the VBA function PrintMortgagesRepLines passing it the following ar
 		bool PrintTotalPrincipal  = false,
 		bool PrintDefaults=true,
 		bool PrintLoss  = true,
-		bool PrintLossOnInterest  = true
+		bool PrintLossOnInterest  = true,
+		bool PrintDelinquencies = true,
+		bool PrintWAL = true
 	);
 	HRESULT PrintMergedCell(const QString& msg, const QString& TargetCell, int RowDim=1, int ColDim=1 ,const QColor& FillColor=Qt::white);
 	HRESULT PrintColumn(const QString& Title, const QList<double>& Values ,const QString& TargetCell,const QString& ValFormat="0.00",const QColor& FillColor=Qt::white);

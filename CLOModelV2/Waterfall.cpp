@@ -1083,6 +1083,48 @@ bool Waterfall::CalculateTranchesCashFlows(){
 				}
 				break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				case WatFalPrior::WaterfallStepType::wst_AllocPrepayFees:{
+					int CurrSenGrpLvl = SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroupLevel).value<IntegerVector>().GetValue(CurrentDate);
+					int CurrSenGrp = SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroup).value<IntegerVector>().GetValue(CurrentDate);
+					bool UseToRedeem = SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate)==2;
+					if (CurrSenGrp > FindMostJuniorLevel(CurrSenGrpLvl)) {
+						PrintToTempFile("ReturnFalse.txt", "Invalid seniority in Turbo");
+						return false;
+					}
+					ProRataBonds.clear();
+					bool UsedOriginals = false;
+					TotalPayable = 0.0;
+					for (int h = 0; h < m_Tranches.size(); h++) {
+						if (m_Tranches.at(h)->GetProrataGroup(CurrSenGrpLvl) == CurrSenGrp) {
+							ProRataBonds.enqueue(h);
+							TotalPayable += m_Tranches.at(h)->GetCurrentOutstanding();
+						}
+					}
+					if (TotalPayable < 0.01) {
+						TotalPayable = 0.0;
+						UsedOriginals = true;
+						for (auto ProRataIte = ProRataBonds.constBegin(); ProRataIte != ProRataBonds.constEnd(); ++ProRataIte) {
+							TotalPayable += m_Tranches.at(*ProRataIte)->GetOriginalAmount();
+						}
+					}
+					Solution = qMin(AvailableInterest, m_MortgagesPayments.GetPrepayFees(CurrentDate)*SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionShare).value<BloombergVector>().GetValue(CurrentDate));
+					AvailableInterest -= Solution;
+					int OriginalProRataBondsSize = ProRataBonds.size();
+					while (ProRataBonds.size() > 0) {
+						int ProrataIndex = ProRataBonds.dequeue();
+						if (TotalPayable > 0) {
+							if (UseToRedeem)
+								Solution = RedeemNotes(Solution, CurrSenGrp, CurrSenGrpLvl, CurrentDate);
+							m_Tranches[ProrataIndex]->AddCashFlow(CurrentDate, Solution*(UsedOriginals ? m_Tranches.at(ProrataIndex)->GetOriginalAmount() : m_Tranches.at(ProrataIndex)->GetCurrentOutstanding()) / TotalPayable, TrancheCashFlow::TrancheFlowType::InterestFlow);
+						}
+						else {
+							m_Tranches[ProrataIndex]->AddCashFlow(CurrentDate, Solution / OriginalProRataBondsSize, TrancheCashFlow::TrancheFlowType::InterestFlow);
+						}
+					}
+					
+				}
+				break;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				case WatFalPrior::WaterfallStepType::wst_Excess:{
 					SolutionDegree = SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate);
 					TestTarget = SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionShare).value<BloombergVector>().GetValue(CurrentDate);
@@ -1182,6 +1224,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 				}
 				break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				case WatFalPrior::WaterfallStepType::wst_ReinvestmentTest:
 				case WatFalPrior::WaterfallStepType::wst_OCTest:{
 					int CurrSenGrpLvl = SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetValue(CurrentDate);
 					int CurrSenGrp = SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate);
@@ -1207,9 +1250,9 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					}
 					//CCC test
 					if (m_CCCcurve.GetValue(CurrentDate)>m_CCCTestLimit)
-						Solution = (1.0 - ((m_CCCcurve.GetValue(CurrentDate) - m_CCCTestLimit)*m_CCChaircut))*m_MortgagesPayments.GetAmountOut(i);
+						Solution = (1.0 - ((m_CCCcurve.GetValue(CurrentDate) - m_CCCTestLimit)*m_CCChaircut))*m_MortgagesPayments.GetOutstandingForOC(i);
 					else
-						Solution = m_MortgagesPayments.GetAmountOut(i);
+						Solution = m_MortgagesPayments.GetOutstandingForOC(i);
 					Solution += AvailablePrincipal.Total();
 					
 					if (Solution + TotalPayable<=0.0) continue; 
@@ -1410,6 +1453,8 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		m_CalculatedMtgPayments=m_MortgagesPayments;
 		m_MortgagesPayments=OriginalMtgFlows;
 		FillAllDates();
+		m_MortgagesPayments.FillWAL();
+		m_CalculatedMtgPayments.FillWAL();
 		if (NullCCCanchor[0]) m_CCCcurve.RemoveAnchorDate();
 		if (NullCCCanchor[1]) m_PaymentFrequency.RemoveAnchorDate();
 		if (NullCCCanchor[2]) m_SeniorExpenses.RemoveAnchorDate();
@@ -2019,7 +2064,7 @@ GenericCashFlow Waterfall::GetAggregatedGIC() const {
 	Result.AddFlow(m_GICflows.AggregateRange(m_GICflows.GetDate(0), m_FirstIPDdate));
 	const TrancheCashFlow& benchFlow = m_Tranches.first()->GetCashFlow();
 	for (int i = 1; i < benchFlow.Count(); ++i) {
-		Result.AddFlow(m_GICflows.AggregateRange(benchFlow.GetDate(i - 1), benchFlow.GetDate(i)));
+		Result.AddFlow(m_GICflows.AggregateRange(benchFlow.GetDate(i - 1).addDays(1), benchFlow.GetDate(i)));
 	}
 	return Result;
 }
@@ -2029,7 +2074,7 @@ MtgCashFlow Waterfall::GetAggregatedMtgFlows() const {
 	Result.AddFlow(m_CalculatedMtgPayments.AggregateRange(m_CalculatedMtgPayments.GetDate(0), m_FirstIPDdate));
 	const TrancheCashFlow& benchFlow = m_Tranches.first()->GetCashFlow();
 	for (int i = 1; i < benchFlow.Count(); ++i) {
-		Result.AddFlow(m_CalculatedMtgPayments.AggregateRange(benchFlow.GetDate(i - 1), benchFlow.GetDate(i)));
+		Result.AddFlow(m_CalculatedMtgPayments.AggregateRange(benchFlow.GetDate(i - 1).addDays(1), benchFlow.GetDate(i)));
 	}
 	return Result;
 }

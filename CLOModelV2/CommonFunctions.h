@@ -23,7 +23,7 @@ template<typename T> class QList;
 #define LOGASSERT(CheckExp,LogMsg) ((CheckExp) ? qt_noop() : PrintToTempFile("DebugLog.log",LogMsg)); Q_ASSERT_X(CheckExp,"LOGASSERT",LogMsg)
 #define LOGDEBUG(LogMsg) PrintToTempFile("DebugLog",LogMsg,false)
 #define LOGTOFILE(LogFile,LogMsg) PrintToTempFile(LogFile,LogMsg)
-#define LOGCONDITIONALLY(Condition,LogMsg) ((Condition) ? PrintToTempFile("ConditionalLog",LogMsg): qt_noop());
+#define LOGCONDITIONALLY(Condition,LogMsg) ((Condition) ? PrintToTempFile("ConditionalLog",LogMsg): qt_noop())
 #else
 #define LOGASSERT(CheckExp,LogMsg)
 #define LOGDEBUG(LogMsg)

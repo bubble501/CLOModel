@@ -101,7 +101,7 @@ void Mortgage::SetInterest(const QString& a){
 		 || MaturityExtension<0
 		 || StartingHaircut<0.0
 		 || StartingHaircut>1.0
-		 || PrepaymentFee.IsEmpty(0.0, 1.0)
+		 || PrepaymentFee.IsEmpty(0.0)
 		 ) return false;
 	 
 	 QDate AdjMaturityDate = QDate(m_MaturityDate.year(), m_MaturityDate.month(), 15).addMonths(MaturityExtension);
@@ -142,8 +142,8 @@ void Mortgage::SetInterest(const QString& a){
 	 
 	 double CurrentInterest, TempFlow1, TempFlow2;
 	 int TempStep;
-	 double CurrentAmtOut = m_Size*(1.0 - StartingHaircut);
-	 m_CashFlows.AddFlow(AdjStartDate, m_Size*StartingHaircut, MtgCashFlow::MtgFlowType::LossFlow);
+	 double CurrentAmtOut = m_Size*qMax(0.0,1.0 - StartingHaircut-m_HaircutVector.GetValue(AdjStartDate));
+	 m_CashFlows.AddFlow(AdjStartDate, m_Size*qMin(1.0, StartingHaircut + m_HaircutVector.GetValue(AdjStartDate)), MtgCashFlow::MtgFlowType::LossFlow);
 	 m_CashFlows.AddFlow(AdjStartDate, CurrentAmtOut, MtgCashFlow::MtgFlowType::AmountOutstandingFlow);
 	 m_CashFlows.AddFlow(AdjStartDate, CurrentAmtOut*GetInterest(AdjStartDate), MtgCashFlow::MtgFlowType::WACouponFlow);
 	 QDate NextPaymentDate = AdjStartDate.addMonths(m_PaymentFreq.GetValue(AdjStartDate));
@@ -362,7 +362,7 @@ void Mortgage::SetInterest(const QString& a){
 	if (HasProperty("Price")) { if (BloombergVector(GetProperty("Price")).IsEmpty(0.0)) Result += "Loan Price\n"; }
 	if (HasProperty("MaturityExtension")) {if (GetProperty("MaturityExtension").toInt() < 0) Result += "Loan Maturity Extension\n";}
 	if (HasProperty("StartingHaircut")) { double TempHC = GetProperty("StartingHaircut").toDouble(); if (TempHC< 0.0 || TempHC>1.0) Result += "Loan Starting Haircut\n"; }
-	if (HasProperty("PrepaymentFee")) { if (BloombergVector(GetProperty("PrepaymentFee")).IsEmpty(0.0, 1.0)) Result += "Loan Prepayment Fee\n"; }
+	if (HasProperty("PrepaymentFee")) { if (BloombergVector(GetProperty("PrepaymentFee")).IsEmpty(0.0)) Result += "Loan Prepayment Fee\n"; }
 	if(!Result.isEmpty()) return Result.left(Result.size()-1);
 	return Result;
  }

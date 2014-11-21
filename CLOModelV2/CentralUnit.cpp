@@ -43,7 +43,6 @@ void CentralUnit::AddLoan(
 	, const QString& PrepayMult
 	, const QString& HaicutVect
 	, const QString& Properties
-	, const QString& dayCnt
 	) {
 	Mortgage TempMtg;
 	TempMtg.SetMaturityDate(Maturity);
@@ -55,7 +54,6 @@ void CentralUnit::AddLoan(
 	TempMtg.SetPaymentFreq(Freq);
 	TempMtg.SetAnnuity(Annuity);
 	TempMtg.SetHaircutVector(HaicutVect);
-	TempMtg.SetDayCountConvention(dayCnt);
 	QStringList PropList = Properties.split("#,#");
 	foreach(const QString& SingleProp, PropList) {
 		QStringList KeyVal = SingleProp.split("#=#");

@@ -126,7 +126,6 @@ Public Sub GetInputFromStructure( _
     Dim IndustryProperty As Range
     Dim MezzanineProperty As Range
     Dim PriceProperty As Range
-    Dim LoanDayCountHead As Range
     Dim StartingAdditionalProp As Range
     'New Waterfall
     Dim WaterfallSheet As Worksheet
@@ -168,7 +167,6 @@ Public Sub GetInputFromStructure( _
     Set IndustryProperty = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("IndustryProperty"), LookAt:=xlWhole, LookIn:=xlValues)
     Set MezzanineProperty = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("MezzanineProperty"), LookAt:=xlWhole, LookIn:=xlValues)
     Set PriceProperty = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("PriceProperty"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set LoanDayCountHead = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("LoanDayCountHead"), LookAt:=xlWhole, LookIn:=xlValues)
     Set StartingAdditionalProp = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("StartingAdditionalProp"), LookAt:=xlWhole, LookIn:=xlValues)
     ''''''''''''''''''''''''''''''''''''''''''''''''''''
     Set HaircutVecStart = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("HaircutVecHeader"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -313,15 +311,6 @@ ReferenceRateFromBBg:
                 Call AddInput(AllTheInputs, "0")
             Else
                 Call AddInput(AllTheInputs, CStr(HaircutVecStart.Offset(i, 0).Value))
-            End If
-            If (LoanDayCountHead Is Nothing) Then
-                Call AddInput(AllTheInputs, "1128")
-            Else
-               If (IsEmpty(LoanDayCountHead.Offset(i, 0)) Or LoanDayCountHead.Offset(i, 0).Value = "") Then
-                    Call AddInput(AllTheInputs, "1128")
-               Else
-                    Call AddInput(AllTheInputs, CStr(LoanDayCountHead.Offset(i, 0).Value))
-               End If
             End If
             'Loans Properties
             Dim PropertyString As String

@@ -27,7 +27,6 @@ public:
 		, const QString& PrepayMult = "100"
 		, const QString& HaicutVect = "0"
 		, const QString& Properties = ""
-		, const QString& dayCnt = QString::number(static_cast<qint16>(DayCountConvention::CompN30360))
 		);
 #ifndef NO_BLOOMBERG
 	void AddTranche(const QString& Name, const QString& ProRataGroup, double MinOC = 0.0, double MinIC = 0.0, double Price = 100.0, double FxRate = 1.0, const QString& BbgExt = "Mtge");

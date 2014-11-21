@@ -26,7 +26,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	{ //Loans
 		QDate Matur;
 		double sze;
-		QString Intr, frq, lossm, prem, Ann, Hairc, BaseRte, TempDayCnt;
+		QString Intr, frq, lossm, prem, Ann, Hairc, BaseRte;
 		QString Properties;
 		NumElements=pdFreq->intVal;pdFreq++;
 		for(int i=0;i<NumElements;i++){
@@ -39,9 +39,8 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			prem=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			lossm=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			Hairc=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
-			TempDayCnt = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 			Properties = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
-			if (sze >= 0.01) TempUnit.AddLoan(Matur, sze, Intr, Ann, frq, BaseRte, lossm, prem, Hairc, Properties, TempDayCnt);
+			if (sze >= 0.01) TempUnit.AddLoan(Matur, sze, Intr, Ann, frq, BaseRte, lossm, prem, Hairc, Properties);
 		}
 	}
 	{//Tranches

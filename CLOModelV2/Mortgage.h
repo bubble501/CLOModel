@@ -11,7 +11,6 @@
 #include "DayCountVect.h"
 class Mortgage : public BackwardInterface{
 private:
-	DayCountVector m_DayCountConvention;
 	QString m_Properties;
 	QDate m_MaturityDate;
 	RepaymentVector m_AnnuityVect;
@@ -28,8 +27,8 @@ private:
 protected:
 	void FillDiscountOutstanding();
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
-	double GetInterest(const QDate& a, const QDate& StartAccrue, const QDate& EndAccrue);
-	double GetInterest(int a, const QDate& StartAccrue, const QDate& EndAccrue);
+	double GetInterest(const QDate& a, const QDate& StartAccrue, const QDate& EndAccrue, DayCountConvention DayCnt);
+	double GetInterest(int a, const QDate& StartAccrue, const QDate& EndAccrue, DayCountConvention DayCnt);
 	double GetInterest(const QDate& a);
 	double GetInterest(int a);
 	QString GetProperty(qint32 PropIndex, bool PropValue) const;
@@ -83,8 +82,6 @@ public:
 	QString GetPropertyName(qint32 PropIndex) const { return GetProperty(PropIndex, false); }
 	bool HasProperty(const QString& PropName) const;
 	qint32 GetNumProperties()const;
-	const DayCountVector& GetDayCountConvention() const { return m_DayCountConvention; }
-	void SetDayCountConvention(const QString& val) { m_DayCountConvention = val; }
 	friend QDataStream& operator<<(QDataStream & stream, const Mortgage& flows);
 	friend QDataStream& operator>>(QDataStream & stream, Mortgage& flows);
 };

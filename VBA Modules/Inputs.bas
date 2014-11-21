@@ -1150,28 +1150,31 @@ FromStringToPriorty_Error:
     End
 End Function
 
-Public Function GetDM(TrancheName As String, Price As Double, Optional ToCall As Boolean = False)
-    Dim result(0 To 3) As Variant
-    result(0) = Left(ActiveWorkbook.FullName, InStrRev(ActiveWorkbook.FullName, "\"))
-    result(1) = TrancheName
-    result(2) = ToCall
-    result(3) = Price
-    GetDM = CLODiscountMargin(result)
-End Function
-Public Function GetIRR(TrancheName As String, Price As Double, Optional ToCall As Boolean = False)
-    Dim result(0 To 3) As Variant
-    result(0) = Left(ActiveWorkbook.FullName, InStrRev(ActiveWorkbook.FullName, "\"))
-    result(1) = TrancheName
-    result(2) = ToCall
-    result(3) = Price
-    GetIRR = CLOReturnRate(result)
-End Function
-Public Function GetWAL(TrancheName As String, CutOffDate As Date, Price As Double, Optional ToCall As Boolean = False)
+Public Function GetDM(TrancheName As String, DealName As String, Price As Double, Optional ToCall As Boolean = False)
     Dim result(0 To 4) As Variant
     result(0) = Left(ActiveWorkbook.FullName, InStrRev(ActiveWorkbook.FullName, "\"))
-    result(1) = TrancheName
-    result(2) = Format(CutOffDate, "yyyy-mm-dd")
+    result(2) = TrancheName
+    result(1) = DealName
     result(3) = ToCall
+    result(4) = Price
+    GetDM = CLODiscountMargin(result)
+End Function
+Public Function GetIRR(TrancheName As String, DealName As String, Price As Double, Optional ToCall As Boolean = False)
+    Dim result(0 To 4) As Variant
+    result(0) = Left(ActiveWorkbook.FullName, InStrRev(ActiveWorkbook.FullName, "\"))
+    result(2) = TrancheName
+    result(1) = DealName
+    result(3) = ToCall
+    result(4) = Price
+    GetIRR = CLOReturnRate(result)
+End Function
+Public Function GetWAL(TrancheName As String, DealName As String, CutOffDate As Date, Price As Double, Optional ToCall As Boolean = False)
+    Dim result(0 To 4) As Variant
+    result(0) = Left(ActiveWorkbook.FullName, InStrRev(ActiveWorkbook.FullName, "\"))
+    result(2) = TrancheName
+    result(1) = DealName
+    result(3) = Format(CutOffDate, "yyyy-mm-dd")
+    result(4) = ToCall
     GetWAL = CLOWALife(result)
 End Function
 Public Sub StressTargetEvent(NewTrancheName As String, StressSheet As String, StressTargetCell As String, Xvar As Long, Yvar As Long, NewPrice As Double, Optional PlotSheet As String = "", Optional PlotIndex As Long = 1)

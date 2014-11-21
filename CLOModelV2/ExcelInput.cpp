@@ -388,6 +388,7 @@ double __stdcall CLOReturnRate(LPSAFEARRAY *ArrayData){
 	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
 	if (!SUCCEEDED(hr)) return 0.0;
 	QString FolderPath=QString::fromStdWString(pdFreq->bstrVal);pdFreq++;
+	QString DealName = QString::fromStdWString(pdFreq->bstrVal); pdFreq++;
 	QString TrancheName=QString::fromStdWString(pdFreq->bstrVal);pdFreq++;
 	bool ToCall=pdFreq->boolVal;pdFreq++;
 	double NewPrice=pdFreq->dblVal;pdFreq++;
@@ -395,8 +396,13 @@ double __stdcall CLOReturnRate(LPSAFEARRAY *ArrayData){
 	Waterfall TempWaterfall;
 	QString Filename=FolderPath+"\\BaseCase.clo";
 	QFile file(Filename);
-	if(!file.exists()){
-		return 0.0;
+	bool UsingClom = false;
+	if (!file.exists()) {
+		QSettings ConfigIni(":/Configs/GlobalConfigs.ini", QSettings::IniFormat);
+		ConfigIni.beginGroup("Folders");
+		file.setFileName(ConfigIni.value("UnifiedResultsFolder", "\\\\synserver2\\Company Share\\24AM\\Monitoring\\Model Results").toString() + '\\' + DealName + ".clom");
+		if (!file.exists())return 0.0;
+		UsingClom = true;
 	}
 	if (!file.open(QIODevice::ReadOnly)){
 		return 0.0;
@@ -407,6 +413,10 @@ double __stdcall CLOReturnRate(LPSAFEARRAY *ArrayData){
 	out >> VersionChecker;
 	//if(VersionChecker!=qint32(ModelVersionNumber)) return 0.0;
 	if(VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) return 0.0;
+	if (UsingClom) {
+		{QDate Junk; out >> Junk; }
+		{bool Junk; out >> Junk; }
+	}
 	{bool Junk; out >> Junk; }
 	TempWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempWaterfall;
@@ -426,6 +436,7 @@ double __stdcall CLODiscountMargin(LPSAFEARRAY *ArrayData){
 	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
 	if (!SUCCEEDED(hr)) return 0.0;
 	QString FolderPath=QString::fromStdWString(pdFreq->bstrVal);pdFreq++;
+	QString DealName = QString::fromStdWString(pdFreq->bstrVal); pdFreq++;
 	QString TrancheName=QString::fromStdWString(pdFreq->bstrVal);pdFreq++;
 	bool ToCall=pdFreq->boolVal;pdFreq++;
 	double NewPrice=pdFreq->dblVal;pdFreq++;
@@ -433,8 +444,13 @@ double __stdcall CLODiscountMargin(LPSAFEARRAY *ArrayData){
 	Waterfall TempWaterfall;
 	QString Filename=FolderPath+"\\BaseCase.clo";
 	QFile file(Filename);
+	bool UsingClom = false;
 	if(!file.exists()){
-		return 0.0;
+		QSettings ConfigIni(":/Configs/GlobalConfigs.ini", QSettings::IniFormat);
+		ConfigIni.beginGroup("Folders");
+		file.setFileName(ConfigIni.value("UnifiedResultsFolder", "\\\\synserver2\\Company Share\\24AM\\Monitoring\\Model Results").toString() + '\\' + DealName + ".clom");
+		if (!file.exists())return 0.0;
+		UsingClom = true;
 	}
 	if (!file.open(QIODevice::ReadOnly)){
 		return 0.0;
@@ -443,8 +459,11 @@ double __stdcall CLODiscountMargin(LPSAFEARRAY *ArrayData){
 	QDataStream out(&file);
 	out.setVersion(QDataStream::Qt_5_3);
 	out >> VersionChecker;
-	//if(VersionChecker!=qint32(ModelVersionNumber)) return 0.0;
 	if(VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) return 0.0;
+	if (UsingClom) {
+		{QDate Junk; out >> Junk; }
+		{bool Junk; out >> Junk; }
+	}
 	{bool Junk; out >> Junk; }
 	TempWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempWaterfall;
@@ -454,10 +473,10 @@ double __stdcall CLODiscountMargin(LPSAFEARRAY *ArrayData){
 	}
 	file.close();
 	const Tranche* TranchPoint=TempWaterfall.GetTranche(TrancheName);
-	if(!TranchPoint){
-		return 0.0;
+	if(TranchPoint){
+		return TranchPoint->GetDiscountMargin(NewPrice);
 	}
-	return TranchPoint->GetDiscountMargin(NewPrice);
+	return 0.0;
 }
 double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
 	qint32 VersionChecker;
@@ -465,6 +484,7 @@ double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
 	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
 	if (!SUCCEEDED(hr)) return 0.0;
 	QString FolderPath=QString::fromStdWString(pdFreq->bstrVal);pdFreq++;
+	QString DealName = QString::fromStdWString(pdFreq->bstrVal); pdFreq++;
 	QString TrancheName=QString::fromStdWString(pdFreq->bstrVal);pdFreq++;
 	QDate StartDate=QDate::fromString(QString::fromStdWString(pdFreq->bstrVal),"yyyy-MM-dd");pdFreq++;
 	bool ToCall=pdFreq->boolVal;pdFreq++;
@@ -472,12 +492,23 @@ double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
 	Waterfall TempWaterfall;
 	QString Filename=FolderPath+"\\BaseCase.clo";
 	QFile file(Filename);
-	if(!file.exists())return 0.0;
+	bool UsingClom = false;
+	if (!file.exists()){
+		QSettings ConfigIni(":/Configs/GlobalConfigs.ini", QSettings::IniFormat);
+		ConfigIni.beginGroup("Folders");
+		file.setFileName(ConfigIni.value("UnifiedResultsFolder", "\\\\synserver2\\Company Share\\24AM\\Monitoring\\Model Results").toString() + '\\' + DealName + ".clom");
+		if (!file.exists())return 0.0;
+		UsingClom = true;
+	}
 	if (!file.open(QIODevice::ReadOnly))return 0.0;
 	QDataStream out(&file);
 	out.setVersion(QDataStream::Qt_5_3);
 	out >> VersionChecker;
 	if(VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) return 0.0;
+	if (UsingClom) {
+		{QDate Junk; out >> Junk; }
+		{bool Junk; out >> Junk; }
+	}
 	{bool Junk; out >> Junk; }
 	TempWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempWaterfall;
@@ -514,17 +545,6 @@ double __stdcall GetStressLoss(LPSAFEARRAY *ArrayData) {
 	SafeArrayUnaccessData(*ArrayData);
 	if (*(FolderPath.end() - 1) != '\\' && *(FolderPath.end() - 1) != '/') FolderPath += '/';
 	FolderPath += "StressResult.fcsr";
-	LOGDEBUG(
-		QString("Path: %1\nTranche Name: %2\nCPR: %3\nCDR: %4\nLS: %5\nRecLag: %6\nDelinq: %7\nDelinqLag: %8")
-		.arg(FolderPath)
-		.arg(TrancheName)
-		.arg(CPRscenario)
-		.arg(CDRscenario)
-		.arg(LSscenario)
-		.arg(RecLagScenario)
-		.arg(DelinqScenario)
-		.arg(DelinqLagScenario)
-	);
 	if (!QFile::exists(FolderPath)) { LOGDEBUG("Returned -1"); return -1.0; }
 	Waterfall TempRes = StressTest::GetScenarioFromFile(FolderPath, CPRscenario, CDRscenario, LSscenario, RecLagScenario, DelinqScenario, DelinqLagScenario);
 	const Tranche* Result = TempRes.GetTranche(TrancheName);

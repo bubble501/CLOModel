@@ -1085,3 +1085,11 @@ End Sub
 Public Sub HideProgress()
 Unload ProgressForm
 End Sub
+Sub DeleteCloFile()
+    Dim FileToDelete As String
+    FileToDelete = Left(ActiveWorkbook.FullName, InStrRev(ActiveWorkbook.FullName, "\")) + "\BaseCase.clo"
+    If (Dir(FileToDelete) <> "") Then
+        SetAttr FileToDelete, vbNormal
+        Kill FileToDelete
+    End If
+End Sub

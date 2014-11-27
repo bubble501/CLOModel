@@ -654,6 +654,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 				}
 			}
 		}
+		QDate ActualCallDate;
 		m_CalledPeriod = QDate();
 		m_TriggersResults.ClearResults();
 		PrincipalRecip AvailablePrincipal;
@@ -768,11 +769,11 @@ bool Waterfall::CalculateTranchesCashFlows(){
 								double PayablePrincipal;
 								if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 1) {  //Reinvest Prepay Only
 									PayablePrincipal = m_PrincipalAvailable.GetPrepay()*SingleStep->GetParameter(WatFalPrior::wstParameters::AdditionalCollateralShare).value<BloombergVector>().GetValue(CurrentDate);
-									m_PrincipalAvailable.SetPrepay(m_PrincipalAvailable.GetPrepay() - PayablePrincipal);
+									m_PrincipalAvailable.AddPrepay(- PayablePrincipal);
 								}
 								else if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 2) {  //Reinvest scheduled only
 									PayablePrincipal = m_PrincipalAvailable.GetScheduled()*SingleStep->GetParameter(WatFalPrior::wstParameters::AdditionalCollateralShare).value<BloombergVector>().GetValue(CurrentDate);
-									m_PrincipalAvailable.SetScheduled(m_PrincipalAvailable.GetScheduled() - PayablePrincipal);
+									m_PrincipalAvailable.AddScheduled( - PayablePrincipal);
 								}
 								else {
 									PayablePrincipal = m_PrincipalAvailable.Total()*SingleStep->GetParameter(WatFalPrior::wstParameters::AdditionalCollateralShare).value<BloombergVector>().GetValue(CurrentDate);
@@ -800,6 +801,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 			}
 			if (IsCallPaymentDate) {
 				m_CalledPeriod = RollingNextIPD;
+				ActualCallDate = CurrentDate;
 				if (m_PoolValueAtCall.IsEmpty())
 					TotalPayable = m_MortgagesPayments.GetWAPrice(i);
 				else
@@ -972,7 +974,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					for (int h = 0; h < m_Tranches.size(); h++) {
 						if (m_Tranches.at(h)->GetProrataGroup(CurrSenGrpLvl) == CurrSenGrp) {
 							if (!m_Tranches.at(h)->HasCoupon(CurrCoupIndx)) {
-								PrintToTempFile("ReturnFalse.txt", "Coupon not set in tranche");
+								PrintToTempFile("ReturnFalse.txt", m_Tranches.at(h)->GetTrancheName() + " - Coupon not set in tranche");
 								return false;
 							}
 							ProRataBonds.enqueue(h);
@@ -1021,7 +1023,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					for (int h = 0; h < m_Tranches.size(); h++) {
 						if (m_Tranches.at(h)->GetProrataGroup(CurrSenGrpLvl) == CurrSenGrp) {
 							if (!m_Tranches.at(h)->HasCoupon(CurrCoupIndx)) {
-								PrintToTempFile("ReturnFalse.txt", "Coupon not set in tranche");
+								PrintToTempFile("ReturnFalse.txt", m_Tranches.at(h)->GetTrancheName() + " - Coupon not set in tranche");
 								return false;
 							}
 							ProRataBonds.enqueue(h);
@@ -1344,7 +1346,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					for (int h = 0; h < m_Tranches.size(); h++) {
 						if (m_Tranches.at(h)->GetProrataGroup(CurrSenGrpLvl) <= CurrSenGrp) {
 							if (!m_Tranches.at(h)->HasCoupon(CurrCoupIndx)) {
-								PrintToTempFile("ReturnFalse.txt", "Coupon not set in tranche");
+								PrintToTempFile("ReturnFalse.txt", m_Tranches.at(h)->GetTrancheName() +" - Coupon not set in tranche");
 								return false;
 							}
 							AdjustedCoupon = AdjustCoupon((m_Tranches.at(h)->GetCoupon(CurrentDate, qMax(CurrCoupIndx, 0))), RollingNextIPD, RollingNextIPD.addMonths(m_PaymentFrequency.GetValue(RollingNextIPD)), m_Tranches.at(h)->GetDayCount().GetValue(CurrentDate));
@@ -1400,17 +1402,16 @@ bool Waterfall::CalculateTranchesCashFlows(){
 				break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				case WatFalPrior::WaterfallStepType::wst_ReinvestPrincipal:
-					LOGDEBUG("Reinvestment Trigger: " + SingleStep->GetParameter(WatFalPrior::wstParameters::Trigger).toString());
 					if (!IsCallPaymentDate && i<m_MortgagesPayments.Count()-1) {
 						if(AvailablePrincipal.Total()>0.0){
 							double PayablePrincipal;
 							if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 1) {  //Reinvest Prepay Only
 								PayablePrincipal = AvailablePrincipal.GetPrepay()*SingleStep->GetParameter(WatFalPrior::wstParameters::AdditionalCollateralShare).value<BloombergVector>().GetValue(CurrentDate);
-								AvailablePrincipal.SetPrepay(AvailablePrincipal.GetPrepay() - PayablePrincipal);
+								AvailablePrincipal.AddPrepay( - PayablePrincipal);
 							}
 							else if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 2) {  //Reinvest scheduled only
 								PayablePrincipal = AvailablePrincipal.GetScheduled()*SingleStep->GetParameter(WatFalPrior::wstParameters::AdditionalCollateralShare).value<BloombergVector>().GetValue(CurrentDate);
-								AvailablePrincipal.SetScheduled(AvailablePrincipal.GetScheduled() - PayablePrincipal);
+								AvailablePrincipal.AddScheduled( - PayablePrincipal);
 							}
 							else {
 								PayablePrincipal = AvailablePrincipal.Total()*SingleStep->GetParameter(WatFalPrior::wstParameters::AdditionalCollateralShare).value<BloombergVector>().GetValue(CurrentDate);
@@ -1453,8 +1454,6 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		m_CalculatedMtgPayments=m_MortgagesPayments;
 		m_MortgagesPayments=OriginalMtgFlows;
 		FillAllDates();
-		m_MortgagesPayments.FillWAL();
-		m_CalculatedMtgPayments.FillWAL();
 		if (NullCCCanchor[0]) m_CCCcurve.RemoveAnchorDate();
 		if (NullCCCanchor[1]) m_PaymentFrequency.RemoveAnchorDate();
 		if (NullCCCanchor[2]) m_SeniorExpenses.RemoveAnchorDate();
@@ -1488,18 +1487,18 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		}
 		LOGDEBUG(QString("After Reserve Funds:\t%1").arg(CheckResults,0,'f'));
 		CheckMtgCashFlow.Clear();
-		if (m_CalledPeriod.isNull()) {
+		if (ActualCallDate.isNull()) {
 			 CheckMtgCashFlow.AddFlow(m_CalculatedMtgPayments);
 		}
 		else {
 			for (int MtgFlwIter = 0; MtgFlwIter <= m_CalculatedMtgPayments.Count(); ++MtgFlwIter) {
 				CheckMtgCashFlow.AddFlow(m_CalculatedMtgPayments.SingleDate(m_CalculatedMtgPayments.GetDate(MtgFlwIter)));
-				if (m_CalculatedMtgPayments.GetDate(MtgFlwIter) >= m_CalledPeriod) {
+				if (m_CalculatedMtgPayments.GetDate(MtgFlwIter) >= ActualCallDate) {
 					if (m_PoolValueAtCall.IsEmpty())
 						TotalPayable = m_CalculatedMtgPayments.GetWAPrice(MtgFlwIter);
 					else
 						TotalPayable = m_PoolValueAtCall.GetValue(m_CalculatedMtgPayments.GetDate(MtgFlwIter));
-					CheckMtgCashFlow.AddFlow(m_CalledPeriod,TotalPayable*m_CalculatedMtgPayments.GetAmountOut(MtgFlwIter),MtgCashFlow::MtgFlowType::PrincipalFlow);
+					CheckMtgCashFlow.AddFlow(ActualCallDate, TotalPayable*m_CalculatedMtgPayments.GetAmountOut(MtgFlwIter), MtgCashFlow::MtgFlowType::PrincipalFlow);
 					break;
 				}
 			}
@@ -1530,7 +1529,9 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		LOGDEBUG(QString("Final Test\t%1").arg(CheckResults,0,'f'));
 		if (qAbs(CheckResults) >= 1.0) {
 			PrintToTempFile("ReturnFalse.txt", QString("Cash Flows don't Match, Diff: %1").arg(CheckResults,0,'f'));
+#ifndef DebugLogging
 			return false;
+#endif // !DebugLogging
 		}
 		return true;
 }

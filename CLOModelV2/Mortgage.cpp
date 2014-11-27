@@ -264,7 +264,7 @@ void Mortgage::SetInterest(const QString& a){
 		 m_CashFlows.AddFlow(CurrentMonth, CurrentAmtOut*m_PrepayMultiplier.GetValue(CurrentMonth), MtgCashFlow::MtgFlowType::WAPrepayMult);
 		 m_CashFlows.AddFlow(CurrentMonth, CurrentAmtOut*m_LossMultiplier.GetValue(CurrentMonth), MtgCashFlow::MtgFlowType::WALossMult);
 		 m_CashFlows.AddFlow(CurrentMonth, CurrentAmtOut*PrepaymentFee.GetValue(CurrentMonth), MtgCashFlow::MtgFlowType::WAPrepayFees);
-		 m_CashFlows.AddFlow(CurrentMonth, CurrentAmtOut*static_cast<double>(MonthDiff(AdjMaturityDate, AdjStartDate)) / 12.0, MtgCashFlow::MtgFlowType::WALlevel);
+		 m_CashFlows.AddFlow(CurrentMonth, CurrentAmtOut*static_cast<double>(MonthDiff(AdjMaturityDate, CurrentMonth)) / 12.0, MtgCashFlow::MtgFlowType::WALlevel);
 		 if (CurrentAmtOut < 0.01) break;
 	 }
 	 for (QDate CurrentMonth = AdjMaturityDate.addMonths(1); CurrentMonth <= m_CashFlows.MaturityDate(); CurrentMonth = CurrentMonth.addMonths(1)) {

@@ -34,9 +34,9 @@ int main(int argc, char *argv[]) {
 	b.LoadStress("C:/Temp/StressResult.fcsr");
 	return a.exec();*/
 
-	/*Waterfall TempWtf, TempCallWaterfall;
-	QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/BaseCase.clo");
-	//QFile file("C:/Temp/.SavedInputs.clo");
+	Waterfall TempWtf, TempCallWaterfall;
+	//QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/BaseCase.clo");
+	QFile file("C:/Temp/.SavedInputs.clo");
 	file.open(QIODevice::ReadOnly);
 	qint32 VersionChecker;
 	QDataStream out(&file);
@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
 	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempCallWaterfall;
 	file.close();
-	TempWtf.CalculateTranchesCashFlows();*/
+	TempCallWaterfall.CalculateTranchesCashFlows();
 
 	/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	QApplication a(argc, argv);
@@ -117,7 +117,7 @@ int main(int argc, char *argv[]) {
 	return a.exec();*/
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*//
 
-	Mortgage TempMtg1;
+	/*Mortgage TempMtg1;
 	TempMtg1.SetProperty("PrepaymentFee", "5");
 	TempMtg1.SetAnnuity("I");
 	TempMtg1.SetInterest("5");
@@ -233,5 +233,6 @@ int main(int argc, char *argv[]) {
 		if (file3.exists()) file3.remove();
 		QApplication a(argc, argv);
 		QMessageBox::information(0, "Success", "Cash Flows are identical");
-	}
+	}*/
+return 0;
 }

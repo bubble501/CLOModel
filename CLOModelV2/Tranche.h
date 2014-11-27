@@ -102,7 +102,7 @@ public:
 	bool GetUseForwardCurve() const { return m_UseForwardCurve; }
 	void CompileReferenceRateValue(ConstantBaseRateTable& Values)const;
 	void CompileReferenceRateValue(ForwardBaseRateTable& Values)const;
-	bool HasCoupon(qint32 CoupIdx) const { return InterestType.contains(CoupIdx) && Coupon.contains(CoupIdx) && ReferenceRate.contains(CoupIdx); }
+	bool HasCoupon(qint32 CoupIdx) const;
 #ifndef NO_DATABASE
 	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll = false)const;
 	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll = false)const;

@@ -5,6 +5,8 @@
 #include "BackwardCompatibilityInterface.h"
 #include <QDataStream>
 #include <QMetaType>
+#include <QMutex>
+#define VectorAnchorDateFormat "(\\d{1,2})/(\\d{1,2})/(\\d{4})"
 class AbstractBbgVect : public BackwardInterface
 {
 protected:

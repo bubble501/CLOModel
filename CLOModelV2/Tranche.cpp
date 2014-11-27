@@ -380,15 +380,15 @@ double Tranche::GetDiscountMargin(double NewPrice)const{
 		FlowsDates.append(TempDate);
 		FlowsValues.append(CashFlow.GetTotalFlow(i));
 	}
-	const BloombergVector* ApplicableRate = ReferenceRateValue.value(0, ReferenceRateValue.value(-1, NULL));
+	const BloombergVector* ApplicableRate = ReferenceRateValue.value(0, ReferenceRateValue.value(-1, nullptr));
 	if (!ApplicableRate) {
 		DownloadBaseRates();
-		ApplicableRate = ReferenceRateValue.value(0, ReferenceRateValue.value(-1, NULL));
+		ApplicableRate = ReferenceRateValue.value(0, ReferenceRateValue.value(-1, nullptr));
 		if (!ApplicableRate) return 0.0;
 	}
 	if (ApplicableRate->IsEmpty()) {
 		DownloadBaseRates();
-		ApplicableRate = ReferenceRateValue.value(0, ReferenceRateValue.value(-1, NULL));
+		ApplicableRate = ReferenceRateValue.value(0, ReferenceRateValue.value(-1, nullptr));
 		if (ApplicableRate->IsEmpty()) return 0.0;
 	}
 	return qMax(0.0, CalculateDM(FlowsDates, FlowsValues, *ApplicableRate, m_DayCount));

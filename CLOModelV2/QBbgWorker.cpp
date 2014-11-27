@@ -226,7 +226,7 @@ void QBbgWorker::handleResponseEvent(const BloombergLP::blpapi::Event& event) {
 												}
 												DataRowRecieved(message.correlationId().asInteger(), *SingleReq, CurrentRow, CurrentHead);
 											}
-											if (DataRecieved(message.correlationId().asInteger(), *SingleReq)) return;
+											if (DataRecieved(message.correlationId().asInteger(), *SingleReq, FoundRequ->GetField())) return;
 										}
 									}
 									else {
@@ -278,7 +278,10 @@ bool QBbgWorker::DataRecieved(qint64 GroupID, qint64 RequestID, const QString& V
 	return DataRecieved(GroupID, RequestID);
 }
 
-bool QBbgWorker::DataRecieved(qint64 GroupID, qint64 RequestID) {
+bool QBbgWorker::DataRecieved(qint64 GroupID, qint64 RequestID, const QString& Header) {
+	if (!Header.isEmpty() && m_Results.contains(RequestID)) {
+		m_Results[RequestID]->SetHeader(Header);
+	}
 	if (!m_UseSyncronous) {
 		emit QRecieved(RequestID);
 		emit QUpdateProgress(100 * m_Results.size() / m_Requests.NumRequests());

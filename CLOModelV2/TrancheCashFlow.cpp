@@ -7,6 +7,7 @@
 #include <QSqlQuery>
 #include <QSettings>
 #include <QVariant>
+#include "QSingleBbgResult.h"
 #endif
 TrancheCashFlow::TrancheCashFlow(double ThrancheOutstanding)
 	:OutstandingAmt(ThrancheOutstanding)
@@ -161,6 +162,20 @@ bool TrancheCashFlow::GetCashFlowsDatabase(const QString& TrancheID) {
 	return false;
 }
 #endif
+#ifndef NO_BLOOMBERG
+bool TrancheCashFlow::GetCashFlowsBloomberg(const QBloombergLib::QSingleBbgResult& a) {
+	if (a.GetHeader() != "MTG_CASH_FLOW" || a.HasErrors() || a.GetNumRows() == 0) return false;
+	for (int i = 0; i < a.GetNumRows(); ++i) {
+		const QDate CurrentDate = a.GetTableResult(i, 1)->GetDate();
+		AddFlow(CurrentDate, a.GetTableResult(i, 3)->GetDouble(), TrancheFlowType::InterestFlow);
+		AddFlow(CurrentDate, a.GetTableResult(i, 4)->GetDouble(), TrancheFlowType::PrincipalFlow);
+		if (i == 0) {
+			OutstandingAmt = a.GetTableResult(0, 4)->GetDouble() + a.GetTableResult(0, 5)->GetDouble();
+		}
+	}
+	return true;
+}
+#endif
 TrancheCashFlow TrancheCashFlow::ScaledCashFlows(double NewSize, double OldSize) const {
 	TrancheCashFlow Result;
 	Result.SetInitialOutstanding(OutstandingAmt * NewSize/OldSize);
@@ -204,4 +219,5 @@ double TrancheCashFlow::GetDeferred(const QDate& a) const {
 	}
 	return Result;
 }
+
 

@@ -4,6 +4,9 @@
 #include <QList>
 #include <QDate>
 #define MaximumInterestsTypes 8
+#ifndef NO_BLOOMBERG
+namespace QBloombergLib {class QSingleBbgResult;}
+#endif
 class TrancheCashFlow : public GenericCashFlow {
 private:
 	double OutstandingAmt;
@@ -56,6 +59,9 @@ public:
 	void SetStartingDeferredInterest(const double& val) { StartingDeferredInterest = val; }
 #ifndef NO_DATABASE
 	virtual bool GetCashFlowsDatabase(const QString& TrancheID);
+#endif
+#ifndef NO_BLOOMBERG
+	virtual bool GetCashFlowsBloomberg(const QBloombergLib::QSingleBbgResult& a);
 #endif
 	virtual TrancheCashFlow ScaledCashFlows(double NewSize, double OldSize)const;
 	virtual TrancheCashFlow ScaledCashFlows(double NewSize) const { return ScaledCashFlows(NewSize, OutstandingAmt); }

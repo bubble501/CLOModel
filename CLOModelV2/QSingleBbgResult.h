@@ -62,6 +62,7 @@ namespace QBloombergLib {
 	protected:
 		void Clear();
 		void SetValue(const QString& val, const QString& Header = QString());
+		void SetHeader(const QString& Header = QString());
 		void AddValueRow(const QList<QString>& val, const QList<QString>& Headers = QList<QString>());
 		void SetErrorCode(BbgErrorCodes ErrCd);
 		friend class QBbgWorker;

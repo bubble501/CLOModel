@@ -54,7 +54,7 @@ namespace QBloombergLib {
 		bool SetError(qint64 GroupID, qint64 RequestID, QSingleBbgResult::BbgErrorCodes Err);
 		void Send();
 		bool DataRecieved(qint64 GroupID, qint64 RequestID, const QString& Value, const QString& Header);
-		bool DataRecieved(qint64 GroupID, qint64 RequestID);
+		bool DataRecieved(qint64 GroupID, qint64 RequestID, const QString& Header=QString());
 		void DataRowRecieved(qint64 GroupID, qint64 RequestID, const QList<QString>&  Value, const QList<QString>&  Header);
 		void EndOfProcess();
 #endif

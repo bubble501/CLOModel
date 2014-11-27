@@ -14,7 +14,6 @@ void QBbgWorker::SetServerAddress(const QString& val) {
 QBbgWorker::QBbgWorker(QObject* parent)
 	: ServerAddress("localhost")
 	, ServerPort(8194)
-	, session(NULL)
 	, m_SessionFinished(false)
 	, m_UseSyncronous(false)
 	, QObject(parent)
@@ -37,7 +36,7 @@ void QBbgWorker::RunRequest() {
 	sessionOptions.setServerPort(ServerPort);
 	sessionOptions.setMaxPendingRequests(INT_MAX - 2);
 	if (m_UseSyncronous) {
-		session= new Session(sessionOptions);
+		session.reset(new Session(sessionOptions));
 		if (!session->start()) {
 			SetGlobalError(QSingleBbgResult::SessionError);
 			return;
@@ -49,7 +48,7 @@ void QBbgWorker::RunRequest() {
 		Send();
 	}
 	else {
-		session= new Session(sessionOptions, this);
+		session.reset(new Session(sessionOptions, this));
 		if (!session->startAsync()) {
 			SetGlobalError(QSingleBbgResult::SessionError);
 			return;
@@ -166,7 +165,7 @@ void QBbgWorker::handleResponseEvent(const BloombergLP::blpapi::Event& event) {
 	qint32 NumVals, NumFieldExep;
 	while (iter.next()) {
 		Message message = iter.message();
-		const QList<qint64>* CurrentGroup = Groups.value(message.correlationId().asInteger(), NULL);
+		const QList<qint64>* CurrentGroup = Groups.value(message.correlationId().asInteger(), nullptr);
 		if (CurrentGroup) {
 			if (message.hasElement("responseError")) {
 				for (QList<qint64>::const_iterator SingleReq = CurrentGroup->constBegin(); SingleReq != CurrentGroup->constEnd(); SingleReq++) {
@@ -308,14 +307,13 @@ void QBbgWorker::DataRowRecieved(qint64 GroupID, qint64 RequestID, const QList<Q
 	else {
 		TempIter.value()->AddValueRow(Value, Header);
 	}
-	DataRecieved(GroupID, RequestID);
+	//DataRecieved(GroupID, RequestID);
 }
 
 void QBbgWorker::EndOfProcess() {
 	if (!session) return;
 	m_SessionFinished = false;
-	delete session;
-	session=NULL;
+	session.reset();
 	if (m_UseSyncronous && (m_Requests.GetErrorCode() & static_cast<qint32>(QSingleBbgResult::SessionStopped))) {
 		emit QStopped();
 	}
@@ -332,7 +330,6 @@ void QBbgWorker::StopRequest() {
 QBbgWorker::~QBbgWorker() {
 	if (session) {
 		session->stop();
-		delete session;
 	}
 	while (!m_Results.empty()) {
 		delete (m_Results.begin().value());
@@ -370,7 +367,7 @@ void QBbgWorker::StartRequestSync(const QBbgRequest& a) {
 }
 
 const QSingleBbgResult* QBbgWorker::GetResult(qint64 ID) const {
-	return m_Results.value(ID, NULL);
+	return m_Results.value(ID, nullptr);
 }
 
 const QBbgRequest& QBbgWorker::GetRequest() const {

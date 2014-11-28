@@ -313,6 +313,15 @@
     <ClCompile Include="DelinquencyTrigger.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_WaterfallStepHelperDialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_WaterfallStepHelperDialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="WaterfallStepHelperDialog.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Resources.qrc">
@@ -460,6 +469,9 @@
       <Filter>Header Files\Core</Filter>
     </CustomBuild>
     <CustomBuild Include="PhasedProgressWidget.h">
+      <Filter>Header Files\Core</Filter>
+    </CustomBuild>
+    <CustomBuild Include="WaterfallStepHelperDialog.h">
       <Filter>Header Files\Core</Filter>
     </CustomBuild>
   </ItemGroup>

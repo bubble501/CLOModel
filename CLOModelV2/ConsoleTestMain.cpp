@@ -22,10 +22,14 @@
 #include "PoolSizeTrigger.h"
 #include "StressViewer.h"
 #include "SummaryView.h"
+#include "WaterfallStepHelperDialog.h"
 int main(int argc, char *argv[]) {
-	/*QApplication a(argc, argv);
-	ConsoleTestObj b;
-	return a.exec();*/
+	QApplication a(argc, argv);
+	WaterfallStepHelperDialog b;
+	if (b.exec()==QDialog::Accepted) {
+		qDebug() << b.GetParameters();
+	}
+	return a.exec();
 
 
 	/*QApplication a(argc, argv);
@@ -235,13 +239,5 @@ int main(int argc, char *argv[]) {
 		QMessageBox::information(0, "Success", "Cash Flows are identical");
 	}*/
 
-QApplication a(argc, argv);
-QBloombergLib::QBbgRequest TestReq;
-TestReq.AddRequest(1,"TMSE 1 A", "MTG_CASH_FLOW");
-QBloombergLib::QBbgWorker TestWork;
-TestWork.StartRequestSync(TestReq);
-TrancheCashFlow TempFlow;
-TempFlow.GetCashFlowsBloomberg(*(TestWork.GetResult(1)));
-PrintToTempFile("TextCashFlowsXML", TempFlow.ToXML(), false);
-return 0;
+
 }

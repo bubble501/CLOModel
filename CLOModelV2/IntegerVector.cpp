@@ -72,6 +72,9 @@ void IntegerVector::UnpackVector() {
 bool IntegerVector::IsValid() const {
 	return AbstractBbgVect::IsValid("-?\\d+", true);
 }
+QRegExpValidator* IntegerVector::GetValidator(QObject* parent) const {
+	return AbstractBbgVect::GetValidator("-?\\d+", true, parent);
+}
 int IntegerVector::GetValue(const QDate& index)const {
 	return GetValueTemplate(m_VectVal, index, 0) + m_Shift;
 }

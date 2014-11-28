@@ -37,7 +37,14 @@ bool AbstractBbgVect::IsValid(const QString& ValidInputs, bool AllowRamps) const
 	QRegExp Vigil(PatternString, Qt::CaseInsensitive);
 	return (Vigil.exactMatch(m_Vector.trimmed()) && ValidAnchorDate()) || m_Vector.isEmpty();
 }
-
+QRegExpValidator* AbstractBbgVect::GetValidator(const QString& ValidInputs, bool AllowRamps, QObject* parent) const {
+	QString PatternString = QString("(^$|^(A\\s+") + VectorAnchorDateFormat + "\\s+){0,1}" + ValidInputs + "(\\s+[1-9][0-9]*";
+	if (AllowRamps) PatternString += "[RS]";
+	else PatternString += 'S';
+	PatternString += "\\s+" + ValidInputs + ")*$)";
+	QRegExp ValidReg(PatternString,Qt::CaseInsensitive);
+	return new QRegExpValidator(ValidReg, parent);
+}
 bool AbstractBbgVect::ExtractAnchorDate() {
 	QString TempVec(m_Vector.trimmed().toUpper());
 	QRegExp AnchorCheck(QString("^A\\s+") + VectorAnchorDateFormat + "\\s+(.+)", Qt::CaseInsensitive);
@@ -56,3 +63,7 @@ void AbstractBbgVect::Clear() {
 	m_Vector = "";
 	UnpackVector();
 }
+
+
+
+

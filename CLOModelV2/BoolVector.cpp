@@ -50,7 +50,9 @@ void BoolVector::UnpackVector(){
 bool BoolVector::IsValid() const{
 	return AbstractBbgVect::IsValid("[TFNY]", false);
 }
-
+QRegExpValidator* BoolVector::GetValidator(QObject* parent) const {
+	return AbstractBbgVect::GetValidator("[TFNY]", false, parent);
+}
 bool BoolVector::GetValue(const QDate& index)const{
 	return GetValueTemplate(m_VectVal, index, false);
 }

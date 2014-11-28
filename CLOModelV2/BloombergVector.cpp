@@ -238,6 +238,9 @@ void BloombergVector::UnpackVector(){
 bool BloombergVector::IsValid() const{
 	return AbstractBbgVect::IsValid("-?\\d*\\.?\\d+",true);
 }
+QRegExpValidator* BloombergVector::GetValidator(QObject* parent) const {
+	return AbstractBbgVect::GetValidator("-?\\d*\\.?\\d+", true, parent);
+}
 double BloombergVector::GetValue(const QDate& index,int Frequency)const{
 	if (Frequency<1) return 0.0;
 	double Result = GetValueTemplate(m_VectVal, index, 0.0);

@@ -45,7 +45,10 @@ BaseRateVector::BaseRateVector(const QString& Vec,const QDate& Anchor)
 	
 }
 bool BaseRateVector::IsValid() const{
-	return AbstractBbgVect::IsValid("\\S+", true);
+	return AbstractBbgVect::IsValid("\\S+", false);
+}
+QRegExpValidator* BaseRateVector::GetValidator(QObject* parent) const {
+	return AbstractBbgVect::GetValidator("\\S+", false, parent);
 }
 void BaseRateVector::UnpackVector(){
 	m_VectVal.clear();
@@ -288,5 +291,7 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ForwardBaseRateTable& Refer
 	}
 	return BloombergVector();
 }
+
+
 
 #endif

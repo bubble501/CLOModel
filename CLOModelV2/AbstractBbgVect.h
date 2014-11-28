@@ -5,7 +5,8 @@
 #include "BackwardCompatibilityInterface.h"
 #include <QDataStream>
 #include <QMetaType>
-#include <QMutex>
+#include <QRegExpValidator>
+class QObject;
 #define VectorAnchorDateFormat "(\\d{1,2})/(\\d{1,2})/(\\d{4})"
 class AbstractBbgVect : public BackwardInterface
 {
@@ -14,6 +15,7 @@ protected:
 	QDate m_AnchorDate;
 	virtual bool IsValid() const =0;
 	virtual bool IsValid(const QString& ValidInputs, bool AllowRamps) const;
+	virtual QRegExpValidator* GetValidator(const QString& ValidInputs, bool AllowRamps, QObject* parent=0) const;
 	virtual void UnpackVector() = 0;
 	virtual bool ValidAnchorDate() const;
 	virtual bool ExtractAnchorDate();
@@ -34,6 +36,7 @@ protected:
 		return VecVal.at(qMin(index, VecVal.size() - 1));
 	}
 public:
+	virtual QRegExpValidator* GetValidator(QObject* parent = 0) const =0;
 	virtual void Clear();
 	virtual bool SetVector(const QString& Vec);
 	AbstractBbgVect(){}
@@ -44,6 +47,7 @@ public:
 	virtual const QDate& GetAnchorDate() const{return m_AnchorDate;}
 	AbstractBbgVect& operator=(const QString& a){SetVector(a); return *this;}
 	virtual bool IsEmpty() const{return m_Vector.isEmpty();}
+	
 };
 
 

@@ -20,6 +20,7 @@ public:
 	BaseRateVector(const BaseRateVector& Vec);
 	BaseRateVector(const QString& Vec,const QDate& Anchor);
 	BaseRateVector& operator=(const BaseRateVector& Vec);
+	virtual QRegExpValidator* GetValidator(QObject* parent = 0) const override;
 	int NumElements() const {return m_VectVal.size();}
 	QString GetValue(const QDate& index) const;
 	QString GetValue(int index) const;

@@ -53,9 +53,19 @@ bool RepaymentVector::IsValid() const {
 		PossibleRatesPattern += TempPart;
 	}
 	PossibleRatesPattern += ']';
-	return AbstractBbgVect::IsValid(PossibleRatesPattern, true);
+	return AbstractBbgVect::IsValid(PossibleRatesPattern, false);
 }
-
+QRegExpValidator* RepaymentVector::GetValidator(QObject* parent) const {
+	QString PossibleRatesPattern = "[YNP";
+	QString TempPart;
+	for (int i = 1; true; i <<= 1) {
+		TempPart = RepaymentMethodsToString(i);
+		if (TempPart.isEmpty()) break;
+		PossibleRatesPattern += TempPart;
+	}
+	PossibleRatesPattern += ']';
+	return AbstractBbgVect::GetValidator(PossibleRatesPattern, false, parent);
+}
 RepaymentVector::RepaymentMethods RepaymentVector::GetValue(const QDate& index)const {
 	return GetValueTemplate(m_VectVal, index, RepaymentMethods::Invalid);
 }

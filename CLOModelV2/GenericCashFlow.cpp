@@ -284,6 +284,15 @@ bool GenericCashFlow::HasFlowType(qint32 FlowTpe) const {
 }
 
 QList<qint32> GenericCashFlow::AvailableFlows(const QDate& a) const {
+	if (a.isNull()) {
+		QSet<qint32> Result;
+		for (auto i = m_CashFlows.constBegin(); i != m_CashFlows.constEnd(); ++i) {
+			for (auto j = i.value()->constBegin(); j != i.value()->constEnd(); ++j) {
+				Result.insert(j.key());
+			}
+		}
+		return Result.toList();
+	}
 	QMap<QDate, QHash<qint32, double>*	>::const_iterator TempIter = m_CashFlows.find(a);
 	if (TempIter == m_CashFlows.constEnd()) return QList<qint32>();
 	return TempIter.value()->keys();
@@ -362,4 +371,39 @@ GenericCashFlow GenericCashFlow::ScaledCashFlows(double OriginalRefSize, double 
 		}
 	}
 	return Result;
+}
+
+QString GenericCashFlow::ToPlainText(bool UseHeaders /*= true*/) const {
+	QString Result;
+	const auto AllFlows = AvailableFlows();
+	for (auto j = AllFlows.constBegin(); j != AllFlows.constEnd(); ++j) {
+		if (j != AllFlows.constBegin()) Result += '\t';
+		if (UseHeaders) Result += m_CashFlowLabels.value(*j, QString("Flow %1").arg(*j));
+		else  Result += QString("%1").arg(*j);
+	}
+	for (auto i = m_CashFlows.constBegin(); i != m_CashFlows.constEnd(); ++i) {
+		Result += '\n' + i.key().toString("yyyy-MM-dd");
+		for (auto j = AllFlows.constBegin(); j != AllFlows.constEnd(); ++j) {
+			Result += '\t' + QString::number(i.value()->value(*j, 0.0), 'f');
+		}
+	}
+	return Result;
+}
+
+QString GenericCashFlow::ToXML() const {
+	QString Result="<CashFlow>";
+	const auto AllFlows = AvailableFlows();
+	for (auto j = AllFlows.constBegin(); j != AllFlows.constEnd(); ++j) {
+		Result += QString("<Flow id='%1'>").arg(*j);
+		if (m_CashFlowLabels.contains(*j)) Result += "<Label>" + ConvertValidXML(m_CashFlowLabels.value(*j)) + "</Label>";
+		else Result += "<Label />";
+		for (auto i = m_CashFlows.constBegin(); i != m_CashFlows.constEnd(); ++i) {
+			Result += "<SingleFlow>";
+			Result += "<Date>" + i.key().toString("yyyy-MM-dd") + "</Date>";
+			Result += "<Amount>" + QString::number(i.value()->value(*j,0.0),'f',2) + "</Amount>";
+			Result += "</SingleFlow>";
+		}
+		Result += "</Flow>";
+	}
+	return Result + "</CashFlow>";
 }

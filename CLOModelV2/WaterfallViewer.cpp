@@ -356,6 +356,8 @@ void WaterfallViewer::AddStep(const WatFalPrior& a){
 	}
 	if (a.HasParameter(WatFalPrior::wstParameters::Trigger)) {
 		QString TriggerString = a.GetParameter(WatFalPrior::wstParameters::Trigger).toString();
+		TriggerString.replace("!0*0", "FALSE");
+		TriggerString.replace("!0*0", "TRUE");
 		TriggerString.replace("*", " AND ");
 		TriggerString.replace("+", " OR ");
 		TriggerString.replace("/", " NAND ");

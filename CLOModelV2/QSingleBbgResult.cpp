@@ -5,9 +5,9 @@ using namespace QBloombergLib;
 QSingleBbgResult::QSingleBbgResult()
 	: m_ErrorCode(NoErrors)
 	, TableResultCols(0) {
-	m_StringValue=NULL;
-	m_DateValue=NULL;
-	m_DoubleValue=NULL;
+	m_StringValue=nullptr;
+	m_DateValue = nullptr;
+	m_DoubleValue = nullptr;
 }
 qint32 QSingleBbgResult::GetErrorCode() const { return m_ErrorCode; }
 bool QSingleBbgResult::HasErrors() const { return m_ErrorCode != NoErrors; }
@@ -73,9 +73,9 @@ void QSingleBbgResult::Clear() {
 		delete[] m_TableResultRows.takeFirst();
 	}
 
-	m_StringValue=NULL;
-	m_DateValue = NULL;
-	m_DoubleValue = NULL;
+	m_StringValue = nullptr;
+	m_DateValue = nullptr;
+	m_DoubleValue = nullptr;
 	TableResultCols = 0;
 	m_Header = "";
 	m_ErrorCode = NoErrors;
@@ -114,7 +114,7 @@ void QSingleBbgResult::AddValueRow(const QList<QString>&  val, const QList<QStri
 
 const QSingleBbgResult* QSingleBbgResult::GetTableResult(quint32 r, quint32 c) const {
 	if (r >= m_TableResultRows.size() || c >= TableResultCols)
-		return NULL;
+		return nullptr;
 	QSingleBbgResult* const & TempRow = m_TableResultRows.at(r);
 	return TempRow+c;
 
@@ -153,15 +153,15 @@ bool QSingleBbgResult::HasTable() const {
 }
 
 bool QSingleBbgResult::HasDouble() const {
-	return m_DoubleValue != NULL;
+	return !m_DoubleValue;
 }
 
 bool QSingleBbgResult::HasDate() const {
-	return m_DateValue != NULL;
+	return !m_DateValue;
 }
 
 bool QSingleBbgResult::HasString() const {
-	return m_StringValue != NULL;
+	return !m_StringValue;
 }
 
 bool QSingleBbgResult::IsEmpty() const {
@@ -233,6 +233,10 @@ QDataStream& QSingleBbgResult::LoadOldVersion(QDataStream& stream) {
 		m_TableResultRows.append(TempRes);
 	}
 	return stream;
+}
+
+void QBloombergLib::QSingleBbgResult::SetHeader(const QString& Header /*= QString()*/) {
+	m_Header = Header;
 }
 
 

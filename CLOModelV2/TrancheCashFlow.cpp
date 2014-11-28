@@ -1,12 +1,14 @@
 #include "TrancheCashFlow.h"
 #include <QMap>
 #include <QDataStream>
+#include "MtgCashFlow.h"
 #ifndef NO_DATABASE
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QSettings>
 #include <QVariant>
+#include "QSingleBbgResult.h"
 #endif
 TrancheCashFlow::TrancheCashFlow(double ThrancheOutstanding)
 	:OutstandingAmt(ThrancheOutstanding)
@@ -161,6 +163,28 @@ bool TrancheCashFlow::GetCashFlowsDatabase(const QString& TrancheID) {
 	return false;
 }
 #endif
+#ifndef NO_BLOOMBERG
+bool TrancheCashFlow::GetCashFlowsBloomberg(const QBloombergLib::QSingleBbgResult& a) {
+	if (
+		(
+			a.GetHeader() != "MTG_CASH_FLOW" 
+			&&  a.GetHeader() != "EXTENDED_CASH_FLOW"
+			&&  a.GetHeader() != "HIST_CASH_FLOW"
+		)
+		|| a.HasErrors()
+		|| a.GetNumRows() == 0
+	) return false;
+	for (int i = 0; i < a.GetNumRows(); ++i) {
+		const QDate CurrentDate = a.GetTableResult(i, 1)->GetDate();
+		AddFlow(CurrentDate, a.GetTableResult(i, 3)->GetDouble(), TrancheFlowType::InterestFlow);
+		AddFlow(CurrentDate, a.GetTableResult(i, 4)->GetDouble(), TrancheFlowType::PrincipalFlow);
+		if (i == 0) {
+			OutstandingAmt = a.GetTableResult(0, 4)->GetDouble() + a.GetTableResult(0, 5)->GetDouble();
+		}
+	}
+	return true;
+}
+#endif
 TrancheCashFlow TrancheCashFlow::ScaledCashFlows(double NewSize, double OldSize) const {
 	TrancheCashFlow Result;
 	Result.SetInitialOutstanding(OutstandingAmt * NewSize/OldSize);
@@ -204,4 +228,23 @@ double TrancheCashFlow::GetDeferred(const QDate& a) const {
 	}
 	return Result;
 }
+
+QString TrancheCashFlow::ToXML() const {
+	GenericCashFlow NewFlow(*this);
+	NewFlow.SetLabel(static_cast<qint32>(MtgCashFlow::MtgFlowType::AmountOutstandingFlow), "Outstanding");
+	for (auto i = m_CashFlows.constBegin(); i != m_CashFlows.constEnd(); ++i) {
+		NewFlow.AddFlow(i.key(), GetAmountOutstanding(i.key()), static_cast<qint32>(MtgCashFlow::MtgFlowType::AmountOutstandingFlow));
+	}
+	return NewFlow.ToXML();
+}
+
+QString TrancheCashFlow::ToPlainText(bool UseHeaders /*= true*/) const {
+	GenericCashFlow NewFlow(*this);
+	NewFlow.SetLabel(static_cast<qint32>(MtgCashFlow::MtgFlowType::AmountOutstandingFlow), "Outstanding");
+	for (auto i = m_CashFlows.constBegin(); i != m_CashFlows.constEnd(); ++i) {
+		NewFlow.AddFlow(i.key(), GetAmountOutstanding(i.key()), static_cast<qint32>(MtgCashFlow::MtgFlowType::AmountOutstandingFlow));
+	}
+	return NewFlow.ToPlainText(UseHeaders);
+}
+
 

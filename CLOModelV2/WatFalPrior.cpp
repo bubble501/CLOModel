@@ -203,8 +203,10 @@ void WatFalPrior::SetParameter(qint32 ParameterType, const QString& val) {
 		TriggerStruc.replace("not", "!");
 		TriggerStruc.replace("^", "!");
 		TriggerStruc.replace(QRegExp("&?&"), "*");
-		TriggerStruc.replace(QRegExp("|?|"), "*");
+		TriggerStruc.replace(QRegExp("|?|"), "+");
 		TriggerStruc.replace(QRegExp("\\s"), "");
+		TriggerStruc.replace("FALSE", "!0*0",Qt::CaseInsensitive);
+		TriggerStruc.replace("TRUE", "!0+0", Qt::CaseInsensitive);
 	break;
 	case wstParameters::SeniorityGroupLevel:
 	case wstParameters::RedemptionGroupLevel:

@@ -37,8 +37,7 @@ public:
 	};
 	virtual MtgCashFlow ApplyScenario(BloombergVector CPRv, BloombergVector CDRv, BloombergVector LSv) const;
 	virtual MtgCashFlow ApplyScenario(const QString& CPRv, const QString& CDRv, const QString& LSv) const { return ApplyScenario(BloombergVector(CPRv), BloombergVector(CDRv), BloombergVector(LSv)); }
-	void FillWAL();
-	double GetWAL(int index) const { return  GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::WALlevel)); }
+	double GetWAL(int index) const;
 	double GetInterest(int index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::InterestFlow)); }
 	double GetScheduled(int index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::PrincipalFlow)); }
 	double GetPrepay(int index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::PrepaymentFlow)); }
@@ -59,7 +58,7 @@ public:
 	double GetRecoveries(int index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::PrincipalRecovered)); }
 	double GetInterestRecoveries(int index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::InterestRecovered)); }
 	double GetOutstandingForOC(int index) const;
-	double GetWAL(const QDate& index) const{ return  GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::WALlevel)); }
+	double GetWAL(const QDate& index) const;
 	double GetInterest(const QDate& index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::InterestFlow)); }
 	double GetScheduled(const QDate& index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::PrincipalFlow)); }
 	double GetPrepay(const QDate& index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::PrepaymentFlow)); }

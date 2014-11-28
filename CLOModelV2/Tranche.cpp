@@ -380,15 +380,15 @@ double Tranche::GetDiscountMargin(double NewPrice)const{
 		FlowsDates.append(TempDate);
 		FlowsValues.append(CashFlow.GetTotalFlow(i));
 	}
-	const BloombergVector* ApplicableRate = ReferenceRateValue.value(0, ReferenceRateValue.value(-1, NULL));
+	const BloombergVector* ApplicableRate = ReferenceRateValue.value(0, ReferenceRateValue.value(-1, nullptr));
 	if (!ApplicableRate) {
 		DownloadBaseRates();
-		ApplicableRate = ReferenceRateValue.value(0, ReferenceRateValue.value(-1, NULL));
+		ApplicableRate = ReferenceRateValue.value(0, ReferenceRateValue.value(-1, nullptr));
 		if (!ApplicableRate) return 0.0;
 	}
 	if (ApplicableRate->IsEmpty()) {
 		DownloadBaseRates();
-		ApplicableRate = ReferenceRateValue.value(0, ReferenceRateValue.value(-1, NULL));
+		ApplicableRate = ReferenceRateValue.value(0, ReferenceRateValue.value(-1, nullptr));
 		if (ApplicableRate->IsEmpty()) return 0.0;
 	}
 	return qMax(0.0, CalculateDM(FlowsDates, FlowsValues, *ApplicableRate, m_DayCount));
@@ -568,7 +568,7 @@ void Tranche::SetCoupon(const QString& a, qint32 CoupIndex ) {
 }
 void Tranche::SetReferenceRate(const QString& a, qint32 CoupIndex ) {
 	if (CoupIndex<0 || CoupIndex >= (1 << MaximumInterestsTypes)) return;
-	if (BaseRateVector(a).IsEmpty()) return;
+	if (BaseRateVector(a).IsEmpty() /*&& !a.isEmpty()*/) return;
 	if (ReferenceRate.contains(CoupIndex))
 		(*(ReferenceRate[CoupIndex])) = a;
 	else
@@ -596,6 +596,13 @@ bool Tranche::AdjHolidays(DayCountConvention a) {
 		|| a == DayCountConvention::AFBACTACT
 		|| a == DayCountConvention::ISDAACTACT
 		;
+}
+
+bool Tranche::HasCoupon(qint32 CoupIdx) const {
+	return 
+		InterestType.contains(CoupIdx)
+		&& Coupon.contains(CoupIdx)
+		&& ((InterestType.value(CoupIdx) == TrancheInterestType::FloatingInterest) ? ReferenceRate.contains(CoupIdx):true);
 }
 
 

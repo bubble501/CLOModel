@@ -44,6 +44,15 @@ double MtgCashFlow::GetWAPrepayFees(const QDate& index) const {
 	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0.0) return 0.0;
 	return GetFlow(index, MtgFlowType::WAPrepayFees) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
 }
+double MtgCashFlow::GetWAL(int index) const {
+	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0.0) return 0.0;
+	return GetFlow(index, MtgFlowType::WALlevel) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
+}
+double MtgCashFlow::GetWAL(const QDate& index) const {
+	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0.0) return 0.0;
+	return GetFlow(index, MtgFlowType::WALlevel) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
+}
+
 
 /*
 QDataStream& operator<<(QDataStream & stream, const MtgCashFlow& flows) {
@@ -133,6 +142,7 @@ MtgCashFlow MtgCashFlow::ApplyScenario(BloombergVector CPRv, BloombergVector CDR
 			Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::WALossMult) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::WALossMult);
 			Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::WAPrice) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::WAPrice);
 			Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::WAPrepayFees) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::WAPrepayFees);
+			Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::WALlevel) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::WALlevel);
 		}
 	}
 	return Result;
@@ -178,13 +188,6 @@ double MtgCashFlow::GetTotalFlow(const QDate& a) const {
 	QList<qint32> FlowsType;
 	
 	return GenericCashFlow::GetTotalFlow(a, FlowsType);
-}
-
-void MtgCashFlow::FillWAL() {
-	RemoveFlow(static_cast<qint32>(MtgFlowType::WALlevel));
-	for (auto i = m_CashFlows.constBegin(); i != m_CashFlows.constEnd(); ++i) {
-		AddFlow(i.key(), CalculateWAL(i.key()), MtgFlowType::WALlevel);
-	}
 }
 double MtgCashFlow::CalculateWAL(const QDate& StartDate) const {
 	double RunningSum = 0.0, Result = 0.0, CurrentPrinc;

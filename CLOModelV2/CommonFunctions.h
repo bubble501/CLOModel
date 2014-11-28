@@ -3,8 +3,8 @@
 #include <QtGlobal>
 #include <QMetaType>
 #include <typeinfo>
+#include <QString>
 class QDate;
-class QString;
 class DayCountVector;
 class BloombergVector;
 template<typename T> class QList;
@@ -13,8 +13,8 @@ template<typename T> class QList;
 #define MaximumInterestsTypes 8
 #define MaximumIRRIterations 10000 //INT_MAX-1
 #define CompoundShift 10
-//#define USE_SOFT_COLOUR //Uses softer color in stress test table rather than pure RGB(255,0,0) style ones
-//#define SAVE_EXCEL_INPUTS
+#define USE_SOFT_COLOUR //Uses softer color in stress test table rather than pure RGB(255,0,0) style ones
+#define SAVE_EXCEL_INPUTS
 //#define SaveLoanTape
 //#define DebugLogging
 //#define PrintAggregatedMtgFlows
@@ -97,8 +97,7 @@ bool removeDir(const QString& dirName);
 double GetLoanAssumption(const QString& LoanName, int columnIndex, QDate RefDate);
 void PrintToTempFile(const QString& TempFileName, const QString& Message, bool PrintTime = true);
 bool ValidDayCount(qint16 a);
-
-
+QString ConvertValidXML(QString a);
 
 #endif // CommonFunctions_h__
 

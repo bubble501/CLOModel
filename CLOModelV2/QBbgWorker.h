@@ -7,6 +7,7 @@
 #include "QBbgRequest.h"
 #include <QObject>
 #include <QMap>
+#include <QScopedPointer>
 #ifdef QBBG_PRIVATE
 #include <blpapi_session.h>
 #endif
@@ -43,7 +44,7 @@ namespace QBloombergLib {
 		unsigned short ServerPort;
 		QBbgRequest m_Requests;
 		QMap<qint64, QSingleBbgResult* > m_Results;
-		BloombergLP::blpapi::Session* session;
+		QScopedPointer<BloombergLP::blpapi::Session> session;
 		bool m_SessionFinished;
 		bool m_UseSyncronous;
 		void RunRequest();
@@ -53,7 +54,7 @@ namespace QBloombergLib {
 		bool SetError(qint64 GroupID, qint64 RequestID, QSingleBbgResult::BbgErrorCodes Err);
 		void Send();
 		bool DataRecieved(qint64 GroupID, qint64 RequestID, const QString& Value, const QString& Header);
-		bool DataRecieved(qint64 GroupID, qint64 RequestID);
+		bool DataRecieved(qint64 GroupID, qint64 RequestID, const QString& Header=QString());
 		void DataRowRecieved(qint64 GroupID, qint64 RequestID, const QList<QString>&  Value, const QList<QString>&  Header);
 		void EndOfProcess();
 #endif

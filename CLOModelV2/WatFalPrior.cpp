@@ -33,7 +33,7 @@ QString WatFalPrior::ReadyToCalculate() const {
 	case WatFalPrior::WaterfallStepType::wst_SeniorExpenses:
 	case WatFalPrior::WaterfallStepType::wst_SeniorFees:
 	case WatFalPrior::WaterfallStepType::wst_juniorFees:
-		if (GetParameter(wstParameters::SourceOfFunding).value<IntegerVector>().IsEmpty(1,2)) Result += "Expenses and Fees Source of Funding Parameter\n";
+		if (GetParameter(wstParameters::SourceOfFunding).value<IntegerVector>().IsEmpty(1,2)) Result += "Expenses and Fees need a Source of Funding Parameter\n";
 	break;
 	case WatFalPrior::WaterfallStepType::wst_Interest:
 		if (GetParameter(wstParameters::SeniorityGroup).value<IntegerVector>().IsEmpty(1)) Result += "Interest needs a Seniority Group Parameter\n";
@@ -46,6 +46,7 @@ QString WatFalPrior::ReadyToCalculate() const {
 	break;
 	case WatFalPrior::WaterfallStepType::wst_ReinvestmentTest:
 	case WatFalPrior::WaterfallStepType::wst_OCTest:
+		if (GetParameter(wstParameters::SourceOfFunding).value<IntegerVector>().IsEmpty(1, 2)) Result += "OC Test needs a Source of Funding Parameter\n";
 		if (GetParameter(wstParameters::SeniorityGroup).value<IntegerVector>().IsEmpty(1)) Result += "OC Test needs a Seniority Group Parameter\n";
 		if (GetParameter(wstParameters::SeniorityGroupLevel).value<IntegerVector>().IsEmpty(0)) Result += "OC Test needs a Seniority Group Level Parameter\n";
 		if (HasParameter(wstParameters::RedemptionGroup)) {
@@ -66,6 +67,7 @@ QString WatFalPrior::ReadyToCalculate() const {
 		}
 		break;
 	case WatFalPrior::WaterfallStepType::wst_ICTest:
+		if (GetParameter(wstParameters::SourceOfFunding).value<IntegerVector>().IsEmpty(1, 2)) Result += "IC Test needs a Source of Funding Parameter\n";
 		if (GetParameter(wstParameters::SeniorityGroup).value<IntegerVector>().IsEmpty(1)) Result += "IC Test needs a Seniority Group Parameter\n";
 		if (GetParameter(wstParameters::SeniorityGroupLevel).value<IntegerVector>().IsEmpty(0)) Result += "IC Test needs a Seniority Group Level Parameter\n";
 		if (GetParameter(wstParameters::CouponIndex).value<IntegerVector>().IsEmpty(0)) Result += "IC Test needs a Coupon Index Parameter\n";

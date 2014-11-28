@@ -2,21 +2,21 @@
 #define WATERFALLSTEPHELPERDIALOG_H
 
 #include <QDialog>
-#include <QStringList>
+#include <QMap>
 class QComboBox;
 class QStackedWidget;
-#define NumwstParameters 12
+
 class WaterfallStepHelperDialog : public QDialog
 {
 	Q_OBJECT
 
 public:
 	WaterfallStepHelperDialog(QWidget *parent=0);
-	QStringList GetParameters() const;
+	QString GetParameters() const;
 private slots:
 	void CheckOkEnabled(int index);
-	void ClearParameters() { for (int i = 0; i < NumwstParameters; ++i) ResultingParameters[i].clear(); }
-	void SetParameter(int PrmIndex, QString value) { if (PrmIndex < 0 || PrmIndex >= NumwstParameters) return;  ResultingParameters[PrmIndex] = value; }
+	void ClearParameters() { ResultingParameters.clear(); }
+	void SetParameter(int PrmIndex, QString value) { ResultingParameters[PrmIndex] = value; }
 	void SetSeniorityGroup(QString value);
 	void SetSeniorityGroupLevel(QString value);
 	void SetRedemptionGroup(QString value);
@@ -30,13 +30,31 @@ private slots:
 	void SetReserveIndex(QString value);
 	void SetTrigger(QString value);
 	void SetDefaults1();
+	void SetDefaults100();
+	void SetDefaults0();
+	void SetbasedOnWaterfall(int index);
+	void ResetSoFCombo(int index);
+	void SoFComboChanged(int index);
 signals:
-	void SetDefaults(QString);
+	void SetTo1(QString);
+	void SetTo100(QString);
+	void SetTo0(QString);
+	void SetSoFCombo(int);
 private:
 	QWidget* CreateInterestWidget();
 	QWidget* CreatePrincipalWidget();
+	QWidget* CreateICWidget();
+	QWidget* CreateOCWidget();
+	QWidget* CreateDeferredInterestWidget();
+	QWidget* CreateExcessWidget();
+	QWidget* CreateReinvestPrincipalWidget();
+	QWidget* CreateReserveReplenishWidget();
+	QWidget* CreateTurboWidget();
+	QWidget* CreateCurePDLWidget();
+	QWidget* CreateFeesFromXSWidget();
+	QWidget* CreateAllocPrepayWidget();
 	bool FirstCombodeleted;
-	QString ResultingParameters[NumwstParameters];
+	QMap<qint32,QString> ResultingParameters;
 	QPushButton* AcceptButton;
 	QComboBox* StepSelectorCombo;
 	QStackedWidget* StepBuilderBase;

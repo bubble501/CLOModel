@@ -383,3 +383,12 @@ QString InfixToPostfix(const QString& a) {
 		sb.append(ops.at(s.pop())).append(' ');
 	return sb.trimmed();
 }
+
+QString ConvertValidXML(QString a) {
+	a.replace("<", "&lt;");
+	a.replace(">", "&gt;");
+	a.replace("&", "&amp;");
+	a.replace("'", "&apos;");
+	a.replace("\"", "&quot;");
+	return a;
+}

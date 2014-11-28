@@ -45,7 +45,7 @@ public:
 	virtual GenericCashFlow SingleFlow(qint32 FlowTpe) const;
 	virtual GenericCashFlow SingleDate(const QDate& a) const;
 	virtual bool HasFlowType(qint32 FlowTpe)const;
-	virtual QList<qint32> AvailableFlows(const QDate& a) const;
+	virtual QList<qint32> AvailableFlows(const QDate& a=QDate()) const;
 	virtual bool GetAdjustHolidays() const { return m_AdjustHolidays; }
 	virtual void SetAdjustHolidays(bool val);
 	virtual double GetTotalFlow(const QDate& a, const QList<qint32>& Groups) const;
@@ -60,6 +60,8 @@ public:
 	virtual void RemoveLabel(qint32 FlowTp) { m_CashFlowLabels.remove(FlowTp); }
 	virtual void ClearLabels() { m_CashFlowLabels.clear(); }
 	virtual GenericCashFlow ScaledCashFlows(double OriginalRefSize, double ResultSize, const QList<qint32>& Groups = QList<qint32>(), const QList<qint32>& ExcludeGroups = QList<qint32>()) const;
+	virtual QString ToPlainText(bool UseHeaders = true)const;
+	virtual QString ToXML()const;
 protected:
 	static bool SamePeriod(const QDate& a, const QDate& b, CashFlowAggregation Freq);
 	QMap<QDate, QHash<qint32, double>*	> m_CashFlows;

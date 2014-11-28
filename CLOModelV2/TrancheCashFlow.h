@@ -57,6 +57,8 @@ public:
 	int GetLastFlowIndex(bool IncludeDeferred = false) const;
 	const double& GetStartingDeferredInterest() const { return StartingDeferredInterest; }
 	void SetStartingDeferredInterest(const double& val) { StartingDeferredInterest = val; }
+	virtual QString ToXML()const override;
+	virtual QString ToPlainText(bool UseHeaders = true)const override;
 #ifndef NO_DATABASE
 	virtual bool GetCashFlowsDatabase(const QString& TrancheID);
 #endif

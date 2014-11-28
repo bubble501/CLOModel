@@ -237,8 +237,11 @@ int main(int argc, char *argv[]) {
 
 QApplication a(argc, argv);
 QBloombergLib::QBbgRequest TestReq;
-TestReq.AddRequest("TMSE 1 A", "MTG_CASH_FLOW");
+TestReq.AddRequest(1,"TMSE 1 A", "MTG_CASH_FLOW");
 QBloombergLib::QBbgWorker TestWork;
 TestWork.StartRequestSync(TestReq);
+TrancheCashFlow TempFlow;
+TempFlow.GetCashFlowsBloomberg(*(TestWork.GetResult(1)));
+PrintToTempFile("TextCashFlowsXML", TempFlow.ToXML(), false);
 return 0;
 }

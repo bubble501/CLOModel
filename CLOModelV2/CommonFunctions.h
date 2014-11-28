@@ -97,6 +97,7 @@ bool removeDir(const QString& dirName);
 double GetLoanAssumption(const QString& LoanName, int columnIndex, QDate RefDate);
 void PrintToTempFile(const QString& TempFileName, const QString& Message, bool PrintTime = true);
 bool ValidDayCount(qint16 a);
+QString ConvertValidXML(QString a);
 
 #endif // CommonFunctions_h__
 

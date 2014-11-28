@@ -1,6 +1,7 @@
 #include "TrancheCashFlow.h"
 #include <QMap>
 #include <QDataStream>
+#include "MtgCashFlow.h"
 #ifndef NO_DATABASE
 #include <QSqlDatabase>
 #include <QSqlError>
@@ -164,7 +165,15 @@ bool TrancheCashFlow::GetCashFlowsDatabase(const QString& TrancheID) {
 #endif
 #ifndef NO_BLOOMBERG
 bool TrancheCashFlow::GetCashFlowsBloomberg(const QBloombergLib::QSingleBbgResult& a) {
-	if (a.GetHeader() != "MTG_CASH_FLOW" || a.HasErrors() || a.GetNumRows() == 0) return false;
+	if (
+		(
+			a.GetHeader() != "MTG_CASH_FLOW" 
+			&&  a.GetHeader() != "EXTENDED_CASH_FLOW"
+			&&  a.GetHeader() != "HIST_CASH_FLOW"
+		)
+		|| a.HasErrors()
+		|| a.GetNumRows() == 0
+	) return false;
 	for (int i = 0; i < a.GetNumRows(); ++i) {
 		const QDate CurrentDate = a.GetTableResult(i, 1)->GetDate();
 		AddFlow(CurrentDate, a.GetTableResult(i, 3)->GetDouble(), TrancheFlowType::InterestFlow);
@@ -218,6 +227,24 @@ double TrancheCashFlow::GetDeferred(const QDate& a) const {
 		Result += GetFlow(a, i);
 	}
 	return Result;
+}
+
+QString TrancheCashFlow::ToXML() const {
+	GenericCashFlow NewFlow(*this);
+	NewFlow.SetLabel(static_cast<qint32>(MtgCashFlow::MtgFlowType::AmountOutstandingFlow), "Outstanding");
+	for (auto i = m_CashFlows.constBegin(); i != m_CashFlows.constEnd(); ++i) {
+		NewFlow.AddFlow(i.key(), GetAmountOutstanding(i.key()), static_cast<qint32>(MtgCashFlow::MtgFlowType::AmountOutstandingFlow));
+	}
+	return NewFlow.ToXML();
+}
+
+QString TrancheCashFlow::ToPlainText(bool UseHeaders /*= true*/) const {
+	GenericCashFlow NewFlow(*this);
+	NewFlow.SetLabel(static_cast<qint32>(MtgCashFlow::MtgFlowType::AmountOutstandingFlow), "Outstanding");
+	for (auto i = m_CashFlows.constBegin(); i != m_CashFlows.constEnd(); ++i) {
+		NewFlow.AddFlow(i.key(), GetAmountOutstanding(i.key()), static_cast<qint32>(MtgCashFlow::MtgFlowType::AmountOutstandingFlow));
+	}
+	return NewFlow.ToPlainText(UseHeaders);
 }
 
 

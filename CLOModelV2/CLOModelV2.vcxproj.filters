@@ -280,6 +280,9 @@
     <CustomBuild Include="WaterfallStepHelperDialog.h">
       <Filter>Header Files\Widgets</Filter>
     </CustomBuild>
+    <CustomBuild Include="TriggerStructHelperWidget.h">
+      <Filter>Header Files\Widgets</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\Debug\moc_CentralUnit.cpp">
@@ -556,6 +559,15 @@
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="WaterfallStepHelperDialog.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_TriggerStructHelperWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_TriggerStructHelperWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="TriggerStructHelperWidget.cpp">
       <Filter>Source Files\Widgets</Filter>
     </ClCompile>
   </ItemGroup>

@@ -139,7 +139,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 				break;
 			case static_cast<int>(AbstractTrigger::TriggerType::PoolSizeTrigger) :
 				TempTrigger.reset(new PoolSizeTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
-				TempTrigger.dynamicCast<PoolSizeTrigger>()->SetTargetSize(pdFreq->dblVal); pdFreq++;
+				TempTrigger.dynamicCast<PoolSizeTrigger>()->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
 				TempTrigger.dynamicCast<PoolSizeTrigger>()->SetSide(static_cast<PoolSizeTrigger::TriggerSide>(pdFreq->intVal)); pdFreq++;
 				TempUnit.SetTrigger(i + 1, TempTrigger);
 				break;

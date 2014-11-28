@@ -16,3 +16,14 @@ QDataStream& AbstractTrigger::LoadOldVersion(QDataStream& stream) {
 	return stream;
 }
 
+QString AbstractTrigger::TriggerTypeToString(TriggerType a)const {
+	switch (a){
+	case TriggerType::DateTrigger: return "Date Trigger";
+	case TriggerType::VectorTrigger: return "Vector Trigger";
+	case TriggerType::PoolSizeTrigger: return "Pool Size Trigger";
+	case TriggerType::TrancheTrigger: return "Tranche Trigger";
+	case TriggerType::DelinquencyTrigger: return "Delinquency Trigger";
+	default: return QString();
+	}
+}
+

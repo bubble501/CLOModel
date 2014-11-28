@@ -2023,16 +2023,21 @@ bool Waterfall::EvaluateTrigger(quint32 TrigID, int PeriodIndex, const QDate& Cu
 			return TempTrig->Passing(CurrentIPD);
 		return TempTrig->Passing(PeriodIndex);
 	}
-	case AbstractTrigger::TriggerType::PoolSizeTrigger:
-		if (PeriodIndex<0 || PeriodIndex>=m_MortgagesPayments.Count()) return false;
-		return CurrentTrigger.dynamicCast<PoolSizeTrigger>()->Passing(m_MortgagesPayments.GetAmountOut(PeriodIndex));
+	case AbstractTrigger::TriggerType::PoolSizeTrigger:{
+		if (PeriodIndex < 0 || PeriodIndex >= m_MortgagesPayments.Count()) return false;
+		bool TempRes;
+		bool NullAnch = CurrentTrigger.dynamicCast<PoolSizeTrigger>()->GetTargetSize().GetAnchorDate().isNull();
+		if (NullAnch) CurrentTrigger.dynamicCast<PoolSizeTrigger>()->SetAnchorDate(m_MortgagesPayments.GetDate(0));
+		TempRes = CurrentTrigger.dynamicCast<PoolSizeTrigger>()->Passing(m_MortgagesPayments.GetAmountOut(PeriodIndex), m_MortgagesPayments.GetDate(PeriodIndex));
+		if (NullAnch) CurrentTrigger.dynamicCast<DelinquencyTrigger>()->RemoveAnchorDate();
+		return TempRes;
+	}
 	case AbstractTrigger::TriggerType::TrancheTrigger:
 		return CurrentTrigger.dynamicCast<TrancheTrigger>()->Passing(m_Tranches);
 	case AbstractTrigger::TriggerType::DelinquencyTrigger:{
 		bool TempRes;
 		bool NullAnch = CurrentTrigger.dynamicCast<DelinquencyTrigger>()->GetTarget().GetAnchorDate().isNull();
 		if (NullAnch) CurrentTrigger.dynamicCast<DelinquencyTrigger>()->SetAnchorDate(m_MortgagesPayments.GetDate(0));
-		LOGDEBUG("Date: " + m_MortgagesPayments.GetDate(PeriodIndex).toString("dd-MM-yyyy"));
 		TempRes = CurrentTrigger.dynamicCast<DelinquencyTrigger>()->Passing(m_MortgagesPayments.GetDelinquentShare(PeriodIndex), m_MortgagesPayments.GetDate(PeriodIndex));
 		if (NullAnch) CurrentTrigger.dynamicCast<DelinquencyTrigger>()->RemoveAnchorDate();
 		return TempRes;

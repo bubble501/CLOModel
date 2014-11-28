@@ -322,6 +322,15 @@
     <ClCompile Include="WaterfallStepHelperDialog.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_TriggerStructHelperWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_TriggerStructHelperWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="TriggerStructHelperWidget.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Resources.qrc">
@@ -472,6 +481,9 @@
       <Filter>Header Files\Core</Filter>
     </CustomBuild>
     <CustomBuild Include="WaterfallStepHelperDialog.h">
+      <Filter>Header Files\Core</Filter>
+    </CustomBuild>
+    <CustomBuild Include="TriggerStructHelperWidget.h">
       <Filter>Header Files\Core</Filter>
     </CustomBuild>
   </ItemGroup>

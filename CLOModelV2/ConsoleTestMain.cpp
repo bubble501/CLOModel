@@ -23,7 +23,9 @@
 #include "StressViewer.h"
 #include "SummaryView.h"
 #include "WaterfallStepHelperDialog.h"
+#include "TriggerStructHelperWidget.h"
 int main(int argc, char *argv[]) {
+
 	QApplication a(argc, argv);
 	WaterfallStepHelperDialog b;
 	if (b.exec()==QDialog::Accepted) {
@@ -239,5 +241,26 @@ int main(int argc, char *argv[]) {
 		QMessageBox::information(0, "Success", "Cash Flows are identical");
 	}*/
 
+
+/*
+
+Waterfall TempWtf, TempCallWaterfall;
+QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/BaseCase.clo");
+file.open(QIODevice::ReadOnly);
+qint32 VersionChecker;
+QDataStream out(&file);
+out.setVersion(QDataStream::Qt_5_3);
+out >> VersionChecker;
+if (VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) {
+file.close();
+return 1;
+}
+{bool Junk; out >> Junk; }
+TempWtf.SetLoadProtocolVersion(VersionChecker);
+out >> TempWtf;
+QApplication a(argc, argv);
+TriggerStructHelperWidget b(TempWtf.GetTriggers());
+b.show();
+return a.exec();*/
 
 }

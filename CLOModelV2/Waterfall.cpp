@@ -1969,7 +1969,6 @@ bool Waterfall::ValidTriggerStructure(const QString& TriggerStructure)const {
 bool Waterfall::TriggerPassing(const QString& TriggerStructure, int PeriodIndex,const QDate& CurrentIPD, bool IsCallDate) {
 	QString AdjStructure = InfixToPostfix(TriggerStructure);
 	if (AdjStructure.isEmpty()) return false;
-	//QRegExp SignleTriggers("\\b(\\d+)\\b");
 	QRegExp SignleTriggers("(\\d+)");
 	QStringList CapturedTriggers;
 	{
@@ -1992,9 +1991,11 @@ bool Waterfall::TriggerPassing(const QString& TriggerStructure, int PeriodIndex,
 	}
 	QStack<bool> PolishStack;
 	QStringList PolishParts = AdjStructure.split(' ');
-	SignleTriggers.setPattern("\\d+");
+	SignleTriggers.setPattern("(\\d+)");
 	foreach(const QString& SinglePart, PolishParts) {
-		if (SignleTriggers.exactMatch(SinglePart)) {
+		if (SinglePart == "F") PolishStack.push(false);
+		else if (SinglePart == "T") PolishStack.push(true);
+		else if(SignleTriggers.exactMatch(SinglePart)) {
 				PolishStack.push(m_TriggersResults.GetResult(SinglePart.toUInt(), CurrentIPD) == TriggersResults::TrigRes::trTrue);
 		}
 		else {
@@ -2014,33 +2015,33 @@ bool Waterfall::TriggerPassing(const QString& TriggerStructure, int PeriodIndex,
 bool Waterfall::EvaluateTrigger(quint32 TrigID, int PeriodIndex, const QDate& CurrentIPD, bool IsCallDate) const {
 	const QSharedPointer<AbstractTrigger> CurrentTrigger = m_Triggers.value(TrigID, QSharedPointer<AbstractTrigger>());
 	if (!CurrentTrigger) return false;
+	if (PeriodIndex < 0 || PeriodIndex >= m_MortgagesPayments.Count()) return false;
 	switch (CurrentTrigger->GetTriggerType()) {
 	case AbstractTrigger::TriggerType::DateTrigger:
 		return CurrentTrigger.dynamicCast<DateTrigger>()->Passing(CurrentIPD);
 	case AbstractTrigger::TriggerType::VectorTrigger:{
-		QSharedPointer<VectorTrigger> TempTrig = CurrentTrigger.dynamicCast<VectorTrigger>();
-		if (TempTrig->HasAnchor())
-			return TempTrig->Passing(CurrentIPD);
-		return TempTrig->Passing(PeriodIndex);
+		VectorTrigger TempTrig(*CurrentTrigger.dynamicCast<VectorTrigger>());
+		if (!TempTrig.HasAnchor())
+			TempTrig.SetAnchor(m_MortgagesPayments.GetDate(0));
+		return TempTrig.Passing(CurrentIPD);
 	}
 	case AbstractTrigger::TriggerType::PoolSizeTrigger:{
-		if (PeriodIndex < 0 || PeriodIndex >= m_MortgagesPayments.Count()) return false;
-		bool TempRes;
-		bool NullAnch = CurrentTrigger.dynamicCast<PoolSizeTrigger>()->GetTargetSize().GetAnchorDate().isNull();
-		if (NullAnch) CurrentTrigger.dynamicCast<PoolSizeTrigger>()->SetAnchorDate(m_MortgagesPayments.GetDate(0));
-		TempRes = CurrentTrigger.dynamicCast<PoolSizeTrigger>()->Passing(m_MortgagesPayments.GetAmountOut(PeriodIndex), m_MortgagesPayments.GetDate(PeriodIndex));
-		if (NullAnch) CurrentTrigger.dynamicCast<DelinquencyTrigger>()->RemoveAnchorDate();
-		return TempRes;
+		PoolSizeTrigger TempTrig(*CurrentTrigger.dynamicCast<PoolSizeTrigger>());
+		if (!TempTrig.HasAnchor())
+			TempTrig.SetAnchorDate(m_MortgagesPayments.GetDate(0));
+		return TempTrig.Passing(m_MortgagesPayments.GetAmountOut(PeriodIndex), m_MortgagesPayments.GetDate(PeriodIndex));
 	}
-	case AbstractTrigger::TriggerType::TrancheTrigger:
-		return CurrentTrigger.dynamicCast<TrancheTrigger>()->Passing(m_Tranches);
+	case AbstractTrigger::TriggerType::TrancheTrigger:{
+		TrancheTrigger TempTrig(*CurrentTrigger.dynamicCast<TrancheTrigger>());
+		if (!TempTrig.HasAnchor())
+			TempTrig.FillMissingAnchorDate(m_MortgagesPayments.GetDate(0));
+		return CurrentTrigger.dynamicCast<TrancheTrigger>()->Passing(m_Tranches, CurrentIPD);
+	}
 	case AbstractTrigger::TriggerType::DelinquencyTrigger:{
-		bool TempRes;
-		bool NullAnch = CurrentTrigger.dynamicCast<DelinquencyTrigger>()->GetTarget().GetAnchorDate().isNull();
-		if (NullAnch) CurrentTrigger.dynamicCast<DelinquencyTrigger>()->SetAnchorDate(m_MortgagesPayments.GetDate(0));
-		TempRes = CurrentTrigger.dynamicCast<DelinquencyTrigger>()->Passing(m_MortgagesPayments.GetDelinquentShare(PeriodIndex), m_MortgagesPayments.GetDate(PeriodIndex));
-		if (NullAnch) CurrentTrigger.dynamicCast<DelinquencyTrigger>()->RemoveAnchorDate();
-		return TempRes;
+		DelinquencyTrigger TempTrig(*CurrentTrigger.dynamicCast<DelinquencyTrigger>());
+		if (!TempTrig.HasAnchor())
+			TempTrig.SetAnchorDate(m_MortgagesPayments.GetDate(0));
+		return CurrentTrigger.dynamicCast<DelinquencyTrigger>()->Passing(m_MortgagesPayments.GetDelinquentShare(PeriodIndex), m_MortgagesPayments.GetDate(PeriodIndex));
 	}
 	default:
 		return false;

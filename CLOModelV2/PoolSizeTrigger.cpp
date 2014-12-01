@@ -9,6 +9,7 @@ QDataStream& PoolSizeTrigger::WriteToStream(QDataStream& stream) const {
 }
 QDataStream& PoolSizeTrigger::LoadOldVersion(QDataStream& stream) {
 	quint8 TempChar;
+	m_TargetSize.SetLoadProtocolVersion(m_LoadProtocolVersion);
 	stream
 		>> m_TargetSize
 		>> TempChar

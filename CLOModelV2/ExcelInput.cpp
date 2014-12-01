@@ -145,9 +145,9 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 				break;
 			case static_cast<int>(AbstractTrigger::TriggerType::TrancheTrigger) :
 				TempTrigger.reset(new TrancheTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
-				TempTrigger.dynamicCast<TrancheTrigger>()->SetTargetSeniority(pdFreq->intVal); pdFreq++;
-				TempTrigger.dynamicCast<TrancheTrigger>()->SetTargetSeniorityLevel(pdFreq->intVal); pdFreq++;
-				TempTrigger.dynamicCast<TrancheTrigger>()->SetTargetSize(pdFreq->dblVal); pdFreq++;
+				TempTrigger.dynamicCast<TrancheTrigger>()->SetTargetSeniority(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+				TempTrigger.dynamicCast<TrancheTrigger>()->SetTargetSeniorityLevel(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+				TempTrigger.dynamicCast<TrancheTrigger>()->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
 				TempTrigger.dynamicCast<TrancheTrigger>()->SetSenioritySide(static_cast<TrancheTrigger::TriggerSenioritySide>(pdFreq->intVal)); pdFreq++;
 				TempTrigger.dynamicCast<TrancheTrigger>()->SetSizeSide(static_cast<TrancheTrigger::TriggerSizeSide>(pdFreq->intVal)); pdFreq++;
 				TempUnit.SetTrigger(i + 1, TempTrigger);

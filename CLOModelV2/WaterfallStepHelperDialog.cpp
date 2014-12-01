@@ -11,6 +11,7 @@
 #include "WatFalPrior.h"
 #include "IntegerVector.h"
 #include "BloombergVector.h"
+#include "TriggerStructHelperWidget.h"
 WaterfallStepHelperDialog::WaterfallStepHelperDialog(QWidget *parent)
 	: QDialog(parent)
 	, m_InterestWF(true)
@@ -37,6 +38,7 @@ WaterfallStepHelperDialog::WaterfallStepHelperDialog(QWidget *parent)
 	StepSelectorCombo->addItem("PDL", static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_PDL));
 	StepSelectorCombo->addItem("Fees From Excess", static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_FeesFromExcess));
 	StepSelectorCombo->addItem("Allocate Prepay Fees", static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_AllocPrepayFees));
+	StepSelectorCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
 	StepBuilderBase = new QStackedWidget(this);
 	StepBuilderBase->setMinimumSize(200, 200);
@@ -97,9 +99,20 @@ WaterfallStepHelperDialog::WaterfallStepHelperDialog(QWidget *parent)
 	ButtonsLay->addWidget(AcceptButton);
 	ButtonsLay->addWidget(CancelButton);
 
+	TriggerBuilder = new TriggerStructHelperWidget(QHash<quint32, QSharedPointer<AbstractTrigger> >(), this);
+	TriggerBuilder->setEnabled(false);
+	QGroupBox *TrigGroup = new QGroupBox(this);
+	TrigGroup->setTitle("Trigger");
+	QHBoxLayout* TrigLay = new QHBoxLayout(TrigGroup);
+	TrigLay->addWidget(TriggerBuilder);
+	
+	QHBoxLayout* CentreLay=new QHBoxLayout;
+	CentreLay->addWidget(ParamGroup);
+	CentreLay->addWidget(TrigGroup);
+
 	QVBoxLayout* mainlay = new QVBoxLayout(this);
 	mainlay->addWidget(TopGroup);
-	mainlay->addWidget(ParamGroup);
+	mainlay->addLayout(CentreLay);
 	mainlay->addLayout(ButtonsLay);
 
 }
@@ -115,6 +128,7 @@ void WaterfallStepHelperDialog::CheckOkEnabled(int index) {
 		FirstCombodeleted = true;
 		StepSelectorCombo->removeItem(0);
 		disconnect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(CheckOkEnabled(int)));
+		TriggerBuilder->setEnabled(true);
 	}
 }
 
@@ -209,7 +223,7 @@ QString WaterfallStepHelperDialog::GetParameters() const {
 	Result += '#' + ResultingParameters.value(static_cast<qint32>(WatFalPrior::wstParameters::TestTargetOverride), "") ;
 	Result += '#' + ResultingParameters.value(static_cast<qint32>(WatFalPrior::wstParameters::IRRtoEquityTarget), "") ;
 	Result += '#' + ResultingParameters.value(static_cast<qint32>(WatFalPrior::wstParameters::ReserveIndex), "") ;
-	Result += '#' + ResultingParameters.value(static_cast<qint32>(WatFalPrior::wstParameters::Trigger), "") ;
+	Result += '#' + TriggerBuilder->GetResult() ;
 	return Result;
 }
 

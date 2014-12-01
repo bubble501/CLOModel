@@ -82,6 +82,7 @@ public:
 	Waterfall(const Waterfall& a);
 	~Waterfall();
 	Waterfall& operator=(const Waterfall& a);
+	const QHash<quint32, QSharedPointer<AbstractTrigger> >& GetTriggers() const { return m_Triggers; }
 	QString GetGICinterest() const { return m_GICinterest.GetVector(); }
 	QString GetSeniorExpenses() const { return m_SeniorExpenses.GetVector(); }
 	QString GetSeniorFees() const { return m_SeniorFees.GetVector(); }

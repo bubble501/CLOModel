@@ -5,7 +5,7 @@
 #include <QMap>
 class QComboBox;
 class QStackedWidget;
-
+class TriggerStructHelperWidget;
 class WaterfallStepHelperDialog : public QDialog
 {
 	Q_OBJECT
@@ -40,6 +40,19 @@ signals:
 	void SetTo100(QString);
 	void SetTo0(QString);
 	void SetSoFCombo(int);
+
+	void ImportSeniorityGroup(QString value);
+	void ImportSeniorityGroupLevel(QString value);
+	void ImportRedemptionGroup(QString value);
+	void ImportRedemptionGroupLevel(QString value);
+	void ImportRedemptionShare(QString value);
+	void ImportAdditionalCollateralShare(QString value);
+	void ImportSourceOfFunding(QString value);
+	void ImportCouponIndex(QString value);
+	void ImportTestTargetOverride(QString value);
+	void ImportIRRtoEquityTarget(QString value);
+	void ImportReserveIndex(QString value);
+	void ImportTrigger(QString value);
 private:
 	QWidget* CreateInterestWidget();
 	QWidget* CreatePrincipalWidget();
@@ -59,6 +72,7 @@ private:
 	QComboBox* StepSelectorCombo;
 	QStackedWidget* StepBuilderBase;
 	bool m_InterestWF;
+	TriggerStructHelperWidget* TriggerBuilder;
 };
 
 #endif // WATERFALLSTEPHELPERDIALOG_H

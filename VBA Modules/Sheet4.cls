@@ -8,7 +8,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
-Private Sub Worksheet_Change(ByVal Target As Range)
+Private Sub Worksheet_BeforeDoubleClick(ByVal Target As Range, Cancel As Boolean)
     Dim allFields As New Collection
     PopulateDafaultLabels allFields
     On Error GoTo StepNotFoundError
@@ -19,11 +19,12 @@ Private Sub Worksheet_Change(ByVal Target As Range)
     For Each singleCell In Target
     If (singleCell.Row > StepFound.Row And singleCell.Column = StepFound.Column) Then
         Me.Unprotect
-        Call NewWaterfallStepChanged(singleCell, allFields)
+        Call EditWaterfallStep("Liabilities + input", singleCell, allFields)
         Me.Protect
     End If
     Next singleCell
 StepNotFoundError:
+Cancel = True
 Application.EnableEvents = True
 On Error GoTo 0
 End Sub

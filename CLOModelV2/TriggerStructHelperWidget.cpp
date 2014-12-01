@@ -102,6 +102,7 @@ void TriggerStructHelperWidget::SetAvailableTriggers(const QHash<quint32, QShare
 		TriggersModel->setData(TriggersModel->index(RowCount, 1), i.value()->GetTriggerLabel());
 		QString TempString = i.value()->ToString(); TempString.replace(LabelRegExp, ""); TempString.replace("\n", " - ");
 		TriggersModel->setData(TriggersModel->index(RowCount++, 2), TempString);
+		TriggersModel->setData(TriggersModel->index(RowCount++, 2), TempString,Qt::ToolTipRole);
 		RegExpString += '|' + QString::number(i.key());
 	}
 	TriggersModel->sort(0);

@@ -62,6 +62,7 @@ public:
 	WatFalPrior(const WatFalPrior& a);
 	WatFalPrior& operator=(const WatFalPrior& a);
 	QString ToString() const;
+	QString CodeForDialog() const;
 private:
 	void RemoveParameter(qint32 ParameterType);
 	QVariant GetParameter(qint32 ParameterType) const;

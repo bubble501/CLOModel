@@ -3,6 +3,8 @@
 
 #include <QDialog>
 #include <QMap>
+#include <QSharedPointer>
+#include "AbstractTrigger.h"
 class QComboBox;
 class QStackedWidget;
 class TriggerStructHelperWidget;
@@ -13,6 +15,8 @@ class WaterfallStepHelperDialog : public QDialog
 public:
 	WaterfallStepHelperDialog(QWidget *parent=0);
 	QString GetParameters() const;
+	void SetAvailableTriggers(const QHash<quint32, QSharedPointer<AbstractTrigger> >& AvailableTriggers);
+	void SetCurrentPars(const QString& a);
 private slots:
 	void CheckOkEnabled(int index);
 	void ClearParameters() { ResultingParameters.clear(); }
@@ -28,7 +32,6 @@ private slots:
 	void SetTestTargetOverride(QString value);
 	void SetIRRtoEquityTarget(QString value);
 	void SetReserveIndex(QString value);
-	void SetTrigger(QString value);
 	void SetDefaults1();
 	void SetDefaults100();
 	void SetDefaults0();
@@ -52,7 +55,6 @@ signals:
 	void ImportTestTargetOverride(QString value);
 	void ImportIRRtoEquityTarget(QString value);
 	void ImportReserveIndex(QString value);
-	void ImportTrigger(QString value);
 private:
 	QWidget* CreateInterestWidget();
 	QWidget* CreatePrincipalWidget();

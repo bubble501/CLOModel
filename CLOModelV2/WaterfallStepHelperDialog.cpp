@@ -64,12 +64,13 @@ WaterfallStepHelperDialog::WaterfallStepHelperDialog(QWidget *parent)
 
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), StepBuilderBase, SLOT(setCurrentIndex(int)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(ClearParameters()));
-	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(SetDefaults1()), Qt::QueuedConnection);
-	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(SetDefaults100()), Qt::QueuedConnection);
-	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(SetDefaults0()), Qt::QueuedConnection);
-	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(SetbasedOnWaterfall(int)), Qt::QueuedConnection);
-	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(CheckOkEnabled(int)),Qt::QueuedConnection);
-	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(ResetSoFCombo(int)), Qt::QueuedConnection);
+	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(SetDefaults1())/*, Qt::QueuedConnection*/);
+	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(SetDefaults100())/*, Qt::QueuedConnection*/);
+	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(SetDefaults0())/*, Qt::QueuedConnection*/);
+	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(SetbasedOnWaterfall(int))/*, Qt::QueuedConnection*/);
+	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(CheckOkEnabled(int))/*,Qt::QueuedConnection*/);
+	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(ResetSoFCombo(int))/*, Qt::QueuedConnection*/);
+
 	QLabel *StepSelectLabel = new QLabel(this);
 	StepSelectLabel->setText(tr("Select Step Type"));
 
@@ -88,6 +89,7 @@ WaterfallStepHelperDialog::WaterfallStepHelperDialog(QWidget *parent)
 	TopGroup->setTitle("Step");
 	QGroupBox *ParamGroup = new QGroupBox(this);
 	ParamGroup->setTitle("Parameters");
+	ParamGroup->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	QHBoxLayout* ParamLay = new QHBoxLayout(ParamGroup);
 	ParamLay->addWidget(StepBuilderBase);
 	QHBoxLayout* TopLay = new QHBoxLayout(TopGroup);
@@ -102,6 +104,7 @@ WaterfallStepHelperDialog::WaterfallStepHelperDialog(QWidget *parent)
 	TriggerBuilder = new TriggerStructHelperWidget(QHash<quint32, QSharedPointer<AbstractTrigger> >(), this);
 	TriggerBuilder->setEnabled(false);
 	QGroupBox *TrigGroup = new QGroupBox(this);
+	TrigGroup->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	TrigGroup->setTitle("Trigger");
 	QHBoxLayout* TrigLay = new QHBoxLayout(TrigGroup);
 	TrigLay->addWidget(TriggerBuilder);
@@ -200,11 +203,6 @@ void WaterfallStepHelperDialog::SetReserveIndex(QString value) {
 		SetParameter(static_cast<qint32>(WatFalPrior::wstParameters::ReserveIndex), value);
 }
 
-void WaterfallStepHelperDialog::SetTrigger(QString value) {
-	if (!sender()) return;
-	if (StepBuilderBase->currentWidget()->children().contains(sender()))
-		SetParameter(static_cast<qint32>(WatFalPrior::wstParameters::Trigger), value);
-}
 void WaterfallStepHelperDialog::SoFComboChanged(int index) {
 	if (!sender()) return;
 	if (StepBuilderBase->currentWidget()->children().contains(sender()))
@@ -269,6 +267,7 @@ QWidget* WaterfallStepHelperDialog::CreateInterestWidget() {
 	SenGrpEdit->setToolTip(tr("This is the pro-rata level of the tranches.\nAccepts vectors."));
 	connect(SenGrpEdit, SIGNAL(textChanged(QString)), this, SLOT(SetSeniorityGroup(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), SenGrpEdit, SLOT(clear()));
+	connect(this, SIGNAL(ImportSeniorityGroup(QString)), SenGrpEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(SenGrpLbl, CountRow, 0);
 	ResLay->addWidget(SenGrpEdit, CountRow, 1);
 	CountRow++;
@@ -281,6 +280,7 @@ QWidget* WaterfallStepHelperDialog::CreateInterestWidget() {
 	connect(SenLvlEdit, SIGNAL(textChanged(QString)), this, SLOT(SetSeniorityGroupLevel(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), SenLvlEdit, SLOT(clear()));
 	connect(this, SIGNAL(SetTo1(QString)), SenLvlEdit, SLOT(setText(QString)));
+	connect(this, SIGNAL(ImportSeniorityGroupLevel(QString)), SenLvlEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(SenLvlLbl, CountRow, 0);
 	ResLay->addWidget(SenLvlEdit, CountRow, 1);
 	CountRow++;
@@ -294,6 +294,7 @@ QWidget* WaterfallStepHelperDialog::CreateInterestWidget() {
 	connect(CoupIdxEdit, SIGNAL(textChanged(QString)), this, SLOT(SetCouponIndex(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), CoupIdxEdit, SLOT(clear()));
 	connect(this, SIGNAL(SetTo1(QString)), CoupIdxEdit, SLOT(setText(QString)));
+	connect(this, SIGNAL(ImportCouponIndex(QString)), CoupIdxEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(CoupIdxLbl, CountRow, 0);
 	ResLay->addWidget(CoupIdxEdit, CountRow, 1);
 	CountRow++;
@@ -315,6 +316,7 @@ QWidget* WaterfallStepHelperDialog::CreatePrincipalWidget() {
 	SenGrpEdit->setToolTip(tr("This is the pro-rata level of the tranches.\nAccepts vectors."));
 	connect(SenGrpEdit, SIGNAL(textChanged(QString)), this, SLOT(SetSeniorityGroup(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), SenGrpEdit, SLOT(clear()));
+	connect(this, SIGNAL(ImportSeniorityGroup(QString)), SenGrpEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(SenGrpLbl, CountRow, 0);
 	ResLay->addWidget(SenGrpEdit, CountRow, 1);
 	CountRow++;
@@ -327,6 +329,7 @@ QWidget* WaterfallStepHelperDialog::CreatePrincipalWidget() {
 	connect(SenLvlEdit, SIGNAL(textChanged(QString)), this, SLOT(SetSeniorityGroupLevel(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), SenLvlEdit, SLOT(clear()));
 	connect(this, SIGNAL(SetTo1(QString)), SenLvlEdit, SLOT(setText(QString)));
+	connect(this, SIGNAL(ImportSeniorityGroupLevel(QString)), SenLvlEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(SenLvlLbl, CountRow, 0);
 	ResLay->addWidget(SenLvlEdit, CountRow, 1);
 	CountRow++;
@@ -348,6 +351,7 @@ QWidget* WaterfallStepHelperDialog::CreateICWidget() {
 	SenGrpEdit->setToolTip(tr("This is the pro-rata level of the tranches.\nAccepts vectors."));
 	connect(SenGrpEdit, SIGNAL(textChanged(QString)), this, SLOT(SetSeniorityGroup(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), SenGrpEdit, SLOT(clear()));
+	connect(this, SIGNAL(ImportSeniorityGroup(QString)), SenGrpEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(SenGrpLbl, CountRow, 0);
 	ResLay->addWidget(SenGrpEdit, CountRow, 1);
 	CountRow++;
@@ -355,11 +359,12 @@ QWidget* WaterfallStepHelperDialog::CreateICWidget() {
 	QLabel* SenLvlLbl = new QLabel(Result);
 	SenLvlLbl->setText(tr("Level of seniority the seniority group refers to"));
 	QLineEdit* SenLvlEdit = new QLineEdit(Result);
-	SenLvlEdit->setValidator(IntegerVector().GetValidator(SenGrpEdit));
+	SenLvlEdit->setValidator(IntegerVector().GetValidator(SenLvlEdit));
 	SenLvlEdit->setToolTip(tr("This is the depth of the pro-rata group.\nAccepts vectors.\nNormally 1"));
 	connect(SenLvlEdit, SIGNAL(textChanged(QString)), this, SLOT(SetSeniorityGroupLevel(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), SenLvlEdit, SLOT(clear()));
 	connect(this, SIGNAL(SetTo1(QString)), SenLvlEdit, SLOT(setText(QString)));
+	connect(this, SIGNAL(ImportSeniorityGroupLevel(QString)), SenLvlEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(SenLvlLbl, CountRow, 0);
 	ResLay->addWidget(SenLvlEdit, CountRow, 1);
 	CountRow++;
@@ -368,11 +373,12 @@ QWidget* WaterfallStepHelperDialog::CreateICWidget() {
 	QLabel* CoupIdxLbl = new QLabel(Result);
 	CoupIdxLbl->setText(tr("Level coupon to be considered in the test"));
 	QLineEdit* CoupIdxEdit = new QLineEdit(Result);
-	CoupIdxEdit->setValidator(IntegerVector().GetValidator(SenGrpEdit));
+	CoupIdxEdit->setValidator(IntegerVector().GetValidator(CoupIdxEdit));
 	CoupIdxEdit->setToolTip(tr("This is the coupon to be paid.\nAccepts vectors.\nNormally 1"));
 	connect(CoupIdxEdit, SIGNAL(textChanged(QString)), this, SLOT(SetCouponIndex(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), CoupIdxEdit, SLOT(clear()));
 	connect(this, SIGNAL(SetTo1(QString)), CoupIdxEdit, SLOT(setText(QString)));
+	connect(this, SIGNAL(ImportCouponIndex(QString)), CoupIdxEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(CoupIdxLbl, CountRow, 0);
 	ResLay->addWidget(CoupIdxEdit, CountRow, 1);
 	CountRow++;
@@ -382,10 +388,11 @@ QWidget* WaterfallStepHelperDialog::CreateICWidget() {
 	QLabel* TestOvrdLbl = new QLabel(Result);
 	TestOvrdLbl->setText(tr("Override for the test trigger"));
 	QLineEdit* TestOvrdEdit = new QLineEdit(Result);
-	TestOvrdEdit->setValidator(BloombergVector().GetValidator(SenGrpEdit));
+	TestOvrdEdit->setValidator(BloombergVector().GetValidator(TestOvrdEdit));
 	TestOvrdEdit->setToolTip(tr("This is the override for the test hurdle.\nAccepts vectors.\nLeave blank if no override applies"));
 	connect(TestOvrdEdit, SIGNAL(textChanged(QString)), this, SLOT(SetTestTargetOverride(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), TestOvrdEdit, SLOT(clear()));
+	connect(this, SIGNAL(ImportTestTargetOverride(QString)), TestOvrdEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(TestOvrdLbl, CountRow, 0);
 	ResLay->addWidget(TestOvrdEdit, CountRow, 1);
 	CountRow++;
@@ -406,6 +413,7 @@ QWidget* WaterfallStepHelperDialog::CreateOCWidget() {
 	SenGrpEdit->setToolTip(tr("This is the pro-rata level of the tranches.\nAccepts vectors."));
 	connect(SenGrpEdit, SIGNAL(textChanged(QString)), this, SLOT(SetSeniorityGroup(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), SenGrpEdit, SLOT(clear()));
+	connect(this, SIGNAL(ImportSeniorityGroup(QString)), SenGrpEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(SenGrpLbl, CountRow, 0);
 	ResLay->addWidget(SenGrpEdit, CountRow, 1);
 	CountRow++;
@@ -418,6 +426,7 @@ QWidget* WaterfallStepHelperDialog::CreateOCWidget() {
 	connect(SenLvlEdit, SIGNAL(textChanged(QString)), this, SLOT(SetSeniorityGroupLevel(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), SenLvlEdit, SLOT(clear()));
 	connect(this, SIGNAL(SetTo1(QString)), SenLvlEdit, SLOT(setText(QString)));
+	connect(this, SIGNAL(ImportSeniorityGroupLevel(QString)), SenLvlEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(SenLvlLbl, CountRow, 0);
 	ResLay->addWidget(SenLvlEdit, CountRow, 1);
 	CountRow++;
@@ -430,6 +439,7 @@ QWidget* WaterfallStepHelperDialog::CreateOCWidget() {
 	RedGrpEdit->setToolTip(tr("This is the pro-rata level of the tranches.\nAccepts vectors.\nLeave blank for sequential"));
 	connect(RedGrpEdit, SIGNAL(textChanged(QString)), this, SLOT(SetRedemptionGroup(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedGrpEdit, SLOT(clear()));
+	connect(this, SIGNAL(ImportRedemptionGroup(QString)), RedGrpEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(RedGrpLbl, CountRow, 0);
 	ResLay->addWidget(RedGrpEdit, CountRow, 1);
 	CountRow++;
@@ -442,6 +452,7 @@ QWidget* WaterfallStepHelperDialog::CreateOCWidget() {
 	connect(RedLvlEdit, SIGNAL(textChanged(QString)), this, SLOT(SetRedemptionGroupLevel(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedLvlEdit, SLOT(clear()));
 	connect(this, SIGNAL(SetTo1(QString)), RedLvlEdit, SLOT(setText(QString)));
+	connect(this, SIGNAL(ImportRedemptionGroupLevel(QString)), RedLvlEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(RedLvlLbl, CountRow, 0);
 	ResLay->addWidget(RedLvlEdit, CountRow, 1);
 	CountRow++;
@@ -455,6 +466,7 @@ QWidget* WaterfallStepHelperDialog::CreateOCWidget() {
 	connect(RedShrEdit, SIGNAL(textChanged(QString)), this, SLOT(SetRedemptionShare(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedShrEdit, SLOT(clear()));
 	connect(this, SIGNAL(SetTo100(QString)), RedShrEdit, SLOT(setText(QString)));
+	connect(this, SIGNAL(ImportRedemptionShare(QString)), RedShrEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(RedShrLbl, CountRow, 0);
 	ResLay->addWidget(RedShrEdit, CountRow, 1);
 	CountRow++;
@@ -467,6 +479,7 @@ QWidget* WaterfallStepHelperDialog::CreateOCWidget() {
 	connect(ColShrEdit, SIGNAL(textChanged(QString)), this, SLOT(SetAdditionalCollateralShare(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), ColShrEdit, SLOT(clear()));
 	connect(this, SIGNAL(SetTo0(QString)), ColShrEdit, SLOT(setText(QString)));
+	connect(this, SIGNAL(ImportAdditionalCollateralShare(QString)), ColShrEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(ColShrLbl, CountRow, 0);
 	ResLay->addWidget(ColShrEdit, CountRow, 1);
 	CountRow++;
@@ -479,6 +492,7 @@ QWidget* WaterfallStepHelperDialog::CreateOCWidget() {
 	TestOvrdEdit->setToolTip(tr("This is the override for the test hurdle.\nAccepts vectors.\nLeave blank if no override applies"));
 	connect(TestOvrdEdit, SIGNAL(textChanged(QString)), this, SLOT(SetTestTargetOverride(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), TestOvrdEdit, SLOT(clear()));
+	connect(this, SIGNAL(ImportTestTargetOverride(QString)), TestOvrdEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(TestOvrdLbl, CountRow, 0);
 	ResLay->addWidget(TestOvrdEdit, CountRow, 1);
 	CountRow++;
@@ -499,6 +513,7 @@ QWidget* WaterfallStepHelperDialog::CreateDeferredInterestWidget() {
 	SenGrpEdit->setToolTip(tr("This is the pro-rata level of the tranches.\nAccepts vectors."));
 	connect(SenGrpEdit, SIGNAL(textChanged(QString)), this, SLOT(SetSeniorityGroup(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), SenGrpEdit, SLOT(clear()));
+	connect(this, SIGNAL(ImportSeniorityGroup(QString)), SenGrpEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(SenGrpLbl, CountRow, 0);
 	ResLay->addWidget(SenGrpEdit, CountRow, 1);
 	CountRow++;
@@ -511,6 +526,7 @@ QWidget* WaterfallStepHelperDialog::CreateDeferredInterestWidget() {
 	connect(SenLvlEdit, SIGNAL(textChanged(QString)), this, SLOT(SetSeniorityGroupLevel(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), SenLvlEdit, SLOT(clear()));
 	connect(this, SIGNAL(SetTo1(QString)), SenLvlEdit, SLOT(setText(QString)));
+	connect(this, SIGNAL(ImportSeniorityGroupLevel(QString)), SenLvlEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(SenLvlLbl, CountRow, 0);
 	ResLay->addWidget(SenLvlEdit, CountRow, 1);
 	CountRow++;
@@ -524,6 +540,7 @@ QWidget* WaterfallStepHelperDialog::CreateDeferredInterestWidget() {
 	connect(CoupIdxEdit, SIGNAL(textChanged(QString)), this, SLOT(SetCouponIndex(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), CoupIdxEdit, SLOT(clear()));
 	connect(this, SIGNAL(SetTo1(QString)), CoupIdxEdit, SLOT(setText(QString)));
+	connect(this, SIGNAL(ImportCouponIndex(QString)), CoupIdxEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(CoupIdxLbl, CountRow, 0);
 	ResLay->addWidget(CoupIdxEdit, CountRow, 1);
 	CountRow++;
@@ -545,6 +562,7 @@ QWidget* WaterfallStepHelperDialog::CreateExcessWidget() {
 	RedGrpEdit->setToolTip(tr("This is the pro-rata level of the tranches.\nAccepts vectors.\nLeave blank to allocate to an external \"Excess Spread\" account"));
 	connect(RedGrpEdit, SIGNAL(textChanged(QString)), this, SLOT(SetRedemptionGroup(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedGrpEdit, SLOT(clear()));
+	connect(this, SIGNAL(ImportRedemptionGroup(QString)), RedGrpEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(RedGrpLbl, CountRow, 0);
 	ResLay->addWidget(RedGrpEdit, CountRow, 1);
 	CountRow++;
@@ -557,6 +575,7 @@ QWidget* WaterfallStepHelperDialog::CreateExcessWidget() {
 	connect(RedLvlEdit, SIGNAL(textChanged(QString)), this, SLOT(SetRedemptionGroupLevel(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedLvlEdit, SLOT(clear()));
 	connect(this, SIGNAL(SetTo1(QString)), RedLvlEdit, SLOT(setText(QString)));
+	connect(this, SIGNAL(ImportRedemptionGroupLevel(QString)), RedLvlEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(RedLvlLbl, CountRow, 0);
 	ResLay->addWidget(RedLvlEdit, CountRow, 1);
 	CountRow++;
@@ -570,6 +589,7 @@ QWidget* WaterfallStepHelperDialog::CreateExcessWidget() {
 	connect(RedShrEdit, SIGNAL(textChanged(QString)), this, SLOT(SetRedemptionShare(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedShrEdit, SLOT(clear()));
 	connect(this, SIGNAL(SetTo100(QString)), RedShrEdit, SLOT(setText(QString)));
+	connect(this, SIGNAL(ImportRedemptionShare(QString)), RedShrEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(RedShrLbl, CountRow, 0);
 	ResLay->addWidget(RedShrEdit, CountRow, 1);
 	CountRow++;
@@ -605,6 +625,7 @@ QWidget* WaterfallStepHelperDialog::CreateReinvestPrincipalWidget() {
 	connect(ColShrEdit, SIGNAL(textChanged(QString)), this, SLOT(SetAdditionalCollateralShare(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), ColShrEdit, SLOT(clear()));
 	connect(this, SIGNAL(SetTo0(QString)), ColShrEdit, SLOT(setText(QString)));
+	connect(this, SIGNAL(ImportAdditionalCollateralShare(QString)), ColShrEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(ColShrLbl, CountRow, 0);
 	ResLay->addWidget(ColShrEdit, CountRow, 1);
 	CountRow++;
@@ -618,15 +639,16 @@ QWidget* WaterfallStepHelperDialog::CreateReserveReplenishWidget() {
 	QGridLayout *ResLay = new QGridLayout(Result);
 	int CountRow = 0;
 
-	QLabel* RedLvlLbl = new QLabel(Result);
-	RedLvlLbl->setText(tr("Index of the reserve to replenish"));
-	QLineEdit* RedLvlEdit = new QLineEdit(Result);
-	RedLvlEdit->setValidator(IntegerVector().GetValidator(RedLvlEdit));
-	RedLvlEdit->setToolTip(tr("This is the depth of the pro-rata group.\nAccepts vectors.\nNormally 1"));
-	connect(RedLvlEdit, SIGNAL(textChanged(QString)), this, SLOT(SetReserveIndex(QString)));
-	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedLvlEdit, SLOT(clear()));
-	ResLay->addWidget(RedLvlLbl, CountRow, 0);
-	ResLay->addWidget(RedLvlEdit, CountRow, 1);
+	QLabel* ResIdxLbl = new QLabel(Result);
+	ResIdxLbl->setText(tr("Index of the reserve to replenish"));
+	QLineEdit* ResIdxEdit = new QLineEdit(Result);
+	ResIdxEdit->setValidator(IntegerVector().GetValidator(ResIdxEdit));
+	ResIdxEdit->setToolTip(tr("Accepts vectors."));
+	connect(ResIdxEdit, SIGNAL(textChanged(QString)), this, SLOT(SetReserveIndex(QString)));
+	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), ResIdxEdit, SLOT(clear()));
+	connect(this, SIGNAL(ImportReserveIndex(QString)), ResIdxEdit, SLOT(setText(QString)), Qt::QueuedConnection);
+	ResLay->addWidget(ResIdxLbl, CountRow, 0);
+	ResLay->addWidget(ResIdxEdit, CountRow, 1);
 	CountRow++;
 
 	ResLay->addItem(new QSpacerItem(20, 20, QSizePolicy::Preferred, QSizePolicy::Expanding), CountRow, 0, 1, 2);
@@ -643,6 +665,7 @@ QWidget* WaterfallStepHelperDialog::CreateTurboWidget() {
 	RedGrpEdit->setToolTip(tr("This is the pro-rata level of the tranches.\nAccepts vectors."));
 	connect(RedGrpEdit, SIGNAL(textChanged(QString)), this, SLOT(SetRedemptionGroup(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedGrpEdit, SLOT(clear()));
+	connect(this, SIGNAL(ImportRedemptionGroup(QString)), RedGrpEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(RedGrpLbl, CountRow, 0);
 	ResLay->addWidget(RedGrpEdit, CountRow, 1);
 	CountRow++;
@@ -655,6 +678,7 @@ QWidget* WaterfallStepHelperDialog::CreateTurboWidget() {
 	connect(RedLvlEdit, SIGNAL(textChanged(QString)), this, SLOT(SetRedemptionGroupLevel(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedLvlEdit, SLOT(clear()));
 	connect(this, SIGNAL(SetTo1(QString)), RedLvlEdit, SLOT(setText(QString)));
+	connect(this, SIGNAL(ImportRedemptionGroupLevel(QString)), RedLvlEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(RedLvlLbl, CountRow, 0);
 	ResLay->addWidget(RedLvlEdit, CountRow, 1);
 	CountRow++;
@@ -668,6 +692,7 @@ QWidget* WaterfallStepHelperDialog::CreateTurboWidget() {
 	connect(RedShrEdit, SIGNAL(textChanged(QString)), this, SLOT(SetRedemptionShare(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedShrEdit, SLOT(clear()));
 	connect(this, SIGNAL(SetTo100(QString)), RedShrEdit, SLOT(setText(QString)));
+	connect(this, SIGNAL(ImportRedemptionShare(QString)), RedShrEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(RedShrLbl, CountRow, 0);
 	ResLay->addWidget(RedShrEdit, CountRow, 1);
 	CountRow++;
@@ -688,6 +713,7 @@ QWidget* WaterfallStepHelperDialog::CreateCurePDLWidget() {
 	SenGrpEdit->setToolTip(tr("This is the pro-rata level of the tranches.\nAccepts vectors."));
 	connect(SenGrpEdit, SIGNAL(textChanged(QString)), this, SLOT(SetSeniorityGroup(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), SenGrpEdit, SLOT(clear()));
+	connect(this, SIGNAL(ImportSeniorityGroup(QString)), SenGrpEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(SenGrpLbl, CountRow, 0);
 	ResLay->addWidget(SenGrpEdit, CountRow, 1);
 	CountRow++;
@@ -700,6 +726,7 @@ QWidget* WaterfallStepHelperDialog::CreateCurePDLWidget() {
 	connect(SenLvlEdit, SIGNAL(textChanged(QString)), this, SLOT(SetSeniorityGroupLevel(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), SenLvlEdit, SLOT(clear()));
 	connect(this, SIGNAL(SetTo1(QString)), SenLvlEdit, SLOT(setText(QString)));
+	connect(this, SIGNAL(ImportSeniorityGroupLevel(QString)), SenLvlEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(SenLvlLbl, CountRow, 0);
 	ResLay->addWidget(SenLvlEdit, CountRow, 1);
 	CountRow++;
@@ -712,6 +739,7 @@ QWidget* WaterfallStepHelperDialog::CreateCurePDLWidget() {
 	RedGrpEdit->setToolTip(tr("This is the pro-rata level of the tranches.\nAccepts vectors.\nLeave blank for sequential"));
 	connect(RedGrpEdit, SIGNAL(textChanged(QString)), this, SLOT(SetRedemptionGroup(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedGrpEdit, SLOT(clear()));
+	connect(this, SIGNAL(ImportRedemptionGroup(QString)), RedGrpEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(RedGrpLbl, CountRow, 0);
 	ResLay->addWidget(RedGrpEdit, CountRow, 1);
 	CountRow++;
@@ -724,6 +752,7 @@ QWidget* WaterfallStepHelperDialog::CreateCurePDLWidget() {
 	connect(RedLvlEdit, SIGNAL(textChanged(QString)), this, SLOT(SetRedemptionGroupLevel(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedLvlEdit, SLOT(clear()));
 	connect(this, SIGNAL(SetTo1(QString)), RedLvlEdit, SLOT(setText(QString)));
+	connect(this, SIGNAL(ImportRedemptionGroupLevel(QString)), RedLvlEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(RedLvlLbl, CountRow, 0);
 	ResLay->addWidget(RedLvlEdit, CountRow, 1);
 	CountRow++;
@@ -737,6 +766,7 @@ QWidget* WaterfallStepHelperDialog::CreateCurePDLWidget() {
 	connect(RedShrEdit, SIGNAL(textChanged(QString)), this, SLOT(SetRedemptionShare(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedShrEdit, SLOT(clear()));
 	connect(this, SIGNAL(SetTo0(QString)), RedShrEdit, SLOT(setText(QString)));
+	connect(this, SIGNAL(ImportRedemptionShare(QString)), RedShrEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(RedShrLbl, CountRow, 0);
 	ResLay->addWidget(RedShrEdit, CountRow, 1);
 	CountRow++;
@@ -758,6 +788,7 @@ QWidget* WaterfallStepHelperDialog::CreateFeesFromXSWidget() {
 	connect(RedShrEdit, SIGNAL(textChanged(QString)), this, SLOT(SetRedemptionShare(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedShrEdit, SLOT(clear()));
 	connect(this, SIGNAL(SetTo0(QString)), RedShrEdit, SLOT(setText(QString)));
+	connect(this, SIGNAL(ImportRedemptionShare(QString)), RedShrEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(RedShrLbl, CountRow, 0);
 	ResLay->addWidget(RedShrEdit, CountRow, 1);
 	CountRow++;
@@ -770,12 +801,13 @@ QWidget* WaterfallStepHelperDialog::CreateAllocPrepayWidget() {
 	QGridLayout *ResLay = new QGridLayout(Result);
 	int CountRow = 0;
 	QLabel* RedGrpLbl = new QLabel(Result);
-	RedGrpLbl->setText(tr("Group that will recieve prepayment fees"));
+	RedGrpLbl->setText(tr("Group that will receive prepayment fees"));
 	QLineEdit* RedGrpEdit = new QLineEdit(Result);
 	RedGrpEdit->setValidator(IntegerVector().GetValidator(RedGrpEdit));
 	RedGrpEdit->setToolTip(tr("This is the pro-rata level of the tranches.\nAccepts vectors."));
 	connect(RedGrpEdit, SIGNAL(textChanged(QString)), this, SLOT(SetRedemptionGroup(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedGrpEdit, SLOT(clear()));
+	connect(this, SIGNAL(ImportRedemptionGroup(QString)), RedGrpEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(RedGrpLbl, CountRow, 0);
 	ResLay->addWidget(RedGrpEdit, CountRow, 1);
 	CountRow++;
@@ -788,6 +820,7 @@ QWidget* WaterfallStepHelperDialog::CreateAllocPrepayWidget() {
 	connect(RedLvlEdit, SIGNAL(textChanged(QString)), this, SLOT(SetRedemptionGroupLevel(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedLvlEdit, SLOT(clear()));
 	connect(this, SIGNAL(SetTo1(QString)), RedLvlEdit, SLOT(setText(QString)));
+	connect(this, SIGNAL(ImportRedemptionGroupLevel(QString)), RedLvlEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(RedLvlLbl, CountRow, 0);
 	ResLay->addWidget(RedLvlEdit, CountRow, 1);
 	CountRow++;
@@ -801,12 +834,49 @@ QWidget* WaterfallStepHelperDialog::CreateAllocPrepayWidget() {
 	connect(RedShrEdit, SIGNAL(textChanged(QString)), this, SLOT(SetRedemptionShare(QString)));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedShrEdit, SLOT(clear()));
 	connect(this, SIGNAL(SetTo100(QString)), RedShrEdit, SLOT(setText(QString)));
+	connect(this, SIGNAL(ImportRedemptionShare(QString)), RedShrEdit, SLOT(setText(QString)), Qt::QueuedConnection);
 	ResLay->addWidget(RedShrLbl, CountRow, 0);
 	ResLay->addWidget(RedShrEdit, CountRow, 1);
 	CountRow++;
 
 	ResLay->addItem(new QSpacerItem(20, 20, QSizePolicy::Preferred, QSizePolicy::Expanding), CountRow, 0, 1, 2);
 	return Result;
+}
+
+void WaterfallStepHelperDialog::SetAvailableTriggers(const QHash<quint32, QSharedPointer<AbstractTrigger> >& AvailableTriggers) {
+	TriggerBuilder->SetAvailableTriggers(AvailableTriggers);
+}
+
+void WaterfallStepHelperDialog::SetCurrentPars(const QString& a) {
+	const auto AllPars = a.split('#');
+	if (AllPars.size() != 13) return;
+	auto i = AllPars.constBegin();
+	if (i->isEmpty()) return;
+	StepSelectorCombo->setCurrentIndex(StepSelectorCombo->findData(static_cast<qint16>(i->toInt()))); ++i;
+	if (!i->isEmpty()) { emit  ImportSeniorityGroup(*i); } ++i;
+	if (!i->isEmpty()) { emit  ImportSeniorityGroupLevel(*i); } ++i;
+	if (!i->isEmpty()) { emit  ImportRedemptionGroup(*i); }++i;
+	if (!i->isEmpty()) { emit  ImportRedemptionGroupLevel(*i); } ++i;
+	if (!i->isEmpty()) { emit  ImportRedemptionShare(*i); }++i;
+	if (!i->isEmpty()) { emit  ImportAdditionalCollateralShare(*i); } ++i;
+	if (!i->isEmpty()) {
+		emit  ImportSourceOfFunding(*i); 
+		if (StepSelectorCombo->currentData().toInt() == static_cast<qint32>(WatFalPrior::WaterfallStepType::wst_ReinvestPrincipal)) {
+			ResultingParameters[static_cast<qint32>(WatFalPrior::wstParameters::SourceOfFunding)] = *i;
+			switch (i->toInt()) {
+			case 1: emit SetSoFCombo(1); break;
+			case 2: emit SetSoFCombo(2); break;
+			default:
+			case 3: emit SetSoFCombo(0); break;
+			}
+		}
+	}
+	++i;
+	if (!i->isEmpty()) { emit  ImportCouponIndex(*i); }++i;
+	if (!i->isEmpty()) { emit  ImportTestTargetOverride(*i); } ++i;
+	if (!i->isEmpty()) { emit  ImportIRRtoEquityTarget(*i); }++i;
+	if (!i->isEmpty()) { emit  ImportReserveIndex(*i); }++i;
+	TriggerBuilder->SetCurrentStructure(*i);
 }
 
 

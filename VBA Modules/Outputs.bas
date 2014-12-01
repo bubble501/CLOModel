@@ -1,5 +1,12 @@
 Attribute VB_Name = "Outputs"
 Option Explicit
+Public Sub PrintWaterfallStep( _
+    DestinationSheet As String, _
+    DestinatAddress As String, _
+    StepStructure As String _
+)
+
+End Sub
 Public Sub PrintTranche( _
     Data As Variant, _
     DestinatAddress As String, _

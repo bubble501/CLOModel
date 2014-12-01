@@ -26,12 +26,12 @@
 #include "TriggerStructHelperWidget.h"
 int main(int argc, char *argv[]) {
 
-	QApplication a(argc, argv);
+	/*QApplication a(argc, argv);
 	WaterfallStepHelperDialog b;
 	if (b.exec()==QDialog::Accepted) {
 		qDebug() << b.GetParameters();
 	}
-	return a.exec();
+	return a.exec();*/
 
 
 	/*QApplication a(argc, argv);
@@ -242,7 +242,7 @@ int main(int argc, char *argv[]) {
 	}*/
 
 
-/*
+
 
 Waterfall TempWtf, TempCallWaterfall;
 QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/BaseCase.clo");
@@ -259,8 +259,14 @@ return 1;
 TempWtf.SetLoadProtocolVersion(VersionChecker);
 out >> TempWtf;
 QApplication a(argc, argv);
-TriggerStructHelperWidget b(TempWtf.GetTriggers());
-b.show();
-return a.exec();*/
+WaterfallStepHelperDialog b;
+b.SetAvailableTriggers(TempWtf.GetTriggers());
+for (int i = 0; i < TempWtf.GetStepsCount(); ++i) {
+	b.SetCurrentPars(TempWtf.GetStep(i)->CodeForDialog());
+	if (b.exec() == QDialog::Accepted) {
+		qDebug() << b.GetParameters();
+	}
+}
+return a.exec();
 
 }

@@ -8,6 +8,7 @@ Declare Function CLOReturnRate Lib "C:\Visual Studio Projects\CLOModelV2\Win32\R
 Declare Function GetStressLoss Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
 Declare Function GetStressDM Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
 'Declare Sub InspectWaterfall Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
+Declare Sub WatFallStepEdit Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
 Declare Function GetLoansAssumption Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
 Public Sub GetInputFromStructure( _
     MortgagesSheet As String, _
@@ -556,14 +557,14 @@ DefaultExchange:
             Case 2 'Pool Size Trigger
                 Call AddInput(AllTheInputs, CLng(2))
                 Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
-                Call AddInput(AllTheInputs, CDbl(TriggerStart.Offset(i, 2).Value))
-                Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 3).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 2).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 3).Value))
             Case 3 'Tranche Trigger
                 Call AddInput(AllTheInputs, CLng(3))
                 Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
-                Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 2).Value))
-                Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 3).Value - 1))
-                Call AddInput(AllTheInputs, CDbl(TriggerStart.Offset(i, 4).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 2).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 3).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 4).Value))
                 Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 5).Value))
                 Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 6).Value))
             Case 4 'Delinquency Trigger
@@ -1339,5 +1340,65 @@ Attribute GetLoanAssumption.VB_ProcData.VB_Invoke_Func = " \n14"
         GetLoanAssumption = response
     End If
 End Function
-
+Public Sub EditWaterfallStep(InputsSheet As String, Target As Range, FieldsLabels As Collection)
+     Dim AllTheInputs As New Collection
+     Dim TriggerStart As Range
+     Dim i As Long
+     Call AddInput(AllTheInputs, Target.Parent.Name)
+     Call AddInput(AllTheInputs, Sheets(Target.Parent.Name).Cells(Target.Row, 1).Address)
+     Dim CurrentStepStruct As String
+     CurrentStepStruct = CStr(FromStringToPriorty(Target.Value))
+     For i = 1 To 12
+        CurrentStepStruct = CurrentStepStruct & "#" & Target.Offset(0, i).Value
+     Next i
+     Call AddInput(AllTheInputs, CurrentStepStruct)
+     Set TriggerStart = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("TriggerStart"), LookAt:=xlWhole, LookIn:=xlValues)
+    i = 1
+    Do While True
+        If IsEmpty(TriggerStart.Offset(i, 0)) Then Exit Do
+        i = i + 1
+    Loop
+    Call AddInput(AllTheInputs, CLng(i - 1))
+    i = 1
+    Do While True
+        If IsEmpty(TriggerStart.Offset(i, 0)) Then Exit Do
+        Select Case FromStringToTriggerType(TriggerStart.Offset(i, 0).Value)
+            Case 0 'Date Trigger
+                Call AddInput(AllTheInputs, CLng(0))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
+                Call AddInput(AllTheInputs, Format(TriggerStart.Offset(i, 2).Value, "yyyy-mm-dd"))
+                Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 3).Value))
+            Case 1 'Vector Trigger
+                Call AddInput(AllTheInputs, CLng(1))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 2).Value))
+            Case 2 'Pool Size Trigger
+                Call AddInput(AllTheInputs, CLng(2))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 2).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 3).Value))
+            Case 3 'Tranche Trigger
+                Call AddInput(AllTheInputs, CLng(3))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 2).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 3).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 4).Value))
+                Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 5).Value))
+                Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 6).Value))
+            Case 4 'Delinquency Trigger
+                Call AddInput(AllTheInputs, CLng(4))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 2).Value))
+            Case Else
+                Exit Sub
+        End Select
+        i = i + 1
+    Loop
+     Dim result() As Variant
+    ReDim result(0 To AllTheInputs.Count - 1)
+    For i = 1 To AllTheInputs.Count
+        result(i - 1) = AllTheInputs(i)
+    Next i
+    Call WatFallStepEdit(result)
+End Sub
 

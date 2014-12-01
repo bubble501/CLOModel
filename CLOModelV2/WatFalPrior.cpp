@@ -280,6 +280,23 @@ void WatFalPrior::ResetMissinAnchors() {
 	FilledNullAnchors.clear();
 }
 
+QString WatFalPrior::CodeForDialog() const {
+	return QString("%1").arg(static_cast<qint16>(PriorityType)) + '#' +
+		GetParameter(wstParameters::SeniorityGroup).value<IntegerVector>().GetVector() + '#' +
+		GetParameter(wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetVector() + '#' +
+		GetParameter(wstParameters::RedemptionGroup).value<IntegerVector>().GetVector() + '#' +
+		GetParameter(wstParameters::RedemptionGroupLevel).value<IntegerVector>().GetVector() + '#' +
+		GetParameter(wstParameters::RedemptionShare).value<BloombergVector>().GetVector() + '#' +
+		GetParameter(wstParameters::AdditionalCollateralShare).value<BloombergVector>().GetVector() + '#' +
+		GetParameter(wstParameters::SourceOfFunding).value<IntegerVector>().GetVector() + '#' +
+		GetParameter(wstParameters::CouponIndex).value<IntegerVector>().GetVector() + '#' +
+		GetParameter(wstParameters::TestTargetOverride).value<BloombergVector>().GetVector() + '#' +
+		GetParameter(wstParameters::IRRtoEquityTarget).value<BloombergVector>().GetVector() + '#' +
+		GetParameter(wstParameters::ReserveIndex).value<IntegerVector>().GetVector() + '#' +
+		GetParameter(wstParameters::Trigger).toString()
+	;
+}
+
 QDataStream& operator>>(QDataStream & stream, WatFalPrior& flows) {
 	return flows.LoadOldVersion(stream);
 }

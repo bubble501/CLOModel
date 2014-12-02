@@ -17,6 +17,8 @@ public:
 	QString GetParameters() const;
 	void SetAvailableTriggers(const QHash<quint32, QSharedPointer<AbstractTrigger> >& AvailableTriggers);
 	void SetCurrentPars(const QString& a);
+	const bool& GetInterestWF() const { return m_InterestWF; }
+	void SetInterestWF(const bool& val) { m_InterestWF = val; }
 private slots:
 	void CheckOkEnabled(int index);
 	void ClearParameters() { ResultingParameters.clear(); }

@@ -13,16 +13,18 @@ Private Sub Worksheet_BeforeDoubleClick(ByVal Target As Range, Cancel As Boolean
     PopulateDafaultLabels allFields
     On Error GoTo StepNotFoundError
     Application.EnableEvents = False
-    Dim StepFound As Range
-    Set StepFound = Me.Cells.Find(what:=allFields("StepHead"), LookAt:=xlWhole, LookIn:=xlFormulas)
+    Dim FirstStep As Range
+    Dim LastStep As Range
+    Set FirstStep = Me.Cells.Find(What:=allFields("StepHead"), LookAt:=xlWhole, LookIn:=xlFormulas)
+    Set LastStep = Me.Cells.Find(What:=allFields("StepHead"), SearchDirection:=xlPrevious, LookAt:=xlWhole, LookIn:=xlFormulas)
     Dim singleCell As Range
+    Me.Unprotect
     For Each singleCell In Target
-    If (singleCell.Row > StepFound.Row And singleCell.Column = StepFound.Column) Then
-        Me.Unprotect
-        Call EditWaterfallStep("Liabilities + input", singleCell, allFields)
-        Me.Protect
+    If (singleCell.Row > FirstStep.Row And singleCell.Column = FirstStep.Column) Then
+        Call EditWaterfallStep("Liabilities + input", singleCell, allFields, singleCell.Row < LastStep)
     End If
     Next singleCell
+    Me.Protect
 StepNotFoundError:
 Cancel = True
 Application.EnableEvents = True

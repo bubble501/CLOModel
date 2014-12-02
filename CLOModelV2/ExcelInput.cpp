@@ -585,13 +585,14 @@ double __stdcall GetStressDM(LPSAFEARRAY *ArrayData) {
 		return Result->GetDiscountMargin(NewPrice);
 	return 0.0;
 }
-void __stdcall WatFallStepEdit(LPSAFEARRAY *ArrayData) {
+BSTR __stdcall WatFallStepEdit(LPSAFEARRAY *ArrayData) {
 	QHash<quint32, QSharedPointer<AbstractTrigger> >AvailableTriggers;
 	VARIANT HUGEP *pdFreq;
 	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
-	if (!SUCCEEDED(hr))return;
-	QString DestinationSheet = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
-	QString DestinationAddress = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+	if (!SUCCEEDED(hr))return NULL;
+	//QString DestinationSheet = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+	//QString DestinationAddress = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+	bool IsInterestWF = pdFreq->boolVal; pdFreq++;
 	QString CurrentStep = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 	{ //Triggers
 		int TriggerCount, TriggerTpe;
@@ -634,11 +635,17 @@ void __stdcall WatFallStepEdit(LPSAFEARRAY *ArrayData) {
 	int argc = sizeof(argv) / sizeof(char*) - 1;
 	QApplication a(argc, argv);
 	WaterfallStepHelperDialog WatfDialog;
+	WatfDialog.SetInterestWF(IsInterestWF);
 	WatfDialog.SetAvailableTriggers(AvailableTriggers);
 	WatfDialog.SetCurrentPars(CurrentStep);
 	if (WatfDialog.exec() == QDialog::Accepted) {
-		ExcelOutput::PrintWaterfallStep(DestinationSheet, DestinationAddress,WatfDialog.GetParameters());
+		QString Result = WatfDialog.GetParameters();
+		a.quit();
+		return SysAllocStringByteLen(Result.toStdString().c_str(), Result.size());
+		//ExcelOutput::PrintWaterfallStep(DestinationSheet, DestinationAddress,WatfDialog.GetParameters());
 	}
+	a.quit();
+	return NULL; 
 }
 
 //Ugly!!!

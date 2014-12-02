@@ -155,7 +155,6 @@ It will call the VBA function PrintMortgagesRepLines passing it the following ar
 	HRESULT PlotCallToEquity(const Waterfall& source,const QString& DestinationSheet,int DestinationIndex,const QDate& CallDate);
 	HRESULT PlotCPRLS(const Waterfall& source,const QString& DestinationSheet,int DestinationIndex);
 	HRESULT PlotEquityReturn(const Waterfall& source,const QString& DestinationSheet,int DestinationIndex);
-	HRESULT PrintWaterfallStep(const QString& DestinationSheet, const QString& DestinationAddress, const QString& StepStructure);
 }
 #endif // ExcelOutput_h__
 

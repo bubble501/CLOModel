@@ -97,22 +97,17 @@ void TriggerStructHelperWidget::SetAvailableTriggers(const QHash<quint32, QShare
 	int RowCount = 2;
 	QRegExp LabelRegExp("Label: .+\n");
 	LabelRegExp.setMinimal(true);
-	for (auto i = AvailableTriggers.constBegin(); i != AvailableTriggers.constEnd(); ++i) {
+	for (auto i = AvailableTriggers.constBegin(); i != AvailableTriggers.constEnd(); ++i, ++RowCount) {
 		TriggersModel->setData(TriggersModel->index(RowCount, 0), i.key());
 		TriggersModel->setData(TriggersModel->index(RowCount, 1), i.value()->GetTriggerLabel());
 		QString TempString = i.value()->ToString(); TempString.replace(LabelRegExp, ""); TempString.replace("\n", " - ");
-		TriggersModel->setData(TriggersModel->index(RowCount++, 2), TempString);
-		TriggersModel->setData(TriggersModel->index(RowCount++, 2), TempString,Qt::ToolTipRole);
+		TriggersModel->setData(TriggersModel->index(RowCount, 2), TempString);
+		TriggersModel->setData(TriggersModel->index(RowCount, 2), TempString,Qt::ToolTipRole);
 		RegExpString += '|' + QString::number(i.key());
 	}
 	TriggersModel->sort(0);
 	RegExpString += "|!|\\(|\\))*";
-	auto CurrentVal = EncriptedTriggers->validator();
-	/*if (CurrentVal) {
-		EncriptedTriggers->setValidator(NULL);
-	}*/
 	EncriptedTriggers->setValidator(new QRegExpValidator(QRegExp(RegExpString), EncriptedTriggers));
-
 }
 
 void TriggerStructHelperWidget::InsertOperator() {
@@ -235,7 +230,7 @@ void TriggerStructHelperWidget::DecriptTriggers(QString encr) {
 }
 
 void TriggerStructHelperWidget::SetCurrentStructure(const QString& a) {
-	EncriptedTriggers->setText(a);
+	EncriptedTriggers->setText(NormaliseTriggerStructure(a));
 }
 
 QString TriggerStructHelperWidget::GetResult() const {

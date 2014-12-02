@@ -8,7 +8,7 @@ Declare Function CLOReturnRate Lib "C:\Visual Studio Projects\CLOModelV2\Win32\R
 Declare Function GetStressLoss Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
 Declare Function GetStressDM Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
 'Declare Sub InspectWaterfall Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
-Declare Sub WatFallStepEdit Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
+Declare Function WatFallStepEdit Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As String
 Declare Function GetLoansAssumption Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
 Public Sub GetInputFromStructure( _
     MortgagesSheet As String, _
@@ -146,7 +146,7 @@ Public Sub GetInputFromStructure( _
     Dim TriggersHead As Long
     
     Set WaterfallSheet = Sheets(FieldsLabels("WaterfallSheet"))
-     Set FirstStep = WaterfallSheet.Cells.Find(What:=FieldsLabels("StepHead"), LookAt:=xlWhole, LookIn:=xlFormulas)
+    Set FirstStep = WaterfallSheet.Cells.Find(What:=FieldsLabels("StepHead"), LookAt:=xlWhole, LookIn:=xlFormulas)
     Set LastStep = WaterfallSheet.Cells.Find(What:=FieldsLabels("StepHead"), SearchDirection:=xlPrevious, LookAt:=xlWhole, LookIn:=xlFormulas)
     SeniorityGroupHead = WaterfallSheet.Cells.Find(What:=FieldsLabels("SeniorityGroupHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
     SeniorityGroupLevelHead = WaterfallSheet.Cells.Find(What:=FieldsLabels("SeniorityGroupLevelHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
@@ -1150,7 +1150,53 @@ FromStringToPriorty_Error:
                 , vbCritical, "Error")
     End
 End Function
+Private Function FromPriortyToString(a As Long) As String
+   On Error GoTo FromPriortyToString_Error
+    Select Case UCase(a)
+        Case 0
+            FromPriortyToString = "Senior expenses"
+        Case 1
+            FromPriortyToString = "Senior management fees"
+        Case 13
+            FromPriortyToString = "Reinvestment"
+        Case 2
+            FromPriortyToString = "Interest"
+        Case 3
+            FromPriortyToString = "Principal"
+        Case 4
+            FromPriortyToString = "OC"
+        Case 6
+            FromPriortyToString = "IC"
+        Case 8
+            FromPriortyToString = "Deferred"
+        Case 12
+            FromPriortyToString = "Excess"
+        Case 10
+            FromPriortyToString = "Junior management fees"
+        Case 11
+            FromPriortyToString = "Reinvestment test"
+        Case 14
+            FromPriortyToString = "Replenish Reserve"
+        Case 16
+            FromPriortyToString = "Turbo"
+        Case 17
+            FromPriortyToString = "Cure PDL"
+        Case 18
+            FromPriortyToString = "Fees From XS"
+        Case 19
+            FromPriortyToString = "Allocate Prepay fees"
+        Case Else
+            GoTo FromPriortyToString_Error
+    End Select
+   On Error GoTo 0
+   Exit Function
 
+FromPriortyToString_Error:
+    Call MsgBox("Invalid step in the Waterfall." _
+                & vbCrLf & "Aborting" _
+                , vbCritical, "Error")
+    End
+End Function
 Public Function GetDM(TrancheName As String, DealName As String, Price As Double, Optional ToCall As Boolean = False)
     Dim result(0 To 4) As Variant
     result(0) = Left(ActiveWorkbook.FullName, InStrRev(ActiveWorkbook.FullName, "\"))
@@ -1340,17 +1386,18 @@ Attribute GetLoanAssumption.VB_ProcData.VB_Invoke_Func = " \n14"
         GetLoanAssumption = response
     End If
 End Function
-Public Sub EditWaterfallStep(InputsSheet As String, Target As Range, FieldsLabels As Collection)
+Public Sub EditWaterfallStep(InputsSheet As String, Target As Range, FieldsLabels As Collection, IntrWF As Boolean)
      Dim AllTheInputs As New Collection
      Dim TriggerStart As Range
      Dim i As Long
-     Call AddInput(AllTheInputs, Target.Parent.Name)
-     Call AddInput(AllTheInputs, Sheets(Target.Parent.Name).Cells(Target.Row, 1).Address)
+     'Call AddInput(AllTheInputs, Target.Parent.Name)
+     'Call AddInput(AllTheInputs, Sheets(Target.Parent.Name).Cells(Target.Row, 1).Address)
      Dim CurrentStepStruct As String
      CurrentStepStruct = CStr(FromStringToPriorty(Target.Value))
      For i = 1 To 12
         CurrentStepStruct = CurrentStepStruct & "#" & Target.Offset(0, i).Value
      Next i
+     Call AddInput(AllTheInputs, IntrWF)
      Call AddInput(AllTheInputs, CurrentStepStruct)
      Set TriggerStart = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("TriggerStart"), LookAt:=xlWhole, LookIn:=xlValues)
     i = 1
@@ -1399,6 +1446,29 @@ Public Sub EditWaterfallStep(InputsSheet As String, Target As Range, FieldsLabel
     For i = 1 To AllTheInputs.Count
         result(i - 1) = AllTheInputs(i)
     Next i
-    Call WatFallStepEdit(result)
+    Dim EditedStep As String
+    EditedStep = WatFallStepEdit(result)
+    If EditedStep = "" Then Exit Sub
+    Dim StepParts
+    StepParts = Split(EditedStep, "#")
+    Target.Value = FromPriortyToString(CLng(StepParts(LBound(StepParts))))
+    For i = LBound(StepParts) + 1 To UBound(StepParts)
+        With Target.Offset(0, i - LBound(StepParts))
+            If StepParts(i) = "" Or (i = 7 + LBound(StepParts) And StepParts(LBound(StepParts)) <> "13") Then
+                .ClearContents
+                .NumberFormat = ";;;"
+                .Interior.Color = RGB(191, 191, 191)
+                .ClearComments
+            Else
+                .Value = StepParts(i)
+                .NumberFormat = "General"
+                .Interior.Color = RGB(235, 241, 222)
+            End If
+            If (i = 7 + LBound(StepParts) And StepParts(LBound(StepParts)) = "13") Then
+                .NumberFormat = "[=1]""Unscheduled"";[=2]""Scheduled"";""All Principal"""
+            End If
+        End With
+    Next i
+    Target.Offset(1, 0).EntireRow.Hidden = False
 End Sub
 

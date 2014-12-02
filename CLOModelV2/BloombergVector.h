@@ -33,19 +33,20 @@ public:
 	virtual double GetSMM(const QDate& index, int Frequency = 12) const;
 	virtual double GetSMM(int index, int Frequency = 12) const;
 	int NumElements() const {return m_VectVal.size();}
-	void SetDivisor(double a) { if (a > 0.0) m_Divisor = a; UnpackVector(); }
+	void SetDivisor(double a) { if (a != 0.0) m_Divisor = a; UnpackVector(); }
+	double GetDivisor() const { return m_Divisor; }
 	BloombergVector& operator=(const QString& a){AbstractBbgVect::operator=(a); return *this;}
 	BloombergVector& operator=(const BloombergVector& Vec);
 	BloombergVector operator+(const BloombergVector& Vec) const;
 	BloombergVector operator+(double a) const;
-	BloombergVector operator*(double a) const { BloombergVector Result(*this); Result.SetDivisor(a / m_Divisor); return Result; }
-	BloombergVector operator/(double a) const { BloombergVector Result(*this); Result.SetDivisor(a * m_Divisor); return Result; }
+	BloombergVector operator*(double a) const;
+	BloombergVector operator/(double a) const;
 	BloombergVector operator-(double a) const{return operator+(-a);}
 	BloombergVector& operator+=(const BloombergVector& a){return operator=(operator+(a));}
 	BloombergVector& operator+=(double a){return operator=(operator+(a));}
 	BloombergVector& operator-=(double a){return operator+=(-a);}
-	BloombergVector& operator*=(double a) { SetDivisor(a / m_Divisor); return *this; }
-	BloombergVector& operator/=(double a) { SetDivisor(a * m_Divisor); return *this; }
+	BloombergVector& operator*=(double a);
+	BloombergVector& operator/=(double a);
 	friend QDataStream& operator<<(QDataStream & stream, const BloombergVector& flows);
 	friend QDataStream& operator>>(QDataStream & stream, BloombergVector& flows);
 };

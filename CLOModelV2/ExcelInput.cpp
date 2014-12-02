@@ -17,6 +17,7 @@
 #include "TrancheTrigger.h"
 #include "DelinquencyTrigger.h"
 #include "WaterfallStepHelperDialog.h"
+#include "TriggerHelperDialog.h"
 void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	bool RunStress;
 	CentralUnit TempUnit;
@@ -151,6 +152,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 				TempTrigger.dynamicCast<TrancheTrigger>()->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
 				TempTrigger.dynamicCast<TrancheTrigger>()->SetSenioritySide(static_cast<TrancheTrigger::TriggerSenioritySide>(pdFreq->intVal)); pdFreq++;
 				TempTrigger.dynamicCast<TrancheTrigger>()->SetSizeSide(static_cast<TrancheTrigger::TriggerSizeSide>(pdFreq->intVal)); pdFreq++;
+				TempTrigger.dynamicCast<TrancheTrigger>()->SetSizeMultiplier(pdFreq->dblVal); pdFreq++;
 				TempUnit.SetTrigger(i + 1, TempTrigger);
 				break;
 			case static_cast<int>(AbstractTrigger::TriggerType::DelinquencyTrigger) :
@@ -622,6 +624,7 @@ BSTR __stdcall WatFallStepEdit(LPSAFEARRAY *ArrayData) {
 				TempIter->dynamicCast<TrancheTrigger>()->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
 				TempIter->dynamicCast<TrancheTrigger>()->SetSenioritySide(static_cast<TrancheTrigger::TriggerSenioritySide>(pdFreq->intVal)); pdFreq++;
 				TempIter->dynamicCast<TrancheTrigger>()->SetSizeSide(static_cast<TrancheTrigger::TriggerSizeSide>(pdFreq->intVal)); pdFreq++;
+				TempIter->dynamicCast<TrancheTrigger>()->SetSizeMultiplier(pdFreq->dblVal); pdFreq++;
 				break;
 			case static_cast<int>(AbstractTrigger::TriggerType::DelinquencyTrigger) :
 				TempIter = AvailableTriggers.insert(i, QSharedPointer<AbstractTrigger>(new DelinquencyTrigger(QString::fromWCharArray(pdFreq->bstrVal)))); pdFreq++;
@@ -642,12 +645,30 @@ BSTR __stdcall WatFallStepEdit(LPSAFEARRAY *ArrayData) {
 		QString Result = WatfDialog.GetParameters();
 		a.quit();
 		return SysAllocStringByteLen(Result.toStdString().c_str(), Result.size());
-		//ExcelOutput::PrintWaterfallStep(DestinationSheet, DestinationAddress,WatfDialog.GetParameters());
 	}
 	a.quit();
 	return NULL; 
 }
-
+BSTR __stdcall TriggerEdit(LPSAFEARRAY *ArrayData) {
+	QHash<quint32, QSharedPointer<AbstractTrigger> >AvailableTriggers;
+	VARIANT HUGEP *pdFreq;
+	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
+	if (!SUCCEEDED(hr))return NULL;
+	QString CurrentTrig = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+	SafeArrayUnaccessData(*ArrayData);
+	char *argv[] = { "NoArgumnets" };
+	int argc = sizeof(argv) / sizeof(char*) - 1;
+	QApplication a(argc, argv);
+	TriggerHelperDialog TrigDialog;
+	TrigDialog.SetCurrentPars(CurrentTrig);
+	if (TrigDialog.exec() == QDialog::Accepted) {
+		QString Result = TrigDialog.GetParameters();
+		a.quit();
+		return SysAllocStringByteLen(Result.toStdString().c_str(), Result.size());
+	}
+	a.quit();
+	return NULL;
+}
 //Ugly!!!
 double __stdcall GetLoansAssumption(LPSAFEARRAY *ArrayData) {
 	ExcelCommons::InitExcelOLE();

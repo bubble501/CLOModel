@@ -158,3 +158,8 @@ void TrancheTrigger::FillMissingAnchorDate(const QDate& a) {
 	if (m_TargetSeniorityLevel.GetAnchorDate().isNull()) m_TargetSeniorityLevel.SetAnchorDate(a);
 	if (m_TargetSeniority.GetAnchorDate().isNull()) m_TargetSeniority.SetAnchorDate(a);
 }
+
+void TrancheTrigger::SetSizeMultiplier(double mult) {
+	if (mult == 0.0) return ResetSizeMultiplier();  
+	m_TargetSize*=mult;
+}

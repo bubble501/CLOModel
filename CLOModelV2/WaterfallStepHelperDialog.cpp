@@ -67,7 +67,6 @@ WaterfallStepHelperDialog::WaterfallStepHelperDialog(QWidget *parent)
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(SetDefaults1())/*, Qt::QueuedConnection*/);
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(SetDefaults100())/*, Qt::QueuedConnection*/);
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(SetDefaults0())/*, Qt::QueuedConnection*/);
-	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(SetbasedOnWaterfall(int))/*, Qt::QueuedConnection*/);
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(CheckOkEnabled(int))/*,Qt::QueuedConnection*/);
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(ResetSoFCombo(int))/*, Qt::QueuedConnection*/);
 
@@ -208,7 +207,8 @@ void WaterfallStepHelperDialog::SoFComboChanged(int index) {
 	if (StepBuilderBase->currentWidget()->children().contains(sender()))
 		ResultingParameters[static_cast<qint32>(WatFalPrior::wstParameters::SourceOfFunding)] = QString::number((index == 0) ? 3 : index);
 }
-QString WaterfallStepHelperDialog::GetParameters() const {
+QString WaterfallStepHelperDialog::GetParameters() {
+	SetbasedOnWaterfall();
 	QString Result = QString::number(StepSelectorCombo->currentData().toInt());
 	Result += '#' + ResultingParameters.value(static_cast<qint32>(WatFalPrior::wstParameters::SeniorityGroup), "");
 	Result += '#' + ResultingParameters.value(static_cast<qint32>(WatFalPrior::wstParameters::SeniorityGroupLevel), "") ;
@@ -240,8 +240,8 @@ void WaterfallStepHelperDialog::ResetSoFCombo(int index) {
 		emit SetSoFCombo(0);
 	}
 }
-void WaterfallStepHelperDialog::SetbasedOnWaterfall(int index) {
-	switch (static_cast<WatFalPrior::WaterfallStepType>(StepSelectorCombo->itemData(index).toInt())) {
+void WaterfallStepHelperDialog::SetbasedOnWaterfall() {
+	switch (static_cast<WatFalPrior::WaterfallStepType>(StepSelectorCombo->currentData().toInt())) {
 	case WatFalPrior::WaterfallStepType::wst_SeniorExpenses:
 	case WatFalPrior::WaterfallStepType::wst_SeniorFees:
 	case WatFalPrior::WaterfallStepType::wst_juniorFees:

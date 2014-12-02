@@ -14,7 +14,7 @@ class WaterfallStepHelperDialog : public QDialog
 
 public:
 	WaterfallStepHelperDialog(QWidget *parent=0);
-	QString GetParameters() const;
+	QString GetParameters();
 	void SetAvailableTriggers(const QHash<quint32, QSharedPointer<AbstractTrigger> >& AvailableTriggers);
 	void SetCurrentPars(const QString& a);
 	const bool& GetInterestWF() const { return m_InterestWF; }
@@ -37,7 +37,7 @@ private slots:
 	void SetDefaults1();
 	void SetDefaults100();
 	void SetDefaults0();
-	void SetbasedOnWaterfall(int index);
+	void SetbasedOnWaterfall();
 	void ResetSoFCombo(int index);
 	void SoFComboChanged(int index);
 signals:

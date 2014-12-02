@@ -8,3 +8,4 @@ EXPORTS
 	GetStressLoss
 	GetStressDM
 	WatFallStepEdit
+	TriggerEdit

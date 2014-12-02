@@ -24,14 +24,15 @@
 #include "SummaryView.h"
 #include "WaterfallStepHelperDialog.h"
 #include "TriggerStructHelperWidget.h"
+#include "TriggerHelperDialog.h"
 int main(int argc, char *argv[]) {
 
-	/*QApplication a(argc, argv);
+	QApplication a(argc, argv);
 	WaterfallStepHelperDialog b;
 	if (b.exec()==QDialog::Accepted) {
 		qDebug() << b.GetParameters();
 	}
-	return a.exec();*/
+	return a.exec();
 
 
 	/*QApplication a(argc, argv);
@@ -240,33 +241,5 @@ int main(int argc, char *argv[]) {
 		QApplication a(argc, argv);
 		QMessageBox::information(0, "Success", "Cash Flows are identical");
 	}*/
-
-
-
-
-Waterfall TempWtf, TempCallWaterfall;
-QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/BaseCase.clo");
-file.open(QIODevice::ReadOnly);
-qint32 VersionChecker;
-QDataStream out(&file);
-out.setVersion(QDataStream::Qt_5_3);
-out >> VersionChecker;
-if (VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) {
-file.close();
-return 1;
-}
-{bool Junk; out >> Junk; }
-TempWtf.SetLoadProtocolVersion(VersionChecker);
-out >> TempWtf;
-QApplication a(argc, argv);
-WaterfallStepHelperDialog b;
-b.SetAvailableTriggers(TempWtf.GetTriggers());
-for (int i = 0; i < TempWtf.GetStepsCount(); ++i) {
-	b.SetCurrentPars(TempWtf.GetStep(i)->CodeForDialog());
-	if (b.exec() == QDialog::Accepted) {
-		qDebug() << b.GetParameters();
-	}
-}
-return a.exec();
 
 }

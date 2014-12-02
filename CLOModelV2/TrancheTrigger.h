@@ -42,7 +42,7 @@ public:
 	void SetTargetSeniority(const QString& val) { m_TargetSeniority = val; }
 	const BloombergVector& GetTargetSize() const { return m_TargetSize; }
 	void SetTargetSize(const QString& val) { m_TargetSize = val; }
-	void SetSizeMultiplier(double mult) { m_TargetSize.SetDivisor(100.0*(1.0/mult)); }
+	void SetSizeMultiplier(double mult);
 	void ResetSizeMultiplier() { m_TargetSize.SetDivisor(100.0); }
 	virtual QString ToString() const override;
 	bool HasAnchor()const;

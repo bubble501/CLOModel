@@ -9,18 +9,7 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Option Explicit
 Private Sub Worksheet_Change(ByVal Target As Range)
-    If Not Intersect(Target, Me.Range("f25:m150")) Is Nothing Then
-        Dim singleCell
-        Application.ScreenUpdating = False
-        Me.Unprotect
-        Application.EnableEvents = False
-        For Each singleCell In Target
-            Call TriggerChanged(Me.Range(singleCell.Address), 6) '6 is the colum index of F1
-        Next singleCell
-        Application.EnableEvents = True
-        Me.Protect AllowFormattingCells:=True, AllowFormattingColumns:=True, AllowFormattingRows:=True
-        Application.ScreenUpdating = True
-    ElseIf Not Intersect(Target, Me.Range("A4:A19")) Is Nothing Then
+  If Not Intersect(Target, Me.Range("A4:A19")) Is Nothing Then
         Me.Shapes("GhostButton").Visible = _
             Application.WorksheetFunction.CountBlank(Me.Range("A4:A19")) = 16
         Me.Shapes("ImportFromOldButton").Visible = _
@@ -75,6 +64,19 @@ DefaulttargetValue:
             Application.Calculation = xlCalculationAutomatic
             Me.Protect AllowFormattingCells:=True, AllowFormattingColumns:=True, AllowFormattingRows:=True
         End If
+        Cancel = True
+    End If
+    If Not Intersect(Target, Me.Range("f25:f150")) Is Nothing Then
+        Dim singleCell
+        Application.ScreenUpdating = False
+        Me.Unprotect
+        Application.EnableEvents = False
+        For Each singleCell In Target
+            Call EditTrigger(Me.Range(singleCell.Address))
+        Next singleCell
+        Application.EnableEvents = True
+        Me.Protect AllowFormattingCells:=True, AllowFormattingColumns:=True, AllowFormattingRows:=True
+        Application.ScreenUpdating = True
         Cancel = True
     End If
 End Sub

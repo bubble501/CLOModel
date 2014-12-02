@@ -21,7 +21,7 @@ Private Sub Worksheet_BeforeDoubleClick(ByVal Target As Range, Cancel As Boolean
     Me.Unprotect
     For Each singleCell In Target
     If (singleCell.Row > FirstStep.Row And singleCell.Column = FirstStep.Column) Then
-        Call EditWaterfallStep("Liabilities + input", singleCell, allFields, singleCell.Row < LastStep)
+        Call EditWaterfallStep("Liabilities + input", singleCell, allFields, singleCell.Row < LastStep.Row)
     End If
     Next singleCell
     Me.Protect

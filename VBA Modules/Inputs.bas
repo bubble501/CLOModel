@@ -9,6 +9,7 @@ Declare Function GetStressLoss Lib "C:\Visual Studio Projects\CLOModelV2\Win32\R
 Declare Function GetStressDM Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
 'Declare Sub InspectWaterfall Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
 Declare Function WatFallStepEdit Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As String
+Declare Function TriggerEdit Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As String
 Declare Function GetLoansAssumption Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
 Public Sub GetInputFromStructure( _
     MortgagesSheet As String, _
@@ -567,6 +568,7 @@ DefaultExchange:
                 Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 4).Value))
                 Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 5).Value))
                 Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 6).Value))
+                Call AddInput(AllTheInputs, CDbl(TriggerStart.Offset(i, 7).Value))
             Case 4 'Delinquency Trigger
                 Call AddInput(AllTheInputs, CLng(4))
                 Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
@@ -1092,7 +1094,31 @@ FromStringToTriggerType_Error:
                 & vbCrLf & "Aborting" _
                 , vbCritical, "Error")
 End Function
-
+Public Function FromTriggerTypeToString(a As Long) As String
+    On Error GoTo FromTriggerTypeToString_Error
+    Select Case a
+        Case 0
+            FromTriggerTypeToString = "Date Trigger"
+        Case 1
+            FromTriggerTypeToString = "Vector Trigger"
+        Case 2
+            FromTriggerTypeToString = "Pool Size Trigger"
+        Case 3
+            FromTriggerTypeToString = "Tranche Trigger"
+        Case 4
+            FromTriggerTypeToString = "Delinquency Trigger"
+        Case ""
+            Exit Function
+        Case Else
+            GoTo FromTriggerTypeToString_Error
+    End Select
+    On Error GoTo 0
+    Exit Function
+FromTriggerTypeToString_Error:
+    Call MsgBox("Invalid trigger type." _
+                & vbCrLf & "Aborting" _
+                , vbCritical, "Error")
+End Function
 
 Private Function FromStringToPriorty(a As String) As Long
     
@@ -1454,7 +1480,7 @@ Public Sub EditWaterfallStep(InputsSheet As String, Target As Range, FieldsLabel
     Target.Value = FromPriortyToString(CLng(StepParts(LBound(StepParts))))
     For i = LBound(StepParts) + 1 To UBound(StepParts)
         With Target.Offset(0, i - LBound(StepParts))
-            If StepParts(i) = "" Or (i = 7 + LBound(StepParts) And StepParts(LBound(StepParts)) <> "13") Then
+            If StepParts(i) = "" Then
                 .ClearContents
                 .NumberFormat = ";;;"
                 .Interior.Color = RGB(191, 191, 191)
@@ -1464,6 +1490,10 @@ Public Sub EditWaterfallStep(InputsSheet As String, Target As Range, FieldsLabel
                 .NumberFormat = "General"
                 .Interior.Color = RGB(235, 241, 222)
             End If
+            If StepParts(i) = "" Or (i = 7 + LBound(StepParts) And StepParts(LBound(StepParts)) <> "13") Then
+                .NumberFormat = ";;;"
+                .Interior.Color = RGB(191, 191, 191)
+            End If
             If (i = 7 + LBound(StepParts) And StepParts(LBound(StepParts)) = "13") Then
                 .NumberFormat = "[=1]""Unscheduled"";[=2]""Scheduled"";""All Principal"""
             End If
@@ -1472,3 +1502,32 @@ Public Sub EditWaterfallStep(InputsSheet As String, Target As Range, FieldsLabel
     Target.Offset(1, 0).EntireRow.Hidden = False
 End Sub
 
+Public Sub EditTrigger(Target As Range)
+    Dim i As Long
+    Dim CurrentTrigStruct As String
+    CurrentTrigStruct = CStr(FromStringToTriggerType(Target.Value))
+    For i = 1 To 8
+       CurrentTrigStruct = CurrentTrigStruct & "#" & Target.Offset(0, i).Value
+    Next i
+    Dim result() As Variant
+    ReDim result(0 To 0)
+    result(0) = CurrentTrigStruct
+    Dim EditedStep As String
+    EditedStep = TriggerEdit(result)
+    If EditedStep = "" Then Exit Sub
+    Dim StepParts
+    StepParts = Split(EditedStep, "#")
+    Target.Value = FromTriggerTypeToString(CLng(StepParts(LBound(StepParts))))
+    For i = LBound(StepParts) + 1 To LBound(StepParts) + 8
+        With Target.Offset(0, i - LBound(StepParts))
+            If i > UBound(StepParts) Then
+                .ClearContents
+            ElseIf StepParts(i) = "" Then
+                .ClearContents
+            Else
+                .Value = StepParts(i)
+                .NumberFormat = "General"
+            End If
+        End With
+    Next i
+End Sub

@@ -331,6 +331,15 @@
     <ClCompile Include="TriggerStructHelperWidget.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_TriggerHelperDialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_TriggerHelperDialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="TriggerHelperDialog.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Resources.qrc">
@@ -484,6 +493,9 @@
       <Filter>Header Files\Core</Filter>
     </CustomBuild>
     <CustomBuild Include="TriggerStructHelperWidget.h">
+      <Filter>Header Files\Core</Filter>
+    </CustomBuild>
+    <CustomBuild Include="TriggerHelperDialog.h">
       <Filter>Header Files\Core</Filter>
     </CustomBuild>
   </ItemGroup>

@@ -1432,9 +1432,14 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					PrintToTempFile("ReturnFalse.txt", "Reached Default");
 					return false;
 				}//End Switch
-			}//End Cicle through the steps of the waterfall
+			}//End Cycle through the steps of the waterfall
+			//If, after applying the waterfall, there are still funds available, apply them to XS
+			if (AvailablePrincipal.Total()>0.0) m_ExcessCashFlow.AddFlow(CurrentDate, AvailablePrincipal.Total(), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
+			if (AvailableInterest>0.0) m_ExcessCashFlow.AddFlow(CurrentDate, AvailableInterest, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
+			AvailablePrincipal.Erase();
+			AvailableInterest = 0.0;
 			m_PrincipalAvailable.Erase();
-			m_InterestAvailable=0.0;
+			m_InterestAvailable = 0.0;
 			CurrentAssetSum = 0.0;
 			CurrentAssetCount = 0;
 			RollingLastIPD=RollingNextIPD;
@@ -1443,7 +1448,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 				i++;
 				break;
 			}
-		}//End Cicle in time
+		}//End Cycle in time
 		for(int j=0;j<m_Reserves.size();j++){
 			m_Reserves[j]->SetReserveFundCurrent(m_Reserves[j]->GetStartingReserve());
 			m_Reserves[j]->ResetMissingAnchors();
@@ -1503,6 +1508,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 				}
 			}
 		}
+		LOGDEBUG(QString("After Call Proceeds:\t%1").arg(CheckResults, 0, 'f'));
 		CheckResults -= CheckMtgCashFlow.GetTotalFlow(0);
 		LOGDEBUG(QString("After Loans Flows:\t%1").arg(CheckResults,0,'f'));
 		CheckTranCashFlow.Clear(); CheckTranCashFlow.AddFlow(m_GICflows); CheckResults -= CheckTranCashFlow.GetTotalFlow(0);
@@ -1947,7 +1953,7 @@ bool Waterfall::ValidTriggerStructure(const QString& TriggerStructure)const {
 		LOGDEBUG("Failed in Postfix"); 
 		return false; 
 	}
-	QRegExp SignleTriggers("(\\d+)");
+	QRegExp SignleTriggers("(\\d+|T|F)",Qt::CaseInsensitive);
 	QStringList CapturedTriggers;
 	{
 		int pos = 0;
@@ -1958,6 +1964,7 @@ bool Waterfall::ValidTriggerStructure(const QString& TriggerStructure)const {
 	}
 	if (CapturedTriggers.isEmpty()) return false;
 	for (auto i = CapturedTriggers.constBegin();i!=CapturedTriggers.constEnd();++i){
+		if (i->compare("F", Qt::CaseInsensitive) == 0 || i->compare("T", Qt::CaseInsensitive) == 0) continue;
 		if (!m_Triggers.contains(i->toUInt())) {
 			LOGDEBUG("Failed Finding Trigger");
 			return false;
@@ -1993,8 +2000,8 @@ bool Waterfall::TriggerPassing(const QString& TriggerStructure, int PeriodIndex,
 	QStringList PolishParts = AdjStructure.split(' ');
 	SignleTriggers.setPattern("(\\d+)");
 	foreach(const QString& SinglePart, PolishParts) {
-		if (SinglePart == "F") PolishStack.push(false);
-		else if (SinglePart == "T") PolishStack.push(true);
+		if (SinglePart.compare("F",Qt::CaseInsensitive)==0) PolishStack.push(false);
+		else if (SinglePart.compare("T", Qt::CaseInsensitive) == 0) PolishStack.push(true);
 		else if(SignleTriggers.exactMatch(SinglePart)) {
 				PolishStack.push(m_TriggersResults.GetResult(SinglePart.toUInt(), CurrentIPD) == TriggersResults::TrigRes::trTrue);
 		}

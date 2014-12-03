@@ -374,11 +374,12 @@ GenericCashFlow GenericCashFlow::ScaledCashFlows(double OriginalRefSize, double 
 }
 
 QString GenericCashFlow::ToPlainText(bool UseHeaders /*= true*/) const {
-	QString Result;
-	const auto AllFlows = AvailableFlows();
+	if (IsEmpty()) return false;
+	QString Result("Date");
+	auto AllFlows = AvailableFlows();
+	qSort(AllFlows);
 	for (auto j = AllFlows.constBegin(); j != AllFlows.constEnd(); ++j) {
-		if (j != AllFlows.constBegin()) Result += '\t';
-		if (UseHeaders) Result += m_CashFlowLabels.value(*j, QString("Flow %1").arg(*j));
+		if (UseHeaders) Result += '\t' + m_CashFlowLabels.value(*j, QString("Flow %1").arg(*j));
 		else  Result += QString("%1").arg(*j);
 	}
 	for (auto i = m_CashFlows.constBegin(); i != m_CashFlows.constEnd(); ++i) {
@@ -392,7 +393,8 @@ QString GenericCashFlow::ToPlainText(bool UseHeaders /*= true*/) const {
 
 QString GenericCashFlow::ToXML() const {
 	QString Result="<CashFlow>";
-	const auto AllFlows = AvailableFlows();
+	auto AllFlows = AvailableFlows();
+	qSort(AllFlows);
 	for (auto j = AllFlows.constBegin(); j != AllFlows.constEnd(); ++j) {
 		Result += QString("<Flow id='%1'>").arg(*j);
 		if (m_CashFlowLabels.contains(*j)) Result += "<Label>" + ConvertValidXML(m_CashFlowLabels.value(*j)) + "</Label>";

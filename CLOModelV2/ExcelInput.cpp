@@ -16,6 +16,8 @@
 #include "PoolSizeTrigger.h"
 #include "TrancheTrigger.h"
 #include "DelinquencyTrigger.h"
+#include "WaterfallStepHelperDialog.h"
+#include "TriggerHelperDialog.h"
 void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	bool RunStress;
 	CentralUnit TempUnit;
@@ -139,17 +141,18 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 				break;
 			case static_cast<int>(AbstractTrigger::TriggerType::PoolSizeTrigger) :
 				TempTrigger.reset(new PoolSizeTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
-				TempTrigger.dynamicCast<PoolSizeTrigger>()->SetTargetSize(pdFreq->dblVal); pdFreq++;
+				TempTrigger.dynamicCast<PoolSizeTrigger>()->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
 				TempTrigger.dynamicCast<PoolSizeTrigger>()->SetSide(static_cast<PoolSizeTrigger::TriggerSide>(pdFreq->intVal)); pdFreq++;
 				TempUnit.SetTrigger(i + 1, TempTrigger);
 				break;
 			case static_cast<int>(AbstractTrigger::TriggerType::TrancheTrigger) :
 				TempTrigger.reset(new TrancheTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
-				TempTrigger.dynamicCast<TrancheTrigger>()->SetTargetSeniority(pdFreq->intVal); pdFreq++;
-				TempTrigger.dynamicCast<TrancheTrigger>()->SetTargetSeniorityLevel(pdFreq->intVal); pdFreq++;
-				TempTrigger.dynamicCast<TrancheTrigger>()->SetTargetSize(pdFreq->dblVal); pdFreq++;
+				TempTrigger.dynamicCast<TrancheTrigger>()->SetTargetSeniority(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+				TempTrigger.dynamicCast<TrancheTrigger>()->SetTargetSeniorityLevel(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+				TempTrigger.dynamicCast<TrancheTrigger>()->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
 				TempTrigger.dynamicCast<TrancheTrigger>()->SetSenioritySide(static_cast<TrancheTrigger::TriggerSenioritySide>(pdFreq->intVal)); pdFreq++;
 				TempTrigger.dynamicCast<TrancheTrigger>()->SetSizeSide(static_cast<TrancheTrigger::TriggerSizeSide>(pdFreq->intVal)); pdFreq++;
+				TempTrigger.dynamicCast<TrancheTrigger>()->SetSizeMultiplier(pdFreq->dblVal); pdFreq++;
 				TempUnit.SetTrigger(i + 1, TempTrigger);
 				break;
 			case static_cast<int>(AbstractTrigger::TriggerType::DelinquencyTrigger) :
@@ -584,8 +587,92 @@ double __stdcall GetStressDM(LPSAFEARRAY *ArrayData) {
 		return Result->GetDiscountMargin(NewPrice);
 	return 0.0;
 }
-
-
+BSTR __stdcall WatFallStepEdit(LPSAFEARRAY *ArrayData) {
+	QHash<quint32, QSharedPointer<AbstractTrigger> >AvailableTriggers;
+	VARIANT HUGEP *pdFreq;
+	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
+	if (!SUCCEEDED(hr))return NULL;
+	//QString DestinationSheet = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+	//QString DestinationAddress = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+	bool IsInterestWF = pdFreq->boolVal; pdFreq++;
+	QString CurrentStep = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+	{ //Triggers
+		int TriggerTpe;
+		const int TriggerCount = pdFreq->intVal; pdFreq++;
+		QHash<quint32, QSharedPointer<AbstractTrigger> >::iterator TempIter;
+		for (int i = 0; i < TriggerCount; i++) {
+			TriggerTpe = pdFreq->intVal; pdFreq++;
+			switch (TriggerTpe) {
+			case static_cast<int>(AbstractTrigger::TriggerType::DateTrigger) :
+				TempIter = AvailableTriggers.insert(i, QSharedPointer<AbstractTrigger>(new DateTrigger(QString::fromWCharArray(pdFreq->bstrVal)))); pdFreq++;
+				TempIter->dynamicCast<DateTrigger>()->SetLimitDate(QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal), "yyyy-MM-dd")); pdFreq++;
+				TempIter->dynamicCast<DateTrigger>()->SetSide(static_cast<DateTrigger::TriggerSide>(pdFreq->intVal)); pdFreq++;
+				break;
+			case static_cast<int>(AbstractTrigger::TriggerType::VectorTrigger) :
+				TempIter = AvailableTriggers.insert(i, QSharedPointer<AbstractTrigger>(new VectorTrigger(QString::fromWCharArray(pdFreq->bstrVal)))); pdFreq++;
+				TempIter->dynamicCast<VectorTrigger>()->SetTrigVector(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+				break;
+			case static_cast<int>(AbstractTrigger::TriggerType::PoolSizeTrigger) :
+				TempIter = AvailableTriggers.insert(i, QSharedPointer<AbstractTrigger>(new PoolSizeTrigger(QString::fromWCharArray(pdFreq->bstrVal)))); pdFreq++;
+				TempIter->dynamicCast<PoolSizeTrigger>()->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+				TempIter->dynamicCast<PoolSizeTrigger>()->SetSide(static_cast<PoolSizeTrigger::TriggerSide>(pdFreq->intVal)); pdFreq++;
+				break;
+			case static_cast<int>(AbstractTrigger::TriggerType::TrancheTrigger) :
+				TempIter = AvailableTriggers.insert(i, QSharedPointer<AbstractTrigger>(new TrancheTrigger(QString::fromWCharArray(pdFreq->bstrVal)))); pdFreq++;
+				TempIter->dynamicCast<TrancheTrigger>()->SetTargetSeniority(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+				TempIter->dynamicCast<TrancheTrigger>()->SetTargetSeniorityLevel(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+				TempIter->dynamicCast<TrancheTrigger>()->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+				TempIter->dynamicCast<TrancheTrigger>()->SetSenioritySide(static_cast<TrancheTrigger::TriggerSenioritySide>(pdFreq->intVal)); pdFreq++;
+				TempIter->dynamicCast<TrancheTrigger>()->SetSizeSide(static_cast<TrancheTrigger::TriggerSizeSide>(pdFreq->intVal)); pdFreq++;
+				TempIter->dynamicCast<TrancheTrigger>()->SetSizeMultiplier(pdFreq->dblVal); pdFreq++;
+				break;
+			case static_cast<int>(AbstractTrigger::TriggerType::DelinquencyTrigger) :
+				TempIter = AvailableTriggers.insert(i, QSharedPointer<AbstractTrigger>(new DelinquencyTrigger(QString::fromWCharArray(pdFreq->bstrVal)))); pdFreq++;
+				TempIter->dynamicCast<DelinquencyTrigger>()->SetTarget(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+				break;
+			}
+		}
+	}
+	SafeArrayUnaccessData(*ArrayData);
+	char *argv[] = { "NoArgumnets" };
+	int argc = sizeof(argv) / sizeof(char*) - 1;
+	{
+		QApplication a(argc, argv);
+		WaterfallStepHelperDialog WatfDialog;
+		WatfDialog.SetInterestWF(IsInterestWF);
+		WatfDialog.SetAvailableTriggers(AvailableTriggers);
+		WatfDialog.SetCurrentPars(CurrentStep);
+		if (WatfDialog.exec() == QDialog::Accepted) {
+			QString Result = WatfDialog.GetParameters();
+			a.quit();
+			return SysAllocStringByteLen(Result.toStdString().c_str(), Result.size());
+		}
+		a.quit();
+	}
+	return NULL; 
+}
+BSTR __stdcall TriggerEdit(LPSAFEARRAY *ArrayData) {
+	QHash<quint32, QSharedPointer<AbstractTrigger> >AvailableTriggers;
+	VARIANT HUGEP *pdFreq;
+	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
+	if (!SUCCEEDED(hr))return NULL;
+	QString CurrentTrig = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+	SafeArrayUnaccessData(*ArrayData);
+	char *argv[] = { "NoArgumnets" };
+	int argc = sizeof(argv) / sizeof(char*) - 1;
+	{
+		QApplication a(argc, argv);
+		TriggerHelperDialog TrigDialog;
+		TrigDialog.SetCurrentPars(CurrentTrig);
+		if (TrigDialog.exec() == QDialog::Accepted) {
+			QString Result = TrigDialog.GetParameters();
+			a.quit();
+			return SysAllocStringByteLen(Result.toStdString().c_str(), Result.size());
+		}
+		a.quit();
+	}
+	return NULL;
+}
 //Ugly!!!
 double __stdcall GetLoansAssumption(LPSAFEARRAY *ArrayData) {
 	ExcelCommons::InitExcelOLE();

@@ -327,14 +327,31 @@ double GetLoanAssumption(const QString& LoanName, int columnIndex, QDate RefDate
 }
 
 QString InfixToPostfix(const QString& a) {
+	if (a.isEmpty()) return QString();
 	QString ops("-+/*");
 	{
+		//Prevent Operators at the beginning of the string
+		QRegExp CheckDoubleOperator("^[" + ops + ']', Qt::CaseInsensitive);
+		if (CheckDoubleOperator.indexIn(a) >= 0) return QString();
+		//Prevent Unmatched parenthesis
+		if (a.count('(') != a.count(')')) return QString();
 		//Prevent two operators one after another
-		QRegExp CheckDoubleOperator('[' + ops + "]\\s*[" + ops + "]",Qt::CaseInsensitive);
+		CheckDoubleOperator.setPattern('[' + ops + "]\\s*[" + ops + ']');
+		if (CheckDoubleOperator.indexIn(a) >= 0) return QString();
+		//Prevent operator just after NOT
+		CheckDoubleOperator.setPattern("![" + ops + ']');
+		if (CheckDoubleOperator.indexIn(a) >= 0) return QString();
+
+		ops += '!';
+
+		//Prevent operators just before close of parenthesis
+		CheckDoubleOperator.setPattern('[' + ops + "]\\)");
+		if (CheckDoubleOperator.indexIn(a) >= 0) return QString();
+		//Prevent Operators at the end of the string
+		CheckDoubleOperator.setPattern('[' + ops + "]$");
 		if (CheckDoubleOperator.indexIn(a) >= 0) return QString();
 	}
-	ops += '!';
-	QRegExp CheckValidNumber("\\d+");
+	QRegExp CheckValidNumber("(?:\\d+|F|T)",Qt::CaseInsensitive);
 	QString Spaced("");
 	for (auto i = a.constBegin(); i != a.constEnd(); ++i) {
 		if (i->isSpace()) continue;
@@ -379,8 +396,9 @@ QString InfixToPostfix(const QString& a) {
 			sb.append(token).append(' ');
 		}
 	}
-	while (!s.isEmpty())
+	while (!s.isEmpty()) {
 		sb.append(ops.at(s.pop())).append(' ');
+	}
 	return sb.trimmed();
 }
 
@@ -391,4 +409,19 @@ QString ConvertValidXML(QString a) {
 	a.replace("'", "&apos;");
 	a.replace("\"", "&quot;");
 	return a;
+}
+QString NormaliseTriggerStructure(QString a) {
+	a=a.toLower();
+	a.replace("nand", "/");
+	a.replace("and", "*");
+	a.replace("nor", "-");
+	a.replace("or", "+");
+	a.replace("not", "!");
+	a.replace("^", "!");
+	a.replace(QRegExp("&?&"), "*");
+	a.replace(QRegExp("|?|"), "+");
+	a.replace("false", "f");
+	a.replace("true", "t");
+	a.replace(QRegExp("\\s"), "");
+	return a.toUpper();
 }

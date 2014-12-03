@@ -12,6 +12,7 @@ public:
 		, Capitalization = 0x8
 	};
 protected:
+	virtual QRegExpValidator* GetValidator(QObject* parent = 0) const override;
 	QList<RepaymentMethods> m_VectVal;
 	QString RepaymentMethodsToString(int a) const;
 	QString RepaymentMethodsToString(RepaymentMethods a) const { return RepaymentMethodsToString(static_cast<int>(a)); }

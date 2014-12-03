@@ -18,6 +18,8 @@ public:
 	void SetTarget(const QString& val) { m_Target = val; }
 	void SetAnchorDate(const QDate& a) { m_Target.SetAnchorDate(a); }
 	void RemoveAnchorDate() { m_Target.RemoveAnchorDate(); }
+	bool HasAnchor()const { return !m_Target.GetAnchorDate().isNull(); }
+	virtual QString ToString() const override { return AbstractTrigger::ToString() + "\nDelinquency Limit: " + m_Target.GetVector(); }
 protected:
 	virtual QDataStream& WriteToStream(QDataStream& stream) const override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;

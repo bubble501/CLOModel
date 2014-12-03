@@ -41,12 +41,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GeneratedFiles\Debug\moc_CentralUnit.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_CentralUnit.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_ChartsWidget.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
@@ -128,19 +122,7 @@
     <ClCompile Include="BloombergVector.cpp">
       <Filter>Source Files\Core Files</Filter>
     </ClCompile>
-    <ClCompile Include="CentralUnit.cpp">
-      <Filter>Source Files\Core Files</Filter>
-    </ClCompile>
     <ClCompile Include="CommonFunctions.cpp">
-      <Filter>Source Files\Core Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ExcelCommons.cpp">
-      <Filter>Source Files\Core Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ExcelInput.cpp">
-      <Filter>Source Files\Core Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ExcelOutput.cpp">
       <Filter>Source Files\Core Files</Filter>
     </ClCompile>
     <ClCompile Include="Mortgage.cpp">
@@ -328,12 +310,6 @@
     <ClInclude Include="CommonFunctions.h">
       <Filter>Header Files\Core Files</Filter>
     </ClInclude>
-    <ClInclude Include="ExcelCommons.h">
-      <Filter>Header Files\Core Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ExcelOutput.h">
-      <Filter>Header Files\Core Files</Filter>
-    </ClInclude>
     <ClInclude Include="Mortgage.h">
       <Filter>Header Files\Core Files</Filter>
     </ClInclude>
@@ -438,9 +414,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="CentralUnit.h">
-      <Filter>Header Files\Core Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="MtgCalculator.h">
       <Filter>Header Files\Core Files</Filter>
     </CustomBuild>

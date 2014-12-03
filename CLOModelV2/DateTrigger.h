@@ -12,6 +12,7 @@ public:
 		, BeforeIncluding = BeforeExcluding | Exactly
 		, AfterIncluding = AfterExcluding | Exactly
 	};
+	QString TriggerSideToString(TriggerSide a) const;
 	DateTrigger(const QString& lab = QString());
 	DateTrigger(const QDate& dte, TriggerSide sd = TriggerSide::Invalid, const QString& lab = QString());
 	DateTrigger(const DateTrigger& a) : m_LimitDate(a.m_LimitDate), m_Side(a.m_Side), AbstractTrigger(a) {}
@@ -22,7 +23,7 @@ public:
 	const DateTrigger::TriggerSide& GetSide() const { return m_Side; }
 	void SetSide(const DateTrigger::TriggerSide& val) { m_Side = val; }
 	virtual QString ReadyToCalculate() const override;
-	virtual QString ToString() { return AbstractTrigger::ToString() + "\nLimit Date: " + m_LimitDate.toString("yyyy-MM-dd") + QString("\nSide: %1").arg(static_cast<quint8>(m_Side)); }
+	virtual QString ToString() const override { return AbstractTrigger::ToString() + "\nLimit Date: " + m_LimitDate.toString("yyyy-MM-dd") + "\nSide: " + TriggerSideToString(m_Side); }
 protected:
 	virtual QDataStream& WriteToStream(QDataStream& stream) const override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;

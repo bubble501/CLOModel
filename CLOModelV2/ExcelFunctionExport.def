@@ -7,3 +7,5 @@ EXPORTS
 	GetLoansAssumption
 	GetStressLoss
 	GetStressDM
+	WatFallStepEdit
+	TriggerEdit

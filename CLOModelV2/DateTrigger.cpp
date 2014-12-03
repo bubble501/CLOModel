@@ -50,3 +50,15 @@ QString DateTrigger::ReadyToCalculate() const {
 	if (m_LimitDate.isNull() || m_Side == TriggerSide::Invalid) return "Trigger " + m_TriggerLabel + " is invalid\n";
 	return QString();
 }
+
+QString DateTrigger::TriggerSideToString(TriggerSide a) const {
+	switch (a) {
+	case TriggerSide::Invalid: return "Invalid";
+	case TriggerSide::BeforeExcluding: return "Before Excluding";
+	case TriggerSide::AfterExcluding: return "After Excluding";
+	case TriggerSide::Exactly: return "Exactly";
+	case TriggerSide::BeforeIncluding: return "Before Including";
+	case TriggerSide::AfterIncluding: return "After Including";
+	default: return QString();
+	}
+}

@@ -1922,34 +1922,6 @@ HRESULT ExcelOutput::PlotCPRLS(
 		return hr;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /*HRESULT ExcelOutput::PlotCostFunding(
 	const Waterfall& source,
 	const QString& DestinationSheet,

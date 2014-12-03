@@ -158,6 +158,7 @@ It will call the VBA function PrintMortgagesRepLines passing it the following ar
 }
 #endif // ExcelOutput_h__
 
+
 /*!
 \file ExcelOutput.h
 \author Luca Beldi

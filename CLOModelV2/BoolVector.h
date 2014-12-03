@@ -12,6 +12,7 @@ protected:
 	virtual bool IsValid() const override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 public:
+	virtual QRegExpValidator* GetValidator(QObject* parent = 0) const override;
 	BoolVector(){}
 	BoolVector(const BoolVector& Vec);
 	BoolVector(const QString& Vec);

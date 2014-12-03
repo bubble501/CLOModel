@@ -8,6 +8,8 @@ Declare Function CLOReturnRate Lib "C:\Visual Studio Projects\CLOModelV2\Win32\R
 Declare Function GetStressLoss Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
 Declare Function GetStressDM Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
 'Declare Sub InspectWaterfall Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
+Declare Function WatFallStepEdit Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As String
+Declare Function TriggerEdit Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As String
 Declare Function GetLoansAssumption Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
 Public Sub GetInputFromStructure( _
     MortgagesSheet As String, _
@@ -145,7 +147,7 @@ Public Sub GetInputFromStructure( _
     Dim TriggersHead As Long
     
     Set WaterfallSheet = Sheets(FieldsLabels("WaterfallSheet"))
-     Set FirstStep = WaterfallSheet.Cells.Find(What:=FieldsLabels("StepHead"), LookAt:=xlWhole, LookIn:=xlFormulas)
+    Set FirstStep = WaterfallSheet.Cells.Find(What:=FieldsLabels("StepHead"), LookAt:=xlWhole, LookIn:=xlFormulas)
     Set LastStep = WaterfallSheet.Cells.Find(What:=FieldsLabels("StepHead"), SearchDirection:=xlPrevious, LookAt:=xlWhole, LookIn:=xlFormulas)
     SeniorityGroupHead = WaterfallSheet.Cells.Find(What:=FieldsLabels("SeniorityGroupHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
     SeniorityGroupLevelHead = WaterfallSheet.Cells.Find(What:=FieldsLabels("SeniorityGroupLevelHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
@@ -556,16 +558,17 @@ DefaultExchange:
             Case 2 'Pool Size Trigger
                 Call AddInput(AllTheInputs, CLng(2))
                 Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
-                Call AddInput(AllTheInputs, CDbl(TriggerStart.Offset(i, 2).Value))
-                Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 3).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 2).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 3).Value))
             Case 3 'Tranche Trigger
                 Call AddInput(AllTheInputs, CLng(3))
                 Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
-                Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 2).Value))
-                Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 3).Value - 1))
-                Call AddInput(AllTheInputs, CDbl(TriggerStart.Offset(i, 4).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 2).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 3).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 4).Value))
                 Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 5).Value))
                 Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 6).Value))
+                Call AddInput(AllTheInputs, CDbl(TriggerStart.Offset(i, 7).Value))
             Case 4 'Delinquency Trigger
                 Call AddInput(AllTheInputs, CLng(4))
                 Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
@@ -1091,7 +1094,31 @@ FromStringToTriggerType_Error:
                 & vbCrLf & "Aborting" _
                 , vbCritical, "Error")
 End Function
-
+Public Function FromTriggerTypeToString(a As Long) As String
+    On Error GoTo FromTriggerTypeToString_Error
+    Select Case a
+        Case 0
+            FromTriggerTypeToString = "Date Trigger"
+        Case 1
+            FromTriggerTypeToString = "Vector Trigger"
+        Case 2
+            FromTriggerTypeToString = "Pool Size Trigger"
+        Case 3
+            FromTriggerTypeToString = "Tranche Trigger"
+        Case 4
+            FromTriggerTypeToString = "Delinquency Trigger"
+        Case ""
+            Exit Function
+        Case Else
+            GoTo FromTriggerTypeToString_Error
+    End Select
+    On Error GoTo 0
+    Exit Function
+FromTriggerTypeToString_Error:
+    Call MsgBox("Invalid trigger type." _
+                & vbCrLf & "Aborting" _
+                , vbCritical, "Error")
+End Function
 
 Private Function FromStringToPriorty(a As String) As Long
     
@@ -1149,7 +1176,53 @@ FromStringToPriorty_Error:
                 , vbCritical, "Error")
     End
 End Function
+Private Function FromPriortyToString(a As Long) As String
+   On Error GoTo FromPriortyToString_Error
+    Select Case UCase(a)
+        Case 0
+            FromPriortyToString = "Senior expenses"
+        Case 1
+            FromPriortyToString = "Senior management fees"
+        Case 13
+            FromPriortyToString = "Reinvestment"
+        Case 2
+            FromPriortyToString = "Interest"
+        Case 3
+            FromPriortyToString = "Principal"
+        Case 4
+            FromPriortyToString = "OC"
+        Case 6
+            FromPriortyToString = "IC"
+        Case 8
+            FromPriortyToString = "Deferred"
+        Case 12
+            FromPriortyToString = "Excess"
+        Case 10
+            FromPriortyToString = "Junior management fees"
+        Case 11
+            FromPriortyToString = "Reinvestment test"
+        Case 14
+            FromPriortyToString = "Replenish Reserve"
+        Case 16
+            FromPriortyToString = "Turbo"
+        Case 17
+            FromPriortyToString = "Cure PDL"
+        Case 18
+            FromPriortyToString = "Fees From XS"
+        Case 19
+            FromPriortyToString = "Allocate Prepay fees"
+        Case Else
+            GoTo FromPriortyToString_Error
+    End Select
+   On Error GoTo 0
+   Exit Function
 
+FromPriortyToString_Error:
+    Call MsgBox("Invalid step in the Waterfall." _
+                & vbCrLf & "Aborting" _
+                , vbCritical, "Error")
+    End
+End Function
 Public Function GetDM(TrancheName As String, DealName As String, Price As Double, Optional ToCall As Boolean = False)
     Dim result(0 To 4) As Variant
     result(0) = Left(ActiveWorkbook.FullName, InStrRev(ActiveWorkbook.FullName, "\"))
@@ -1339,5 +1412,135 @@ Attribute GetLoanAssumption.VB_ProcData.VB_Invoke_Func = " \n14"
         GetLoanAssumption = response
     End If
 End Function
+Public Sub EditWaterfallStep(InputsSheet As String, Target As Range, FieldsLabels As Collection, IntrWF As Boolean)
+     Dim AllTheInputs As New Collection
+     Dim TriggerStart As Range
+     Dim i As Long
+     'Call AddInput(AllTheInputs, Target.Parent.Name)
+     'Call AddInput(AllTheInputs, Sheets(Target.Parent.Name).Cells(Target.Row, 1).Address)
+     Dim CurrentStepStruct As String
+     If (Target.Value = "") Then
+        CurrentStepStruct = ""
+     Else
+        CurrentStepStruct = CStr(FromStringToPriorty(Target.Value))
+        For i = 1 To 12
+           CurrentStepStruct = CurrentStepStruct & "#" & Target.Offset(0, i).Value
+        Next i
+     End If
+     Call AddInput(AllTheInputs, IntrWF)
+     Call AddInput(AllTheInputs, CurrentStepStruct)
+     Set TriggerStart = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("TriggerStart"), LookAt:=xlWhole, LookIn:=xlValues)
+    i = 1
+    Do While True
+        If IsEmpty(TriggerStart.Offset(i, 0)) Then Exit Do
+        i = i + 1
+    Loop
+    Call AddInput(AllTheInputs, CLng(i - 1))
+    i = 1
+    Do While True
+        If IsEmpty(TriggerStart.Offset(i, 0)) Then Exit Do
+        Select Case FromStringToTriggerType(TriggerStart.Offset(i, 0).Value)
+            Case 0 'Date Trigger
+                Call AddInput(AllTheInputs, CLng(0))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
+                Call AddInput(AllTheInputs, Format(TriggerStart.Offset(i, 2).Value, "yyyy-mm-dd"))
+                Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 3).Value))
+            Case 1 'Vector Trigger
+                Call AddInput(AllTheInputs, CLng(1))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 2).Value))
+            Case 2 'Pool Size Trigger
+                Call AddInput(AllTheInputs, CLng(2))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 2).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 3).Value))
+            Case 3 'Tranche Trigger
+                Call AddInput(AllTheInputs, CLng(3))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 2).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 3).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 4).Value))
+                Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 5).Value))
+                Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 6).Value))
+                Call AddInput(AllTheInputs, CDbl(TriggerStart.Offset(i, 7).Value))
+            Case 4 'Delinquency Trigger
+                Call AddInput(AllTheInputs, CLng(4))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 2).Value))
+            Case Else
+                Exit Sub
+        End Select
+        i = i + 1
+    Loop
+     Dim result() As Variant
+    ReDim result(0 To AllTheInputs.Count - 1)
+    For i = 1 To AllTheInputs.Count
+        result(i - 1) = AllTheInputs(i)
+    Next i
+    Dim EditedStep As String
+    EditedStep = WatFallStepEdit(result)
+    If EditedStep = "" Then Exit Sub
+    Dim StepParts
+    StepParts = Split(EditedStep, "#")
+    Target.Value = FromPriortyToString(CLng(StepParts(LBound(StepParts))))
+    For i = LBound(StepParts) + 1 To UBound(StepParts)
+        With Target.Offset(0, i - LBound(StepParts))
+            If StepParts(i) = "" Then
+                .ClearContents
+                .NumberFormat = ";;;"
+                .Interior.Color = RGB(191, 191, 191)
+                .ClearComments
+            Else
+                .Value = StepParts(i)
+                .NumberFormat = "General"
+                .Interior.Color = RGB(235, 241, 222)
+            End If
+            If StepParts(i) = "" Or (i = 7 + LBound(StepParts) And StepParts(LBound(StepParts)) <> "13") Then
+                .NumberFormat = ";;;"
+                .Interior.Color = RGB(191, 191, 191)
+            End If
+            If (i = 7 + LBound(StepParts) And StepParts(LBound(StepParts)) = "13") Then
+                .NumberFormat = "[=1]""Unscheduled"";[=2]""Scheduled"";""All Principal"""
+            End If
+        End With
+    Next i
+    Target.Offset(1, 0).EntireRow.Hidden = False
+End Sub
 
-
+Public Sub EditTrigger(Target As Range)
+    Dim i As Long
+    Dim CurrentTrigStruct As String
+    If (Target.Value = "") Then
+        CurrentTrigStruct = ""
+    Else
+        CurrentTrigStruct = CStr(FromStringToTriggerType(Target.Value))
+        For i = 1 To 8
+           CurrentTrigStruct = CurrentTrigStruct & "#" & Target.Offset(0, i).Value
+        Next i
+    End If
+    Dim result() As Variant
+    ReDim result(0 To 0)
+    result(0) = CurrentTrigStruct
+    Dim EditedStep As String
+    EditedStep = TriggerEdit(result)
+    If EditedStep = "" Then Exit Sub
+    Dim StepParts
+    StepParts = Split(EditedStep, "#")
+    If (StepParts(LBound(StepParts)) = "") Then
+        Target.Value = ""
+    Else
+        Target.Value = FromTriggerTypeToString(CLng(StepParts(LBound(StepParts))))
+    End If
+    For i = LBound(StepParts) + 1 To LBound(StepParts) + 8
+        With Target.Offset(0, i - LBound(StepParts))
+            If i > UBound(StepParts) Then
+                .ClearContents
+            ElseIf StepParts(i) = "" Then
+                .ClearContents
+            Else
+                .Value = StepParts(i)
+                .NumberFormat = "General"
+            End If
+        End With
+    Next i
+End Sub

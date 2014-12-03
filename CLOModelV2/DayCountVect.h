@@ -10,6 +10,7 @@ protected:
 	virtual bool IsValid() const override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 public:
+	virtual QRegExpValidator* GetValidator(QObject* parent = 0) const override;
 	using AbstractBbgVect::IsEmpty;
 	DayCountVector() {}
 	DayCountVector(const DayCountVector& Vec);

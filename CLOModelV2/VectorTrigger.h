@@ -20,6 +20,7 @@ public:
 	const QDate& GetAnchor() const { return m_TrigVector.GetAnchorDate(); }
 	void SetAnchor(const QDate& a) { m_TrigVector.SetAnchorDate(a); }
 	virtual QString ReadyToCalculate() const override;
+	virtual QString ToString() const override {	return AbstractTrigger::ToString() + "\nVector: " + m_TrigVector.GetVector(); }
 protected:
 	virtual QDataStream& WriteToStream(QDataStream& stream) const override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;

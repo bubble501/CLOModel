@@ -238,6 +238,9 @@ void BloombergVector::UnpackVector(){
 bool BloombergVector::IsValid() const{
 	return AbstractBbgVect::IsValid("-?\\d*\\.?\\d+",true);
 }
+QRegExpValidator* BloombergVector::GetValidator(QObject* parent) const {
+	return AbstractBbgVect::GetValidator("-?\\d*\\.?\\d+", true, parent);
+}
 double BloombergVector::GetValue(const QDate& index,int Frequency)const{
 	if (Frequency<1) return 0.0;
 	double Result = GetValueTemplate(m_VectVal, index, 0.0);
@@ -338,4 +341,36 @@ QString BloombergVector::BloombergSafeVector(QDate CurrentDate) const {
 	Shorter.m_VectVal.erase(Shorter.m_VectVal.begin(), Shorter.m_VectVal.begin() + MonthDiff(CurrentDate, m_AnchorDate));
 	Shorter.RepackVector();
 	return Shorter.m_Vector;
+}
+
+BloombergVector BloombergVector::operator*(double a) const {
+	if (a == 0.0) return BloombergVector("0"); 
+	BloombergVector Result(*this);
+	Result.SetDivisor(m_Divisor / a); 
+	return Result;
+}
+
+BloombergVector BloombergVector::operator/(double a) const {
+	if (a == 0.0) return BloombergVector(); 
+	BloombergVector Result(*this);
+	Result.SetDivisor(1.0 / (a * m_Divisor)); 
+	return Result;
+}
+
+BloombergVector& BloombergVector::operator*=(double a) {
+	if (a == 0.0) {
+		QDate CurrentAnchor = GetAnchorDate();
+		SetVector("0");
+		SetAnchorDate(CurrentAnchor);
+	}
+	else SetDivisor(m_Divisor / a);
+	return *this;
+}
+
+BloombergVector& BloombergVector::operator/=(double a) {
+	if (a == 0.0) {
+		operator=(BloombergVector());
+	}
+	else SetDivisor(1.0 / (a * m_Divisor));
+	return *this;
 }

@@ -8,6 +8,8 @@
 class QComboBox;
 class QStackedWidget;
 class TriggerStructHelperWidget;
+class QSortFilterProxyModel;
+class QStandardItemModel;
 class WaterfallStepHelperDialog : public QDialog
 {
 	Q_OBJECT
@@ -18,7 +20,7 @@ public:
 	void SetAvailableTriggers(const QHash<quint32, QSharedPointer<AbstractTrigger> >& AvailableTriggers);
 	void SetCurrentPars(const QString& a);
 	const bool& GetInterestWF() const { return m_InterestWF; }
-	void SetInterestWF(const bool& val) { m_InterestWF = val; }
+	void SetInterestWF(const bool& val);
 private slots:
 	void CheckOkEnabled(int index);
 	void ClearParameters() { ResultingParameters.clear(); }
@@ -59,6 +61,14 @@ signals:
 	void ImportIRRtoEquityTarget(QString value);
 	void ImportReserveIndex(QString value);
 private:
+	enum {
+		AllWaterfalls=0
+		, InterestWFonly=1
+		, PrincipalWFonly = 2
+	};
+	enum {NumberOfStepTypes=16};
+	QStandardItemModel* StepSelectorModel;
+	QSortFilterProxyModel* StepsFilter;
 	QWidget* CreateInterestWidget();
 	QWidget* CreatePrincipalWidget();
 	QWidget* CreateICWidget();

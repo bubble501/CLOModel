@@ -8,6 +8,8 @@
 #include <QLabel>
 #include <QGroupBox>
 #include <QLineEdit>
+#include <QSortFilterProxyModel>
+#include <QStandardItemModel>
 #include "WatFalPrior.h"
 #include "IntegerVector.h"
 #include "BloombergVector.h"
@@ -20,25 +22,37 @@ WaterfallStepHelperDialog::WaterfallStepHelperDialog(QWidget *parent)
 {
 	setWindowIcon(QIcon(":/Icons/Logo.png"));
 	setWindowTitle("Edit Waterfall Step");
+	
+	StepSelectorModel = new QStandardItemModel(this);
+	StepSelectorModel->setColumnCount(2);
+	StepSelectorModel->setRowCount(NumberOfStepTypes + 1);
+	int IndexCounter = 0;
+	StepSelectorModel->setData(StepSelectorModel->index(0, 0), ""); StepSelectorModel->setData(StepSelectorModel->index(0, 0), -1, Qt::UserRole); StepSelectorModel->setData(StepSelectorModel->index(0, 1), AllWaterfalls); StepSelectorModel->setData(StepSelectorModel->index(0, 1), 0);
+	StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), "Senior Expenses"); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_SeniorExpenses), Qt::UserRole); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 1), AllWaterfalls); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), IndexCounter,Qt::UserRole+1); ++IndexCounter;
+	StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), "Senior Fees"); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_SeniorFees), Qt::UserRole); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 1), AllWaterfalls); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), IndexCounter,Qt::UserRole+1); ++IndexCounter;
+	StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), "Interest"); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_Interest), Qt::UserRole); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 1), InterestWFonly); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), IndexCounter,Qt::UserRole+1); ++IndexCounter;
+	StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), "Principal"); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_Principal), Qt::UserRole); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 1), PrincipalWFonly); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), IndexCounter,Qt::UserRole+1); ++IndexCounter;
+	StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), "OC Test"); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_OCTest), Qt::UserRole); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 1), AllWaterfalls); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), IndexCounter,Qt::UserRole+1); ++IndexCounter;
+	StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), "IC Test"); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_ICTest), Qt::UserRole); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 1), AllWaterfalls); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), IndexCounter,Qt::UserRole+1); ++IndexCounter;
+	StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), "Deferred Interest"); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_DeferredInterest), Qt::UserRole); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 1), InterestWFonly); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), IndexCounter,Qt::UserRole+1); ++IndexCounter;
+	StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), "Junior Fees"); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_juniorFees), Qt::UserRole); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 1), AllWaterfalls); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), IndexCounter,Qt::UserRole+1); ++IndexCounter;
+	StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), "Reinvestment Test"); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_ReinvestmentTest), Qt::UserRole); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 1), AllWaterfalls); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), IndexCounter,Qt::UserRole+1); ++IndexCounter;
+	StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), "Excess"); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_Excess), Qt::UserRole); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 1), AllWaterfalls); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), IndexCounter,Qt::UserRole+1); ++IndexCounter;
+	StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), "Reinvest Principal"); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_ReinvestPrincipal), Qt::UserRole); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 1), PrincipalWFonly); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), IndexCounter,Qt::UserRole+1); ++IndexCounter;
+	StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), "Reserve Replenish"); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_ReserveReplenish), Qt::UserRole); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 1), AllWaterfalls); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), IndexCounter,Qt::UserRole+1); ++IndexCounter;
+	StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), "Turbo"); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_Turbo), Qt::UserRole); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 1), InterestWFonly); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), IndexCounter,Qt::UserRole+1); ++IndexCounter;
+	StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), "PDL"); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_PDL), Qt::UserRole); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 1), InterestWFonly); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), IndexCounter,Qt::UserRole+1); ++IndexCounter;
+	StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), "Fees From Excess"); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_FeesFromExcess), Qt::UserRole); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 1), AllWaterfalls); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), IndexCounter,Qt::UserRole+1); ++IndexCounter;
+	StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), "Allocate Prepay Fees"); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_AllocPrepayFees), Qt::UserRole); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 1), AllWaterfalls); StepSelectorModel->setData(StepSelectorModel->index(IndexCounter + 1, 0), IndexCounter,Qt::UserRole+1); ++IndexCounter; 
+	Q_ASSERT(IndexCounter == NumberOfStepTypes);
+	StepsFilter = new QSortFilterProxyModel(this);
+	StepsFilter->setSourceModel(StepSelectorModel);
+	StepsFilter->setFilterKeyColumn(1);
+
 	StepSelectorCombo = new QComboBox(this);
 	StepSelectorCombo->setEditable(false);
-	StepSelectorCombo->addItem("", -1);
-	StepSelectorCombo->addItem("Senior Expenses", static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_SeniorExpenses));
-	StepSelectorCombo->addItem("Senior Fees", static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_SeniorFees));
-	StepSelectorCombo->addItem("Interest", static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_Interest));
-	StepSelectorCombo->addItem("Principal", static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_Principal));
-	StepSelectorCombo->addItem("OC Test", static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_OCTest));
-	StepSelectorCombo->addItem("IC Test", static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_ICTest));
-	StepSelectorCombo->addItem("Deferred Interest", static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_DeferredInterest));
-	StepSelectorCombo->addItem("Junior Fees", static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_juniorFees));
-	StepSelectorCombo->addItem("Reinvestment Test", static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_ReinvestmentTest));
-	StepSelectorCombo->addItem("Excess", static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_Excess));
-	StepSelectorCombo->addItem("Reinvest Principal", static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_ReinvestPrincipal));
-	StepSelectorCombo->addItem("Reserve Replenish", static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_ReserveReplenish));
-	StepSelectorCombo->addItem("Turbo", static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_Turbo));
-	StepSelectorCombo->addItem("PDL", static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_PDL));
-	StepSelectorCombo->addItem("Fees From Excess", static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_FeesFromExcess));
-	StepSelectorCombo->addItem("Allocate Prepay Fees", static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_AllocPrepayFees));
+	StepSelectorCombo->setModel(StepsFilter);
+	StepSelectorCombo->setModelColumn(0);
 	StepSelectorCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
 	StepBuilderBase = new QStackedWidget(this);
@@ -63,7 +77,7 @@ WaterfallStepHelperDialog::WaterfallStepHelperDialog(QWidget *parent)
 	StepBuilderBase->addWidget(CreateFeesFromXSWidget()); //Fees From Excess
 	StepBuilderBase->addWidget(CreateAllocPrepayWidget()); //Allocate Prepay Fees
 
-	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), StepBuilderBase, SLOT(setCurrentIndex(int)));
+	connect(StepSelectorCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [&](int index) {StepBuilderBase->setCurrentIndex(StepSelectorCombo->itemData(index, Qt::UserRole + 1).toInt()); });
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(ClearParameters()));
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(SetDefaults1())/*, Qt::QueuedConnection*/);
 	connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(SetDefaults100())/*, Qt::QueuedConnection*/);
@@ -123,19 +137,20 @@ WaterfallStepHelperDialog::WaterfallStepHelperDialog(QWidget *parent)
 	mainlay->addLayout(CentreLay);
 	mainlay->addLayout(ButtonsLay);
 
+	SetInterestWF(m_InterestWF);
 }
 
 void WaterfallStepHelperDialog::CheckOkEnabled(int index) {
 	if (FirstCombodeleted) return;
 	AcceptButton->setEnabled(index != 0);
 	if (index != 0) {
+		disconnect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(CheckOkEnabled(int)));
 		QWidget* EmptyWidg = StepBuilderBase->widget(0);
 		StepBuilderBase->removeWidget(EmptyWidg);
 		StepBuilderBase->setCurrentIndex(StepBuilderBase->currentIndex() - 1);
 		EmptyWidg->deleteLater();
 		FirstCombodeleted = true;
-		StepSelectorCombo->removeItem(0);
-		disconnect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(CheckOkEnabled(int)));
+		StepSelectorModel->removeRow(0);
 		TriggerBuilder->setEnabled(true);
 	}
 }
@@ -242,7 +257,7 @@ void WaterfallStepHelperDialog::SetDefaults0() {
 	emit SetTo0("0");
 }
 void WaterfallStepHelperDialog::ResetSoFCombo(int index) {
-	if (StepSelectorCombo->itemData(index).toInt() == static_cast<qint32>(WatFalPrior::WaterfallStepType::wst_ReinvestPrincipal)) {
+	if (StepSelectorCombo->itemData(index).toInt() == static_cast<qint16>(WatFalPrior::WaterfallStepType::wst_ReinvestPrincipal)) {
 		ResultingParameters[static_cast<qint32>(WatFalPrior::wstParameters::SourceOfFunding)] = "3";
 		emit SetSoFCombo(0);
 	}
@@ -891,6 +906,15 @@ void WaterfallStepHelperDialog::SetCurrentPars(const QString& a) {
 void WaterfallStepHelperDialog::ClearAndAccept() {
 	Cleared = true;
 	accept();
+}
+
+void WaterfallStepHelperDialog::SetInterestWF(const bool& val) {
+	m_InterestWF = val;
+	QString FilterPattern = "^[" + QString::number(AllWaterfalls);
+	if (m_InterestWF) FilterPattern += QString::number(InterestWFonly);
+	else FilterPattern += QString::number(PrincipalWFonly);
+	FilterPattern += "]$";
+	StepsFilter->setFilterRegExp(QRegExp(FilterPattern));
 }
 
 

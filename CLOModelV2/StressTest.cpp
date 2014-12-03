@@ -124,6 +124,7 @@ void StressTest::RunStressTest() {
 		ProgressForm->AddPhase(tr("Calculating full assets cash flows"),0,CountScenarios());
 		ProgressForm->AddPhase(tr("Applying scenarios to aggregated cash flows"), 0, 0);
 		ProgressForm->AddPhase(tr("Calculating liabilities cash flows"), 0, 100);
+		ProgressForm->AddPhase(tr("Saving Results"), 0, 100);
 		ProgressForm->SetTotalProgressLabel(tr("Stress Test"));
 		ProgressForm->show();
 		connect(ProgressForm, SIGNAL(Cancelled()), this, SLOT(StopCalculation()));
@@ -292,6 +293,7 @@ QDataStream& operator>>(QDataStream & stream, StressTest& flows) {
 }
 
 void StressTest::SaveResults(const QString& DestPath)const{
+	if (ProgressForm) ProgressForm->NextPhase();
 	QString DestinationPath(DestPath.trimmed());
 	if (*(DestinationPath.end() - 1) != '\\' && *(DestinationPath.end() - 1) != '/') DestinationPath.append('/');
 	QDir curDir;
@@ -331,11 +333,11 @@ void StressTest::SaveResults(const QString& DestPath)const{
 			TargetFile.close();
 		}
 		OldData.seek(0);
-		OldData.deleteLater();
 		zip.close();
 		if (!curDir.remove(DestinationFull)) return;
 	}
 	{
+		const double TotalProgIter = static_cast<double>(OldCounter + Results.size());
 		if (!zip.open(QuaZip::mdCreate)) return;
 		QuaZipFile TargetFile(&zip);
 		QuaZipNewInfo ZipFileInfo("StressTestInputs");
@@ -356,10 +358,12 @@ void StressTest::SaveResults(const QString& DestPath)const{
 				out << qint32(ModelVersionNumber) << TempWF;
 				TargetFile.close();
 			}
+			if (ProgressForm) ProgressForm->SetPhaseProgress(100.0*(TotalProgIter - static_cast<double>(Results.size() + OldCounter)) / TotalProgIter);
 		}
 		OldData.close();
+		int CurrentProg = static_cast<int>(TotalProgIter) - Results.size()+1;
 		ZipFileInfo.dateTime = QDateTime::currentDateTime();
-		for (auto i = Results.constBegin(); i != Results.constEnd(); ++i) {
+		for (auto i = Results.constBegin(); i != Results.constEnd(); ++i, ++CurrentProg) {
 			ZipFileInfo.name = i.key().ToString() + ".csw";
 			if (TargetFile.open(QIODevice::WriteOnly, ZipFileInfo)) {
 				QDataStream out(&TargetFile);
@@ -367,6 +371,7 @@ void StressTest::SaveResults(const QString& DestPath)const{
 				out << qint32(ModelVersionNumber) << *(i.value());
 				TargetFile.close();
 			}
+			if (ProgressForm) ProgressForm->SetPhaseProgress(100.0*CurrentProg / TotalProgIter);
 		}
 		zip.close();
 	}

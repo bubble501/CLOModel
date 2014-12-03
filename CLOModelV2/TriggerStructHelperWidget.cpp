@@ -66,9 +66,11 @@ TriggerStructHelperWidget::TriggerStructHelperWidget(const QHash<quint32, QShare
 	connect(CloseParButton, &QPushButton::clicked, this, &TriggerStructHelperWidget::CloseParenthesis);
 	DelButton = new QPushButton(this);
 	DelButton->setText(tr("DEL","DEL button in calculator"));
+	DelButton->setEnabled(false);
 	connect(DelButton, &QPushButton::clicked, this, &TriggerStructHelperWidget::Del);
 	ClearButton = new QPushButton(this);
 	ClearButton->setText(tr("Clear", "AC button in calculator"));
+	ClearButton->setEnabled(false);
 	connect(ClearButton, &QPushButton::clicked, this, &TriggerStructHelperWidget::Clear);
 
 	QGridLayout* Mainlay = new QGridLayout(this);
@@ -107,7 +109,7 @@ void TriggerStructHelperWidget::SetAvailableTriggers(const QHash<quint32, QShare
 	}
 	TriggersModel->sort(0);
 	RegExpString += "|!|\\(|\\))*";
-	EncriptedTriggers->setValidator(new QRegExpValidator(QRegExp(RegExpString), EncriptedTriggers));
+	EncriptedTriggers->setValidator(new QRegExpValidator(QRegExp(RegExpString,Qt::CaseInsensitive), EncriptedTriggers));
 }
 
 void TriggerStructHelperWidget::InsertOperator() {
@@ -206,14 +208,14 @@ void TriggerStructHelperWidget::DecriptTriggers(QString encr) {
 	}
 	else {
 		QChar lastChar = encr.at(encr.size() - 1);
-		EnableOperators(lastChar.isDigit() || lastChar == 'T' || lastChar == 'F');
+		EnableOperators(lastChar.isDigit() || lastChar.toUpper() == 'T' || lastChar.toUpper() == 'F');
 		if (InfixToPostfix(encr).isEmpty()) {
 			DecriptedTriggers->setStyleSheet("color: red;");
 			DecriptedTriggers->setText("Invalid Trigger Structure");
 		}
 		else {
 			for (int i = 0; i < TriggersModel->rowCount(); ++i) {
-				encr.replace(TriggersModel->index(i, 0).data().toString(), TriggersModel->index(i, 1).data().toString());
+				encr.replace(TriggersModel->index(i, 0).data().toString(), TriggersModel->index(i, 1).data().toString(),Qt::CaseInsensitive);
 			}
 			encr.replace("*", " AND ");
 			encr.replace("+", " OR ");
@@ -225,6 +227,8 @@ void TriggerStructHelperWidget::DecriptTriggers(QString encr) {
 		}
 		
 	}
+	DelButton->setEnabled(!EncriptedTriggers->text().isEmpty());
+	ClearButton->setEnabled(!EncriptedTriggers->text().isEmpty());
 	EncriptedTriggers->activateWindow();
 	EncriptedTriggers->deselect();
 }

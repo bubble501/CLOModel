@@ -16,6 +16,7 @@ WaterfallStepHelperDialog::WaterfallStepHelperDialog(QWidget *parent)
 	: QDialog(parent)
 	, m_InterestWF(true)
 	, FirstCombodeleted(false)
+	, Cleared(false)
 {
 	setWindowIcon(QIcon(":/Icons/Logo.png"));
 	setWindowTitle("Edit Waterfall Step");
@@ -83,6 +84,10 @@ WaterfallStepHelperDialog::WaterfallStepHelperDialog(QWidget *parent)
 	CancelButton->setText(tr("Cancel"));
 	CancelButton->setDefault(false);
 	connect(CancelButton, &QPushButton::clicked, this, &QDialog::reject);
+	QPushButton* ClearAcceptButton = new QPushButton(this);
+	ClearAcceptButton->setText(tr("Clear"));
+	ClearAcceptButton->setDefault(false);
+	connect(ClearAcceptButton, &QPushButton::clicked, this, &WaterfallStepHelperDialog::ClearAndAccept);
 
 	QGroupBox *TopGroup = new QGroupBox(this);
 	TopGroup->setTitle("Step");
@@ -98,6 +103,7 @@ WaterfallStepHelperDialog::WaterfallStepHelperDialog(QWidget *parent)
 	QHBoxLayout* ButtonsLay = new QHBoxLayout;
 	ButtonsLay->addSpacerItem(new QSpacerItem(20, 20, QSizePolicy::Expanding));
 	ButtonsLay->addWidget(AcceptButton);
+	ButtonsLay->addWidget(ClearAcceptButton);
 	ButtonsLay->addWidget(CancelButton);
 
 	TriggerBuilder = new TriggerStructHelperWidget(QHash<quint32, QSharedPointer<AbstractTrigger> >(), this);
@@ -209,7 +215,8 @@ void WaterfallStepHelperDialog::SoFComboChanged(int index) {
 }
 QString WaterfallStepHelperDialog::GetParameters() {
 	SetbasedOnWaterfall();
-	QString Result = QString::number(StepSelectorCombo->currentData().toInt());
+	if (Cleared) ResultingParameters.clear();
+	QString Result = (Cleared? QString() : QString::number(StepSelectorCombo->currentData().toInt()));
 	Result += '#' + ResultingParameters.value(static_cast<qint32>(WatFalPrior::wstParameters::SeniorityGroup), "");
 	Result += '#' + ResultingParameters.value(static_cast<qint32>(WatFalPrior::wstParameters::SeniorityGroupLevel), "") ;
 	Result += '#' + ResultingParameters.value(static_cast<qint32>(WatFalPrior::wstParameters::RedemptionGroup), "") ;
@@ -221,7 +228,7 @@ QString WaterfallStepHelperDialog::GetParameters() {
 	Result += '#' + ResultingParameters.value(static_cast<qint32>(WatFalPrior::wstParameters::TestTargetOverride), "") ;
 	Result += '#' + ResultingParameters.value(static_cast<qint32>(WatFalPrior::wstParameters::IRRtoEquityTarget), "") ;
 	Result += '#' + ResultingParameters.value(static_cast<qint32>(WatFalPrior::wstParameters::ReserveIndex), "") ;
-	Result += '#' + TriggerBuilder->GetResult() ;
+	Result += '#' + (Cleared ? QString() : TriggerBuilder->GetResult());
 	return Result;
 }
 
@@ -845,9 +852,11 @@ QWidget* WaterfallStepHelperDialog::CreateAllocPrepayWidget() {
 
 void WaterfallStepHelperDialog::SetAvailableTriggers(const QHash<quint32, QSharedPointer<AbstractTrigger> >& AvailableTriggers) {
 	TriggerBuilder->SetAvailableTriggers(AvailableTriggers);
+	Cleared = false;
 }
 
 void WaterfallStepHelperDialog::SetCurrentPars(const QString& a) {
+	Cleared = false;
 	const auto AllPars = a.split('#');
 	if (AllPars.size() != 13) return;
 	auto i = AllPars.constBegin();
@@ -877,6 +886,11 @@ void WaterfallStepHelperDialog::SetCurrentPars(const QString& a) {
 	if (!i->isEmpty()) { emit  ImportIRRtoEquityTarget(*i); }++i;
 	if (!i->isEmpty()) { emit  ImportReserveIndex(*i); }++i;
 	TriggerBuilder->SetCurrentStructure(*i);
+}
+
+void WaterfallStepHelperDialog::ClearAndAccept() {
+	Cleared = true;
+	accept();
 }
 
 

@@ -40,6 +40,7 @@ private slots:
 	void SetbasedOnWaterfall();
 	void ResetSoFCombo(int index);
 	void SoFComboChanged(int index);
+	void ClearAndAccept();
 signals:
 	void SetTo1(QString);
 	void SetTo100(QString);
@@ -71,6 +72,7 @@ private:
 	QWidget* CreateFeesFromXSWidget();
 	QWidget* CreateAllocPrepayWidget();
 	bool FirstCombodeleted;
+	bool Cleared;
 	QMap<qint32,QString> ResultingParameters;
 	QPushButton* AcceptButton;
 	QComboBox* StepSelectorCombo;

@@ -597,8 +597,8 @@ BSTR __stdcall WatFallStepEdit(LPSAFEARRAY *ArrayData) {
 	bool IsInterestWF = pdFreq->boolVal; pdFreq++;
 	QString CurrentStep = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 	{ //Triggers
-		int TriggerCount, TriggerTpe;
-		TriggerCount = pdFreq->intVal; pdFreq++;
+		int TriggerTpe;
+		const int TriggerCount = pdFreq->intVal; pdFreq++;
 		QHash<quint32, QSharedPointer<AbstractTrigger> >::iterator TempIter;
 		for (int i = 0; i < TriggerCount; i++) {
 			TriggerTpe = pdFreq->intVal; pdFreq++;
@@ -636,17 +636,19 @@ BSTR __stdcall WatFallStepEdit(LPSAFEARRAY *ArrayData) {
 	SafeArrayUnaccessData(*ArrayData);
 	char *argv[] = { "NoArgumnets" };
 	int argc = sizeof(argv) / sizeof(char*) - 1;
-	QApplication a(argc, argv);
-	WaterfallStepHelperDialog WatfDialog;
-	WatfDialog.SetInterestWF(IsInterestWF);
-	WatfDialog.SetAvailableTriggers(AvailableTriggers);
-	WatfDialog.SetCurrentPars(CurrentStep);
-	if (WatfDialog.exec() == QDialog::Accepted) {
-		QString Result = WatfDialog.GetParameters();
+	{
+		QApplication a(argc, argv);
+		WaterfallStepHelperDialog WatfDialog;
+		WatfDialog.SetInterestWF(IsInterestWF);
+		WatfDialog.SetAvailableTriggers(AvailableTriggers);
+		WatfDialog.SetCurrentPars(CurrentStep);
+		if (WatfDialog.exec() == QDialog::Accepted) {
+			QString Result = WatfDialog.GetParameters();
+			a.quit();
+			return SysAllocStringByteLen(Result.toStdString().c_str(), Result.size());
+		}
 		a.quit();
-		return SysAllocStringByteLen(Result.toStdString().c_str(), Result.size());
 	}
-	a.quit();
 	return NULL; 
 }
 BSTR __stdcall TriggerEdit(LPSAFEARRAY *ArrayData) {
@@ -658,15 +660,17 @@ BSTR __stdcall TriggerEdit(LPSAFEARRAY *ArrayData) {
 	SafeArrayUnaccessData(*ArrayData);
 	char *argv[] = { "NoArgumnets" };
 	int argc = sizeof(argv) / sizeof(char*) - 1;
-	QApplication a(argc, argv);
-	TriggerHelperDialog TrigDialog;
-	TrigDialog.SetCurrentPars(CurrentTrig);
-	if (TrigDialog.exec() == QDialog::Accepted) {
-		QString Result = TrigDialog.GetParameters();
+	{
+		QApplication a(argc, argv);
+		TriggerHelperDialog TrigDialog;
+		TrigDialog.SetCurrentPars(CurrentTrig);
+		if (TrigDialog.exec() == QDialog::Accepted) {
+			QString Result = TrigDialog.GetParameters();
+			a.quit();
+			return SysAllocStringByteLen(Result.toStdString().c_str(), Result.size());
+		}
 		a.quit();
-		return SysAllocStringByteLen(Result.toStdString().c_str(), Result.size());
 	}
-	a.quit();
 	return NULL;
 }
 //Ugly!!!

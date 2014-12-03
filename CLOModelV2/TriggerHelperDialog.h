@@ -24,6 +24,7 @@ private slots:
 signals:
 	void ImportParam(int parIdx, const QString& parVal);
 private:
+	bool Cleared;
 	bool FirstCombodeleted;
 	QComboBox* TriggerTypeCombo;
 	QStackedWidget* TriggerBuilderBase;

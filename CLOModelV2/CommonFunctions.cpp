@@ -351,7 +351,7 @@ QString InfixToPostfix(const QString& a) {
 		CheckDoubleOperator.setPattern('[' + ops + "]$");
 		if (CheckDoubleOperator.indexIn(a) >= 0) return QString();
 	}
-	QRegExp CheckValidNumber("(?:\\d+|F|T)");
+	QRegExp CheckValidNumber("(?:\\d+|F|T)",Qt::CaseInsensitive);
 	QString Spaced("");
 	for (auto i = a.constBegin(); i != a.constEnd(); ++i) {
 		if (i->isSpace()) continue;
@@ -420,8 +420,8 @@ QString NormaliseTriggerStructure(QString a) {
 	a.replace("^", "!");
 	a.replace(QRegExp("&?&"), "*");
 	a.replace(QRegExp("|?|"), "+");
+	a.replace("false", "f");
+	a.replace("true", "t");
 	a.replace(QRegExp("\\s"), "");
-	a.replace("false", "F");
-	a.replace("true", "T");
-	return a;
+	return a.toUpper();
 }

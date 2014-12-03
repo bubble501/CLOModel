@@ -1419,10 +1419,14 @@ Public Sub EditWaterfallStep(InputsSheet As String, Target As Range, FieldsLabel
      'Call AddInput(AllTheInputs, Target.Parent.Name)
      'Call AddInput(AllTheInputs, Sheets(Target.Parent.Name).Cells(Target.Row, 1).Address)
      Dim CurrentStepStruct As String
-     CurrentStepStruct = CStr(FromStringToPriorty(Target.Value))
-     For i = 1 To 12
-        CurrentStepStruct = CurrentStepStruct & "#" & Target.Offset(0, i).Value
-     Next i
+     If (Target.Value = "") Then
+        CurrentStepStruct = ""
+     Else
+        CurrentStepStruct = CStr(FromStringToPriorty(Target.Value))
+        For i = 1 To 12
+           CurrentStepStruct = CurrentStepStruct & "#" & Target.Offset(0, i).Value
+        Next i
+     End If
      Call AddInput(AllTheInputs, IntrWF)
      Call AddInput(AllTheInputs, CurrentStepStruct)
      Set TriggerStart = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("TriggerStart"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -1458,6 +1462,7 @@ Public Sub EditWaterfallStep(InputsSheet As String, Target As Range, FieldsLabel
                 Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 4).Value))
                 Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 5).Value))
                 Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 6).Value))
+                Call AddInput(AllTheInputs, CDbl(TriggerStart.Offset(i, 7).Value))
             Case 4 'Delinquency Trigger
                 Call AddInput(AllTheInputs, CLng(4))
                 Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
@@ -1505,10 +1510,14 @@ End Sub
 Public Sub EditTrigger(Target As Range)
     Dim i As Long
     Dim CurrentTrigStruct As String
-    CurrentTrigStruct = CStr(FromStringToTriggerType(Target.Value))
-    For i = 1 To 8
-       CurrentTrigStruct = CurrentTrigStruct & "#" & Target.Offset(0, i).Value
-    Next i
+    If (Target.Value = "") Then
+        CurrentTrigStruct = ""
+    Else
+        CurrentTrigStruct = CStr(FromStringToTriggerType(Target.Value))
+        For i = 1 To 8
+           CurrentTrigStruct = CurrentTrigStruct & "#" & Target.Offset(0, i).Value
+        Next i
+    End If
     Dim result() As Variant
     ReDim result(0 To 0)
     result(0) = CurrentTrigStruct
@@ -1517,7 +1526,11 @@ Public Sub EditTrigger(Target As Range)
     If EditedStep = "" Then Exit Sub
     Dim StepParts
     StepParts = Split(EditedStep, "#")
-    Target.Value = FromTriggerTypeToString(CLng(StepParts(LBound(StepParts))))
+    If (StepParts(LBound(StepParts)) = "") Then
+        Target.Value = ""
+    Else
+        Target.Value = FromTriggerTypeToString(CLng(StepParts(LBound(StepParts))))
+    End If
     For i = LBound(StepParts) + 1 To LBound(StepParts) + 8
         With Target.Offset(0, i - LBound(StepParts))
             If i > UBound(StepParts) Then

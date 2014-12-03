@@ -18,6 +18,7 @@
 TriggerHelperDialog::TriggerHelperDialog(QDialog *parent)
 	: QDialog(parent)
 	, FirstCombodeleted(false)
+	, Cleared(false)
 {
 	setWindowIcon(QIcon(":/Icons/Logo.png"));
 	setWindowTitle("Edit trigger");
@@ -64,6 +65,10 @@ TriggerHelperDialog::TriggerHelperDialog(QDialog *parent)
 	CancelButton->setText(tr("Cancel"));
 	CancelButton->setDefault(false);
 	connect(CancelButton, &QPushButton::clicked, this, &QDialog::reject);
+	QPushButton* ClearAcceptButton = new QPushButton(this);
+	ClearAcceptButton->setText(tr("Clear"));
+	ClearAcceptButton->setDefault(false);
+	connect(ClearAcceptButton, &QPushButton::clicked, this, [&]() { Cleared = true; accept(); });
 
 	QGroupBox *TopGroup = new QGroupBox(this);
 	TopGroup->setTitle("Trigger");
@@ -81,6 +86,7 @@ TriggerHelperDialog::TriggerHelperDialog(QDialog *parent)
 	QHBoxLayout* ButtonsLay = new QHBoxLayout;
 	ButtonsLay->addSpacerItem(new QSpacerItem(20, 20, QSizePolicy::Expanding));
 	ButtonsLay->addWidget(AcceptButton);
+	ButtonsLay->addWidget(ClearAcceptButton);
 	ButtonsLay->addWidget(CancelButton);
 
 	QVBoxLayout* mainlay = new QVBoxLayout(this);
@@ -117,6 +123,7 @@ void TriggerHelperDialog::SetParameter(int parIdx, const QString& parVal) {
 }
 
 QString TriggerHelperDialog::GetParameters() const {
+	if (Cleared) return QString("#");
 	return 
 		QString::number(TriggerTypeCombo->currentData().toInt()) + '#' +
 		TriggerLabelEdit->text() + '#' +
@@ -453,6 +460,8 @@ void TriggerHelperDialog::ClearParameters() {
 }
 
 void TriggerHelperDialog::SetCurrentPars(const QString& pars) {
+	Cleared = false;
+	if (pars.isEmpty()) return;
 	auto AllPars = pars.split('#');
 	TriggerTypeCombo->setCurrentIndex(TriggerTypeCombo->findData(AllPars.first().toInt()));
 	if (AllPars.size()>1){

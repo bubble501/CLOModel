@@ -331,11 +331,11 @@ void StressTest::SaveResults(const QString& DestPath)const{
 			TargetFile.close();
 		}
 		OldData.seek(0);
-		OldData.deleteLater();
 		zip.close();
 		if (!curDir.remove(DestinationFull)) return;
 	}
 	{
+		const double TotalProgIter = static_cast<double>(OldCounter + Results.size());
 		if (!zip.open(QuaZip::mdCreate)) return;
 		QuaZipFile TargetFile(&zip);
 		QuaZipNewInfo ZipFileInfo("StressTestInputs");
@@ -358,8 +358,9 @@ void StressTest::SaveResults(const QString& DestPath)const{
 			}
 		}
 		OldData.close();
+		int CurrentProg = static_cast<int>(TotalProgIter) - Results.size()+1;
 		ZipFileInfo.dateTime = QDateTime::currentDateTime();
-		for (auto i = Results.constBegin(); i != Results.constEnd(); ++i) {
+		for (auto i = Results.constBegin(); i != Results.constEnd(); ++i, ++CurrentProg) {
 			ZipFileInfo.name = i.key().ToString() + ".csw";
 			if (TargetFile.open(QIODevice::WriteOnly, ZipFileInfo)) {
 				QDataStream out(&TargetFile);

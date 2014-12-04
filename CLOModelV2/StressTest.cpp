@@ -294,82 +294,93 @@ QDataStream& operator>>(QDataStream & stream, StressTest& flows) {
 void StressTest::SaveResults(const QString& DestPath)const{
 	QString DestinationPath(DestPath.trimmed());
 	if (*(DestinationPath.end() - 1) != '\\' && *(DestinationPath.end() - 1) != '/') DestinationPath.append('/');
-	QDir curDir;
-	QString DestinationFull = DestinationPath + QString("StressResult.fcsr");
-	QuaZip zip(DestinationFull);
-	QBuffer OldData;
-	quint32 OldCounter = 0;
-	if (QFile::exists(DestinationFull)) {
-		QStringList FileNames;
-		qint32 VesionCheck;
-		FileNames.append("StressTestInputs");
-		for (auto i = Results.constBegin(); i != Results.constEnd(); ++i) FileNames.append(i.key().ToString() + ".csw");
-		if (!zip.open(QuaZip::mdUnzip)) return;
-		OldData.open(QBuffer::ReadWrite);
-		QuaZipFile TargetFile(&zip);
-		QuaZipFileInfo ZipFileInfo;
-		for (bool more = zip.goToFirstFile(); more; more = zip.goToNextFile()) {
-			TargetFile.open(QIODevice::ReadOnly);
-			if (FileNames.contains(TargetFile.getActualFileName())) {
-				TargetFile.close();
-				continue;
+	QString OldName = DestinationPath + QString("StressResult.fcsr");
+	QString NewName;
+	if (QFile::exists(OldName)) {
+		NewName = DestinationPath + QString("StressResult%1.fcsr");
+		for (quint64 i = 0; true; ++i) {
+			if (!QFile::exists(NewName.arg(i))) {
+				NewName.arg(i);
+				break;
 			}
-			QDataStream Reader(&TargetFile);
-			QDataStream Writer(&OldData);
-			Reader.setVersion(QDataStream::Qt_5_3);
-			Writer.setVersion(QDataStream::Qt_5_3);
-			Waterfall TempWF;
-			Reader >> VesionCheck;
-			if (VesionCheck<qint32(MinimumSupportedVersion) || VesionCheck>qint32(ModelVersionNumber)) continue;
-			TempWF.SetLoadProtocolVersion(VesionCheck);
-			Reader >> TempWF;
-			Writer << TargetFile.getActualFileName();
-			if (TargetFile.getFileInfo(&ZipFileInfo)) Writer << ZipFileInfo.dateTime;
-			else Writer << QDateTime::currentDateTime();
-			Writer << TempWF;
-			OldCounter++;
-			TargetFile.close();
 		}
-		OldData.seek(0);
-		zip.close();
-		if (!curDir.remove(DestinationFull)) return;
 	}
+	else {
+		NewName = OldName;
+		OldName = QString();
+	}
+
+
+	QDir curDir;
+	QuaZip zip(NewName);
+	QStringList UsedFileNames;
+	if (!zip.open(QuaZip::mdCreate)) return;
+	QuaZipFile TargetFile(&zip);
+	QuaZipNewInfo ZipFileInfo("StressTestInputs");
+	UsedFileNames << "StressTestInputs";
+	if (!TargetFile.open(QIODevice::WriteOnly, ZipFileInfo))return;
 	{
-		const double TotalProgIter = static_cast<double>(OldCounter + Results.size());
-		if (!zip.open(QuaZip::mdCreate)) return;
-		QuaZipFile TargetFile(&zip);
-		QuaZipNewInfo ZipFileInfo("StressTestInputs");
-		if (!TargetFile.open(QIODevice::WriteOnly, ZipFileInfo))return;
-		{
+		QDataStream out(&TargetFile);
+		out.setVersion(QDataStream::Qt_5_3);
+		out << qint32(ModelVersionNumber) << StartDate << SequentialComputation << ShowProgress << UseFastVersion << (*BaseCalculator) << Structure;
+		TargetFile.close();
+	}
+	ZipFileInfo.dateTime = QDateTime::currentDateTime();
+	for (auto i = Results.constBegin(); i != Results.constEnd(); ++i) {
+		ZipFileInfo.name = i.key().ToString() + ".csw";
+		UsedFileNames << ZipFileInfo.name;
+		if (TargetFile.open(QIODevice::WriteOnly, ZipFileInfo)) {
 			QDataStream out(&TargetFile);
 			out.setVersion(QDataStream::Qt_5_3);
-			out << qint32(ModelVersionNumber) << StartDate << SequentialComputation << ShowProgress << UseFastVersion << (*BaseCalculator) << Structure;
+			out << qint32(ModelVersionNumber) << *(i.value());
 			TargetFile.close();
 		}
-		QDataStream Reader(&OldData);
-		for (; OldCounter > 0;--OldCounter) {
-			Waterfall TempWF;
-			Reader >> ZipFileInfo.name >> ZipFileInfo.dateTime >> TempWF;
-			if (TargetFile.open(QIODevice::WriteOnly, ZipFileInfo)) {
-				QDataStream out(&TargetFile);
-				out.setVersion(QDataStream::Qt_5_3);
-				out << qint32(ModelVersionNumber) << TempWF;
-				TargetFile.close();
+	}
+
+	if (!OldName.isEmpty()) {
+		QuaZip OldZip(OldName);
+		QuaZipFile OldFile(&OldZip);
+		QuaZipFileInfo OldFileInfo;
+		if (!OldZip.open(QuaZip::mdUnzip)) return;
+		for (bool more = OldZip.goToFirstFile(); more; more = OldZip.goToNextFile()) {
+			if (OldFile.open(QIODevice::ReadOnly)) {
+				if (UsedFileNames.contains(OldFile.getActualFileName())) {
+					OldFile.close();
+					continue;
+				}
+				QDataStream Reader(&OldFile);
+				Reader.setVersion(QDataStream::Qt_5_3);
+				
+				qint32 VesionCheck;
+				Waterfall TempWF;
+				if (!OldFile.getFileInfo(&OldFileInfo)) {
+					OldFileInfo.dateTime = QDateTime::currentDateTime();
+				}
+				Reader >> VesionCheck;
+				if (VesionCheck<qint32(MinimumSupportedVersion) || VesionCheck>qint32(ModelVersionNumber)) {
+					OldFile.close();
+					continue;
+				}
+				TempWF.SetLoadProtocolVersion(VesionCheck);
+				Reader >> TempWF;
+
+				ZipFileInfo.name = OldFile.getActualFileName();
+				ZipFileInfo.dateTime = OldFileInfo.dateTime;
+				UsedFileNames << ZipFileInfo.name;
+				if (TargetFile.open(QIODevice::WriteOnly, ZipFileInfo)) {
+					QDataStream Writer(&TargetFile);
+					Writer.setVersion(QDataStream::Qt_5_3);
+					Writer << qint32(ModelVersionNumber) << TempWF;
+					TargetFile.close();
+				}
+				OldFile.close();
 			}
+
 		}
-		OldData.close();
-		int CurrentProg = static_cast<int>(TotalProgIter) - Results.size()+1;
-		ZipFileInfo.dateTime = QDateTime::currentDateTime();
-		for (auto i = Results.constBegin(); i != Results.constEnd(); ++i, ++CurrentProg) {
-			ZipFileInfo.name = i.key().ToString() + ".csw";
-			if (TargetFile.open(QIODevice::WriteOnly, ZipFileInfo)) {
-				QDataStream out(&TargetFile);
-				out.setVersion(QDataStream::Qt_5_3);
-				out << qint32(ModelVersionNumber) << *(i.value());
-				TargetFile.close();
-			}
-		}
+		OldZip.close();
 		zip.close();
+		if(!curDir.remove(OldName))return;
+		QFile::rename(NewName, OldName);
 	}
 }
 

@@ -248,14 +248,14 @@ void StandaloneStress::Start() {
 void StandaloneStress::Finished(){
 	QDir dir(OutPathEdit->text());
 	Stresser->SaveResults(dir.absolutePath());
-	if(QMessageBox::information(this,tr("Finished"),tr("Stress Test Finished Successfully"))==QMessageBox::Ok) close();
+	if(QMessageBox::information(this,tr("Finished"),tr("Stress Test Finished Successfully"))==QMessageBox::Ok) qApp->quit();
 }
 void StandaloneStress::FinishedEroors() {
 #ifdef _DEBUG
 	QDir dir(OutPathEdit->text());
 	Stresser->SaveResults(dir.absolutePath());
 #endif // _DEBUG
-	if (QMessageBox::critical(this, tr("Finished"), tr("Errors Occured during calculation of stress test\nNo results were saved")) == QMessageBox::Ok) close();
+	if (QMessageBox::critical(this, tr("Finished"), tr("Errors Occured during calculation of stress test\nNo results were saved")) == QMessageBox::Ok) qApp->quit();
 }
 
 

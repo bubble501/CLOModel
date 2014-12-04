@@ -136,6 +136,7 @@ QString WatFalPrior::ReadyToCalculate() const {
 }
 QDataStream& WatFalPrior::LoadOldVersion(QDataStream& stream) {
 	qint32 TempInt,TempSize;
+	quint8 TempUChar;
 	IntegerVector TempIV;
 	BloombergVector TempBV;
 	stream >> TempSize;
@@ -150,8 +151,9 @@ QDataStream& WatFalPrior::LoadOldVersion(QDataStream& stream) {
 		TempBV.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> TempBV;
 		DoubleParameters.insert(TempInt, new BloombergVector(TempBV));
 	}
-	stream >> TempInt >> TriggerStruc >> FilledNullAnchors;
+	stream >> TempInt >> TriggerStruc >> TempUChar >> FilledNullAnchors;
 	PriorityType = static_cast<WaterfallStepType>(TempInt);
+	m_AccrueOrPay = static_cast<wstAccrueOrPay>(TempUChar);
 	ResetProtocolVersion();
 	return stream;
 }
@@ -353,6 +355,6 @@ QDataStream& operator<<(QDataStream & stream, const WatFalPrior& flows) {
 	for (auto i = flows.DoubleParameters.constBegin(); i != flows.DoubleParameters.constEnd(); ++i) {
 		stream << i.key() << *(i.value());
 	}
-	stream << qint32(flows.PriorityType) << flows.TriggerStruc << flows.FilledNullAnchors;
+	stream << qint32(flows.PriorityType) << flows.TriggerStruc << static_cast<quint8>(flows.m_AccrueOrPay) << flows.FilledNullAnchors;
 	return stream;
 }

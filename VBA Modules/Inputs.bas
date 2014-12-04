@@ -1,16 +1,16 @@
 Attribute VB_Name = "Inputs"
 Option Explicit
-Declare Sub RunModel Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant)
+Declare Sub RunModel Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
 'Declare Sub RunModel Lib "Z:\24AM\Analytics\CLO Model\ExcelDllCLOModelLoanTape.dll" (ArrayData() As Variant) 'This will also save the loan pool file
-Declare Function CLODiscountMargin Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As Double
-Declare Function CLOWALife Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As Double
-Declare Function CLOReturnRate Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As Double
-Declare Function GetStressLoss Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As Double
-Declare Function GetStressDM Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As Double
-'Declare Sub InspectWaterfall Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant)
-Declare Function WatFallStepEdit Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As String
-Declare Function TriggerEdit Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As String
-Declare Function GetLoansAssumption Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As Double
+Declare Function CLODiscountMargin Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
+Declare Function CLOWALife Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
+Declare Function CLOReturnRate Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
+Declare Function GetStressLoss Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
+Declare Function GetStressDM Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
+'Declare Sub InspectWaterfall Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
+Declare Function WatFallStepEdit Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As String
+Declare Function TriggerEdit Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As String
+Declare Function GetLoansAssumption Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
 Public Sub GetInputFromStructure( _
     MortgagesSheet As String, _
     InputsSheet As String, _
@@ -145,6 +145,7 @@ Public Sub GetInputFromStructure( _
     Dim IRRtoEquityTargetHead As Long
     Dim ReserveIndexHead As Long
     Dim TriggersHead As Long
+    Dim AccruePayHead As Long
     
     Set WaterfallSheet = Sheets(FieldsLabels("WaterfallSheet"))
     Set FirstStep = WaterfallSheet.Cells.Find(What:=FieldsLabels("StepHead"), LookAt:=xlWhole, LookIn:=xlFormulas)
@@ -161,6 +162,7 @@ Public Sub GetInputFromStructure( _
     IRRtoEquityTargetHead = WaterfallSheet.Cells.Find(What:=FieldsLabels("IRRtoEquityTargetHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
     ReserveIndexHead = WaterfallSheet.Cells.Find(What:=FieldsLabels("ReserveIndexHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
     TriggersHead = WaterfallSheet.Cells.Find(What:=FieldsLabels("TriggersHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
+    AccruePayHead = WaterfallSheet.Cells.Find(What:=FieldsLabels("AccruePayHead"), LookAt:=xlWhole, LookIn:=xlFormulas).Column - FirstStep.Column
     ''''''''''''''''''''''''''''''''''''''''''''''''''''
     On Error Resume Next
     Set IssuerProperty = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("IssuerProperty"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -465,6 +467,11 @@ DefaultExchange:
         Else
             Call AddInput(AllTheInputs, CStr(FirstStep.Offset(i, TriggersHead).Value))
         End If
+        If IsEmpty(FirstStep.Offset(i, AccruePayHead)) Then
+            Call AddInput(AllTheInputs, CLng(0))
+        Else
+            Call AddInput(AllTheInputs, CLng(FirstStep.Offset(i, AccruePayHead).Value))
+        End If
         i = i + 1
     Loop
     'Principal waterfall
@@ -531,6 +538,11 @@ DefaultExchange:
             Call AddInput(AllTheInputs, "")
         Else
             Call AddInput(AllTheInputs, CStr(LastStep.Offset(i, TriggersHead).Value))
+        End If
+        If IsEmpty(LastStep.Offset(i, AccruePayHead)) Then
+            Call AddInput(AllTheInputs, CLng(0))
+        Else
+            Call AddInput(AllTheInputs, CLng(LastStep.Offset(i, AccruePayHead).Value))
         End If
         i = i + 1
     Loop
@@ -1059,6 +1071,7 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
     a.Add "IRR to Equity Target", "IRRtoEquityTargetHead"
     a.Add "Reserve Index", "ReserveIndexHead"
     a.Add "Triggers", "TriggersHead"
+    a.Add "Accrue/Pay", "AccruePayHead"
 End Sub
 
 Private Function FromStringToInterestType(a As String) As Long
@@ -1423,7 +1436,7 @@ Public Sub EditWaterfallStep(InputsSheet As String, Target As Range, FieldsLabel
         CurrentStepStruct = ""
      Else
         CurrentStepStruct = CStr(FromStringToPriorty(Target.Value))
-        For i = 1 To 12
+        For i = 1 To 13
            CurrentStepStruct = CurrentStepStruct & "#" & Target.Offset(0, i).Value
         Next i
      End If

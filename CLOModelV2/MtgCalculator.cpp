@@ -29,13 +29,13 @@ bool MtgCalculator::StartCalculation() {
 		bool CheckAgain = false;
 		ConstantBaseRateTable TempTable;
 		for (auto i = Loans.constBegin(); i != Loans.constEnd(); ++i) {
-			if (i.value()->GetFloatingRateValue().IsEmpty()) {
+			if (i.value()->GetFloatingRateValue().IsEmpty() && !i.value()->GetFloatingRateBase().IsEmpty()) {
 				i.value()->CompileReferenceRateValue(TempTable);
 				CheckAgain = true;
 			}
 		}
 		for (auto i = Loans.constBegin(); CheckAgain && i != Loans.constEnd(); ++i) {
-			if (i.value()->GetFloatingRateValue().IsEmpty()) return false;
+			if (i.value()->GetFloatingRateValue().IsEmpty() && !i.value()->GetFloatingRateBase().IsEmpty()) return false;
 		}
 	}
 

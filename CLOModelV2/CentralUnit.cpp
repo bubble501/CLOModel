@@ -50,7 +50,8 @@ void CentralUnit::AddLoan(
 	TempMtg.SetPrepayMultiplier(PrepayMult);
 	TempMtg.SetLossMultiplier(LossMult);
 	TempMtg.SetInterest(Interest);
-	TempMtg.SetFloatingRateBase((floatBase.isEmpty())? QString("ZERO"):floatBase);
+	//TempMtg.SetFloatingRateBase((floatBase.isEmpty())? QString("ZERO"):floatBase);
+	TempMtg.SetFloatingRateBase(floatBase);
 	TempMtg.SetPaymentFreq(Freq);
 	TempMtg.SetAnnuity(Annuity);
 	TempMtg.SetHaircutVector(HaicutVect);

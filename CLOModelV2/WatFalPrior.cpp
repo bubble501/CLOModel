@@ -57,11 +57,9 @@ QString WatFalPrior::ReadyToCalculate() const {
 		if (HasParameter(wstParameters::RedemptionGroup)) {
 			if (GetParameter(wstParameters::RedemptionGroup).value<IntegerVector>().IsEmpty(1)) Result += "OC Test needs a Redemption Group Parameter\n";
 			if (GetParameter(wstParameters::RedemptionGroupLevel).value<IntegerVector>().IsEmpty(0)) Result += "OC Test needs a Redemption Group Level Parameter\n";
-			if (GetParameter(wstParameters::RedemptionShare).value<BloombergVector>().IsEmpty(0.0,1.0)) Result += "OC Test needs a Redemption Share Parameter\n";
 		}
-		if (HasParameter(wstParameters::AdditionalCollateralShare)) {
-			if (GetParameter(wstParameters::AdditionalCollateralShare).value<BloombergVector>().IsEmpty(0.0, 1.0)) Result += "OC Test needs an Additional Collateral Share Parameter\n";
-		}
+		if (GetParameter(wstParameters::RedemptionShare).value<BloombergVector>().IsEmpty(0.0, 1.0)) Result += "OC Test needs a Redemption Share Parameter\n";
+		if (GetParameter(wstParameters::AdditionalCollateralShare).value<BloombergVector>().IsEmpty(0.0, 1.0)) Result += "OC Test needs an Additional Collateral Share Parameter\n";
 		if (HasParameter(wstParameters::AdditionalCollateralShare) && HasParameter(wstParameters::RedemptionShare)) {
 			BloombergVector ACS = GetParameter(wstParameters::AdditionalCollateralShare).value<BloombergVector>();
 			BloombergVector RS = GetParameter(wstParameters::RedemptionShare).value<BloombergVector>();
@@ -82,7 +80,8 @@ QString WatFalPrior::ReadyToCalculate() const {
 		}
 		break;
 	case WatFalPrior::WaterfallStepType::wst_DeferredInterest:
-		if (!HasParameter(wstParameters::PayAccrue)) Result += "Deferred interest needs an Accrue or Pay Parameter\n";
+		if (GetParameter(wstParameters::SourceOfFunding).value<IntegerVector>().IsEmpty(1, 2)) Result += "Deferred Interest needs a Source of Funding Parameter\n";
+		if (!HasParameter(wstParameters::PayAccrue)) Result += "Deferred Interest needs an Accrue or Pay Parameter\n";
 		if (GetParameter(wstParameters::SeniorityGroup).value<IntegerVector>().IsEmpty(1)) Result += "Deferred Interest needs a Seniority Group Parameter\n";
 		if (GetParameter(wstParameters::SeniorityGroupLevel).value<IntegerVector>().IsEmpty(0)) Result += "Deferred Interest needs a Seniority Group Level Parameter\n";
 		if (GetParameter(wstParameters::CouponIndex).value<IntegerVector>().IsEmpty(0)) Result += "Deferred Interest needs a Coupon Index Parameter\n";
@@ -117,8 +116,8 @@ QString WatFalPrior::ReadyToCalculate() const {
 		if (HasParameter(wstParameters::RedemptionGroup)) {
 			if (GetParameter(wstParameters::RedemptionGroup).value<IntegerVector>().IsEmpty(1)) Result += "PDL Cure needs a Redemption Group Parameter\n";
 			if (GetParameter(wstParameters::RedemptionGroupLevel).value<IntegerVector>().IsEmpty(0)) Result += "PDL Cure needs a Redemption Group Level Parameter\n";
-			if (GetParameter(wstParameters::RedemptionShare).value<BloombergVector>().IsEmpty(0.0, 1.0)) Result += "PDL Cure needs a Redemption Share Parameter\n";
 		}
+		if (GetParameter(wstParameters::RedemptionShare).value<BloombergVector>().IsEmpty(0.0, 1.0)) Result += "PDL Cure needs a Redemption Share Parameter\n";
 		break;
 	case WatFalPrior::WaterfallStepType::wst_FeesFromExcess:
 		if (GetParameter(wstParameters::RedemptionShare).value<BloombergVector>().IsEmpty(0.0, 1.0)) Result += "Fees from Excess Spread needs a Redemption Share Parameter\n";

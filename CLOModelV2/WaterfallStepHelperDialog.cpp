@@ -299,6 +299,7 @@ void WaterfallStepHelperDialog::SetbasedOnWaterfall() {
 	case WatFalPrior::WaterfallStepType::wst_juniorFees:
 	case WatFalPrior::WaterfallStepType::wst_OCTest:
 	case WatFalPrior::WaterfallStepType::wst_ICTest:
+	case WatFalPrior::WaterfallStepType::wst_DeferredInterest:
 	case WatFalPrior::WaterfallStepType::wst_ReinvestmentTest:
 	case WatFalPrior::WaterfallStepType::wst_Excess:
 	case WatFalPrior::WaterfallStepType::wst_ReserveReplenish:

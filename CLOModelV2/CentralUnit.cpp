@@ -141,6 +141,7 @@ void CentralUnit::AddWaterfallStep(
 	, const QString& ArgIRRtoEquityTarget
 	, const QString& ArgReserveIndex
 	, const QString& ArgTrigger
+	, int ArgAccruePay
 	){
 	WatFalPrior TempStep;
 	if (!ArgSeniorityGroup.isEmpty()) { TempStep.SetParameter(WatFalPrior::wstParameters::SeniorityGroup, ArgSeniorityGroup); }
@@ -155,6 +156,7 @@ void CentralUnit::AddWaterfallStep(
 	if (!ArgIRRtoEquityTarget.isEmpty()) { TempStep.SetParameter(WatFalPrior::wstParameters::IRRtoEquityTarget, ArgIRRtoEquityTarget); }
 	if (!ArgReserveIndex.isEmpty()) { TempStep.SetParameter(WatFalPrior::wstParameters::ReserveIndex, ArgReserveIndex); }
 	if (!ArgTrigger.isEmpty()) { TempStep.SetParameter(WatFalPrior::wstParameters::Trigger, ArgTrigger); }
+	TempStep.SetParameter(WatFalPrior::wstParameters::PayAccrue, QString::number(ArgAccruePay));
 	TempStep.SetPriorityType(Tpe);
 	LOGDEBUG(TempStep.ToString());
 	Structure.AddStep(TempStep);

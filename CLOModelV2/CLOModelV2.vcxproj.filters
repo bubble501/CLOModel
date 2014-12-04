@@ -420,9 +420,6 @@
     <ClCompile Include="WaterfallCalculator.cpp">
       <Filter>Source Files\Deal Structure</Filter>
     </ClCompile>
-    <ClCompile Include="WatFalPrior.cpp">
-      <Filter>Source Files\Deal Structure</Filter>
-    </ClCompile>
     <ClCompile Include="TrancheViewer.cpp">
       <Filter>Source Files\Widgets</Filter>
     </ClCompile>
@@ -581,6 +578,9 @@
     </ClCompile>
     <ClCompile Include="TriggerHelperDialog.cpp">
       <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="WatFalPrior.cpp">
+      <Filter>Source Files\Deal Structure</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

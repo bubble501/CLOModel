@@ -86,7 +86,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	}
 	
 	{ //Waterfall Steps
-		int Prior;
+		int Prior,ArgAccruePay;
 		QString ArgTrigger, ArgRedemptionShare, ArgAdditionalCollateralShare, ArgTestTargetOverride, ArgIRRtoEquityTarget, ArgSeniorityGroup, ArgSeniorityGroupLevel, ArgRedemptionGroup, ArgRedemptionGroupLevel, ArgSourceofFunding, ArgCouponIndex, ArgReserveIndex;
 		NumElements = pdFreq->intVal; pdFreq++;
 		LOGDEBUG(QString("Numero Steps: %1").arg(NumElements));
@@ -104,7 +104,8 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			ArgIRRtoEquityTarget = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 			ArgReserveIndex = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 			ArgTrigger = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
-			LOGDEBUG(QString("Seniority Group: %1\nSeniority Group Level: %2\nRedemption Group: %3\nRedemption Group Level: %4\nRedemption Share: %5\nAdd. Collateral Share %6\nSource of Funding: %7\nCoupon Index: %8\nTest Target Ovr: %9\nIIR To Equity: %10\nReserve Index: %11\nTriggers: %12\n")
+			ArgAccruePay = pdFreq->intVal; pdFreq++;
+			LOGDEBUG(QString("Seniority Group: %1\nSeniority Group Level: %2\nRedemption Group: %3\nRedemption Group Level: %4\nRedemption Share: %5\nAdd. Collateral Share %6\nSource of Funding: %7\nCoupon Index: %8\nTest Target Ovr: %9\nIIR To Equity: %10\nReserve Index: %11\nTriggers: %12\nAccrue-Pay: %13\n")
 				.arg(ArgSeniorityGroup)
 				.arg(ArgSeniorityGroupLevel)
 				.arg(ArgRedemptionGroup)
@@ -117,8 +118,9 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 				.arg(ArgIRRtoEquityTarget)
 				.arg(ArgReserveIndex)
 				.arg(ArgTrigger)
+				.arg(ArgAccruePay)
 			);
-			TempUnit.AddWaterfallStep(static_cast<WatFalPrior::WaterfallStepType>(Prior), ArgSeniorityGroup, ArgSeniorityGroupLevel, ArgRedemptionGroup, ArgRedemptionGroupLevel, ArgRedemptionShare, ArgAdditionalCollateralShare, ArgSourceofFunding, ArgCouponIndex, ArgTestTargetOverride, ArgIRRtoEquityTarget, ArgReserveIndex, ArgTrigger);
+			TempUnit.AddWaterfallStep(static_cast<WatFalPrior::WaterfallStepType>(Prior), ArgSeniorityGroup, ArgSeniorityGroupLevel, ArgRedemptionGroup, ArgRedemptionGroupLevel, ArgRedemptionShare, ArgAdditionalCollateralShare, ArgSourceofFunding, ArgCouponIndex, ArgTestTargetOverride, ArgIRRtoEquityTarget, ArgReserveIndex, ArgTrigger, ArgAccruePay);
 		}
 	}
 	{ //Triggers

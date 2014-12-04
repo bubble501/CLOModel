@@ -70,6 +70,7 @@ public:
 		, const QString& ArgIRRtoEquityTarget
 		, const QString& ArgReserveIndex
 		, const QString& ArgTrigger
+		, int ArgAccruePay
 	);
 	void SetSeniorExpenses(const QString& a){Structure.SetSeniorExpenses(a);}
 	void SetSeniorFees(const QString& a) { Structure.SetSeniorFees(a); }

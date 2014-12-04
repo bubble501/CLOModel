@@ -4,12 +4,14 @@
 #include <QMetaType>
 WatFalPrior::WatFalPrior()
 	:PriorityType(WaterfallStepType::wst_Excess)
+	, m_AccrueOrPay(wstAccrueOrPay::Invalid)
 {
 }
 WatFalPrior::WatFalPrior(const WatFalPrior& a)
 	:PriorityType(a.PriorityType)
 	, FilledNullAnchors(a.FilledNullAnchors)
 	, TriggerStruc(a.TriggerStruc)
+	, m_AccrueOrPay(a.m_AccrueOrPay)
 {
 	for (auto i = a.IntParameters.constBegin(); i != a.IntParameters.constEnd(); ++i)
 		IntParameters.insert(i.key(), new IntegerVector(*(i.value())));
@@ -25,6 +27,7 @@ WatFalPrior& WatFalPrior::operator=(const WatFalPrior& a){
 	PriorityType = a.PriorityType;
 	TriggerStruc = a.TriggerStruc;
 	FilledNullAnchors = a.FilledNullAnchors;
+	m_AccrueOrPay = a.m_AccrueOrPay;
 	return *this;
 }
 QString WatFalPrior::ReadyToCalculate() const {
@@ -36,6 +39,7 @@ QString WatFalPrior::ReadyToCalculate() const {
 		if (GetParameter(wstParameters::SourceOfFunding).value<IntegerVector>().IsEmpty(1,2)) Result += "Expenses and Fees need a Source of Funding Parameter\n";
 	break;
 	case WatFalPrior::WaterfallStepType::wst_Interest:
+		if (!HasParameter(wstParameters::PayAccrue)) Result += "Interest needs an Accrue or Pay Parameter\n";
 		if (GetParameter(wstParameters::SeniorityGroup).value<IntegerVector>().IsEmpty(1)) Result += "Interest needs a Seniority Group Parameter\n";
 		if (GetParameter(wstParameters::SeniorityGroupLevel).value<IntegerVector>().IsEmpty(0)) Result += "Interest needs a Seniority Group Level Parameter\n";
 		if (GetParameter(wstParameters::CouponIndex).value<IntegerVector>().IsEmpty(0)) Result += "Interest needs a Coupon Index Parameter\n";
@@ -46,6 +50,7 @@ QString WatFalPrior::ReadyToCalculate() const {
 	break;
 	case WatFalPrior::WaterfallStepType::wst_ReinvestmentTest:
 	case WatFalPrior::WaterfallStepType::wst_OCTest:
+		if (!HasParameter(wstParameters::PayAccrue)) Result += "OC Test needs an Accrue or Pay Parameter\n";
 		if (GetParameter(wstParameters::SourceOfFunding).value<IntegerVector>().IsEmpty(1, 2)) Result += "OC Test needs a Source of Funding Parameter\n";
 		if (GetParameter(wstParameters::SeniorityGroup).value<IntegerVector>().IsEmpty(1)) Result += "OC Test needs a Seniority Group Parameter\n";
 		if (GetParameter(wstParameters::SeniorityGroupLevel).value<IntegerVector>().IsEmpty(0)) Result += "OC Test needs a Seniority Group Level Parameter\n";
@@ -67,6 +72,7 @@ QString WatFalPrior::ReadyToCalculate() const {
 		}
 		break;
 	case WatFalPrior::WaterfallStepType::wst_ICTest:
+		if (!HasParameter(wstParameters::PayAccrue)) Result += "IC Test needs an Accrue or Pay Parameter\n";
 		if (GetParameter(wstParameters::SourceOfFunding).value<IntegerVector>().IsEmpty(1, 2)) Result += "IC Test needs a Source of Funding Parameter\n";
 		if (GetParameter(wstParameters::SeniorityGroup).value<IntegerVector>().IsEmpty(1)) Result += "IC Test needs a Seniority Group Parameter\n";
 		if (GetParameter(wstParameters::SeniorityGroupLevel).value<IntegerVector>().IsEmpty(0)) Result += "IC Test needs a Seniority Group Level Parameter\n";
@@ -76,6 +82,7 @@ QString WatFalPrior::ReadyToCalculate() const {
 		}
 		break;
 	case WatFalPrior::WaterfallStepType::wst_DeferredInterest:
+		if (!HasParameter(wstParameters::PayAccrue)) Result += "Deferred interest needs an Accrue or Pay Parameter\n";
 		if (GetParameter(wstParameters::SeniorityGroup).value<IntegerVector>().IsEmpty(1)) Result += "Deferred Interest needs a Seniority Group Parameter\n";
 		if (GetParameter(wstParameters::SeniorityGroupLevel).value<IntegerVector>().IsEmpty(0)) Result += "Deferred Interest needs a Seniority Group Level Parameter\n";
 		if (GetParameter(wstParameters::CouponIndex).value<IntegerVector>().IsEmpty(0)) Result += "Deferred Interest needs a Coupon Index Parameter\n";
@@ -169,6 +176,7 @@ QVariant WatFalPrior::GetParameter(qint32 ParameterType) const {
 	if (IntParameters.contains(ParameterType)) Result.setValue<IntegerVector>(*(IntParameters.value(ParameterType)));
 	else if (DoubleParameters.contains(ParameterType)) Result.setValue<BloombergVector>(*(DoubleParameters.value(ParameterType)));
 	else if (ParameterType == static_cast<qint32>(wstParameters::Trigger)) Result.setValue(TriggerStruc);
+	else if (ParameterType == static_cast<qint32>(wstParameters::PayAccrue)) Result.setValue(static_cast<quint8>(m_AccrueOrPay));
 	return Result;
 }
 
@@ -177,6 +185,7 @@ bool WatFalPrior::HasParameter(qint32 ParameterType) const {
 		IntParameters.contains(ParameterType)
 		|| DoubleParameters.contains(ParameterType)
 		|| (ParameterType == static_cast<qint32>(wstParameters::Trigger) && !TriggerStruc.isEmpty())
+		|| (ParameterType == static_cast<qint32>(wstParameters::PayAccrue) && m_AccrueOrPay!=wstAccrueOrPay::Invalid)
 	;
 }
 
@@ -198,6 +207,24 @@ void WatFalPrior::SetParameter(qint32 ParameterType, const QString& val) {
 	}
 	case wstParameters::Trigger:
 		TriggerStruc = NormaliseTriggerStructure(val);
+	break;
+	case wstParameters::PayAccrue:{
+		if (val.isEmpty()) {
+			m_AccrueOrPay = wstAccrueOrPay::Invalid;
+			return;
+		}
+		bool CheckConv;
+		int PorA = val.toInt(&CheckConv);
+		if (!CheckConv) {
+			m_AccrueOrPay = wstAccrueOrPay::Invalid;
+			return;
+		}
+		if (PorA < static_cast<quint8>(wstAccrueOrPay::Invalid) || PorA > static_cast<quint8>(wstAccrueOrPay::AccrueAndPay)) {
+			m_AccrueOrPay = wstAccrueOrPay::Invalid; 
+			return; 
+		}
+		m_AccrueOrPay = static_cast<wstAccrueOrPay>(PorA);
+	}
 	break;
 	case wstParameters::SeniorityGroupLevel:
 	case wstParameters::RedemptionGroupLevel:
@@ -239,11 +266,27 @@ void WatFalPrior::RemoveParameter(qint32 ParameterType) {
 		IntParameters.remove(ParameterType);
 	}
 	if (ParameterType == static_cast<qint32>(wstParameters::Trigger)) TriggerStruc=QString();
+	if (ParameterType == static_cast<qint32>(wstParameters::PayAccrue)) m_AccrueOrPay = wstAccrueOrPay::Invalid;
 }
 
 QString WatFalPrior::ToString() const {
 	QString Result="Waterfall Step\n";
 	Result += QString("Type: %1\nTrigger Structure: %2\n").arg(static_cast<qint32>(PriorityType)).arg(TriggerStruc);
+	switch (m_AccrueOrPay) {
+	case WatFalPrior::wstAccrueOrPay::Accrue:
+		Result += '\n'+ (PriorityType == WaterfallStepType::wst_Interest || PriorityType == WaterfallStepType::wst_DeferredInterest) ? QString("Accrue") : QString("Calculate");
+	break;
+	case WatFalPrior::wstAccrueOrPay::Pay:
+		Result += '\n' + (PriorityType == WaterfallStepType::wst_Interest || PriorityType == WaterfallStepType::wst_DeferredInterest) ? QString("Pay") : QString("Cure");
+	break;
+	case WatFalPrior::wstAccrueOrPay::AccrueAndPay:
+		Result += '\n' + (PriorityType == WaterfallStepType::wst_Interest || PriorityType == WaterfallStepType::wst_DeferredInterest) ? QString("Accrue") : QString("Calculate");
+		Result += " and ";
+		Result += (PriorityType == WaterfallStepType::wst_Interest || PriorityType == WaterfallStepType::wst_DeferredInterest) ? QString("Pay") : QString("Cure");
+	break;
+	default:
+		break;
+	}
 	for (auto i = IntParameters.constBegin(); i != IntParameters.constEnd(); ++i) 
 		Result += QString("Parameter %1: %2\n").arg(i.key()).arg(i.value()->GetVector());
 	for (auto i = DoubleParameters.constBegin(); i != DoubleParameters.constEnd(); ++i)
@@ -293,7 +336,9 @@ QString WatFalPrior::CodeForDialog() const {
 		GetParameter(wstParameters::TestTargetOverride).value<BloombergVector>().GetVector() + '#' +
 		GetParameter(wstParameters::IRRtoEquityTarget).value<BloombergVector>().GetVector() + '#' +
 		GetParameter(wstParameters::ReserveIndex).value<IntegerVector>().GetVector() + '#' +
-		GetParameter(wstParameters::Trigger).toString()
+		(HasParameter(wstParameters::PayAccrue) ? QString('#' + GetParameter(wstParameters::PayAccrue).toString() + '#'):QString()) +
+		GetParameter(wstParameters::Trigger).toString();
+	
 	;
 }
 

@@ -45,7 +45,14 @@ public:
 		, TestTargetOverride
 		, IRRtoEquityTarget
 		, ReserveIndex
+		, PayAccrue
 		, Trigger
+	};
+	enum class wstAccrueOrPay :quint8 {
+		Invalid = 0
+		, Accrue = 1
+		, Pay = 2
+		, AccrueAndPay = Accrue | Pay
 	};
 	void FillMissingAnchors(const QDate& a);
 	void ResetMissinAnchors();
@@ -71,6 +78,7 @@ private:
 	QHash<qint32, IntegerVector*> IntParameters;
 	QHash<qint32, BloombergVector*> DoubleParameters;
 	QString TriggerStruc;
+	wstAccrueOrPay m_AccrueOrPay;
 	WaterfallStepType PriorityType;
 	QSet<qint32> FilledNullAnchors;
 protected:

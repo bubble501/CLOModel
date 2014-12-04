@@ -36,18 +36,22 @@ private slots:
 	void SetTestTargetOverride(QString value);
 	void SetIRRtoEquityTarget(QString value);
 	void SetReserveIndex(QString value);
+	void SetPayAccrue(QString value);
 	void SetDefaults1();
 	void SetDefaults100();
 	void SetDefaults0();
 	void SetbasedOnWaterfall();
 	void ResetSoFCombo(int index);
 	void SoFComboChanged(int index);
+	void ResetPayAccrueCombo(int index);
+	void PayAccrueComboChanged(int index);
 	void ClearAndAccept();
 signals:
 	void SetTo1(QString);
 	void SetTo100(QString);
 	void SetTo0(QString);
 	void SetSoFCombo(int);
+	void SetPayAccrueCombo(int);
 
 	void ImportSeniorityGroup(QString value);
 	void ImportSeniorityGroupLevel(QString value);
@@ -60,6 +64,7 @@ signals:
 	void ImportTestTargetOverride(QString value);
 	void ImportIRRtoEquityTarget(QString value);
 	void ImportReserveIndex(QString value);
+	void ImportPayAccrue(QString value);
 private:
 	enum {
 		AllWaterfalls=0

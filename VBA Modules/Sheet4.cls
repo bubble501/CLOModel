@@ -24,7 +24,6 @@ Private Sub Worksheet_BeforeDoubleClick(ByVal Target As Range, Cancel As Boolean
         Call EditWaterfallStep("Liabilities + input", singleCell, allFields, singleCell.Row < LastStep.Row)
     End If
     Next singleCell
-    Me.Protect
 StepNotFoundError:
 Cancel = True
 Application.EnableEvents = True

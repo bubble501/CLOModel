@@ -28,7 +28,7 @@
 int main(int argc, char *argv[]) {
 
 	QApplication a(argc, argv);
-	WaterfallStepHelperDialog b;
+	TriggerHelperDialog b;
 	if (b.exec()==QDialog::Accepted) {
 		qDebug() << b.GetParameters();
 	}

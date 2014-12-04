@@ -1,16 +1,16 @@
 Attribute VB_Name = "Inputs"
 Option Explicit
-Declare Sub RunModel Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
+Declare Sub RunModel Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant)
 'Declare Sub RunModel Lib "Z:\24AM\Analytics\CLO Model\ExcelDllCLOModelLoanTape.dll" (ArrayData() As Variant) 'This will also save the loan pool file
-Declare Function CLODiscountMargin Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
-Declare Function CLOWALife Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
-Declare Function CLOReturnRate Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
-Declare Function GetStressLoss Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
-Declare Function GetStressDM Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
-'Declare Sub InspectWaterfall Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
-Declare Function WatFallStepEdit Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As String
-Declare Function TriggerEdit Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As String
-Declare Function GetLoansAssumption Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
+Declare Function CLODiscountMargin Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As Double
+Declare Function CLOWALife Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As Double
+Declare Function CLOReturnRate Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As Double
+Declare Function GetStressLoss Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As Double
+Declare Function GetStressDM Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As Double
+'Declare Sub InspectWaterfall Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant)
+Declare Function WatFallStepEdit Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As String
+Declare Function TriggerEdit Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As String
+Declare Function GetLoansAssumption Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As Double
 Public Sub GetInputFromStructure( _
     MortgagesSheet As String, _
     InputsSheet As String, _
@@ -1482,7 +1482,11 @@ Public Sub EditWaterfallStep(InputsSheet As String, Target As Range, FieldsLabel
     If EditedStep = "" Then Exit Sub
     Dim StepParts
     StepParts = Split(EditedStep, "#")
-    Target.Value = FromPriortyToString(CLng(StepParts(LBound(StepParts))))
+    If StepParts(LBound(StepParts)) = "" Then
+        Target.ClearContents
+    Else
+        Target.Value = FromPriortyToString(CLng(StepParts(LBound(StepParts))))
+    End If
     For i = LBound(StepParts) + 1 To UBound(StepParts)
         With Target.Offset(0, i - LBound(StepParts))
             If StepParts(i) = "" Then

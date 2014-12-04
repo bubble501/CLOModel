@@ -195,7 +195,7 @@
 		</ComponentGroup>
 		<Component Id="SetEnviromnment" Guid="7281FFFC-D416-4047-8168-F1CCB80F7112" Directory="INSTALLFOLDER">
 			<CreateFolder />
-			<Environment Id="LibrariesPath" Action="set" Name="PATH" Permanent="no" Part="last" System="yes" Value="[INSTALLFOLDER]"/>
+			<Environment Id="LibrariesPath" Action="set" Name="PATH" Permanent="yes" Part="last" System="yes" Value="[INSTALLFOLDER]"/>
 			<Environment Id="PlatformsPath" Action="set" Name="QT_QPA_PLATFORM_PLUGIN_PATH" Permanent="no" Part="last" System="yes" Value="[PLUGINSDIR]"/>
 		</Component>
 		<Component Id="RemoveOldQtCore" Directory="System16Dir" Guid="5BEE9902-7DF2-4625-93BF-1FC951DE5B5A">

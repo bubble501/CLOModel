@@ -42,7 +42,6 @@ TriggerHelperDialog::TriggerHelperDialog(QDialog *parent)
 
 	TriggerBuilderBase = new QStackedWidget(this);
 	connect(TriggerTypeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(ClearParameters()));
-	connect(TriggerTypeCombo, SIGNAL(currentIndexChanged(int)), TriggerBuilderBase, SLOT(setCurrentIndex(int)));
 	connect(TriggerTypeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(CheckOkEnabled(int)));
 	TriggerBuilderBase->setMinimumSize(200, 200);
 	TriggerBuilderBase->setStyleSheet("QLabel { qproperty-alignment: 'AlignRight | AlignVCenter'; }");
@@ -102,11 +101,11 @@ void TriggerHelperDialog::CheckOkEnabled(int index) {
 		disconnect(TriggerTypeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(CheckOkEnabled(int)));
 		QWidget* EmptyWidg = TriggerBuilderBase->widget(0);
 		TriggerBuilderBase->removeWidget(EmptyWidg);
-		TriggerBuilderBase->setCurrentIndex(index - 1);
 		EmptyWidg->deleteLater();
 		FirstCombodeleted = true;
 		TriggerTypeCombo->removeItem(0);
-		
+		TriggerBuilderBase->setCurrentIndex(TriggerTypeCombo->currentIndex());
+		connect(TriggerTypeCombo, SIGNAL(currentIndexChanged(int)), TriggerBuilderBase, SLOT(setCurrentIndex(int)), Qt::QueuedConnection);
 	}
 }
 

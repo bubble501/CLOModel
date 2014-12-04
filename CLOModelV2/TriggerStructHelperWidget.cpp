@@ -214,14 +214,14 @@ void TriggerStructHelperWidget::DecriptTriggers(QString encr) {
 			DecriptedTriggers->setText("Invalid Trigger Structure");
 		}
 		else {
-			for (int i = 0; i < TriggersModel->rowCount(); ++i) {
-				encr.replace(TriggersModel->index(i, 0).data().toString(), TriggersModel->index(i, 1).data().toString(),Qt::CaseInsensitive);
-			}
 			encr.replace("*", " AND ");
 			encr.replace("+", " OR ");
 			encr.replace("-", " NOR ");
 			encr.replace("/", " NAND ");
 			encr.replace("!", "NOT ");
+			for (int i = 0; i < TriggersModel->rowCount(); ++i) {
+				encr.replace(TriggersModel->index(i, 0).data().toString(), TriggersModel->index(i, 1).data().toString(),Qt::CaseInsensitive);
+			}
 			DecriptedTriggers->setText(encr);
 			DecriptedTriggers->setStyleSheet(QString());
 		}

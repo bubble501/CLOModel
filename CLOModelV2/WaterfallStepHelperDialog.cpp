@@ -223,6 +223,11 @@ void WaterfallStepHelperDialog::SetReserveIndex(QString value) {
 	if (StepBuilderBase->currentWidget()->children().contains(sender()))
 		SetParameter(static_cast<qint32>(WatFalPrior::wstParameters::ReserveIndex), value);
 }
+void WaterfallStepHelperDialog::SetPayAccrue(QString value) {
+	if (!sender()) return;
+	if (StepBuilderBase->currentWidget()->children().contains(sender()))
+		SetParameter(static_cast<qint32>(WatFalPrior::wstParameters::PayAccrue), value);
+}
 
 void WaterfallStepHelperDialog::SoFComboChanged(int index) {
 	if (!sender()) return;
@@ -981,7 +986,19 @@ void WaterfallStepHelperDialog::SetCurrentPars(const QString& a) {
 		if (i->toInt() > 0)
 			ResultingParameters[static_cast<qint32>(WatFalPrior::wstParameters::PayAccrue)] = *i;
 		else ResultingParameters.remove(static_cast<qint32>(WatFalPrior::wstParameters::PayAccrue));
-		emit SetPayAccrueCombo(qMax(0, i->toInt() - 1));
+		switch (i->toInt()) {
+		case static_cast<quint8>(WatFalPrior::wstAccrueOrPay::AccrueAndPay) :
+			emit SetPayAccrueCombo(0);
+			break;
+		case static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Accrue) :
+			emit SetPayAccrueCombo(1);
+			break;
+		case static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Pay) :
+			emit SetPayAccrueCombo(2);
+			break;
+		default:
+			break;
+		}
 	}
 	++i;
 	TriggerBuilder->SetCurrentStructure(*i);
@@ -1000,5 +1017,7 @@ void WaterfallStepHelperDialog::SetInterestWF(const bool& val) {
 	FilterPattern += "]$";
 	StepsFilter->setFilterRegExp(QRegExp(FilterPattern));
 }
+
+
 
 

@@ -42,6 +42,26 @@ double TrancheCashFlow::GetAmountOutstanding(int index)const{
 	for (int i = index; i<Count(); i++) Result += GetFlow(i, static_cast<qint32>(TrancheFlowType::PrincipalFlow));
 	return Result;
 }
+double TrancheCashFlow::GetAmountOutstanding(const QDate& a) const {
+	if (a.isNull()) return 0.0;
+	double Result;
+	if (OutstandingAmt > 0.0) {
+		Result = OutstandingAmt;
+		for (auto i = m_CashFlows.constBegin(); i != m_CashFlows.constEnd(); ++i) {
+			if (i.key() <= a) Result -= i.value()->value(static_cast<qint32>(TrancheFlowType::PrincipalFlow), 0.0);
+			else break;
+		}
+		if (qAbs(Result) < 0.01) return 0.0;
+		return Result;
+	}
+	Result = 0.0;
+	for (auto i = m_CashFlows.constBegin(); i != m_CashFlows.constEnd(); ++i) {
+		Result += i.value()->value(static_cast<qint32>(TrancheFlowType::PrincipalFlow), 0.0);
+	}
+	return Result;
+}
+
+
 TrancheCashFlow::TrancheCashFlow(const TrancheCashFlow& a)
 	:OutstandingAmt(a.OutstandingAmt)
 	,StartingDeferredInterest(a.StartingDeferredInterest)
@@ -220,7 +240,6 @@ double TrancheCashFlow::GetDeferred(int index) const {
 	}
 	return Result;
 }
-
 double TrancheCashFlow::GetDeferred(const QDate& a) const {
 	double Result = 0;
 	for (qint32 i = static_cast<qint32>(TrancheFlowType::DeferredFlow); i < (static_cast<qint32>(TrancheFlowType::DeferredFlow) << 1); ++i) {
@@ -228,7 +247,20 @@ double TrancheCashFlow::GetDeferred(const QDate& a) const {
 	}
 	return Result;
 }
-
+double TrancheCashFlow::GetAccrued(const QDate& a) const {
+	double Result = 0;
+	for (qint32 i = static_cast<qint32>(TrancheFlowType::AccruedFlow); i < (static_cast<qint32>(TrancheFlowType::AccruedFlow) << 1); ++i) {
+		Result += GetFlow(a, i);
+	}
+	return Result;
+}
+double TrancheCashFlow::GetAccrued(int a) const {
+	double Result = 0;
+	for (qint32 i = static_cast<qint32>(TrancheFlowType::AccruedFlow); i < (static_cast<qint32>(TrancheFlowType::AccruedFlow) << 1); ++i) {
+		Result += GetFlow(a, i);
+	}
+	return Result;
+}
 QString TrancheCashFlow::ToXML() const {
 	GenericCashFlow NewFlow(*this);
 	NewFlow.SetLabel(static_cast<qint32>(MtgCashFlow::MtgFlowType::AmountOutstandingFlow), "Outstanding");

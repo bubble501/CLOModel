@@ -762,7 +762,6 @@ bool Waterfall::CalculateTranchesCashFlows(){
 				//This is not a Tranche payment date
 				foreach(const WatFalPrior* SingleStep,m_WaterfallStesps){
 					if(SingleStep->GetPriorityType()==WatFalPrior::WaterfallStepType::wst_ReinvestPrincipal){
-						//LOGDEBUG("Reinvestment Trigger: " + SingleStep->GetParameter(WatFalPrior::wstParameters::Trigger).toString());
 						if (TriggerPassing(SingleStep->GetParameter(WatFalPrior::wstParameters::Trigger).toString(), i, RollingNextIPD, IsCallPaymentDate) && !IsCallPaymentDate && i<m_MortgagesPayments.Count() - 1) {
 							//If it should, reinvest
 							if (m_PrincipalAvailable.Total() > 0.0) {
@@ -971,6 +970,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						PrintToTempFile("ReturnFalse.txt", "Invalid seniority in Interest");
 						return false;
 					}
+
 					for (int h = 0; h < m_Tranches.size(); h++) {
 						if (m_Tranches.at(h)->GetProrataGroup(CurrSenGrpLvl) == CurrSenGrp) {
 							if (!m_Tranches.at(h)->HasCoupon(CurrCoupIndx)) {

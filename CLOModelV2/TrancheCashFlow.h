@@ -23,29 +23,32 @@ public:
 		OCTarget=211,
 		ICTarget=212,
 		DeferredFlow = 1 << (MaximumInterestsTypes+1),
+		AccruedFlow = 1 << (MaximumInterestsTypes + 2),
 		PDLOutstanding=201,
 		PDLCured=202
 	};
 	TrancheCashFlow(double ThrancheOutstanding=0.0);
 	TrancheCashFlow(const TrancheCashFlow& a);
-	double GetInterest(int index)const; /*{ return GetFlow(index, static_cast<qint32>(TrancheFlowType::InterestFlow)); }*/
+	double GetInterest(int index)const; 
 	double GetPrincipal(int index)const { return GetFlow(index, static_cast<qint32>(TrancheFlowType::PrincipalFlow)); }
 	double GetOCTest(int index)const { return GetFlow(index, static_cast<qint32>(TrancheFlowType::OCFlow)); }
 	double GetICTest(int index)const { return GetFlow(index, static_cast<qint32>(TrancheFlowType::ICFlow)); }
 	double GetPDLOutstanding(int index)const { return GetFlow(index, static_cast<qint32>(TrancheFlowType::PDLOutstanding)); }
 	double GetPDLCured(int index)const { return GetFlow(index, static_cast<qint32>(TrancheFlowType::PDLCured)); }
-	double GetDeferred(int index)const; /*{ return GetFlow(index, static_cast<qint32>(TrancheFlowType::DeferredFlow)); }*/
+	double GetDeferred(int index)const;
+	double GetAccrued(int index)const;
 	virtual double GetTotalFlow(int index)const override;
 	virtual double GetTotalFlow(const QDate& a)const override;
 	double GetAmountOutstanding(int index = 0)const;
-	double GetInterest(const QDate& a)const; /*{ return GetFlow(a, static_cast<qint32>(TrancheFlowType::InterestFlow)); }*/
+	double GetInterest(const QDate& a)const; 
 	double GetPrincipal(const QDate& a)const { return GetFlow(a, static_cast<qint32>(TrancheFlowType::PrincipalFlow)); }
 	double GetOCTest(const QDate& a)const { return GetFlow(a, static_cast<qint32>(TrancheFlowType::OCFlow)); }
 	double GetICTest(const QDate& a)const { return GetFlow(a, static_cast<qint32>(TrancheFlowType::ICFlow)); }
 	double GetPDLOutstanding(const QDate& a)const { return GetFlow(a, static_cast<qint32>(TrancheFlowType::PDLOutstanding)); }
 	double GetPDLCured(const QDate& a)const { return GetFlow(a, static_cast<qint32>(TrancheFlowType::PDLCured)); }
-	double GetDeferred(const QDate& a)const; /*{ return GetFlow(a, static_cast<qint32>(TrancheFlowType::DeferredFlow)); }*/
-	double GetAmountOutstanding(const QDate& a)const{return GetAmountOutstanding(FindDate(a));} //TODO
+	double GetDeferred(const QDate& a)const;
+	double GetAccrued(const QDate& a)const;
+	double GetAmountOutstanding(const QDate& a)const;
 	double GetInitialOutstanding()const{return OutstandingAmt;}
 	void SetInitialOutstanding(double a){OutstandingAmt=a;}
 	virtual void AddFlow(const QDate& Dte, double Amt, TrancheFlowType FlwTpe) { GenericCashFlow::AddFlow(Dte, Amt, static_cast<qint32>(FlwTpe)); }

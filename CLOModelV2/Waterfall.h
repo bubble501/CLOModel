@@ -143,7 +143,7 @@ public:
 	const MtgCashFlow& GetCalculatedMtgPayments() const {return m_CalculatedMtgPayments;}
 	MtgCashFlow& GetCalculatedMtgPayments() {return m_CalculatedMtgPayments;}
 	const ReserveFund* const GetReserveFund(int RFindex) const {
-		if (RFindex < 0 || RFindex >= m_Reserves.size()) return NULL;
+		if (RFindex < 0 || RFindex >= m_Reserves.size()) return nullptr;
 		return m_Reserves.at(RFindex);
 	}
 	bool GetCumulativeReserves() const {return m_CumulativeReserves;}

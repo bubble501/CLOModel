@@ -45,7 +45,12 @@ BaseRateVector::BaseRateVector(const QString& Vec,const QDate& Anchor)
 	
 }
 bool BaseRateVector::IsValid() const{
-	return AbstractBbgVect::IsValid("\\S+", false);
+	if (!AbstractBbgVect::IsValid("\\S+", false)) return false;
+	QRegExp rx("\\[(-?\\d*\\.?\\d+),(-?\\d*\\.?\\d+)\\]");
+	for (int pos = 0; (pos = rx.indexIn(m_Vector, pos)) >= 0; pos += rx.matchedLength()) {
+		if (rx.cap(1).toDouble() > rx.cap(2).toDouble()) return false;
+	}
+	return true;
 }
 QRegExpValidator* BaseRateVector::GetValidator(QObject* parent) const {
 	return AbstractBbgVect::GetValidator("\\S+", false, parent);
@@ -111,6 +116,7 @@ BloombergVector BaseRateVector::CompileReferenceRateValue(ForwardBaseRateTable& 
 #endif
 		Result.Combine(Values.GetValues().value(StringParts.at(i + 1)), StepLen);
 	}
+	Result.ApplyFloorCap(ExtractFloorCapVector());
 	return Result;
 }
 BloombergVector BaseRateVector::CompileReferenceRateValue(ConstantBaseRateTable& Values) const {
@@ -292,7 +298,7 @@ FloorCapVector BaseRateVector::ExtractFloorCapVector() const {
 	QString ResultStr=m_Vector;
 	for (int i = 0; i < NumElements(); i++) {
 		ResultStr.replace(
-			QRegExp(GetValue(i) + "(?:\\[(\\S+)\\])?")
+			QRegExp(GetValue(i) + "(?:\\[(\\S+,?\\S*)\\])?")
 			, "[\\1]");
 	}
 	FloorCapVector Result(ResultStr);

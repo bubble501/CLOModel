@@ -28,8 +28,6 @@
 #include "FloorCapVector.h"
 int main(int argc, char *argv[]) {
 
-	BaseRateVector Testing("EUR003M[1] 24S EUR003M");
-	Testing.GetRefRateValueFromBloomberg(ConstantBaseRateTable());
 
 	/*QApplication a(argc, argv);
 	WaterfallStepHelperDialog b;
@@ -46,8 +44,8 @@ int main(int argc, char *argv[]) {
 	return a.exec();*/
 
 	/*Waterfall TempWtf, TempCallWaterfall;
-	//QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/BaseCase.clo");
-	QFile file("C:/Temp/.SavedInputs.clo");
+	QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/BaseCase.clo");
+	//QFile file("C:/Temp/.SavedInputs.clo");
 	file.open(QIODevice::ReadOnly);
 	qint32 VersionChecker;
 	QDataStream out(&file);
@@ -63,7 +61,7 @@ int main(int argc, char *argv[]) {
 	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempCallWaterfall;
 	file.close();
-	TempCallWaterfall.CalculateTranchesCashFlows();*/
+	TempWtf.CalculateTranchesCashFlows();*/
 
 	/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	QApplication a(argc, argv);
@@ -75,8 +73,8 @@ int main(int argc, char *argv[]) {
 		, "20", "0.5", "0", "0", "0", "0"
 		).GetTranche("HARVT 10X A"));
 	return a.exec();
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*//*
-
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*
+	*/
 	Waterfall TempWtf, TempCallWaterfall;
 	MtgCalculator TempMtg;
 	QFile file("Z:/24AM/Monitoring/Model Results/HARVT 10X.clom");
@@ -99,11 +97,25 @@ int main(int argc, char *argv[]) {
 	TempMtg.SetLoadProtocolVersion(VersionChecker);
 	out >> TempMtg;
 	file.close();
+	
+
+	Mortgage TempMtg1;
+	TempMtg1.SetFloatingRateBase("EUR003M[3,5]");
+	TempMtg1.SetAnnuity("I");
+	TempMtg1.SetInterest("5");
+	TempMtg1.SetPaymentFreq("1");
+	TempMtg1.SetMaturityDate(QDate(2020, 5, 30));
+	TempMtg1.SetSize(1000000.0);
+	TempMtg1.SetHaircutVector("0 24S 50");
+	TempMtg.AddLoan(TempMtg1,TempMtg.GetLoans().size()+1);
+	TempMtg.ReadyToCalculate();
+	TempMtg.StartCalculation();
 	TempWtf.CalculateTranchesCashFlows();
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*//*
+	/*
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	QApplication a(argc, argv);
 	//QFile file("C:/Temp/Wrong 20#,#8#,#100#,#0#,#0#,#0.csw");
-	/ *QFile file("C:/Temp/20#,#8#,#100#,#0#,#0#,#0.csw");
+	QFile file("C:/Temp/20#,#8#,#100#,#0#,#0#,#0.csw");
 	//QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/BaseCase.clo");
 	file.open(QIODevice::ReadOnly);
 	qint32 VersionChecker;
@@ -113,7 +125,7 @@ int main(int argc, char *argv[]) {
 	if (VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) {
 	file.close();
 	return 1;
-	}* /
+	}
 	//{bool Junk; out >> Junk; }
 	Waterfall TempWtf;
 	Tranche TempTr;
@@ -125,8 +137,8 @@ int main(int argc, char *argv[]) {
 	SummaryView Check;
 	Check.show();
 	Check.SetStructure(TempWtf);
-	return a.exec();*/
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*//
+	return a.exec();
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 
 	/*Mortgage TempMtg1;
 	TempMtg1.SetProperty("PrepaymentFee", "5");

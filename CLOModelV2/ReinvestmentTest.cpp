@@ -18,7 +18,7 @@ void ReinvestmentTest::SetupReinvBond(
 	const QString& DelinquencyLag
 ){
 	ReinvestmentBond.SetAnnuity(AnnuityVec);
-	ReinvestmentBond.SetFloatingRateBase(FloatingBase);
+	ReinvestmentBond.SetFloatingRateBase(FloatingBase.isEmpty() ? QString("ZERO") : FloatingBase);
 	ReinvestmentBond.SetInterest(IntrVec);
 	ReinvestmentBond.SetPaymentFreq(PayFreq);
 	m_ReinvestmentDelay = ReinvDel;

@@ -49,8 +49,8 @@ public:
 	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll = false) { m_FloatingRateBaseValue = m_FloatRateBase.GetBaseRatesDatabase(Values, DownloadAll); m_UseForwardCurve = true; }
 #endif
 
-	void SetFloatingRateBase(const BaseRateVector& a) { m_FloatRateBase = a; }
-	void SetFloatingRateBase(const QString& a) { m_FloatRateBase = a; }
+	//void SetFloatingRateBase(const BaseRateVector& a) { m_FloatRateBase = a; }
+	void SetFloatingRateBase(const QString& a) { m_FloatRateBase = BaseRateVector(a); }
 	void setFixedRate() { m_FloatingRateBaseValue = "0"; m_FloatRateBase = "ZERO"; }
 	const QDate& GetMaturityDate() const {return m_MaturityDate;}
 	void SetMaturityDate(const QDate& a) {m_MaturityDate=a;}

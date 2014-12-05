@@ -23,6 +23,7 @@ public:
 	BaseRateVector(const BaseRateVector& Vec);
 	BaseRateVector(const QString& Vec,const QDate& Anchor);
 	BaseRateVector& operator=(const BaseRateVector& Vec);
+	virtual bool IsZero()const { return m_Vector.trimmed().toUpper() == "ZERO"; }
 	virtual QRegExpValidator* GetValidator(QObject* parent = 0) const override;
 	int NumElements() const {return m_VectVal.size();}
 	template<class T> QString GetValue(const T& index) const {

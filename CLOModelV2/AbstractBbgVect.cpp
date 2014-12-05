@@ -4,13 +4,20 @@
 #include <QDate>
 #include <QSettings>
 bool AbstractBbgVect::SetVector(const QString& Vec){
-	QString OldVec(m_Vector);
+	/*QString OldVec(m_Vector);
 	m_Vector=Vec;
 	if(IsValid()){
 		UnpackVector();
 		return true;
 	}
 	m_Vector=OldVec;
+	return false;*/
+	m_Vector = Vec;
+	if (IsValid()) {
+		UnpackVector();
+		return true;
+	}
+	m_Vector = "";
 	return false;
 }
 AbstractBbgVect::AbstractBbgVect(const QString& Vec)

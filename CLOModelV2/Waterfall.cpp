@@ -1924,22 +1924,26 @@ void Waterfall::CompileReferenceRateValue(ForwardBaseRateTable& Values) {
 	m_GICBaseRateValue = m_GICBaseRate.CompileReferenceRateValue(Values);
 	for (auto i = m_Tranches.begin(); i != m_Tranches.end(); ++i)
 		(*i)->CompileReferenceRateValue(Values);
+	m_ReinvestmentTest.CompileReferenceRateValue(Values);
 }
 void Waterfall::CompileReferenceRateValue(ConstantBaseRateTable& Values) {
 	m_GICBaseRateValue = m_GICBaseRate.CompileReferenceRateValue(Values);
 	for (auto i = m_Tranches.begin(); i != m_Tranches.end(); ++i)
 		(*i)->CompileReferenceRateValue(Values);
+	m_ReinvestmentTest.CompileReferenceRateValue(Values);
 }
 #ifndef NO_DATABASE
 void Waterfall::GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll) {
 	m_GICBaseRateValue = m_GICBaseRate.GetBaseRatesDatabase(Values, DownloadAll);
 	for (auto i = m_Tranches.begin(); i != m_Tranches.end(); ++i)
 		(*i)->GetBaseRatesDatabase(Values, DownloadAll);
+	m_ReinvestmentTest.GetBaseRatesDatabase(Values, DownloadAll);
 }
 void Waterfall::GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll) {
 	m_GICBaseRateValue = m_GICBaseRate.GetBaseRatesDatabase(Values, DownloadAll);
 	for (auto i = m_Tranches.begin(); i != m_Tranches.end(); ++i)
 		(*i)->GetBaseRatesDatabase(Values, DownloadAll);
+	m_ReinvestmentTest.GetBaseRatesDatabase(Values, DownloadAll);
 }
 #endif
 

@@ -88,7 +88,12 @@ void FloorCapVector::UnpackVector() {
 	}
 }
 bool FloorCapVector::IsValid() const {
-	return AbstractBbgVect::IsValid("\\[(?:-?\\d*\\.?\\d+)?(?:,-?\\d*\\.?\\d+)?\\]", false);
+	if (!AbstractBbgVect::IsValid("\\[(?:-?\\d*\\.?\\d+)?(?:,-?\\d*\\.?\\d+)?\\]", false)) return false;
+	QRegExp rx("\\[(-?\\d*\\.?\\d+),(-?\\d*\\.?\\d+)\\]");
+	for (int pos = 0; (pos = rx.indexIn(m_Vector, pos)) >= 0; pos += rx.matchedLength()) {
+		if (rx.cap(1).toDouble() > rx.cap(2).toDouble()) return false;
+	}
+	return true;
 }
 QRegExpValidator* FloorCapVector::GetValidator(QObject* parent) const {
 	return AbstractBbgVect::GetValidator("\\[(?:-?\\d*\\.?\\d+)?(?:,-?\\d*\\.?\\d+)?\\]", false, parent);

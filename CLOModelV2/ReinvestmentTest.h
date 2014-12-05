@@ -50,6 +50,12 @@ public:
 	QString GetDelinquency() const { return m_Delinquency.GetVector(); }
 	QString GetReinvestmentSpreadOverTime() const { return m_ReinvestmentSpreadOverTime.GetVector(); }
 	void SetReinvestmentSpreadOverTime(const QString& val) { m_ReinvestmentSpreadOverTime = val; }
+	void CompileReferenceRateValue(ForwardBaseRateTable& Values) { ReinvestmentBond.CompileReferenceRateValue(Values); }
+	void CompileReferenceRateValue(ConstantBaseRateTable& Values) { ReinvestmentBond.CompileReferenceRateValue(Values); }
+#ifndef NO_DATABASE
+	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll = false) { ReinvestmentBond.GetBaseRatesDatabase(Values, DownloadAll); }
+	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll = false) { ReinvestmentBond.GetBaseRatesDatabase(Values, DownloadAll); }
+#endif
 	friend QDataStream& operator<<(QDataStream & stream, const ReinvestmentTest& flows);
 	friend QDataStream& operator>>(QDataStream & stream, ReinvestmentTest& flows);
 protected:

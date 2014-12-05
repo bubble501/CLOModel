@@ -21,6 +21,7 @@ void MtgCalculator::AddLoan(const Mortgage& a, qint32 Index) {
 		Loans.erase(FoundLn);
 	}
 	Loans.insert(Index, new Mortgage(a));
+	LOGDEBUG(Loans.value(Index)->GetFloatingRateBase().GetVector());
 }
 bool MtgCalculator::StartCalculation() {
 	if (m_ContinueCalculation) return false;
@@ -29,13 +30,13 @@ bool MtgCalculator::StartCalculation() {
 		bool CheckAgain = false;
 		ConstantBaseRateTable TempTable;
 		for (auto i = Loans.constBegin(); i != Loans.constEnd(); ++i) {
-			if (i.value()->GetFloatingRateValue().IsEmpty() && !i.value()->GetFloatingRateBase().IsEmpty()) {
+			if (i.value()->GetFloatingRateValue().IsEmpty()) {
 				i.value()->CompileReferenceRateValue(TempTable);
 				CheckAgain = true;
 			}
 		}
 		for (auto i = Loans.constBegin(); CheckAgain && i != Loans.constEnd(); ++i) {
-			if (i.value()->GetFloatingRateValue().IsEmpty() && !i.value()->GetFloatingRateBase().IsEmpty()) return false;
+			if (i.value()->GetFloatingRateValue().IsEmpty()) return false;
 		}
 	}
 

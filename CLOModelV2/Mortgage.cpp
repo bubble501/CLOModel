@@ -350,6 +350,7 @@ void Mortgage::SetInterest(const QString& a){
 	if (m_InterestVect.IsEmpty())Result += "Loan Coupon\n";
 	if (m_HaircutVector.IsEmpty())Result += "Haircut Vector\n";
 	if (m_PaymentFreq.IsEmpty(1))Result += "Loan Payment Frequency\n";
+	if (m_FloatRateBase.IsEmpty())Result += "Loan Base Rate\n";
 	if (HasProperty("DayCount")) { if (DayCountVector(GetProperty("DayCount")).IsEmpty()) Result += "Loan Day Count Convention\n"; }
 	if (HasProperty("CPR")) {if (BloombergVector(GetProperty("CPR")).IsEmpty(0.0, 1.0)) Result += "Loan CPR Assumption\n";}
 	if (HasProperty("CDR")) { if (BloombergVector(GetProperty("CDR")).IsEmpty(0.0, 1.0)) Result += "Loan CDR Assumption\n"; }
@@ -366,9 +367,6 @@ void Mortgage::SetInterest(const QString& a){
  }
 
  double Mortgage::GetInterest(const QDate& a, const QDate& StartAccrue, const QDate& EndAccrue, DayCountConvention DayCnt) {
-	 if (m_FloatRateBase.IsEmpty()) //Fixed rate
-		 return AdjustCoupon(m_InterestVect.GetValue(a), StartAccrue, EndAccrue, DayCnt);
-	 else {
 		 if (m_FloatingRateBaseValue.IsEmpty()) {
 #ifdef NO_BLOOMBERG
 			 m_FloatingRateBaseValue="0";
@@ -378,12 +376,9 @@ void Mortgage::SetInterest(const QString& a){
 #endif
 		 }
 		 return  AdjustCoupon((m_InterestVect + m_FloatingRateBaseValue).GetValue(a), StartAccrue, EndAccrue, DayCnt);
-	 }
  }
  double Mortgage::GetInterest(int a, const QDate& StartAccrue, const QDate& EndAccrue, DayCountConvention DayCnt) {
-	 if (m_FloatRateBase.IsEmpty()) //Fixed rate
-		 return AdjustCoupon(m_InterestVect.GetValue(a), StartAccrue, EndAccrue, DayCnt);
-	 else {
+
 		 if (m_FloatingRateBaseValue.IsEmpty()) {
 #ifdef NO_BLOOMBERG
 			 m_FloatingRateBaseValue = "0";
@@ -393,12 +388,8 @@ void Mortgage::SetInterest(const QString& a){
 #endif
 		 }
 		 return  AdjustCoupon((m_InterestVect + m_FloatingRateBaseValue).GetValue(a), StartAccrue, EndAccrue, DayCnt);
-	 }
  }
  double Mortgage::GetInterest(const QDate& a) {
-	 if (m_FloatRateBase.IsEmpty()) //Fixed rate
-		 return m_InterestVect.GetValue(a);
-	 else {
 		 if (m_FloatingRateBaseValue.IsEmpty()) {
 #ifdef NO_BLOOMBERG
 			 m_FloatingRateBaseValue = "0";
@@ -408,12 +399,8 @@ void Mortgage::SetInterest(const QString& a){
 #endif
 		 }
 		 return  (m_InterestVect + m_FloatingRateBaseValue).GetValue(a);
-	 }
  }
  double Mortgage::GetInterest(int a) {
-	 if (m_FloatRateBase.IsEmpty()) //Fixed rate
-		 return m_InterestVect.GetValue(a);
-	 else {
 		 if (m_FloatingRateBaseValue.IsEmpty()) {
 #ifdef NO_BLOOMBERG
 			 m_FloatingRateBaseValue = "0";
@@ -423,7 +410,6 @@ void Mortgage::SetInterest(const QString& a){
 #endif
 		 }
 		 return  (m_InterestVect + m_FloatingRateBaseValue).GetValue(a);
-	 }
  }
  void Mortgage::SetProperty(const QString& PropName, const QString& Value) {
 	 if (PropName.isEmpty() || Value.isEmpty() || PropName.contains(QRegExp("#[<>=]#")) || Value.contains(QRegExp("#[<>=]#"))) return;

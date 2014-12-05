@@ -44,14 +44,14 @@ void CentralUnit::AddLoan(
 	, const QString& HaicutVect
 	, const QString& Properties
 	) {
+	LOGDEBUG(floatBase);
 	Mortgage TempMtg;
 	TempMtg.SetMaturityDate(Maturity);
 	TempMtg.SetSize(Size);
 	TempMtg.SetPrepayMultiplier(PrepayMult);
 	TempMtg.SetLossMultiplier(LossMult);
 	TempMtg.SetInterest(Interest);
-	//TempMtg.SetFloatingRateBase((floatBase.isEmpty())? QString("ZERO"):floatBase);
-	TempMtg.SetFloatingRateBase(floatBase);
+	TempMtg.SetFloatingRateBase((floatBase.isEmpty())? QString("ZERO"):floatBase);
 	TempMtg.SetPaymentFreq(Freq);
 	TempMtg.SetAnnuity(Annuity);
 	TempMtg.SetHaircutVector(HaicutVect);

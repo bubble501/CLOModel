@@ -367,21 +367,21 @@ void StressTest::SaveResults(const QString& DestPath)const{
 				ZipFileInfo.name = OldFile.getActualFileName();
 				ZipFileInfo.dateTime = OldFileInfo.dateTime;
 				UsedFileNames << ZipFileInfo.name;
+				OldFile.close();
 				if (TargetFile.open(QIODevice::WriteOnly, ZipFileInfo)) {
 					QDataStream Writer(&TargetFile);
 					Writer.setVersion(QDataStream::Qt_5_3);
 					Writer << qint32(ModelVersionNumber) << TempWF;
 					TargetFile.close();
 				}
-				OldFile.close();
 			}
 
 		}
 		OldZip.close();
-		zip.close();
 		if(!curDir.remove(OldName))return;
 		QFile::rename(NewName, OldName);
 	}
+	zip.close();
 }
 
 Waterfall StressTest::GetScenarioFromFile(const QString& DestPath, const QString& CPRscenario, const QString& CDRscenario, const QString& LSscenario, const QString& RecLagScenario, const QString& DelinqScenario, const QString& DelinqLagScenario) {
@@ -448,7 +448,7 @@ bool StressTest::LoadResultsFromFile(const QString& DestPath){
 		QStringList Spanns = CurrentAss.ToString().split("#,#");
 		if (Spanns.size() != NumStressDimentsions) {
 			TargetFile.close();
-			return false;
+			continue;
 		}
 		for (int i = 0; i < NumStressDimentsions; ++i) {
 			m_AssumptionsRef[i]->insert(Spanns.at(i));
@@ -457,7 +457,10 @@ bool StressTest::LoadResultsFromFile(const QString& DestPath){
 		out.setVersion(QDataStream::Qt_5_3);
 		Waterfall* TempWF = new Waterfall();
 		out >> VesionCheck;
-		if (VesionCheck<qint32(MinimumSupportedVersion) || VesionCheck>qint32(ModelVersionNumber)) continue;
+		if (VesionCheck<qint32(MinimumSupportedVersion) || VesionCheck>qint32(ModelVersionNumber)) {
+			TargetFile.close();
+			continue;
+		}
 		TempWF->SetLoadProtocolVersion(VesionCheck);
 		out >> (*TempWF);
 		Results.insert(CurrentAss, QSharedPointer<Waterfall>(TempWF));

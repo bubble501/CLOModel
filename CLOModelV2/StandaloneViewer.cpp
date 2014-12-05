@@ -151,18 +151,36 @@ void StandaloneViewer::LoadFile(const QString& fileName){
 		file.close();
 		TheViewer->SetStructure(TempWaterfall,TempCallWaterfall);
 		TheViewer->ShowCallStructure();
-		recentNames.removeAll(TempWaterfall.GetDealName());
+		QList<int> IndexesToDelete;
+		for (int i = 0; i < recentNames.size(); ++i) {
+			if (recentNames.at(i) == TempWaterfall.GetDealName()) {
+				IndexesToDelete << i;
+			}
+		}
+		qSort(IndexesToDelete.begin(), IndexesToDelete.end(), qGreater<int>());
+		foreach(int IndexToDelete, IndexesToDelete) {
+			recentNames.removeAt(IndexToDelete);
+			recentFiles.removeAt(IndexToDelete);
+		}
 		recentNames.prepend(TempWaterfall.GetDealName());
-		recentFiles.removeAll(fileName);
 		recentFiles.prepend(fileName);
 		updateRecentFileActions();
 	}
 	else if (QFileInfo(file).suffix().toLower()=="fcsr"){
 		 if(!StressWindow->LoadStress(fileName)) return closeFile();
 		 StressWindow->show();
-		 recentNames.removeAll("Stress " + StressWindow->GetFirstName());
+		 QList<int> IndexesToDelete;
+		 for (int i = 0; i < recentNames.size(); ++i) {
+			 if (recentNames.at(i) == "Stress " + StressWindow->GetFirstName()) {
+				 IndexesToDelete << i;
+			 }
+		 }
+		 qSort(IndexesToDelete.begin(), IndexesToDelete.end(), qGreater<int>());
+		 foreach(int IndexToDelete, IndexesToDelete) {
+			 recentNames.removeAt(IndexToDelete);
+			 recentFiles.removeAt(IndexToDelete);
+		 }
 		 recentNames.prepend("Stress " + StressWindow->GetFirstName());
-		 recentFiles.removeAll(fileName);
 		 recentFiles.prepend(fileName);
 		 updateRecentFileActions();
 	}

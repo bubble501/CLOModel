@@ -86,13 +86,6 @@ QDataStream& BaseRateVector::LoadOldVersion(QDataStream& stream) {
 	ResetProtocolVersion();
 	return stream;
 }
-
-QString BaseRateVector::GetValue(const QDate& index)const {
-	return GetValueTemplate(m_VectVal, index,QString());
-}
-QString BaseRateVector::GetValue(int index)const {
-	return GetValueTemplate(m_VectVal, index, QString());
-}
 BloombergVector BaseRateVector::CompileReferenceRateValue(ForwardBaseRateTable& Values) const {
 	BloombergVector Result;
 	if (IsEmpty()) return Result;

@@ -32,7 +32,10 @@ protected:
 		return GetValueTemplate(VecVal, MonthDiff(index, ValidDate), DefaultValue);
 	}
 	template<class T> T GetValueTemplate(const QList<T>& VecVal, int index, const T& DefaultValue)const {
-		if (VecVal.isEmpty() || index < 0) return DefaultValue;
+		if (VecVal.isEmpty() || index < 0) {
+			//LOGDEBUG("Requested value with index negative or empty vector\n");
+			return DefaultValue;
+		}
 		return VecVal.at(qMin(index, VecVal.size() - 1));
 	}
 public:

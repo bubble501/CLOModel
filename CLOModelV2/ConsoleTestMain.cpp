@@ -27,12 +27,30 @@
 #include "TriggerHelperDialog.h"
 int main(int argc, char *argv[]) {
 
-	QApplication a(argc, argv);
+	BaseRateVector RawVal="EUR003M[5,7] 12S EUR003M";
+	qDebug() << "Source: " + RawVal.GetVector();
+	qDebug() << "Value 0: " + RawVal.GetValue(0);
+	qDebug() << "Floor 0: " + RawVal.GetFloor(0);
+	qDebug() << "Cap 0: " + RawVal.GetCap(0);
+	qDebug() << "Value 14: " + RawVal.GetValue(14);
+	qDebug() << "Floor 14: " + RawVal.GetFloor(14);
+	qDebug() << "Cap 14: " + RawVal.GetCap(14);
+	RawVal = "EUR003M[5,7] 12S EUR003M[2]";
+	qDebug() << "Source: " + RawVal.GetVector();
+	qDebug() << "Value 0: " + RawVal.GetValue(0);
+	qDebug() << "Floor 0: " + RawVal.GetFloor(0);
+	qDebug() << "Cap 0: " + RawVal.GetCap(0);
+	qDebug() << "Value 14: " + RawVal.GetValue(14);
+	qDebug() << "Floor 14: " + RawVal.GetFloor(14);
+	qDebug() << "Cap 14: " + RawVal.GetCap(14);
+	return 0;
+
+	/*QApplication a(argc, argv);
 	WaterfallStepHelperDialog b;
 	if (b.exec()==QDialog::Accepted) {
 		qDebug() << b.GetParameters();
 	}
-	return a.exec();
+	return a.exec();*/
 
 
 	/*QApplication a(argc, argv);

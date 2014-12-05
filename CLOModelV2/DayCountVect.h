@@ -6,7 +6,7 @@ class DayCountVector : public AbstractBbgVect {
 private:
 	QList<DayCountConvention> m_VectVal;
 protected:
-	virtual void UnpackVector();
+	virtual void UnpackVector() override;
 	virtual bool IsValid() const override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 public:

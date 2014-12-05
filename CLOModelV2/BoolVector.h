@@ -1,6 +1,5 @@
-
-#ifndef AnnuityVector_h__
-#define AnnuityVector_h__
+#ifndef BoolVector_h__
+#define BoolVector_h__
 #include <QList>
 #include "AbstractBbgVect.h"
 class BoolVector : public AbstractBbgVect
@@ -27,6 +26,7 @@ public:
 QDataStream& operator<<(QDataStream & stream, const BoolVector& flows);
 QDataStream& operator>>(QDataStream & stream, BoolVector& flows);
 Q_DECLARE_METATYPE(BoolVector)
-#endif // AnnuityVector_h__
+
+#endif // BoolVector_h__
 
 

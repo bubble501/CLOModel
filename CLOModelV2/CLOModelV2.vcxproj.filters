@@ -218,6 +218,9 @@
     <ClInclude Include="DelinquencyTrigger.h">
       <Filter>Header Files\Triggers</Filter>
     </ClInclude>
+    <ClInclude Include="FloorCapVector.h">
+      <Filter>Header Files\Vectors</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Resources.qrc">
@@ -581,6 +584,9 @@
     </ClCompile>
     <ClCompile Include="WatFalPrior.cpp">
       <Filter>Source Files\Deal Structure</Filter>
+    </ClCompile>
+    <ClCompile Include="FloorCapVector.cpp">
+      <Filter>Source Files\Vectors</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -8,6 +8,7 @@
 #include <type_traits>
 #include "BloombergVector.h"
 #include "BaseRateTable.h"
+#include "FloorCapVector.h"
 class BaseRateVector : public AbstractBbgVect{
 public:
 protected:
@@ -16,6 +17,7 @@ protected:
 	virtual bool IsValid() const override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 public:
+	virtual FloorCapVector ExtractFloorCapVector() const;
 	BaseRateVector(){}
 	BaseRateVector(const QString& Vec);
 	BaseRateVector(const BaseRateVector& Vec);
@@ -26,14 +28,14 @@ public:
 	template<class T> QString GetValue(const T& index) const {
 		static_assert(std::is_same<T, QDate>::value || std::is_same<T, int>::value, "GetValue can be used only with int or QDate");
 		QString RawVal = GetValueTemplate(m_VectVal, index, QString()).trimmed();
-		RawVal.replace(QRegExp("\\[(?:-?\\d*\\.?\\d+)?,?(?:-?\\d*\\.?\\d+)?\\]"), "");
+		RawVal.replace(QRegExp("\\[(?:-?\\d*\\.?\\d+)?(?:,-?\\d*\\.?\\d+)?\\]"), "");
 		return RawVal;
 	}
 
 	template<class T> QString GetFloor(const T& index) const {
 		static_assert(std::is_same<T, QDate>::value || std::is_same<T, int>::value, "GetFloor can be used only with int or QDate");
 		QString RawVal = GetValueTemplate(m_VectVal, index, QString()).trimmed();
-		QRegExp CaptureFloor("\\[(-?\\d*\\.?\\d+)?,?(?:-?\\d*\\.?\\d+)?\\]");
+		QRegExp CaptureFloor("\\[(-?\\d*\\.?\\d+)?(?:,-?\\d*\\.?\\d+)?\\]");
 		if (CaptureFloor.indexIn(RawVal) < 0) return QString();
 		return CaptureFloor.cap(1);
 	}

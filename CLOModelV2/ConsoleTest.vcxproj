@@ -38,6 +38,7 @@
     <ClCompile Include="ExcelCommons.cpp" />
     <ClCompile Include="ExcelInput.cpp" />
     <ClCompile Include="ExcelOutput.cpp" />
+    <ClCompile Include="FloorCapVector.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_AbstrAsyncCalculator.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -1522,6 +1523,7 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNDEBUG -DQT_CORE_LIB -DQT_DLL -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_SQL_LIB -DQT_WIDGETS_LIB -DQUAZIP_BUILD -DUNICODE -DWIN32 -DWIN64 "-IC:\Boost\Boost-1.56" "-IC:\Zlib\include" "-IC:\KDAB\KDChart-2.5.1\include" "-IC:\blp\API\APIv3\C++API\v3.7.5.1\include" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtSql" "-I$(QTDIR)\include\QtWidgets"</Command>
     </CustomBuild>
     <ClInclude Include="DelinquencyTrigger.h" />
+    <ClInclude Include="FloorCapVector.h" />
     <ClInclude Include="PoolSizeTrigger.h" />
     <ClInclude Include="PrincipalProceeds.h" />
     <CustomBuild Include="ScenarioApplier.h">

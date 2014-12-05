@@ -116,8 +116,8 @@ BloombergVector BaseRateVector::CompileReferenceRateValue(ForwardBaseRateTable& 
 BloombergVector BaseRateVector::CompileReferenceRateValue(ConstantBaseRateTable& Values) const {
 	if (IsEmpty())return BloombergVector();
 	QString ResultingVector("");
-	for (QStringList::const_iterator i = m_VectVal.constBegin(); i != m_VectVal.constEnd();i++){
-		if (!Values.Contains(*i)) {
+	for (int i = 0; i < NumElements(); i++) {
+		if (!Values.Contains(GetValue(i))) {
 #ifdef NO_BLOOMBERG
 			return BloombergVector();
 #else
@@ -128,19 +128,21 @@ BloombergVector BaseRateVector::CompileReferenceRateValue(ConstantBaseRateTable&
 	const QHash<QString, double>& Sobstitutes = Values.GetValues();
 	QString NewVector = m_Vector;
 	for (QHash<QString, double>::const_iterator i = Sobstitutes.constBegin(); i != Sobstitutes.constEnd(); i++) {
-		NewVector.replace(i.key(), QString("%1").arg(i.value()*100.0));
+		NewVector.replace(QRegExp(i.key() +"(?:\\[\\S+\\])?"), QString::number(i.value()*100.0,'f'));
 	}
-	return BloombergVector(NewVector, m_AnchorDate);
+	BloombergVector Reslt(NewVector, m_AnchorDate);
+	Reslt.ApplyFloorCap(ExtractFloorCapVector());
+	return Reslt;
 }
 #ifndef NO_BLOOMBERG
 BloombergVector BaseRateVector::GetRefRateValueFromBloomberg(ConstantBaseRateTable& Values)const {
 	if(IsEmpty())return BloombergVector();
 	QStringList RatesToDownload;
-	for (QStringList::const_iterator i = m_VectVal.constBegin(); i != m_VectVal.constEnd(); i++) {
+	for (int i = 0; i < NumElements();i++){
 		if(
-			!RatesToDownload.contains(*i)
-			&& !Values.GetValues().contains(*i)
-			) RatesToDownload.append(*i);
+			!RatesToDownload.contains(GetValue(i))
+			&& !Values.GetValues().contains(GetValue(i))
+			) RatesToDownload.append(GetValue(i));
 	}
 	if (!RatesToDownload.isEmpty()) {
 		QBloombergLib::QBbgWorker Bee;
@@ -192,8 +194,8 @@ BloombergVector BaseRateVector::GetRefRateValueFromBloomberg(ForwardBaseRateTabl
 BloombergVector BaseRateVector::GetBaseRatesDatabase(ConstantBaseRateTable& ReferencesValues, bool DownloadAll) const {
 	if (IsEmpty()) return BloombergVector();
 	bool AllRefFound = true;
-	for (QStringList::const_iterator i = m_VectVal.constBegin(); i != m_VectVal.constEnd() && AllRefFound; i++) {
-		if (!ReferencesValues.GetValues().contains(*i)) AllRefFound = false;
+	for (int i = 0; i < NumElements() && AllRefFound; i++) {
+		if (!ReferencesValues.GetValues().contains(GetValue(i))) AllRefFound = false;
 	}
 	if (AllRefFound) return CompileReferenceRateValue(ReferencesValues);
 	QDate MinUpdateDate;
@@ -216,7 +218,7 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ConstantBaseRateTable& Refe
 			while (query.next()) {
 				if (
 					!ReferencesValues.GetValues().contains(query.value(0).toString())
-					&& (DownloadAll || m_VectVal.contains(query.value(0).toString()))
+					&& (DownloadAll || m_VectVal.indexOf(QRegExp(query.value(0).toString() + "(?:\\[\\S+\\])?"))>=0)
 					) {
 					ReferencesValues.GetValues().insert(query.value(0).toString(), query.value(1).toDouble());
 					if (MinUpdateDate.isNull() || query.value(2).toDateTime().date() < MinUpdateDate) MinUpdateDate = query.value(2).toDateTime().date();
@@ -235,8 +237,8 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ConstantBaseRateTable& Refe
 BloombergVector BaseRateVector::GetBaseRatesDatabase(ForwardBaseRateTable& ReferencesValues, bool DownloadAll) const {
 	if (IsEmpty()) return BloombergVector();
 	bool AllRefFound = true;
-	for (QStringList::const_iterator i = m_VectVal.constBegin(); i != m_VectVal.constEnd() && AllRefFound; i++) {
-		if (!ReferencesValues.GetValues().contains(*i)) AllRefFound = false;
+	for (int i = 0; i < NumElements() && AllRefFound; i++) {
+		if (!ReferencesValues.GetValues().contains(GetValue(i))) AllRefFound = false;
 	}
 	if (AllRefFound) return CompileReferenceRateValue(ReferencesValues);
 	QDate MinUpdateDate;
@@ -260,7 +262,7 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ForwardBaseRateTable& Refer
 			while (query.next()) {
 				if (
 					!ReferencesValues.GetValues().contains(query.value(0).toString().trimmed().toUpper())
-					&& (DownloadAll || m_VectVal.contains(query.value(0).toString()))
+					&& (DownloadAll || m_VectVal.indexOf(QRegExp(query.value(0).toString() + "(?:\\[\\S+\\])?")) >= 0)
 				) {
 					QueryResults[query.value(0).toString().trimmed().toUpper()][query.value(1).toDateTime().date()] = query.value(2).toDouble();
 					if (MinUpdateDate.isNull() || query.value(3).toDateTime().date() < MinUpdateDate) MinUpdateDate = query.value(3).toDateTime().date();
@@ -284,7 +286,19 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ForwardBaseRateTable& Refer
 	}
 	return BloombergVector();
 }
-
-
-
 #endif
+
+FloorCapVector BaseRateVector::ExtractFloorCapVector() const {
+	QString ResultStr=m_Vector;
+	for (int i = 0; i < NumElements(); i++) {
+		ResultStr.replace(
+			QRegExp(GetValue(i) + "(?:\\[(\\S+)\\])?")
+			, "[\\1]");
+	}
+	FloorCapVector Result(ResultStr);
+	Result.SetAnchorDate(m_AnchorDate);
+	return Result;
+}
+
+
+

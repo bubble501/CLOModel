@@ -4,6 +4,7 @@
 #include <QMap>
 #include <QSet>
 #include "CommonFunctions.h"
+#include "FloorCapVector.h"
 #include <qmath.h>
 #include <boost/math/tools/toms748_solve.hpp>
 BloombergVector::BloombergVector(const QString& Vec)
@@ -373,4 +374,36 @@ BloombergVector& BloombergVector::operator/=(double a) {
 	}
 	else SetDivisor(1.0 / (a * m_Divisor));
 	return *this;
+}
+
+void BloombergVector::ApplyFloorCap(const FloorCapVector& fc) {
+	if (fc.IsEmpty()) return;
+	QList<double> NewVec;
+	QDate NewAnchor;
+	if (!GetAnchorDate().isNull() && !fc.GetAnchorDate().isNull()) {
+		NewAnchor = GetAnchorDate();
+		for (QDate i = GetAnchorDate(); i<qMax(GetAnchorDate(), fc.GetAnchorDate()); i = i.addMonths(1))  NewVec.append(GetValueTemplate(m_VectVal, i, 0.0));
+		for (
+			QDate i = qMax(GetAnchorDate(), fc.GetAnchorDate());
+			i <= qMax(GetAnchorDate().addMonths(NumElements()), fc.GetAnchorDate().addMonths(fc.NumElements()));
+			i = i.addMonths(1)
+		) {
+			NewVec.append(GetValueTemplate(m_VectVal,i,0.0));
+			if (fc.GetFloor(i)) NewVec.last() = qMax(*fc.GetFloor(i) / m_Divisor, NewVec.last());
+			if (fc.GetCap(i)) NewVec.last() = qMin(*fc.GetCap(i) / m_Divisor, NewVec.last());
+		}
+	}
+	else {
+		if (!GetAnchorDate().isNull()) NewAnchor = GetAnchorDate();
+		if (!fc.GetAnchorDate().isNull())NewAnchor = fc.GetAnchorDate();
+		for (int i = 0; i < qMax(fc.NumElements(), NumElements()); ++i) {
+			NewVec.append(GetValueTemplate(m_VectVal, i, 0.0));
+			if (fc.GetFloor(i)) NewVec.last() = qMax(*fc.GetFloor(i)/m_Divisor, NewVec.last());
+			if (fc.GetCap(i)) NewVec.last() = qMin(*fc.GetCap(i) / m_Divisor, NewVec.last());
+		}
+	}
+	if (NewVec == m_VectVal) return;
+	m_VectVal = NewVec;
+	RepackVector();
+	m_AnchorDate = NewAnchor;
 }

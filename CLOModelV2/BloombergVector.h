@@ -2,6 +2,7 @@
 #define BloombergVector_h__
 #include <QList>
 #include "AbstractBbgVect.h"
+class FloorCapVector;
 class BloombergVector : public AbstractBbgVect
 {
 protected:
@@ -32,6 +33,7 @@ public:
 	virtual double GetValue(int index,int Frequency=12) const;
 	virtual double GetSMM(const QDate& index, int Frequency = 12) const;
 	virtual double GetSMM(int index, int Frequency = 12) const;
+	virtual void ApplyFloorCap(const FloorCapVector& fc);
 	int NumElements() const {return m_VectVal.size();}
 	void SetDivisor(double a) { if (a != 0.0) m_Divisor = a; UnpackVector(); }
 	double GetDivisor() const { return m_Divisor; }

@@ -30,7 +30,7 @@ bool AbstractBbgVect::ValidAnchorDate() const {
 	return true;
 }
 bool AbstractBbgVect::IsValid(const QString& ValidInputs, bool AllowRamps) const {
-	QString PatternString = QString("^(A\\s+") + VectorAnchorDateFormat + "\\s+){0,1}" + ValidInputs + "(\\s+[1-9][0-9]*";
+	QString PatternString = QString("^(?:A\\s+") + VectorAnchorDateFormat + "\\s+){0,1}" + ValidInputs + "(?:\\s+[1-9][0-9]*";
 	if (AllowRamps) PatternString += "[RS]";
 	else PatternString += 'S';
 	PatternString += "\\s+" + ValidInputs + ")*$";
@@ -38,7 +38,7 @@ bool AbstractBbgVect::IsValid(const QString& ValidInputs, bool AllowRamps) const
 	return (Vigil.exactMatch(m_Vector.trimmed()) && ValidAnchorDate()) || m_Vector.isEmpty();
 }
 QRegExpValidator* AbstractBbgVect::GetValidator(const QString& ValidInputs, bool AllowRamps, QObject* parent) const {
-	QString PatternString = QString("(^$|^(A\\s+") + VectorAnchorDateFormat + "\\s+){0,1}" + ValidInputs + "(\\s+[1-9][0-9]*";
+	QString PatternString = QString("(^$|^(?:A\\s+") + VectorAnchorDateFormat + "\\s+){0,1}" + ValidInputs + "(?:\\s+[1-9][0-9]*";
 	if (AllowRamps) PatternString += "[RS]";
 	else PatternString += 'S';
 	PatternString += "\\s+" + ValidInputs + ")*$)";

@@ -61,6 +61,10 @@ int main(int argc, char *argv[]) {
 	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempCallWaterfall;
 	file.close();
+	
+	TrancheCashFlow TestXmlImport;
+	TestXmlImport.LoadFromXML(TempWtf.GetTranche(0)->GetCashFlow().ToXML());
+	PrintToTempFile("TestXML", TestXmlImport.ToPlainText(), false);
 	TempWtf.CalculateTranchesCashFlows();
 
 	/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

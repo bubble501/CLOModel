@@ -401,15 +401,6 @@ QString InfixToPostfix(const QString& a) {
 	}
 	return sb.trimmed();
 }
-
-QString ConvertValidXML(QString a) {
-	a.replace("<", "&lt;");
-	a.replace(">", "&gt;");
-	a.replace("&", "&amp;");
-	a.replace("'", "&apos;");
-	a.replace("\"", "&quot;");
-	return a;
-}
 QString NormaliseTriggerStructure(QString a) {
 	a=a.toLower();
 	a.replace("nand", "/");

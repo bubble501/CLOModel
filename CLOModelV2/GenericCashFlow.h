@@ -62,6 +62,7 @@ public:
 	virtual GenericCashFlow ScaledCashFlows(double OriginalRefSize, double ResultSize, const QList<qint32>& Groups = QList<qint32>(), const QList<qint32>& ExcludeGroups = QList<qint32>()) const;
 	virtual QString ToPlainText(bool UseHeaders = true)const;
 	virtual QString ToXML()const;
+	virtual void LoadFromXML(const QString& Source);
 protected:
 	static bool SamePeriod(const QDate& a, const QDate& b, CashFlowAggregation Freq);
 	QMap<QDate, QHash<qint32, double>*	> m_CashFlows;

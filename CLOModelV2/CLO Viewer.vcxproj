@@ -21,6 +21,7 @@
     <ClCompile Include="DateTrigger.cpp" />
     <ClCompile Include="DayCountVect.cpp" />
     <ClCompile Include="DelinquencyTrigger.cpp" />
+    <ClCompile Include="FloorCapVector.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_AbstrAsyncCalculator.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
@@ -218,6 +219,7 @@
     <ClInclude Include="DateTrigger.h" />
     <ClInclude Include="DayCountVect.h" />
     <ClInclude Include="DelinquencyTrigger.h" />
+    <ClInclude Include="FloorCapVector.h" />
     <ClInclude Include="GenericCashFlow.h" />
     <ClInclude Include="IntegerVector.h" />
     <ClInclude Include="Mortgage.h" />

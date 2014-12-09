@@ -209,7 +209,12 @@ GenericCashFlow& GenericCashFlow::operator=(const GenericCashFlow& a) {
 }
 
 QDate GenericCashFlow::MaturityDate() const {
-	if (m_CashFlows.isEmpty()) return QDate(); return (m_CashFlows.end() - 1).key();
+	if (m_CashFlows.isEmpty()) return QDate();
+	for (auto i = m_CashFlows.constEnd() - 1; true; --i) {
+		if (!i.value()->isEmpty()) return i.key();
+		if (i == m_CashFlows.constBegin()) return QDate();
+	}
+	return QDate();
 }
 
 bool GenericCashFlow::operator==(const GenericCashFlow& a) const {

@@ -123,11 +123,10 @@ SummaryView::SummaryView(QWidget* parent)
 	HeadersStrings.clear();
 	HeadersStrings
 		<< "Date"
-		<< "Interest Reinvested"
-		<< "Principal Reinvested"
+		<< "Funds Reinvested"
 	;
 	ReinvestmentsTable->setRowCount(0);
-	ReinvestmentsTable->setColumnCount(3);
+	ReinvestmentsTable->setColumnCount(2);
 	ReinvestmentsTable->setHorizontalHeaderLabels(HeadersStrings);
 	ReinvestmentsTable->verticalHeader()->setVisible(false);
 	ReinvestmentsTable->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -180,9 +179,9 @@ void SummaryView::DisplayStructure(){
 	OutstandingGradient.setColorAt(1.0,"#F5CB81");
 	setWindowTitle(
 		"Stress Scenario - "
-		"CPR: "+Structure.GetReinvestmentTest().GetCPRAssumption()
-		+" | CDR: "+Structure.GetReinvestmentTest().GetCDRAssumption()
-		+" | LS: "+Structure.GetReinvestmentTest().GetLSAssumption()
+		"CPR: "+Structure.GetReinvestmentTest().GetCPRAssumption().GetVector()
+		+ " | CDR: " + Structure.GetReinvestmentTest().GetCDRAssumption().GetVector()
+		+ " | LS: " + Structure.GetReinvestmentTest().GetLSAssumption().GetVector()
 	);
 	ResetTranches();
 	for (int i=0;i<Structure.GetTranchesCount();i++){
@@ -255,8 +254,7 @@ void SummaryView::DisplayStructure(){
 	ReinvestmentsTable->setRowCount(Structure.GetReinvested().Count());
 	for (int i=0;i<Structure.GetReinvested().Count();i++){
 		ReinvestmentsTable->setItem(i,0,new QTableWidgetItem(Structure.GetReinvested().GetDate(i).toString("MMM-yy")));
-		ReinvestmentsTable->setItem(i,1,new QTableWidgetItem(Commarize(Structure.GetReinvested().GetFlow(i,static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow)))));
-		ReinvestmentsTable->setItem(i, 2, new QTableWidgetItem(Commarize(Structure.GetReinvested().GetFlow(i, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow)))));
+		ReinvestmentsTable->setItem(i, 1, new QTableWidgetItem(Commarize(Structure.GetReinvested().GetTotalFlow(i))));
 	}
 	GICTable->setRowCount(0);
 	GICTable->setRowCount(Structure.GetGICflows().Count());

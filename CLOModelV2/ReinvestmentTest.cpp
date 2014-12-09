@@ -52,6 +52,8 @@ ReinvestmentTest::ReinvestmentTest()
 	, m_ReinvestmentSpreadOverTime("0")
 {
 	WALAssumption.SetDivisor(1.0);
+	m_Reinvested.Aggregate(GenericCashFlow::Monthly);
+	m_Reinvested.SetLabel(static_cast<qint32>(MtgCashFlow::MtgFlowType::PrincipalFlow), "Reinvested Funds");
 }
 ReinvestmentTest::ReinvestmentTest(const ReinvestmentTest& a)
 	:CDRAssumption(a.CDRAssumption)
@@ -66,6 +68,8 @@ ReinvestmentTest::ReinvestmentTest(const ReinvestmentTest& a)
 	, m_Delinquency(a.m_Delinquency)
 	, m_DelinquencyLag(a.m_DelinquencyLag)
 	, m_ReinvestmentSpreadOverTime(a.m_ReinvestmentSpreadOverTime)
+	, m_Reinvested(a.m_Reinvested)
+	, ReinvestQueue(a.ReinvestQueue)
 {
 }
 ReinvestmentTest& ReinvestmentTest::operator=(const ReinvestmentTest& a){
@@ -81,9 +85,11 @@ ReinvestmentTest& ReinvestmentTest::operator=(const ReinvestmentTest& a){
 	m_Delinquency = a.m_Delinquency;
 	m_DelinquencyLag = a.m_DelinquencyLag;
 	m_ReinvestmentSpreadOverTime = a.m_ReinvestmentSpreadOverTime;
+	m_Reinvested = a.m_Reinvested;
+	ReinvestQueue = a.ReinvestQueue;
 	return *this;
 }
-void ReinvestmentTest::CalculateBondCashFlows(double Size, QDate StartDate, int Period){
+void ReinvestmentTest::CalculateBondCashFlows(double Size, QDate StartDate, unsigned int Period, const QDate& MaxMaturity) {
 	ReinvestmentBond.ResetFlows();
 	bool NullDates[] = {
 		CPRAssumption.GetAnchorDate().isNull()
@@ -100,35 +106,25 @@ void ReinvestmentTest::CalculateBondCashFlows(double Size, QDate StartDate, int 
 	if (NullDates[4]) m_Delinquency.SetAnchorDate(StartDate.addMonths(-Period));
 	if (NullDates[5]) m_DelinquencyLag.SetAnchorDate(StartDate.addMonths(-Period));
 	double CurrentPrice;
-	int CurrentDelay = m_ReinvestmentDelay.GetValue(StartDate);
-	int currentSpread = m_ReinvestmentSpreadOverTime.GetValue(StartDate);
-	Size /= static_cast<double>(currentSpread);
-	MtgCashFlow ResultingFlows;
-	for (int SpreadIter = 0; SpreadIter < currentSpread; SpreadIter++) {
-		if (ReinvestmentPrice.GetAnchorDate().isNull()) CurrentPrice = ReinvestmentPrice.GetValue(Period + CurrentDelay + SpreadIter);
-		else CurrentPrice = ReinvestmentPrice.GetValue(StartDate.addMonths(CurrentDelay + SpreadIter));
-		ReinvestmentBond.SetProperty("Price", QString("%1").arg(CurrentPrice*100.0));
-		ReinvestmentBond.SetProperty("PurchasePrice", QString("%1").arg(CurrentPrice*100.0));
-		ReinvestmentBond.SetSize(Size / qMax(CurrentPrice, 0.01));
-		if (WALAssumption.GetAnchorDate().isNull()) ReinvestmentBond.SetMaturityDate(StartDate.addMonths(CurrentDelay + SpreadIter).addDays(RoundUp(365.25*WALAssumption.GetValue(Period + CurrentDelay + SpreadIter))));
-		else ReinvestmentBond.SetMaturityDate(StartDate.addMonths(CurrentDelay + SpreadIter).addDays(RoundUp(365.25*WALAssumption.GetValue(StartDate.addMonths(CurrentDelay + SpreadIter)))));
-		ReinvestmentBond.CalculateCashFlows(
-			StartDate.addMonths(CurrentDelay + SpreadIter)
-			, CPRAssumption
-			, CDRAssumption
-			, LSAssumption
-			, m_RecoveryLag
-			, m_Delinquency
-			, m_DelinquencyLag
-			, true
-			);
-		for (int DelayIter = 0; DelayIter < CurrentDelay + SpreadIter; DelayIter++) {
-			ReinvestmentBond.AddCashFlow(StartDate.addMonths(DelayIter), Size, MtgCashFlow::MtgFlowType::AmountOutstandingFlow);
-		}
-		ResultingFlows.AddFlow(ReinvestmentBond.GetCashFlow());
-		ReinvestmentBond.ResetFlows();
-	}
-	ReinvestmentBond.AddCashFlow(ResultingFlows);
+	if (ReinvestmentPrice.GetAnchorDate().isNull()) CurrentPrice = ReinvestmentPrice.GetValue(Period);
+	else CurrentPrice = ReinvestmentPrice.GetValue(StartDate);
+	ReinvestmentBond.SetProperty("Price", QString("%1").arg(CurrentPrice*100.0));
+	ReinvestmentBond.SetProperty("PurchasePrice", QString("%1").arg(CurrentPrice*100.0));
+	ReinvestmentBond.SetSize(Size / qMax(CurrentPrice, 0.01));
+	if (WALAssumption.GetAnchorDate().isNull()) ReinvestmentBond.SetMaturityDate(StartDate.addDays(RoundUp(365.25*WALAssumption.GetValue(Period))));
+	else ReinvestmentBond.SetMaturityDate(StartDate.addDays(RoundUp(365.25*WALAssumption.GetValue(StartDate))));
+	if (!MaxMaturity.isNull() && ReinvestmentBond.GetMaturityDate() > MaxMaturity) ReinvestmentBond.SetMaturityDate(MaxMaturity);
+	ReinvestmentBond.CalculateCashFlows(
+		StartDate
+		, CPRAssumption
+		, CDRAssumption
+		, LSAssumption
+		, m_RecoveryLag
+		, m_Delinquency
+		, m_DelinquencyLag
+		, true
+		);
+	//ReinvestmentBond.AddCashFlow(StartDate, Size, MtgCashFlow::MtgFlowType::AmountOutstandingFlow);
 	if (NullDates[0]) CPRAssumption.RemoveAnchorDate();
 	if (NullDates[1]) CDRAssumption.RemoveAnchorDate();
 	if (NullDates[2]) LSAssumption.RemoveAnchorDate();
@@ -166,6 +162,8 @@ QDataStream& operator<<(QDataStream & stream, const ReinvestmentTest& flows){
 		<< flows.m_Delinquency
 		<< flows.m_DelinquencyLag
 		<< flows.m_ReinvestmentSpreadOverTime
+		<< flows.m_Reinvested
+		<< flows.ReinvestQueue
 	;
 	return stream;
 }
@@ -183,8 +181,41 @@ QDataStream& ReinvestmentTest::LoadOldVersion(QDataStream& stream) {
 	m_Delinquency.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_Delinquency;
 	m_DelinquencyLag.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_DelinquencyLag;
 	m_ReinvestmentSpreadOverTime.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_ReinvestmentSpreadOverTime;
+	m_Reinvested.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_Reinvested;
+	stream >> ReinvestQueue;
 	ResetProtocolVersion();
 	return stream;
+}
+
+void ReinvestmentTest::QueueReinvestments(double Amount, const QDate& CurrentDate) {
+	if (Amount < 0.01) return;
+	int CurrentDelay = m_ReinvestmentDelay.GetValue(CurrentDate);
+	int CurrentWindow =m_ReinvestmentSpreadOverTime.GetValue(CurrentDate.addMonths(CurrentDelay));
+	for (QDate ReinvIter = CurrentDate.addMonths(CurrentDelay); ReinvIter < CurrentDate.addMonths(CurrentWindow + CurrentDelay); ReinvIter = ReinvIter.addMonths(1)) {
+		QDate NormalisedIter = QDate(ReinvIter.year(), ReinvIter.month(), 15);
+		if (ReinvestQueue.contains(NormalisedIter)) ReinvestQueue[NormalisedIter] += Amount / static_cast<double>(CurrentWindow);
+		else ReinvestQueue.insert(NormalisedIter, Amount / static_cast<double>(CurrentWindow));
+	}
+}
+
+const MtgCashFlow& ReinvestmentTest::ProcessQueue(const QDate& CurrentDate, unsigned int Period, const QDate& MaxMaturity) {
+	QDate Normaliseddate(CurrentDate.year(), CurrentDate.month(), 15);
+	ReinvestmentBond.ResetFlows();
+	auto ReinvIter = ReinvestQueue.find(Normaliseddate);
+	if (ReinvIter == ReinvestQueue.end()) return ReinvestmentBond.GetCashFlow();
+	CalculateBondCashFlows(ReinvIter.value(), CurrentDate, Period, MaxMaturity);
+	m_Reinvested.AddFlow(CurrentDate,ReinvIter.value(),static_cast<qint32>(MtgCashFlow::MtgFlowType::PrincipalFlow));
+	ReinvestQueue.erase(ReinvIter);
+	return ReinvestmentBond.GetCashFlow();
+}
+
+double ReinvestmentTest::GetQueuedCash(const QDate& StartDate) const {
+	double Result = 0.0;
+	for (auto i = ReinvestQueue.begin(); i != ReinvestQueue.end(); ++i) {
+		if (!StartDate.isNull() && i.key()<StartDate) continue;
+		Result += i.value();
+	}
+	return Result;
 }
 
 

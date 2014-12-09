@@ -47,7 +47,12 @@ public:
 	double GetAccruedInterest(int index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::AccruedInterestFlow)); }
 	double GetLossOnInterest(int index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::LossOnInterestFlow)); }
 	double GetDelinquent(int index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::DelinquentOutstanding)); }
-	double GetDelinquentShare(int index)const { return GetDelinquent(index) / GetAmountOut(index); }
+	template<class T> double GetDelinquentShare(const T& index)const {
+		static_assert(std::is_same<T, QDate>::value || std::is_same<T, int>::value, "GetDelinquentShare can be used only with int or QDate");
+		double CurAmtout = GetAmountOut(index);
+		if (CurAmtout < 0.01) return 0.0;
+		return GetDelinquent(index) / CurAmtout;
+	}
 	double GetPrepayFees(int index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::PrepaymentFees)); }
 	double GetWAcoupon(int index) const;
 	double GetWAprepayMult(int index) const;
@@ -68,7 +73,6 @@ public:
 	double GetAccruedInterest(const QDate& index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::AccruedInterestFlow)); }
 	double GetLossOnInterest(const QDate& index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::LossOnInterestFlow)); }
 	double GetDelinquent(const QDate& index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::DelinquentOutstanding)); }
-	double GetDelinquentShare(const QDate& index)const { return GetDelinquent(index) / GetAmountOut(index); }
 	double GetPrepayFees(const QDate& index) const { return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::PrepaymentFees)); }
 	double GetWAcoupon(const QDate& index) const;
 	double GetWAprepayMult(const QDate& index) const;

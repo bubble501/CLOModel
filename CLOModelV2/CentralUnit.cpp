@@ -263,12 +263,12 @@ void CentralUnit::CalculateStress(){
 	ComputationLoop.exec();
 }
 void CentralUnit::CalculationStep1(){
-	LoansCalculator.SetCPRass(Structure.GetReinvestmentTest().GetCPRAssumption());
-	LoansCalculator.SetCDRass(Structure.GetReinvestmentTest().GetCDRAssumption());
-	LoansCalculator.SetLSass(Structure.GetReinvestmentTest().GetLSAssumption());
-	LoansCalculator.SetRecoveryLag(Structure.GetReinvestmentTest().GetRecoveryLag());
-	LoansCalculator.SetDelinquency(Structure.GetReinvestmentTest().GetDelinquency());
-	LoansCalculator.SetDelinquencyLag(Structure.GetReinvestmentTest().GetDelinquencyLag());
+	LoansCalculator.SetCPRass(Structure.GetReinvestmentTest().GetCPRAssumption().GetVector());
+	LoansCalculator.SetCDRass(Structure.GetReinvestmentTest().GetCDRAssumption().GetVector());
+	LoansCalculator.SetLSass(Structure.GetReinvestmentTest().GetLSAssumption().GetVector());
+	LoansCalculator.SetRecoveryLag(Structure.GetReinvestmentTest().GetRecoveryLag().GetVector());
+	LoansCalculator.SetDelinquency(Structure.GetReinvestmentTest().GetDelinquency().GetVector());
+	LoansCalculator.SetDelinquencyLag(Structure.GetReinvestmentTest().GetDelinquencyLag().GetVector());
 	LoansCalculator.SetStartDate(PoolCutOff);
 	QString TmpStr = LoansCalculator.ReadyToCalculate();
 	if (!TmpStr.isEmpty()) {

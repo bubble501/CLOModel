@@ -20,6 +20,7 @@ class Waterfall : public BackwardInterface{
 private:
 	QList<ReserveFund*> m_Reserves;
 	bool m_CumulativeReserves;
+	QDate m_LegalFinal;
 	BloombergVector m_SeniorExpenses;
 	BloombergVector m_SeniorFees;
 	BloombergVector m_JuniorFees;
@@ -45,7 +46,6 @@ private:
 	GenericCashFlow m_AnnualizedExcess;
 	GenericCashFlow m_EquityIncome;
 	QDate m_FirstIPDdate;
-	GenericCashFlow m_Reinvested;
 	QDate m_LastIPDdate; 
 	QDate m_CallDate; 
 	BloombergVector m_PoolValueAtCall; 
@@ -82,6 +82,8 @@ public:
 	Waterfall(const Waterfall& a);
 	~Waterfall();
 	Waterfall& operator=(const Waterfall& a);
+	const QDate& GetLegalFinal() const { return m_LegalFinal; }
+	void SetLegalFinal(const QDate& val) { m_LegalFinal = val; }
 	const QHash<quint32, QSharedPointer<AbstractTrigger> >& GetTriggers() const { return m_Triggers; }
 	QString GetGICinterest() const { return m_GICinterest.GetVector(); }
 	QString GetSeniorExpenses() const { return m_SeniorExpenses.GetVector(); }
@@ -123,8 +125,7 @@ public:
 	double GetCumulativeEquityReturn(int index)const;
 	double GetCallEquityRatio(int index)const;
 	const QDate& GetFirstIPDdate() const {return m_FirstIPDdate;}
-	const GenericCashFlow& GetReinvested() const { return m_Reinvested; }
-	GenericCashFlow& GetReinvested() { return m_Reinvested; }
+	const GenericCashFlow& GetReinvested() const { return m_ReinvestmentTest.GetReinvested(); }
 	const QDate& GetLastIPDdate() const {return m_LastIPDdate;} 
 	const QDate& GetCallDate() const {return m_CallDate;}
 	const QDate& GetCalledPeriod() const;

@@ -41,7 +41,7 @@ protected:
 public:
 	virtual QRegExpValidator* GetValidator(QObject* parent = 0) const =0;
 	virtual void Clear();
-	virtual bool SetVector(const QString& Vec);
+	virtual void SetVector(const QString& Vec);
 	AbstractBbgVect(){}
 	AbstractBbgVect(const QString& Vec);
 	virtual void SetAnchorDate(const QDate& Anchor){m_AnchorDate=Anchor;}

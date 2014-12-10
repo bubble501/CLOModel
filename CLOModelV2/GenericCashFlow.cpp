@@ -14,7 +14,7 @@ GenericCashFlow::GenericCashFlow(const GenericCashFlow& a)
 	, m_CashFlowLabels(a.m_CashFlowLabels)
 	, m_Stocks(a.m_Stocks)
 {
-	AddFlow(a);
+	SetFlow(a);
 }
 
 GenericCashFlow::~GenericCashFlow() {
@@ -29,7 +29,7 @@ void GenericCashFlow::AddFlow(QDate Dte, double Amt, qint32 FlowTpe) {
 		if (SamePeriod(Dte, index.key(), m_AggregationLevel)) break;
 	}
 	if (index != m_CashFlows.end()) {
-		if (Amt== 0.0) return;
+		//if (Amt== 0.0) return;
 		Amt += GetFlow(Dte, FlowTpe);
 		if (qAbs(Amt) < 0.01) Amt = 0.0;
 		if (index.value()->contains(FlowTpe)) {
@@ -42,11 +42,11 @@ void GenericCashFlow::AddFlow(QDate Dte, double Amt, qint32 FlowTpe) {
 	}
 	else {
 		m_CashFlows.insert(Dte, new QHash<qint32, double>());
-		if (qAbs(Amt) > 0.0 || m_Stocks.contains(FlowTpe)) {
+		//if (qAbs(Amt) > 0.0) {
 			Amt += GetFlow(Dte, FlowTpe);
 			if (qAbs(Amt) < 0.01) Amt = 0.0;
 			if (qAbs(Amt) > 0.0 || m_Stocks.contains(FlowTpe)) m_CashFlows[Dte]->insert(FlowTpe, Amt);
-		}
+		//}
 	}
 }
 
@@ -61,25 +61,34 @@ void GenericCashFlow::SetFlow(QDate Dte, double Amt, qint32 FlowTpe) {
 	if (index != m_CashFlows.end()) {
 		if (index.value()->contains(FlowTpe)) {
 			if (Amt == 0.0 && !m_Stocks.contains(FlowTpe)) index.value()->remove(FlowTpe);
-			else index.value()->operator[](FlowTpe) = Amt;
+			else {
+				index.value()->operator[](FlowTpe) = Amt;
+			}
 		}
 		else {
-			if (qAbs(Amt) > 0.0 || m_Stocks.contains(FlowTpe)) index.value()->insert(FlowTpe, Amt);
+			if (qAbs(Amt) > 0.0 || m_Stocks.contains(FlowTpe)) {
+				index.value()->insert(FlowTpe, Amt);
+			}
 		}
 	}
 	else {
 		m_CashFlows.insert(Dte, new QHash<qint32, double>());
-		if (qAbs(Amt) > 0.0 || m_Stocks.contains(FlowTpe)) m_CashFlows[Dte]->insert(FlowTpe, Amt);
+		if (qAbs(Amt) > 0.0 || m_Stocks.contains(FlowTpe)) {
+			m_CashFlows[Dte]->insert(FlowTpe, Amt);
+		}
 	}
 }
 
 
 void GenericCashFlow::AddFlow(const GenericCashFlow& a) {
 	m_Stocks.unite(a.m_Stocks);
-	for (QMap<QDate, QHash<qint32, double>* >::const_iterator i = a.m_CashFlows.constBegin(); i != a.m_CashFlows.constEnd(); i++) {
-		if (i.value()->isEmpty()) AddFlow(i.key(), 0.0, 0);
-		for (QHash<qint32, double>::const_iterator j = i.value()->constBegin(); j != i.value()->constEnd(); j++) {
-			AddFlow(i.key(), j.value(), j.key());
+	if (!a.m_CashFlows.isEmpty()) {
+		for (QMap<QDate, QHash<qint32, double>* >::const_iterator i = a.m_CashFlows.constEnd()-1;true; --i) {
+			if (i.value()->isEmpty()) AddFlow(i.key(), 0.0, 0);
+			for (QHash<qint32, double>::const_iterator j = i.value()->constBegin(); j != i.value()->constEnd(); ++j) {
+				AddFlow(i.key(), j.value(), j.key());
+			}
+			if (i == a.m_CashFlows.constBegin()) break;
 		}
 	}
 	for (auto i = a.m_CashFlowLabels.constBegin(); i != a.m_CashFlowLabels.constEnd(); ++i) {
@@ -90,13 +99,15 @@ void GenericCashFlow::SetFlow(const GenericCashFlow& a) {
 	Clear();
 	m_Stocks = a.m_Stocks;
 	m_CashFlowLabels = a.m_CashFlowLabels;
-	for (QMap<QDate, QHash<qint32, double>* >::const_iterator i = a.m_CashFlows.constBegin(); i != a.m_CashFlows.constEnd(); i++) {
-		if (i.value()->isEmpty()) SetFlow(i.key(), 0.0, 0);
-		for (QHash<qint32, double>::const_iterator j = i.value()->constBegin(); j != i.value()->constEnd(); j++) {
-			SetFlow(i.key(), j.value(), j.key());
+	if (!a.m_CashFlows.isEmpty()) {
+		for (QMap<QDate, QHash<qint32, double>* >::const_iterator i = a.m_CashFlows.constEnd()-1;true; --i) {
+			if (i.value()->isEmpty()) SetFlow(i.key(), 0.0, 0);
+			for (QHash<qint32, double>::const_iterator j = i.value()->constBegin(); j != i.value()->constEnd(); ++j) {
+				SetFlow(i.key(), j.value(), j.key());
+			}
+			if (i == a.m_CashFlows.constBegin()) break;
 		}
 	}
-	
 }
 
 void GenericCashFlow::Clear() {
@@ -393,18 +404,19 @@ void GenericCashFlow::RemoveFlow(qint32 FlowTpe) {
 
 GenericCashFlow GenericCashFlow::ScaledCashFlows(double OriginalRefSize, double ResultSize, const QList<qint32>& Groups, const QList<qint32>& ExcludeGroups) const {
 	GenericCashFlow Result;
+	Result.m_Stocks = m_Stocks;
 	Result.m_AdjustHolidays = m_AdjustHolidays;
 	Result.m_CashFlowLabels = m_CashFlowLabels;
 	Result.Aggregate(m_AggregationLevel);
-	if (ResultSize == 0 || OriginalRefSize == 0) return Result;
-	const double ScaleRatio = OriginalRefSize / ResultSize;
+	if (ResultSize == 0.0 || OriginalRefSize == 0.0) return Result;
+	const double ScaleRatio = ResultSize/OriginalRefSize ;
 	for (auto i = m_CashFlows.constBegin(); i != m_CashFlows.constEnd(); ++i) {
 		for (auto j = i.value()->constBegin(); j != i.value()->constEnd(); ++j) {
 			if ((Groups.isEmpty() || Groups.contains(j.key())) && !ExcludeGroups.contains(j.key())) {
-				Result.AddFlow(i.key(), j.value()*ScaleRatio, j.key());
+				Result.SetFlow(i.key(), GetFlow(i.key(), j.key())*ScaleRatio, j.key());
 			}
 			else {
-				Result.AddFlow(i.key(), j.value(), j.key());
+				Result.SetFlow(i.key(), GetFlow(i.key(), j.key()), j.key());
 			}
 		}
 	}

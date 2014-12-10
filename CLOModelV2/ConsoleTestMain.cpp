@@ -28,22 +28,6 @@
 #include "FloorCapVector.h"
 int main(int argc, char *argv[]) {
 
-	GenericCashFlow Testing;
-	Testing.SetLabel(0, "Out");
-	Testing.SetLabel(1, "Princ");
-	Testing.SetLabel(2, "Intr");
-	Testing.SetStock(0);
-	Testing.AddFlow(QDate(2014, 5, 15), 1000000.0, 0);
-	for (auto i = QDate(2014, 6, 15); i < QDate(2020, 6, 15); i = i.addMonths(1)) {
-		Testing.AddFlow(i, 500.0, 2);
-		if (i == QDate(2016, 6, 15)) {
-			Testing.AddFlow(i, -500000.0, 0);
-			Testing.AddFlow(i, 500000.0, 1);
-		}
-	}
-	Testing.AddFlow(QDate(2020, 6, 15), 500000.0, 1);
-	Testing.AddFlow(QDate(2020, 6, 15), -500000.0, 0);
-	PrintToTempFile("TestStockFlow", Testing.ToPlainText(true), false);
 	/*QApplication a(argc, argv);
 	WaterfallStepHelperDialog b;
 	if (b.exec()==QDialog::Accepted) {
@@ -155,7 +139,7 @@ int main(int argc, char *argv[]) {
 	return a.exec();
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 
-	/*Mortgage TempMtg1;
+	Mortgage TempMtg1;
 	TempMtg1.SetProperty("PrepaymentFee", "5");
 	TempMtg1.SetAnnuity("I");
 	TempMtg1.SetInterest("5");
@@ -164,6 +148,14 @@ int main(int argc, char *argv[]) {
 	TempMtg1.SetSize(1000000.0);
 	TempMtg1.SetHaircutVector("0 24S 50");
 	TempMtg1.CalculateCashFlows(QDate(2014, 5, 30), "0", "0", "0");
+
+	/*TempMtg1.SetProperty("PrepaymentFee", "10");
+	TempMtg1.SetAnnuity("A");
+	TempMtg1.SetInterest("2.5");
+	TempMtg1.SetPaymentFreq("6");
+	TempMtg1.SetMaturityDate(QDate(2018, 5, 30));
+	TempMtg1.SetSize(500000.0);
+	TempMtg1.CalculateCashFlows(QDate(2014, 5, 30), "0", "0", "0");*/
 
 
 	Mortgage TempMtg2;
@@ -179,98 +171,25 @@ int main(int argc, char *argv[]) {
 	BaseFlows += TempMtg2.GetCashFlow();
 
 	MtgCashFlow LegacyFlows = BaseFlows.ApplyScenario("10", "0", "50");
-	//LegacyFlows.Aggregate(GenericCashFlow::Quarterly);
 	TempMtg1.CalculateCashFlows(QDate(2014, 5, 30), "10", "0", "50");
 	TempMtg2.CalculateCashFlows(QDate(2014, 5, 30), "10", "0", "50");
 
 	MtgCashFlow TempMtgsFlows = TempMtg1.GetCashFlow();
 	TempMtgsFlows += TempMtg2.GetCashFlow();
-	bool Testing = TempMtgsFlows == LegacyFlows;
-	if (!Testing) {
-		QString ResultString("");
-		for (int i = 0; i < TempMtgsFlows.Count(); i++) {
-			ResultString += QString("%1\t%2\t%3\t%4\t%5\t%6\t%7\t%8\t%9\t%10\t%11\t%12\n")
-				.arg(TempMtgsFlows.GetAmountOut(i))
-				.arg(TempMtgsFlows.GetAccruedInterest(i))
-				.arg(TempMtgsFlows.GetInterest(i))
-				.arg(TempMtgsFlows.GetScheduled(i))
-				.arg(TempMtgsFlows.GetPrepay(i))
-				.arg(TempMtgsFlows.GetDefaults(i))
-				.arg(TempMtgsFlows.GetLoss(i))
-				.arg(TempMtgsFlows.GetRecoveries(i))
-				.arg(TempMtgsFlows.GetLossOnInterest(i))
-				.arg(TempMtgsFlows.GetInterestRecoveries(i))
-				.arg(TempMtgsFlows.GetPrepayFees(i))
-				.arg(TempMtgsFlows.GetWAPrepayFees(i))
-				;
-		}
-		{
-			QFile file("C://Temp//Model.txt");
-			file.open(QIODevice::WriteOnly | QIODevice::Text);
-			QTextStream out(&file);
-			out << ResultString;
-			file.close();
-		}
-
-		ResultString = "";
-		for (int i = 0; i < LegacyFlows.Count(); i++) {
-			ResultString += QString("%1\t%2\t%3\t%4\t%5\t%6\t%7\t%8\t%9\t%10\t%11\t%12\n")
-				.arg(LegacyFlows.GetAmountOut(i))
-				.arg(LegacyFlows.GetAccruedInterest(i))
-				.arg(LegacyFlows.GetInterest(i))
-				.arg(LegacyFlows.GetScheduled(i))
-				.arg(LegacyFlows.GetPrepay(i))
-				.arg(LegacyFlows.GetDefaults(i))
-				.arg(LegacyFlows.GetLoss(i))
-				.arg(LegacyFlows.GetRecoveries(i))
-				.arg(LegacyFlows.GetLossOnInterest(i))
-				.arg(LegacyFlows.GetInterestRecoveries(i))
-				.arg(LegacyFlows.GetPrepayFees(i))
-				.arg(LegacyFlows.GetWAPrepayFees(i))
-				;
-		}
-		{
-			QFile file("C://Temp//Scenario.txt");
-			file.open(QIODevice::WriteOnly | QIODevice::Text);
-			QTextStream out(&file);
-			out << ResultString;
-			file.close();
-		}
-		ResultString = "";
-		for (int i = 0; i < BaseFlows.Count(); i++) {
-			ResultString += QString("%1\t%2\t%3\t%4\t%5\t%6\t%7\t%8\t%9\t%10\t%11\t%12\n")
-				.arg(BaseFlows.GetAmountOut(i))
-				.arg(BaseFlows.GetAccruedInterest(i))
-				.arg(BaseFlows.GetInterest(i))
-				.arg(BaseFlows.GetScheduled(i))
-				.arg(BaseFlows.GetPrepay(i))
-				.arg(BaseFlows.GetDefaults(i))
-				.arg(BaseFlows.GetLoss(i))
-				.arg(BaseFlows.GetRecoveries(i))
-				.arg(BaseFlows.GetLossOnInterest(i))
-				.arg(BaseFlows.GetInterestRecoveries(i))
-				.arg(BaseFlows.GetPrepayFees(i))
-				.arg(BaseFlows.GetWAPrepayFees(i))
-				;
-		}
-		{
-			QFile file("C://Temp//Base.txt");
-			file.open(QIODevice::WriteOnly | QIODevice::Text);
-			QTextStream out(&file);
-			out << ResultString;
-			file.close();
-		}
-
+	
+	QFile file1("C:/Temp/Scenario.log");
+	QFile file2("C:/Temp/Model.log");
+	QFile file3("C:/Temp/Base.log");
+	if (file1.exists()) file1.remove();
+	if (file2.exists()) file2.remove();
+	if (file3.exists()) file3.remove();
+	if (/*true  ||*/ TempMtgsFlows != LegacyFlows) {
+		PrintToTempFile("Model", TempMtgsFlows.ToPlainText(true), false);
+		PrintToTempFile("Scenario", LegacyFlows.ToPlainText(true), false);
+		PrintToTempFile("Base", BaseFlows.ToPlainText(true), false);
 	}
 	else {
-		QFile file1("C://Temp//Scenario.txt");
-		QFile file2("C://Temp//Model.txt");
-		QFile file3("C://Temp//Base.txt");
-		if (file1.exists()) file1.remove();
-		if (file2.exists()) file2.remove();
-		if (file3.exists()) file3.remove();
-		QApplication a(argc, argv);
-		QMessageBox::information(0, "Success", "Cash Flows are identical");
-	}*/
-
+		qDebug() << "Success, Cash Flows are identical";
+	}
+	return 0;
 }

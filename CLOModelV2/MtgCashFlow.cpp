@@ -4,67 +4,13 @@
 #include<QMap>
 #include <QDataStream>
 #include <qmath.h>
-double MtgCashFlow::GetWAcoupon(int index) const {
-	if (GetFlow(index,MtgFlowType::AmountOutstandingFlow) == 0.0) return 0.0;
-	return GetFlow(index, MtgFlowType::WACouponFlow) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
-}
-double MtgCashFlow::GetWAcoupon(const QDate& index) const {
-	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0.0) return 0.0;
-	return GetFlow(index, MtgFlowType::WACouponFlow) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
-}
-double MtgCashFlow::GetWAprepayMult(int index) const {
-	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0.0) return 0.0;
-	return GetFlow(index, MtgFlowType::WAPrepayMult) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
-}
-double MtgCashFlow::GetWAprepayMult(const QDate& index) const {
-	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0.0) return 0.0;
-	return GetFlow(index, MtgFlowType::WAPrepayMult) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
-}
-double MtgCashFlow::GetWAlossMult(int index) const {
-	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0.0) return 0.0;
-	return GetFlow(index, MtgFlowType::WALossMult) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
-}
-double MtgCashFlow::GetWAlossMult(const QDate& index) const {
-	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0.0) return 0.0;
-	return GetFlow(index, MtgFlowType::WALossMult) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
-}
-double MtgCashFlow::GetWAPrice(int index) const {
-	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0.0) return 0.0;
-	return GetFlow(index, MtgFlowType::WAPrice) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
-}
-double MtgCashFlow::GetWAPrice(const QDate& index) const {
-	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0.0) return 0.0;
-	return GetFlow(index, MtgFlowType::WAPrice) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
-}
-double MtgCashFlow::GetWAPrepayFees(int index) const {
-	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0.0) return 0.0;
-	return GetFlow(index, MtgFlowType::WAPrepayFees) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
-}
-double MtgCashFlow::GetWAPrepayFees(const QDate& index) const {
-	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0.0) return 0.0;
-	return GetFlow(index, MtgFlowType::WAPrepayFees) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
-}
-double MtgCashFlow::GetWAL(int index) const {
-	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0.0) return 0.0;
-	return GetFlow(index, MtgFlowType::WALlevel) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
-}
-double MtgCashFlow::GetWAL(const QDate& index) const {
-	if (GetFlow(index, MtgFlowType::AmountOutstandingFlow) == 0.0) return 0.0;
-	return GetFlow(index, MtgFlowType::WALlevel) / GetFlow(index, MtgFlowType::AmountOutstandingFlow);
-}
 
-
-/*
-QDataStream& operator<<(QDataStream & stream, const MtgCashFlow& flows) {
-	stream << static_cast<const GenericCashFlow&>(flows);
-	return stream;
-}
-QDataStream& operator>>(QDataStream & stream, MtgCashFlow& flows) {
-	return flows.LoadOldVersion(stream);
-}*/
 MtgCashFlow MtgCashFlow::ApplyScenario(BloombergVector CPRv, BloombergVector CDRv, BloombergVector LSv) const {
 	MtgCashFlow Result;
-	qint32 i;
+	Result.SetAdjustHolidays(m_AdjustHolidays);
+	Result.Aggregate(m_AggregationLevel);
+	Result.m_Stocks = m_Stocks;
+	Result.m_CashFlowLabels = m_CashFlowLabels;
 	if (Count() < 1 || CPRv.IsEmpty() || CDRv.IsEmpty() || LSv.IsEmpty()) return Result;
 	if (CPRv.GetAnchorDate().isNull()) CPRv.SetAnchorDate(GetDate(0));
 	if (CDRv.GetAnchorDate().isNull()) CDRv.SetAnchorDate(GetDate(0));
@@ -72,77 +18,86 @@ MtgCashFlow MtgCashFlow::ApplyScenario(BloombergVector CPRv, BloombergVector CDR
 	Result.AddFlow(SingleDate(GetDate(0)));
 	double ShareOfPrinc, ShareOfIntr, ShareOfAccrIntr, ShareOfLoss, ShareOfLossOnInterest, SumDeltaOut, TempF, ApplicablePrincipal, ApplicableMultiplier;
 	bool HasOCoutstanding = HasFlowType(static_cast<qint32>(MtgFlowType::OutstandingForOC));
-	for (i = 1; i < Count(); i++) {
-
-		ShareOfPrinc = GetFlow(i, MtgFlowType::PrincipalFlow) / GetPreviousFlow(i, MtgFlowType::AmountOutstandingFlow);
-		ShareOfIntr = GetFlow(i, MtgFlowType::InterestFlow) / GetPreviousFlow(i, MtgFlowType::AmountOutstandingFlow);
-		ShareOfAccrIntr = GetFlow(i, MtgFlowType::AccruedInterestFlow) / GetPreviousFlow(i, MtgFlowType::AmountOutstandingFlow);
-		if (GetPreviousFlow(i, MtgFlowType::AmountOutstandingFlow) - GetFlow(i, MtgFlowType::PrincipalFlow) <= 0.0) {
+	if (Count() <= 1) return Result;
+	for (QMap<QDate, QHash<qint32, double>* >::const_iterator i = (m_CashFlows.constBegin() + 1); i != m_CashFlows.constEnd(); ++i) {
+		ShareOfPrinc = GetFlow(i.key(), MtgFlowType::PrincipalFlow) / GetFlow((i-1).key(), MtgFlowType::AmountOutstandingFlow);
+		ShareOfIntr = GetFlow(i.key(), MtgFlowType::InterestFlow) / GetFlow((i - 1).key(), MtgFlowType::AmountOutstandingFlow);
+		ShareOfAccrIntr = GetFlow(i.key(), MtgFlowType::AccruedInterestFlow) / GetFlow((i - 1).key(), MtgFlowType::AmountOutstandingFlow);
+		if (GetFlow((i - 1).key(), MtgFlowType::AmountOutstandingFlow) - GetFlow(i.key(), MtgFlowType::PrincipalFlow) <= 0.0) {
 			ShareOfLoss = 0.0;
 			ShareOfLossOnInterest = 0.0;
 		}
 		else {
-			ShareOfLoss = GetFlow(i, MtgFlowType::LossFlow) / (GetPreviousFlow(i, MtgFlowType::AmountOutstandingFlow) - GetFlow(i, MtgFlowType::PrincipalFlow));
-			ShareOfLossOnInterest = GetFlow(i, MtgFlowType::LossOnInterestFlow) / (GetPreviousFlow(i, MtgFlowType::AmountOutstandingFlow) - GetFlow(i, MtgFlowType::PrincipalFlow));
+			ShareOfLoss = GetFlow(i.key(), MtgFlowType::LossFlow) / (GetFlow((i - 1).key(), MtgFlowType::AmountOutstandingFlow) - GetFlow(i.key(), MtgFlowType::PrincipalFlow));
+			ShareOfLossOnInterest = GetFlow(i.key(), MtgFlowType::LossOnInterestFlow) / (GetFlow((i - 1).key(), MtgFlowType::AmountOutstandingFlow) - GetFlow(i.key(), MtgFlowType::PrincipalFlow));
 		}
 
-		ApplicablePrincipal = Result.GetPreviousFlow(i, MtgFlowType::AmountOutstandingFlow) + Result.GetFlow(i, MtgFlowType::PrincipalRecovered);
+		ApplicablePrincipal = Result.GetFlow((i - 1).key(), MtgFlowType::AmountOutstandingFlow) + Result.GetFlow(i.key(), MtgFlowType::PrincipalRecovered);
 
-		Result.AddFlow(GetDate(i), ApplicablePrincipal*ShareOfIntr, MtgFlowType::InterestFlow);
-		Result.AddFlow(GetDate(i), ApplicablePrincipal*ShareOfAccrIntr, MtgFlowType::AccruedInterestFlow);
+		Result.SetFlow(i.key(), ApplicablePrincipal*ShareOfIntr, MtgFlowType::InterestFlow);
+		Result.SetFlow(i.key(), ApplicablePrincipal*ShareOfAccrIntr, MtgFlowType::AccruedInterestFlow);
 
 		SumDeltaOut = ApplicablePrincipal*ShareOfPrinc;
-		Result.AddFlow(GetDate(i), SumDeltaOut, MtgFlowType::PrincipalFlow);
+		Result.SetFlow(i.key(), SumDeltaOut, MtgFlowType::PrincipalFlow);
 
-		Result.AddFlow(GetDate(i), (ApplicablePrincipal - SumDeltaOut)*ShareOfLoss, MtgFlowType::LossFlow);
-		Result.AddFlow(GetDate(i), (ApplicablePrincipal - SumDeltaOut)*ShareOfLossOnInterest, MtgFlowType::LossOnInterestFlow);
+		Result.SetFlow(i.key(), (ApplicablePrincipal - SumDeltaOut)*ShareOfLoss, MtgFlowType::LossFlow);
+		Result.SetFlow(i.key(), (ApplicablePrincipal - SumDeltaOut)*ShareOfLossOnInterest, MtgFlowType::LossOnInterestFlow);
 		SumDeltaOut += (ApplicablePrincipal - SumDeltaOut)*ShareOfLoss;
 
 
-		if (GetFlow(i, MtgFlowType::AmountOutstandingFlow) == 0.0)
+		if (GetFlow(i.key(), MtgFlowType::AmountOutstandingFlow) == 0.0)
 			ApplicableMultiplier = 1.0;
 		else
-			ApplicableMultiplier = GetFlow(i, MtgFlowType::WAPrepayMult) / GetFlow(i, MtgFlowType::AmountOutstandingFlow);
-		ApplicableMultiplier *= CPRv.GetSMM(GetDate(i), 1);
+			ApplicableMultiplier = GetFlow(i.key(), MtgFlowType::WAPrepayMult) / GetFlow(i.key(), MtgFlowType::AmountOutstandingFlow);
+		ApplicableMultiplier *= CPRv.GetSMM(i.key(), 1);
 		{
 			double PrepayedFlow = (ApplicablePrincipal - SumDeltaOut)*ApplicableMultiplier;
-			Result.AddFlow(GetDate(i), PrepayedFlow, MtgFlowType::PrepaymentFlow);
-			double ApplicFee = GetFlow(i, MtgFlowType::WAPrepayFees);
-			if (GetFlow(i, MtgFlowType::AmountOutstandingFlow) == 0.0) ApplicFee = 0.0;
-			else ApplicFee /= GetFlow(i, MtgFlowType::AmountOutstandingFlow);
-			Result.AddFlow(GetDate(i), PrepayedFlow*ApplicFee, MtgFlowType::PrepaymentFees);
-			Result.AddFlow(GetDate(i), PrepayedFlow*ApplicFee, MtgFlowType::InterestFlow);
+			Result.SetFlow(i.key(), PrepayedFlow, MtgFlowType::PrepaymentFlow);
+			double ApplicFee = GetFlow(i.key(), MtgFlowType::WAPrepayFees);
+			if (GetFlow(i.key(), MtgFlowType::AmountOutstandingFlow) == 0.0) ApplicFee = 0.0;
+			else ApplicFee /= GetFlow(i.key(), MtgFlowType::AmountOutstandingFlow);
+			Result.SetFlow(i.key(), PrepayedFlow*ApplicFee, MtgFlowType::PrepaymentFees);
+			Result.AddFlow(i.key(), PrepayedFlow*ApplicFee, MtgFlowType::InterestFlow);
 		}
 		SumDeltaOut += (ApplicablePrincipal - SumDeltaOut)*ApplicableMultiplier;
-		Result.AddFlow(GetDate(i), Result.GetAccruedInterest(GetDate(i))*ApplicableMultiplier, MtgFlowType::InterestFlow);
-		Result.AddFlow(GetDate(i), -Result.GetAccruedInterest(GetDate(i))*ApplicableMultiplier, MtgFlowType::AccruedInterestFlow);
+		Result.AddFlow(i.key(), Result.GetAccruedInterest(i.key())*ApplicableMultiplier, MtgFlowType::InterestFlow);
+		Result.AddFlow(i.key(), -Result.GetAccruedInterest(i.key())*ApplicableMultiplier, MtgFlowType::AccruedInterestFlow);
 
-		if (GetFlow(i, MtgFlowType::AmountOutstandingFlow) == 0.0)
-			ApplicableMultiplier = LSv.GetValue(GetDate(i));
+		if (GetFlow(i.key(), MtgFlowType::AmountOutstandingFlow) == 0.0)
+			ApplicableMultiplier = LSv.GetValue(i.key());
 		else
-			ApplicableMultiplier = LSv.GetValue(GetDate(i))* GetFlow(i, MtgFlowType::WALossMult) / GetFlow(i, MtgFlowType::AmountOutstandingFlow);
-		TempF = (ApplicablePrincipal - SumDeltaOut)*CDRv.GetSMM(GetDate(i), 1);
-		Result.AddFlow(GetDate(i), TempF, MtgFlowType::PrincipalDefault);
-		Result.AddFlow(GetDate(i), qMin(TempF, TempF*ApplicableMultiplier), MtgFlowType::LossFlow);
-		Result.AddFlow(GetDate(i), qMin(TempF, TempF*(1.0 - ApplicableMultiplier)), MtgFlowType::PrincipalRecovered);
+			ApplicableMultiplier = LSv.GetValue(i.key())* GetFlow(i.key(), MtgFlowType::WALossMult) / GetFlow(i.key(), MtgFlowType::AmountOutstandingFlow);
+		TempF = (ApplicablePrincipal - SumDeltaOut)*CDRv.GetSMM(i.key(), 1);
+		Result.SetFlow(i.key(), TempF, MtgFlowType::PrincipalDefault);
+		Result.AddFlow(i.key(), qMin(TempF, TempF*ApplicableMultiplier), MtgFlowType::LossFlow);
+		Result.SetFlow(i.key(), qMin(TempF, TempF*(1.0 - ApplicableMultiplier)), MtgFlowType::PrincipalRecovered);
 		SumDeltaOut += TempF;
 		SumDeltaOut -= qMin(TempF, TempF*(1.0 - ApplicableMultiplier));
 
-		TempF = Result.GetAccruedInterest(GetDate(i))*CDRv.GetSMM(GetDate(i), 1);
+		TempF = Result.GetAccruedInterest(i.key())*CDRv.GetSMM(i.key(), 1);
 		if (TempF >= 0.01) {
-			Result.AddFlow(GetDate(i), qMin(TempF, -TempF*ApplicableMultiplier), MtgFlowType::AccruedInterestFlow);
-			Result.AddFlow(GetDate(i), qMin(TempF, TempF*(1.0 - (ApplicableMultiplier))), MtgFlowType::InterestRecovered);
-			Result.AddFlow(GetDate(i), qMin(TempF, TempF*(ApplicableMultiplier)), MtgFlowType::LossOnInterestFlow);
+			Result.AddFlow(i.key(), qMin(TempF, -TempF*ApplicableMultiplier), MtgFlowType::AccruedInterestFlow);
+			Result.SetFlow(i.key(), qMin(TempF, TempF*(1.0 - (ApplicableMultiplier))), MtgFlowType::InterestRecovered);
+			Result.AddFlow(i.key(), qMin(TempF, TempF*(ApplicableMultiplier)), MtgFlowType::LossOnInterestFlow);
 		}
-		Result.AddFlow(GetDate(i), ApplicablePrincipal - SumDeltaOut, MtgFlowType::AmountOutstandingFlow);
-		if (GetFlow(i, MtgFlowType::AmountOutstandingFlow) != 0.0) {
-			if (HasOCoutstanding) Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::OutstandingForOC) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::OutstandingForOC);
-			Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::WACouponFlow) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::WACouponFlow);
-			Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::WAPrepayMult) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::WAPrepayMult);
-			Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::WALossMult) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::WALossMult);
-			Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::WAPrice) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::WAPrice);
-			Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::WAPrepayFees) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::WAPrepayFees);
-			Result.AddFlow(GetDate(i), GetFlow(i, MtgFlowType::WALlevel) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i, MtgFlowType::AmountOutstandingFlow), MtgFlowType::WALlevel);
+		Result.SetFlow(i.key(), ApplicablePrincipal - SumDeltaOut, MtgFlowType::AmountOutstandingFlow);
+		if (GetFlow(i.key(), MtgFlowType::AmountOutstandingFlow) != 0.0) {
+			if (HasOCoutstanding) Result.SetFlow(i.key(), GetFlow(i.key(), MtgFlowType::OutstandingForOC) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i.key(), MtgFlowType::AmountOutstandingFlow), MtgFlowType::OutstandingForOC);
+			Result.SetFlow(i.key(), GetFlow(i.key(), MtgFlowType::WACouponFlow) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i.key(), MtgFlowType::AmountOutstandingFlow), MtgFlowType::WACouponFlow);
+			Result.SetFlow(i.key(), GetFlow(i.key(), MtgFlowType::WAPrepayMult) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i.key(), MtgFlowType::AmountOutstandingFlow), MtgFlowType::WAPrepayMult);
+			Result.SetFlow(i.key(), GetFlow(i.key(), MtgFlowType::WALossMult) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i.key(), MtgFlowType::AmountOutstandingFlow), MtgFlowType::WALossMult);
+			Result.SetFlow(i.key(), GetFlow(i.key(), MtgFlowType::WAPrice) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i.key(), MtgFlowType::AmountOutstandingFlow), MtgFlowType::WAPrice);
+			Result.SetFlow(i.key(), GetFlow(i.key(), MtgFlowType::WAPrepayFees) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i.key(), MtgFlowType::AmountOutstandingFlow), MtgFlowType::WAPrepayFees);
+			Result.SetFlow(i.key(), GetFlow(i.key(), MtgFlowType::WALlevel) *(ApplicablePrincipal - SumDeltaOut) / GetFlow(i.key(), MtgFlowType::AmountOutstandingFlow), MtgFlowType::WALlevel);
+		}
+		else {
+			if (HasOCoutstanding) Result.SetFlow(i.key(), 0.0, MtgFlowType::OutstandingForOC);
+			Result.SetFlow(i.key(), 0.0, MtgFlowType::WACouponFlow);
+			Result.SetFlow(i.key(), 0.0, MtgFlowType::WAPrepayMult);
+			Result.SetFlow(i.key(), 0.0, MtgFlowType::WALossMult);
+			Result.SetFlow(i.key(), 0.0, MtgFlowType::WAPrice);
+			Result.SetFlow(i.key(), 0.0, MtgFlowType::WAPrepayFees);
+			Result.SetFlow(i.key(), 0.0, MtgFlowType::WALlevel);
 		}
 	}
 	return Result;
@@ -169,47 +124,46 @@ MtgCashFlow::MtgCashFlow() {
 	SetLabel(static_cast<qint32>(MtgFlowType::PrepaymentFees), "Prepayment Fees");
 	SetLabel(static_cast<qint32>(MtgFlowType::OutstandingForOC), "Outstanding for OC Test");
 	Aggregate(Monthly); 
+	SetStock(static_cast<qint32>(MtgFlowType::AmountOutstandingFlow));
+	SetStock(static_cast<qint32>(MtgFlowType::WACouponFlow));
+	SetStock(static_cast<qint32>(MtgFlowType::AccruedInterestFlow));
+	SetStock(static_cast<qint32>(MtgFlowType::WAPrepayMult));
+	SetStock(static_cast<qint32>(MtgFlowType::WALossMult));
+	SetStock(static_cast<qint32>(MtgFlowType::WAPrice));
+	SetStock(static_cast<qint32>(MtgFlowType::WALlevel));
+	SetStock(static_cast<qint32>(MtgFlowType::DelinquentOutstanding));
+	SetStock(static_cast<qint32>(MtgFlowType::WAPrepayFees));
+	SetStock(static_cast<qint32>(MtgFlowType::OutstandingForOC));
 }
 
 MtgCashFlow::MtgCashFlow(const MtgCashFlow& a) 
 	:GenericCashFlow(a)
 {
-	/*Aggregate(Monthly); 
-	AddFlow(a);*/
 }
 double MtgCashFlow::GetTotalFlow(int index) const {
-	QList<qint32> FlowsType;
-	FlowsType.append(static_cast<qint32>(MtgFlowType::InterestFlow));
-	FlowsType.append(static_cast<qint32>(MtgFlowType::PrincipalFlow));
-	FlowsType.append(static_cast<qint32>(MtgFlowType::PrepaymentFlow));
-	return GenericCashFlow::GetTotalFlow(index, FlowsType);
+	return GenericCashFlow::GetTotalFlow(index, QList<qint32>() 
+		<< static_cast<qint32>(MtgFlowType::InterestFlow)
+		<< static_cast<qint32>(MtgFlowType::PrincipalFlow)
+		<< static_cast<qint32>(MtgFlowType::PrepaymentFlow)
+	);
 }
 double MtgCashFlow::GetTotalFlow(const QDate& a) const {
-	QList<qint32> FlowsType;
-	
-	return GenericCashFlow::GetTotalFlow(a, FlowsType);
-}
-double MtgCashFlow::CalculateWAL(const QDate& StartDate) const {
-	double RunningSum = 0.0, Result = 0.0, CurrentPrinc;
-	for (auto i = m_CashFlows.constFind(StartDate); i != m_CashFlows.constEnd(); ++i) {
-		CurrentPrinc = i.value()->value(static_cast<qint32>(MtgFlowType::PrincipalFlow),0);
-		if (CurrentPrinc > 0) {
-			RunningSum += CurrentPrinc;
-			Result += CurrentPrinc*static_cast<double>(StartDate.daysTo(i.key())) / 365.25;
-		}
-	}
-	if (RunningSum <= 0) return 0.0;
-	return Result / RunningSum;
+	return GenericCashFlow::GetTotalFlow(a, QList<qint32>()
+		<< static_cast<qint32>(MtgFlowType::InterestFlow)
+		<< static_cast<qint32>(MtgFlowType::PrincipalFlow)
+		<< static_cast<qint32>(MtgFlowType::PrepaymentFlow)
+	);
 }
 
 MtgCashFlow MtgCashFlow::ScaledCashFlows(double OriginalRefSize, double ResultSize) const {
-	MtgCashFlow Result;
-	Result.AddFlow(GenericCashFlow::ScaledCashFlows(OriginalRefSize, ResultSize, QList<qint32>(), QList<qint32>()
+	MtgCashFlow Result(*this);
+	Result.SetFlow(GenericCashFlow::ScaledCashFlows(OriginalRefSize, ResultSize, QList<qint32>(), QList<qint32>()
 		<< static_cast<qint32>(MtgFlowType::WACouponFlow)
 		<< static_cast<qint32>(MtgFlowType::WAPrepayMult)
 		<< static_cast<qint32>(MtgFlowType::WALossMult)
 		<< static_cast<qint32>(MtgFlowType::WAPrice)
 		<< static_cast<qint32>(MtgFlowType::WALlevel)
+		<< static_cast<qint32>(MtgFlowType::WAPrepayFees)
 		));
 	double CurrentOut;
 	for (auto i = Result.m_CashFlows.begin(); i != Result.m_CashFlows.end(); ++i) {
@@ -220,19 +174,9 @@ MtgCashFlow MtgCashFlow::ScaledCashFlows(double OriginalRefSize, double ResultSi
 			i.value()->operator[](static_cast<qint32>(MtgFlowType::WALossMult)) *= i.value()->value(static_cast<qint32>(MtgFlowType::AmountOutstandingFlow), 0.0) / CurrentOut;
 			i.value()->operator[](static_cast<qint32>(MtgFlowType::WAPrice)) *= i.value()->value(static_cast<qint32>(MtgFlowType::AmountOutstandingFlow), 0.0) / CurrentOut;
 			i.value()->operator[](static_cast<qint32>(MtgFlowType::WALlevel)) *= i.value()->value(static_cast<qint32>(MtgFlowType::AmountOutstandingFlow), 0.0) / CurrentOut;
+			i.value()->operator[](static_cast<qint32>(MtgFlowType::WAPrepayFees)) *= i.value()->value(static_cast<qint32>(MtgFlowType::AmountOutstandingFlow), 0.0) / CurrentOut;
 		}
 			
 	}
 	return Result;
-}
-
-double MtgCashFlow::GetOutstandingForOC(const QDate& index) const {
-	if (HasFlowType(static_cast<qint32>(MtgFlowType::OutstandingForOC)))
-		return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::OutstandingForOC));
-	return GetAmountOut(index);
-}
-double MtgCashFlow::GetOutstandingForOC(int index) const {
-	if (HasFlowType(static_cast<qint32>(MtgFlowType::OutstandingForOC)))
-		return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::OutstandingForOC));
-	return GetAmountOut(index);
 }

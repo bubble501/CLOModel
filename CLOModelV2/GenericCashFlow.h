@@ -3,6 +3,7 @@
 #include "BackwardCompatibilityInterface.h"
 #include "IntegerVector.h"
 #include <QHash>
+#include <QSet>
 #include <QMap>
 #include <QDate>
 #include <QList>
@@ -28,11 +29,14 @@ public:
 	virtual void AddFlow(QDate Dte, double Amt, qint32 FlowTpe);
 	virtual void AddFlow(const GenericCashFlow& a);
 	virtual void SetFlow(QDate Dte, double Amt, qint32 FlowTpe);
+	virtual void SetFlow(const GenericCashFlow& a);
 	virtual QDate GetDate(int index) const;
 	virtual double GetFlow(int index, qint32 FlowTpe) const;
 	virtual double GetFlow(const QDate& index, qint32 FlowTpe) const;
-	virtual double GetPreviousFlow(int index, qint32 FlowTpe) const;
-	virtual double GetPreviousFlow(const QDate& index, qint32 FlowTpe) const;
+#ifdef _DEBUG
+	virtual double GetPreviousFlow(int index, qint32 FlowTpe) const { return 0.0; }
+	virtual double GetPreviousFlow(const QDate& index, qint32 FlowTpe) const { return 0.0; }
+#endif // _DEBUG
 	virtual void Clear();
 	virtual void RemoveFlow(qint32 FlowTpe);
 	virtual void RemoveAllFlows() { Clear(); }
@@ -55,7 +59,7 @@ public:
 	virtual bool IsEmpty() const;
 	virtual QString ToString() const;
 	virtual GenericCashFlow AggregateRange(const QDate& StartDate, const QDate& EndDate)const;
-	virtual void SetLabel(qint32 FlowTpe, const QString& Lab) { m_CashFlowLabels[FlowTpe] = Lab; }
+	virtual void SetLabel(qint32 FlowTpe, const QString& Lab);
 	virtual QString GetLabel(qint32 FlowTpe) const { return m_CashFlowLabels.value(FlowTpe, QString()); }
 	virtual void RemoveLabel(qint32 FlowTp) { m_CashFlowLabels.remove(FlowTp); }
 	virtual void ClearLabels() { m_CashFlowLabels.clear(); }
@@ -63,10 +67,16 @@ public:
 	virtual QString ToPlainText(bool UseHeaders = true)const;
 	virtual QString ToXML()const;
 	virtual void LoadFromXML(const QString& Source);
+	virtual void SetStock(qint32 a) { m_Stocks.insert(a); }
+	virtual void RemoveStock(qint32 a) { m_Stocks.remove(a); }
+	virtual void ClearStocks() { m_Stocks.clear(); }
+	virtual bool IsStock(qint32 a) const { return m_Stocks.contains(a); }
+	virtual const QSet<qint32>& GetStocks() const { return m_Stocks; }
 protected:
 	static bool SamePeriod(const QDate& a, const QDate& b, CashFlowAggregation Freq);
 	QMap<QDate, QHash<qint32, double>*	> m_CashFlows;
 	QHash<qint32, QString> m_CashFlowLabels;
+	QSet<qint32> m_Stocks;
 	CashFlowAggregation m_AggregationLevel;
 	bool m_AdjustHolidays;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;

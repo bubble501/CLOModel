@@ -12,6 +12,7 @@ GenericCashFlow::GenericCashFlow(const GenericCashFlow& a)
 	: m_AggregationLevel(a.m_AggregationLevel) 
 	, m_AdjustHolidays(a.m_AdjustHolidays)
 	, m_CashFlowLabels(a.m_CashFlowLabels)
+	, m_Stocks(a.m_Stocks)
 {
 	AddFlow(a);
 }
@@ -21,58 +22,81 @@ GenericCashFlow::~GenericCashFlow() {
 }
 void GenericCashFlow::AddFlow(QDate Dte, double Amt, qint32 FlowTpe) {
 	if (Dte.isNull()) return;
+	if (qAbs(Amt) < 0.01) Amt = 0.0;
 	if (m_AdjustHolidays) { while (IsHoliday(Dte)) Dte=Dte.addDays(1); }
 	QMap<QDate, QHash<qint32, double>* >::iterator index = m_CashFlows.begin();
 	for (; index != m_CashFlows.end(); ++index) {
 		if (SamePeriod(Dte, index.key(), m_AggregationLevel)) break;
 	}
 	if (index != m_CashFlows.end()) {
-		if (qAbs(Amt) < 0.01) return;
+		if (Amt== 0.0) return;
+		Amt += GetFlow(Dte, FlowTpe);
+		if (qAbs(Amt) < 0.01) Amt = 0.0;
 		if (index.value()->contains(FlowTpe)) {
-				index.value()->operator[](FlowTpe) += Amt;
+			if (Amt == 0.0 && !m_Stocks.contains(FlowTpe)) index.value()->remove(FlowTpe);
+			else index.value()->operator[](FlowTpe) = Amt;
 		}
-		else
-			index.value()->insert(FlowTpe, Amt);
+		else {
+			if (qAbs(Amt) > 0.0 || m_Stocks.contains(FlowTpe)) index.value()->insert(FlowTpe, Amt);
+		}
 	}
 	else {
 		m_CashFlows.insert(Dte, new QHash<qint32, double>());
-		if (qAbs(Amt) >= 0.01) m_CashFlows[Dte]->insert(FlowTpe,Amt);
+		if (qAbs(Amt) > 0.0 || m_Stocks.contains(FlowTpe)) {
+			Amt += GetFlow(Dte, FlowTpe);
+			if (qAbs(Amt) < 0.01) Amt = 0.0;
+			if (qAbs(Amt) > 0.0 || m_Stocks.contains(FlowTpe)) m_CashFlows[Dte]->insert(FlowTpe, Amt);
+		}
 	}
 }
 
 void GenericCashFlow::SetFlow(QDate Dte, double Amt, qint32 FlowTpe) {
 	if (Dte.isNull()) return;
 	if (m_AdjustHolidays) { while (IsHoliday(Dte)) Dte = Dte.addDays(1); }
+	if (qAbs(Amt) < 0.01) Amt = 0.0;
 	QMap<QDate, QHash<qint32, double>* >::iterator index = m_CashFlows.begin();
 	for (; index != m_CashFlows.end(); ++index) {
 		if (SamePeriod(Dte, index.key(), m_AggregationLevel)) break;
 	}
 	if (index != m_CashFlows.end()) {
-		if (qAbs(Amt) < 0.01) return;
 		if (index.value()->contains(FlowTpe)) {
-			index.value()->operator[](FlowTpe) = Amt;
+			if (Amt == 0.0 && !m_Stocks.contains(FlowTpe)) index.value()->remove(FlowTpe);
+			else index.value()->operator[](FlowTpe) = Amt;
 		}
-		else
-			index.value()->insert(FlowTpe, Amt);
+		else {
+			if (qAbs(Amt) > 0.0 || m_Stocks.contains(FlowTpe)) index.value()->insert(FlowTpe, Amt);
+		}
 	}
 	else {
 		m_CashFlows.insert(Dte, new QHash<qint32, double>());
-		if (qAbs(Amt) >= 0.01) m_CashFlows[Dte]->insert(FlowTpe, Amt);
+		if (qAbs(Amt) > 0.0 || m_Stocks.contains(FlowTpe)) m_CashFlows[Dte]->insert(FlowTpe, Amt);
 	}
 }
 
 
 void GenericCashFlow::AddFlow(const GenericCashFlow& a) {
+	m_Stocks.unite(a.m_Stocks);
 	for (QMap<QDate, QHash<qint32, double>* >::const_iterator i = a.m_CashFlows.constBegin(); i != a.m_CashFlows.constEnd(); i++) {
-		QHash<qint32, double>* const & TempHash = i.value();
-		if (TempHash->isEmpty()) AddFlow(i.key(), 0.0, 0);
-		for (QHash<qint32, double>::const_iterator j = TempHash->constBegin(); j != TempHash->constEnd(); j++) {
+		if (i.value()->isEmpty()) AddFlow(i.key(), 0.0, 0);
+		for (QHash<qint32, double>::const_iterator j = i.value()->constBegin(); j != i.value()->constEnd(); j++) {
 			AddFlow(i.key(), j.value(), j.key());
 		}
 	}
 	for (auto i = a.m_CashFlowLabels.constBegin(); i != a.m_CashFlowLabels.constEnd(); ++i) {
 		if (!m_CashFlowLabels.contains(i.key())) m_CashFlowLabels.insert(i.key(), i.value());
 	}
+}
+void GenericCashFlow::SetFlow(const GenericCashFlow& a) {
+	Clear();
+	m_Stocks = a.m_Stocks;
+	m_CashFlowLabels = a.m_CashFlowLabels;
+	for (QMap<QDate, QHash<qint32, double>* >::const_iterator i = a.m_CashFlows.constBegin(); i != a.m_CashFlows.constEnd(); i++) {
+		if (i.value()->isEmpty()) SetFlow(i.key(), 0.0, 0);
+		for (QHash<qint32, double>::const_iterator j = i.value()->constBegin(); j != i.value()->constEnd(); j++) {
+			SetFlow(i.key(), j.value(), j.key());
+		}
+	}
+	
 }
 
 void GenericCashFlow::Clear() {
@@ -88,35 +112,28 @@ QDate GenericCashFlow::GetDate(int index) const {
 }
 
 double GenericCashFlow::GetFlow(const QDate& index, qint32 FlowTpe) const {
+	if (index.isNull()) return 0.0;
+	if (m_Stocks.contains(FlowTpe)) {
+		QMap<QDate, QHash<qint32, double>*	>::const_iterator FoundIt = m_CashFlows.constFind(index);
+		if (FoundIt == m_CashFlows.constEnd()) {
+			FoundIt = m_CashFlows.lowerBound(index);
+			if (FoundIt == m_CashFlows.constBegin()) return 0.0;
+			--FoundIt;
+		}
+		for (; true; --FoundIt) {
+			if (FoundIt.value()->contains(FlowTpe))
+				return FoundIt.value()->value(FlowTpe);
+			if (FoundIt == m_CashFlows.constBegin()) break;
+		}
+		return 0.0;
+	}
 	if (!m_CashFlows.contains(index)) return 0.0;
-	if (!m_CashFlows.value(index)->contains(FlowTpe)) return 0.0;
-	return m_CashFlows.value(index)->value(FlowTpe);
+	return m_CashFlows.value(index)->value(FlowTpe,0.0);
 }
 
 double GenericCashFlow::GetFlow(int index, qint32 FlowTpe) const {
-	if (index < 0 || index >= m_CashFlows.size()) return 0.0;
-	if (!(m_CashFlows.constBegin() + index).value()->contains(FlowTpe))  return 0.0;
-	return (m_CashFlows.constBegin() + index).value()->value(FlowTpe);
+	return GetFlow(GetDate(index), FlowTpe);
 }
-double GenericCashFlow::GetPreviousFlow(int index, qint32 FlowTpe) const {
-	if (m_CashFlows.isEmpty() || index < 0) return 0.0;
-	const QHash<qint32, double>* TempFlows;
-	if (index < 1 || index >= m_CashFlows.size())  TempFlows = (m_CashFlows.constEnd() - 1).value();
-	else  TempFlows = (m_CashFlows.constBegin() + index - 1).value();
-	if (!TempFlows->contains(FlowTpe))  return 0.0;
-	return TempFlows->value(FlowTpe);
-}
-
-double GenericCashFlow::GetPreviousFlow(const QDate& index, qint32 FlowTpe) const {
-	if (m_CashFlows.isEmpty() || index.isNull()) return 0.0;
-	QMap<QDate, QHash<qint32, double>*	>::const_iterator TempFind = m_CashFlows.find(index);
-	const QHash<qint32, double>* TempFlows;
-	if (TempFind == m_CashFlows.constEnd() || TempFind == m_CashFlows.constBegin())  TempFlows = (m_CashFlows.constEnd() - 1).value();
-	else TempFlows = (--TempFind).value();
-	if (!TempFlows->contains(FlowTpe))  return 0.0;
-	return TempFlows->value(FlowTpe);
-}
-
 
 int GenericCashFlow::FindDate(const QDate& a) const {
 	QMap<QDate, QHash<qint32, double>*	>::const_iterator TempFind = m_CashFlows.find(a);
@@ -146,7 +163,8 @@ void GenericCashFlow::Aggregate(CashFlowAggregation Freq) {
 				for (QHash<qint32, double>::const_iterator i = TempSecond->constBegin(); i != TempSecond->constEnd(); ++i) {
 					if (!TempMain->contains(i.key())) 
 						TempMain->insert(i.key(), 0.0); //Should never happen but just to be safe
-						TempMain->operator[](i.key()) += i.value();
+					if (m_Stocks.contains(i.key())) TempMain->operator[](i.key()) = i.value();
+					else TempMain->operator[](i.key()) += i.value();
 				}
 				delete (SecondIter.value());
 				SecondIter = m_CashFlows.erase(SecondIter);
@@ -179,7 +197,7 @@ bool GenericCashFlow::SamePeriod(const QDate& a, const QDate& b, CashFlowAggrega
 	}
 }
 QDataStream& operator<<(QDataStream & stream, const GenericCashFlow& flows) {
-	stream << flows.m_AdjustHolidays << flows.m_CashFlowLabels << static_cast<qint32>(flows.m_AggregationLevel) << static_cast<qint32>(flows.m_CashFlows.size());
+	stream << flows.m_AdjustHolidays << flows.m_CashFlowLabels << flows.m_Stocks << static_cast<qint32>(flows.m_AggregationLevel) << static_cast<qint32>(flows.m_CashFlows.size());
 	for (QMap<QDate, QHash<qint32, double>* >::const_iterator MainIter = flows.m_CashFlows.constBegin(); MainIter != flows.m_CashFlows.constEnd(); ++MainIter) {
 		const QHash<qint32, double>* TempMain = MainIter.value();
 		stream << MainIter.key() << (*TempMain);
@@ -191,7 +209,7 @@ QDataStream& GenericCashFlow::LoadOldVersion(QDataStream& stream) {
 	quint32 TempSize;
 	QDate TempDate;
 	QHash<qint32, double> TempMain;
-	stream >> m_AdjustHolidays >> m_CashFlowLabels >> TempSize;
+	stream >> m_AdjustHolidays >> m_CashFlowLabels >> m_Stocks >> TempSize;
 	m_AggregationLevel = static_cast<CashFlowAggregation>(TempSize);
 	stream >> TempSize;
 	for (quint32 i = 0; i < TempSize; i++) {
@@ -204,10 +222,8 @@ QDataStream& GenericCashFlow::LoadOldVersion(QDataStream& stream) {
 }
 
 GenericCashFlow& GenericCashFlow::operator=(const GenericCashFlow& a) {
-	Clear(); 
-	m_AggregationLevel = a.m_AggregationLevel;  
-	AddFlow(a); 
-	m_CashFlowLabels = a.m_CashFlowLabels;
+	Aggregate(a.m_AggregationLevel);  
+	SetFlow(a); 
 	return *this;
 }
 
@@ -267,17 +283,22 @@ GenericCashFlow GenericCashFlow::SingleFlow(qint32 FlowTpe) const {
 	GenericCashFlow Result;
 	Result.Aggregate(m_AggregationLevel);
 	for (QMap<QDate, QHash<qint32, double>* >::const_iterator MainIter = m_CashFlows.constBegin(); MainIter != m_CashFlows.constEnd(); ++MainIter) {
-		Result.AddFlow(MainIter.key(), MainIter.value()->value(FlowTpe, 0.0), FlowTpe);
+		Result.SetFlow(MainIter.key(), MainIter.value()->value(FlowTpe, 0.0), FlowTpe);
 	}
+	if (IsStock(FlowTpe)) Result.SetStock(FlowTpe);
+	if (m_CashFlowLabels.contains(FlowTpe)) Result.SetLabel(FlowTpe,m_CashFlowLabels.value(FlowTpe));
 	return Result;
 }
 GenericCashFlow GenericCashFlow::SingleDate(const QDate& a) const {
 	GenericCashFlow Result;
 	Result.Aggregate(m_AggregationLevel);
+	Result.m_Stocks = m_Stocks;
 	for (QMap<QDate, QHash<qint32, double>* >::const_iterator MainIter = m_CashFlows.constBegin(); MainIter != m_CashFlows.constEnd(); ++MainIter) {
 		if (SamePeriod(a, MainIter.key(), m_AggregationLevel)) {
 			for (auto SecondIter = MainIter.value()->constBegin(); SecondIter != MainIter.value()->constEnd(); ++SecondIter) {
-				Result.AddFlow(a, SecondIter.value(), SecondIter.key());
+				Result.SetFlow(a, SecondIter.value(), SecondIter.key());
+				if (m_CashFlowLabels.contains(SecondIter.key())) 
+					Result.SetLabel(SecondIter.key(), m_CashFlowLabels.value(SecondIter.key()));
 			}
 			return Result;
 		}
@@ -292,8 +313,8 @@ bool GenericCashFlow::HasFlowType(qint32 FlowTpe) const {
 }
 
 QList<qint32> GenericCashFlow::AvailableFlows(const QDate& a) const {
+	QSet<qint32> Result;
 	if (a.isNull()) {
-		QSet<qint32> Result;
 		for (auto i = m_CashFlows.constBegin(); i != m_CashFlows.constEnd(); ++i) {
 			for (auto j = i.value()->constBegin(); j != i.value()->constEnd(); ++j) {
 				Result.insert(j.key());
@@ -301,9 +322,17 @@ QList<qint32> GenericCashFlow::AvailableFlows(const QDate& a) const {
 		}
 		return Result.toList();
 	}
-	QMap<QDate, QHash<qint32, double>*	>::const_iterator TempIter = m_CashFlows.find(a);
-	if (TempIter == m_CashFlows.constEnd()) return QList<qint32>();
-	return TempIter.value()->keys();
+	
+	QMap<QDate, QHash<qint32, double>*	>::const_iterator TempIter = m_CashFlows.constFind(a);
+	if (TempIter != m_CashFlows.constEnd())
+		Result.unite(TempIter.value()->keys().toSet());
+	for (TempIter = m_CashFlows.constBegin(); TempIter != m_CashFlows.constEnd(); ++TempIter) {
+		if (TempIter.key() > a) break;
+		foreach(qint32 SingleStock, m_Stocks) {
+			if (TempIter.value()->contains(SingleStock)) Result.insert(SingleStock);
+		}
+	}
+	return Result.toList();
 }
 
 void GenericCashFlow::SetAdjustHolidays(bool val) {
@@ -319,7 +348,8 @@ void GenericCashFlow::SetAdjustHolidays(bool val) {
 }
 
 double GenericCashFlow::GetTotalFlow(const QDate& a, const QList<qint32>& Groups /*= QList<qint32>()*/) const {
-	QMap<QDate, QHash<qint32, double>*	>::const_iterator TempIter = m_CashFlows.find(a);
+	if (a.isNull()) return 0.0;
+	QMap<QDate, QHash<qint32, double>*	>::const_iterator TempIter = m_CashFlows.constFind(a);
 	if (TempIter == m_CashFlows.constEnd()) return 0.0;
 	double Result = 0.0;
 	for (QHash<qint32, double>::const_iterator i = TempIter.value()->constBegin(); i != TempIter.value()->constEnd(); ++i) {
@@ -328,13 +358,7 @@ double GenericCashFlow::GetTotalFlow(const QDate& a, const QList<qint32>& Groups
 	return Result;
 }
 double GenericCashFlow::GetTotalFlow(int index, const QList<qint32>& Groups /*= QList<qint32>()*/) const {
-	if (index < 0 || index >= m_CashFlows.size()) return 0.0;
-	QMap<QDate, QHash<qint32, double>*	>::const_iterator TempIter = m_CashFlows.constBegin()+index;
-	double Result = 0.0;
-	for (QHash<qint32, double>::const_iterator i = TempIter.value()->constBegin(); i != TempIter.value()->constEnd(); ++i) {
-		if (Groups.isEmpty() || Groups.contains(i.key())) Result += i.value();
-	}
-	return Result;
+	return GetTotalFlow(GetDate(index), Groups);
 }
 bool GenericCashFlow::IsEmpty() const {
 	for (QMap<QDate, QHash<qint32, double>* >::const_iterator i = m_CashFlows.constBegin(); i != m_CashFlows.constEnd(); ++i) {
@@ -345,10 +369,16 @@ bool GenericCashFlow::IsEmpty() const {
 
 GenericCashFlow GenericCashFlow::AggregateRange(const QDate& StartDate, const QDate& EndDate) const{
 	GenericCashFlow Results;
-	for (QMap<QDate, QHash<qint32, double>* >::const_iterator i = m_CashFlows.constBegin(); i != m_CashFlows.constEnd() && i.key()<=EndDate; ++i) {
+	Results.m_Stocks = m_Stocks;
+	Results.m_CashFlowLabels = m_CashFlowLabels;
+	Results.m_AdjustHolidays = m_AdjustHolidays;
+	Results.Aggregate(m_AggregationLevel);
+	for (QMap<QDate, QHash<qint32, double>* >::const_iterator i = m_CashFlows.constBegin(); i != m_CashFlows.constEnd(); ++i) {
+		if (i.key()>EndDate) break;
 		if (i.key() >= StartDate) {
 			for (QHash<qint32, double>::const_iterator j = i.value()->constBegin(); j != i.value()->constEnd(); ++j) {
-				Results.AddFlow(EndDate, j.value(), j.key());
+				if (m_Stocks.contains(j.key())) Results.SetFlow(EndDate, j.value(), j.key());
+				else Results.AddFlow(EndDate, j.value(), j.key());
 			}
 		}
 	}
@@ -365,7 +395,7 @@ GenericCashFlow GenericCashFlow::ScaledCashFlows(double OriginalRefSize, double 
 	GenericCashFlow Result;
 	Result.m_AdjustHolidays = m_AdjustHolidays;
 	Result.m_CashFlowLabels = m_CashFlowLabels;
-	Result.m_AggregationLevel = m_AggregationLevel;
+	Result.Aggregate(m_AggregationLevel);
 	if (ResultSize == 0 || OriginalRefSize == 0) return Result;
 	const double ScaleRatio = OriginalRefSize / ResultSize;
 	for (auto i = m_CashFlows.constBegin(); i != m_CashFlows.constEnd(); ++i) {
@@ -393,7 +423,7 @@ QString GenericCashFlow::ToPlainText(bool UseHeaders /*= true*/) const {
 	for (auto i = m_CashFlows.constBegin(); i != m_CashFlows.constEnd(); ++i) {
 		Result += '\n' + i.key().toString("yyyy-MM-dd");
 		for (auto j = AllFlows.constBegin(); j != AllFlows.constEnd(); ++j) {
-			Result += '\t' + QString::number(i.value()->value(*j, 0.0), 'f');
+			Result += '\t' + QString::number(GetFlow(i.key(), *j), 'f');
 		}
 	}
 	return Result;
@@ -414,30 +444,13 @@ QString GenericCashFlow::ToXML() const {
 		for (auto i = m_CashFlows.constBegin(); i != m_CashFlows.constEnd(); ++i) {
 			Writer.writeStartElement("SingleFlow");
 			Writer.writeTextElement("Date", i.key().toString("yyyy-MM-dd"));
-			Writer.writeTextElement("Amount", QString::number(i.value()->value(*j, 0.0), 'f', 2));
+			Writer.writeTextElement("Amount", QString::number(GetFlow(i.key(), *j), 'f', 2));
 			Writer.writeEndElement();
 		}
 		Writer.writeEndElement();
 	}
 	Writer.writeEndElement();
 	return Result;
-
-	/*QString Result="<CashFlow>";
-	auto AllFlows = AvailableFlows();
-	qSort(AllFlows);
-	for (auto j = AllFlows.constBegin(); j != AllFlows.constEnd(); ++j) {
-		Result += QString("<Flow id='%1'>").arg(*j);
-		if (m_CashFlowLabels.contains(*j)) Result += "<Label>" + ConvertValidXML(m_CashFlowLabels.value(*j)) + "</Label>";
-		else Result += "<Label />";
-		for (auto i = m_CashFlows.constBegin(); i != m_CashFlows.constEnd(); ++i) {
-			Result += "<SingleFlow>";
-			Result += "<Date>" + i.key().toString("yyyy-MM-dd") + "</Date>";
-			Result += "<Amount>" + QString::number(i.value()->value(*j,0.0),'f',2) + "</Amount>";
-			Result += "</SingleFlow>";
-		}
-		Result += "</Flow>";
-	}
-	return Result + "</CashFlow>";*/
 }
 
 void GenericCashFlow::LoadFromXML(const QString& Source) {
@@ -522,4 +535,9 @@ void GenericCashFlow::LoadFromXML(const QString& Source) {
 		Clear();
 	}
 	xml.clear();
+}
+
+void GenericCashFlow::SetLabel(qint32 FlowTpe, const QString& Lab) {
+	if (Lab.isEmpty()) m_CashFlowLabels.remove(FlowTpe);
+	else m_CashFlowLabels[FlowTpe] = Lab;
 }

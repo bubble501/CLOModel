@@ -28,7 +28,22 @@
 #include "FloorCapVector.h"
 int main(int argc, char *argv[]) {
 
-
+	GenericCashFlow Testing;
+	Testing.SetLabel(0, "Out");
+	Testing.SetLabel(1, "Princ");
+	Testing.SetLabel(2, "Intr");
+	Testing.SetStock(0);
+	Testing.AddFlow(QDate(2014, 5, 15), 1000000.0, 0);
+	for (auto i = QDate(2014, 6, 15); i < QDate(2020, 6, 15); i = i.addMonths(1)) {
+		Testing.AddFlow(i, 500.0, 2);
+		if (i == QDate(2016, 6, 15)) {
+			Testing.AddFlow(i, -500000.0, 0);
+			Testing.AddFlow(i, 500000.0, 1);
+		}
+	}
+	Testing.AddFlow(QDate(2020, 6, 15), 500000.0, 1);
+	Testing.AddFlow(QDate(2020, 6, 15), -500000.0, 0);
+	PrintToTempFile("TestStockFlow", Testing.ToPlainText(true), false);
 	/*QApplication a(argc, argv);
 	WaterfallStepHelperDialog b;
 	if (b.exec()==QDialog::Accepted) {
@@ -43,7 +58,7 @@ int main(int argc, char *argv[]) {
 	b.LoadStress("C:/Temp/StressResult.fcsr");
 	return a.exec();*/
 
-	Waterfall TempWtf, TempCallWaterfall;
+	/*Waterfall TempWtf, TempCallWaterfall;
 	QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/BaseCase.clo");
 	//QFile file("C:/Temp/.SavedInputs.clo");
 	file.open(QIODevice::ReadOnly);
@@ -61,11 +76,7 @@ int main(int argc, char *argv[]) {
 	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempCallWaterfall;
 	file.close();
-	
-	TrancheCashFlow TestXmlImport;
-	TestXmlImport.LoadFromXML(TempWtf.GetTranche(0)->GetCashFlow().ToXML());
-	PrintToTempFile("TestXML", TestXmlImport.ToPlainText(), false);
-	TempWtf.CalculateTranchesCashFlows();
+	TempWtf.CalculateTranchesCashFlows();*/
 
 	/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	QApplication a(argc, argv);

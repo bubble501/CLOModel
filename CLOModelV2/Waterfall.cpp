@@ -89,7 +89,6 @@ Waterfall::Waterfall()
 	m_TotalJuniorFees.Aggregate(GenericCashFlow::Monthly);
 	m_AnnualizedExcess.Aggregate(GenericCashFlow::Monthly);
 	m_EquityIncome.Aggregate(GenericCashFlow::Monthly);
-	m_Reinvested.Aggregate(GenericCashFlow::Monthly);
 
 	m_SeniorExpensesFixed.SetDivisor(1.0);
 	m_SeniorFeesFixed.SetDivisor(1.0);
@@ -114,7 +113,6 @@ Waterfall::Waterfall(const Waterfall& a)
 	,m_JuniorFeesCoupon(a.m_JuniorFeesCoupon)
 	,m_AnnualizedExcess(a.m_AnnualizedExcess)
 	,m_FirstIPDdate(a.m_FirstIPDdate)
-	,m_Reinvested(a.m_Reinvested)
 	,m_LastIPDdate(a.m_LastIPDdate)
 	,m_CallDate(a.m_CallDate)
 	,m_PoolValueAtCall(a.m_PoolValueAtCall)
@@ -189,7 +187,6 @@ Waterfall& Waterfall::operator=(const Waterfall& a){
 	m_JuniorFeesCoupon=a.m_JuniorFeesCoupon;
 	m_AnnualizedExcess=a.m_AnnualizedExcess;
 	m_FirstIPDdate=a.m_FirstIPDdate;
-	m_Reinvested=a.m_Reinvested;
 	m_LastIPDdate=a.m_LastIPDdate;
 	m_CallDate=a.m_CallDate;
 	m_PoolValueAtCall=a.m_PoolValueAtCall;
@@ -654,36 +651,34 @@ bool Waterfall::CalculateTranchesCashFlows(){
 				}
 			}
 		}
-		QDate ActualCallDate;
+		QDate ActualCallDate; //Date in Loans Flow that is the limit for the call
 		m_CalledPeriod = QDate();
 		m_TriggersResults.ClearResults();
-		PrincipalRecip AvailablePrincipal;
-		double AvailableInterest;
-		double TotalPayable;
-		QQueue<int> ProRataBonds;
-		double TestTarget;
-		//int CurrentSeniority;
-		double Solution;
-		int SolutionDegree;
-		double CurrentAssetSum=0.0;
-		int CurrentAssetCount=0;
-		double AdjustedCoupon;
-		double InterestPayableBefore;
+		PrincipalRecip AvailablePrincipal; //Principal Available during an IPD
+		double AvailableInterest; //Interest Available during an IPD
+		double TotalPayable; // Temp Variable
+		QQueue<int> ProRataBonds; //Queue filled with all the bonds that should be considered pro rata
+		double TestTarget;// Temp Variable
+		double Solution;// Temp Variable
+		int SolutionDegree;// Temp Variable
+		double CurrentAssetSum=0.0; //Sum of the AUM between 2 IPDs, used when calculating fees based on avg AUM
+		int CurrentAssetCount=0; //Count of months between 2 IPDs, used when calculating fees based on avg AUM
+		double AdjustedCoupon; //De-annualized interest rate 
+		double InterestPayableBefore;// Temp Variable
 		QDate RollingNextIPD=m_FirstIPDdate;
 		QDate RollingLastIPD=m_LastIPDdate;
-		double adjSeniorExpenses;
-		double adjSeniorFees;
-		double adjJuniorFees;
-		double OriginalAvailableInterest=m_InterestAvailable;
-		PrincipalRecip OriginalAvailablePrincipal=m_PrincipalAvailable;
-		double OriginalStartingDefJunFees = m_StartingDeferredJunFees;
-		double* OriginalReserveLevel;
-		bool IsCallPaymentDate=false;
-		double ActualCallReserveLevel=0.0;
-		QDate CurrentDate;
-		int PeriodsCounter=0;
-		MtgCashFlow OriginalMtgFlows=m_MortgagesPayments;
-		double* OriginalStartingDeferred = new double[m_Tranches.size()];
+		double adjSeniorExpenses;//De-annualized Senior Expenses
+		double adjSeniorFees;//De-annualized Senior Fees 
+		double adjJuniorFees;//De-annualized Junior Fees 
+		double OriginalAvailableInterest=m_InterestAvailable; //Stores the interest cash
+		PrincipalRecip OriginalAvailablePrincipal=m_PrincipalAvailable; //Stores the Principal cash
+		double OriginalStartingDefJunFees = m_StartingDeferredJunFees; //Stores the current deferred junior fees
+		bool IsCallPaymentDate=false; //Stores if the current date is the call date
+		double ActualCallReserveLevel=0.0;// Temp Variable used for call calculation
+		//QDate CurrentDate;
+		bool IsMaturityDate = false;  //Stores if the current date is the maturity date of the notes
+		MtgCashFlow OriginalMtgFlows=m_MortgagesPayments; //Stores the loans cash flows before reinvestments
+		double* OriginalStartingDeferred = new double[m_Tranches.size()]; //Stores the current tranches deferred interest
 		for (int i = 0; i < m_Tranches.size(); ++i) {
 			OriginalStartingDeferred[i] = m_Tranches.at(i)->GetStartingDeferredInterest();
 		}
@@ -693,8 +688,8 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		m_TotalJuniorFees.Clear();
 		m_AnnualizedExcess.Clear();
 		m_EquityIncome.Clear();
-		m_Reinvested.Clear();
-		bool NullCCCanchor[]={
+		m_ReinvestmentTest.ClearFlows();
+		bool NullCCCanchor[]={ //Stores whether the vectors have anchors or not
 			m_CCCcurve.GetAnchorDate().isNull()
 			,m_PaymentFrequency.GetAnchorDate().isNull()
 			, m_SeniorExpenses.GetAnchorDate().isNull()
@@ -723,23 +718,50 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		foreach(WatFalPrior* SingleStp, m_WaterfallStesps) {
 			SingleStp->FillMissingAnchors(m_MortgagesPayments.GetDate(0));
 		}
-		for(int i=0;i<m_MortgagesPayments.Count();i++){
-			CurrentDate=m_MortgagesPayments.GetDate(i);
-			if (i > 0) {
-				CurrentAssetSum += m_MortgagesPayments.GetAmountOut(i-1);
+		for (QDate CurrentDate = m_MortgagesPayments.GetDate(0); !IsMaturityDate; CurrentDate = CurrentDate.addMonths(1)) {
+			int CurrentPeriodIndex = MonthDiff(CurrentDate, m_MortgagesPayments.GetDate(0));
+			if (CurrentDate>m_MortgagesPayments.MaturityDate() && (
+				m_LegalFinal.isNull()
+				|| m_ReinvestmentTest.ReinvestQueueueEmpty()
+			)) IsMaturityDate = true;
+			if (!m_LegalFinal.isNull() && CurrentDate >= m_LegalFinal)  IsMaturityDate = true;
+			if (!IsMaturityDate && m_MortgagesPayments.FindDate(CurrentDate) < 0) m_MortgagesPayments.AddFlow(CurrentDate, 0, 0);
+			if (IsMaturityDate) {
+				//Everything after maturity date comes in as cash
+				/*for (QDate Rollingdt = CurrentDate; Rollingdt <= m_MortgagesPayments.MaturityDate(); Rollingdt = Rollingdt.addMonths(1)) {
+					m_PrincipalAvailable.AddPrepay(m_MortgagesPayments.GetPrepay(Rollingdt));
+					m_PrincipalAvailable.AddScheduled(m_MortgagesPayments.GetScheduled(Rollingdt));
+					m_InterestAvailable+=m_MortgagesPayments.GetInterest(Rollingdt);
+				}*/
+				m_PrincipalAvailable.AddPrepay(m_ReinvestmentTest.GetQueuedCash());
+				m_ReinvestmentTest.ResetReinvestQueueue();
+			}
+			else {
+				//Process the current reinvestments
+				const MtgCashFlow& ReinvFlows = m_ReinvestmentTest.ProcessQueue(CurrentDate, CurrentPeriodIndex,m_LegalFinal);
+				if (!ReinvFlows.IsEmpty()) {
+					m_MortgagesPayments.AddFlow(ReinvFlows);
+					m_InterestAvailable += ReinvFlows.GetInterest(CurrentDate);
+					m_PrincipalAvailable.AddScheduled(ReinvFlows.GetScheduled(CurrentDate));
+					m_PrincipalAvailable.AddPrepay(ReinvFlows.GetPrepay(CurrentDate));
+				}
+			}
+			if (CurrentDate > m_MortgagesPayments.GetDate(0)) {
+				CurrentAssetSum += m_MortgagesPayments.GetAmountOut(CurrentDate.addMonths(-1)) + m_ReinvestmentTest.GetQueuedCash();
 				++CurrentAssetCount;
-				TotalPayable = AdjustCoupon(m_GICinterest.GetValue(CurrentDate) + m_GICBaseRateValue.GetValue(CurrentDate), m_MortgagesPayments.GetDate(i - 1), m_MortgagesPayments.GetDate(i), m_DealDayCountConvention.GetValue(CurrentDate));
+				TotalPayable = AdjustCoupon(m_GICinterest.GetValue(CurrentDate) + m_GICBaseRateValue.GetValue(CurrentDate), CurrentDate.addMonths(-1), CurrentDate, m_DealDayCountConvention.GetValue(CurrentDate));
 				m_GICflows.AddFlow(CurrentDate, m_InterestAvailable*TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
 				m_GICflows.AddFlow(CurrentDate, m_PrincipalAvailable.GetScheduled()*TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
 				m_GICflows.AddFlow(CurrentDate, m_PrincipalAvailable.GetPrepay()*TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
+				m_GICflows.AddFlow(CurrentDate, m_ReinvestmentTest.GetQueuedCash()*TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
 				foreach(const ReserveFund* SingleRes, m_Reserves) {
 					m_GICflows.AddFlow(CurrentDate, SingleRes->GetReserveFundCurrent()*TotalPayable, 1+static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
 				}
 				m_InterestAvailable +=m_GICflows.GetTotalFlow(CurrentDate);
 			}
-			m_PrincipalAvailable.AddScheduled(m_MortgagesPayments.GetScheduled(i));
-			m_PrincipalAvailable.AddPrepay(m_MortgagesPayments.GetPrepay(i));
-			m_InterestAvailable+=m_MortgagesPayments.GetInterest(i);
+			m_PrincipalAvailable.AddScheduled(m_MortgagesPayments.GetScheduled(CurrentDate));
+			m_PrincipalAvailable.AddPrepay(m_MortgagesPayments.GetPrepay(CurrentDate));
+			m_InterestAvailable += m_MortgagesPayments.GetInterest(CurrentDate);
 			if(m_UseCall && !IsCallPaymentDate){
 				ActualCallReserveLevel=0.0;
 				TotalPayable=0.0;
@@ -754,15 +776,23 @@ bool Waterfall::CalculateTranchesCashFlows(){
 							ActualCallReserveLevel += (*ResIter)->GetReserveFundCurrent();
 					}
 					ActualCallReserveLevel*=m_CallMultiple;
-					IsCallPaymentDate=ActualCallReserveLevel>=TotalPayable-m_PrincipalAvailable.Total();
+					IsCallPaymentDate=ActualCallReserveLevel>=(TotalPayable-m_PrincipalAvailable.Total());
 				}
 				IsCallPaymentDate= IsCallPaymentDate || (!m_CallDate.isNull() && CurrentDate>=m_CallDate);
 			}
-			if((CurrentDate.year()<RollingNextIPD.year() || (CurrentDate.year()==RollingNextIPD.year() && CurrentDate.month()<RollingNextIPD.month())) && i<m_MortgagesPayments.Count()-1){
+
+			if((CurrentDate.year()<RollingNextIPD.year() || (CurrentDate.year()==RollingNextIPD.year() && CurrentDate.month()<RollingNextIPD.month())) && !IsMaturityDate){
 				//This is not a Tranche payment date
 				foreach(const WatFalPrior* SingleStep,m_WaterfallStesps){
 					if(SingleStep->GetPriorityType()==WatFalPrior::WaterfallStepType::wst_ReinvestPrincipal){
-						if (TriggerPassing(SingleStep->GetParameter(WatFalPrior::wstParameters::Trigger).toString(), i, RollingNextIPD, IsCallPaymentDate) && !IsCallPaymentDate && i<m_MortgagesPayments.Count() - 1) {
+						if (
+							(
+								!SingleStep->HasParameter(WatFalPrior::wstParameters::Trigger)
+								||TriggerPassing(SingleStep->GetParameter(WatFalPrior::wstParameters::Trigger).toString(), CurrentPeriodIndex, RollingNextIPD, IsCallPaymentDate || IsMaturityDate) 
+							)
+							&& !IsCallPaymentDate 
+							&& !IsMaturityDate
+							) {
 							//If it should, reinvest
 							if (m_PrincipalAvailable.Total() > 0.0) {
 								double PayablePrincipal;
@@ -778,12 +808,18 @@ bool Waterfall::CalculateTranchesCashFlows(){
 									PayablePrincipal = m_PrincipalAvailable.Total()*SingleStep->GetParameter(WatFalPrior::wstParameters::AdditionalCollateralShare).value<BloombergVector>().GetValue(CurrentDate);
 									m_PrincipalAvailable -= PayablePrincipal;
 								}
-								m_ReinvestmentTest.CalculateBondCashFlows(PayablePrincipal, CurrentDate, i);
-								m_MortgagesPayments.AddFlow(m_ReinvestmentTest.GetBondCashFlow());
-								m_Reinvested.AddFlow(CurrentDate, PayablePrincipal, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
-								m_InterestAvailable += m_ReinvestmentTest.GetBondCashFlow().GetInterest(CurrentDate);
-								m_PrincipalAvailable.AddScheduled(m_ReinvestmentTest.GetBondCashFlow().GetScheduled(CurrentDate));
-								m_PrincipalAvailable.AddPrepay(m_ReinvestmentTest.GetBondCashFlow().GetPrepay(CurrentDate));
+								
+								{
+									//Fill the reinvestments queue and process the current reinvestments
+									m_ReinvestmentTest.QueueReinvestments(PayablePrincipal, CurrentDate);
+									const MtgCashFlow& ReinvFlows = m_ReinvestmentTest.ProcessQueue(CurrentDate, CurrentPeriodIndex, m_LegalFinal);
+									if (!ReinvFlows.IsEmpty()){
+										m_MortgagesPayments.AddFlow(ReinvFlows);
+										m_InterestAvailable += ReinvFlows.GetInterest(CurrentDate);
+										m_PrincipalAvailable.AddScheduled(ReinvFlows.GetScheduled(CurrentDate));
+										m_PrincipalAvailable.AddPrepay(ReinvFlows.GetPrepay(CurrentDate));
+									}
+								}								
 							}
 						}
 					}
@@ -802,14 +838,14 @@ bool Waterfall::CalculateTranchesCashFlows(){
 				m_CalledPeriod = RollingNextIPD;
 				ActualCallDate = CurrentDate;
 				if (m_PoolValueAtCall.IsEmpty())
-					TotalPayable = m_MortgagesPayments.GetWAPrice(i);
+					TotalPayable = m_MortgagesPayments.GetWAPrice(CurrentDate);
 				else
 					TotalPayable = m_PoolValueAtCall.GetValue(CurrentDate);
-				AvailablePrincipal += TotalPayable*m_MortgagesPayments.GetAmountOut(i);
+				AvailablePrincipal += TotalPayable*m_MortgagesPayments.GetAmountOut(CurrentDate);
 			}
 			foreach(WatFalPrior* SingleStep,m_WaterfallStesps){//Cycle through the steps of the waterfall
 				if (SingleStep->HasParameter(WatFalPrior::wstParameters::Trigger)) {
-					if (!TriggerPassing(SingleStep->GetParameter(WatFalPrior::wstParameters::Trigger).toString(), i, RollingNextIPD, IsCallPaymentDate)) 
+					if (!TriggerPassing(SingleStep->GetParameter(WatFalPrior::wstParameters::Trigger).toString(), CurrentPeriodIndex, RollingNextIPD, IsCallPaymentDate || IsMaturityDate))
 						continue;
 				}
 				switch(SingleStep->GetPriorityType()){
@@ -919,7 +955,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 									FreedAmnt+=m_Tranches.at(h)->GetCurrentOutstanding();
 							}
 						}
-						if(i<m_MortgagesPayments.Count()-1 && !IsCallPaymentDate && FreedAmnt>0.01){
+						if(!IsCallPaymentDate && !IsMaturityDate &&  FreedAmnt>0.01){
 							TestTarget=0.0;
 							if (qRound(m_Reserves.at(RevIdx)->GetReserveFundTarget().GetValue(CurrentDate))>MostJun) TestTarget = m_Reserves.at(RevIdx)->GetReserveFundTarget().GetValue(CurrentDate);
 							else{
@@ -1202,8 +1238,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 							}
 						}
 					}
-					LOGDEBUG(QString("TotalSenior: %1\nCollateral: %2\nCurrnet Out: %3").arg(TotalPayable).arg(m_MortgagesPayments.GetAmountOut(i) + AvailablePrincipal.Total()).arg(TestTarget));
-					Solution = qMin(TotalPayable - m_MortgagesPayments.GetAmountOut(i) - AvailablePrincipal.Total(), TestTarget);
+					Solution = qMin(TotalPayable - m_MortgagesPayments.GetAmountOut(CurrentDate) - AvailablePrincipal.Total(), TestTarget);
 					if (Solution >= 0.01) {
 						foreach(const int& SingleBond, ProRataBonds) {
 							m_Tranches[SingleBond]->AddCashFlow(CurrentDate, qMax(0.0, Solution - AvailableInterest)* m_Tranches.at(SingleBond)->GetCurrentOutstanding() / TestTarget, TrancheCashFlow::TrancheFlowType::PDLOutstanding);
@@ -1252,10 +1287,10 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					}
 					//CCC test
 					if (m_CCCcurve.GetValue(CurrentDate)>m_CCCTestLimit)
-						Solution = (1.0 - ((m_CCCcurve.GetValue(CurrentDate) - m_CCCTestLimit)*m_CCChaircut))*m_MortgagesPayments.GetOutstandingForOC(i);
+						Solution = (1.0 - ((m_CCCcurve.GetValue(CurrentDate) - m_CCCTestLimit)*m_CCChaircut))*m_MortgagesPayments.GetOutstandingForOC(CurrentDate);
 					else
-						Solution = m_MortgagesPayments.GetOutstandingForOC(i);
-					Solution += AvailablePrincipal.Total();
+						Solution = m_MortgagesPayments.GetOutstandingForOC(CurrentDate);
+					Solution += AvailablePrincipal.Total() + m_ReinvestmentTest.GetQueuedCash();
 					
 					if (Solution + TotalPayable<=0.0) continue; 
 					if (Solution == 0.0) Solution = 1.0;
@@ -1279,7 +1314,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						double CurrAddColShare = SingleStep->GetParameter(WatFalPrior::wstParameters::AdditionalCollateralShare).value<BloombergVector>().GetValue(CurrentDate);
 						double CurrentRedemptionShare = SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionShare).value<BloombergVector>().GetValue(CurrentDate);
 						double NeedToCure;
-						if (IsCallPaymentDate || i == m_MortgagesPayments.Count() - 1) CurrAddColShare = 0.0;
+						if (IsCallPaymentDate || IsMaturityDate) CurrAddColShare = 0.0;
 						if (CurrAddColShare + (CurrentRedemptionShare*TestTarget) == 0.0) {
 							PrintToTempFile("ReturnFalse.txt", "OC cure denominator is 0");
 							return false;
@@ -1299,18 +1334,16 @@ bool Waterfall::CalculateTranchesCashFlows(){
 							AvailablePrincipal -= FundsToRedemption + FundsToCollateral;
 						}
 						//reinvest
-						if (TotalPayable > 0.0) {
-							m_ReinvestmentTest.CalculateBondCashFlows(FundsToCollateral, CurrentDate, i);
-							m_MortgagesPayments.AddFlow(m_ReinvestmentTest.GetBondCashFlow());
-							m_Reinvested.AddFlow(CurrentDate, FundsToCollateral,
-								(SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 1 ?
-								static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow)
-								: static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow)
-								)
-								);
-							AvailableInterest += m_ReinvestmentTest.GetBondCashFlow().GetInterest(CurrentDate);
-							AvailablePrincipal.AddScheduled(m_ReinvestmentTest.GetBondCashFlow().GetScheduled(CurrentDate));
-							AvailablePrincipal.AddPrepay(m_ReinvestmentTest.GetBondCashFlow().GetPrepay(CurrentDate));
+						if (TotalPayable > 0.0 ) {
+							//Fill the reinvestments queue and process the current reinvestments
+							m_ReinvestmentTest.QueueReinvestments(FundsToCollateral, CurrentDate);
+							const MtgCashFlow& ReinvFlows = m_ReinvestmentTest.ProcessQueue(CurrentDate, CurrentPeriodIndex, m_LegalFinal);
+							if (!ReinvFlows.IsEmpty()) {
+								m_MortgagesPayments.AddFlow(ReinvFlows);
+								AvailableInterest += ReinvFlows.GetInterest(CurrentDate);
+								AvailablePrincipal.AddScheduled(ReinvFlows.GetScheduled(CurrentDate));
+								AvailablePrincipal.AddPrepay(ReinvFlows.GetPrepay(CurrentDate));
+							}
 						}
 						//Redeem
 						if (!SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroup).value<IntegerVector>().IsEmpty()) {
@@ -1342,7 +1375,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					adjSeniorFees = AdjustCoupon(m_SeniorFees.GetValue(CurrentDate), RollingNextIPD, RollingNextIPD.addMonths(m_PaymentFrequency.GetValue(RollingNextIPD)), m_DealDayCountConvention.GetValue(CurrentDate));
 					ProRataBonds.clear();
 					TotalPayable = 0.0;
-					Solution = m_InterestAvailable + m_MortgagesPayments.GetAccruedInterest(i) - ((adjSeniorFees + adjSeniorExpenses)*(CurrentAssetSum / static_cast<double>(CurrentAssetCount))) - m_SeniorExpensesFixed.GetValue(CurrentDate) - m_SeniorFeesFixed.GetValue(CurrentDate);
+					Solution = m_InterestAvailable + m_MortgagesPayments.GetAccruedInterest(CurrentDate) - ((adjSeniorFees + adjSeniorExpenses)*(CurrentAssetSum / static_cast<double>(CurrentAssetCount))) - m_SeniorExpensesFixed.GetValue(CurrentDate) - m_SeniorFeesFixed.GetValue(CurrentDate);
 					for (int h = 0; h < m_Tranches.size(); h++) {
 						if (m_Tranches.at(h)->GetProrataGroup(CurrSenGrpLvl) <= CurrSenGrp) {
 							if (!m_Tranches.at(h)->HasCoupon(CurrCoupIndx)) {
@@ -1371,7 +1404,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					//if it fails redeem senior notes until cured
 					if (Solution / TotalPayable < TestTarget && ((AvailablePrincipal.Total()>0.0 && SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 2) || (AvailableInterest > 0 && SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 1))) {
 						SolutionDegree = 1;
-						InterestPayableBefore = (m_InterestAvailable + m_MortgagesPayments.GetAccruedInterest(i) - ((adjSeniorExpenses + adjSeniorFees) * (CurrentAssetSum / static_cast<double>(CurrentAssetCount))) - m_SeniorExpensesFixed.GetValue(CurrentDate) - m_SeniorFeesFixed.GetValue(CurrentDate)) / TestTarget;
+						InterestPayableBefore = (m_InterestAvailable + m_MortgagesPayments.GetAccruedInterest(CurrentDate) - ((adjSeniorExpenses + adjSeniorFees) * (CurrentAssetSum / static_cast<double>(CurrentAssetCount))) - m_SeniorExpensesFixed.GetValue(CurrentDate) - m_SeniorFeesFixed.GetValue(CurrentDate)) / TestTarget;
 						TotalPayable = 0;
 						bool SolutionFound;
 						do {
@@ -1402,7 +1435,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 				break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				case WatFalPrior::WaterfallStepType::wst_ReinvestPrincipal:
-					if (!IsCallPaymentDate && i<m_MortgagesPayments.Count()-1) {
+					if (!IsCallPaymentDate && !IsMaturityDate) {
 						if(AvailablePrincipal.Total()>0.0){
 							double PayablePrincipal;
 							if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 1) {  //Reinvest Prepay Only
@@ -1417,12 +1450,15 @@ bool Waterfall::CalculateTranchesCashFlows(){
 								PayablePrincipal = AvailablePrincipal.Total()*SingleStep->GetParameter(WatFalPrior::wstParameters::AdditionalCollateralShare).value<BloombergVector>().GetValue(CurrentDate);
 								AvailablePrincipal -= PayablePrincipal;
 							}
-							m_ReinvestmentTest.CalculateBondCashFlows(PayablePrincipal, CurrentDate, i);
-							m_MortgagesPayments.AddFlow(m_ReinvestmentTest.GetBondCashFlow());
-							m_Reinvested.AddFlow(CurrentDate, PayablePrincipal, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
-							AvailableInterest+=m_ReinvestmentTest.GetBondCashFlow().GetInterest(CurrentDate);
-							AvailablePrincipal.AddScheduled(m_ReinvestmentTest.GetBondCashFlow().GetScheduled(CurrentDate));
-							AvailablePrincipal.AddPrepay(m_ReinvestmentTest.GetBondCashFlow().GetPrepay(CurrentDate));
+							//Fill the reinvestments queue and process the current reinvestments
+							m_ReinvestmentTest.QueueReinvestments(PayablePrincipal, CurrentDate);
+							const MtgCashFlow& ReinvFlows = m_ReinvestmentTest.ProcessQueue(CurrentDate, CurrentPeriodIndex, m_LegalFinal);
+							if (!ReinvFlows.IsEmpty()) {
+								m_MortgagesPayments.AddFlow(ReinvFlows);
+								AvailableInterest += ReinvFlows.GetInterest(CurrentDate);
+								AvailablePrincipal.AddScheduled(ReinvFlows.GetScheduled(CurrentDate));
+								AvailablePrincipal.AddPrepay(ReinvFlows.GetPrepay(CurrentDate));
+							}
 						}
 					}	
 				break;
@@ -1445,7 +1481,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 			RollingLastIPD=RollingNextIPD;
 			RollingNextIPD=RollingNextIPD.addMonths(m_PaymentFrequency.GetValue(RollingNextIPD));
 			if(IsCallPaymentDate){
-				i++;
+				//i++;
 				break;
 			}
 		}//End Cycle in time
@@ -1518,7 +1554,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		CheckResults -= m_PrincipalAvailable.Total();
 		LOGDEBUG(QString("After Principal:\t%1").arg(CheckResults,0,'f'));
 		// Use of funds
-		CheckTranCashFlow.Clear(); CheckTranCashFlow.AddFlow(m_Reinvested); CheckResults += CheckTranCashFlow.GetTotalFlow(0);
+		CheckTranCashFlow.Clear(); CheckTranCashFlow.AddFlow(m_ReinvestmentTest.GetReinvested()); CheckResults += CheckTranCashFlow.GetTotalFlow(0);
 		LOGDEBUG(QString("After Reinvestments:\t%1").arg(CheckResults,0,'f'));
 		CheckTranCashFlow.Clear(); CheckTranCashFlow.AddFlow(m_TotalSeniorExpenses); CheckResults += CheckTranCashFlow.GetTotalFlow(0);
 		LOGDEBUG(QString("After Senior Expenses:\t%1").arg(CheckResults,0,'f'));
@@ -1569,9 +1605,9 @@ QDataStream& operator<<(QDataStream & stream, const Waterfall& flows){
 		<< flows.m_AnnualizedExcess
 		<< flows.m_EquityIncome
 		<< flows.m_FirstIPDdate
-		<< flows.m_Reinvested
 		<< flows.m_LastIPDdate
 		<< flows.m_CallDate
+		<< flows.m_LegalFinal
 		<< flows.m_PoolValueAtCall
 		<< flows.m_UseCall
 		<< flows.m_CallMultiple
@@ -1640,9 +1676,7 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream){
 	m_AnnualizedExcess.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_AnnualizedExcess;
 	m_EquityIncome.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_EquityIncome;
 	stream >> m_FirstIPDdate;
-	m_Reinvested.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_Reinvested;
-	stream >> m_LastIPDdate
-		>> m_CallDate;
+	stream >> m_LastIPDdate >> m_CallDate >> m_LegalFinal;
 	m_PoolValueAtCall.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_PoolValueAtCall;
 	stream >> m_UseCall
 		>> m_CallMultiple
@@ -1734,12 +1768,12 @@ QString Waterfall::ReadyToCalculate()const{
 	if (BloombergVector(m_ReinvestmentTest.GetCPRAssumption()).IsEmpty(0.0, 1.0))Result += "CPR\n";
 	if (BloombergVector(m_ReinvestmentTest.GetLSAssumption()).IsEmpty(0.0, 1.0))Result += "LS\n";
 	if (BloombergVector(m_ReinvestmentTest.GetWALAssumption()).IsEmpty(0.0))Result += "Reinvestment Bond WAL\n";
-	if (BloombergVector(m_ReinvestmentTest.GetReinvDelay()).IsEmpty(0.0))Result += "Reinvestment Delay\n";
+	if (m_ReinvestmentTest.GetReinvDelay().IsEmpty(0.0))Result += "Reinvestment Delay\n";
 	if (BloombergVector(m_ReinvestmentTest.GetReinvPrice()).IsEmpty(0.0))Result += "Reinvestment Price\n";
 	if (m_ReinvestmentTest.GetReinvestmentPeriod() < QDate(2000, 1, 1))Result += "Reinvestment Period\n";
 	if (m_ReinvestmentTest.GetReinvestmentBond().GetPaymentFreq().IsEmpty(1)) Result += "Reinvestment Bond Payment Frequency\n";
 	if (m_ReinvestmentTest.GetReinvestmentBond().GetInterest().isEmpty())Result += "Reinvestment Bond Spread\n";
-	if (IntegerVector(m_ReinvestmentTest.GetReinvestmentSpreadOverTime()).IsEmpty(1)) Result += "Reinvestment Spread Over Time\n";
+	if (m_ReinvestmentTest.GetReinvestmentSpreadOverTime().IsEmpty(1)) Result += "Reinvestment Spread Over Time\n";
 	if (m_CCCcurve.IsEmpty(0.0,1.0))Result += "CCC Curve\n";
 	if (m_CCChaircut < 0.0 || m_CCChaircut>1.0)Result += "CCC Value\n";
 	if (m_PoolValueAtCall.IsEmpty(0.0) && !m_PoolValueAtCall.IsEmpty()) Result += "Pool Value at Call\n";
@@ -1989,7 +2023,7 @@ bool Waterfall::TriggerPassing(const QString& TriggerStructure, int PeriodIndex,
 			pos += SignleTriggers.matchedLength();
 		}
 	}
-	if (CapturedTriggers.isEmpty()) return false;
+	//if (CapturedTriggers.isEmpty()) return false;
 	for (auto i = CapturedTriggers.constBegin(); i != CapturedTriggers.constEnd(); ++i) {
 		quint32 CurrentTrigger = i->toUInt();
 		if (!m_Triggers.contains(CurrentTrigger)) 	return false;
@@ -2020,6 +2054,7 @@ bool Waterfall::TriggerPassing(const QString& TriggerStructure, int PeriodIndex,
 			}
 		}
 	}
+	Q_ASSERT_X(PolishStack.size() == 1, "TriggerPassing", "Polish Notation stack has more than one element when finished");
 	return PolishStack.pop();
 }
 
@@ -2069,10 +2104,10 @@ void Waterfall::ResetTriggers() {
 
 GenericCashFlow Waterfall::GetAggregatedReinvestment() const {
 	GenericCashFlow Result;
-	Result.AddFlow(m_Reinvested.AggregateRange(m_Reinvested.GetDate(0), m_FirstIPDdate));
+	Result.AddFlow(m_ReinvestmentTest.GetReinvested().AggregateRange(m_ReinvestmentTest.GetReinvested().GetDate(0), m_FirstIPDdate));
 	const TrancheCashFlow& benchFlow = m_Tranches.first()->GetCashFlow();
 	for (int i = 1; i < benchFlow.Count(); ++i) {
-		Result.AddFlow(m_Reinvested.AggregateRange(benchFlow.GetDate(i - 1).addDays(1), benchFlow.GetDate(i)));
+		Result.AddFlow(m_ReinvestmentTest.GetReinvested().AggregateRange(benchFlow.GetDate(i - 1).addDays(1), benchFlow.GetDate(i)));
 	}
 	return Result;
 }

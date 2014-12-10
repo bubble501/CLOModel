@@ -97,6 +97,7 @@ public:
 	void SetGICBaseRate(const QString& a) { Structure.SetGICBaseRate(a); }
 	void SetDealDayCountConvention(const QString&  val) { Structure.SetDealDayCountConvention(val); }
 	void SetReinvestementPeriod(const QDate& ReinvPer) { Structure.SetReinvestementPeriod(ReinvPer); }
+	void SetLegalFinal(const QDate& a) { Structure.SetLegalFinal(a); }
 	void SetupReinvBond(
 		const QString& IntrVec
 		, const QString& CPRVec

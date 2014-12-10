@@ -279,4 +279,18 @@ QString TrancheCashFlow::ToPlainText(bool UseHeaders /*= true*/) const {
 	return NewFlow.ToPlainText(UseHeaders);
 }
 
+void TrancheCashFlow::LoadFromXML(const QString& Source) {
+	GenericCashFlow::LoadFromXML(Source);
+	if (m_CashFlows.isEmpty()) {
+		OutstandingAmt = 0.0;
+		return;
+	}
+	OutstandingAmt =
+		m_CashFlows.constBegin().value()->value(static_cast<qint32>(MtgCashFlow::MtgFlowType::AmountOutstandingFlow), 0.0)
+		+ m_CashFlows.constBegin().value()->value(static_cast<qint32>(TrancheFlowType::PrincipalFlow), 0.0);
+	for (auto i = m_CashFlows.begin(); i != m_CashFlows.end(); i++) {
+		i.value()->remove(static_cast<qint32>(MtgCashFlow::MtgFlowType::AmountOutstandingFlow));
+	}
+}
+
 

@@ -26,6 +26,7 @@ Public Sub GetInputFromStructure( _
     Dim i As Long, j As Long, propCounter As Long
     ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     'Fields to search
+    Dim LegalFinalCell As Range
     Dim MaturityStart As Range
     Dim CouponStart As Range
     Dim OutstandingStart As Range
@@ -252,6 +253,7 @@ Public Sub GetInputFromStructure( _
     Set CallValueCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("CallValueField"), LookAt:=xlWhole, LookIn:=xlValues)
     Set CallMultiplierCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("CallMultiplierField"), LookAt:=xlWhole, LookIn:=xlValues)
     Set CallReserveCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("CallReserveField"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set LegalFinalCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("LegalFinalCell"), LookAt:=xlWhole, LookIn:=xlValues)
     Set UseCallStressCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("UseCallStressField"), LookAt:=xlWhole, LookIn:=xlValues)
     Set ReinvestPeriodCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("ReinvestPeriodField"), LookAt:=xlWhole, LookIn:=xlValues)
     Set ReinvestLimitCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("ReinvestLimitField"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -660,6 +662,7 @@ DefaultExchange:
     Call AddInput(AllTheInputs, CallMultiplierCell.Offset(0, 1).Value)
     Call AddInput(AllTheInputs, CallReserveCell.Offset(0, 1).Value)
     Call AddInput(AllTheInputs, CStr(CallValueCell.Offset(0, 1).Value))
+    Call AddInput(AllTheInputs, Format(LegalFinalCell.Offset(0, 1).Value, "yyyy-mm-dd"))
     ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     'Reserve fund
     Call AddInput(AllTheInputs, CLng(2))
@@ -1010,7 +1013,7 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
     a.Add 8, "CPRLSPlotIndex"
     a.Add 9, "CallToEquityPlotIndex"
     a.Add 7, "EquityReturnPlotIndex"
-    'a.Add "Accrued Interest", "IntrAccrHead"
+    a.Add "Legal Final", "LegalFinalCell"
     a.Add "First Fund Target", "FirstResTargCell"
     a.Add "First Fund Multiple", "FirstResMultCell"
     a.Add "First Fund Floor", "FirstResFloorCell"
@@ -1046,16 +1049,16 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
     a.Add "Deal Day Count Convention", "DealDaycountCell"
     a.Add "Day count", "LoanDayCountHead"
     'Loans Properties
-     a.Add "Issuer", "IssuerProperty"
-     a.Add "Facility", "FacilityProperty"
-     a.Add "Country", "CountryProperty"
-     a.Add "Industry", "IndustryProperty"
-     a.Add "Mezzanine", "MezzanineProperty"
-     a.Add "Price", "PriceProperty"
-     a.Add "Additional Properties", "StartingAdditionalProp"
-     a.Add "Reinvestement Window", "ReinvestementWindowCell"
-     'New waterfall steps
-     a.Add "Waterfall", "WaterfallSheet"
+    a.Add "Issuer", "IssuerProperty"
+    a.Add "Facility", "FacilityProperty"
+    a.Add "Country", "CountryProperty"
+    a.Add "Industry", "IndustryProperty"
+    a.Add "Mezzanine", "MezzanineProperty"
+    a.Add "Price", "PriceProperty"
+    a.Add "Additional Properties", "StartingAdditionalProp"
+    a.Add "Reinvestement Window", "ReinvestementWindowCell"
+    'New waterfall steps
+    a.Add "Waterfall", "WaterfallSheet"
     a.Add "Interest Waterfall", "InterestWaterfallHead"
     a.Add "Principal Waterfall", "PrincipalWaterfallHead"
     a.Add "Step", "StepHead"

@@ -1,6 +1,9 @@
 #include "GenericCashFlow.h"
 #include <QDataStream>
 #include <QSet>
+#include <QXmlStreamWriter>
+#include <QXmlStreamReader>
+#include <QStack>
 GenericCashFlow::GenericCashFlow() 
 	: m_AggregationLevel(NoAggregation)
 	, m_AdjustHolidays(false)
@@ -209,7 +212,12 @@ GenericCashFlow& GenericCashFlow::operator=(const GenericCashFlow& a) {
 }
 
 QDate GenericCashFlow::MaturityDate() const {
-	if (m_CashFlows.isEmpty()) return QDate(); return (m_CashFlows.end() - 1).key();
+	if (m_CashFlows.isEmpty()) return QDate();
+	for (auto i = m_CashFlows.constEnd() - 1; true; --i) {
+		if (!i.value()->isEmpty()) return i.key();
+		if (i == m_CashFlows.constBegin()) return QDate();
+	}
+	return QDate();
 }
 
 bool GenericCashFlow::operator==(const GenericCashFlow& a) const {
@@ -392,7 +400,29 @@ QString GenericCashFlow::ToPlainText(bool UseHeaders /*= true*/) const {
 }
 
 QString GenericCashFlow::ToXML() const {
-	QString Result="<CashFlow>";
+	QString Result;
+	QXmlStreamWriter Writer(&Result);
+	Writer.setAutoFormatting(false);
+	Writer.writeStartElement("CashFlow");
+	auto AllFlows = AvailableFlows();
+	qSort(AllFlows);
+	for (auto j = AllFlows.constBegin(); j != AllFlows.constEnd(); ++j) {
+		Writer.writeStartElement("Flow");
+		Writer.writeAttribute("id", QString::number(*j));
+		if (m_CashFlowLabels.contains(*j)) Writer.writeTextElement("Label", m_CashFlowLabels.value(*j));
+		else Writer.writeEmptyElement("Label");
+		for (auto i = m_CashFlows.constBegin(); i != m_CashFlows.constEnd(); ++i) {
+			Writer.writeStartElement("SingleFlow");
+			Writer.writeTextElement("Date", i.key().toString("yyyy-MM-dd"));
+			Writer.writeTextElement("Amount", QString::number(i.value()->value(*j, 0.0), 'f', 2));
+			Writer.writeEndElement();
+		}
+		Writer.writeEndElement();
+	}
+	Writer.writeEndElement();
+	return Result;
+
+	/*QString Result="<CashFlow>";
 	auto AllFlows = AvailableFlows();
 	qSort(AllFlows);
 	for (auto j = AllFlows.constBegin(); j != AllFlows.constEnd(); ++j) {
@@ -407,5 +437,89 @@ QString GenericCashFlow::ToXML() const {
 		}
 		Result += "</Flow>";
 	}
-	return Result + "</CashFlow>";
+	return Result + "</CashFlow>";*/
+}
+
+void GenericCashFlow::LoadFromXML(const QString& Source) {
+	Clear();
+	QScopedPointer<qint32> CurrrentId(nullptr);
+	QScopedPointer<QDate> CurrentDate ( nullptr);
+	QScopedPointer<double> CurrentAmt ( nullptr);
+	QStack<QString> CurrentElement;
+	bool NoErrorsOccured = true;
+	QXmlStreamReader xml(Source);
+	while (!xml.atEnd() && !xml.hasError() && NoErrorsOccured) {
+		xml.readNext();
+		if (xml.isStartElement()) {
+			if (xml.name() == "Flow") {
+				if (CurrrentId) {
+					NoErrorsOccured = false;
+					continue;
+				}
+				CurrrentId.reset(new qint32(xml.attributes().value("id").toInt(&NoErrorsOccured)));
+			}
+			CurrentElement.push(xml.name().toString());
+		}
+		else if (xml.isEndElement()) {
+			if (xml.name() == "Flow") {
+				if (CurrrentId) CurrrentId.reset();
+				if (CurrentDate) {
+					NoErrorsOccured = false;
+					continue;
+				}
+				if (CurrentAmt) {
+					NoErrorsOccured = false;
+					continue;
+				}
+			}
+			else if (xml.name() == "SingleFlow") {
+				if (CurrentDate) CurrentDate.reset();
+				else {
+					NoErrorsOccured = false;
+					continue;
+				}
+				if (CurrentAmt) CurrentAmt.reset();
+				else {
+					NoErrorsOccured = false;
+					continue;
+				}
+			}
+			if (CurrentElement.isEmpty()) {
+				NoErrorsOccured = false;
+				continue;
+			}
+			CurrentElement.pop();
+		}
+		else if (xml.isCharacters()) {
+			if (!CurrrentId) {
+				NoErrorsOccured = false;
+				continue;
+			}
+			if (CurrentElement.top() == "Label") {
+				if (xml.text().isEmpty()) m_CashFlowLabels.remove(*CurrrentId);
+				else m_CashFlowLabels[*CurrrentId] = xml.text().toString();
+			}
+			else if (CurrentElement.top() == "Date") {
+				if (CurrentDate) {
+					NoErrorsOccured = false;
+					continue;
+				}
+				CurrentDate.reset(new QDate(QDate::fromString(xml.text().toString(), "yyyy-MM-dd")));
+			}
+			else if (CurrentElement.top() == "Amount") {
+				if (CurrentAmt) {
+					NoErrorsOccured = false;
+					continue;
+				}
+				CurrentAmt.reset(new double(xml.text().toDouble(&NoErrorsOccured)));
+			}
+			if (CurrentDate && CurrentAmt) {
+				AddFlow(*CurrentDate, *CurrentAmt, *CurrrentId);
+			}
+		}
+	}
+	if (xml.hasError() || !NoErrorsOccured) {
+		Clear();
+	}
+	xml.clear();
 }

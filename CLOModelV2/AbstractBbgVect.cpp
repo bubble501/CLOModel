@@ -3,7 +3,7 @@
 #include <QStringList>
 #include <QDate>
 #include <QSettings>
-bool AbstractBbgVect::SetVector(const QString& Vec){
+void AbstractBbgVect::SetVector(const QString& Vec){
 	/*QString OldVec(m_Vector);
 	m_Vector=Vec;
 	if(IsValid()){
@@ -13,12 +13,8 @@ bool AbstractBbgVect::SetVector(const QString& Vec){
 	m_Vector=OldVec;
 	return false;*/
 	m_Vector = Vec;
-	if (IsValid()) {
-		UnpackVector();
-		return true;
-	}
-	m_Vector = "";
-	return false;
+	if (!IsValid()) m_Vector = ""; 
+	UnpackVector();
 }
 AbstractBbgVect::AbstractBbgVect(const QString& Vec)
 	:m_Vector(Vec)

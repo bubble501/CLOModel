@@ -10,14 +10,19 @@ public:
 	ReinvestmentTest();
 	ReinvestmentTest(const ReinvestmentTest& a);
 	ReinvestmentTest& operator=(const ReinvestmentTest& a);
+	const GenericCashFlow& GetReinvested() const { return m_Reinvested; }
 	const QDate& GetReinvestmentPeriod() const {return ReinvestmentPeriod;}
 	const Mortgage& GetReinvestmentBond() const {return ReinvestmentBond;}
-	QString GetCPRAssumption() const {return CPRAssumption.GetVector();}
-	QString GetCDRAssumption() const {return CDRAssumption.GetVector();}
-	QString GetLSAssumption() const {return LSAssumption.GetVector();}
-	QString GetWALAssumption() const {return WALAssumption.GetVector();}
-	QString GetReinvDelay()const { return m_ReinvestmentDelay.GetVector(); }
-	QString GetReinvPrice()const { return ReinvestmentPrice.GetVector(); }
+	const BloombergVector& GetCPRAssumption() const { return CPRAssumption; }
+	const BloombergVector& GetCDRAssumption() const { return CDRAssumption; }
+	const BloombergVector& GetLSAssumption() const { return LSAssumption; }
+	const BloombergVector& GetWALAssumption() const { return WALAssumption; }
+	const IntegerVector& GetReinvDelay()const { return m_ReinvestmentDelay; }
+	const BloombergVector& GetReinvPrice()const { return ReinvestmentPrice; }
+	void ClearFlows() { m_Reinvested.Clear(); ReinvestmentBond.ResetFlows(); }
+	double GetQueuedCash(const QDate& StartDate=QDate()) const;
+	bool ReinvestQueueueEmpty() const { return ReinvestQueue.isEmpty(); }
+	void ResetReinvestQueueue() { ReinvestQueue.clear(); }
 	void SetupReinvBond(
 		const QString& IntrVec
 		, const QString& CPRVec
@@ -34,9 +39,11 @@ public:
 		, const QString& Delinquency = "0"
 		, const QString& DelinquencyLag = "0"
 	);
+	void QueueReinvestments(double Amount, const QDate& CurrentDate);
+	const MtgCashFlow& ProcessQueue(const QDate& CurrentDate, unsigned int Period, const QDate& MaxMaturity=QDate());
 	void SetMissingAnchors(const QDate& a);
 	void SetReinvestementPeriod(const QDate& ReinvPer);
-	void CalculateBondCashFlows(double Size, QDate StartDate, int Period=0);
+	void CalculateBondCashFlows(double Size, QDate StartDate, unsigned int Period, const QDate& MaxMaturity = QDate());
 	const MtgCashFlow& GetBondCashFlow() const;
 	void SetCPR(const QString& a);
 	void SetCDR(const QString& a);
@@ -45,10 +52,10 @@ public:
 	void SetRecoveryLag(const QString& a);
 	void SetDelinquency(const QString& a);
 	void SetDelinquencyLag(const QString& a);
-	QString GetDelinquencyLag() const { return m_DelinquencyLag.GetVector(); }
-	QString GetRecoveryLag() const { return m_RecoveryLag.GetVector(); }
-	QString GetDelinquency() const { return m_Delinquency.GetVector(); }
-	QString GetReinvestmentSpreadOverTime() const { return m_ReinvestmentSpreadOverTime.GetVector(); }
+	const IntegerVector&  GetDelinquencyLag() const { return m_DelinquencyLag; }
+	const IntegerVector&  GetRecoveryLag() const { return m_RecoveryLag; }
+	const BloombergVector& GetDelinquency() const { return m_Delinquency; }
+	IntegerVector GetReinvestmentSpreadOverTime() const { return m_ReinvestmentSpreadOverTime.GetVector(); }
 	void SetReinvestmentSpreadOverTime(const QString& val) { m_ReinvestmentSpreadOverTime = val; }
 	void CompileReferenceRateValue(ForwardBaseRateTable& Values) { ReinvestmentBond.CompileReferenceRateValue(Values); }
 	void CompileReferenceRateValue(ConstantBaseRateTable& Values) { ReinvestmentBond.CompileReferenceRateValue(Values); }
@@ -59,6 +66,7 @@ public:
 	friend QDataStream& operator<<(QDataStream & stream, const ReinvestmentTest& flows);
 	friend QDataStream& operator>>(QDataStream & stream, ReinvestmentTest& flows);
 protected:
+	GenericCashFlow m_Reinvested;
 	QDate ReinvestmentPeriod;
 	Mortgage ReinvestmentBond;
 	BloombergVector CPRAssumption;
@@ -71,6 +79,7 @@ protected:
 	BloombergVector m_Delinquency;
 	IntegerVector m_DelinquencyLag;
 	IntegerVector m_ReinvestmentSpreadOverTime;
+	QHash<QDate,double> ReinvestQueue;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 
 };

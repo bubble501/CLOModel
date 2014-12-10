@@ -62,6 +62,7 @@ public:
 	void SetStartingDeferredInterest(const double& val) { StartingDeferredInterest = val; }
 	virtual QString ToXML()const override;
 	virtual QString ToPlainText(bool UseHeaders = true)const override;
+	virtual void LoadFromXML(const QString& Source) override;
 #ifndef NO_DATABASE
 	virtual bool GetCashFlowsDatabase(const QString& TrancheID);
 #endif

@@ -95,6 +95,8 @@ public:
 	int GetLastFlowIndex(bool IncludeDeferred = false) const;
 	const double& GetStartingDeferredInterest(qint32 CoupIdx/*=0*/) const { return StartingDeferredInterest.value(CoupIdx, 0.0); }
 	void SetStartingDeferredInterest(const double& val, qint32 CoupIdx/*=0*/);
+	void ResetStartingDeferredInterest() { StartingDeferredInterest.clear(); }
+	virtual bool HasFlowType(qint32 FlowTpe)const override;
 	virtual void LoadFromXML(const QString& Source) override;
 #ifndef NO_DATABASE
 	virtual bool GetCashFlowsDatabase(const QString& TrancheID);

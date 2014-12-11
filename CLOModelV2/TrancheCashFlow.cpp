@@ -12,7 +12,6 @@
 #endif
 TrancheCashFlow::TrancheCashFlow(double ThrancheOutstanding)
 	:OutstandingAmt(ThrancheOutstanding)
-	, StartingDeferredInterest(0.0)
 {
 	for (qint32 i = static_cast<qint32>(TrancheFlowType::InterestFlow); i < (static_cast<qint32>(TrancheFlowType::InterestFlow) << 1); ++i) {
 		SetLabel(i, QString("Interest %1").arg(i - static_cast<qint32>(TrancheFlowType::InterestFlow) + 1));
@@ -136,7 +135,7 @@ bool TrancheCashFlow::GetCashFlowsDatabase(const QString& TrancheID) {
 					Cleared = true;
 					Clear();
 					SetInitialOutstanding(query.value(5).toDouble() + query.value(4).toDouble());
-					SetStartingDeferredInterest(0.0);
+					ResetStartingDeferredInterest();
 				}
 				AddFlow(query.value(0).toDate(), query.value(3).toDouble(), TrancheFlowType::InterestFlow);
 				AddFlow(query.value(0).toDate(), query.value(4).toDouble(), TrancheFlowType::PrincipalFlow);
@@ -218,8 +217,14 @@ void TrancheCashFlow::AddFlow(QDate Dte, double Amt, qint32 FlwTpe) {
 }
 
 void TrancheCashFlow::SetStartingDeferredInterest(const double& val, qint32 CoupIdx ) {
-	if (CoupIdx >= 0 && CoupIdx < (1 << MaximumInterestsTypes))
-		StartingDeferredInterest[CoupIdx] = val;
+	if (CoupIdx >= 0 && CoupIdx < (1 << MaximumInterestsTypes)) {
+		if (val == 0.0) StartingDeferredInterest.remove(CoupIdx);
+		else StartingDeferredInterest[CoupIdx] = val;
+	}
+}
+
+bool TrancheCashFlow::HasFlowType(qint32 FlowTpe) const {
+	return GenericCashFlow::HasFlowType(FlowTpe) || StartingDeferredInterest.contains(FlowTpe);
 }
 
 

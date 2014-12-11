@@ -322,7 +322,10 @@ GenericCashFlow GenericCashFlow::SingleDate(const QDate& a) const {
 }
 bool GenericCashFlow::HasFlowType(qint32 FlowTpe) const {
 	for (QMap<QDate, QHash<qint32, double>* >::const_iterator MainIter = m_CashFlows.constBegin(); MainIter != m_CashFlows.constEnd(); ++MainIter) {
-		if (MainIter.value()->contains(FlowTpe)) return true;
+		if (MainIter.value()->contains(FlowTpe)){
+			if (m_Stocks.contains(FlowTpe)) return MainIter.value()->value(FlowTpe) >= 0.01;
+			return true;
+		}
 	}
 	return false;
 }

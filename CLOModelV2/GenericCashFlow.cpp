@@ -94,6 +94,7 @@ void GenericCashFlow::AddFlow(const GenericCashFlow& a) {
 	for (auto i = a.m_CashFlowLabels.constBegin(); i != a.m_CashFlowLabels.constEnd(); ++i) {
 		if (!m_CashFlowLabels.contains(i.key())) m_CashFlowLabels.insert(i.key(), i.value());
 	}
+	CompactFlows();
 }
 void GenericCashFlow::SetFlow(const GenericCashFlow& a) {
 	Clear();
@@ -108,6 +109,7 @@ void GenericCashFlow::SetFlow(const GenericCashFlow& a) {
 			if (i == a.m_CashFlows.constBegin()) break;
 		}
 	}
+	CompactFlows();
 }
 
 void GenericCashFlow::Clear() {
@@ -294,10 +296,11 @@ GenericCashFlow GenericCashFlow::SingleFlow(qint32 FlowTpe) const {
 	GenericCashFlow Result;
 	Result.Aggregate(m_AggregationLevel);
 	for (QMap<QDate, QHash<qint32, double>* >::const_iterator MainIter = m_CashFlows.constBegin(); MainIter != m_CashFlows.constEnd(); ++MainIter) {
-		Result.SetFlow(MainIter.key(), MainIter.value()->value(FlowTpe, 0.0), FlowTpe);
+		Result.SetFlow(MainIter.key(), GetFlow(MainIter.key(),FlowTpe), FlowTpe);
 	}
 	if (IsStock(FlowTpe)) Result.SetStock(FlowTpe);
 	if (m_CashFlowLabels.contains(FlowTpe)) Result.SetLabel(FlowTpe,m_CashFlowLabels.value(FlowTpe));
+	Result.CompactFlows();
 	return Result;
 }
 GenericCashFlow GenericCashFlow::SingleDate(const QDate& a) const {
@@ -306,10 +309,11 @@ GenericCashFlow GenericCashFlow::SingleDate(const QDate& a) const {
 	Result.m_Stocks = m_Stocks;
 	for (QMap<QDate, QHash<qint32, double>* >::const_iterator MainIter = m_CashFlows.constBegin(); MainIter != m_CashFlows.constEnd(); ++MainIter) {
 		if (SamePeriod(a, MainIter.key(), m_AggregationLevel)) {
-			for (auto SecondIter = MainIter.value()->constBegin(); SecondIter != MainIter.value()->constEnd(); ++SecondIter) {
-				Result.SetFlow(a, SecondIter.value(), SecondIter.key());
-				if (m_CashFlowLabels.contains(SecondIter.key())) 
-					Result.SetLabel(SecondIter.key(), m_CashFlowLabels.value(SecondIter.key()));
+			auto AllFlws = AvailableFlows(a);
+			for (auto SecondIter = AllFlws.constBegin(); SecondIter != AllFlws.constEnd(); ++SecondIter) {
+				Result.SetFlow(a, GetFlow(a, *SecondIter), *SecondIter);
+				if (m_CashFlowLabels.contains(*SecondIter)) 
+					Result.SetLabel(*SecondIter, m_CashFlowLabels.value(*SecondIter));
 			}
 			return Result;
 		}
@@ -552,4 +556,24 @@ void GenericCashFlow::LoadFromXML(const QString& Source) {
 void GenericCashFlow::SetLabel(qint32 FlowTpe, const QString& Lab) {
 	if (Lab.isEmpty()) m_CashFlowLabels.remove(FlowTpe);
 	else m_CashFlowLabels[FlowTpe] = Lab;
+}
+
+void GenericCashFlow::CompactFlows() {
+	foreach(qint32 SingleStock, m_Stocks) {
+		auto PreviousFlow=m_CashFlows.end();
+		for (auto i = m_CashFlows.begin(); i != m_CashFlows.end(); ++i) {
+			if (i.value()->contains(SingleStock)) {
+				PreviousFlow = i;
+				break;
+			}
+		}
+		if (PreviousFlow == m_CashFlows.end()) continue;
+		for (auto i = PreviousFlow+1; i != m_CashFlows.end();++i) {
+			if (i.value()->contains(SingleStock)) {
+				if (i.value()->value(SingleStock) == PreviousFlow.value()->value(SingleStock))
+					i.value()->remove(SingleStock);
+				else PreviousFlow = i;
+			}
+		}
+	}
 }

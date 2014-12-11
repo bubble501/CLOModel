@@ -33,10 +33,6 @@ public:
 	virtual QDate GetDate(int index) const;
 	virtual double GetFlow(int index, qint32 FlowTpe) const;
 	virtual double GetFlow(const QDate& index, qint32 FlowTpe) const;
-#ifdef _DEBUG
-	virtual double GetPreviousFlow(int index, qint32 FlowTpe) const { return 0.0; }
-	virtual double GetPreviousFlow(const QDate& index, qint32 FlowTpe) const { return 0.0; }
-#endif // _DEBUG
 	virtual void Clear();
 	virtual void RemoveFlow(qint32 FlowTpe);
 	virtual void RemoveAllFlows() { Clear(); }
@@ -73,6 +69,7 @@ public:
 	virtual bool IsStock(qint32 a) const { return m_Stocks.contains(a); }
 	virtual const QSet<qint32>& GetStocks() const { return m_Stocks; }
 protected:
+	virtual void CompactFlows();
 	static bool SamePeriod(const QDate& a, const QDate& b, CashFlowAggregation Freq);
 	QMap<QDate, QHash<qint32, double>*	> m_CashFlows;
 	QHash<qint32, QString> m_CashFlowLabels;

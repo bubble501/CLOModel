@@ -33,9 +33,10 @@ WatFalPrior& WatFalPrior::operator=(const WatFalPrior& a){
 QString WatFalPrior::ReadyToCalculate() const {
 	QString Result = "";
 	switch (PriorityType) {
+	case WatFalPrior::WaterfallStepType::wst_juniorFees:
+		if (!HasParameter(wstParameters::PayAccrue)) Result += "Junior Fees need an Accrue or Pay Parameter\n";
 	case WatFalPrior::WaterfallStepType::wst_SeniorExpenses:
 	case WatFalPrior::WaterfallStepType::wst_SeniorFees:
-	case WatFalPrior::WaterfallStepType::wst_juniorFees:
 		if (GetParameter(wstParameters::SourceOfFunding).value<IntegerVector>().IsEmpty(1,2)) Result += "Expenses and Fees need a Source of Funding Parameter\n";
 	break;
 	case WatFalPrior::WaterfallStepType::wst_Interest:

@@ -509,7 +509,7 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 				for (DWORD i = 0; i < Numrows; i++)
 				{
 					pdFreq->vt = VT_R8;
-					pdFreq->dblVal = source.GetCashFlow().GetInterest(i);
+					pdFreq->dblVal = source.GetCashFlow().GetTotalInterest(i);
 					pdFreq++;
 				}
 			}
@@ -533,7 +533,7 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 				for (DWORD i = 0; i < Numrows; i++)
 				{
 					pdFreq->vt = VT_R8;
-					pdFreq->dblVal = source.GetCashFlow().GetDeferred(i);
+					pdFreq->dblVal = source.GetCashFlow().GetTotalDeferred(i);
 					pdFreq++;
 				}
 			}

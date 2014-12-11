@@ -602,7 +602,10 @@ bool Tranche::HasCoupon(qint32 CoupIdx) const {
 	return 
 		InterestType.contains(CoupIdx)
 		&& Coupon.contains(CoupIdx)
-		&& ((InterestType.value(CoupIdx) == TrancheInterestType::FloatingInterest) ? ReferenceRate.contains(CoupIdx):true);
+		&& (
+			InterestType.value(CoupIdx) != TrancheInterestType::FloatingInterest
+			|| ReferenceRate.contains(CoupIdx)
+		);
 }
 
 

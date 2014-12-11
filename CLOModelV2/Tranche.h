@@ -55,8 +55,8 @@ public:
 	~Tranche();
 	Tranche& operator=(const Tranche& a);
 	const QHash<qint32, BloombergVector*>& GetRefRateValues() const { return ReferenceRateValue; }
-	const double& GetStartingDeferredInterest() const { return CashFlow.GetStartingDeferredInterest(); }
-	void SetStartingDeferredInterest(const double& val) { CashFlow.SetStartingDeferredInterest(val); }
+	const double& GetStartingDeferredInterest(qint32 CoupIdx = static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow)) const { return CashFlow.GetStartingDeferredInterest(CoupIdx); }
+	void SetStartingDeferredInterest(const double& val, qint32 CoupIdx = static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow)) { CashFlow.SetStartingDeferredInterest(val, CoupIdx); }
 	const QString& GetTrancheName() const{return TrancheName;}
 	const QString& GetCurrency() const{return Currency;}
 	double GetOriginalAmount() const {return OriginalAmt;}
@@ -120,7 +120,7 @@ public:
 	void SetExchangeRate(double a);
 	void SetPaymentFrequency(const QString& a);
 	void AddCashFlow(QDate Dte,double Amt, qint32 FlwTpe){CashFlow.AddFlow(Dte,Amt,FlwTpe);}
-	void AddCashFlow(QDate Dte, double Amt, TrancheCashFlow::TrancheFlowType FlwTpe) { AddCashFlow(Dte, Amt, static_cast<qint32>(FlwTpe)); }
+	void AddCashFlow(QDate Dte, double Amt, TrancheCashFlow::TrancheFlowType FlwTpe) { CashFlow.AddFlow(Dte, Amt, FlwTpe); }
 	void AddCashFlow(const TrancheCashFlow& a){CashFlow.AddFlow(a);}
 	double GetBondFactor() const {return OutstandingAmt/OriginalAmt;}
 #ifndef NO_BLOOMBERG
@@ -132,7 +132,6 @@ public:
 	double GetPrice(double DiscountMargin) const;
 	double GetIRR() const;
 	double GetIRR(double NewPrice) const;
-	double GetCurrentOutstanding() const;
 	double GetWALife(const QDate& StartDate) const;
 	const QDate& GetSettlementDate() const{return SettlementDate;}
 	void SetSettlementDate(const QDate& a){SettlementDate=a;}

@@ -30,7 +30,7 @@ void GenericCashFlow::AddFlow(QDate Dte, double Amt, qint32 FlowTpe) {
 	}
 	if (index != m_CashFlows.end()) {
 		//if (Amt== 0.0) return;
-		Amt += GetFlow(Dte, FlowTpe);
+		Amt += GetFlow(index.key(), FlowTpe);
 		if (qAbs(Amt) < 0.01) Amt = 0.0;
 		if (index.value()->contains(FlowTpe)) {
 			if (Amt == 0.0 && !m_Stocks.contains(FlowTpe)) index.value()->remove(FlowTpe);

@@ -68,7 +68,7 @@ private:
 	double GroupWACoupon(int GroupTarget, int SeliorityScaleLevel, const QDate& Period, qint32 CouponType = 0)const;
 	double GroupWACoupon(int GroupTarget, int SeliorityScaleLevel, const QDate& Period, QList<qint32> CouponTypes)const;
 	double RedeemNotes(double AvailableFunds, int GroupTarget, int SeliorityScaleLevel, const QDate& PeriodIndex);
-	double RedeemProRata(double AvailableFunds, const QDate& PeriodIndex, QList<int> Groups, int SeliorityScaleLevel);
+	//double RedeemProRata(double AvailableFunds, const QDate& PeriodIndex, QList<int> Groups, int SeliorityScaleLevel);
 	double RedeemSequential(double AvailableFunds, const QDate& PeriodIndex, int SeliorityScaleLevel, int MaxGroup = -1 );
 	int FindTrancheIndex(const QString& Tranchename)const;
 	void FillAllDates();

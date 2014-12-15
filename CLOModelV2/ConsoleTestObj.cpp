@@ -8,10 +8,10 @@ ConsoleTestObj::ConsoleTestObj(QObject *parent)
 	, Tested(nullptr)
 {
 	connect(&TempUnit, &CentralUnit::CalculationFinished, this, &ConsoleTestObj::PrintOutput);
-	//BBVALTest();
+	BBVALTest();
 	//SlateTest();
 	//TestApplier();
-	TestStressTest();
+	//TestStressTest();
 }
 
 void ConsoleTestObj::BBVALTest() {
@@ -217,24 +217,24 @@ void ConsoleTestObj::BBVALTest() {
 		);
 	TempUnit.GetBaseRatesDatabase(ConstantBaseRateTable());
 	//Waterfall
-	/*TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_SeniorExpenses, 0, 1, 0.0);
-	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_SeniorFees, 0, 1, 0.0);
-	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_Interest, 1, 1, 0.0);
-	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_OCTest, 1, 0, 0.0);
-	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_OCTestPrinc, 1, 0, 0.0);
-	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_Interest, 2, 1, 0.0);
-	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_DeferredInterest, 2, 1, 0.0);
-	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_DeferredPrinc, 2, 1, 0.0);
-	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_OCTest, 2, 0, 0.0);
-	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_OCTestPrinc, 2, 0, 0.0);
-	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_Interest, 3, 1, 0.0);
-	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_DeferredInterest, 3, 1, 0.0);
-	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_DeferredPrinc, 3, 1, 0.0);
-	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_OCTest, 3, 0, 0.0);
-	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_OCTestPrinc, 3, 0, 0.0);
-	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_ReserveReplenish, 1, 1, 0.0);
-	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_ReserveReplenish, 1, 2, 0.0);
-	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_Excess, 0, 0, 0.0);*/
+	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_SeniorExpenses,"","","","","","","1","","","","","",static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Invalid));
+	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_SeniorFees, "", "", "", "", "", "", "1", "", "", "", "", "", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Invalid));
+	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_Interest, "1", "1", "", "", "", "", "1", "1", "", "", "", "", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::AccrueAndPay));
+	//TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_OCTest, "1", "1", "", "", "", "", "1", "1", "", "", "", "", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::AccrueAndPay));
+	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_Interest, "2", "1", "", "", "", "", "1", "1", "", "", "", "", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::AccrueAndPay));
+	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_DeferredInterest, "2", "1", "", "", "", "", "1", "1", "", "", "", "", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Invalid));
+	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_DeferredInterest, "2", "1", "", "", "", "", "2", "1", "", "", "", "", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Invalid));
+	//TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_OCTest, 2, 0, 0.0);
+	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_Interest, "3", "1", "", "", "", "", "1", "1", "", "", "", "", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::AccrueAndPay));
+	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_DeferredInterest, "3", "1", "", "", "", "", "1", "1", "", "", "", "", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Invalid));
+	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_DeferredInterest, "3", "1", "", "", "", "", "2", "1", "", "", "", "", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Invalid));
+	//TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_OCTest, 3, 0, 0.0);
+	/*TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_ReserveReplenish, 1, 1, 0.0);
+	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_ReserveReplenish, 1, 2, 0.0);*/
+	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_Principal, "1", "1", "", "", "", "", "1", "1", "", "", "", "", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Invalid));
+	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_Principal, "2", "1", "", "", "", "", "1", "1", "", "", "", "", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Invalid));
+	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_Principal, "3", "1", "", "", "", "", "1", "1", "", "", "", "", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Invalid));
+	TempUnit.AddWaterfallStep(WatFalPrior::WaterfallStepType::wst_Excess, "", "", "", "", "", "", "3", "", "", "", "", "", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Invalid));
 
 
 	//Other Inputs
@@ -263,7 +263,7 @@ void ConsoleTestObj::BBVALTest() {
 	TempUnit.SetBaseCaseToCall(false);
 	TempUnit.SetSaveBaseCase(true);
 	TempUnit.SetReinvestementPeriod(QDate(2009, 5, 26));
-	TempUnit.SetupReinvBond("1", "4.79", "5", "80", "5", "1", "I", "100", "0", "EUR003M", "0", "0", "0");
+	TempUnit.SetupReinvBond("1", "4.79", "5", "80", "5", "1", "I", "100", "0","1", "EUR003M", "0", "0", "0");
 	TempUnit.SetSchedPrincAvailable(/*16018445.0*/0.0);
 	TempUnit.SetInterestAvailable(0.0);
 	TempUnit.SetPoolCutOff(QDate(2014, 7, 31));

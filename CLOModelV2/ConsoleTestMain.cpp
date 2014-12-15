@@ -28,12 +28,9 @@
 #include "FloorCapVector.h"
 int main(int argc, char *argv[]) {
 
-	/*QApplication a(argc, argv);
-	WaterfallStepHelperDialog b;
-	if (b.exec()==QDialog::Accepted) {
-		qDebug() << b.GetParameters();
-	}
-	return a.exec();*/
+	//QApplication a(argc, argv);
+	//ConsoleTestObj b;
+	//return a.exec();
 
 
 	/*QApplication a(argc, argv);
@@ -42,7 +39,7 @@ int main(int argc, char *argv[]) {
 	b.LoadStress("C:/Temp/StressResult.fcsr");
 	return a.exec();*/
 
-	/*Waterfall TempWtf, TempCallWaterfall;
+	Waterfall TempWtf, TempCallWaterfall;
 	QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/BaseCase.clo");
 	//QFile file("C:/Temp/.SavedInputs.clo");
 	file.open(QIODevice::ReadOnly);
@@ -60,7 +57,7 @@ int main(int argc, char *argv[]) {
 	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempCallWaterfall;
 	file.close();
-	TempWtf.CalculateTranchesCashFlows();*/
+	TempWtf.CalculateTranchesCashFlows();
 
 	/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	QApplication a(argc, argv);
@@ -139,7 +136,7 @@ int main(int argc, char *argv[]) {
 	return a.exec();
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 
-	Mortgage TempMtg1;
+	/*Mortgage TempMtg1;
 	TempMtg1.SetProperty("PrepaymentFee", "5");
 	TempMtg1.SetAnnuity("I");
 	TempMtg1.SetInterest("5");
@@ -149,13 +146,13 @@ int main(int argc, char *argv[]) {
 	TempMtg1.SetHaircutVector("0 24S 50");
 	TempMtg1.CalculateCashFlows(QDate(2014, 5, 30), "0", "0", "0");
 
-	/*TempMtg1.SetProperty("PrepaymentFee", "10");
+	/ *TempMtg1.SetProperty("PrepaymentFee", "10");
 	TempMtg1.SetAnnuity("A");
 	TempMtg1.SetInterest("2.5");
 	TempMtg1.SetPaymentFreq("6");
 	TempMtg1.SetMaturityDate(QDate(2018, 5, 30));
 	TempMtg1.SetSize(500000.0);
-	TempMtg1.CalculateCashFlows(QDate(2014, 5, 30), "0", "0", "0");*/
+	TempMtg1.CalculateCashFlows(QDate(2014, 5, 30), "0", "0", "0");* /
 
 
 	Mortgage TempMtg2;
@@ -183,13 +180,13 @@ int main(int argc, char *argv[]) {
 	if (file1.exists()) file1.remove();
 	if (file2.exists()) file2.remove();
 	if (file3.exists()) file3.remove();
-	if (/*true  ||*/ TempMtgsFlows != LegacyFlows) {
+	if (/ *true  ||* / TempMtgsFlows != LegacyFlows) {
 		PrintToTempFile("Model", TempMtgsFlows.ToPlainText(true), false);
 		PrintToTempFile("Scenario", LegacyFlows.ToPlainText(true), false);
 		PrintToTempFile("Base", BaseFlows.ToPlainText(true), false);
 	}
 	else {
 		qDebug() << "Success, Cash Flows are identical";
-	}
+	}*/
 	return 0;
 }

@@ -206,6 +206,9 @@ void TrancheCashFlow::LoadFromXML(const QString& Source) {
 void TrancheCashFlow::AddFlow(const QDate& Dte, double Amt, TrancheFlowType FlwTpe) {
 	AddFlow(Dte, Amt, static_cast<qint32>(FlwTpe));
 }
+void TrancheCashFlow::SetFlow(const QDate& Dte, double Amt, TrancheFlowType FlwTpe) {
+	SetFlow(Dte, Amt, static_cast<qint32>(FlwTpe));
+}
 void TrancheCashFlow::AddFlow(QDate Dte, double Amt, qint32 FlwTpe) {
 	if (m_CashFlows.isEmpty()) {
 		if (OutstandingAmt>0.0) GenericCashFlow::SetFlow(Dte, OutstandingAmt, static_cast<qint32>(TrancheFlowType::AmountOutstandingFlow));
@@ -214,6 +217,15 @@ void TrancheCashFlow::AddFlow(QDate Dte, double Amt, qint32 FlwTpe) {
 		}
 	}
 	GenericCashFlow::AddFlow(Dte, Amt, FlwTpe);
+}
+void TrancheCashFlow::SetFlow(QDate Dte, double Amt, qint32 FlwTpe) {
+	if (m_CashFlows.isEmpty()) {
+		if (OutstandingAmt > 0.0) GenericCashFlow::SetFlow(Dte, OutstandingAmt, static_cast<qint32>(TrancheFlowType::AmountOutstandingFlow));
+		for (auto i = StartingDeferredInterest.constBegin(); i != StartingDeferredInterest.constEnd(); ++i) {
+			if (i.value() > 0.0) GenericCashFlow::SetFlow(Dte, i.value(), i.key());
+		}
+	}
+	GenericCashFlow::SetFlow(Dte, Amt, FlwTpe);
 }
 
 void TrancheCashFlow::SetStartingDeferredInterest(const double& val, qint32 CoupIdx ) {

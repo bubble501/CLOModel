@@ -72,11 +72,11 @@ bool TrancheTrigger::Passing(const QList<Tranche*>& currentTranches, const QDate
 	double RelevantAmount=0.0;
 	for (auto i = currentTranches.constBegin(); i != currentTranches.constEnd(); ++i) {
 		if ((*i)->GetProrataGroup(m_TargetSeniorityLevel.GetValue(CurrentPeriod)) < m_TargetSeniority.GetValue(CurrentPeriod) && (static_cast<quint8>(m_SenioritySide)& static_cast<quint8>(TriggerSenioritySide::Senior)))
-			RelevantAmount += (*i)->GetCurrentOutstanding();
+			RelevantAmount += (*i)->GetCashFlow().GetAmountOutstanding(CurrentPeriod);
 		if ((*i)->GetProrataGroup(m_TargetSeniorityLevel.GetValue(CurrentPeriod)) > m_TargetSeniority.GetValue(CurrentPeriod) && (static_cast<quint8>(m_SenioritySide)& static_cast<quint8>(TriggerSenioritySide::Junior)))
-			RelevantAmount += (*i)->GetCurrentOutstanding();
+			RelevantAmount += (*i)->GetCashFlow().GetAmountOutstanding(CurrentPeriod);
 		if ((*i)->GetProrataGroup(m_TargetSeniorityLevel.GetValue(CurrentPeriod)) == m_TargetSeniority.GetValue(CurrentPeriod) && (static_cast<quint8>(m_SenioritySide)& static_cast<quint8>(TriggerSenioritySide::Exactly)))
-			RelevantAmount += (*i)->GetCurrentOutstanding();
+			RelevantAmount += (*i)->GetCashFlow().GetAmountOutstanding(CurrentPeriod);
 	}
 	bool Result = false;
 	if (static_cast<quint8>(m_SizeSide) & static_cast<quint8>(TriggerSizeSide::Bigger)) {
@@ -95,11 +95,11 @@ bool TrancheTrigger::Passing(const QList<Tranche*>& currentTranches, int Current
 	double RelevantAmount = 0.0;
 	for (auto i = currentTranches.constBegin(); i != currentTranches.constEnd(); ++i) {
 		if ((*i)->GetProrataGroup(m_TargetSeniorityLevel.GetValue(CurrentPeriod)) < m_TargetSeniority.GetValue(CurrentPeriod) && (static_cast<quint8>(m_SenioritySide)& static_cast<quint8>(TriggerSenioritySide::Senior)))
-			RelevantAmount += (*i)->GetCurrentOutstanding();
+			RelevantAmount += (*i)->GetCashFlow().GetAmountOutstanding(CurrentPeriod);
 		if ((*i)->GetProrataGroup(m_TargetSeniorityLevel.GetValue(CurrentPeriod)) > m_TargetSeniority.GetValue(CurrentPeriod) && (static_cast<quint8>(m_SenioritySide)& static_cast<quint8>(TriggerSenioritySide::Junior)))
-			RelevantAmount += (*i)->GetCurrentOutstanding();
+			RelevantAmount += (*i)->GetCashFlow().GetAmountOutstanding(CurrentPeriod);
 		if ((*i)->GetProrataGroup(m_TargetSeniorityLevel.GetValue(CurrentPeriod)) == m_TargetSeniority.GetValue(CurrentPeriod) && (static_cast<quint8>(m_SenioritySide)& static_cast<quint8>(TriggerSenioritySide::Exactly)))
-			RelevantAmount += (*i)->GetCurrentOutstanding();
+			RelevantAmount += (*i)->GetCashFlow().GetAmountOutstanding(CurrentPeriod);
 	}
 	bool Result = false;
 	if (static_cast<quint8>(m_SizeSide)& static_cast<quint8>(TriggerSizeSide::Bigger)) {

@@ -980,14 +980,14 @@ HRESULT ExcelOutput::PlotTranchesDynamic(
 					SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
 					SysFreeString(Params.rgvarg[Params.cArgs-7].bstrVal);
 					SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
-					for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+					for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
 					{
 						SysFreeString(pdFreq->bstrVal);
 						pdFreq++;
 					}
 					SafeArrayUnaccessData(DatesArray);
 					SafeArrayAccessData(TitlesArray, (void HUGEP* FAR*)&pdFreq);
-					for (DWORD i = 0; i < source.GetTranchesCount(); i++)
+					for (int i = 0; i < source.GetTranchesCount(); i++)
 					{
 						SysFreeString(pdFreq->bstrVal);
 						pdFreq++;
@@ -1004,14 +1004,14 @@ HRESULT ExcelOutput::PlotTranchesDynamic(
 				SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
 				SysFreeString(Params.rgvarg[Params.cArgs-7].bstrVal);
 				SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
-				for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+				for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
 				{
 					SysFreeString(pdFreq->bstrVal);
 					pdFreq++;
 				}
 				SafeArrayUnaccessData(DatesArray);
 				SafeArrayAccessData(TitlesArray, (void HUGEP* FAR*)&pdFreq);
-				for (DWORD i = 0; i < source.GetTranchesCount(); i++)
+				for (int i = 0; i < source.GetTranchesCount(); i++)
 				{
 					SysFreeString(pdFreq->bstrVal);
 					pdFreq++;
@@ -1028,7 +1028,7 @@ HRESULT ExcelOutput::PlotTranchesDynamic(
 		SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
 		SysFreeString(Params.rgvarg[Params.cArgs-7].bstrVal);
 		SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
-		for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+		for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
 		{
 			SysFreeString(pdFreq->bstrVal);
 			pdFreq++;

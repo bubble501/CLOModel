@@ -43,7 +43,7 @@ QString WatFalPrior::ReadyToCalculate() const {
 		if (!HasParameter(wstParameters::PayAccrue)) Result += "Interest needs an Accrue or Pay Parameter\n";
 		if (GetParameter(wstParameters::SeniorityGroup).value<IntegerVector>().IsEmpty(1)) Result += "Interest needs a Seniority Group Parameter\n";
 		if (GetParameter(wstParameters::SeniorityGroupLevel).value<IntegerVector>().IsEmpty(0)) Result += "Interest needs a Seniority Group Level Parameter\n";
-		if (GetParameter(wstParameters::CouponIndex).value<IntegerVector>().IsEmpty(0)) Result += "Interest needs a Coupon Index Parameter\n";
+		if (GetParameter(wstParameters::CouponIndex).value<IntegerVector>().IsEmpty(0,(1 << MaximumInterestsTypes)-1)) Result += "Interest needs a Coupon Index Parameter\n";
 	break;
 	case WatFalPrior::WaterfallStepType::wst_Principal:
 		if (GetParameter(wstParameters::SeniorityGroup).value<IntegerVector>().IsEmpty(1)) Result += "Principal needs a Seniority Group Parameter\n";
@@ -75,17 +75,16 @@ QString WatFalPrior::ReadyToCalculate() const {
 		if (GetParameter(wstParameters::SourceOfFunding).value<IntegerVector>().IsEmpty(1, 2)) Result += "IC Test needs a Source of Funding Parameter\n";
 		if (GetParameter(wstParameters::SeniorityGroup).value<IntegerVector>().IsEmpty(1)) Result += "IC Test needs a Seniority Group Parameter\n";
 		if (GetParameter(wstParameters::SeniorityGroupLevel).value<IntegerVector>().IsEmpty(0)) Result += "IC Test needs a Seniority Group Level Parameter\n";
-		if (GetParameter(wstParameters::CouponIndex).value<IntegerVector>().IsEmpty(0)) Result += "IC Test needs a Coupon Index Parameter\n";
+		if (GetParameter(wstParameters::CouponIndex).value<IntegerVector>().IsEmpty(0, (1 << MaximumInterestsTypes) - 1)) Result += "IC Test needs a Coupon Index Parameter\n";
 		if (HasParameter(wstParameters::TestTargetOverride)) {
 			if (GetParameter(wstParameters::TestTargetOverride).value<BloombergVector>().IsEmpty(0.0)) Result += "IC Test needs a target Override Parameter\n";
 		}
 		break;
 	case WatFalPrior::WaterfallStepType::wst_DeferredInterest:
 		if (GetParameter(wstParameters::SourceOfFunding).value<IntegerVector>().IsEmpty(1, 2)) Result += "Deferred Interest needs a Source of Funding Parameter\n";
-		if (!HasParameter(wstParameters::PayAccrue)) Result += "Deferred Interest needs an Accrue or Pay Parameter\n";
 		if (GetParameter(wstParameters::SeniorityGroup).value<IntegerVector>().IsEmpty(1)) Result += "Deferred Interest needs a Seniority Group Parameter\n";
 		if (GetParameter(wstParameters::SeniorityGroupLevel).value<IntegerVector>().IsEmpty(0)) Result += "Deferred Interest needs a Seniority Group Level Parameter\n";
-		if (GetParameter(wstParameters::CouponIndex).value<IntegerVector>().IsEmpty(0)) Result += "Deferred Interest needs a Coupon Index Parameter\n";
+		if (GetParameter(wstParameters::CouponIndex).value<IntegerVector>().IsEmpty(0, (1 << MaximumInterestsTypes) - 1)) Result += "Deferred Interest needs a Coupon Index Parameter\n";
 		break;
 	case WatFalPrior::WaterfallStepType::wst_Excess:
 		if (GetParameter(wstParameters::SourceOfFunding).value<IntegerVector>().IsEmpty(1,3)) Result += "Excess Spread needs a Source of Funding Parameter\n";

@@ -67,7 +67,7 @@ WaterfallStepHelperDialog::WaterfallStepHelperDialog(QWidget *parent)
 	StepBuilderBase->addWidget(CreateOCWidget()); //OC Test
 	StepBuilderBase->addWidget(CreateICWidget()); //IC Test
 	StepBuilderBase->addWidget(CreateDeferredInterestWidget()); //Deferred Interest
-	StepBuilderBase->addWidget(new QWidget(this)); //Junior Fees
+	StepBuilderBase->addWidget(CreateJuniorFeesWidget()); //Junior Fees
 	StepBuilderBase->addWidget(CreateOCWidget()); //Reinvestment Test
 	StepBuilderBase->addWidget(CreateExcessWidget()); //Excess
 	StepBuilderBase->addWidget(CreateReinvestPrincipalWidget()); //Reinvest
@@ -308,6 +308,27 @@ void WaterfallStepHelperDialog::SetbasedOnWaterfall() {
 		ResultingParameters[static_cast<qint32>(WatFalPrior::wstParameters::SourceOfFunding)] = (m_InterestWF ? QString("1") : QString("2")); break;
 	}
 }
+QWidget* WaterfallStepHelperDialog::CreateJuniorFeesWidget() {
+	QWidget* Result = new QWidget(this);
+	QGridLayout *ResLay = new QGridLayout(Result);
+	int CountRow = 0;
+
+	QLabel* SrcFndLbl = new QLabel(Result);
+	SrcFndLbl->setText(tr("Accrue or Pay"));
+	QComboBox* SrcFndCmb = new QComboBox(Result);
+	SrcFndCmb->setEditable(false);
+	SrcFndCmb->addItem("Accrue and Pay", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::AccrueAndPay));
+	SrcFndCmb->addItem("Accrue Only", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Accrue));
+	SrcFndCmb->addItem("Pay Only", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Pay));
+	connect(this, SIGNAL(SetPayAccrueCombo(int)), SrcFndCmb, SLOT(setCurrentIndex(int)));
+	connect(SrcFndCmb, SIGNAL(currentIndexChanged(int)), this, SLOT(PayAccrueComboChanged(int)));
+	ResLay->addWidget(SrcFndLbl, CountRow, 0);
+	ResLay->addWidget(SrcFndCmb, CountRow, 1);
+	CountRow++;
+
+	ResLay->addItem(new QSpacerItem(20, 20, QSizePolicy::Preferred, QSizePolicy::Expanding), CountRow, 0, 1, 2);
+	return Result;
+}
 QWidget* WaterfallStepHelperDialog::CreateInterestWidget() {
 	QWidget* Result = new QWidget(this);
 	QGridLayout *ResLay = new QGridLayout(Result);
@@ -361,7 +382,6 @@ QWidget* WaterfallStepHelperDialog::CreateInterestWidget() {
 	SrcFndCmb->addItem("Accrue and Pay", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::AccrueAndPay));
 	SrcFndCmb->addItem("Accrue Only", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Accrue));
 	SrcFndCmb->addItem("Pay Only", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Pay));
-	SrcFndCmb->setEnabled(false);
 	connect(this, SIGNAL(SetPayAccrueCombo(int)), SrcFndCmb, SLOT(setCurrentIndex(int)));
 	connect(SrcFndCmb, SIGNAL(currentIndexChanged(int)), this, SLOT(PayAccrueComboChanged(int)));
 	ResLay->addWidget(SrcFndLbl, CountRow, 0);
@@ -471,7 +491,6 @@ QWidget* WaterfallStepHelperDialog::CreateICWidget() {
 	SrcFndCmb->addItem("Calculate and Cure", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::AccrueAndPay));
 	SrcFndCmb->addItem("Calculate Only", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Accrue));
 	SrcFndCmb->addItem("Cure Only", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Pay));
-	SrcFndCmb->setEnabled(false);
 	connect(this, SIGNAL(SetPayAccrueCombo(int)), SrcFndCmb, SLOT(setCurrentIndex(int)));
 	connect(SrcFndCmb, SIGNAL(currentIndexChanged(int)), this, SLOT(PayAccrueComboChanged(int)));
 	ResLay->addWidget(SrcFndLbl, CountRow, 0);
@@ -585,7 +604,6 @@ QWidget* WaterfallStepHelperDialog::CreateOCWidget() {
 	SrcFndCmb->addItem("Calculate and Cure", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::AccrueAndPay));
 	SrcFndCmb->addItem("Calculate Only", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Accrue));
 	SrcFndCmb->addItem("Cure Only", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Pay));
-	SrcFndCmb->setEnabled(false);
 	connect(this, SIGNAL(SetPayAccrueCombo(int)), SrcFndCmb, SLOT(setCurrentIndex(int)));
 	connect(SrcFndCmb, SIGNAL(currentIndexChanged(int)), this, SLOT(PayAccrueComboChanged(int)));
 	ResLay->addWidget(SrcFndLbl, CountRow, 0);
@@ -641,20 +659,6 @@ QWidget* WaterfallStepHelperDialog::CreateDeferredInterestWidget() {
 	CountRow++;
 	CoupIdxEdit->setText("1");
 	CoupIdxEdit->setEnabled(false);
-
-	QLabel* SrcFndLbl = new QLabel(Result);
-	SrcFndLbl->setText(tr("Accrue or Pay"));
-	QComboBox* SrcFndCmb = new QComboBox(Result);
-	SrcFndCmb->setEditable(false);
-	SrcFndCmb->addItem("Accrue and Pay", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::AccrueAndPay));
-	SrcFndCmb->addItem("Accrue Only", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Accrue));
-	SrcFndCmb->addItem("Pay Only", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Pay));
-	SrcFndCmb->setEnabled(false);
-	connect(this, SIGNAL(SetPayAccrueCombo(int)), SrcFndCmb, SLOT(setCurrentIndex(int)));
-	connect(SrcFndCmb, SIGNAL(currentIndexChanged(int)), this, SLOT(PayAccrueComboChanged(int)));
-	ResLay->addWidget(SrcFndLbl, CountRow, 0);
-	ResLay->addWidget(SrcFndCmb, CountRow, 1);
-	CountRow++;
 
 	ResLay->addItem(new QSpacerItem(20, 20, QSizePolicy::Preferred, QSizePolicy::Expanding), CountRow, 0, 1, 2);
 	return Result;
@@ -1022,6 +1026,8 @@ void WaterfallStepHelperDialog::SetInterestWF(const bool& val) {
 	FilterPattern += "]$";
 	StepsFilter->setFilterRegExp(QRegExp(FilterPattern));
 }
+
+
 
 
 

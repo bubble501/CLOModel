@@ -483,8 +483,8 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 		Bound[0].cElements = Numrows;
 		Bound[1].lLbound   = 0;
 		Bound[1].cElements = NumOfCols;
-		SAFEARRAY* saData;
-		saData = SafeArrayCreate(VT_VARIANT, 2, Bound);
+		
+		SAFEARRAY* saData = SafeArrayCreate(VT_VARIANT, 2, Bound);
 		VARIANT HUGEP *pdFreq;
 		HRESULT hr = SafeArrayAccessData(saData, (void HUGEP* FAR*)&pdFreq);
 		if (SUCCEEDED(hr))
@@ -567,9 +567,32 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 			}
 			SafeArrayUnaccessData(saData);
 		}
-
-
-
+		SAFEARRAYBOUND ICLimitBound;
+		SAFEARRAYBOUND OCLimitBound;
+		OCLimitBound.lLbound = 1;
+		OCLimitBound.cElements = Numrows;
+		ICLimitBound.lLbound = 1;
+		ICLimitBound.cElements = Numrows;
+		SAFEARRAY* OCLimitData = SafeArrayCreate(VT_VARIANT, 1, &OCLimitBound);
+		hr = SafeArrayAccessData(OCLimitData, (void HUGEP* FAR*)&pdFreq);
+		if (SUCCEEDED(hr)) {
+			for (DWORD i = 0; i < Numrows; i++) {
+				pdFreq->vt = VT_R8;
+				pdFreq->dblVal = source.GetCashFlow().GetOCTarget(i);
+				pdFreq++;
+			}
+			SafeArrayUnaccessData(OCLimitData);
+		}
+		SAFEARRAY* ICLimitData = SafeArrayCreate(VT_VARIANT, 1, &ICLimitBound);
+		hr = SafeArrayAccessData(ICLimitData, (void HUGEP* FAR*)&pdFreq);
+		if (SUCCEEDED(hr)) {
+			for (DWORD i = 0; i < Numrows; i++) {
+				pdFreq->vt = VT_R8;
+				pdFreq->dblVal = source.GetCashFlow().GetICTarget(i);
+				pdFreq++;
+			}
+			SafeArrayUnaccessData(ICLimitData);
+		}
 
 		static DISPID dispid = 0;
 		DISPPARAMS Params;
@@ -606,10 +629,10 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 			Command[CurrentCmdIndex--].boolVal=PrintICtest;
 			Command[CurrentCmdIndex].vt = VT_BOOL;
 			Command[CurrentCmdIndex--].boolVal = PrintPDL;
-			Command[CurrentCmdIndex].vt = VT_R8;
-			Command[CurrentCmdIndex--].dblVal=source.GetMinIClevel();
-			Command[CurrentCmdIndex].vt = VT_R8;
-			Command[CurrentCmdIndex--].dblVal=source.GetMinOClevel();
+			Command[CurrentCmdIndex].vt = VT_ARRAY | VT_VARIANT;
+			Command[CurrentCmdIndex--].parray = ICLimitData;
+			Command[CurrentCmdIndex].vt = VT_ARRAY | VT_VARIANT;
+			Command[CurrentCmdIndex--].parray = OCLimitData;
 
 			
 			Params.rgdispidNamedArgs = NULL;
@@ -643,6 +666,7 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 				DISPATCH_METHOD, &Params, NULL, NULL, NULL);
 			if(FAILED(hr))
 			{
+				LOGDEBUG("Failed Invoke " + QString::number(hr, 16));
 				SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
 				SysFreeString(Params.rgvarg[Params.cArgs-3].bstrVal);
 				SysFreeString(Params.rgvarg[Params.cArgs-4].bstrVal);
@@ -662,6 +686,7 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 		catch(_com_error &ce)
 		{
 			hr = ce.Error();
+			LOGDEBUG("Exception in call" + QString::number(hr, 16));
 		}
 		SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
 		SysFreeString(Params.rgvarg[Params.cArgs-3].bstrVal);
@@ -676,6 +701,7 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 			}
 			SafeArrayUnaccessData(saData);
 		}
+		LOGDEBUG("Reached End " + QString::number(hr, 16));
 		return hr;
 }
 

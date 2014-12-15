@@ -57,6 +57,7 @@ int main(int argc, char *argv[]) {
 	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempCallWaterfall;
 	file.close();
+	ExcelOutput::PrintTrancheFlow(*(TempWtf.GetTranche(1)),"'Tranches Results'!A1",Qt::gray);
 	TempWtf.CalculateTranchesCashFlows();
 
 	/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

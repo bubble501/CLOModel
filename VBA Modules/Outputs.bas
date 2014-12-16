@@ -1,12 +1,5 @@
 Attribute VB_Name = "Outputs"
 Option Explicit
-Public Sub PrintWaterfallStep( _
-    DestinationSheet As String, _
-    DestinatAddress As String, _
-    StepStructure As String _
-)
-
-End Sub
 Public Sub PrintTranche( _
     Data As Variant, _
     DestinatAddress As String, _
@@ -21,8 +14,8 @@ Public Sub PrintTranche( _
     PrintOCtest As Boolean, _
     PrintICtest As Boolean, _
     PrintPDL As Boolean, _
-    TargetICtest As Double, _
-    TargetOCtest As Double _
+    TargetICtest As Variant, _
+    TargetOCtest As Variant _
 )
     Application.ScreenUpdating = False
     Dim ColOffset As Long, i As Long
@@ -137,8 +130,8 @@ Public Sub PrintTranche( _
         End If
         If (PrintOCtest) Then
             TargetCell.Offset(i, ColOffset).Value = Data(i, ColOffset)
-            If (TargetOCtest > 0) Then
-                TargetCell.Offset(i, ColOffset).NumberFormat = "[Red][<" + Format(TargetOCtest, "0.0000") + "]0%;[>=10]""Infinity"";0%"
+            If (TargetOCtest(i - LBound(Data, 1) + LBound(TargetICtest)) > 0) Then
+                TargetCell.Offset(i, ColOffset).NumberFormat = "[Red][<" + Format(TargetOCtest(i - LBound(Data, 1) + LBound(TargetICtest)), "0.0000") + "]0%;[>=10]""Infinity"";0%"
             Else
                 TargetCell.Offset(i, ColOffset).NumberFormat = "[<10]0%;[>=10]""Infinity"""
             End If
@@ -146,8 +139,8 @@ Public Sub PrintTranche( _
         End If
         If (PrintICtest) Then
             TargetCell.Offset(i, ColOffset).Value = Data(i, ColOffset)
-            If (TargetICtest > 0) Then
-                TargetCell.Offset(i, ColOffset).NumberFormat = "[Red][<" + Format(TargetICtest, "0.0000") + "]0%;[>=10]""Infinity"";0%"
+            If (TargetICtest(i - LBound(Data, 1) + LBound(TargetICtest)) > 0) Then
+                TargetCell.Offset(i, ColOffset).NumberFormat = "[Red][<" + Format(TargetICtest(i - LBound(Data, 1) + LBound(TargetICtest)), "0.0000") + "]0%;[>=10]""Infinity"";0%"
             Else
                 TargetCell.Offset(i, ColOffset).NumberFormat = "[<10]0%;[>=10]""Infinity"""
             End If

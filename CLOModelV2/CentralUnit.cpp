@@ -44,7 +44,6 @@ void CentralUnit::AddLoan(
 	, const QString& HaicutVect
 	, const QString& Properties
 	) {
-	LOGDEBUG(floatBase);
 	Mortgage TempMtg;
 	TempMtg.SetMaturityDate(Maturity);
 	TempMtg.SetSize(Size);
@@ -159,7 +158,6 @@ void CentralUnit::AddWaterfallStep(
 	if (!ArgTrigger.isEmpty()) { TempStep.SetParameter(WatFalPrior::wstParameters::Trigger, ArgTrigger); }
 	TempStep.SetParameter(WatFalPrior::wstParameters::PayAccrue, QString::number(ArgAccruePay));
 	TempStep.SetPriorityType(Tpe);
-	LOGDEBUG(TempStep.ToString());
 	Structure.AddStep(TempStep);
 	if(Stresser)Stresser->SetStructure(Structure);
 }
@@ -263,6 +261,7 @@ void CentralUnit::CalculateStress(){
 	ComputationLoop.exec();
 }
 void CentralUnit::CalculationStep1(){
+	LOGDEBUG("Reached CalculationStep1");
 	LoansCalculator.SetCPRass(Structure.GetReinvestmentTest().GetCPRAssumption().GetVector());
 	LoansCalculator.SetCDRass(Structure.GetReinvestmentTest().GetCDRAssumption().GetVector());
 	LoansCalculator.SetLSass(Structure.GetReinvestmentTest().GetLSAssumption().GetVector());
@@ -291,6 +290,7 @@ void CentralUnit::CalculationStep1(){
 	}
 }
 void CentralUnit::CalculationStep2(){
+	LOGDEBUG("Reached CalculationStep2");
 	MtgsProgress->SetValue(0);
 	MtgsProgress->SetTitle("Calculating Tranches");
 	MtgsProgress->SetMax(1);
@@ -304,6 +304,16 @@ void CentralUnit::CalculationStep2(){
 		QApplication::quit();
 		return;
 	}
+#ifdef SAVE_EXCEL_INPUTS
+	QString Filename = "C:\\Temp\\.SavedInputs.clo";
+	QFile file(Filename);
+	if (file.open(QIODevice::WriteOnly)) {
+		QDataStream out(&file);
+		out.setVersion(QDataStream::Qt_5_3);
+		out << qint32(ModelVersionNumber) << m_BaseCaseToCall << Structure << Waterfall();
+		file.close();
+	}
+#endif // SAVE_EXCEL_INPUTS
 	if(!RunCall){
 		CallStructure.ResetMtgFlows();
 		CallStructure.ResetTranches();
@@ -334,6 +344,7 @@ void CentralUnit::CalculationStep2(){
 }
 void CentralUnit::CheckCalculationDone()
 {
+	LOGDEBUG("Reached Calculation Done");
 	MtgsProgress->SetValue(1);
 	QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 	if(MtgsProgress) MtgsProgress->deleteLater();

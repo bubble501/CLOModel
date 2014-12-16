@@ -86,6 +86,7 @@ private:
 	QWidget* CreateCurePDLWidget();
 	QWidget* CreateFeesFromXSWidget();
 	QWidget* CreateAllocPrepayWidget();
+	QWidget* CreateJuniorFeesWidget();
 	bool FirstCombodeleted;
 	bool Cleared;
 	QMap<qint32,QString> ResultingParameters;

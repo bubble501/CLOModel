@@ -108,7 +108,7 @@ public:
 		, const QString& AnnuityVec = "I"
 		, const QString& ReinvPric = "100"
 		, const QString& ReinvDel = "0"
-		, const QString& ReinvSpr = "0"
+		, const QString& ReinvSpr = "1"
 		, const QString& FloatingBase = "ZERO"
 		, const QString& RecoveryLag = "0"
 		, const QString& Delinquency = "0"

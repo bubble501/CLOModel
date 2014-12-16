@@ -19,11 +19,11 @@ public:
 	FloorCapVector(const QString& Vec);
 	FloorCapVector(const QString& Vec, const QDate& Anchor);
 	template<class T> QSharedPointer<double> GetFloor(const T& index) const {
-		static_assert(std::is_same<T, QDate>::value || std::is_same<T, int>::value, "GetFloor can be used only with int or QDate");
+		static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetFloor can be used only with int or QDate");
 		return AbstractBbgVect::GetValueTemplate(m_FloorVal, index, QSharedPointer<double>(NULL));
 	}
 	template<class T> QSharedPointer<double> GetCap(const T& index) const {
-		static_assert(std::is_same<T, QDate>::value || std::is_same<T, int>::value, "GetCap can be used only with int or QDate");
+		static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetCap can be used only with int or QDate");
 		return AbstractBbgVect::GetValueTemplate(m_CapVal, index, QSharedPointer<double>(NULL));
 	}
 	int NumElements() const { return m_FloorVal.size(); }

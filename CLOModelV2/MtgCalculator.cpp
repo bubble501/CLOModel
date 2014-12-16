@@ -21,7 +21,6 @@ void MtgCalculator::AddLoan(const Mortgage& a, qint32 Index) {
 		Loans.erase(FoundLn);
 	}
 	Loans.insert(Index, new Mortgage(a));
-	LOGDEBUG(Loans.value(Index)->GetFloatingRateBase().GetVector());
 }
 bool MtgCalculator::StartCalculation() {
 	if (m_ContinueCalculation) return false;

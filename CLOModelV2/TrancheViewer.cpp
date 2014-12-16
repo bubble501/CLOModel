@@ -66,7 +66,7 @@ void TrancheViewer::SetTranche(const Tranche& a){
 		ColumnIter = 0;
 		MainTable->setItem(i, ColumnIter++, new QTableWidgetItem(a.GetCashFlow().GetDate(i).toString("MMM-yy")));
 		MainTable->setItem(i, ColumnIter++, new QTableWidgetItem(Commarize(a.GetCashFlow().GetAmountOutstanding(i))));
-		MainTable->setItem(i, ColumnIter++, new QTableWidgetItem(Commarize(a.GetCashFlow().GetInterest(i))));
+		MainTable->setItem(i, ColumnIter++, new QTableWidgetItem(Commarize(a.GetCashFlow().GetTotalInterest(i))));
 		MainTable->setItem(i, ColumnIter++, new QTableWidgetItem(Commarize(a.GetCashFlow().GetPrincipal(i))));
 		for (qint32 j = static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow); j < (static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) << 1); ++j) {
 			if (a.GetCashFlow().HasFlowType(j)) MainTable->setItem(i, ColumnIter++, new QTableWidgetItem(Commarize(a.GetCashFlow().GetFlow(i, j))));

@@ -411,10 +411,6 @@ double Tranche::GetIRR(double NewPrice)const{
 	}
 	return qMax(0.0,CalculateIRR(FlowsDates,FlowsValues,m_DayCount));
 }
-double Tranche::GetCurrentOutstanding()const{
-	if(CashFlow.Count()==0) return OutstandingAmt;
-	return CashFlow.GetAmountOutstanding(CashFlow.Count()-1);
-}
 double Tranche::GetWALife(const QDate& StartDate)const{
 	if(OutstandingAmt<0.01 || StartDate.isNull()) return 0.0;
 	double RunningSum=0.0, Result=0.0, CurrentPrinc;
@@ -602,7 +598,10 @@ bool Tranche::HasCoupon(qint32 CoupIdx) const {
 	return 
 		InterestType.contains(CoupIdx)
 		&& Coupon.contains(CoupIdx)
-		&& ((InterestType.value(CoupIdx) == TrancheInterestType::FloatingInterest) ? ReferenceRate.contains(CoupIdx):true);
+		&& (
+			InterestType.value(CoupIdx) != TrancheInterestType::FloatingInterest
+			|| ReferenceRate.contains(CoupIdx)
+		);
 }
 
 

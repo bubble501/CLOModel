@@ -141,9 +141,11 @@ SummaryView::SummaryView(QWidget* parent)
 		<< "Date"
 		<< "Interest On Revenues Cash"
 		<< "Interest On Principal Cash"
+		<< "Interest On Reserve Funds"
+		<< "Interest On Re-investable Cash"
 		;
 	GICTable->setRowCount(0);
-	GICTable->setColumnCount(3);
+	GICTable->setColumnCount(5);
 	GICTable->setHorizontalHeaderLabels(HeadersStrings);
 	GICTable->verticalHeader()->setVisible(false);
 	GICTable->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -262,6 +264,8 @@ void SummaryView::DisplayStructure(){
 		GICTable->setItem(i, 0, new QTableWidgetItem(Structure.GetGICflows().GetDate(i).toString("MMM-yy")));
 		GICTable->setItem(i, 1, new QTableWidgetItem(Commarize(Structure.GetGICflows().GetFlow(i, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow)))));
 		GICTable->setItem(i, 2, new QTableWidgetItem(Commarize(Structure.GetGICflows().GetFlow(i, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow)))));
+		GICTable->setItem(i, 3, new QTableWidgetItem(Commarize(Structure.GetGICflows().GetFlow(i, 1+static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow)))));
+		GICTable->setItem(i, 4, new QTableWidgetItem(Commarize(Structure.GetGICflows().GetFlow(i, 2+static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow)))));
 	}
 	StructureTable->setRowCount(0);
 	StructureTable->setRowCount(Structure.GetTranchesCount());

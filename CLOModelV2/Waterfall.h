@@ -64,11 +64,18 @@ private:
 	QHash <quint32, QSharedPointer<AbstractTrigger> > m_Triggers;
 	int FindMostJuniorLevel(int SeliorityScaleLevel) const;
 	void SortByProRataGroup();
-	double GroupOutstanding(int GroupTarget, int SeliorityScaleLevel)const;
+	template<class T> double GroupOutstanding(int GroupTarget, int SeliorityScaleLevel, const T& PeriodInedex)const {
+		static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GroupOutstanding can be used only with int or QDate");
+		double Result = 0.0;
+		for (QList<Tranche*>::const_iterator i = m_Tranches.constBegin(); i != m_Tranches.constEnd(); i++) {
+			if ((*i)->GetProrataGroup(SeliorityScaleLevel) == GroupTarget) Result += (*i)->GetCashFlow().GetAmountOutstanding(PeriodInedex);
+		}
+		return Result;
+	}
 	double GroupWACoupon(int GroupTarget, int SeliorityScaleLevel, const QDate& Period, qint32 CouponType = 0)const;
 	double GroupWACoupon(int GroupTarget, int SeliorityScaleLevel, const QDate& Period, QList<qint32> CouponTypes)const;
 	double RedeemNotes(double AvailableFunds, int GroupTarget, int SeliorityScaleLevel, const QDate& PeriodIndex);
-	double RedeemProRata(double AvailableFunds, const QDate& PeriodIndex, QList<int> Groups, int SeliorityScaleLevel);
+	//double RedeemProRata(double AvailableFunds, const QDate& PeriodIndex, QList<int> Groups, int SeliorityScaleLevel);
 	double RedeemSequential(double AvailableFunds, const QDate& PeriodIndex, int SeliorityScaleLevel, int MaxGroup = -1 );
 	int FindTrancheIndex(const QString& Tranchename)const;
 	void FillAllDates();

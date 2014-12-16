@@ -1,4 +1,4 @@
-#include <QtAlgorithms>
+#include <algorithm>
 #include <QQueue>
 #include <QHash>
 #include <QSet>
@@ -12,6 +12,7 @@
 #include <QStack>
 #include "AssumptionSet.h"
 #include "DelinquencyTrigger.h"
+#include "DuringStressTestTrigger.h"
 const WatFalPrior* Waterfall::GetStep(int Index)const {
 	if (Index<0 || Index >= m_WaterfallStesps.size()) return nullptr;
 	return m_WaterfallStesps.at(Index);
@@ -37,7 +38,7 @@ Tranche* Waterfall::GetTranche(const QString& TrancheName){
 	return GetTranche(FindTrancheIndex(TrancheName));
 }
 void Waterfall::SortByProRataGroup(){
-	qSort(m_Tranches.begin(), m_Tranches.end(), [](const Tranche* a, const Tranche* b) -> bool {return a->GetProrataGroup(0) < b->GetProrataGroup(0); });
+	std::sort(m_Tranches.begin(), m_Tranches.end(), [](const Tranche* a, const Tranche* b) -> bool {return a->GetProrataGroup(0) < b->GetProrataGroup(0); });
 }
 QDate Waterfall::GetStructureMaturity()const{
 	if(m_Tranches.isEmpty()) return QDate();
@@ -81,6 +82,7 @@ Waterfall::Waterfall()
 	, m_StartingDeferredJunFees(0.0)
 	, m_GICBaseRate("ZERO")
 	, m_DealDayCountConvention(DayCountConvention::ACT360)
+	, m_IsStressTest(false)
 {
 	m_GICflows.Aggregate(GenericCashFlow::Monthly);
 	m_ExcessCashFlow.Aggregate(GenericCashFlow::Monthly);
@@ -136,6 +138,7 @@ Waterfall::Waterfall(const Waterfall& a)
 	, m_DealDayCountConvention(a.m_DealDayCountConvention)
 	, m_CalledPeriod(a.m_CalledPeriod)
 	, m_TriggersResults(a.m_TriggersResults)
+	, m_IsStressTest(a.m_IsStressTest)
 {
 	m_LoadProtocolVersion = a.m_LoadProtocolVersion;
 	for(QList<Tranche*>::const_iterator i=a.m_Tranches.constBegin();i!=a.m_Tranches.constEnd();i++){
@@ -163,6 +166,9 @@ Waterfall::Waterfall(const Waterfall& a)
 			break;
 		case AbstractTrigger::TriggerType::DelinquencyTrigger:
 			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DelinquencyTrigger(*(i.value().dynamicCast<DelinquencyTrigger>()))));
+			break;
+		case AbstractTrigger::TriggerType::DuringStressTestTrigger:
+			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DuringStressTestTrigger(*(i.value().dynamicCast<DuringStressTestTrigger>()))));
 			break;
 		default:
 			break;
@@ -211,6 +217,7 @@ Waterfall& Waterfall::operator=(const Waterfall& a){
 	m_DealDayCountConvention = a.m_DealDayCountConvention;
 	m_CalledPeriod = a.m_CalledPeriod;
 	m_TriggersResults = a.m_TriggersResults;
+	m_IsStressTest = a.m_IsStressTest;
 	ResetTranches();
 	for(QList<Tranche*>::const_iterator i=a.m_Tranches.constBegin();i!=a.m_Tranches.constEnd();i++){
 		m_Tranches.append(new Tranche(**i));
@@ -239,7 +246,10 @@ Waterfall& Waterfall::operator=(const Waterfall& a){
 			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new TrancheTrigger(*(i.value().dynamicCast<TrancheTrigger>()))));
 			break;
 		case AbstractTrigger::TriggerType::DelinquencyTrigger:
-			m_Triggers.insert(i.key(), QSharedPointer<DelinquencyTrigger>(new DelinquencyTrigger(*(i.value().dynamicCast<DelinquencyTrigger>()))));
+			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DelinquencyTrigger(*(i.value().dynamicCast<DelinquencyTrigger>()))));
+			break;
+		case AbstractTrigger::TriggerType::DuringStressTestTrigger:
+			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DuringStressTestTrigger(*(i.value().dynamicCast<DuringStressTestTrigger>()))));
 			break;
 		default:
 			break;
@@ -601,6 +611,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 			PrintToTempFile("ReturnFalse.txt", "Not Ready To Calculate");
 			return false;
 		}
+		LOGTOFILE("Pre-Reinv",m_MortgagesPayments.ToPlainText());
 		{//Check if all base rates are valid
 			bool KeepSearching = false;
 			ConstantBaseRateTable TempTable;
@@ -1588,6 +1599,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 				break;
 			}
 		}//End Cycle in time
+		LOGTOFILE("Post-Reinv", m_MortgagesPayments.ToPlainText());
 		for(int j=0;j<m_Reserves.size();j++){
 			m_Reserves[j]->SetReserveFundCurrent(m_Reserves[j]->GetStartingReserve());
 			m_Reserves[j]->ResetMissingAnchors();
@@ -1709,6 +1721,7 @@ QDataStream& operator<<(QDataStream & stream, const Waterfall& flows){
 		<< flows.m_LegalFinal
 		<< flows.m_PoolValueAtCall
 		<< flows.m_UseCall
+		<< flows.m_IsStressTest
 		<< flows.m_CallMultiple
 		<< flows.m_CallReserve
 		<< flows.m_DealName
@@ -1778,6 +1791,7 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream){
 	stream >> m_LastIPDdate >> m_CallDate >> m_LegalFinal;
 	m_PoolValueAtCall.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_PoolValueAtCall;
 	stream >> m_UseCall
+		>> m_IsStressTest
 		>> m_CallMultiple
 		>> m_CallReserve
 		>> m_DealName;
@@ -1819,6 +1833,9 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream){
 				break;
 			case AbstractTrigger::TriggerType::DelinquencyTrigger:
 				TempTrig.reset(new DelinquencyTrigger());
+				break;
+			case AbstractTrigger::TriggerType::DuringStressTestTrigger:
+				TempTrig.reset(new DuringStressTestTrigger());
 				break;
 			}
 			TempTrig->SetLoadProtocolVersion(m_LoadProtocolVersion);
@@ -2197,13 +2214,16 @@ bool Waterfall::EvaluateTrigger(quint32 TrigID, int PeriodIndex, const QDate& Cu
 		TrancheTrigger TempTrig(*CurrentTrigger.dynamicCast<TrancheTrigger>());
 		if (!TempTrig.HasAnchor())
 			TempTrig.FillMissingAnchorDate(m_MortgagesPayments.GetDate(0));
-		return CurrentTrigger.dynamicCast<TrancheTrigger>()->Passing(m_Tranches, CurrentIPD);
+		return TempTrig.Passing(m_Tranches, CurrentIPD);
 	}
 	case AbstractTrigger::TriggerType::DelinquencyTrigger:{
 		DelinquencyTrigger TempTrig(*CurrentTrigger.dynamicCast<DelinquencyTrigger>());
 		if (!TempTrig.HasAnchor())
 			TempTrig.SetAnchorDate(m_MortgagesPayments.GetDate(0));
-		return CurrentTrigger.dynamicCast<DelinquencyTrigger>()->Passing(m_MortgagesPayments.GetDelinquentShare(PeriodIndex), m_MortgagesPayments.GetDate(PeriodIndex));
+		return TempTrig.Passing(m_MortgagesPayments.GetDelinquentShare(PeriodIndex), m_MortgagesPayments.GetDate(PeriodIndex));
+	}
+	case AbstractTrigger::TriggerType::DuringStressTestTrigger:{
+		return CurrentTrigger.dynamicCast<DuringStressTestTrigger>()->Passing(m_IsStressTest);
 	}
 	default:
 		return false;

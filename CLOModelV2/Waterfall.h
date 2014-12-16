@@ -50,7 +50,8 @@ private:
 	QDate m_CallDate; 
 	BloombergVector m_PoolValueAtCall; 
 	bool m_UseCall; 
-	double m_CallMultiple; 
+	bool m_IsStressTest;
+	double m_CallMultiple;
 	double m_CallReserve;
 	QString m_DealName;
 	BloombergVector m_GICinterest;
@@ -165,7 +166,9 @@ public:
 	GenericCashFlow GetAggregatedReinvestment() const;
 	GenericCashFlow GetAggregatedGIC() const;
 	MtgCashFlow GetAggregatedMtgFlows() const;
+	const bool& GetIsStressTest() const { return m_IsStressTest; }
 	//////////////////////////////////////////////////////////////////////////
+	void SetIsStressTest(const bool& val) { m_IsStressTest = val; }
 	void SetAssumptions(const AssumptionSet& a);
 	const TriggersResults& GetTriggersResults() const { return m_TriggersResults; }
 	void SetTrigger(quint32 key, QSharedPointer<AbstractTrigger> val);

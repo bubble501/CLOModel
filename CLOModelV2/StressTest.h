@@ -109,7 +109,7 @@ public:
 	bool GetUseMultithread()const {return !SequentialComputation;}
 	void AddLoan(const Mortgage& a);
 	void ResetLoans();
-	void SetStructure(const Waterfall& a){Structure=a;}
+	void SetStructure(const Waterfall& a) { Structure = a; Structure.SetIsStressTest(true); }
 	void SetStartDate(const QDate& a){StartDate=a;}
 	void UseMultithread(bool a=true){SequentialComputation=!a;}
 	void SaveResults(const QString& DestPath)const;

@@ -11,6 +11,7 @@ public:
 		,PoolSizeTrigger=2
 		,TrancheTrigger=3
 		,DelinquencyTrigger=4
+		,DuringStressTestTrigger=5
 	};
 protected:
 	TriggerType m_TriggerType;
@@ -19,13 +20,13 @@ protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 public:
 	QString TriggerTypeToString(TriggerType a) const;
-	AbstractTrigger(const AbstractTrigger& a) :m_TriggerType(a.m_TriggerType), m_TriggerLabel(a.m_TriggerLabel) {}
-	AbstractTrigger(TriggerType TTP, const QString& lab = QString()) :m_TriggerType(TTP), m_TriggerLabel(lab) {}
+	AbstractTrigger(const AbstractTrigger& a);
+	AbstractTrigger(TriggerType TTP, const QString& lab = QString());
 	TriggerType GetTriggerType() const { return m_TriggerType; }
 	const QString& GetTriggerLabel() const { return m_TriggerLabel; }
 	void SetTriggerLabel(const QString& lab) { m_TriggerLabel = lab; }
 	virtual QString ReadyToCalculate() const = 0;
-	virtual QString ToString() const { return "Label: " + m_TriggerLabel + "\nTrigger type: " + TriggerTypeToString(m_TriggerType); }
+	virtual QString ToString() const;
 	friend QDataStream& operator<<(QDataStream & stream, const AbstractTrigger& flows);
 	friend QDataStream& operator>>(QDataStream & stream, AbstractTrigger& flows);
 };

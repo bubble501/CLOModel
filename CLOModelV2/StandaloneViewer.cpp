@@ -11,6 +11,8 @@
 #include <QSettings>
 #include "CommonFunctions.h"
 #include "StressViewer.h"
+#include <algorithm>
+#include <functional>
 StandaloneViewer::StandaloneViewer(QWidget *parent)
 	:QMainWindow(parent)
 {
@@ -157,7 +159,7 @@ void StandaloneViewer::LoadFile(const QString& fileName){
 				IndexesToDelete << i;
 			}
 		}
-		qSort(IndexesToDelete.begin(), IndexesToDelete.end(), qGreater<int>());
+		std::sort(IndexesToDelete.begin(), IndexesToDelete.end(), std::greater<int>());
 		foreach(int IndexToDelete, IndexesToDelete) {
 			recentNames.removeAt(IndexToDelete);
 			recentFiles.removeAt(IndexToDelete);
@@ -175,7 +177,7 @@ void StandaloneViewer::LoadFile(const QString& fileName){
 				 IndexesToDelete << i;
 			 }
 		 }
-		 qSort(IndexesToDelete.begin(), IndexesToDelete.end(), qGreater<int>());
+		 std::sort(IndexesToDelete.begin(), IndexesToDelete.end(), std::greater<int>());
 		 foreach(int IndexToDelete, IndexesToDelete) {
 			 recentNames.removeAt(IndexToDelete);
 			 recentFiles.removeAt(IndexToDelete);

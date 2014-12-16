@@ -4,6 +4,8 @@
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
 #include <QStack>
+#include <algorithm>
+#include <functional>  
 GenericCashFlow::GenericCashFlow() 
 	: m_AggregationLevel(NoAggregation)
 	, m_AdjustHolidays(false)
@@ -81,20 +83,48 @@ void GenericCashFlow::SetFlow(QDate Dte, double Amt, qint32 FlowTpe) {
 
 
 void GenericCashFlow::AddFlow(const GenericCashFlow& a) {
+	QSet<qint32> StocksToCalculate;
+	QHash<qint32,QSet<QDate> >DatesOfStockChange;
 	m_Stocks.unite(a.m_Stocks);
-	if (!a.m_CashFlows.isEmpty()) {
-		for (QMap<QDate, QHash<qint32, double>* >::const_iterator i = a.m_CashFlows.constEnd()-1;true; --i) {
-			if (i.value()->isEmpty()) AddFlow(i.key(), 0.0, 0);
+	qint32 FakeFlow = 0;
+	while (m_Stocks.contains(FakeFlow)) ++FakeFlow;
+
+	//Aggregate Flows
+	for (auto i = a.m_CashFlows.constBegin(); i != a.m_CashFlows.constEnd(); ++i) {
+		if (i.value()->isEmpty()) AddFlow(i.key(), 0.0, FakeFlow);
+		else {
 			for (QHash<qint32, double>::const_iterator j = i.value()->constBegin(); j != i.value()->constEnd(); ++j) {
-				AddFlow(i.key(), j.value(), j.key());
+				if (m_Stocks.contains(j.key())) {
+					//Save stocks types to calculate later
+					AddFlow(i.key(), 0.0, FakeFlow);
+					StocksToCalculate.insert(j.key());
+					DatesOfStockChange[j.key()].insert(i.key());
+				}
+				else AddFlow(i.key(), j.value(), j.key());
 			}
-			if (i == a.m_CashFlows.constBegin()) break;
 		}
 	}
+	for (auto i = m_CashFlows.constBegin(); i != m_CashFlows.constEnd(); ++i) {
+		for (QHash<qint32, double>::const_iterator j = i.value()->constBegin(); j != i.value()->constEnd(); ++j) {
+			if (m_Stocks.contains(j.key())) {
+				//Add stocks types already in cash flows
+				StocksToCalculate.insert(j.key());
+				DatesOfStockChange[j.key()].insert(i.key());
+			}
+		}
+	}
+	//Aggregate Stocks
+	foreach(qint32 SingleStock, StocksToCalculate) {
+		auto CurrDates = DatesOfStockChange.value(SingleStock, QSet<QDate>()).toList();
+		std::sort(CurrDates.begin(), CurrDates.end(), std::greater<QDate>());
+		for (auto i = CurrDates.constBegin(); i != CurrDates.constEnd(); ++i) {
+			SetFlow(*i, GetFlow(*i, SingleStock) + a.GetFlow(*i, SingleStock), SingleStock);
+		}
+	}
+	//Aggregate Labels
 	for (auto i = a.m_CashFlowLabels.constBegin(); i != a.m_CashFlowLabels.constEnd(); ++i) {
 		if (!m_CashFlowLabels.contains(i.key())) m_CashFlowLabels.insert(i.key(), i.value());
 	}
-	CompactFlows();
 }
 void GenericCashFlow::SetFlow(const GenericCashFlow& a) {
 	Clear();
@@ -109,7 +139,6 @@ void GenericCashFlow::SetFlow(const GenericCashFlow& a) {
 			if (i == a.m_CashFlows.constBegin()) break;
 		}
 	}
-	CompactFlows();
 }
 
 void GenericCashFlow::Clear() {
@@ -279,7 +308,7 @@ QString GenericCashFlow::ToString() const {
 	}
 	QString Result("Date");
 	QList<qint32> FlowsTypesList = FlowsTypes.toList();
-	qSort(FlowsTypesList);
+	std::sort(FlowsTypesList.begin(), FlowsTypesList.end());
 	for (QList<qint32>::const_iterator SecIter = FlowsTypesList.constBegin(); SecIter != FlowsTypesList.constEnd(); ++SecIter) {
 		Result += '\t'+ m_CashFlowLabels.value(*SecIter, QString("Flow %1").arg(*SecIter));
 	}
@@ -300,7 +329,6 @@ GenericCashFlow GenericCashFlow::SingleFlow(qint32 FlowTpe) const {
 	}
 	if (IsStock(FlowTpe)) Result.SetStock(FlowTpe);
 	if (m_CashFlowLabels.contains(FlowTpe)) Result.SetLabel(FlowTpe,m_CashFlowLabels.value(FlowTpe));
-	Result.CompactFlows();
 	return Result;
 }
 GenericCashFlow GenericCashFlow::SingleDate(const QDate& a) const {
@@ -434,7 +462,7 @@ QString GenericCashFlow::ToPlainText(bool UseHeaders /*= true*/) const {
 	if (IsEmpty()) return false;
 	QString Result("Date");
 	auto AllFlows = AvailableFlows();
-	qSort(AllFlows);
+	std::sort(AllFlows.begin(),AllFlows.end());
 	for (auto j = AllFlows.constBegin(); j != AllFlows.constEnd(); ++j) {
 		if (UseHeaders) Result += '\t' + m_CashFlowLabels.value(*j, QString("Flow %1").arg(*j));
 		else  Result += QString("%1").arg(*j);
@@ -452,9 +480,12 @@ QString GenericCashFlow::ToXML() const {
 	QString Result;
 	QXmlStreamWriter Writer(&Result);
 	Writer.setAutoFormatting(false);
+#ifdef _DEBUG
+	Writer.writeStartDocument();
+#endif // _DEBUG
 	Writer.writeStartElement("CashFlow");
 	auto AllFlows = AvailableFlows();
-	qSort(AllFlows);
+	std::sort(AllFlows.begin(),AllFlows.end());
 	for (auto j = AllFlows.constBegin(); j != AllFlows.constEnd(); ++j) {
 		Writer.writeStartElement("Flow");
 		Writer.writeAttribute("id", QString::number(*j));
@@ -469,6 +500,9 @@ QString GenericCashFlow::ToXML() const {
 		Writer.writeEndElement();
 	}
 	Writer.writeEndElement();
+#ifdef _DEBUG
+	Writer.writeEndDocument();
+#endif // _DEBUG
 	return Result;
 }
 
@@ -559,24 +593,4 @@ void GenericCashFlow::LoadFromXML(const QString& Source) {
 void GenericCashFlow::SetLabel(qint32 FlowTpe, const QString& Lab) {
 	if (Lab.isEmpty()) m_CashFlowLabels.remove(FlowTpe);
 	else m_CashFlowLabels[FlowTpe] = Lab;
-}
-
-void GenericCashFlow::CompactFlows() {
-	foreach(qint32 SingleStock, m_Stocks) {
-		auto PreviousFlow=m_CashFlows.end();
-		for (auto i = m_CashFlows.begin(); i != m_CashFlows.end(); ++i) {
-			if (i.value()->contains(SingleStock)) {
-				PreviousFlow = i;
-				break;
-			}
-		}
-		if (PreviousFlow == m_CashFlows.end()) continue;
-		for (auto i = PreviousFlow+1; i != m_CashFlows.end();++i) {
-			if (i.value()->contains(SingleStock)) {
-				if (i.value()->value(SingleStock) == PreviousFlow.value()->value(SingleStock))
-					i.value()->remove(SingleStock);
-				else PreviousFlow = i;
-			}
-		}
-	}
 }

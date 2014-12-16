@@ -18,6 +18,7 @@
 #include "DelinquencyTrigger.h"
 #include "WaterfallStepHelperDialog.h"
 #include "TriggerHelperDialog.h"
+#include "DuringStressTestTrigger.h"
 void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	bool RunStress;
 	CentralUnit TempUnit;
@@ -160,6 +161,10 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			case static_cast<int>(AbstractTrigger::TriggerType::DelinquencyTrigger) :
 				TempTrigger.reset(new DelinquencyTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
 				TempTrigger.dynamicCast<DelinquencyTrigger>()->SetTarget(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+				TempUnit.SetTrigger(i + 1, TempTrigger);
+				break;
+			case static_cast<int>(AbstractTrigger::TriggerType::DuringStressTestTrigger) :
+				TempTrigger.reset(new DuringStressTestTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
 				TempUnit.SetTrigger(i + 1, TempTrigger);
 				break;
 			}
@@ -632,6 +637,9 @@ BSTR __stdcall WatFallStepEdit(LPSAFEARRAY *ArrayData) {
 			case static_cast<int>(AbstractTrigger::TriggerType::DelinquencyTrigger) :
 				TempIter = AvailableTriggers.insert(i, QSharedPointer<AbstractTrigger>(new DelinquencyTrigger(QString::fromWCharArray(pdFreq->bstrVal)))); pdFreq++;
 				TempIter->dynamicCast<DelinquencyTrigger>()->SetTarget(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+				break;
+			case static_cast<int>(AbstractTrigger::TriggerType::DuringStressTestTrigger) :
+				AvailableTriggers.insert(i, QSharedPointer<AbstractTrigger>(new DuringStressTestTrigger(QString::fromWCharArray(pdFreq->bstrVal)))); pdFreq++;
 				break;
 			}
 		}

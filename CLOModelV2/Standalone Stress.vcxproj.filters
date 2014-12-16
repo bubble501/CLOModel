@@ -155,6 +155,9 @@
     <ClInclude Include="FloorCapVector.h">
       <Filter>Header Files\Core Files</Filter>
     </ClInclude>
+    <ClInclude Include="DuringStressTestTrigger.h">
+      <Filter>Header Files\Core Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="StandaloneStress.h">
@@ -212,7 +215,7 @@
       <Filter>Header Files\Core Files</Filter>
     </CustomBuild>
     <CustomBuild Include="ApplyFlowThread.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Core Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

@@ -23,7 +23,22 @@ QString AbstractTrigger::TriggerTypeToString(TriggerType a)const {
 	case TriggerType::PoolSizeTrigger: return "Pool Size Trigger";
 	case TriggerType::TrancheTrigger: return "Tranche Trigger";
 	case TriggerType::DelinquencyTrigger: return "Delinquency Trigger";
+	case TriggerType::DuringStressTestTrigger: return "During Stress Test Trigger";
 	default: return QString();
 	}
+}
+
+AbstractTrigger::AbstractTrigger(const AbstractTrigger& a) 
+	:m_TriggerType(a.m_TriggerType)
+	, m_TriggerLabel(a.m_TriggerLabel) 
+{}
+
+AbstractTrigger::AbstractTrigger(TriggerType TTP, const QString& lab /*= QString()*/) 
+	: m_TriggerType(TTP)
+	, m_TriggerLabel(lab) 
+{}
+
+QString AbstractTrigger::ToString() const {
+	return "Label: " + m_TriggerLabel + "\nTrigger type: " + TriggerTypeToString(m_TriggerType);
 }
 

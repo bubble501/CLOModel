@@ -25,6 +25,7 @@ StressTest::StressTest(QObject* parent)
 	, UseFastVersion(false)
 	, m_ErrorsOccured(false)
 {
+	Structure.SetIsStressTest(true);
 	BaseCalculator = new MtgCalculator(this);
 	BaseCalculator->SetOverrideAssumptions(true);
 	TranchesCalculator = new WaterfallCalculator(this);

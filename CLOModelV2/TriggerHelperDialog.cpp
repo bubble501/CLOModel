@@ -31,6 +31,7 @@ TriggerHelperDialog::TriggerHelperDialog(QDialog *parent)
 	TriggerTypeCombo->addItem("Pool Size", static_cast<quint8>(AbstractTrigger::TriggerType::PoolSizeTrigger));
 	TriggerTypeCombo->addItem("Tranche", static_cast<quint8>(AbstractTrigger::TriggerType::TrancheTrigger));
 	TriggerTypeCombo->addItem("Delinquencies", static_cast<quint8>(AbstractTrigger::TriggerType::DelinquencyTrigger));
+	TriggerTypeCombo->addItem("During Stress Test", static_cast<quint8>(AbstractTrigger::TriggerType::DuringStressTestTrigger));
 	TriggerTypeCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	
 	QLabel *TriggerLabelLabel = new QLabel(this);
@@ -52,6 +53,7 @@ TriggerHelperDialog::TriggerHelperDialog(QDialog *parent)
 	TriggerBuilderBase->addWidget(CreatePoolSizeTriggerWidget());
 	TriggerBuilderBase->addWidget(CreateTrancheTriggerWidget());
 	TriggerBuilderBase->addWidget(CreateDelinquencyTriggerWidget());
+	TriggerBuilderBase->addWidget(new QWidget(TriggerBuilderBase));
 	
 	
 

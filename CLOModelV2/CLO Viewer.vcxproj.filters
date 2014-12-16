@@ -418,6 +418,9 @@
     <ClInclude Include="FloorCapVector.h">
       <Filter>Header Files\Core Files</Filter>
     </ClInclude>
+    <ClInclude Include="DuringStressTestTrigger.h">
+      <Filter>Header Files\Core Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MtgCalculator.h">

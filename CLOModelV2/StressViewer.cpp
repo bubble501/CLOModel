@@ -170,7 +170,7 @@ bool StressViewer::LoadStress(const QString& filename) {
 	AvailableAssumptions[AssRecLag] = StressTarget->GetRecLagScenarios().toList();
 	AvailableAssumptions[AssDelinq] = StressTarget->GetDelinqScenarios().toList();
 	AvailableAssumptions[AssDelinqLag] = StressTarget->GetDelinqLagScenarios().toList();
-	for (int i = 0; i < NumStressDimentsions; ++i) qSort(AvailableAssumptions[i].begin(), AvailableAssumptions[i].end(), [](const QString& a, const QString& b) {return BloombergVector(a).GetValue(0) < BloombergVector(b).GetValue(0); });
+	for (int i = 0; i < NumStressDimentsions; ++i) std::sort(AvailableAssumptions[i].begin(), AvailableAssumptions[i].end(), [](const QString& a, const QString& b) {return BloombergVector(a).GetValue(0) < BloombergVector(b).GetValue(0); });
 	TrancheCombo->clear();
 	for (int i = 0; i < StressTarget->GetStructure().GetTranchesCount(); ++i) {
 		TrancheCombo->addItem(StressTarget->GetStructure().GetTranche(i)->GetTrancheName(), i);

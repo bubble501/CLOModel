@@ -587,6 +587,9 @@ DefaultExchange:
                 Call AddInput(AllTheInputs, CLng(4))
                 Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
                 Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 2).Value))
+            Case 5 'During Stress Test Trigger
+                Call AddInput(AllTheInputs, CLng(5))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
             Case Else
                 Exit Sub
         End Select
@@ -1098,6 +1101,8 @@ Public Function FromStringToTriggerType(a As String) As Long
             FromStringToTriggerType = 3
         Case "DELINQUENCY TRIGGER"
             FromStringToTriggerType = 4
+        Case "DURING STRESS TEST TRIGGER"
+            FromStringToTriggerType = 5
         Case ""
             Exit Function
         Case Else
@@ -1123,6 +1128,8 @@ Public Function FromTriggerTypeToString(a As Long) As String
             FromTriggerTypeToString = "Tranche Trigger"
         Case 4
             FromTriggerTypeToString = "Delinquency Trigger"
+        Case 5
+            FromTriggerTypeToString = "During Stress Test Trigger"
         Case ""
             Exit Function
         Case Else
@@ -1483,6 +1490,9 @@ Public Sub EditWaterfallStep(InputsSheet As String, Target As Range, FieldsLabel
                 Call AddInput(AllTheInputs, CLng(4))
                 Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
                 Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 2).Value))
+            Case 5 'During Reinvestment Test Trigger
+                Call AddInput(AllTheInputs, CLng(5))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
             Case Else
                 Exit Sub
         End Select

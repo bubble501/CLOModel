@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
 	b.LoadStress("C:/Temp/StressResult.fcsr");
 	return a.exec();*/
 
-	Waterfall TempWtf, TempCallWaterfall;
+	/*Waterfall TempWtf, TempCallWaterfall;
 	QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/BaseCase.clo");
 	//QFile file("C:/Temp/.SavedInputs.clo");
 	file.open(QIODevice::ReadOnly);
@@ -57,7 +57,8 @@ int main(int argc, char *argv[]) {
 	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempCallWaterfall;
 	file.close();
-	TempWtf.CalculateTranchesCashFlows();
+	TempWtf.SetIsStressTest(true);
+	TempWtf.CalculateTranchesCashFlows();*/
 
 	/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	QApplication a(argc, argv);
@@ -136,40 +137,40 @@ int main(int argc, char *argv[]) {
 	return a.exec();
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 
-	/*Mortgage TempMtg1;
-	TempMtg1.SetProperty("PrepaymentFee", "5");
+	Mortgage TempMtg1;
 	TempMtg1.SetAnnuity("I");
-	TempMtg1.SetInterest("5");
-	TempMtg1.SetPaymentFreq("1");
-	TempMtg1.SetMaturityDate(QDate(2020, 5, 30));
-	TempMtg1.SetSize(1000000.0);
-	TempMtg1.SetHaircutVector("0 24S 50");
-	TempMtg1.CalculateCashFlows(QDate(2014, 5, 30), "0", "0", "0");
+	TempMtg1.SetInterest("4.25");
+	TempMtg1.SetFloatingRateBase("EUR003M");
+	TempMtg1.SetPaymentFreq("3");
+	TempMtg1.SetMaturityDate(QDate(2020, 11, 15));
+	TempMtg1.SetSize(2030713.0);
+	TempMtg1.CalculateCashFlows(QDate(2014, 9, 19), "0", "0", "0");
 
-	/ *TempMtg1.SetProperty("PrepaymentFee", "10");
+	/*TempMtg1.SetProperty("PrepaymentFee", "10");
 	TempMtg1.SetAnnuity("A");
 	TempMtg1.SetInterest("2.5");
 	TempMtg1.SetPaymentFreq("6");
 	TempMtg1.SetMaturityDate(QDate(2018, 5, 30));
 	TempMtg1.SetSize(500000.0);
-	TempMtg1.CalculateCashFlows(QDate(2014, 5, 30), "0", "0", "0");* /
+	TempMtg1.CalculateCashFlows(QDate(2014, 5, 30), "0", "0", "0");*/
 
 
 	Mortgage TempMtg2;
-	TempMtg2.SetProperty("PrepaymentFee", "10");
-	TempMtg2.SetAnnuity("A");
-	TempMtg2.SetInterest("2.5");
-	TempMtg2.SetPaymentFreq("6");
-	TempMtg2.SetMaturityDate(QDate(2018, 5, 30));
-	TempMtg2.SetSize(500000.0);
-	TempMtg2.CalculateCashFlows(QDate(2014, 5, 30), "0", "0", "0");
+	TempMtg2.SetAnnuity("I");
+	TempMtg2.SetInterest("4.52");
+	TempMtg2.SetFloatingRateBase("EUR003M");
+	TempMtg2.SetPaymentFreq("3");
+	TempMtg2.SetMaturityDate(QDate(2021, 5, 30));
+	TempMtg2.SetSize(3687803.0);
+	TempMtg2.CalculateCashFlows(QDate(2014, 9, 19), "0", "0", "0");
 
 	MtgCashFlow BaseFlows = TempMtg1.GetCashFlow();
 	BaseFlows += TempMtg2.GetCashFlow();
 
+
 	MtgCashFlow LegacyFlows = BaseFlows.ApplyScenario("10", "0", "50");
-	TempMtg1.CalculateCashFlows(QDate(2014, 5, 30), "10", "0", "50");
-	TempMtg2.CalculateCashFlows(QDate(2014, 5, 30), "10", "0", "50");
+	TempMtg1.CalculateCashFlows(QDate(2014, 9, 19), "10", "0", "50");
+	TempMtg2.CalculateCashFlows(QDate(2014, 9, 19), "10", "0", "50");
 
 	MtgCashFlow TempMtgsFlows = TempMtg1.GetCashFlow();
 	TempMtgsFlows += TempMtg2.GetCashFlow();
@@ -180,13 +181,13 @@ int main(int argc, char *argv[]) {
 	if (file1.exists()) file1.remove();
 	if (file2.exists()) file2.remove();
 	if (file3.exists()) file3.remove();
-	if (/ *true  ||* / TempMtgsFlows != LegacyFlows) {
-		PrintToTempFile("Model", TempMtgsFlows.ToPlainText(true), false);
-		PrintToTempFile("Scenario", LegacyFlows.ToPlainText(true), false);
-		PrintToTempFile("Base", BaseFlows.ToPlainText(true), false);
+	if (/*true  ||*/ TempMtgsFlows != LegacyFlows) {
+		PrintToTempFile("Model", TempMtgsFlows.ToPlainText(), false);
+		PrintToTempFile("Scenario", LegacyFlows.ToPlainText(), false);
+		PrintToTempFile("Base", BaseFlows.ToPlainText(), false);
 	}
 	else {
 		qDebug() << "Success, Cash Flows are identical";
-	}*/
+	}
 	return 0;
 }

@@ -710,12 +710,6 @@ bool Waterfall::CalculateTranchesCashFlows(){
 			if (!m_LegalFinal.isNull() && CurrentDate >= m_LegalFinal)  IsMaturityDate = true;
 			if (!IsMaturityDate && m_MortgagesPayments.FindDate(CurrentDate) < 0) m_MortgagesPayments.AddFlow(CurrentDate, 0, 0);
 			if (IsMaturityDate) {
-				//Everything after maturity date comes in as cash
-				/*for (QDate Rollingdt = CurrentDate; Rollingdt <= m_MortgagesPayments.MaturityDate(); Rollingdt = Rollingdt.addMonths(1)) {
-					m_PrincipalAvailable.AddPrepay(m_MortgagesPayments.GetPrepay(Rollingdt));
-					m_PrincipalAvailable.AddScheduled(m_MortgagesPayments.GetScheduled(Rollingdt));
-					m_InterestAvailable+=m_MortgagesPayments.GetInterest(Rollingdt);
-				}*/
 				m_PrincipalAvailable.AddPrepay(m_ReinvestmentTest.GetQueuedCash());
 				m_ReinvestmentTest.ResetReinvestQueueue();
 			}
@@ -1331,6 +1325,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						if (Solution == 0.0) Solution = 1.0;
 						TotalPayable = qMax(TotalPayable, 0.000001);
 						for (; ProRataBonds.size() > 0; ProRataBonds.dequeue()) {
+							if (m_Tranches[ProRataBonds.head()]->GetCashFlow().GetOCTarget(CurrentDate)==0.0)
 								m_Tranches[ProRataBonds.head()]->SetCashFlow(CurrentDate, Solution / TotalPayable, TrancheCashFlow::TrancheFlowType::OCFlow);
 						}
 					}
@@ -1456,8 +1451,10 @@ bool Waterfall::CalculateTranchesCashFlows(){
 							}
 						}
 						TotalPayable = qMax(TotalPayable, 0.000001);
-						for (; !ProRataBonds.isEmpty(); ProRataBonds.dequeue()) 
-							m_Tranches[ProRataBonds.head()]->SetCashFlow(CurrentDate, Solution / TotalPayable, TrancheCashFlow::TrancheFlowType::ICFlow);
+						for (; !ProRataBonds.isEmpty(); ProRataBonds.dequeue()) {
+							if (m_Tranches[ProRataBonds.head()]->GetCashFlow().GetICTarget(CurrentDate) == 0.0)
+								m_Tranches[ProRataBonds.head()]->SetCashFlow(CurrentDate, Solution / TotalPayable, TrancheCashFlow::TrancheFlowType::ICFlow);
+						}
 					}
 					if (SingleStep->GetParameter(WatFalPrior::wstParameters::PayAccrue).toInt() & static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Pay)) {
 						ProRataBonds.clear();

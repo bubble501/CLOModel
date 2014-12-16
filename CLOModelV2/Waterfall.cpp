@@ -93,6 +93,8 @@ Waterfall::Waterfall()
 	m_SeniorExpensesFixed.SetDivisor(1.0);
 	m_SeniorFeesFixed.SetDivisor(1.0);
 	m_JuniorFeesFixed.SetDivisor(1.0);
+
+	m_TotalJuniorFees.SetStock(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow));
 }
 Waterfall::Waterfall(const Waterfall& a)
 	:m_SeniorExpenses(a.m_SeniorExpenses)

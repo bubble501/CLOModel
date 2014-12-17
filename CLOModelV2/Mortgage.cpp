@@ -1,13 +1,17 @@
 #include "Mortgage.h"
 #include "CommonFunctions.h"
 #include <qmath.h>
+#ifndef NO_DATABASE
+#include <QSqlDatabase>
+#include <QSqlError>
+#include <QSqlQuery>
+#include <QSettings>
+#include <QVariant>
+#endif
 Mortgage::Mortgage()
-	:m_LossMultiplier("100")
-	, m_PrepayMultiplier("100")
-	, m_PaymentFreq("1")
+	: m_PaymentFreq("1")
 	, m_AnnuityVect("N")
 	, m_InterestVect("0")
-	, m_HaircutVector("0")
 	, m_FloatRateBase("ZERO")
 	, m_FloatingRateBaseValue("0")
 	, m_Size(0.0)
@@ -21,9 +25,7 @@ void Mortgage::SetInterest(const QString& a){
 	m_InterestVect=a;
 }
  Mortgage::Mortgage(const Mortgage& a)
-	 :m_LossMultiplier(a.m_LossMultiplier)
-	 ,m_PrepayMultiplier(a.m_PrepayMultiplier)
-	 , m_FloatRateBase(a.m_FloatRateBase)
+	 : m_FloatRateBase(a.m_FloatRateBase)
 	 , m_FloatingRateBaseValue(a.m_FloatingRateBaseValue)
 	 ,m_PaymentFreq(a.m_PaymentFreq)
 	 ,m_AnnuityVect(a.m_AnnuityVect)
@@ -31,13 +33,10 @@ void Mortgage::SetInterest(const QString& a){
 	 ,m_Size(a.m_Size)
 	 ,m_MaturityDate(a.m_MaturityDate)
 	 ,m_CashFlows(a.m_CashFlows)
-	 ,m_HaircutVector(a.m_HaircutVector)
 	 , m_UseForwardCurve(a.m_UseForwardCurve)
 	 ,m_Properties(a.m_Properties)
  {}
  const Mortgage& Mortgage::operator=(const Mortgage& a){
-	 m_LossMultiplier=a.m_LossMultiplier;
-	 m_PrepayMultiplier=a.m_PrepayMultiplier;
 	 m_FloatRateBase = a.m_FloatRateBase;
 	 m_FloatingRateBaseValue = a.m_FloatingRateBaseValue;
 	 m_PaymentFreq=a.m_PaymentFreq;
@@ -46,7 +45,6 @@ void Mortgage::SetInterest(const QString& a){
 	 m_Size=a.m_Size;
 	 m_MaturityDate=a.m_MaturityDate;
 	 m_CashFlows=a.m_CashFlows;
-	 m_HaircutVector=a.m_HaircutVector;
 	 m_UseForwardCurve = a.m_UseForwardCurve;
 	 m_Properties = a.m_Properties;
 	 return *this;
@@ -77,11 +75,64 @@ void Mortgage::SetInterest(const QString& a){
 	 qint32 MaturityExtension=0;
 	 double StartingHaircut = 0.0;
 	 BloombergVector PrepaymentFee("0");
+	 BloombergVector HaircutVector("0");
+	 BloombergVector PrepayMultiplier("100");
+	 BloombergVector LossMultiplier("100");
 	 DayCountVector CurrentDayCountConvention(QString("%1").arg(static_cast<qint16>(DayCountConvention::CompN30360)));
+#ifndef NO_DATABASE
+	 if (HasProperty("Scenario") && HasProperty("Mezzanine")) {
+		//Download Scenario From Database
+		 QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
+		 if (!db.isValid()) {
+			 db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype", "QODBC"), "TwentyFourDB");
+			 db.setDatabaseName(
+				 "Driver={" + GetFromConfig("Database", "Driver", "SQL Server")
+				 + "}; "
+				 + GetFromConfig("Database", "DataSource", R"(Server=SYNSERVER2\SQLExpress; Initial Catalog = ABSDB; Integrated Security = SSPI; Trusted_Connection = Yes;)")
+				 );
+		 }
+		 bool DbOpen = db.isOpen();
+		 if (!DbOpen) DbOpen = db.open();
+		 if (DbOpen) {
+			 QSqlQuery PrepayAssQuerry(db);
+			 PrepayAssQuerry.setForwardOnly(true);
+			 PrepayAssQuerry.prepare("{CALL " + GetFromConfig("Database", "GetLoanAssumptionStoredProc", "getLoanAssumption(:scenarioName,:isSenior)") + "}");
+			 PrepayAssQuerry.bindValue(":scenarioName", GetProperty("Scenario"));
+			 PrepayAssQuerry.bindValue(":isSenior", GetProperty("Mezzanine").compare("Yes",Qt::CaseInsensitive)!=0);
+			 if (PrepayAssQuerry.exec()) {
+				 if (PrepayAssQuerry.next()) {
+					 int FieldCount = 0;
+					 if (!PrepayAssQuerry.isNull(FieldCount)) MaturityExtension = PrepayAssQuerry.value(FieldCount).toInt(); ++FieldCount;
+					 if (!PrepayAssQuerry.isNull(FieldCount)) StartingHaircut = PrepayAssQuerry.value(FieldCount).toDouble(); ++FieldCount;
+					 if (!PrepayAssQuerry.isNull(FieldCount)) PrepaymentFee = PrepayAssQuerry.value(FieldCount).toString(); ++FieldCount;
+					 if (!PrepayAssQuerry.isNull(FieldCount)) CurrentDayCountConvention = PrepayAssQuerry.value(FieldCount).toString(); ++FieldCount;
+					 if (!OverrideProperties) {
+						 if (!PrepayAssQuerry.isNull(FieldCount)) CPRVec = PrepayAssQuerry.value(FieldCount).toString(); ++FieldCount;
+						 if (!PrepayAssQuerry.isNull(FieldCount)) CDRVec = PrepayAssQuerry.value(FieldCount).toString(); ++FieldCount;
+						 if (!PrepayAssQuerry.isNull(FieldCount)) LossVec = PrepayAssQuerry.value(FieldCount).toString(); ++FieldCount;
+						 if (!PrepayAssQuerry.isNull(FieldCount)) RecoveryLag = PrepayAssQuerry.value(FieldCount).toString(); ++FieldCount;
+						 if (!PrepayAssQuerry.isNull(FieldCount)) Delinquency = PrepayAssQuerry.value(FieldCount).toString(); ++FieldCount;
+						 if (!PrepayAssQuerry.isNull(FieldCount)) DelinquencyLag = PrepayAssQuerry.value(FieldCount).toString(); ++FieldCount;
+					 }
+					 else FieldCount += 6;
+					 if (!HasProperty("Price") && !PrepayAssQuerry.isNull(FieldCount)) SetProperty("Price", QString::number(PrepayAssQuerry.value(FieldCount).toDouble(), 'f')); ++FieldCount;
+					 if (!PrepayAssQuerry.isNull(FieldCount)) HaircutVector = PrepayAssQuerry.value(FieldCount).toString(); ++FieldCount;
+					 if (!PrepayAssQuerry.isNull(FieldCount)) PrepayMultiplier = PrepayAssQuerry.value(FieldCount).toString(); ++FieldCount;
+					 if (!PrepayAssQuerry.isNull(FieldCount)) LossMultiplier = PrepayAssQuerry.value(FieldCount).toString(); ++FieldCount;
+				 }
+			 }
+		 }
+
+	 }
+#endif
+
 	 if (HasProperty("MaturityExtension")) MaturityExtension = GetProperty("MaturityExtension").toInt();
 	 if (HasProperty("StartingHaircut")) StartingHaircut = GetProperty("StartingHaircut").toDouble();
 	 if (HasProperty("PrepaymentFee")) PrepaymentFee = GetProperty("PrepaymentFee");
 	 if (HasProperty("DayCount")) { const DayCountVector TempDCV(GetProperty("DayCount")); if (!TempDCV.IsEmpty()) CurrentDayCountConvention = TempDCV; }
+	 if (HasProperty("Haircut")) HaircutVector=GetProperty("Haircut");
+	 if (HasProperty("PrepayMultiplier")) PrepayMultiplier = GetProperty("PrepayMultiplier");
+	 if (HasProperty("LossMultiplier")) LossMultiplier = GetProperty("LossMultiplier");
 	 if (!OverrideProperties) {
 		 if (HasProperty("CPR")) CPRVec = GetProperty("CPR");
 		 if (HasProperty("CDR")) CDRVec = GetProperty("CDR");
@@ -101,6 +152,9 @@ void Mortgage::SetInterest(const QString& a){
 		 || StartingHaircut<0.0
 		 || StartingHaircut>1.0
 		 || PrepaymentFee.IsEmpty(0.0)
+		 || HaircutVector.IsEmpty(0.0,1.0)
+		 || LossMultiplier.IsEmpty(0.0)
+		 || PrepayMultiplier.IsEmpty(0.0)
 		 ) return false;
 	 
 	 QDate AdjMaturityDate = QDate(m_MaturityDate.year(), m_MaturityDate.month(), 15).addMonths(MaturityExtension);
@@ -112,6 +166,9 @@ void Mortgage::SetInterest(const QString& a){
 	 if (Delinquency.GetAnchorDate().isNull()) Delinquency.SetAnchorDate(AdjStartDate);
 	 if (DelinquencyLag.GetAnchorDate().isNull()) DelinquencyLag.SetAnchorDate(AdjStartDate);
 	 if (PrepaymentFee.GetAnchorDate().isNull()) PrepaymentFee.SetAnchorDate(AdjStartDate);
+	 if (HaircutVector.GetAnchorDate().isNull()) HaircutVector.SetAnchorDate(AdjStartDate);
+	 if (PrepayMultiplier.GetAnchorDate().isNull()) PrepayMultiplier.SetAnchorDate(AdjStartDate);
+	 if (LossMultiplier.GetAnchorDate().isNull()) LossMultiplier.SetAnchorDate(AdjStartDate);
 	 if (CurrentDayCountConvention.GetAnchorDate().isNull()) CurrentDayCountConvention.SetAnchorDate(AdjStartDate);
 	 
 	 if (Delinquency.GetValue(AdjStartDate)>0.0) m_CashFlows.AddFlow(AdjStartDate, m_Size* Delinquency.GetValue(AdjStartDate), MtgCashFlow::MtgFlowType::DelinquentOutstanding);
@@ -124,25 +181,19 @@ void Mortgage::SetInterest(const QString& a){
 	 //if (!ReadyToCalculate().isEmpty()) return false;
 	 bool NullAnchorDates[] = {
 		 m_InterestVect.GetAnchorDate().isNull()
-		 , m_LossMultiplier.GetAnchorDate().isNull()
-		 , m_PrepayMultiplier.GetAnchorDate().isNull()
-		 , m_HaircutVector.GetAnchorDate().isNull()
 		 , m_AnnuityVect.GetAnchorDate().isNull()
 		 , m_PaymentFreq.GetAnchorDate().isNull()
 	 };
 	 if (NullAnchorDates[0]) m_InterestVect.SetAnchorDate(AdjStartDate);
-	 if (NullAnchorDates[1]) m_LossMultiplier.SetAnchorDate(AdjStartDate);
-	 if (NullAnchorDates[2]) m_PrepayMultiplier.SetAnchorDate(AdjStartDate);
-	 if (NullAnchorDates[3]) m_HaircutVector.SetAnchorDate(AdjStartDate);
-	 if (NullAnchorDates[4]) m_AnnuityVect.SetAnchorDate(AdjStartDate);
-	 if (NullAnchorDates[5]) m_PaymentFreq.SetAnchorDate(AdjStartDate);
+	 if (NullAnchorDates[1]) m_AnnuityVect.SetAnchorDate(AdjStartDate);
+	 if (NullAnchorDates[2])  m_PaymentFreq.SetAnchorDate(AdjStartDate);
 
 
 	 
 	 double CurrentInterest, TempFlow1, TempFlow2;
 	 int TempStep;
-	 double CurrentAmtOut = m_Size*qMax(0.0,1.0 - StartingHaircut-m_HaircutVector.GetValue(AdjStartDate));
-	 m_CashFlows.SetFlow(AdjStartDate, m_Size*qMin(1.0, StartingHaircut + m_HaircutVector.GetValue(AdjStartDate)), MtgCashFlow::MtgFlowType::LossFlow);
+	 double CurrentAmtOut = m_Size*qMax(0.0,1.0 - StartingHaircut-HaircutVector.GetValue(AdjStartDate));
+	 m_CashFlows.SetFlow(AdjStartDate, m_Size*qMin(1.0, StartingHaircut + HaircutVector.GetValue(AdjStartDate)), MtgCashFlow::MtgFlowType::LossFlow);
 	 m_CashFlows.SetFlow(AdjStartDate, CurrentAmtOut, MtgCashFlow::MtgFlowType::AmountOutstandingFlow);
 	 m_CashFlows.SetFlow(AdjStartDate, CurrentAmtOut*GetInterest(AdjStartDate), MtgCashFlow::MtgFlowType::WACouponFlow);
 	 QDate NextPaymentDate = AdjStartDate.addMonths(m_PaymentFreq.GetValue(AdjStartDate));
@@ -218,13 +269,13 @@ void Mortgage::SetInterest(const QString& a){
 		 if (CurrentAmtOut > 0) {
 			 //////////////////////////////////////////////////////////////////////////
 			 // Haircut
-			 if (m_HaircutVector.GetValue(CurrentMonth.addMonths(-1)) == 1.0) {
-				 TempFlow1 = CurrentAmtOut * m_HaircutVector.GetValue(CurrentMonth);
-				 TempFlow2 = m_CashFlows.GetAccruedInterest(CurrentMonth) * m_HaircutVector.GetValue(CurrentMonth);
+			 if (HaircutVector.GetValue(CurrentMonth.addMonths(-1)) == 1.0) {
+				 TempFlow1 = CurrentAmtOut * HaircutVector.GetValue(CurrentMonth);
+				 TempFlow2 = m_CashFlows.GetAccruedInterest(CurrentMonth) * HaircutVector.GetValue(CurrentMonth);
 			 }
 			 else {
-				 TempFlow1 = CurrentAmtOut - (CurrentAmtOut * (1.0 - m_HaircutVector.GetValue(CurrentMonth)) / (1.0 - m_HaircutVector.GetValue(CurrentMonth.addMonths(-1))));
-				 TempFlow2 = m_CashFlows.GetAccruedInterest(CurrentMonth) *( 1.0 - ((1.0 - m_HaircutVector.GetValue(CurrentMonth)) / (1.0 - m_HaircutVector.GetValue(CurrentMonth.addMonths(-1)))));
+				 TempFlow1 = CurrentAmtOut - (CurrentAmtOut * (1.0 - HaircutVector.GetValue(CurrentMonth)) / (1.0 - HaircutVector.GetValue(CurrentMonth.addMonths(-1))));
+				 TempFlow2 = m_CashFlows.GetAccruedInterest(CurrentMonth) *( 1.0 - ((1.0 - HaircutVector.GetValue(CurrentMonth)) / (1.0 - HaircutVector.GetValue(CurrentMonth.addMonths(-1)))));
 			 }
 			 m_CashFlows.AddFlow(CurrentMonth, qMin(TempFlow1, CurrentAmtOut), MtgCashFlow::MtgFlowType::LossFlow);
 			 CurrentAmtOut = qMax(0.0, CurrentAmtOut - TempFlow1);
@@ -232,11 +283,11 @@ void Mortgage::SetInterest(const QString& a){
 			 m_CashFlows.AddFlow(CurrentMonth, -qMin(TempFlow2, m_CashFlows.GetAccruedInterest(CurrentMonth)), MtgCashFlow::MtgFlowType::AccruedInterestFlow);
 			 //////////////////////////////////////////////////////////////////////////
 			 //Prepayments
-			 TempFlow1 = qMin(CurrentAmtOut, CurrentAmtOut * CPRVec.GetSMM(CurrentMonth, 1) * m_PrepayMultiplier.GetValue(CurrentMonth));
+			 TempFlow1 = qMin(CurrentAmtOut, CurrentAmtOut * CPRVec.GetSMM(CurrentMonth, 1) * PrepayMultiplier.GetValue(CurrentMonth));
 			 m_CashFlows.AddFlow(CurrentMonth, TempFlow1, MtgCashFlow::MtgFlowType::PrepaymentFlow);
 			 CurrentAmtOut -= TempFlow1;
 			 TempFlow2 = TempFlow1*PrepaymentFee.GetValue(CurrentMonth);
-			 TempFlow1 = m_CashFlows.GetAccruedInterest(CurrentMonth) * qMin(1.0,CPRVec.GetSMM(CurrentMonth, 1) * m_PrepayMultiplier.GetValue(CurrentMonth));
+			 TempFlow1 = m_CashFlows.GetAccruedInterest(CurrentMonth) * qMin(1.0,CPRVec.GetSMM(CurrentMonth, 1) * PrepayMultiplier.GetValue(CurrentMonth));
 			 m_CashFlows.AddFlow(CurrentMonth, TempFlow1+TempFlow2, MtgCashFlow::MtgFlowType::InterestFlow);
 			 m_CashFlows.AddFlow(CurrentMonth, TempFlow2, MtgCashFlow::MtgFlowType::PrepaymentFees);
 			 m_CashFlows.AddFlow(CurrentMonth, -TempFlow1, MtgCashFlow::MtgFlowType::AccruedInterestFlow);
@@ -246,17 +297,17 @@ void Mortgage::SetInterest(const QString& a){
 			 m_CashFlows.AddFlow(CurrentMonth, TempFlow1, MtgCashFlow::MtgFlowType::PrincipalDefault);
 			 CurrentAmtOut -= TempFlow1;
 			 //Assign losses and recoveries
-			 m_CashFlows.AddFlow(CurrentMonth.addMonths(RecoveryLag.GetValue(CurrentMonth)), qMin(TempFlow1,TempFlow1*LossVec.GetValue(CurrentMonth)*m_LossMultiplier.GetValue(CurrentMonth)), MtgCashFlow::MtgFlowType::LossFlow);
-			 m_CashFlows.AddFlow(CurrentMonth.addMonths(RecoveryLag.GetValue(CurrentMonth)), qMin(TempFlow1, TempFlow1*(1.0-(LossVec.GetValue(CurrentMonth)*m_LossMultiplier.GetValue(CurrentMonth)))), MtgCashFlow::MtgFlowType::PrincipalRecovered);
+			 m_CashFlows.AddFlow(CurrentMonth.addMonths(RecoveryLag.GetValue(CurrentMonth)), qMin(TempFlow1,TempFlow1*LossVec.GetValue(CurrentMonth)*LossMultiplier.GetValue(CurrentMonth)), MtgCashFlow::MtgFlowType::LossFlow);
+			 m_CashFlows.AddFlow(CurrentMonth.addMonths(RecoveryLag.GetValue(CurrentMonth)), qMin(TempFlow1, TempFlow1*(1.0-(LossVec.GetValue(CurrentMonth)*LossMultiplier.GetValue(CurrentMonth)))), MtgCashFlow::MtgFlowType::PrincipalRecovered);
 			 //In case of no lag in recoveries add the principal back straight away
-			 if (RecoveryLag.GetValue(CurrentMonth) == 0) CurrentAmtOut += qMin(TempFlow1, TempFlow1*(1.0 - (LossVec.GetValue(CurrentMonth)*m_LossMultiplier.GetValue(CurrentMonth))));
+			 if (RecoveryLag.GetValue(CurrentMonth) == 0) CurrentAmtOut += qMin(TempFlow1, TempFlow1*(1.0 - (LossVec.GetValue(CurrentMonth)*LossMultiplier.GetValue(CurrentMonth))));
 			 //Calculate defaulted interest
 			 TempFlow1 = m_CashFlows.GetAccruedInterest(CurrentMonth)* qMin(1.0, CDRVec.GetSMM(CurrentMonth, 1));
 			 m_CashFlows.AddFlow(CurrentMonth, -TempFlow1, MtgCashFlow::MtgFlowType::AccruedInterestFlow);
 			 //Assign losses and recoveries on interest
-			 m_CashFlows.AddFlow(CurrentMonth.addMonths(RecoveryLag.GetValue(CurrentMonth)), qMin(TempFlow1, TempFlow1*(1.0 - (LossVec.GetValue(CurrentMonth)*m_LossMultiplier.GetValue(CurrentMonth)))), MtgCashFlow::MtgFlowType::InterestRecovered);
-			 m_CashFlows.AddFlow(CurrentMonth.addMonths(RecoveryLag.GetValue(CurrentMonth)), qMin(TempFlow1, TempFlow1*(LossVec.GetValue(CurrentMonth)*m_LossMultiplier.GetValue(CurrentMonth))), MtgCashFlow::MtgFlowType::LossOnInterestFlow);
-			 if (RecoveryLag.GetValue(CurrentMonth) == 0) m_CashFlows.AddFlow(CurrentMonth, qMin(TempFlow1, TempFlow1*(1.0 - (LossVec.GetValue(CurrentMonth)*m_LossMultiplier.GetValue(CurrentMonth)))), MtgCashFlow::MtgFlowType::AccruedInterestFlow);
+			 m_CashFlows.AddFlow(CurrentMonth.addMonths(RecoveryLag.GetValue(CurrentMonth)), qMin(TempFlow1, TempFlow1*(1.0 - (LossVec.GetValue(CurrentMonth)*LossMultiplier.GetValue(CurrentMonth)))), MtgCashFlow::MtgFlowType::InterestRecovered);
+			 m_CashFlows.AddFlow(CurrentMonth.addMonths(RecoveryLag.GetValue(CurrentMonth)), qMin(TempFlow1, TempFlow1*(LossVec.GetValue(CurrentMonth)*LossMultiplier.GetValue(CurrentMonth))), MtgCashFlow::MtgFlowType::LossOnInterestFlow);
+			 if (RecoveryLag.GetValue(CurrentMonth) == 0) m_CashFlows.AddFlow(CurrentMonth, qMin(TempFlow1, TempFlow1*(1.0 - (LossVec.GetValue(CurrentMonth)*LossMultiplier.GetValue(CurrentMonth)))), MtgCashFlow::MtgFlowType::AccruedInterestFlow);
 			 //////////////////////////////////////////////////////////////////////////
 
 		 }
@@ -264,8 +315,8 @@ void Mortgage::SetInterest(const QString& a){
 		 m_CashFlows.SetFlow(CurrentMonth, CurrentAmtOut, MtgCashFlow::MtgFlowType::AmountOutstandingFlow);
 		 if (Delinquency.GetValue(AdjStartDate)>0.0) m_CashFlows.SetFlow(CurrentMonth, CurrentAmtOut*Delinquency.GetValue(CurrentMonth), MtgCashFlow::MtgFlowType::DelinquentOutstanding);
 		 m_CashFlows.SetFlow(CurrentMonth, CurrentAmtOut*GetInterest(CurrentMonth), MtgCashFlow::MtgFlowType::WACouponFlow);
-		 m_CashFlows.SetFlow(CurrentMonth, CurrentAmtOut*m_PrepayMultiplier.GetValue(CurrentMonth), MtgCashFlow::MtgFlowType::WAPrepayMult);
-		 m_CashFlows.SetFlow(CurrentMonth, CurrentAmtOut*m_LossMultiplier.GetValue(CurrentMonth), MtgCashFlow::MtgFlowType::WALossMult);
+		 m_CashFlows.SetFlow(CurrentMonth, CurrentAmtOut*PrepayMultiplier.GetValue(CurrentMonth), MtgCashFlow::MtgFlowType::WAPrepayMult);
+		 m_CashFlows.SetFlow(CurrentMonth, CurrentAmtOut*LossMultiplier.GetValue(CurrentMonth), MtgCashFlow::MtgFlowType::WALossMult);
 		 m_CashFlows.SetFlow(CurrentMonth, CurrentAmtOut*PrepaymentFee.GetValue(CurrentMonth), MtgCashFlow::MtgFlowType::WAPrepayFees);
 		 m_CashFlows.SetFlow(CurrentMonth, CurrentAmtOut*static_cast<double>(MonthDiff(AdjMaturityDate, CurrentMonth)) / 12.0, MtgCashFlow::MtgFlowType::WALlevel);
 		 if (CurrentAmtOut < 0.01) break;
@@ -291,11 +342,8 @@ void Mortgage::SetInterest(const QString& a){
 	 }
 
 	 if (NullAnchorDates[0]) m_InterestVect.RemoveAnchorDate();
-	 if (NullAnchorDates[1]) m_LossMultiplier.RemoveAnchorDate();
-	 if (NullAnchorDates[2]) m_PrepayMultiplier.RemoveAnchorDate();
-	 if (NullAnchorDates[3]) m_HaircutVector.RemoveAnchorDate();
-	 if (NullAnchorDates[4]) m_AnnuityVect.RemoveAnchorDate();
-	 if (NullAnchorDates[5]) m_PaymentFreq.RemoveAnchorDate();
+	 if (NullAnchorDates[1]) m_AnnuityVect.RemoveAnchorDate();
+	 if (NullAnchorDates[2]) m_PaymentFreq.RemoveAnchorDate();
 	 FillDiscountOutstanding();
 	 return true;
  }
@@ -311,14 +359,11 @@ void Mortgage::SetInterest(const QString& a){
 		 << flows.m_MaturityDate
 		 << flows.m_AnnuityVect
 		 << flows.m_Size
-		 << flows.m_LossMultiplier
-		 << flows.m_PrepayMultiplier
 		 << flows.m_InterestVect
 		 << flows.m_CashFlows
 		 << flows.m_FloatRateBase
 		 << flows.m_FloatingRateBaseValue
 		 << flows.m_PaymentFreq
-		 << flows.m_HaircutVector
 		 << flows.m_UseForwardCurve
 		 << flows.m_Properties
 	;
@@ -328,14 +373,11 @@ void Mortgage::SetInterest(const QString& a){
 	 stream >> m_MaturityDate;
 	 m_AnnuityVect.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_AnnuityVect;
 	 stream >> m_Size;
-	 m_LossMultiplier.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_LossMultiplier;
-	 m_PrepayMultiplier.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_PrepayMultiplier;
 	 m_InterestVect.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_InterestVect;
 	 m_CashFlows.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_CashFlows;
 	 m_FloatRateBase.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_FloatRateBase;
 	 m_FloatingRateBaseValue.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_FloatingRateBaseValue;
 	 m_PaymentFreq.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_PaymentFreq;
-	 m_HaircutVector.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_HaircutVector;
 	 stream >> m_UseForwardCurve >> m_Properties;
 	 ResetProtocolVersion();
 	 return stream;
@@ -348,10 +390,10 @@ void Mortgage::SetInterest(const QString& a){
 	if(m_MaturityDate<QDate(2000,1,1)) Result+="Loan Maturity Date\n";
 	if (m_AnnuityVect.IsEmpty())Result += "Loan Annuity Vector\n";
 	if(m_Size<0.0)Result+="Loan Size\n";
-	if (m_LossMultiplier.IsEmpty()) Result += "Loss Multiplier\n";
-	if (m_PrepayMultiplier.IsEmpty()) Result += "Prepay Multiplier\n";
+	if (BloombergVector(GetProperty("LossMultiplier")).IsEmpty(0.0)) Result += "Loss Multiplier\n";
+	if (BloombergVector(GetProperty("PrepayMultiplier")).IsEmpty(0.0)) Result += "Prepay Multiplier\n";
 	if (m_InterestVect.IsEmpty())Result += "Loan Coupon\n";
-	if (m_HaircutVector.IsEmpty())Result += "Haircut Vector\n";
+	if (HasProperty("Haircut")) if (BloombergVector(GetProperty("Haircut")).IsEmpty(0.0, 1.0))Result += "Haircut Vector\n";
 	if (m_PaymentFreq.IsEmpty(1))Result += "Loan Payment Frequency\n";
 	if (m_FloatRateBase.IsEmpty())Result += "Loan Base Rate\n";
 	if (HasProperty("DayCount")) { if (DayCountVector(GetProperty("DayCount")).IsEmpty()) Result += "Loan Day Count Convention\n"; }

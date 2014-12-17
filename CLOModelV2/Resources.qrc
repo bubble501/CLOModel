@@ -4,6 +4,6 @@
         <file alias="Loading.gif">Resources/Loading2.gif</file>
     </qresource>
 	<qresource prefix="/Configs">
-		<file alias="GlobalConfigs.ini">Resources/GlobalConfigs.ini</file>
+		<file alias="GlobalConfigs.xml">Resources/GlobalConfigs.xml</file>
 	</qresource>
 </RCC>

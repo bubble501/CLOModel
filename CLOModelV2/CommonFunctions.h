@@ -98,6 +98,7 @@ double GetLoanAssumption(const QString& LoanName, int columnIndex, QDate RefDate
 void PrintToTempFile(const QString& TempFileName, const QString& Message, bool PrintTime = true);
 bool ValidDayCount(qint16 a);
 QString NormaliseTriggerStructure(QString a);
+QString GetFromConfig(const QString& Domain, const QString& Field, const QString& DefaultValue);
 #endif // CommonFunctions_h__
 
 

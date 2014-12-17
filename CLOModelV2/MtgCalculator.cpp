@@ -42,7 +42,6 @@ bool MtgCalculator::StartCalculation() {
 	/*if (m_UseStoredCashFlows){//Check if CF are available
 		QString DealName,TrancheName;
 		bool CashFound=false;
-		QSettings ConfigIni(":/Configs/GlobalConfigs.ini", QSettings::IniFormat);
 #ifndef NO_DATABASE
 		bool DBAvailable;
 		ConfigIni.beginGroup("Database");

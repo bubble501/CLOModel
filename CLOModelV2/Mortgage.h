@@ -15,10 +15,7 @@ private:
 	QDate m_MaturityDate;
 	RepaymentVector m_AnnuityVect;
 	double m_Size;
-	BloombergVector m_LossMultiplier;
-	BloombergVector m_PrepayMultiplier;
 	BloombergVector m_InterestVect;
-	BloombergVector m_HaircutVector;
 	MtgCashFlow m_CashFlows;
 	BaseRateVector m_FloatRateBase;
 	BloombergVector m_FloatingRateBaseValue;
@@ -54,18 +51,12 @@ public:
 	void setFixedRate() { m_FloatingRateBaseValue = "0"; m_FloatRateBase = "ZERO"; }
 	const QDate& GetMaturityDate() const {return m_MaturityDate;}
 	void SetMaturityDate(const QDate& a) {m_MaturityDate=a;}
-	QString GetLossMultiplier() const {return m_LossMultiplier.GetVector();}
-	void SetLossMultiplier(QString a) {m_LossMultiplier=a;}
-	QString GetPrepayMultiplier() const {return m_PrepayMultiplier.GetVector();}
-	void SetPrepayMultiplier(QString a) {m_PrepayMultiplier=a;}
 	const MtgCashFlow& GetCashFlow() const{return m_CashFlows;}
 	MtgCashFlow& GetCashFlow(){return m_CashFlows;}
 	QString GetAnnuity() const {return m_AnnuityVect.GetVector();}
 	void SetAnnuity(const QString& a);
 	QString GetInterest() const {return m_InterestVect.GetVector();}
 	void SetInterest(const QString& a);
-	void SetHaircutVector(const QString& a){m_HaircutVector=a;}
-	QString GetHaircutVector() const {return m_HaircutVector.GetVector();}
 	double GetSize() const{return m_Size;}
 	void SetSize(double a){if(a>=0) m_Size=a;}
 	bool CalculateCashFlows(const QDate& StartDate,const QString& CPRVecs, const QString& CDRVecs, const QString& LossVecs, const QString& RecoveryLag = "0", const QString& Delinquency = "0", const QString& DelinquencyLag = "0");

@@ -204,22 +204,20 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ConstantBaseRateTable& Refe
 		if (!ReferencesValues.GetValues().contains(GetValue(i))) AllRefFound = false;
 	}
 	if (AllRefFound) return CompileReferenceRateValue(ReferencesValues);
-	QDate MinUpdateDate;
-	QSettings ConfigIni(":/Configs/GlobalConfigs.ini", QSettings::IniFormat);
-	ConfigIni.beginGroup("Database");
+	QDate MinUpdateDate;;
 	QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
 	if (!db.isValid()) {
-		db = QSqlDatabase::addDatabase(ConfigIni.value("DBtype", "QODBC").toString(), "TwentyFourDB");
+		db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype", "QODBC"), "TwentyFourDB");
 		db.setDatabaseName(
-			"Driver={" + ConfigIni.value("Driver", "SQL Server").toString()
+			"Driver={" + GetFromConfig("Database", "Driver", "SQL Server")
 			+ "}; "
-			+ ConfigIni.value("DataSource", "Server=SYNSERVER2\\SQLExpress;Initial Catalog=ABSDB;Integrated Security=SSPI;Trusted_Connection=Yes;").toString()
+			+ GetFromConfig("Database", "DataSource", R"(Server=SYNSERVER2\SQLExpress;Initial Catalog=ABSDB;Integrated Security=SSPI;Trusted_Connection=Yes;)")
 			);
 	}
 	if (db.open()) {
 		QSqlQuery query(db);
 		query.setForwardOnly(true);
-		query.prepare("{CALL "+ ConfigIni.value("ConstBaseRatesStoredProc", "getLatestIndexPrices").toString()+"}");
+		query.prepare("{CALL " + GetFromConfig("Database", "ConstBaseRatesStoredProc", "getLatestIndexPrices") + "}");
 		if (query.exec()) {
 			while (query.next()) {
 				if (
@@ -232,7 +230,6 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ConstantBaseRateTable& Refe
 					
 			}
 			db.close();
-			ConfigIni.endGroup();
 			ReferencesValues.SetUpdateDate(MinUpdateDate);
 			return CompileReferenceRateValue(ReferencesValues);
 		}
@@ -248,21 +245,19 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ForwardBaseRateTable& Refer
 	}
 	if (AllRefFound) return CompileReferenceRateValue(ReferencesValues);
 	QDate MinUpdateDate;
-	QSettings ConfigIni(":/Configs/GlobalConfigs.ini", QSettings::IniFormat);
-	ConfigIni.beginGroup("Database");
 	QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
 	if (!db.isValid()) {
-		db = QSqlDatabase::addDatabase(ConfigIni.value("DBtype", "QODBC").toString(), "TwentyFourDB");
+		db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype", "QODBC"), "TwentyFourDB");
 		db.setDatabaseName(
-			"Driver={" + ConfigIni.value("Driver", "SQL Server").toString()
+			"Driver={" + GetFromConfig("Database", "Driver", "SQL Server")
 			+ "}; "
-			+ ConfigIni.value("DataSource", "Server=SYNSERVER2\\SQLExpress;Initial Catalog=ABSDB;Integrated Security=SSPI;Trusted_Connection=Yes;").toString()
+			+ GetFromConfig("Database",  "DataSource", R"(Server=SYNSERVER2\SQLExpress;Initial Catalog=ABSDB;Integrated Security=SSPI;Trusted_Connection=Yes;)")
 			);
 	}
 	if (db.open()) {
 		QSqlQuery query(db);
 		query.setForwardOnly(true);
-		query.prepare("{CALL " + ConfigIni.value("ForwardBaseRatesStoredProc", "getForwardCurveMatrix").toString() + "}");
+		query.prepare("{CALL " + GetFromConfig("Database", "ForwardBaseRatesStoredProc", "getForwardCurveMatrix") + "}");
 		if (query.exec()) {
 			QHash < QString, QHash<QDate, double> > QueryResults;
 			while (query.next()) {
@@ -276,7 +271,6 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ForwardBaseRateTable& Refer
 					
 			}
 			db.close();
-			ConfigIni.endGroup();
 			for (QHash < QString, QHash<QDate, double> >::const_iterator i = QueryResults.constBegin(); i != QueryResults.constEnd(); ++i) {
 				ReferencesValues.SetValue(i.key(), i.value().keys(), i.value().values());
 			}

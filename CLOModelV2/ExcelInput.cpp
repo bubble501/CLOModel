@@ -39,11 +39,8 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			BaseRte = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 			Ann=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			frq = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
-			prem=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
-			lossm=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
-			Hairc=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			Properties = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
-			if (sze >= 0.01) TempUnit.AddLoan(Matur, sze, Intr, Ann, frq, BaseRte, lossm, prem, Hairc, Properties);
+			if (sze >= 0.01) TempUnit.AddLoan(Matur, sze, Intr, Ann, frq, BaseRte, Properties);
 		}
 	}
 	{//Tranches
@@ -409,9 +406,7 @@ double __stdcall CLOReturnRate(LPSAFEARRAY *ArrayData){
 	QFile file(Filename);
 	bool UsingClom = false;
 	if (!file.exists()) {
-		QSettings ConfigIni(":/Configs/GlobalConfigs.ini", QSettings::IniFormat);
-		ConfigIni.beginGroup("Folders");
-		file.setFileName(ConfigIni.value("UnifiedResultsFolder", "\\\\synserver2\\Company Share\\24AM\\Monitoring\\Model Results").toString() + '\\' + DealName + ".clom");
+		file.setFileName(GetFromConfig("Folders", "UnifiedResultsFolder", R"(\\synserver2\Company Share\24AM\Monitoring\Model Results)") + '\\' + DealName + ".clom");
 		if (!file.exists())return 0.0;
 		UsingClom = true;
 	}
@@ -457,9 +452,7 @@ double __stdcall CLODiscountMargin(LPSAFEARRAY *ArrayData){
 	QFile file(Filename);
 	bool UsingClom = false;
 	if(!file.exists()){
-		QSettings ConfigIni(":/Configs/GlobalConfigs.ini", QSettings::IniFormat);
-		ConfigIni.beginGroup("Folders");
-		file.setFileName(ConfigIni.value("UnifiedResultsFolder", "\\\\synserver2\\Company Share\\24AM\\Monitoring\\Model Results").toString() + '\\' + DealName + ".clom");
+		file.setFileName(GetFromConfig("Folders", "UnifiedResultsFolder", R"(\\synserver2\Company Share\24AM\Monitoring\Model Results)") + '\\' + DealName + ".clom");
 		if (!file.exists())return 0.0;
 		UsingClom = true;
 	}
@@ -505,9 +498,7 @@ double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
 	QFile file(Filename);
 	bool UsingClom = false;
 	if (!file.exists()){
-		QSettings ConfigIni(":/Configs/GlobalConfigs.ini", QSettings::IniFormat);
-		ConfigIni.beginGroup("Folders");
-		file.setFileName(ConfigIni.value("UnifiedResultsFolder", "\\\\synserver2\\Company Share\\24AM\\Monitoring\\Model Results").toString() + '\\' + DealName + ".clom");
+		file.setFileName(GetFromConfig("Folders", "UnifiedResultsFolder", R"(\\synserver2\Company Share\24AM\Monitoring\Model Results)") + '\\' + DealName + ".clom");
 		if (!file.exists())return 0.0;
 		UsingClom = true;
 	}

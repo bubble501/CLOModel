@@ -39,21 +39,15 @@ void CentralUnit::AddLoan(
 	, const QString& Annuity
 	, const QString& Freq
 	, const QString& floatBase
-	, const QString& LossMult
-	, const QString& PrepayMult
-	, const QString& HaicutVect
 	, const QString& Properties
 	) {
 	Mortgage TempMtg;
 	TempMtg.SetMaturityDate(Maturity);
 	TempMtg.SetSize(Size);
-	TempMtg.SetPrepayMultiplier(PrepayMult);
-	TempMtg.SetLossMultiplier(LossMult);
 	TempMtg.SetInterest(Interest);
 	TempMtg.SetFloatingRateBase((floatBase.isEmpty())? QString("ZERO"):floatBase);
 	TempMtg.SetPaymentFreq(Freq);
 	TempMtg.SetAnnuity(Annuity);
-	TempMtg.SetHaircutVector(HaicutVect);
 	QStringList PropList = Properties.split("#,#");
 	foreach(const QString& SingleProp, PropList) {
 		QStringList KeyVal = SingleProp.split("#=#");
@@ -382,9 +376,7 @@ void CentralUnit::CheckCalculationDone()
 	}
 	emit CalculationFinished();
 	if (m_SaveBaseCase) {
-		QSettings ConfigIni(":/Configs/GlobalConfigs.ini", QSettings::IniFormat);
-		ConfigIni.beginGroup("Folders");
-		QDir UnifiedDir(ConfigIni.value("UnifiedResultsFolder","\\\\synserver2\\Company Share\\24AM\\Monitoring\\Model Results").toString());
+		QDir UnifiedDir(GetFromConfig("Folders", "UnifiedResultsFolder", R"(\\synserver2\Company Share\24AM\Monitoring\Model Results)"));
 		if (UnifiedDir.exists()) {
 			QString AdjDealName = Structure.GetDealName();
 			if (AdjDealName.isEmpty() && Structure.GetTranchesCount() > 0) {

@@ -255,9 +255,10 @@ QDataStream& operator<<(QDataStream & stream, const StressTest& flows){
 	stream << flows.SequentialComputation;
 	stream << flows.ShowProgress;
 	stream << flows.UseFastVersion;
-	for (int i = 0; i < NumStressDimentsions; ++i) {
+	std::for_each(std::begin(flows.m_AssumptionsRef), std::end(flows.m_AssumptionsRef), [&stream](QSet<QString>* i) {stream << *i; });
+	/*for (int i = 0; i < NumStressDimentsions; ++i) {
 		stream << *(flows.m_AssumptionsRef[i]);
-	}
+	}*/
 	stream << static_cast<qint32>(flows.Results.size());
 	for (auto i = flows.Results.constBegin(); i != flows.Results.constEnd(); ++i) {
 		stream << i.key() << *(i.value());
@@ -272,9 +273,10 @@ QDataStream& StressTest::LoadOldVersion(QDataStream& stream) {
 	stream >> SequentialComputation;
 	stream >> ShowProgress;
 	stream >> UseFastVersion;
-	for (int i = 0; i < NumStressDimentsions; ++i) {
+	std::for_each(std::begin(m_AssumptionsRef), std::end(m_AssumptionsRef), [&stream](QSet<QString>* i) {stream >> *i; });
+	/*for (int i = 0; i < NumStressDimentsions; ++i) {
 		stream >> *(m_AssumptionsRef[i]);
-	}
+	}*/
 	ResetResults();
 	stream >> tempint;
 	AssumptionSet TempAssSet;
@@ -451,7 +453,7 @@ bool StressTest::LoadResultsFromFile(const QString& DestPath){
 			TargetFile.close();
 			continue;
 		}
-		for (int i = 0; i < NumStressDimentsions; ++i) {
+		for (auto i = 0; i < NumStressDimentsions; ++i) {
 			m_AssumptionsRef[i]->insert(Spanns.at(i));
 		}
 		QDataStream out(&TargetFile);
@@ -552,7 +554,8 @@ void StressTest::GatherResults() {
 }
 
 void StressTest::ResetScenarios() {
-	for (int i = 0; i < NumStressDimentsions; i++) m_AssumptionsRef[i]->clear();
+	std::for_each(std::begin(m_AssumptionsRef), std::end(m_AssumptionsRef), [](QSet<QString>* a) { a->clear(); });
+	//for (int i = 0; i < NumStressDimentsions; i++) m_AssumptionsRef[i]->clear();
 }
 
 

@@ -23,6 +23,7 @@ public:
 		OCFlow = 11,
 		ICFlow = 12,
 		OCTarget = 211,
+		OCNumerator=311,
 		ICTarget = 212,
 		DeferredFlow = 1 << (MaximumInterestsTypes + 1),
 		AccruedFlow = 1 << (MaximumInterestsTypes + 2),
@@ -64,6 +65,7 @@ public:
 	template<class T> double GetICTest(const T& a)const { static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetICTest can be used only with int or QDate"); return GetFlow(a, static_cast<qint32>(TrancheFlowType::ICFlow)); }
 	template<class T> double GetOCTarget(const T& a)const { static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetOCTarget can be used only with int or QDate"); return GetFlow(a, static_cast<qint32>(TrancheFlowType::OCTarget)); }
 	template<class T> double GetICTarget(const T& a)const { static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetICTarget can be used only with int or QDate"); return GetFlow(a, static_cast<qint32>(TrancheFlowType::ICTarget)); }
+	template<class T> double GetOCNumerator(const T& a)const { static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetOCNumerator can be used only with int or QDate"); return GetFlow(a, static_cast<qint32>(TrancheFlowType::OCNumerator)); }
 	template<class T> double GetPDLOutstanding(const T& a)const { static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetPDLOutstanding can be used only with int or QDate"); return GetFlow(a, static_cast<qint32>(TrancheFlowType::PDLOutstanding)); }
 	template<class T> double GetPDLCured(const T& a)const { static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetPDLCured can be used only with int or QDate"); return GetFlow(a, static_cast<qint32>(TrancheFlowType::PDLCured)); }
 	template<class T> double GetAmountOutstanding(const T& a)const { 

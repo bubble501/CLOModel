@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
 	b.LoadStress("C:/Temp/StressResult.fcsr");
 	return a.exec();*/
 
-	/*Waterfall TempWtf, TempCallWaterfall;
+	Waterfall TempWtf, TempCallWaterfall;
 	QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/BaseCase.clo");
 	//QFile file("C:/Temp/.SavedInputs.clo");
 	file.open(QIODevice::ReadOnly);
@@ -57,8 +57,8 @@ int main(int argc, char *argv[]) {
 	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempCallWaterfall;
 	file.close();
-	TempWtf.SetIsStressTest(true);
-	TempWtf.CalculateTranchesCashFlows();*/
+	if (TempWtf.CalculateTranchesCashFlows()) qDebug() << "Calculation Finished Correctly";
+	else qDebug() << "Critical Error in Waterfall Calculation";
 
 	/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	QApplication a(argc, argv);
@@ -137,7 +137,7 @@ int main(int argc, char *argv[]) {
 	return a.exec();
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 
-	Mortgage TempMtg1;
+	/*Mortgage TempMtg1;
 	TempMtg1.SetAnnuity("I");
 	TempMtg1.SetInterest("4.25");
 	TempMtg1.SetFloatingRateBase("EUR003M");
@@ -146,13 +146,13 @@ int main(int argc, char *argv[]) {
 	TempMtg1.SetSize(2030713.0);
 	TempMtg1.CalculateCashFlows(QDate(2014, 9, 19), "0", "0", "0");
 
-	/*TempMtg1.SetProperty("PrepaymentFee", "10");
+	/ *TempMtg1.SetProperty("PrepaymentFee", "10");
 	TempMtg1.SetAnnuity("A");
 	TempMtg1.SetInterest("2.5");
 	TempMtg1.SetPaymentFreq("6");
 	TempMtg1.SetMaturityDate(QDate(2018, 5, 30));
 	TempMtg1.SetSize(500000.0);
-	TempMtg1.CalculateCashFlows(QDate(2014, 5, 30), "0", "0", "0");*/
+	TempMtg1.CalculateCashFlows(QDate(2014, 5, 30), "0", "0", "0");* /
 
 
 	Mortgage TempMtg2;
@@ -181,13 +181,13 @@ int main(int argc, char *argv[]) {
 	if (file1.exists()) file1.remove();
 	if (file2.exists()) file2.remove();
 	if (file3.exists()) file3.remove();
-	if (/*true  ||*/ TempMtgsFlows != LegacyFlows) {
+	if (/ *true  ||* / TempMtgsFlows != LegacyFlows) {
 		PrintToTempFile("Model", TempMtgsFlows.ToPlainText(), false);
 		PrintToTempFile("Scenario", LegacyFlows.ToPlainText(), false);
 		PrintToTempFile("Base", BaseFlows.ToPlainText(), false);
 	}
 	else {
 		qDebug() << "Success, Cash Flows are identical";
-	}
+	}*/
 	return 0;
 }

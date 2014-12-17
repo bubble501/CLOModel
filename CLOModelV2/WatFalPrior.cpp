@@ -57,8 +57,8 @@ QString WatFalPrior::ReadyToCalculate() const {
 		if (GetParameter(wstParameters::SeniorityGroupLevel).value<IntegerVector>().IsEmpty(0)) Result += "OC Test needs a Seniority Group Level Parameter\n";
 		if (HasParameter(wstParameters::RedemptionGroup)) {
 			if (GetParameter(wstParameters::RedemptionGroup).value<IntegerVector>().IsEmpty(1)) Result += "OC Test needs a Redemption Group Parameter\n";
-			if (GetParameter(wstParameters::RedemptionGroupLevel).value<IntegerVector>().IsEmpty(0)) Result += "OC Test needs a Redemption Group Level Parameter\n";
 		}
+		if (GetParameter(wstParameters::RedemptionGroupLevel).value<IntegerVector>().IsEmpty(0)) Result += "OC Test needs a Redemption Group Level Parameter\n";
 		if (GetParameter(wstParameters::RedemptionShare).value<BloombergVector>().IsEmpty(0.0, 1.0)) Result += "OC Test needs a Redemption Share Parameter\n";
 		if (GetParameter(wstParameters::AdditionalCollateralShare).value<BloombergVector>().IsEmpty(0.0, 1.0)) Result += "OC Test needs an Additional Collateral Share Parameter\n";
 		if (HasParameter(wstParameters::AdditionalCollateralShare) && HasParameter(wstParameters::RedemptionShare)) {

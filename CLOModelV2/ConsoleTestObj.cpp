@@ -1545,7 +1545,8 @@ void ConsoleTestObj::SlateTest() {
 	QList<Tranche::TrancheInterestType> TempFlowType; TempFlowType << Tranche::TrancheInterestType::FloatingInterest;
 	QList<QString> TempRef; TempRef << "LIBOR";
 
-	QList<QString> TempCoup; TempCoup << "A 08/01/2014 85 60S 170";
+	QList<QString> TempCoup;
+	TempCoup << "A 08/01/2014 85 60S 170";
 	TempUnit.AddTranche(
 		"SLATE A"
 		, ""

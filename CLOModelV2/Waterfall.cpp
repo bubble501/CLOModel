@@ -611,7 +611,6 @@ bool Waterfall::CalculateTranchesCashFlows(){
 			PrintToTempFile("ReturnFalse.txt", "Not Ready To Calculate");
 			return false;
 		}
-		LOGTOFILE("Pre-Reinv",m_MortgagesPayments.ToPlainText());
 		{//Check if all base rates are valid
 			bool KeepSearching = false;
 			ConstantBaseRateTable TempTable;
@@ -1337,12 +1336,16 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						Solution += AvailablePrincipal.Total() + m_ReinvestmentTest.GetQueuedCash();
 						if (Solution == 0.0) Solution = 1.0;
 						TotalPayable = qMax(TotalPayable, 0.000001);
+						LOGDEBUG(QString("Old Assets: %1, Old Liab: %2, Test: %3").arg(Solution, 0, 'f').arg(TotalPayable, 0, 'f').arg(Solution / TotalPayable, 0, 'f'));
 						for (; ProRataBonds.size() > 0; ProRataBonds.dequeue()) {
-							if (m_Tranches[ProRataBonds.head()]->GetCashFlow().GetOCTarget(CurrentDate)==0.0)
+							if (m_Tranches[ProRataBonds.head()]->GetCashFlow().GetOCTest(CurrentDate) == 0.0) {
 								m_Tranches[ProRataBonds.head()]->SetCashFlow(CurrentDate, Solution / TotalPayable, TrancheCashFlow::TrancheFlowType::OCFlow);
+								m_Tranches[ProRataBonds.head()]->SetCashFlow(CurrentDate, Solution, TrancheCashFlow::TrancheFlowType::OCNumerator);
+							}
 						}
 					}
 					if (SingleStep->GetParameter(WatFalPrior::wstParameters::PayAccrue).toInt() & static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Pay)) {
+						double TestResult;
 						ProRataBonds.clear();
 						TotalPayable = Solution = 0.0;
 						TestTarget = -1.0;
@@ -1353,7 +1356,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						for (auto h = m_Tranches.begin(); h != m_Tranches.end();++h) {
 							if ((*h)->GetProrataGroup(CurrSenGrpLvl) == CurrSenGrp) {
 								if (!FirstTestFound) {
-									Solution = (*h)->GetCashFlow().GetOCTest(CurrentDate);
+									TestResult = (*h)->GetCashFlow().GetOCTest(CurrentDate);
 									FirstTestFound = true;
 								}
 								if (TestTarget <= 0.0) TestTarget = (*h)->GetMinOClevel();
@@ -1361,9 +1364,9 @@ bool Waterfall::CalculateTranchesCashFlows(){
 									(*h)->SetCashFlow(CurrentDate, TestTarget, TrancheCashFlow::TrancheFlowType::OCTarget);
 							}
 						}
-						if (Solution != 0.0  && FirstTestFound && TestTarget > 0.0) {
+						if (TestResult != 0.0  && FirstTestFound && TestTarget > 0.0) {
 							//if it fails redeem notes until cured
-							if (Solution < TestTarget) {
+							if (TestResult < TestTarget) {
 								double CurrAddColShare = SingleStep->GetParameter(WatFalPrior::wstParameters::AdditionalCollateralShare).value<BloombergVector>().GetValue(CurrentDate);
 								double CurrentRedemptionShare = SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionShare).value<BloombergVector>().GetValue(CurrentDate);
 								double NeedToCure;
@@ -1373,32 +1376,32 @@ bool Waterfall::CalculateTranchesCashFlows(){
 									return false;
 								}
 								TotalPayable = Solution = 0.0;
-								//OC Denominator
-								foreach(Tranche* SingleTranche, m_Tranches) {
-									if (SingleTranche->GetProrataGroup(CurrSenGrpLvl) <= CurrSenGrp)
-										TotalPayable += SingleTranche->GetCashFlow().GetAmountOutstanding(CurrentDate);
+								//OC Numerator and Denominator
+								foreach(Tranche* SingleTranche ,m_Tranches) {
+									if (SingleTranche->GetProrataGroup(CurrSenGrpLvl) == CurrSenGrp) {
+										Solution = SingleTranche->GetCashFlow().GetOCNumerator(CurrentDate);
+										TotalPayable = Solution / TestResult;
+										break;
+									}
 								}
-								//OC Numerator
-								if (m_CCCcurve.GetValue(CurrentDate)>m_CCCTestLimit)
-									Solution = (1.0 - ((m_CCCcurve.GetValue(CurrentDate) - m_CCCTestLimit)*m_CCChaircut))*m_MortgagesPayments.GetOutstandingForOC(CurrentDate);
-								else
-									Solution = m_MortgagesPayments.GetOutstandingForOC(CurrentDate);
-								Solution += AvailablePrincipal.Total() + m_ReinvestmentTest.GetQueuedCash();
 
 								if (Solution == 0.0) Solution = 1.0;
 								TotalPayable = qMax(TotalPayable, 0.000001);
 								NeedToCure = ((TotalPayable*TestTarget) - Solution) / (CurrAddColShare + (CurrentRedemptionShare*TestTarget));
+								Q_ASSERT_X(NeedToCure >= 0.0, "OC Test", "Negative NeedToCure");
 								double FundsToRedemption, FundsToCollateral;
 								if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 1) {
 									NeedToCure = qMin(NeedToCure, AvailableInterest);
 									FundsToRedemption = NeedToCure*CurrentRedemptionShare;
 									FundsToCollateral = NeedToCure*CurrAddColShare;
+									Q_ASSERT_X(FundsToRedemption + FundsToCollateral <= AvailableInterest, "OC Test", "Paying Too Much");
 									AvailableInterest -= FundsToRedemption + FundsToCollateral;
 								}
 								else {
 									NeedToCure = qMin(NeedToCure, AvailablePrincipal.Total());
 									FundsToRedemption = NeedToCure*CurrentRedemptionShare;
-									FundsToCollateral = NeedToCure*CurrAddColShare;
+									FundsToCollateral = NeedToCure*CurrAddColShare;									
+									Q_ASSERT_X(FundsToRedemption + FundsToCollateral <= AvailablePrincipal.Total(), "OC Test", "Paying Too Much");
 									AvailablePrincipal -= FundsToRedemption + FundsToCollateral;
 								}
 								//reinvest
@@ -1418,7 +1421,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 									if (!SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroup).value<IntegerVector>().IsEmpty()) {
 										FundsToRedemption = RedeemNotes(FundsToRedemption, CurrRedGrp, CurrRedGrpLvl, CurrentDate);
 									}
-									else FundsToRedemption = RedeemSequential(FundsToRedemption, CurrentDate, CurrRedGrpLvl);
+									if (FundsToRedemption>=0.01) FundsToRedemption = RedeemSequential(FundsToRedemption, CurrentDate, CurrRedGrpLvl);
 									if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 1)
 										AvailableInterest += FundsToRedemption;
 									else
@@ -1599,7 +1602,6 @@ bool Waterfall::CalculateTranchesCashFlows(){
 				break;
 			}
 		}//End Cycle in time
-		LOGTOFILE("Post-Reinv", m_MortgagesPayments.ToPlainText());
 		for(int j=0;j<m_Reserves.size();j++){
 			m_Reserves[j]->SetReserveFundCurrent(m_Reserves[j]->GetStartingReserve());
 			m_Reserves[j]->ResetMissingAnchors();
@@ -1623,7 +1625,9 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		foreach(WatFalPrior* SingleStp, m_WaterfallStesps) {
 			SingleStp->ResetMissinAnchors();
 		}
-
+		foreach(Tranche* SingleTranche, m_Tranches) {
+			SingleTranche->GetCashFlow().RemoveFlow(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::OCNumerator));
+		}
 
 		//Check that there is no losses of cash flows
 		TrancheCashFlow CheckTranCashFlow;

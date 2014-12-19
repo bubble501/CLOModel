@@ -1,13 +1,11 @@
 #include "MtgCalculator.h"
 #include "Mortgage.h"
-#include <QSettings>
 #include <QDir>
 #include "Waterfall.h"
 #ifndef NO_DATABASE
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
-#include <QSettings>
 #include <QVariant>
 #endif
 MtgCalculator::MtgCalculator(QObject* parent)

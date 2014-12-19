@@ -5,7 +5,6 @@
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
-#include <QSettings>
 #include <QVariant>
 #endif
 Mortgage::Mortgage()
@@ -94,31 +93,31 @@ void Mortgage::SetInterest(const QString& a){
 		 bool DbOpen = db.isOpen();
 		 if (!DbOpen) DbOpen = db.open();
 		 if (DbOpen) {
-			 QSqlQuery PrepayAssQuerry(db);
-			 PrepayAssQuerry.setForwardOnly(true);
-			 PrepayAssQuerry.prepare("{CALL " + GetFromConfig("Database", "GetLoanAssumptionStoredProc", "getLoanAssumption(:scenarioName,:isSenior)") + "}");
-			 PrepayAssQuerry.bindValue(":scenarioName", GetProperty("Scenario"));
-			 PrepayAssQuerry.bindValue(":isSenior", GetProperty("Mezzanine").compare("Yes",Qt::CaseInsensitive)!=0);
-			 if (PrepayAssQuerry.exec()) {
-				 if (PrepayAssQuerry.next()) {
+			 QSqlQuery LoanAssQuerry(db);
+			 LoanAssQuerry.setForwardOnly(true);
+			 LoanAssQuerry.prepare("{CALL " + GetFromConfig("Database", "GetLoanAssumptionStoredProc", "getLoanAssumption(:scenarioName,:isSenior)") + "}");
+			 LoanAssQuerry.bindValue(":scenarioName", GetProperty("Scenario"));
+			 LoanAssQuerry.bindValue(":isSenior", GetProperty("Mezzanine").compare("Yes",Qt::CaseInsensitive)!=0);
+			 if (LoanAssQuerry.exec()) {
+				 if (LoanAssQuerry.next()) {
 					 int FieldCount = 0;
-					 if (!PrepayAssQuerry.isNull(FieldCount)) MaturityExtension = PrepayAssQuerry.value(FieldCount).toInt(); ++FieldCount;
-					 if (!PrepayAssQuerry.isNull(FieldCount)) StartingHaircut = PrepayAssQuerry.value(FieldCount).toDouble(); ++FieldCount;
-					 if (!PrepayAssQuerry.isNull(FieldCount)) PrepaymentFee = PrepayAssQuerry.value(FieldCount).toString(); ++FieldCount;
-					 if (!PrepayAssQuerry.isNull(FieldCount)) CurrentDayCountConvention = PrepayAssQuerry.value(FieldCount).toString(); ++FieldCount;
+					 if (!LoanAssQuerry.isNull(FieldCount)) MaturityExtension = LoanAssQuerry.value(FieldCount).toInt(); ++FieldCount;
+					 if (!LoanAssQuerry.isNull(FieldCount)) StartingHaircut = LoanAssQuerry.value(FieldCount).toDouble(); ++FieldCount;
+					 if (!LoanAssQuerry.isNull(FieldCount)) PrepaymentFee = LoanAssQuerry.value(FieldCount).toString(); ++FieldCount;
+					 if (!LoanAssQuerry.isNull(FieldCount)) CurrentDayCountConvention = LoanAssQuerry.value(FieldCount).toString(); ++FieldCount;
 					 if (!OverrideProperties) {
-						 if (!PrepayAssQuerry.isNull(FieldCount)) CPRVec = PrepayAssQuerry.value(FieldCount).toString(); ++FieldCount;
-						 if (!PrepayAssQuerry.isNull(FieldCount)) CDRVec = PrepayAssQuerry.value(FieldCount).toString(); ++FieldCount;
-						 if (!PrepayAssQuerry.isNull(FieldCount)) LossVec = PrepayAssQuerry.value(FieldCount).toString(); ++FieldCount;
-						 if (!PrepayAssQuerry.isNull(FieldCount)) RecoveryLag = PrepayAssQuerry.value(FieldCount).toString(); ++FieldCount;
-						 if (!PrepayAssQuerry.isNull(FieldCount)) Delinquency = PrepayAssQuerry.value(FieldCount).toString(); ++FieldCount;
-						 if (!PrepayAssQuerry.isNull(FieldCount)) DelinquencyLag = PrepayAssQuerry.value(FieldCount).toString(); ++FieldCount;
+						 if (!LoanAssQuerry.isNull(FieldCount)) CPRVec = LoanAssQuerry.value(FieldCount).toString(); ++FieldCount;
+						 if (!LoanAssQuerry.isNull(FieldCount)) CDRVec = LoanAssQuerry.value(FieldCount).toString(); ++FieldCount;
+						 if (!LoanAssQuerry.isNull(FieldCount)) LossVec = LoanAssQuerry.value(FieldCount).toString(); ++FieldCount;
+						 if (!LoanAssQuerry.isNull(FieldCount)) RecoveryLag = LoanAssQuerry.value(FieldCount).toString(); ++FieldCount;
+						 if (!LoanAssQuerry.isNull(FieldCount)) Delinquency = LoanAssQuerry.value(FieldCount).toString(); ++FieldCount;
+						 if (!LoanAssQuerry.isNull(FieldCount)) DelinquencyLag = LoanAssQuerry.value(FieldCount).toString(); ++FieldCount;
 					 }
 					 else FieldCount += 6;
-					 if (!HasProperty("Price") && !PrepayAssQuerry.isNull(FieldCount)) SetProperty("Price", QString::number(PrepayAssQuerry.value(FieldCount).toDouble(), 'f')); ++FieldCount;
-					 if (!PrepayAssQuerry.isNull(FieldCount)) HaircutVector = PrepayAssQuerry.value(FieldCount).toString(); ++FieldCount;
-					 if (!PrepayAssQuerry.isNull(FieldCount)) PrepayMultiplier = PrepayAssQuerry.value(FieldCount).toString(); ++FieldCount;
-					 if (!PrepayAssQuerry.isNull(FieldCount)) LossMultiplier = PrepayAssQuerry.value(FieldCount).toString(); ++FieldCount;
+					 if (!HasProperty("Price") && !LoanAssQuerry.isNull(FieldCount)) SetProperty("Price", QString::number(LoanAssQuerry.value(FieldCount).toDouble(), 'f')); ++FieldCount;
+					 if (!LoanAssQuerry.isNull(FieldCount)) HaircutVector = LoanAssQuerry.value(FieldCount).toString(); ++FieldCount;
+					 if (!LoanAssQuerry.isNull(FieldCount)) PrepayMultiplier = LoanAssQuerry.value(FieldCount).toString(); ++FieldCount;
+					 if (!LoanAssQuerry.isNull(FieldCount)) LossMultiplier = LoanAssQuerry.value(FieldCount).toString(); ++FieldCount;
 				 }
 			 }
 		 }

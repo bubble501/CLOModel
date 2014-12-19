@@ -256,8 +256,7 @@ void PrintToTempFile(const QString& TempFileName, const QString& Message, bool P
 	TempWrite << (PrintTime ? QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm "):QString()) + Message + '\n';
 	TempFile.close();
 }
-#include <QSettings>
-#include <QRegExp>
+
 //UGLY!!!
 double GetLoanAssumption(const QString& LoanName, int columnIndex, QDate RefDate) {
 /*columnIndex

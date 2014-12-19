@@ -8,7 +8,6 @@
 #include <QDate>
 #include <QString>
 #include <QFile>
-#include <QSettings>
 #include <QApplication>
 #include <QTextStream>
 #include "DateTrigger.h"

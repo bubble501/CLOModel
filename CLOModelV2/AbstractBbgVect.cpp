@@ -2,7 +2,6 @@
 #include <QRegExp>
 #include <QStringList>
 #include <QDate>
-#include <QSettings>
 void AbstractBbgVect::SetVector(const QString& Vec){
 	/*QString OldVec(m_Vector);
 	m_Vector=Vec;

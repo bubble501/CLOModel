@@ -9,7 +9,6 @@
 #include "ProgressWidget.h"
 #include "ExcelCommons.h"
 #include "ExcelOutput.h"
-#include <QSettings>
 #include <QStringList>
 CentralUnit::CentralUnit(QObject* parent)
 	:QObject(parent)

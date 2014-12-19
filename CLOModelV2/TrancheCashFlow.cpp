@@ -6,7 +6,6 @@
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
-#include <QSettings>
 #include <QVariant>
 #include "QSingleBbgResult.h"
 #endif

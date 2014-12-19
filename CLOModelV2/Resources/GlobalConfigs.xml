@@ -8,6 +8,7 @@
 <ForwardBaseRatesStoredProc>getForwardCurveMatrix</ForwardBaseRatesStoredProc>
 <CashFlowsStoredProc>getCashFlows</CashFlowsStoredProc>
 <GetLoanAssumptionStoredProc>getLoanAssumption(:scenarioName,:isSenior)</GetLoanAssumptionStoredProc>
+<GetAllLoanAssumptionStoredProc>getAllLoanAssumptions</GetAllLoanAssumptionStoredProc>
 </Database>
 <Folders>
 <UnifiedResultsFolder>Z:/24AM/Monitoring/Model Results</UnifiedResultsFolder>

@@ -1,6 +1,5 @@
 #include "ScenarioApplier.h"
 #include "ApplyFlowThread.h"
-#include <QSettings>
 #include <QDir>
 ScenarioApplier::ScenarioApplier(QObject* parent) 
 	: TemplAsyncCalculator<ApplyFlowThread, MtgCashFlow>(parent)

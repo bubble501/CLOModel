@@ -8,7 +8,6 @@
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
-#include <QSettings>
 #include <QVariant>
 #endif
 
@@ -45,7 +44,7 @@ BaseRateVector::BaseRateVector(const QString& Vec,const QDate& Anchor)
 	
 }
 bool BaseRateVector::IsValid() const{
-	if (!AbstractBbgVect::IsValid("\\S+", false)) return false;
+	if (!AbstractBbgVect::IsValid(R"**([^\s,\[\]]+(?:\[(?:(?:-?\d*\.?\d+)|(?:(?:-?\d*\.?\d+)?(?:,-?\d*\.?\d+)))\])?)**", false)) return false;
 	QRegExp rx("\\[(-?\\d*\\.?\\d+),(-?\\d*\\.?\\d+)\\]");
 	for (int pos = 0; (pos = rx.indexIn(m_Vector, pos)) >= 0; pos += rx.matchedLength()) {
 		if (rx.cap(1).toDouble() > rx.cap(2).toDouble()) return false;
@@ -53,7 +52,7 @@ bool BaseRateVector::IsValid() const{
 	return true;
 }
 QRegExpValidator* BaseRateVector::GetValidator(QObject* parent) const {
-	return AbstractBbgVect::GetValidator("\\S+", false, parent);
+	return AbstractBbgVect::GetValidator(R"**([^\s,\[\]]+(?:\[(?:(?:-?\d*\.?\d+)|(?:(?:-?\d*\.?\d+)?(?:,-?\d*\.?\d+)))\])?)**", false, parent);
 }
 void BaseRateVector::UnpackVector(){
 	m_VectVal.clear();

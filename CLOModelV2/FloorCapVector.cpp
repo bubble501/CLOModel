@@ -88,7 +88,7 @@ void FloorCapVector::UnpackVector() {
 	}
 }
 bool FloorCapVector::IsValid() const {
-	if (!AbstractBbgVect::IsValid("\\[(?:-?\\d*\\.?\\d+)?(?:,-?\\d*\\.?\\d+)?\\]", false)) return false;
+	if (!AbstractBbgVect::IsValid(R"**(\[(?:(?:-?\d*\.?\d+)|(?:(?:-?\d*\.?\d+)?(?:,-?\d*\.?\d+)))\])**", false)) return false;
 	QRegExp rx("\\[(-?\\d*\\.?\\d+),(-?\\d*\\.?\\d+)\\]");
 	for (int pos = 0; (pos = rx.indexIn(m_Vector, pos)) >= 0; pos += rx.matchedLength()) {
 		if (rx.cap(1).toDouble() > rx.cap(2).toDouble()) return false;

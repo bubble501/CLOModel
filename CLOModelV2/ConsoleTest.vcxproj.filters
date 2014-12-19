@@ -35,6 +35,11 @@
     <Filter Include="Header Files\Core">
       <UniqueIdentifier>{1c66b12c-cd83-4be3-b600-608955df767c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Form Files">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+      <ParseFiles>true</ParseFiles>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\qrc_Resources.cpp">
@@ -343,6 +348,18 @@
     <ClCompile Include="FloorCapVector.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
+    <ClCompile Include="LoanAssumption.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LoanAssumptionsEditor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_LoanAssumptionsEditor.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_LoanAssumptionsEditor.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Resources.qrc">
@@ -501,6 +518,9 @@
     <CustomBuild Include="TriggerHelperDialog.h">
       <Filter>Header Files\Core</Filter>
     </CustomBuild>
+    <CustomBuild Include="LoanAssumptionsEditor.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DayCountVect.h">
@@ -547,6 +567,9 @@
     </ClInclude>
     <ClInclude Include="DuringStressTestTrigger.h">
       <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="LoanAssumption.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

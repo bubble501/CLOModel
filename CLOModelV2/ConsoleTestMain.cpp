@@ -26,12 +26,18 @@
 #include "TriggerStructHelperWidget.h"
 #include "TriggerHelperDialog.h"
 #include "FloorCapVector.h"
+#include "LoanAssumptionsEditor.h"
 int main(int argc, char *argv[]) {
 
 	//QApplication a(argc, argv);
 	//ConsoleTestObj b;
 	//return a.exec();
 
+	QApplication a(argc, argv);
+	LoanAssumptionsEditor b;
+	b.FillFromQuery();
+	b.show();
+	return a.exec();
 
 	/*QApplication a(argc, argv);
 	StressViewer b;
@@ -137,7 +143,7 @@ int main(int argc, char *argv[]) {
 	return a.exec();
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 
-	Mortgage TempMtg1;
+/*Mortgage TempMtg1;
 	TempMtg1.SetAnnuity("I");
 	TempMtg1.SetInterest("4.25");
 	TempMtg1.SetFloatingRateBase("EUR003M");
@@ -148,7 +154,7 @@ int main(int argc, char *argv[]) {
 	TempMtg1.SetProperty("Mezzanine", "No");
 	TempMtg1.CalculateCashFlows(QDate(2014, 9, 19), "10", "2", "50");
 	PrintToTempFile("DownloadResults", TempMtg1.GetCashFlow().ToPlainText());
-	/*
+	
 
 
 	Mortgage TempMtg2;

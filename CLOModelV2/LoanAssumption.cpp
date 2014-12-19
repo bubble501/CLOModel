@@ -62,3 +62,7 @@ void LoanAssumption::AddAlias(const QString& val) {
 		&& !m_Aliases.contains(val, Qt::CaseInsensitive)
 	) m_Aliases.append(val);
 }
+
+QString LoanAssumption::GetRawAssumption(AssumptionType at, Seniority sn) const {
+	return m_Assumptions[at][sn].trimmed();
+}

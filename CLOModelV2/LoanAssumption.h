@@ -4,11 +4,8 @@
 #include <QStringList>
 #include <QDate>
 class LoanAssumption {
-private:
-	enum {SenioritySize=2};
-	enum Seniority{Senior=0,Mezz=1};
-	enum { AssumptionTypeSize = 14};
-	enum AssumptionType{ 
+public:
+	enum AssumptionType {
 		MaturityExtension = 0
 		, InitialHaircut
 		, PrepaymentFee
@@ -24,11 +21,16 @@ private:
 		, PrepayMultiplier
 		, LossMultiplier
 	};
+private:
+	enum {SenioritySize=2};
+	enum Seniority{Senior=0,Mezz=1};
+	enum { AssumptionTypeSize = 14};
 	QString m_ScenarioName;
 	QStringList m_Aliases;
 	QString m_Assumptions[AssumptionTypeSize][SenioritySize];
 	QDate m_LastUpdate[SenioritySize];
 	QString GetAssumption(AssumptionType at, Seniority sn)const;
+	QString GetRawAssumption(AssumptionType at, Seniority sn)const;
 	void SetAssumption(AssumptionType at, Seniority sn, const QString& Val) { m_Assumptions[at][sn] = Val; }
 	const QDate& GetLastUpdate(Seniority sn)const { return m_LastUpdate[sn]; }
 	void SetLastUpdate(Seniority sn, const QDate& a) {m_LastUpdate[sn] = a;}
@@ -106,5 +108,33 @@ public:
 	QString GetMezzHaircut() const { return GetAssumption(Haircut, Mezz); }
 	QString GetMezzPrepayMultiplier()const { return GetAssumption(PrepayMultiplier, Mezz); }
 	QString GetMezzLossMultiplier()const { return GetAssumption(LossMultiplier, Mezz); }
+	QString GetRawSeniorMaturityExtension() const { return GetRawAssumption(MaturityExtension, Senior); }
+	QString GetRawSeniorInitialHaircut()const { return GetRawAssumption(InitialHaircut, Senior); }
+	QString GetRawSeniorPrepaymentFee() const { return GetRawAssumption(PrepaymentFee, Senior); }
+	QString GetRawSeniorDayCount() const { return GetRawAssumption(DayCount, Senior); }
+	QString GetRawSeniorCPR() const { return GetRawAssumption(CPR, Senior); }
+	QString GetRawSeniorCDR()const { return GetRawAssumption(CDR, Senior); }
+	QString GetRawSeniorLS()const { return GetRawAssumption(LS, Senior); }
+	QString GetRawSeniorRecoveryLag() const { return GetRawAssumption(RecoveryLag, Senior); }
+	QString GetRawSeniorDelinquency() const { return GetRawAssumption(Delinquency, Senior); }
+	QString GetRawSeniorDelinquencyLag()const { return GetRawAssumption(DelinquencyLag, Senior); }
+	QString GetRawSeniorPrice()const { return GetRawAssumption(Price, Senior); }
+	QString GetRawSeniorHaircut() const { return GetRawAssumption(Haircut, Senior); }
+	QString GetRawSeniorPrepayMultiplier() const { return GetRawAssumption(PrepayMultiplier, Senior); }
+	QString GetRawSeniorLossMultiplier()const { return GetRawAssumption(LossMultiplier, Senior); }
+	QString GetRawMezzMaturityExtension()const { return GetRawAssumption(MaturityExtension, Mezz); }
+	QString GetRawMezzInitialHaircut() const { return GetRawAssumption(InitialHaircut, Mezz); }
+	QString GetRawMezzPrepaymentFee() const { return GetRawAssumption(PrepaymentFee, Mezz); }
+	QString GetRawMezzDayCount()const { return GetRawAssumption(DayCount, Mezz); }
+	QString GetRawMezzCPR() const { return GetRawAssumption(CPR, Mezz); }
+	QString GetRawMezzCDR()const { return GetRawAssumption(CDR, Mezz); }
+	QString GetRawMezzLS()const { return GetRawAssumption(LS, Mezz); }
+	QString GetRawMezzRecoveryLag()const { return GetRawAssumption(RecoveryLag, Mezz); }
+	QString GetRawMezzDelinquency() const { return GetRawAssumption(Delinquency, Mezz); }
+	QString GetRawMezzDelinquencyLag() const { return GetRawAssumption(DelinquencyLag, Mezz); }
+	QString GetRawMezzPrice()const { return GetRawAssumption(Price, Mezz); }
+	QString GetRawMezzHaircut() const { return GetRawAssumption(Haircut, Mezz); }
+	QString GetRawMezzPrepayMultiplier()const { return GetRawAssumption(PrepayMultiplier, Mezz); }
+	QString GetRawMezzLossMultiplier()const { return GetRawAssumption(LossMultiplier, Mezz); }
 };
 #endif // LoanAssumption_h__

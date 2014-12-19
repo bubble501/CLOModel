@@ -11,6 +11,9 @@ class QListView;
 class QSortFilterProxyModel;
 class QComboBox;
 class QLineEdit;
+class QTableView;
+class QCheckBox;
+class QDateEdit;
 class LoanAssumptionsEditor : public QWidget
 {
 	Q_OBJECT
@@ -28,12 +31,20 @@ private:
 	QSharedPointer<LoanAssumption> ActiveAssumption;
 	QStandardItemModel* m_ScenariosModel;
 	QStandardItemModel* m_AliasesModel;
+	QStandardItemModel* m_SeniorAsumptionsModel;
+	QStandardItemModel* m_MezzAsumptionsModel;
 	QSortFilterProxyModel* m_SortScenarios;
 	QListView* m_ScenarioList;
 	QListView* m_AliasesList;
+	QTableView* m_SeniorTable;
+	QTableView* m_MezzTable;
 	QComboBox* m_ScenariosCombo;
 	QLineEdit* m_ScenarioNameEdit;
 	QLineEdit* m_AliasLineEdit;
+	QCheckBox* m_seniorDateCheck;
+	QCheckBox* m_MezzDateCheck;
+	QDateEdit* m_SeniorDateEdit;
+	QDateEdit* m_MezzDateEdit;
 
 	QHash<QString, DocDirty> m_IsDirty;
 	QHash<QString, QSharedPointer<LoanAssumption> > m_DirtyAssumptions;
@@ -41,6 +52,7 @@ signals:
 	void ActiveAssumptionChanged();
 private slots:
 	void ChangeScenario(const QModelIndex& curr, const QModelIndex& prev);
+	void SenioScenaChanged(const QModelIndex& index);
 	//void SaveCurrentScenario();
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(LoanAssumptionsEditor::DocDirty)

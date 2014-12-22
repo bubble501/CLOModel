@@ -14,18 +14,21 @@ class QLineEdit;
 class QTableView;
 class QCheckBox;
 class QDateEdit;
+class QPushButton;
 class LoanAssumptionsEditor : public QWidget
 {
 	Q_OBJECT
 
 public:
 	LoanAssumptionsEditor(QWidget *parent=nullptr);
-	enum DocDirtyEnum { NotDirty = 0x0, Edited = 0x1, Added = 0x2, NameEdited = 0x4 };
-	Q_DECLARE_FLAGS(DocDirty, DocDirtyEnum)
 #ifndef NO_DATABASE
 	virtual void FillFromQuery();
 #endif
 private:
+	bool YesNoDialog(const QString& Title, const QString& Mess);
+	LoanAssumption BuildCurrentAssumption() const;
+	bool ScenExist(const QString& Teststr)const;
+	bool CheckAliasInput();
 	void FillScenariosModel();
 	QHash<QString,QSharedPointer<LoanAssumption> > m_Assumptions;
 	QSharedPointer<LoanAssumption> ActiveAssumption;
@@ -45,15 +48,26 @@ private:
 	QCheckBox* m_MezzDateCheck;
 	QDateEdit* m_SeniorDateEdit;
 	QDateEdit* m_MezzDateEdit;
+	QPushButton* AddAliasButton;
+	QPushButton* RemoveAliasButton;
+	QPushButton* ReplaceAliasButton;
+	QPushButton* AddSeniorAssumptionButton;
+	QPushButton* RemoveSeniorAssumptionButton;
+	QPushButton* AddScenarioButton;
+	QPushButton* RemoveScenarioButton;
+	QPushButton* SaveCurrentButton;
+	QPushButton* SaveAllButton;
+	QPushButton* DiscardCurrentButton;
+	QPushButton* DiscardAllButton;
 
-	QHash<QString, DocDirty> m_IsDirty;
 	QHash<QString, QSharedPointer<LoanAssumption> > m_DirtyAssumptions;
 signals:
 	void ActiveAssumptionChanged();
 private slots:
+	void CheckCurrentDirty();
 	void ChangeScenario(const QModelIndex& curr, const QModelIndex& prev);
 	void SenioScenaChanged(const QModelIndex& index);
-	//void SaveCurrentScenario();
+	void SaveScenario(const QString& key);
+	void DiscardScenario(const QString& key);
 };
-Q_DECLARE_OPERATORS_FOR_FLAGS(LoanAssumptionsEditor::DocDirty)
 #endif // LOANASSUMPTIONSMODEL_H

@@ -66,3 +66,21 @@ void LoanAssumption::AddAlias(const QString& val) {
 QString LoanAssumption::GetRawAssumption(AssumptionType at, Seniority sn) const {
 	return m_Assumptions[at][sn].trimmed();
 }
+
+bool LoanAssumption::operator==(const LoanAssumption& a) const {
+	bool Result = m_ScenarioName == a.m_ScenarioName;
+	for (int j = 0; j < SenioritySize && Result; j++) {
+		Result = m_LastUpdate[j] == a.m_LastUpdate[j];
+		for (int i = 0; i < AssumptionTypeSize && Result; i++) {
+			Result=m_Assumptions[i][j] == a.m_Assumptions[i][j];
+		}
+	}
+	Result = Result && m_Aliases.size() == a.m_Aliases.size();
+	for (auto i = m_Aliases.constBegin(); i != m_Aliases.constEnd() && Result; ++i) {
+		Result = a.m_Aliases.contains(*i);
+	}
+	for (auto i = a.m_Aliases.constBegin(); i != a.m_Aliases.constEnd() && Result; ++i) {
+		Result = m_Aliases.contains(*i);
+	}
+	return Result;
+}

@@ -21,20 +21,22 @@ public:
 		, PrepayMultiplier
 		, LossMultiplier
 	};
+	enum Seniority { Senior = 0, Mezz };
 private:
 	enum {SenioritySize=2};
-	enum Seniority{Senior=0,Mezz=1};
 	enum { AssumptionTypeSize = 14};
 	QString m_ScenarioName;
 	QStringList m_Aliases;
 	QString m_Assumptions[AssumptionTypeSize][SenioritySize];
 	QDate m_LastUpdate[SenioritySize];
+public:
 	QString GetAssumption(AssumptionType at, Seniority sn)const;
 	QString GetRawAssumption(AssumptionType at, Seniority sn)const;
 	void SetAssumption(AssumptionType at, Seniority sn, const QString& Val) { m_Assumptions[at][sn] = Val; }
 	const QDate& GetLastUpdate(Seniority sn)const { return m_LastUpdate[sn]; }
 	void SetLastUpdate(Seniority sn, const QDate& a) {m_LastUpdate[sn] = a;}
-public:
+	bool operator==(const LoanAssumption& a) const;
+	bool operator!=(const LoanAssumption& a) const { return !operator==(a); }
 	int GetAliasesCount() const { return m_Aliases.size(); }
 	const QStringList& GetAliases() const { return m_Aliases; }
 	void SetAliases(const QString& val);

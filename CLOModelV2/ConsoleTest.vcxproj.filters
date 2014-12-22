@@ -378,6 +378,15 @@
     <ClCompile Include="GeneratedFiles\Release\moc_LoanAssumptionDelegate.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="RichTextDelegate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_RichTextDelegate.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_RichTextDelegate.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Resources.qrc">
@@ -543,6 +552,9 @@
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="LoanAssumptionDelegate.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="RichTextDelegate.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>

@@ -348,20 +348,11 @@
     <ClCompile Include="FloorCapVector.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
-    <ClCompile Include="LoanAssumption.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LoanAssumptionsEditor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_LoanAssumptionsEditor.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_LoanAssumptionsEditor.cpp">
       <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="AssumptionsComboDelegate.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_AssumptionsComboDelegate.cpp">
       <Filter>Generated Files\Debug</Filter>
@@ -369,23 +360,32 @@
     <ClCompile Include="GeneratedFiles\Release\moc_AssumptionsComboDelegate.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="LoanAssumptionDelegate.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_LoanAssumptionDelegate.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_LoanAssumptionDelegate.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="RichTextDelegate.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_RichTextDelegate.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_RichTextDelegate.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="LoanAssumption.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="LoanAssumptionDelegate.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="LoanAssumptionsEditor.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="RichTextDelegate.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="AssumptionsComboDelegate.cpp">
+      <Filter>Source Files\Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -545,17 +545,17 @@
     <CustomBuild Include="TriggerHelperDialog.h">
       <Filter>Header Files\Core</Filter>
     </CustomBuild>
-    <CustomBuild Include="LoanAssumptionsEditor.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="AssumptionsComboDelegate.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Core</Filter>
     </CustomBuild>
     <CustomBuild Include="LoanAssumptionDelegate.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Core</Filter>
+    </CustomBuild>
+    <CustomBuild Include="LoanAssumptionsEditor.h">
+      <Filter>Header Files\Core</Filter>
     </CustomBuild>
     <CustomBuild Include="RichTextDelegate.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Core</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -605,7 +605,7 @@
       <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="LoanAssumption.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

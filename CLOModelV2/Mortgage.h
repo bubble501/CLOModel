@@ -9,6 +9,7 @@
 #include "BaseRateVect.h"
 #include "BaseRateTable.h"
 #include "DayCountVect.h"
+
 class Mortgage : public BackwardInterface{
 private:
 	QString m_Properties;

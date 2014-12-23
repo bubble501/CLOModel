@@ -33,11 +33,12 @@ int main(int argc, char *argv[]) {
 	//ConsoleTestObj b;
 	//return a.exec();
 
+/*
 	QApplication a(argc, argv);
 	LoanAssumptionsEditor b;
 	b.FillFromQuery();
 	b.show();
-	return a.exec();
+	return a.exec();*/
 
 	/*QApplication a(argc, argv);
 	StressViewer b;
@@ -76,7 +77,7 @@ int main(int argc, char *argv[]) {
 		, "20", "0.5", "0", "0", "0", "0"
 		).GetTranche("HARVT 10X A"));
 	return a.exec();
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*
+	*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	Waterfall TempWtf, TempCallWaterfall;
 	MtgCalculator TempMtg;
@@ -101,21 +102,12 @@ int main(int argc, char *argv[]) {
 	out >> TempMtg;
 	file.close();
 	
-
-	Mortgage TempMtg1;
-	TempMtg1.SetFloatingRateBase("EUR003M[3,5]");
-	TempMtg1.SetAnnuity("I");
-	TempMtg1.SetInterest("5");
-	TempMtg1.SetPaymentFreq("1");
-	TempMtg1.SetMaturityDate(QDate(2020, 5, 30));
-	TempMtg1.SetSize(1000000.0);
-	TempMtg1.SetHaircutVector("0 24S 50");
-	TempMtg.AddLoan(TempMtg1,TempMtg.GetLoans().size()+1);
-	TempMtg.ReadyToCalculate();
+	//TempWtf.CalculateTranchesCashFlows();
+	QApplication a(argc, argv);
+	TempMtg.SetSequentialComputation(true);
 	TempMtg.StartCalculation();
-	TempWtf.CalculateTranchesCashFlows();
-	
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	return a.exec();
+	/*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	QApplication a(argc, argv);
 	//QFile file("C:/Temp/Wrong 20#,#8#,#100#,#0#,#0#,#0.csw");
 	QFile file("C:/Temp/20#,#8#,#100#,#0#,#0#,#0.csw");

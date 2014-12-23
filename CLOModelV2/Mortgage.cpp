@@ -6,7 +6,9 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QVariant>
+#include <QSqlRecord>
 #endif
+
 Mortgage::Mortgage()
 	: m_PaymentFreq("1")
 	, m_AnnuityVect("N")
@@ -81,14 +83,17 @@ void Mortgage::SetInterest(const QString& a){
 #ifndef NO_DATABASE
 	 if (HasProperty("Scenario") && HasProperty("Mezzanine")) {
 		//Download Scenario From Database
+		 Db_Mutex.lock();
 		 QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
 		 if (!db.isValid()) {
-			 db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype", "QODBC"), "TwentyFourDB");
-			 db.setDatabaseName(
-				 "Driver={" + GetFromConfig("Database", "Driver", "SQL Server")
-				 + "}; "
-				 + GetFromConfig("Database", "DataSource", R"(Server=SYNSERVER2\SQLExpress; Initial Catalog = ABSDB; Integrated Security = SSPI; Trusted_Connection = Yes;)")
-				 );
+			 if (!db.isValid()) {
+				 db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype", "QODBC"), "TwentyFourDB");
+				 db.setDatabaseName(
+					 "Driver={" + GetFromConfig("Database", "Driver", "SQL Server")
+					 + "}; "
+					 + GetFromConfig("Database", "DataSource", R"(Server=SYNSERVER2\SQLExpress; Initial Catalog = ABSDB; Integrated Security = SSPI; Trusted_Connection = Yes;)")
+				);
+			 }
 		 }
 		 bool DbOpen = db.isOpen();
 		 if (!DbOpen) DbOpen = db.open();
@@ -97,31 +102,32 @@ void Mortgage::SetInterest(const QString& a){
 			 LoanAssQuerry.setForwardOnly(true);
 			 LoanAssQuerry.prepare("{CALL " + GetFromConfig("Database", "GetLoanAssumptionStoredProc", "getLoanAssumption(:scenarioName,:isSenior)") + "}");
 			 LoanAssQuerry.bindValue(":scenarioName", GetProperty("Scenario"));
-			 LoanAssQuerry.bindValue(":isSenior", GetProperty("Mezzanine").compare("Yes",Qt::CaseInsensitive)!=0);
+			 LoanAssQuerry.bindValue(":isSenior", static_cast<bool>(GetProperty("Mezzanine").compare("Yes",Qt::CaseInsensitive)!=0));
 			 if (LoanAssQuerry.exec()) {
 				 if (LoanAssQuerry.next()) {
-					 int FieldCount = 0;
-					 if (!LoanAssQuerry.isNull(FieldCount)) MaturityExtension = LoanAssQuerry.value(FieldCount).toInt(); ++FieldCount;
-					 if (!LoanAssQuerry.isNull(FieldCount)) StartingHaircut = LoanAssQuerry.value(FieldCount).toDouble(); ++FieldCount;
-					 if (!LoanAssQuerry.isNull(FieldCount)) PrepaymentFee = LoanAssQuerry.value(FieldCount).toString(); ++FieldCount;
-					 if (!LoanAssQuerry.isNull(FieldCount)) CurrentDayCountConvention = LoanAssQuerry.value(FieldCount).toString(); ++FieldCount;
-					 if (!OverrideProperties) {
-						 if (!LoanAssQuerry.isNull(FieldCount)) CPRVec = LoanAssQuerry.value(FieldCount).toString(); ++FieldCount;
-						 if (!LoanAssQuerry.isNull(FieldCount)) CDRVec = LoanAssQuerry.value(FieldCount).toString(); ++FieldCount;
-						 if (!LoanAssQuerry.isNull(FieldCount)) LossVec = LoanAssQuerry.value(FieldCount).toString(); ++FieldCount;
-						 if (!LoanAssQuerry.isNull(FieldCount)) RecoveryLag = LoanAssQuerry.value(FieldCount).toString(); ++FieldCount;
-						 if (!LoanAssQuerry.isNull(FieldCount)) Delinquency = LoanAssQuerry.value(FieldCount).toString(); ++FieldCount;
-						 if (!LoanAssQuerry.isNull(FieldCount)) DelinquencyLag = LoanAssQuerry.value(FieldCount).toString(); ++FieldCount;
-					 }
-					 else FieldCount += 6;
-					 if (!HasProperty("Price") && !LoanAssQuerry.isNull(FieldCount)) SetProperty("Price", QString::number(LoanAssQuerry.value(FieldCount).toDouble(), 'f')); ++FieldCount;
-					 if (!LoanAssQuerry.isNull(FieldCount)) HaircutVector = LoanAssQuerry.value(FieldCount).toString(); ++FieldCount;
-					 if (!LoanAssQuerry.isNull(FieldCount)) PrepayMultiplier = LoanAssQuerry.value(FieldCount).toString(); ++FieldCount;
-					 if (!LoanAssQuerry.isNull(FieldCount)) LossMultiplier = LoanAssQuerry.value(FieldCount).toString(); ++FieldCount;
+					auto DbgRecord = LoanAssQuerry.record();
+					int FieldCount = 0;
+					if (!DbgRecord.isNull(FieldCount)) MaturityExtension = DbgRecord.value(FieldCount).toInt(); ++FieldCount;
+					if (!DbgRecord.isNull(FieldCount)) StartingHaircut = DbgRecord.value(FieldCount).toDouble(); ++FieldCount;
+					if (!DbgRecord.isNull(FieldCount)) PrepaymentFee = DbgRecord.value(FieldCount).toString(); ++FieldCount;
+					if (!DbgRecord.isNull(FieldCount)) CurrentDayCountConvention = DbgRecord.value(FieldCount).toString(); ++FieldCount;
+					if (!OverrideProperties) {
+						if (!DbgRecord.isNull(FieldCount)) CPRVec = DbgRecord.value(FieldCount).toString(); ++FieldCount;
+						if (!DbgRecord.isNull(FieldCount)) CDRVec = DbgRecord.value(FieldCount).toString(); ++FieldCount;
+						if (!DbgRecord.isNull(FieldCount)) LossVec = DbgRecord.value(FieldCount).toString(); ++FieldCount;
+						if (!DbgRecord.isNull(FieldCount)) RecoveryLag = DbgRecord.value(FieldCount).toString(); ++FieldCount;
+						if (!DbgRecord.isNull(FieldCount)) Delinquency = DbgRecord.value(FieldCount).toString(); ++FieldCount;
+						if (!DbgRecord.isNull(FieldCount)) DelinquencyLag = DbgRecord.value(FieldCount).toString(); ++FieldCount;
+					}
+					else FieldCount += 6;
+					if (!HasProperty("Price") && !DbgRecord.isNull(FieldCount)) SetProperty("Price", QString::number(DbgRecord.value(FieldCount).toDouble(), 'f')); ++FieldCount;
+					if (!DbgRecord.isNull(FieldCount)) HaircutVector = DbgRecord.value(FieldCount).toString(); ++FieldCount;
+					if (!DbgRecord.isNull(FieldCount)) PrepayMultiplier = DbgRecord.value(FieldCount).toString(); ++FieldCount;
+					if (!DbgRecord.isNull(FieldCount)) LossMultiplier = DbgRecord.value(FieldCount).toString(); ++FieldCount;
 				 }
 			 }
 		 }
-
+		 Db_Mutex.unlock();
 	 }
 #endif
 

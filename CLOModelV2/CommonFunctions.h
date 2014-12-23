@@ -30,6 +30,11 @@ template<typename T> class QList;
 #define LOGTOFILE(LogFile,LogMsg)
 #define LOGCONDITIONALLY(Condition,LogMsg)
 #endif
+#ifndef NO_DATABASE
+#include <QMutex>
+extern QMutex Db_Mutex;
+#endif // !NO_DATABASE
+
 int MonthDiff(const QDate& FutureDte,const QDate& PresentDte);
 QString InfixToPostfix(const QString& a);
 enum class DayCountConvention : qint16 {

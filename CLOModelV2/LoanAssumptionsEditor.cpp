@@ -798,6 +798,175 @@ void LoanAssumptionsEditor::ChangeScenario(const QModelIndex& curr, const QModel
 				, Qt::EditRole);
 		}AssIndex++;
 		//Mezz Assumptions
+		AssIndex = 0;
+		if (!ActiveAssumption->GetRawMezzMaturityExtension().isEmpty()) {
+			m_MezzAsumptionsModel->insertRow(m_MezzAsumptionsModel->rowCount());
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0), AssIndex, Qt::UserRole);
+			m_MezzAsumptionsModel->setData(
+				m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0)
+				, qobject_cast<AssumptionsComboDelegate*>(m_MezzTable->itemDelegate(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0)))->ComboElementforIndex(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0))
+				, Qt::EditRole
+				);
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 1),
+				ActiveAssumption->GetRawMezzMaturityExtension().toInt()
+				, Qt::EditRole);
+		}AssIndex++;
+		if (!ActiveAssumption->GetRawMezzInitialHaircut().isEmpty()) {
+			m_MezzAsumptionsModel->insertRow(m_MezzAsumptionsModel->rowCount());
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0), AssIndex, Qt::UserRole);
+			m_MezzAsumptionsModel->setData(
+				m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0)
+				, qobject_cast<AssumptionsComboDelegate*>(m_MezzTable->itemDelegate(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0)))->ComboElementforIndex(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0))
+				, Qt::EditRole
+				);
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 1),
+				ActiveAssumption->GetRawMezzInitialHaircut().toDouble()
+				, Qt::EditRole);
+		}AssIndex++;
+		if (!ActiveAssumption->GetRawMezzPrepaymentFee().isEmpty()) {
+			m_MezzAsumptionsModel->insertRow(m_MezzAsumptionsModel->rowCount());
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0), AssIndex, Qt::UserRole);
+			m_MezzAsumptionsModel->setData(
+				m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0)
+				, qobject_cast<AssumptionsComboDelegate*>(m_MezzTable->itemDelegate(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0)))->ComboElementforIndex(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0))
+				, Qt::EditRole
+				);
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 1),
+				ActiveAssumption->GetRawMezzPrepaymentFee()
+				, Qt::EditRole);
+		}AssIndex++;
+		if (!ActiveAssumption->GetRawMezzDayCount().isEmpty()) {
+			m_MezzAsumptionsModel->insertRow(m_MezzAsumptionsModel->rowCount());
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0), AssIndex, Qt::UserRole);
+			m_MezzAsumptionsModel->setData(
+				m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0)
+				, qobject_cast<AssumptionsComboDelegate*>(m_MezzTable->itemDelegate(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0)))->ComboElementforIndex(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0))
+				, Qt::EditRole
+				);
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 1),
+				ActiveAssumption->GetRawMezzDayCount()
+				, Qt::EditRole);
+		}AssIndex++;
+		if (!ActiveAssumption->GetRawMezzCPR().isEmpty()) {
+			m_MezzAsumptionsModel->insertRow(m_MezzAsumptionsModel->rowCount());
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0), AssIndex, Qt::UserRole);
+			m_MezzAsumptionsModel->setData(
+				m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0)
+				, qobject_cast<AssumptionsComboDelegate*>(m_MezzTable->itemDelegate(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0)))->ComboElementforIndex(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0))
+				, Qt::EditRole
+				);
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 1),
+				ActiveAssumption->GetRawMezzCPR()
+				, Qt::EditRole);
+		}AssIndex++;
+		if (!ActiveAssumption->GetRawMezzCDR().isEmpty()) {
+			m_MezzAsumptionsModel->insertRow(m_MezzAsumptionsModel->rowCount());
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0), AssIndex, Qt::UserRole);
+			m_MezzAsumptionsModel->setData(
+				m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0)
+				, qobject_cast<AssumptionsComboDelegate*>(m_MezzTable->itemDelegate(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0)))->ComboElementforIndex(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0))
+				, Qt::EditRole
+				);
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 1),
+				ActiveAssumption->GetRawMezzCDR()
+				, Qt::EditRole);
+		}AssIndex++;
+		if (!ActiveAssumption->GetRawMezzLS().isEmpty()) {
+			m_MezzAsumptionsModel->insertRow(m_MezzAsumptionsModel->rowCount());
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0), AssIndex, Qt::UserRole);
+			m_MezzAsumptionsModel->setData(
+				m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0)
+				, qobject_cast<AssumptionsComboDelegate*>(m_MezzTable->itemDelegate(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0)))->ComboElementforIndex(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0))
+				, Qt::EditRole
+				);
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 1),
+				ActiveAssumption->GetRawMezzLS()
+				, Qt::EditRole);
+		}AssIndex++;
+		if (!ActiveAssumption->GetRawMezzRecoveryLag().isEmpty()) {
+			m_MezzAsumptionsModel->insertRow(m_MezzAsumptionsModel->rowCount());
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0), AssIndex, Qt::UserRole);
+			m_MezzAsumptionsModel->setData(
+				m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0)
+				, qobject_cast<AssumptionsComboDelegate*>(m_MezzTable->itemDelegate(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0)))->ComboElementforIndex(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0))
+				, Qt::EditRole
+				);
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 1),
+				ActiveAssumption->GetRawMezzRecoveryLag()
+				, Qt::EditRole);
+		}AssIndex++;
+		if (!ActiveAssumption->GetRawMezzDelinquency().isEmpty()) {
+			m_MezzAsumptionsModel->insertRow(m_MezzAsumptionsModel->rowCount());
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0), AssIndex, Qt::UserRole);
+			m_MezzAsumptionsModel->setData(
+				m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0)
+				, qobject_cast<AssumptionsComboDelegate*>(m_MezzTable->itemDelegate(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0)))->ComboElementforIndex(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0))
+				, Qt::EditRole
+				);
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 1),
+				ActiveAssumption->GetRawMezzDelinquency()
+				, Qt::EditRole);
+		}AssIndex++;
+		if (!ActiveAssumption->GetRawMezzDelinquencyLag().isEmpty()) {
+			m_MezzAsumptionsModel->insertRow(m_MezzAsumptionsModel->rowCount());
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0), AssIndex, Qt::UserRole);
+			m_MezzAsumptionsModel->setData(
+				m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0)
+				, qobject_cast<AssumptionsComboDelegate*>(m_MezzTable->itemDelegate(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0)))->ComboElementforIndex(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0))
+				, Qt::EditRole
+				);
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 1),
+				ActiveAssumption->GetRawMezzDelinquencyLag()
+				, Qt::EditRole);
+		}AssIndex++;
+		if (!ActiveAssumption->GetRawMezzPrice().isEmpty()) {
+			m_MezzAsumptionsModel->insertRow(m_MezzAsumptionsModel->rowCount());
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0), AssIndex, Qt::UserRole);
+			m_MezzAsumptionsModel->setData(
+				m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0)
+				, qobject_cast<AssumptionsComboDelegate*>(m_MezzTable->itemDelegate(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0)))->ComboElementforIndex(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0))
+				, Qt::EditRole
+				);
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 1),
+				ActiveAssumption->GetRawMezzPrice().toDouble()
+				, Qt::EditRole);
+		}AssIndex++;
+		if (!ActiveAssumption->GetRawMezzHaircut().isEmpty()) {
+			m_MezzAsumptionsModel->insertRow(m_MezzAsumptionsModel->rowCount());
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0), AssIndex, Qt::UserRole);
+			m_MezzAsumptionsModel->setData(
+				m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0)
+				, qobject_cast<AssumptionsComboDelegate*>(m_MezzTable->itemDelegate(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0)))->ComboElementforIndex(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0))
+				, Qt::EditRole
+				);
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 1),
+				ActiveAssumption->GetRawMezzHaircut()
+				, Qt::EditRole);
+		}AssIndex++;
+		if (!ActiveAssumption->GetRawMezzPrepayMultiplier().isEmpty()) {
+			m_MezzAsumptionsModel->insertRow(m_MezzAsumptionsModel->rowCount());
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0), AssIndex, Qt::UserRole);
+			m_MezzAsumptionsModel->setData(
+				m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0)
+				, qobject_cast<AssumptionsComboDelegate*>(m_MezzTable->itemDelegate(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0)))->ComboElementforIndex(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0))
+				, Qt::EditRole
+				);
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 1),
+				ActiveAssumption->GetRawMezzPrepayMultiplier()
+				, Qt::EditRole);
+		}AssIndex++;
+		if (!ActiveAssumption->GetRawMezzLossMultiplier().isEmpty()) {
+			m_MezzAsumptionsModel->insertRow(m_MezzAsumptionsModel->rowCount());
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0), AssIndex, Qt::UserRole);
+			m_MezzAsumptionsModel->setData(
+				m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0)
+				, qobject_cast<AssumptionsComboDelegate*>(m_MezzTable->itemDelegate(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0)))->ComboElementforIndex(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 0))
+				, Qt::EditRole
+				);
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(m_MezzAsumptionsModel->rowCount() - 1, 1),
+				ActiveAssumption->GetRawMezzLossMultiplier()
+				, Qt::EditRole);
+		}AssIndex++;
 	}
 	else {
 		m_seniorDateCheck->setChecked(false);
@@ -857,7 +1026,51 @@ void LoanAssumptionsEditor::SeniorScenarioChanged(const QModelIndex& index) {
 	}
 	
 }
+void LoanAssumptionsEditor::MezzScenarioChanged(const QModelIndex& index) {
+	if (index.column() == 0) {
+		m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(index.row(), 1), QVariant(), Qt::EditRole);
+		auto AssumptionType = m_MezzAsumptionsModel->data(index, Qt::UserRole).toInt();
+		for (int i = 0; i < m_MezzAsumptionsModel->rowCount() && AssumptionType >= 0; ++i) {
+			if (i == index.row())continue;
+			if (m_MezzAsumptionsModel->data(m_MezzAsumptionsModel->index(i, 0), Qt::UserRole) == AssumptionType) {
+				m_MezzAsumptionsModel->setData(index, -1, Qt::UserRole);
+				m_MezzAsumptionsModel->setData(index, QVariant(), Qt::EditRole);
+				m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(index.row(), 1), QVariant(), Qt::UserRole);
+				return;
+			}
+		}
+		switch (AssumptionType) {
+		case LoanAssumption::MaturityExtension:
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(index.row(), 1), static_cast<qint8>(LoanAssumptionDelegate::AssumptionType::IntegerAssumption), Qt::UserRole);
+			break;
+		case LoanAssumption::InitialHaircut:
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(index.row(), 1), static_cast<qint8>(LoanAssumptionDelegate::AssumptionType::DoubleAssumption0To100), Qt::UserRole);
+			break;
+		case LoanAssumption::DayCount:
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(index.row(), 1), static_cast<qint8>(LoanAssumptionDelegate::AssumptionType::DayCountVectorAssumption), Qt::UserRole);
+			break;
+		case LoanAssumption::PrepaymentFee:
+		case LoanAssumption::CPR:
+		case LoanAssumption::CDR:
+		case LoanAssumption::LS:
+		case LoanAssumption::Delinquency:
+		case LoanAssumption::Haircut:
+		case LoanAssumption::PrepayMultiplier:
+		case LoanAssumption::LossMultiplier:
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(index.row(), 1), static_cast<qint8>(LoanAssumptionDelegate::AssumptionType::BloombergVectorAssumption), Qt::UserRole);
+			break;
+		case LoanAssumption::RecoveryLag:
+		case LoanAssumption::DelinquencyLag:
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(index.row(), 1), static_cast<qint8>(LoanAssumptionDelegate::AssumptionType::IntegerVectorAssumption), Qt::UserRole);
+			break;
+		case LoanAssumption::Price:
+			m_MezzAsumptionsModel->setData(m_MezzAsumptionsModel->index(index.row(), 1), static_cast<qint8>(LoanAssumptionDelegate::AssumptionType::DoubleAssumption), Qt::UserRole);
+			break;
+		}
 
+	}
+
+}
 bool LoanAssumptionsEditor::CheckAliasInput() {
 	if (m_AliasLineEdit->text().isEmpty() || QRegExp(m_AliasLineEdit->text()).isValid()) {
 		m_AliasLineEdit->setStyleSheet(QString());
@@ -1061,6 +1274,32 @@ void LoanAssumptionsEditor::SaveScenario(const QString& key) {
 	TmpString = CurrAss->GetRawSeniorLossMultiplier(); SetSeniorAssQuery.bindValue(":scenarioLossMultiplier", TmpString.isEmpty() ? QVariant(QVariant::String) : TmpString);
 	SetSeniorAssQuery.bindValue(":scenarioUpdateDate", CurrAss->GetSeniorLastUpdate().isNull() ? QVariant(QVariant::String) : CurrAss->GetSeniorLastUpdate().toString("yyyy-MM-dd"));
 	if (!SetSeniorAssQuery.exec()) {
+		QMessageBox::critical(this, "Error", "Failed to commit changes to the database, try again later.");
+		return;
+	}
+	QSqlQuery SetMezzAssQuery(db);
+	SetMezzAssQuery.setForwardOnly(true);
+	SetMezzAssQuery.prepare("{CALL " + GetFromConfig("Database", "SetLoanAssumptionStoredProc", "") + "}");
+	SetMezzAssQuery.bindValue(":OldScenName", key);
+	SetMezzAssQuery.bindValue(":scenarioName", CurrAss->GetScenarioName());
+	TmpString = CurrAss->GelAliasString(); SetMezzAssQuery.bindValue(":scanarioAlias", TmpString.isEmpty() ? QVariant(QVariant::String) : TmpString);
+	SetMezzAssQuery.bindValue(":seniorScenario", false);
+	TmpString = CurrAss->GetRawMezzMaturityExtension(); SetMezzAssQuery.bindValue(":scenarioMaturityExtension", TmpString.isEmpty() ? QVariant(QVariant::Int) : TmpString.toInt());
+	TmpString = CurrAss->GetRawMezzInitialHaircut(); SetMezzAssQuery.bindValue(":scenarioInitialHaircut", TmpString.isEmpty() ? QVariant(QVariant::Double) : TmpString.toDouble());
+	TmpString = CurrAss->GetRawMezzPrepaymentFee(); SetMezzAssQuery.bindValue(":scenarioPrepaymentFee", TmpString.isEmpty() ? QVariant(QVariant::String) : TmpString);
+	TmpString = CurrAss->GetRawMezzDayCount(); SetMezzAssQuery.bindValue(":scenarioDayCount", TmpString.isEmpty() ? QVariant(QVariant::String) : TmpString);
+	TmpString = CurrAss->GetRawMezzCPR(); SetMezzAssQuery.bindValue(":scenarioCPR", TmpString.isEmpty() ? QVariant(QVariant::String) : TmpString);
+	TmpString = CurrAss->GetRawMezzCDR(); SetMezzAssQuery.bindValue(":scenarioCDR", TmpString.isEmpty() ? QVariant(QVariant::String) : TmpString);
+	TmpString = CurrAss->GetRawMezzLS(); SetMezzAssQuery.bindValue(":scenarioLS", TmpString.isEmpty() ? QVariant(QVariant::String) : TmpString);
+	TmpString = CurrAss->GetRawMezzRecoveryLag(); SetMezzAssQuery.bindValue(":scenarioRecoveryLag", TmpString.isEmpty() ? QVariant(QVariant::String) : TmpString);
+	TmpString = CurrAss->GetRawMezzDelinquency(); SetMezzAssQuery.bindValue(":scenarioDelinquency", TmpString.isEmpty() ? QVariant(QVariant::String) : TmpString);
+	TmpString = CurrAss->GetRawMezzDelinquencyLag(); SetMezzAssQuery.bindValue(":scenarioDelinquencyLag", TmpString.isEmpty() ? QVariant(QVariant::String) : TmpString);
+	TmpString = CurrAss->GetRawMezzPrice(); SetMezzAssQuery.bindValue(":scenarioPrice", TmpString.isEmpty() ? QVariant(QVariant::Double) : TmpString.toDouble());
+	TmpString = CurrAss->GetRawMezzHaircut(); SetMezzAssQuery.bindValue(":scenarioHaircut", TmpString.isEmpty() ? QVariant(QVariant::String) : TmpString);
+	TmpString = CurrAss->GetRawMezzPrepayMultiplier(); SetMezzAssQuery.bindValue(":scenarioPrepayMultiplier", TmpString.isEmpty() ? QVariant(QVariant::String) : TmpString);
+	TmpString = CurrAss->GetRawMezzLossMultiplier(); SetMezzAssQuery.bindValue(":scenarioLossMultiplier", TmpString.isEmpty() ? QVariant(QVariant::String) : TmpString);
+	SetMezzAssQuery.bindValue(":scenarioUpdateDate", CurrAss->GetMezzLastUpdate().isNull() ? QVariant(QVariant::String) : CurrAss->GetMezzLastUpdate().toString("yyyy-MM-dd"));
+	if (!SetMezzAssQuery.exec()) {
 		QMessageBox::critical(this, "Error", "Failed to commit changes to the database, try again later.");
 		return;
 	}

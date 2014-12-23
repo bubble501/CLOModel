@@ -15,7 +15,7 @@ QWidget *LoanAssumptionDelegate::createEditor(QWidget *parent, const QStyleOptio
 			QDoubleSpinBox *editor = new QDoubleSpinBox(parent);
 			editor->setMinimum(0.0);
 			editor->setSingleStep(5.0);
-			connect(editor, SIGNAL(valueChanged(double)), this, SIGNAL(Edited()));
+			//connect(editor, SIGNAL(valueChanged(double)), this, SIGNAL(Edited()));
 			return editor;
 		}
 		case static_cast<qint8>(AssumptionType::DoubleAssumption0To100) : {
@@ -24,32 +24,32 @@ QWidget *LoanAssumptionDelegate::createEditor(QWidget *parent, const QStyleOptio
 			editor->setSingleStep(5.0);
 			editor->setMaximum(100.0);
 			editor->setSuffix("%");
-			connect(editor, SIGNAL(valueChanged(double)), this, SIGNAL(Edited()));
+			//connect(editor, SIGNAL(valueChanged(double)), this, SIGNAL(Edited()));
 			return editor;
 		}
 		case static_cast<qint8>(AssumptionType::IntegerAssumption) : {
 			QSpinBox *editor = new QSpinBox(parent);
 			editor->setMinimum(0);
 			editor->setSingleStep(1);
-			connect(editor, SIGNAL(valueChanged(int)), this, SIGNAL(Edited()));
+			//connect(editor, SIGNAL(valueChanged(int)), this, SIGNAL(Edited()));
 			return editor;
 		}
 		case static_cast<qint8>(AssumptionType::BloombergVectorAssumption) : {
 			QLineEdit *editor = new QLineEdit(parent);
 			editor->setValidator(BloombergVector().GetValidator(editor));
-			connect(editor, SIGNAL(textEdited(const QString &)), this, SIGNAL(Edited()));
+			//connect(editor, SIGNAL(textEdited(const QString &)), this, SIGNAL(Edited()));
 			return editor;
 		}
 		case static_cast<qint8>(AssumptionType::IntegerVectorAssumption) : {
 			QLineEdit *editor = new QLineEdit(parent);
 			editor->setValidator(IntegerVector().GetValidator(editor));
-			connect(editor, SIGNAL(textEdited(const QString &)), this, SIGNAL(Edited()));
+			//connect(editor, SIGNAL(textEdited(const QString &)), this, SIGNAL(Edited()));
 			return editor;
 		}
 		case static_cast<qint8>(AssumptionType::DayCountVectorAssumption) : {
 			QLineEdit *editor = new QLineEdit(parent);
 			editor->setValidator(DayCountVector().GetValidator(editor));
-			connect(editor, SIGNAL(textEdited(const QString &)), this, SIGNAL(Edited()));
+			//connect(editor, SIGNAL(textEdited(const QString &)), this, SIGNAL(Edited()));
 			return editor;
 		}
 		default: break;
@@ -62,16 +62,20 @@ void LoanAssumptionDelegate::setEditorData(QWidget *editor, const QModelIndex &i
 		switch (index.data(Qt::UserRole).toInt()) {
 		case static_cast<qint8>(AssumptionType::DoubleAssumption) :
 		case static_cast<qint8>(AssumptionType::DoubleAssumption0To100) :
-																		return qobject_cast<QDoubleSpinBox*>(editor)->setValue(index.model()->data(index, Qt::EditRole).toDouble());
+			qobject_cast<QDoubleSpinBox*>(editor)->setValue(index.model()->data(index, Qt::EditRole).toDouble());
+			break;
 		case static_cast<qint8>(AssumptionType::IntegerAssumption) :
-			return qobject_cast<QSpinBox*>(editor)->setValue(index.model()->data(index, Qt::EditRole).toInt());
+			qobject_cast<QSpinBox*>(editor)->setValue(index.model()->data(index, Qt::EditRole).toInt());
+			break;
 		case static_cast<qint8>(AssumptionType::BloombergVectorAssumption) :
 		case static_cast<qint8>(AssumptionType::IntegerVectorAssumption) :
-		case static_cast<qint8>(AssumptionType::DayCountVectorAssumption) :
-																		  return qobject_cast<QLineEdit*>(editor)->setText(index.model()->data(index, Qt::EditRole).toString());
+		case static_cast<qint8>(AssumptionType::DayCountVectorAssumption) :	
+			qobject_cast<QLineEdit*>(editor)->setText(index.model()->data(index, Qt::EditRole).toString());
+			break;
 		default:
 			return;
 		}
+		emit Edited();
 	}
 }
 

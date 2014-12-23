@@ -22,7 +22,7 @@ QWidget *AssumptionsComboDelegate::createEditor(QWidget *parent, const QStyleOpt
 	for (auto i = ComboElements.constBegin(); i != ComboElements.constEnd(); ++i) {
 		editor->addItem(i.value(), i.key());
 	}
-	connect(editor, SIGNAL(currentIndexChanged(int)), this, SIGNAL(Edited()));
+	//connect(editor, SIGNAL(currentIndexChanged(int)), this, SIGNAL(Edited()));
 	return editor;
 }
 void AssumptionsComboDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
@@ -32,6 +32,7 @@ void AssumptionsComboDelegate::setEditorData(QWidget *editor, const QModelIndex 
 void AssumptionsComboDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const {
 	model->setData(index, (static_cast<QComboBox*>(editor))->currentData(), Qt::UserRole);
 	model->setData(index, (static_cast<QComboBox*>(editor))->currentText(), Qt::EditRole);
+	emit Edited();
 }
 void AssumptionsComboDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &) const {
 	editor->setGeometry(option.rect);

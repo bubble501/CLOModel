@@ -20,7 +20,7 @@ public:
 	virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
 	virtual void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 signals:
-	void Edited();
+	void Edited() const;
 };
 #endif // LoanAssumptionDelegate_h__
 

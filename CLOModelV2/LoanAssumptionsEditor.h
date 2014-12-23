@@ -53,6 +53,8 @@ private:
 	QPushButton* ReplaceAliasButton;
 	QPushButton* AddSeniorAssumptionButton;
 	QPushButton* RemoveSeniorAssumptionButton;
+	QPushButton* AddMezzAssumptionButton;
+	QPushButton* RemoveMezzAssumptionButton;
 	QPushButton* AddScenarioButton;
 	QPushButton* RemoveScenarioButton;
 	QPushButton* SaveCurrentButton;
@@ -64,9 +66,13 @@ private:
 signals:
 	void ActiveAssumptionChanged();
 private slots:
+	void SeniorDateChanged(const QDate&);
+	void MezzDateChanged(const QDate&);
+	void CheckAllDirty();
 	void CheckCurrentDirty();
-	void ChangeScenario(const QModelIndex& curr, const QModelIndex& prev);
-	void SenioScenaChanged(const QModelIndex& index);
+	void ChangeScenario(const QModelIndex& curr, const QModelIndex&);
+	void SeniorScenarioChanged(const QModelIndex& index);
+	void MezzScenarioChanged(const QModelIndex& index);
 	void SaveScenario(const QString& key);
 	void DiscardScenario(const QString& key);
 };

@@ -84,3 +84,12 @@ bool LoanAssumption::operator==(const LoanAssumption& a) const {
 	}
 	return Result;
 }
+
+QString LoanAssumption::GelAliasString() const {
+	QString Result;
+	for (auto i = m_Aliases.constBegin(); i != m_Aliases.constEnd(); ++i) {
+		if (!Result.isEmpty())Result += "$,$";
+		Result += *i;
+	}
+	return Result;
+}

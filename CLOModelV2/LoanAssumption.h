@@ -43,6 +43,7 @@ public:
 	void AddAlias(const QString& val);
 	void RemoveAlias(int index) { if (index >= 0 && index < m_Aliases.size()) m_Aliases.removeAt(index); }
 	void ClearAliases() { m_Aliases.clear(); }
+	QString GelAliasString() const;
 	bool MatchPattern(const QString& Pat) const;
 	LoanAssumption(const LoanAssumption& a);
 	LoanAssumption& operator=(const LoanAssumption& a);

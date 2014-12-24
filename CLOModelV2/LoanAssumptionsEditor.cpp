@@ -42,8 +42,6 @@ LoanAssumptionsEditor::LoanAssumptionsEditor(QWidget *parent)
 	m_SortScenarios = new QSortFilterProxyModel(this);
 	m_SortScenarios->setSourceModel(m_ScenariosModel);
 
-	
-
 	m_AliasesModel = new QStandardItemModel(this);
 	m_AliasesModel->setColumnCount(1);
 	m_AliasesModel->setRowCount(0);

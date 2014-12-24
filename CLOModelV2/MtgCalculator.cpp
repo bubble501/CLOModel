@@ -293,7 +293,7 @@ void MtgCalculator::ClearResults() {
 	m_AggregatedRes.Clear();
 	TemplAsyncCalculator<MtgCalculatorThread, MtgCashFlow>::ClearResults();
 }
-
+#ifndef NO_DATABASE
 void MtgCalculator::DownloadScenarios() {
 	QCache<QString, LoanAssumption> AssumptionCache;
 	foreach(Mortgage* i,Loans){
@@ -404,3 +404,53 @@ void MtgCalculator::DownloadScenarios() {
 		}
 	}
 }
+
+void MtgCalculator::GuessLoanScenarios(bool OverrideAss) {
+	QHash<QString,LoanAssumption*> AvailableAssumptions;
+	Db_Mutex.lock();
+	{
+		QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
+		if (!db.isValid()) {
+			if (!db.isValid()) {
+				db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype", "QODBC"), "TwentyFourDB");
+				db.setDatabaseName(
+					"Driver={" + GetFromConfig("Database", "Driver", "SQL Server")
+					+ "}; "
+					+ GetFromConfig("Database", "DataSource", R"(Server=SYNSERVER2\SQLExpress; Initial Catalog = ABSDB; Integrated Security = SSPI; Trusted_Connection = Yes;)")
+					);
+			}
+		}
+		bool DbOpen = db.isOpen();
+		if (!DbOpen) DbOpen = db.open();
+		if (DbOpen) {
+			QSqlQuery LoanAssQuerry(db);
+			LoanAssQuerry.setForwardOnly(true);
+			LoanAssQuerry.prepare("{CALL " + GetFromConfig("Database", "GetAllLoanAssumptionsStoredProc", "getAllLoanAssumptions") + "}");
+			if (LoanAssQuerry.exec()) {
+				while (LoanAssQuerry.next()) {
+					auto DbgRecord = LoanAssQuerry.record();
+					if (AvailableAssumptions.contains(DbgRecord.value(0).toString())) continue;
+					auto CurrAss = AvailableAssumptions.insert(DbgRecord.value(0).toString(), new LoanAssumption(DbgRecord.value(0).toString()));
+					(*CurrAss)->SetAliases(DbgRecord.value(1).toString());
+				}
+			}
+		}
+	}
+	Db_Mutex.unlock();
+	foreach(Mortgage* SingleLoan, Loans) {
+		for (auto i = AvailableAssumptions.constBegin(); i != AvailableAssumptions.constEnd(); ++i) {
+			if (i.value()->MatchPattern(SingleLoan->GetProperty("Issuer"))) {
+				if (!SingleLoan->HasProperty("Scenario") || OverrideAss)
+					SingleLoan->SetProperty("Scenario", i.key());
+			}
+			else if (i.value()->MatchPattern(SingleLoan->GetProperty("Facility"))) {
+				if (!SingleLoan->HasProperty("Scenario") || OverrideAss)
+					SingleLoan->SetProperty("Scenario", i.key());
+			}
+		}
+	}
+	for (auto i = AvailableAssumptions.begin(); i != AvailableAssumptions.end(); ++i) {
+		delete i.value();
+	}
+}
+#endif

@@ -49,6 +49,7 @@ public:
 	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll=false);
 	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll=false);
 	void DownloadScenarios();
+	void GuessLoanScenarios(bool OverrideAss);
 #endif
 	void SetOverrideAssumptions(bool a) { m_OverrideAssumptions = a; }
 	bool GetOverrideAssumptions()const { return m_OverrideAssumptions; }

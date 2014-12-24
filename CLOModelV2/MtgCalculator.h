@@ -48,10 +48,13 @@ public:
 #ifndef NO_DATABASE
 	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll=false);
 	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll=false);
+	void DownloadScenarios();
 #endif
 	void SetOverrideAssumptions(bool a) { m_OverrideAssumptions = a; }
 	bool GetOverrideAssumptions()const { return m_OverrideAssumptions; }
 	const MtgCashFlow& GetAggregatedResults()const { return m_AggregatedRes; }
+	bool GetDownloadScenario() const { return m_DownloadScenario; }
+	void SetDownloadScenario(bool val) { m_DownloadScenario = val; }
 private:
 	QHash<qint32, Mortgage*> Loans;
 	QString m_CPRass;
@@ -61,6 +64,7 @@ private:
 	QString m_Delinquency;
 	QString m_DelinquencyLag;
 	bool m_OverrideAssumptions;
+	bool m_DownloadScenario;
 	bool m_UseStoredCashFlows;
 	QDate StartDate;
 	MtgCashFlow m_AggregatedRes;

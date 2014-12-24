@@ -76,6 +76,7 @@ void StressTest::RunStressTest() {
 	BaseApplier->SetSequentialComputation(SequentialComputation);
 	BaseApplier->ClearResults();
 	BaseApplier->ClearScenarios();
+	BaseCalculator->DownloadScenarios();
 	BaseCalculator->SetStartDate(StartDate);
 	BaseCalculator->SetCDRass("0");
 	BaseCalculator->SetCPRass("0");

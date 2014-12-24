@@ -204,6 +204,7 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ConstantBaseRateTable& Refe
 	}
 	if (AllRefFound) return CompileReferenceRateValue(ReferencesValues);
 	QDate MinUpdateDate;;
+	QMutexLocker DbLocker(&Db_Mutex);
 	QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
 	if (!db.isValid()) {
 		db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype", "QODBC"), "TwentyFourDB");
@@ -213,7 +214,9 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ConstantBaseRateTable& Refe
 			+ GetFromConfig("Database", "DataSource", R"(Server=SYNSERVER2\SQLExpress;Initial Catalog=ABSDB;Integrated Security=SSPI;Trusted_Connection=Yes;)")
 			);
 	}
-	if (db.open()) {
+	bool DbOpen = db.isOpen();
+	if (!DbOpen) DbOpen = db.open();
+	if (DbOpen) {
 		QSqlQuery query(db);
 		query.setForwardOnly(true);
 		query.prepare("{CALL " + GetFromConfig("Database", "ConstBaseRatesStoredProc", "getLatestIndexPrices") + "}");
@@ -244,6 +247,7 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ForwardBaseRateTable& Refer
 	}
 	if (AllRefFound) return CompileReferenceRateValue(ReferencesValues);
 	QDate MinUpdateDate;
+	QMutexLocker DbLocker(&Db_Mutex);
 	QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
 	if (!db.isValid()) {
 		db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype", "QODBC"), "TwentyFourDB");
@@ -253,7 +257,9 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ForwardBaseRateTable& Refer
 			+ GetFromConfig("Database",  "DataSource", R"(Server=SYNSERVER2\SQLExpress;Initial Catalog=ABSDB;Integrated Security=SSPI;Trusted_Connection=Yes;)")
 			);
 	}
-	if (db.open()) {
+	bool DbOpen = db.isOpen();
+	if (!DbOpen) DbOpen = db.open();
+	if (DbOpen) {
 		QSqlQuery query(db);
 		query.setForwardOnly(true);
 		query.prepare("{CALL " + GetFromConfig("Database", "ForwardBaseRatesStoredProc", "getForwardCurveMatrix") + "}");

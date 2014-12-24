@@ -50,14 +50,14 @@ void Mortgage::SetInterest(const QString& a){
 	 m_Properties = a.m_Properties;
 	 return *this;
  }
- bool Mortgage::CalculateCashFlows(const QDate& StartDate, const QString& CPRVecs, const QString& CDRVecs, const QString& LossVecs, const QString& RecoveryLag, const QString& Delinquency, const QString& DelinquencyLag) {
+ bool Mortgage::CalculateCashFlows(const QDate& StartDate, const QString& CPRVecs, const QString& CDRVecs, const QString& LossVecs, const QString& RecoveryLag, const QString& Delinquency, const QString& DelinquencyLag, bool OverrideProperties , bool DownloadScenario) {
 	 BloombergVector CPRVec(CPRVecs);
 	 BloombergVector CDRVec(CDRVecs);
 	 BloombergVector LossVec(LossVecs);
 	 IntegerVector RecoveryLagVec(RecoveryLag);
 	 BloombergVector DelinquencyVec(Delinquency);
 	 IntegerVector DelinquencyLagVec(DelinquencyLag);
-	 return CalculateCashFlows(StartDate, CPRVec, CDRVec, LossVec, RecoveryLagVec, DelinquencyVec, DelinquencyLagVec);
+	 return CalculateCashFlows(StartDate, CPRVec, CDRVec, LossVec, RecoveryLagVec, DelinquencyVec, DelinquencyLagVec,OverrideProperties,DownloadScenario);
  }
  bool Mortgage::CalculateCashFlows(
 	 const QDate& StartDate,
@@ -67,7 +67,8 @@ void Mortgage::SetInterest(const QString& a){
 	 IntegerVector  RecoveryLag,
 	 BloombergVector Delinquency,
 	 IntegerVector DelinquencyLag,
-	 bool OverrideProperties
+	 bool OverrideProperties,
+	 bool DownloadScenario
 	 )
  {
 	 QDate AdjStartDate(StartDate.year(), StartDate.month(), 15);
@@ -81,7 +82,7 @@ void Mortgage::SetInterest(const QString& a){
 	 BloombergVector LossMultiplier("100");
 	 DayCountVector CurrentDayCountConvention(QString("%1").arg(static_cast<qint16>(DayCountConvention::CompN30360)));
 #ifndef NO_DATABASE
-	 if (HasProperty("Scenario") && HasProperty("Mezzanine")) {
+	 if (HasProperty("Scenario") && HasProperty("Mezzanine") && DownloadScenario) {
 		//Download Scenario From Database
 		 Db_Mutex.lock();
 		 QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
@@ -107,23 +108,25 @@ void Mortgage::SetInterest(const QString& a){
 				 if (LoanAssQuerry.next()) {
 					auto DbgRecord = LoanAssQuerry.record();
 					int FieldCount = 0;
+					QString VecsAnchor;
+					if (!DbgRecord.isNull(FieldCount)) VecsAnchor = "A " + DbgRecord.value(FieldCount).toDate().toString("MM/dd/aaaa") + ' ';
 					if (!DbgRecord.isNull(FieldCount)) MaturityExtension = DbgRecord.value(FieldCount).toInt(); ++FieldCount;
 					if (!DbgRecord.isNull(FieldCount)) StartingHaircut = DbgRecord.value(FieldCount).toDouble(); ++FieldCount;
-					if (!DbgRecord.isNull(FieldCount)) PrepaymentFee = DbgRecord.value(FieldCount).toString(); ++FieldCount;
-					if (!DbgRecord.isNull(FieldCount)) CurrentDayCountConvention = DbgRecord.value(FieldCount).toString(); ++FieldCount;
+					if (!DbgRecord.isNull(FieldCount)) PrepaymentFee = VecsAnchor+ DbgRecord.value(FieldCount).toString(); ++FieldCount;
+					if (!DbgRecord.isNull(FieldCount)) CurrentDayCountConvention = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
 					if (!OverrideProperties) {
-						if (!DbgRecord.isNull(FieldCount)) CPRVec = DbgRecord.value(FieldCount).toString(); ++FieldCount;
-						if (!DbgRecord.isNull(FieldCount)) CDRVec = DbgRecord.value(FieldCount).toString(); ++FieldCount;
-						if (!DbgRecord.isNull(FieldCount)) LossVec = DbgRecord.value(FieldCount).toString(); ++FieldCount;
-						if (!DbgRecord.isNull(FieldCount)) RecoveryLag = DbgRecord.value(FieldCount).toString(); ++FieldCount;
-						if (!DbgRecord.isNull(FieldCount)) Delinquency = DbgRecord.value(FieldCount).toString(); ++FieldCount;
-						if (!DbgRecord.isNull(FieldCount)) DelinquencyLag = DbgRecord.value(FieldCount).toString(); ++FieldCount;
+						if (!DbgRecord.isNull(FieldCount)) CPRVec = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
+						if (!DbgRecord.isNull(FieldCount)) CDRVec = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
+						if (!DbgRecord.isNull(FieldCount)) LossVec = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
+						if (!DbgRecord.isNull(FieldCount)) RecoveryLag = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
+						if (!DbgRecord.isNull(FieldCount)) Delinquency = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
+						if (!DbgRecord.isNull(FieldCount)) DelinquencyLag = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
 					}
 					else FieldCount += 6;
 					if (!HasProperty("Price") && !DbgRecord.isNull(FieldCount)) SetProperty("Price", QString::number(DbgRecord.value(FieldCount).toDouble(), 'f')); ++FieldCount;
-					if (!DbgRecord.isNull(FieldCount)) HaircutVector = DbgRecord.value(FieldCount).toString(); ++FieldCount;
-					if (!DbgRecord.isNull(FieldCount)) PrepayMultiplier = DbgRecord.value(FieldCount).toString(); ++FieldCount;
-					if (!DbgRecord.isNull(FieldCount)) LossMultiplier = DbgRecord.value(FieldCount).toString(); ++FieldCount;
+					if (!DbgRecord.isNull(FieldCount)) HaircutVector = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
+					if (!DbgRecord.isNull(FieldCount)) PrepayMultiplier = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
+					if (!DbgRecord.isNull(FieldCount)) LossMultiplier = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
 				 }
 			 }
 		 }
@@ -395,10 +398,10 @@ void Mortgage::SetInterest(const QString& a){
 	if(m_MaturityDate<QDate(2000,1,1)) Result+="Loan Maturity Date\n";
 	if (m_AnnuityVect.IsEmpty())Result += "Loan Annuity Vector\n";
 	if(m_Size<0.0)Result+="Loan Size\n";
-	if (BloombergVector(GetProperty("LossMultiplier")).IsEmpty(0.0)) Result += "Loss Multiplier\n";
-	if (BloombergVector(GetProperty("PrepayMultiplier")).IsEmpty(0.0)) Result += "Prepay Multiplier\n";
+	if (HasProperty("LossMultiplier")){if (BloombergVector(GetProperty("LossMultiplier")).IsEmpty(0.0)) Result += "Loss Multiplier\n";}
+	if (HasProperty("PrepayMultiplier")){if (BloombergVector(GetProperty("PrepayMultiplier")).IsEmpty(0.0)) Result += "Prepay Multiplier\n";}
 	if (m_InterestVect.IsEmpty())Result += "Loan Coupon\n";
-	if (HasProperty("Haircut")) if (BloombergVector(GetProperty("Haircut")).IsEmpty(0.0, 1.0))Result += "Haircut Vector\n";
+	if (HasProperty("Haircut")) {if (BloombergVector(GetProperty("Haircut")).IsEmpty(0.0, 1.0))Result += "Haircut Vector\n";}
 	if (m_PaymentFreq.IsEmpty(1))Result += "Loan Payment Frequency\n";
 	if (m_FloatRateBase.IsEmpty())Result += "Loan Base Rate\n";
 	if (HasProperty("DayCount")) { if (DayCountVector(GetProperty("DayCount")).IsEmpty()) Result += "Loan Day Count Convention\n"; }

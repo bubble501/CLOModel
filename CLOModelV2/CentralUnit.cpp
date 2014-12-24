@@ -255,6 +255,7 @@ void CentralUnit::CalculateStress(){
 }
 void CentralUnit::CalculationStep1(){
 	LOGDEBUG("Reached CalculationStep1");
+	LoansCalculator.DownloadScenarios();
 	LoansCalculator.SetCPRass(Structure.GetReinvestmentTest().GetCPRAssumption().GetVector());
 	LoansCalculator.SetCDRass(Structure.GetReinvestmentTest().GetCDRAssumption().GetVector());
 	LoansCalculator.SetLSass(Structure.GetReinvestmentTest().GetLSAssumption().GetVector());

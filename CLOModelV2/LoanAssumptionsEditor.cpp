@@ -482,6 +482,7 @@ LoanAssumptionsEditor::LoanAssumptionsEditor(QWidget *parent)
 #ifndef NO_DATABASE
 void LoanAssumptionsEditor::FillFromQuery() {
 	m_Assumptions.clear();
+	Db_Mutex.lock();
 	QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
 	if (!db.isValid()) {
 		db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype", "QODBC"), "TwentyFourDB");
@@ -494,15 +495,16 @@ void LoanAssumptionsEditor::FillFromQuery() {
 	bool DbOpen = db.isOpen();
 	if (!DbOpen) DbOpen = db.open();
 	if (DbOpen) {
-		QSqlQuery PrepayAssQuerry(db);
-		PrepayAssQuerry.setForwardOnly(true);
-		PrepayAssQuerry.prepare("{CALL " + GetFromConfig("Database", "GetAllLoanAssumptionStoredProc", "getAllLoanAssumptions") + "}");
-		if (PrepayAssQuerry.exec()) {
+		QSqlQuery LoanAssQuery(db);
+		LoanAssQuery.setForwardOnly(true);
+		LoanAssQuery.prepare("{CALL " + GetFromConfig("Database", "GetAllLoanAssumptionStoredProc", "getAllLoanAssumptions") + "}");
+		if (LoanAssQuery.exec()) {
 			bool CurrentSenior;
 			int FieldCount;
-			while (PrepayAssQuerry.next()) {
+			while (LoanAssQuery.next()) {
 				FieldCount = 0;
-				QString CurrentScenario = PrepayAssQuerry.value(FieldCount).toString(); ++FieldCount;
+				auto LoanAssRecord = LoanAssQuery.record();
+				QString CurrentScenario = LoanAssRecord.value(FieldCount).toString(); ++FieldCount;
 				QSharedPointer<LoanAssumption> CurrentAss(nullptr);
 				for (auto i = m_Assumptions.begin(); i != m_Assumptions.end(); ++i) {
 					if (i.key().compare(CurrentScenario, Qt::CaseInsensitive) == 0) {
@@ -512,74 +514,75 @@ void LoanAssumptionsEditor::FillFromQuery() {
 				}
 				if (!CurrentAss) {
 					CurrentAss = QSharedPointer<LoanAssumption>(new LoanAssumption(CurrentScenario));
-					if (!PrepayAssQuerry.isNull(FieldCount)) CurrentAss->SetAliases(PrepayAssQuerry.value(FieldCount).toString());
+					if (!LoanAssRecord.isNull(FieldCount)) CurrentAss->SetAliases(LoanAssRecord.value(FieldCount).toString());
 					m_Assumptions.insert(CurrentAss->GetScenarioName(), CurrentAss);
 				}++FieldCount;
-				CurrentSenior = PrepayAssQuerry.value(FieldCount).toBool(); ++FieldCount;
-				if (!PrepayAssQuerry.isNull(FieldCount)) {
-					if (CurrentSenior) CurrentAss->SetSeniorMaturityExtension(PrepayAssQuerry.value(FieldCount).toString());
-					else CurrentAss->SetMezzMaturityExtension(PrepayAssQuerry.value(FieldCount).toString());
+				CurrentSenior = LoanAssRecord.value(FieldCount).toBool(); ++FieldCount;
+				if (!LoanAssRecord.isNull(FieldCount)) {
+					if (CurrentSenior) CurrentAss->SetSeniorMaturityExtension(LoanAssRecord.value(FieldCount).toString());
+					else CurrentAss->SetMezzMaturityExtension(LoanAssRecord.value(FieldCount).toString());
 				} ++FieldCount;
-				if (!PrepayAssQuerry.isNull(FieldCount)) {
-					if (CurrentSenior) CurrentAss->SetSeniorInitialHaircut(PrepayAssQuerry.value(FieldCount).toString());
-					else CurrentAss->SetMezzInitialHaircut(PrepayAssQuerry.value(FieldCount).toString());
+				if (!LoanAssRecord.isNull(FieldCount)) {
+					if (CurrentSenior) CurrentAss->SetSeniorInitialHaircut(LoanAssRecord.value(FieldCount).toString());
+					else CurrentAss->SetMezzInitialHaircut(LoanAssRecord.value(FieldCount).toString());
 				} ++FieldCount;
-				if (!PrepayAssQuerry.isNull(FieldCount)) {
-					if (CurrentSenior) CurrentAss->SetSeniorPrepaymentFee(PrepayAssQuerry.value(FieldCount).toString());
-					else CurrentAss->SetMezzPrepaymentFee(PrepayAssQuerry.value(FieldCount).toString());
+				if (!LoanAssRecord.isNull(FieldCount)) {
+					if (CurrentSenior) CurrentAss->SetSeniorPrepaymentFee(LoanAssRecord.value(FieldCount).toString());
+					else CurrentAss->SetMezzPrepaymentFee(LoanAssRecord.value(FieldCount).toString());
 				} ++FieldCount;
-				if (!PrepayAssQuerry.isNull(FieldCount)) {
-					if (CurrentSenior) CurrentAss->SetSeniorDayCount(PrepayAssQuerry.value(FieldCount).toString());
-					else CurrentAss->SetMezzDayCount(PrepayAssQuerry.value(FieldCount).toString());
+				if (!LoanAssRecord.isNull(FieldCount)) {
+					if (CurrentSenior) CurrentAss->SetSeniorDayCount(LoanAssRecord.value(FieldCount).toString());
+					else CurrentAss->SetMezzDayCount(LoanAssRecord.value(FieldCount).toString());
 				} ++FieldCount;
-				if (!PrepayAssQuerry.isNull(FieldCount)) {
-					if (CurrentSenior) CurrentAss->SetSeniorCPR(PrepayAssQuerry.value(FieldCount).toString());
-					else CurrentAss->SetMezzCPR(PrepayAssQuerry.value(FieldCount).toString());
+				if (!LoanAssRecord.isNull(FieldCount)) {
+					if (CurrentSenior) CurrentAss->SetSeniorCPR(LoanAssRecord.value(FieldCount).toString());
+					else CurrentAss->SetMezzCPR(LoanAssRecord.value(FieldCount).toString());
 				} ++FieldCount;
-				if (!PrepayAssQuerry.isNull(FieldCount)) {
-					if (CurrentSenior) CurrentAss->SetSeniorCDR(PrepayAssQuerry.value(FieldCount).toString());
-					else CurrentAss->SetMezzCDR(PrepayAssQuerry.value(FieldCount).toString());
+				if (!LoanAssRecord.isNull(FieldCount)) {
+					if (CurrentSenior) CurrentAss->SetSeniorCDR(LoanAssRecord.value(FieldCount).toString());
+					else CurrentAss->SetMezzCDR(LoanAssRecord.value(FieldCount).toString());
 				} ++FieldCount;
-				if (!PrepayAssQuerry.isNull(FieldCount)) {
-					if (CurrentSenior) CurrentAss->SetSeniorLS(PrepayAssQuerry.value(FieldCount).toString());
-					else CurrentAss->SetMezzLS(PrepayAssQuerry.value(FieldCount).toString());
+				if (!LoanAssRecord.isNull(FieldCount)) {
+					if (CurrentSenior) CurrentAss->SetSeniorLS(LoanAssRecord.value(FieldCount).toString());
+					else CurrentAss->SetMezzLS(LoanAssRecord.value(FieldCount).toString());
 				} ++FieldCount;
-				if (!PrepayAssQuerry.isNull(FieldCount)) {
-					if (CurrentSenior) CurrentAss->SetSeniorRecoveryLag(PrepayAssQuerry.value(FieldCount).toString());
-					else CurrentAss->SetMezzRecoveryLag(PrepayAssQuerry.value(FieldCount).toString());
+				if (!LoanAssRecord.isNull(FieldCount)) {
+					if (CurrentSenior) CurrentAss->SetSeniorRecoveryLag(LoanAssRecord.value(FieldCount).toString());
+					else CurrentAss->SetMezzRecoveryLag(LoanAssRecord.value(FieldCount).toString());
 				} ++FieldCount;
-				if (!PrepayAssQuerry.isNull(FieldCount)) {
-					if (CurrentSenior) CurrentAss->SetSeniorDelinquency(PrepayAssQuerry.value(FieldCount).toString());
-					else CurrentAss->SetMezzDelinquency(PrepayAssQuerry.value(FieldCount).toString());
+				if (!LoanAssRecord.isNull(FieldCount)) {
+					if (CurrentSenior) CurrentAss->SetSeniorDelinquency(LoanAssRecord.value(FieldCount).toString());
+					else CurrentAss->SetMezzDelinquency(LoanAssRecord.value(FieldCount).toString());
 				} ++FieldCount;
-				if (!PrepayAssQuerry.isNull(FieldCount)) {
-					if (CurrentSenior) CurrentAss->SetSeniorDelinquencyLag(PrepayAssQuerry.value(FieldCount).toString());
-					else CurrentAss->SetMezzDelinquencyLag(PrepayAssQuerry.value(FieldCount).toString());
+				if (!LoanAssRecord.isNull(FieldCount)) {
+					if (CurrentSenior) CurrentAss->SetSeniorDelinquencyLag(LoanAssRecord.value(FieldCount).toString());
+					else CurrentAss->SetMezzDelinquencyLag(LoanAssRecord.value(FieldCount).toString());
 				} ++FieldCount;
-				if (!PrepayAssQuerry.isNull(FieldCount)) {
-					if (CurrentSenior) CurrentAss->SetSeniorPrice(PrepayAssQuerry.value(FieldCount).toString());
-					else CurrentAss->SetMezzPrice(PrepayAssQuerry.value(FieldCount).toString());
+				if (!LoanAssRecord.isNull(FieldCount)) {
+					if (CurrentSenior) CurrentAss->SetSeniorPrice(LoanAssRecord.value(FieldCount).toString());
+					else CurrentAss->SetMezzPrice(LoanAssRecord.value(FieldCount).toString());
 				} ++FieldCount;
-				if (!PrepayAssQuerry.isNull(FieldCount)) {
-					if (CurrentSenior) CurrentAss->SetSeniorHaircut(PrepayAssQuerry.value(FieldCount).toString());
-					else CurrentAss->SetMezzHaircut(PrepayAssQuerry.value(FieldCount).toString());
+				if (!LoanAssRecord.isNull(FieldCount)) {
+					if (CurrentSenior) CurrentAss->SetSeniorHaircut(LoanAssRecord.value(FieldCount).toString());
+					else CurrentAss->SetMezzHaircut(LoanAssRecord.value(FieldCount).toString());
 				} ++FieldCount;
-				if (!PrepayAssQuerry.isNull(FieldCount)) {
-					if (CurrentSenior) CurrentAss->SetSeniorPrepayMultiplier(PrepayAssQuerry.value(FieldCount).toString());
-					else CurrentAss->SetMezzPrepayMultiplier(PrepayAssQuerry.value(FieldCount).toString());
+				if (!LoanAssRecord.isNull(FieldCount)) {
+					if (CurrentSenior) CurrentAss->SetSeniorPrepayMultiplier(LoanAssRecord.value(FieldCount).toString());
+					else CurrentAss->SetMezzPrepayMultiplier(LoanAssRecord.value(FieldCount).toString());
 				} ++FieldCount;
-				if (!PrepayAssQuerry.isNull(FieldCount)) {
-					if (CurrentSenior) CurrentAss->SetSeniorLossMultiplier(PrepayAssQuerry.value(FieldCount).toString());
-					else CurrentAss->SetMezzLossMultiplier(PrepayAssQuerry.value(FieldCount).toString());
+				if (!LoanAssRecord.isNull(FieldCount)) {
+					if (CurrentSenior) CurrentAss->SetSeniorLossMultiplier(LoanAssRecord.value(FieldCount).toString());
+					else CurrentAss->SetMezzLossMultiplier(LoanAssRecord.value(FieldCount).toString());
 				} ++FieldCount;
-				if (!PrepayAssQuerry.isNull(FieldCount)) {
-					if (CurrentSenior) CurrentAss->SetSeniorLastUpdate(PrepayAssQuerry.value(FieldCount).toDate());
-					else CurrentAss->SetMezzLastUpdate(PrepayAssQuerry.value(FieldCount).toDate());
+				if (!LoanAssRecord.isNull(FieldCount)) {
+					if (CurrentSenior) CurrentAss->SetSeniorLastUpdate(LoanAssRecord.value(FieldCount).toDate());
+					else CurrentAss->SetMezzLastUpdate(LoanAssRecord.value(FieldCount).toDate());
 				} ++FieldCount;
 
 			}
 		}
 	}
+	Db_Mutex.unlock();
 	FillScenariosModel();
 }
 
@@ -1213,6 +1216,7 @@ void LoanAssumptionsEditor::SaveScenario(const QString& key) {
 			) == 0;
 	}
 #ifndef NO_DATABASE
+	QMutexLocker DbLocker(&Db_Mutex);
 	QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
 	if (!db.isValid()) {
 		db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype", "QODBC"), "TwentyFourDB");
@@ -1303,6 +1307,7 @@ void LoanAssumptionsEditor::SaveScenario(const QString& key) {
 		QMessageBox::critical(this, "Error", "Failed to commit changes to the database, try again later.");
 		return;
 	}
+	DbLocker.unlock();
 #endif // !NO_DATABASE
 
 	if (CurrAss->GetScenarioName() != key) {

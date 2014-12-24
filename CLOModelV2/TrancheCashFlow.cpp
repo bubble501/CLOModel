@@ -111,6 +111,7 @@ double TrancheCashFlow::GetTotalFlow(const QDate& a) const {
 #ifndef NO_DATABASE
 bool TrancheCashFlow::GetCashFlowsDatabase(const QString& TrancheID) {
 	if (TrancheID.isEmpty()) return false;
+	QMutexLocker DbLocker(&Db_Mutex);
 	QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
 	if (!db.isValid()) {
 		db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype", "QODBC"), "TwentyFourDB");
@@ -120,7 +121,9 @@ bool TrancheCashFlow::GetCashFlowsDatabase(const QString& TrancheID) {
 			+ GetFromConfig("Database", "DataSource", R"(Server=SYNSERVER2\SQLExpress;Initial Catalog=ABSDB;Integrated Security=SSPI;Trusted_Connection=Yes;)")
 			);
 	}
-	if (db.open()) {
+	bool DbOpen = db.isOpen();
+	if (!DbOpen) DbOpen = db.open();
+	if (DbOpen) {
 		QSqlQuery query(db);
 		query.setForwardOnly(true);
 		query.prepare("CALL " + GetFromConfig("Database", "CashFlowsStoredProc", "getCashFlows") + "(?)");
@@ -139,11 +142,9 @@ bool TrancheCashFlow::GetCashFlowsDatabase(const QString& TrancheID) {
 				AddFlow(query.value(0).toDate(), -query.value(4).toDouble(), TrancheFlowType::AmountOutstandingFlow);
 				AddFlow(query.value(0).toDate(), query.value(2).toDouble(), TrancheFlowType::DeferredFlow);
 			}
-			db.close();
 			if (!Cleared) return false;
 			return true;
 		}
-		db.close();
 	}
 	return false;
 }

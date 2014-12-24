@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
 	
 	//TempWtf.CalculateTranchesCashFlows();
 	QApplication a(argc, argv);
-	TempMtg.SetSequentialComputation(true);
+	TempMtg.DownloadScenarios();
 	TempMtg.StartCalculation();
 	return a.exec();
 	/*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

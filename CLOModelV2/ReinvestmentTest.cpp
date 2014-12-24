@@ -123,6 +123,7 @@ void ReinvestmentTest::CalculateBondCashFlows(double Size, QDate StartDate, unsi
 		, m_Delinquency
 		, m_DelinquencyLag
 		, true
+		,false
 		);
 	//ReinvestmentBond.AddCashFlow(StartDate, Size, MtgCashFlow::MtgFlowType::AmountOutstandingFlow);
 	if (NullDates[0]) CPRAssumption.RemoveAnchorDate();

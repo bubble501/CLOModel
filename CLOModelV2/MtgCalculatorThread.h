@@ -15,6 +15,7 @@ protected:
 	QString DelinquencyLag;
 	QDate StartDate;
 	bool m_OverrideAssumptions;
+	bool m_DownloadScenario;
 public:
 	MtgCalculatorThread(int Identity,QObject* parent=0);
 	void SetLoan(const Mortgage& a){Loan=a;}
@@ -36,6 +37,8 @@ public:
 	const QDate& GetStartDate()const {return StartDate;}
 	void SetOverrideAssumptions(bool a) { m_OverrideAssumptions = a; }
 	bool GetOverrideAssumptions()const { return m_OverrideAssumptions; }
+	bool GetDownloadScenario() const { return m_DownloadScenario; }
+	void SetDownloadScenario(bool val) { m_DownloadScenario = val; }
 signals:
 	void Calculated(int,const MtgCashFlow&);
 protected slots:

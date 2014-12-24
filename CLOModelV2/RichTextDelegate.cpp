@@ -11,13 +11,8 @@ RichTextDelegate::RichTextDelegate(QObject *parent)
 void RichTextDelegate::paint(QPainter *painter,const QStyleOptionViewItem &option,const QModelIndex &index) const {
 	bool selected = option.state & QStyle::State_Selected;
 	QPalette palette(option.palette);
-	palette.setColor(QPalette::Active, QPalette::Window,
-		selected ? option.palette.highlight().color()
-		: option.palette.base().color());
-	palette.setColor(QPalette::Active, QPalette::WindowText,
-		selected
-		? option.palette.highlightedText().color()
-		: option.palette.text().color());
+	palette.setColor(QPalette::Active, QPalette::Window, selected ? option.palette.highlight().color() : option.palette.base().color());
+	palette.setColor(QPalette::Active, QPalette::WindowText, selected ? option.palette.highlightedText().color() : option.palette.text().color());
 	QRect labelRect(option.rect.x(),option.rect.y(), option.rect.width(),option.rect.height());
 	labelRect.adjust(LabelPadding, LabelPadding, -(2 * LabelPadding), -(2 * LabelPadding));
 	label->setPalette(palette);

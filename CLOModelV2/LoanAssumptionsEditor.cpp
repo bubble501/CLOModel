@@ -33,10 +33,12 @@
 #include "RichTextDelegate.h"
 #include "Mortgage.h"
 #include "PoolTableProxy.h"
+#include "CheckAndEditDelegate.h"
 LoanAssumptionsEditor::LoanAssumptionsEditor(QWidget *parent)
 	: QWidget(parent)
 	, ActiveAssumption(nullptr)
 	, m_LastColSorted(1)
+	, m_currentChanging(false)
 {
 	setWindowIcon(QIcon(":/Icons/Logo.png"));
 	setWindowTitle(tr("Loan Scenarios Editor"));
@@ -491,6 +493,10 @@ void LoanAssumptionsEditor::CreatePoolMatcher() {
 	m_PoolTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	m_PoolTable->horizontalHeader()->setMinimumSectionSize(130);
 	m_PoolTable->horizontalHeader()->setStretchLastSection(true);
+	m_PoolTable->setItemDelegateForColumn(2, new CheckAndEditDelegate(this));
+	m_PoolTable->setItemDelegateForColumn(3, new CheckAndEditDelegate(this));
+	m_PoolTable->setEditTriggers(QAbstractItemView::CurrentChanged | QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
+	m_PoolTable->setStyleSheet("QTableView::item{border: 0px; padding: 0px;}");
 
 	LoadPoolButton = new QPushButton(this);
 	LoadPoolButton->setText(tr("Load Model"));
@@ -516,6 +522,19 @@ void LoanAssumptionsEditor::CreatePoolMatcher() {
 	});
 	connect(m_PoolModel, &QStandardItemModel::dataChanged, [&](const QModelIndex&, const QModelIndex&) {
 		m_PoolSorter->sort((m_LastColSorted-1)* (m_LastColSorted <0 ? -1 : 1));
+	});
+	connect(m_PoolModel, &QStandardItemModel::dataChanged, [&](const QModelIndex& index, const QModelIndex&) {
+		if (index.column() >= 2 && !m_currentChanging) {
+			m_currentChanging = true;
+			auto CurrVal = m_PoolModel->data(index, Qt::UserRole + Qt::CheckStateRole).toInt() == Qt::Checked;
+			m_PoolModel->setData(
+				m_PoolModel->index(index.row(), index.column()==2 ? 3:2)
+				, CurrVal ? Qt::Unchecked : Qt::Checked
+				, Qt::UserRole + Qt::CheckStateRole
+			);
+			m_currentChanging = false;
+		}
+		m_PoolSorter->sort((m_LastColSorted - 1)* (m_LastColSorted < 0 ? -1 : 1));
 	});
 	connect(m_PoolModel, &QStandardItemModel::rowsInserted, [&](const QModelIndex&, int,int) {
 		GuessAssumptionsButton->setEnabled(m_PoolModel->rowCount() > 0);
@@ -1471,6 +1490,8 @@ void LoanAssumptionsEditor::AddLoanToPool(Mortgage& a) {
 	m_PoolModel->setData(m_PoolModel->index(m_PoolModel->rowCount() - 1, 0), m_LoanPool.GetLoans().size(), Qt::UserRole);
 	m_PoolModel->setData(m_PoolModel->index(m_PoolModel->rowCount() - 1, 1), a.GetProperty("Facility"), Qt::EditRole);
 	m_PoolModel->setData(m_PoolModel->index(m_PoolModel->rowCount() - 1, 2), a.GetProperty("Scenario"), Qt::EditRole);
+	m_PoolModel->setData(m_PoolModel->index(m_PoolModel->rowCount() - 1, 2), true, Qt::UserRole + 24);
+	m_PoolModel->setData(m_PoolModel->index(m_PoolModel->rowCount() - 1, 2), Qt::Checked, Qt::UserRole + Qt::CheckStateRole);
 	m_LoanPool.AddLoan(a, m_LoanPool.GetLoans().size());
 }
 
@@ -1511,6 +1532,8 @@ void LoanAssumptionsEditor::LoadModel() {
 		m_PoolModel->setData(m_PoolModel->index(RowCounter, 0), i.key(), Qt::UserRole);
 		m_PoolModel->setData(m_PoolModel->index(RowCounter, 1), i.value()->GetProperty("Facility"), Qt::EditRole);
 		m_PoolModel->setData(m_PoolModel->index(RowCounter, 2), i.value()->GetProperty("Scenario"), Qt::EditRole);
+		m_PoolModel->setData(m_PoolModel->index(RowCounter, 2), true, Qt::UserRole + 24);
+		m_PoolModel->setData(m_PoolModel->index(RowCounter, 2), Qt::Checked, Qt::UserRole + Qt::CheckStateRole);
 	}
 	LoadProgress.setValue(4);
 }
@@ -1529,11 +1552,13 @@ void LoanAssumptionsEditor::GuessAssumptions(bool OverrideManual) {
 				if (CurrAss->MatchPattern(m_PoolModel->data(m_PoolModel->index(i, 0), Qt::EditRole).toString())) {
 					m_PoolModel->setData(m_PoolModel->index(i, 3), j.key(), Qt::EditRole);
 					m_PoolModel->setData(m_PoolModel->index(i, 3), QVariant(), Qt::UserRole);
+					m_PoolModel->setData(m_PoolModel->index(i, 3), Qt::Checked, Qt::UserRole + Qt::CheckStateRole);
 					++MatchFound;
 				}
 				else if (CurrAss->MatchPattern(m_PoolModel->data(m_PoolModel->index(i, 1), Qt::EditRole).toString())) {
 					m_PoolModel->setData(m_PoolModel->index(i, 3), j.key(), Qt::EditRole);
 					m_PoolModel->setData(m_PoolModel->index(i, 3), QVariant(), Qt::UserRole);
+					m_PoolModel->setData(m_PoolModel->index(i, 3), Qt::Checked, Qt::UserRole + Qt::CheckStateRole);
 					++MatchFound;
 				}
 			}

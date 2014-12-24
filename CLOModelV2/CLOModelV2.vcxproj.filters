@@ -316,6 +316,12 @@
     <CustomBuild Include="RichTextDelegate.h">
       <Filter>Header Files\Loans\Loans Assumptions</Filter>
     </CustomBuild>
+    <CustomBuild Include="CheckAndEditDelegate.h">
+      <Filter>Header Files\Loans\Loans Assumptions</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CheckAndEdit.h">
+      <Filter>Header Files\Loans\Loans Assumptions</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\Debug\moc_CentralUnit.cpp">
@@ -652,6 +658,24 @@
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_RichTextDelegate.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CheckAndEditDelegate.cpp">
+      <Filter>Source Files\Loans\Loans Assumptions</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_CheckAndEditDelegate.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_CheckAndEdit.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_CheckAndEdit.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="CheckAndEdit.cpp">
+      <Filter>Source Files\Loans\Loans Assumptions</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_CheckAndEditDelegate.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
   </ItemGroup>

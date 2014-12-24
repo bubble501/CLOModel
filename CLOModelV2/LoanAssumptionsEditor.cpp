@@ -4,8 +4,10 @@
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
+#include <QSqlRecord>
 #include <QVariant>
 #endif
+#include <QProgressDialog>
 #include <QStandardItemModel>
 #include <QListView>
 #include <QGridLayout>
@@ -24,16 +26,29 @@
 #include <QDateTimeEdit>
 #include <QHeaderView>
 #include <QSplitter>
+#include <QTabWidget>
+#include <QFileDialog>
 #include "AssumptionsComboDelegate.h"
 #include "LoanAssumptionDelegate.h"
 #include "RichTextDelegate.h"
+#include "Mortgage.h"
+#include "PoolTableProxy.h"
 LoanAssumptionsEditor::LoanAssumptionsEditor(QWidget *parent)
 	: QWidget(parent)
 	, ActiveAssumption(nullptr)
+	, m_LastColSorted(1)
 {
 	setWindowIcon(QIcon(":/Icons/Logo.png"));
 	setWindowTitle(tr("Loan Scenarios Editor"));
-
+	BaseTab = new QTabWidget(this);
+	BaseTab->setTabPosition(QTabWidget::West);
+	QVBoxLayout* MainLay = new QVBoxLayout(this);
+	//MainLay->setMargin(0);
+	MainLay->addWidget(BaseTab);
+	CreateScenarioEditor();
+	CreatePoolMatcher();
+}
+void LoanAssumptionsEditor::CreateScenarioEditor() {
 	m_ScenariosModel = new QStandardItemModel(this);
 	m_ScenariosModel->setRowCount(0);
 	m_ScenariosModel->setColumnCount(1);
@@ -51,7 +66,7 @@ LoanAssumptionsEditor::LoanAssumptionsEditor(QWidget *parent)
 	m_AliasesList->setModel(m_AliasesModel);
 	m_AliasesList->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	m_AliasesList->setSelectionMode(QAbstractItemView::SingleSelection);
-	
+
 	QLabel* SelectScenarioLabel = new QLabel(this);
 	SelectScenarioLabel->setText(tr("Select Scenario"));
 	QCompleter* ScenariosCompleter = new QCompleter(m_SortScenarios, this);
@@ -90,8 +105,8 @@ LoanAssumptionsEditor::LoanAssumptionsEditor(QWidget *parent)
 	ReplaceAliasButton = new QPushButton(this);
 	ReplaceAliasButton->setText("\342\207\205"); //Unicode for up and down arrow
 	ReplaceAliasButton->setEnabled(false);
-	
-	
+
+
 
 	QGroupBox* NamesGroup = new QGroupBox(this);
 	NamesGroup->setStyleSheet(
@@ -106,21 +121,21 @@ LoanAssumptionsEditor::LoanAssumptionsEditor(QWidget *parent)
 		"background: qradialgradient(cx: 0.3, cy: -0.4,fx: 0.3, fy: -0.4,radius: 1.35, stop: 0 #ccc, stop: 1 #fff);"
 		"}"
 		"QLabel { qproperty-alignment: 'AlignRight | AlignVCenter'; }"
-	);
+		);
 	NamesGroup->setTitle(tr("Identifiers"));
 	QLabel* ScenarioNameLabel = new QLabel(this);
 	ScenarioNameLabel->setText(tr("Scenario Name"));
 	m_ScenarioNameEdit = new QLineEdit(this);
 	QGridLayout* NamesLay = new QGridLayout(NamesGroup);
 	NamesLay->addWidget(ScenarioNameLabel, 0, 0);
-	NamesLay->addWidget(m_ScenarioNameEdit, 0, 1,1,4);
+	NamesLay->addWidget(m_ScenarioNameEdit, 0, 1, 1, 4);
 	NamesLay->addWidget(AliasLabel, 1, 0);
 	NamesLay->addWidget(m_AliasLineEdit, 1, 1);
 	NamesLay->addWidget(AddAliasButton, 1, 2);
 	NamesLay->addWidget(RemoveAliasButton, 1, 3);
 	NamesLay->addWidget(ReplaceAliasButton, 1, 4);
 	NamesLay->addWidget(m_AliasesList, 2, 1, 1, 4);
-	
+
 	m_SeniorAsumptionsModel = new QStandardItemModel(this);
 	m_SeniorAsumptionsModel->setColumnCount(2);
 	m_SeniorAsumptionsModel->setRowCount(1);
@@ -215,7 +230,7 @@ LoanAssumptionsEditor::LoanAssumptionsEditor(QWidget *parent)
 	QGridLayout* LeftLay = new QGridLayout(LeftSection);
 	LeftLay->addWidget(SelectScenarioLabel, 0, 0, 1, 2);
 	LeftLay->addWidget(m_ScenariosCombo, 1, 0, 1, 2);
-	LeftLay->addWidget(m_ScenarioList, 2, 0,1,2);
+	LeftLay->addWidget(m_ScenarioList, 2, 0, 1, 2);
 	LeftLay->addWidget(AddScenarioButton, 3, 0);
 	LeftLay->addWidget(RemoveScenarioButton, 3, 1);
 	LeftSection->setMinimumWidth(150);
@@ -256,36 +271,40 @@ LoanAssumptionsEditor::LoanAssumptionsEditor(QWidget *parent)
 	SaveCurrentButton->setText(tr("Save"));
 	SaveCurrentButton->setEnabled(false);
 
-
-	QGridLayout* mainLay = new QGridLayout(this);
+	
+	QWidget* TempTab = new QWidget(this);;
+	QGridLayout* mainLay = new QGridLayout(TempTab);
 	/*mainLay->setSpacing(0);
 	mainLay->setMargin(0);*/
-	mainLay->addWidget(MainSplit,0,0,1,5);
+	mainLay->addWidget(MainSplit, 0, 0, 1, 5);
 	mainLay->addWidget(BottomLine, 1, 0, 1, 5);
-	mainLay->addItem(new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Preferred),2,0);
+	mainLay->addItem(new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Preferred), 2, 0);
 	mainLay->addWidget(DiscardAllButton, 2, 1);
 	mainLay->addWidget(DiscardCurrentButton, 2, 2);
 	mainLay->addWidget(SaveAllButton, 2, 3);
 	mainLay->addWidget(SaveCurrentButton, 2, 4);
+	BaseTab->addTab(TempTab, "Scenarios Editor");
 
-	
 	connect(m_ScenariosModel, &QStandardItemModel::dataChanged, [&](const QModelIndex& index, const QModelIndex&) {
 		m_SortScenarios->sort(0);
 	});
 	connect(m_ScenarioList->selectionModel(), &QItemSelectionModel::currentChanged, this, &LoanAssumptionsEditor::ChangeScenario);
 	connect(m_ScenarioList->selectionModel(), &QItemSelectionModel::currentChanged, [&](const QModelIndex& index, const QModelIndex&) {
 		if (index.isValid()) m_ScenariosCombo->setCurrentIndex(index.row());
-		RemoveAliasButton->setEnabled(index.isValid() && m_AliasesModel->rowCount()>0);
-		AddAliasButton->setEnabled(false );
-		ReplaceAliasButton->setEnabled(index.isValid() && m_AliasesModel->rowCount()>0);
-		AddSeniorAssumptionButton->setEnabled(index.isValid());
-		RemoveSeniorAssumptionButton->setEnabled(index.isValid() && m_SeniorAsumptionsModel->rowCount()>0);
-		m_SeniorDateEdit->setEnabled(index.isValid());
-		m_seniorDateCheck->setEnabled(index.isValid());
-		AddMezzAssumptionButton->setEnabled(index.isValid());
-		RemoveMezzAssumptionButton->setEnabled(index.isValid() && m_MezzAsumptionsModel->rowCount() > 0);
-		m_MezzDateEdit->setEnabled(index.isValid());
-		m_MezzDateCheck->setEnabled(index.isValid());
+		else {
+			RemoveAliasButton->setEnabled(false);
+			AddAliasButton->setEnabled(false);
+			ReplaceAliasButton->setEnabled(false );
+			AddSeniorAssumptionButton->setEnabled(false);
+			RemoveSeniorAssumptionButton->setEnabled(false);
+			m_SeniorDateEdit->setEnabled(false);
+			m_seniorDateCheck->setEnabled(false);
+			AddMezzAssumptionButton->setEnabled(false);
+			RemoveMezzAssumptionButton->setEnabled(false);
+			m_MezzDateEdit->setEnabled(false);
+			m_MezzDateCheck->setEnabled(false);
+		}
+		
 		m_AliasLineEdit->clear();
 	});
 	connect(m_AliasLineEdit, &QLineEdit::textChanged, [&](const QString& a) {AddAliasButton->setEnabled(!a.isEmpty()); });
@@ -310,13 +329,13 @@ LoanAssumptionsEditor::LoanAssumptionsEditor(QWidget *parent)
 		}
 	});
 	connect(RemoveAliasButton, &QPushButton::clicked, [&](bool) {
-		if (m_AliasesList->selectionModel()->currentIndex().isValid()) 
+		if (m_AliasesList->selectionModel()->currentIndex().isValid())
 			m_AliasesModel->removeRow(m_AliasesList->selectionModel()->currentIndex().row());
 		RemoveAliasButton->setEnabled(m_AliasesModel->rowCount()>0);
 		ReplaceAliasButton->setEnabled(m_AliasesModel->rowCount()>0);
 	});
 	connect(ReplaceAliasButton, &QPushButton::clicked, [&](bool) {
-		if (m_AliasesList->selectionModel()->currentIndex().isValid()){
+		if (m_AliasesList->selectionModel()->currentIndex().isValid()) {
 			if (CheckAliasInput())
 				m_AliasesModel->setData(m_AliasesModel->index(m_AliasesList->selectionModel()->currentIndex().row(), 0), m_AliasLineEdit->text());
 		}
@@ -375,20 +394,7 @@ LoanAssumptionsEditor::LoanAssumptionsEditor(QWidget *parent)
 		m_ScenariosModel->setData(m_ScenariosModel->index(m_ScenariosModel->rowCount() - 1, 0), RichTextDelegate::Added, Qt::UserRole);
 		m_ScenarioList->selectionModel()->setCurrentIndex(m_SortScenarios->mapFromSource(m_ScenariosModel->index(m_ScenariosModel->rowCount() - 1, 0)), QItemSelectionModel::ClearAndSelect);
 	});
-	connect(RemoveScenarioButton, &QPushButton::clicked, [&](bool) {
-		if (m_ScenarioList->selectionModel()->currentIndex().isValid()) {
-			auto currIdx = m_SortScenarios->mapToSource(m_ScenarioList->selectionModel()->currentIndex());
-			if (m_ScenariosModel->data(currIdx, Qt::UserRole) == RichTextDelegate::Added) {
-				m_DirtyAssumptions.remove(m_ScenariosModel->data(currIdx, Qt::EditRole).toString());
-				m_ScenariosModel->removeRow(currIdx.row());
-			}
-			else {
-				m_ScenariosModel->setData(currIdx, RichTextDelegate::Erased, Qt::UserRole);
-				m_DirtyAssumptions[m_ScenariosModel->data(currIdx, Qt::EditRole).toString()] = QSharedPointer<LoanAssumption>(nullptr);
-			}
-		}
-		RemoveScenarioButton->setEnabled(m_ScenariosModel->rowCount() > 0);
-	});
+	connect(RemoveScenarioButton, SIGNAL(clicked()), this, SLOT(RemoveScenario()));
 	connect(m_ScenariosModel, &QStandardItemModel::rowsInserted, [&](const QModelIndex &, int, int) {
 		RemoveScenarioButton->setEnabled(m_ScenariosModel->rowCount() > 0);
 	});
@@ -404,7 +410,7 @@ LoanAssumptionsEditor::LoanAssumptionsEditor(QWidget *parent)
 		}
 	});
 	connect(DiscardAllButton, &QPushButton::clicked, [&](bool) {
-		if (YesNoDialog(DiscardAllButton->text(), tr("Are you sure you want to discard changes to %n scenario(s)", "", m_DirtyAssumptions.size()))){
+		if (YesNoDialog(DiscardAllButton->text(), tr("Are you sure you want to discard changes to %n scenario(s)", "", m_DirtyAssumptions.size()))) {
 			auto AllKeys = m_DirtyAssumptions.keys();
 			foreach(const QString& k, AllKeys) {
 				DiscardScenario(k);
@@ -413,22 +419,15 @@ LoanAssumptionsEditor::LoanAssumptionsEditor(QWidget *parent)
 		CheckAllDirty();
 	});
 	connect(SaveCurrentButton, &QPushButton::clicked, [&](bool) {
-		if (m_ScenarioNameEdit->text().isEmpty()) {
-			QMessageBox::critical(this, "Error", "Scenario Name can't be empty"); 
-			return;
-		}
 		if (m_ScenarioList->selectionModel()->currentIndex().isValid()) {
 			auto currIdx = m_SortScenarios->mapToSource(m_ScenarioList->selectionModel()->currentIndex());
 			if (YesNoDialog(SaveCurrentButton->text(), tr("Are you sure you want to save changes to %1").arg(m_ScenariosModel->data(currIdx, Qt::EditRole).toString()))) {
 				SaveScenario(m_ScenariosModel->data(currIdx, Qt::EditRole).toString());
-			} 
+			}
 		}
 	});
 	connect(SaveAllButton, &QPushButton::clicked, [&](bool) {
-		if (m_ScenarioNameEdit->text().isEmpty()) {
-			QMessageBox::critical(this, "Error", "Scenario Name can't be empty");
-			return;
-		}
+		auto CurrentIDx = m_SortScenarios->mapToSource(m_ScenarioList->selectionModel()->currentIndex());
 		if (YesNoDialog(SaveAllButton->text(), tr("Are you sure you want to save changes to %n scenario(s)", "", m_DirtyAssumptions.size()))) {
 			auto AllKeys = m_DirtyAssumptions.keys();
 			foreach(const QString& k, AllKeys) {
@@ -436,10 +435,11 @@ LoanAssumptionsEditor::LoanAssumptionsEditor(QWidget *parent)
 			}
 		}
 		CheckAllDirty();
+		m_ScenarioList->selectionModel()->setCurrentIndex(m_SortScenarios->mapFromSource(CurrentIDx),QItemSelectionModel::ClearAndSelect);
 	});
 
 
-	connect(RemoveSeniorAssumptionButton, SIGNAL(clicked()), this,SLOT(CheckCurrentDirty()));
+	connect(RemoveSeniorAssumptionButton, SIGNAL(clicked()), this, SLOT(CheckCurrentDirty()));
 	connect(AddSeniorAssumptionButton, SIGNAL(clicked()), this, SLOT(CheckCurrentDirty()));
 	connect(RemoveMezzAssumptionButton, SIGNAL(clicked()), this, SLOT(CheckCurrentDirty()));
 	connect(AddMezzAssumptionButton, SIGNAL(clicked()), this, SLOT(CheckCurrentDirty()));
@@ -458,10 +458,10 @@ LoanAssumptionsEditor::LoanAssumptionsEditor(QWidget *parent)
 	connect(m_MezzTable->itemDelegateForColumn(0), SIGNAL(Edited()), this, SLOT(CheckCurrentDirty()));
 	connect(m_MezzTable->itemDelegateForColumn(1), SIGNAL(Edited()), this, SLOT(CheckCurrentDirty()));
 	connect(m_ScenariosModel, &QStandardItemModel::dataChanged, [&](const QModelIndex& index, const QModelIndex&) {
-		bool CurrentDirty, Anydirty ;
+		bool CurrentDirty, Anydirty;
 		Anydirty = CurrentDirty = m_ScenariosModel->data(index, Qt::UserRole).toInt() != RichTextDelegate::NotDirty;
 		for (int i = 0; i < m_ScenariosModel->rowCount() && !Anydirty; ++i) {
-			Anydirty = m_ScenariosModel->data(m_ScenariosModel->index(i,0), Qt::UserRole).toInt() != RichTextDelegate::NotDirty;
+			Anydirty = m_ScenariosModel->data(m_ScenariosModel->index(i, 0), Qt::UserRole).toInt() != RichTextDelegate::NotDirty;
 		}
 		SaveCurrentButton->setEnabled(CurrentDirty);
 		DiscardCurrentButton->setEnabled(CurrentDirty);
@@ -476,6 +476,63 @@ LoanAssumptionsEditor::LoanAssumptionsEditor(QWidget *parent)
 		SaveCurrentButton->setEnabled(Result);
 		DiscardCurrentButton->setEnabled(Result);
 	});
+}
+void LoanAssumptionsEditor::CreatePoolMatcher() {
+	m_PoolModel = new QStandardItemModel(this);
+	m_PoolModel->setRowCount(0);
+	m_PoolModel->setColumnCount(4);
+	m_PoolModel->setHorizontalHeaderLabels(QStringList() << "Issuer" << "Facility" << "Current Scenario" << "Suggested Scenario");
+	m_PoolSorter = new PoolTableProxy(this);
+	m_PoolSorter->setSourceModel(m_PoolModel);
+
+	m_PoolTable = new QTableView(this);
+	m_PoolTable->setModel(m_PoolSorter);
+	m_PoolTable->verticalHeader()->hide();
+	m_PoolTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+	m_PoolTable->horizontalHeader()->setMinimumSectionSize(130);
+	m_PoolTable->horizontalHeader()->setStretchLastSection(true);
+
+	LoadPoolButton = new QPushButton(this);
+	LoadPoolButton->setText(tr("Load Model"));
+	GuessAssumptionsButton = new QPushButton(this);
+	GuessAssumptionsButton->setText(tr("Guess Scenarios"));
+	GuessAssumptionsButton->setEnabled(false);
+	OverrideManualScenariosCheck = new QCheckBox(this);
+	OverrideManualScenariosCheck->setText(tr("Override Manual Input"));
+	OverrideManualScenariosCheck->setChecked(false);
+	OverrideManualScenariosCheck->setEnabled(false);
+
+	connect(GuessAssumptionsButton, &QPushButton::clicked, [&]() {GuessAssumptions(OverrideManualScenariosCheck->isChecked()); });
+	connect(LoadPoolButton, SIGNAL(clicked()), this, SLOT(LoadModel()));
+	connect(m_PoolTable->horizontalHeader(), &QHeaderView::sectionClicked, [&](int a) {
+		if (m_LastColSorted == a+1) {
+			m_PoolSorter->sort(a,Qt::DescendingOrder);
+			m_LastColSorted = -(a+1);
+		}
+		else {
+			m_LastColSorted = a+1;
+			m_PoolSorter->sort(a,Qt::AscendingOrder);
+		}
+	});
+	connect(m_PoolModel, &QStandardItemModel::dataChanged, [&](const QModelIndex&, const QModelIndex&) {
+		m_PoolSorter->sort((m_LastColSorted-1)* (m_LastColSorted <0 ? -1 : 1));
+	});
+	connect(m_PoolModel, &QStandardItemModel::rowsInserted, [&](const QModelIndex&, int,int) {
+		GuessAssumptionsButton->setEnabled(m_PoolModel->rowCount() > 0);
+		OverrideManualScenariosCheck->setEnabled(m_PoolModel->rowCount() > 0);
+	});
+	connect(m_PoolModel, &QStandardItemModel::rowsRemoved, [&](const QModelIndex&, int, int) {
+		GuessAssumptionsButton->setEnabled(m_PoolModel->rowCount() > 0);
+		OverrideManualScenariosCheck->setEnabled(m_PoolModel->rowCount() > 0);
+	});
+
+	QWidget* TempTab = new QWidget(this);;
+	QGridLayout* mainLay = new QGridLayout(TempTab);
+	mainLay->addWidget(m_PoolTable, 0, 0,1,3);
+	mainLay->addWidget(LoadPoolButton, 1, 0);
+	mainLay->addWidget(GuessAssumptionsButton, 1, 1);
+	mainLay->addWidget(OverrideManualScenariosCheck, 1, 2);
+	BaseTab->addTab(TempTab, "Pool");
 }
 #ifndef NO_DATABASE
 void LoanAssumptionsEditor::FillFromQuery() {
@@ -597,6 +654,7 @@ void LoanAssumptionsEditor::FillScenariosModel() {
 }
 
 void LoanAssumptionsEditor::ChangeScenario(const QModelIndex& curr, const QModelIndex& prev) {
+	if (!curr.isValid()) return;
 	ActiveAssumption = m_DirtyAssumptions.value(m_ScenariosModel->data(m_SortScenarios->mapToSource(curr)).toString(),
 		m_Assumptions.value(m_ScenariosModel->data(m_SortScenarios->mapToSource(curr)).toString(), QSharedPointer<LoanAssumption>(nullptr)));
 	m_ScenarioNameEdit->setText(ActiveAssumption ? ActiveAssumption->GetScenarioName():QString());
@@ -618,6 +676,7 @@ void LoanAssumptionsEditor::ChangeScenario(const QModelIndex& curr, const QModel
 			m_SeniorDateEdit->setEnabled(true);
 			m_SeniorDateEdit->setDate(ActiveAssumption->GetSeniorLastUpdate());
 		}
+		
 		if (ActiveAssumption->GetMezzLastUpdate().isNull()) {
 			m_MezzDateCheck->setChecked(false);
 			m_MezzDateEdit->setDate(QDate::currentDate());
@@ -978,8 +1037,16 @@ void LoanAssumptionsEditor::ChangeScenario(const QModelIndex& curr, const QModel
 		m_MezzDateEdit->setDate(QDate::currentDate());
 		m_AliasesModel->setRowCount(0);
 	}
-	
-
+	m_MezzDateCheck->setEnabled(ActiveAssumption);
+	m_seniorDateCheck->setEnabled(ActiveAssumption);
+	m_ScenarioNameEdit->setEnabled(ActiveAssumption);
+	m_AliasLineEdit->setEnabled(ActiveAssumption);
+	AddSeniorAssumptionButton->setEnabled(ActiveAssumption);
+	AddMezzAssumptionButton->setEnabled(ActiveAssumption);
+	RemoveSeniorAssumptionButton->setEnabled(ActiveAssumption && m_SeniorAsumptionsModel->rowCount()>0);
+	RemoveMezzAssumptionButton->setEnabled(ActiveAssumption && m_MezzAsumptionsModel->rowCount()>0);
+	RemoveAliasButton->setEnabled(ActiveAssumption && m_AliasesModel->rowCount()>0);
+	ReplaceAliasButton->setEnabled(ActiveAssumption && m_AliasesModel->rowCount()>0);
 }
 
 void LoanAssumptionsEditor::SeniorScenarioChanged(const QModelIndex& index) {
@@ -1207,9 +1274,9 @@ void LoanAssumptionsEditor::SaveScenario(const QString& key) {
 	bool KeyIsCurrent = false;
 	QModelIndex CurrentIdx;
 	if (m_ScenarioList->selectionModel()->currentIndex().isValid()) {
-		CurrentIdx = m_ScenarioList->selectionModel()->currentIndex();
+		CurrentIdx = m_SortScenarios->mapToSource(m_ScenarioList->selectionModel()->currentIndex());
 		KeyIsCurrent = key.compare(
-			m_ScenariosModel->data(m_SortScenarios->mapToSource(CurrentIdx), Qt::EditRole).toString()
+			m_ScenariosModel->data(CurrentIdx, Qt::EditRole).toString()
 			, Qt::CaseInsensitive
 			) == 0;
 	}
@@ -1322,6 +1389,14 @@ void LoanAssumptionsEditor::SaveScenario(const QString& key) {
 		m_ScenariosModel->insertRow(m_ScenariosModel->rowCount());
 		m_ScenariosModel->setData(m_ScenariosModel->index(m_ScenariosModel->rowCount() - 1, 0), CurrAss->GetScenarioName(), Qt::EditRole);
 		m_ScenarioList->selectionModel()->setCurrentIndex(m_SortScenarios->mapFromSource(m_ScenariosModel->index(m_ScenariosModel->rowCount() - 1, 0)), QItemSelectionModel::ClearAndSelect);
+		for (int j = 0; j < m_PoolModel->rowCount(); ++j) {
+			if (key.compare(
+				m_PoolModel->data(m_PoolModel->index(j, 3), Qt::EditRole).toString()
+				, Qt::CaseInsensitive
+			) == 0) 
+				m_PoolModel->setData(m_PoolModel->index(j, 3), CurrAss->GetScenarioName(), Qt::EditRole);
+			
+		}
 	}
 	else {
 		m_Assumptions[key] = m_DirtyAssumptions.value(key);
@@ -1329,7 +1404,7 @@ void LoanAssumptionsEditor::SaveScenario(const QString& key) {
 	}
 	if (KeyIsCurrent) {
 		ActiveAssumption = m_Assumptions.value(key);
-		ChangeScenario(CurrentIdx, CurrentIdx);
+		ChangeScenario(m_SortScenarios->mapFromSource(CurrentIdx), m_SortScenarios->mapFromSource(CurrentIdx));
 		CheckCurrentDirty();
 		m_AliasesList->selectionModel()->setCurrentIndex(m_AliasesModel->index(m_AliasesModel->rowCount() - 1, 0), QItemSelectionModel::ClearAndSelect);
 	}
@@ -1340,9 +1415,9 @@ void LoanAssumptionsEditor::DiscardScenario(const QString& key) {
 	bool KeyIsCurrent=false;
 	QModelIndex CurrentIdx;
 	if (m_ScenarioList->selectionModel()->currentIndex().isValid()) {
-		CurrentIdx = m_ScenarioList->selectionModel()->currentIndex();
+		CurrentIdx = m_SortScenarios->mapToSource(m_ScenarioList->selectionModel()->currentIndex());
 		KeyIsCurrent=key.compare(
-			m_ScenariosModel->data(m_SortScenarios->mapToSource(CurrentIdx), Qt::EditRole).toString()
+			m_ScenariosModel->data(CurrentIdx, Qt::EditRole).toString()
 			, Qt::CaseInsensitive
 		)==0;
 	}
@@ -1357,14 +1432,21 @@ void LoanAssumptionsEditor::DiscardScenario(const QString& key) {
 				) == 0
 				)ScenIdx = m_ScenariosModel->index(j, 0);
 		}
-		if (ScenIdx.isValid()) {
-			m_ScenariosModel->removeRow(ScenIdx.row());
+		for (int j = 0; j < m_PoolModel->rowCount(); ++j) {
+			if (key.compare(
+				m_PoolModel->data(m_PoolModel->index(j, 3), Qt::EditRole).toString()
+				, Qt::CaseInsensitive
+				) == 0) {
+				m_PoolModel->setData(m_PoolModel->index(j, 3), QVariant(), Qt::EditRole);
+				m_PoolModel->setData(m_PoolModel->index(j, 3), QVariant(), Qt::UserRole);
+			}
 		}
+		m_DirtyAssumptions.remove(key);
+		m_ScenariosModel->removeRow(ScenIdx.row());
 		m_Assumptions.remove(key); 
-		ActiveAssumption.reset(nullptr);
 	}
 	if (KeyIsCurrent) {
-		ChangeScenario(CurrentIdx, CurrentIdx);
+		ChangeScenario(m_SortScenarios->mapFromSource(CurrentIdx), m_SortScenarios->mapFromSource(CurrentIdx));
 		CheckCurrentDirty();
 		m_AliasesList->selectionModel()->setCurrentIndex(m_AliasesModel->index(m_AliasesModel->rowCount() - 1, 0), QItemSelectionModel::ClearAndSelect);
 	}
@@ -1375,6 +1457,124 @@ void LoanAssumptionsEditor::SeniorDateChanged(const QDate&) {
 }
 void LoanAssumptionsEditor::MezzDateChanged(const QDate&) {
 	if (m_MezzDateCheck->isChecked()) CheckCurrentDirty();
+}
+
+void LoanAssumptionsEditor::AddLoanAssumption(const LoanAssumption& a) {
+	m_Assumptions.insert(a.GetScenarioName(), QSharedPointer<LoanAssumption>(new LoanAssumption(a)));
+	m_ScenariosModel->insertRow(m_ScenariosModel->rowCount());
+	m_ScenariosModel->setData(m_ScenariosModel->index(m_ScenariosModel->rowCount() - 1, 0), a.GetScenarioName(), Qt::EditRole);
+}
+
+void LoanAssumptionsEditor::AddLoanToPool(Mortgage& a) {
+	m_PoolModel->insertRow(m_PoolModel->rowCount());
+	m_PoolModel->setData(m_PoolModel->index(m_PoolModel->rowCount() - 1, 0), a.GetProperty("Issuer"), Qt::EditRole);
+	m_PoolModel->setData(m_PoolModel->index(m_PoolModel->rowCount() - 1, 0), m_LoanPool.GetLoans().size(), Qt::UserRole);
+	m_PoolModel->setData(m_PoolModel->index(m_PoolModel->rowCount() - 1, 1), a.GetProperty("Facility"), Qt::EditRole);
+	m_PoolModel->setData(m_PoolModel->index(m_PoolModel->rowCount() - 1, 2), a.GetProperty("Scenario"), Qt::EditRole);
+	m_LoanPool.AddLoan(a, m_LoanPool.GetLoans().size());
+}
+
+void LoanAssumptionsEditor::LoadModel() {
+	QString ModelPath = QFileDialog::getOpenFileName(this, tr("Open Model"), GetFromConfig("Folders", "UnifiedResultsFolder", QString()), tr("CLO Models (*clom)"));
+	if (ModelPath.isNull()) return;
+	QFile file(ModelPath);
+	file.open(QIODevice::ReadOnly);
+	qint32 VersionChecker;
+	QDataStream out(&file);
+	out.setVersion(QDataStream::Qt_5_3);
+	out >> VersionChecker;
+	if (VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) {
+		file.close();
+		return;
+	}
+	QProgressDialog LoadProgress("Loading Model", QString(), 0, 4, this);
+	LoadProgress.setCancelButton(nullptr); 
+	LoadProgress.setWindowModality(Qt::WindowModal);
+	{QDate Junk; out >> Junk; }
+	{bool Junk; out >> Junk; }
+	{bool Junk; out >> Junk; }
+	m_WtfToExtension.SetLoadProtocolVersion(VersionChecker);
+	out >> m_WtfToExtension;
+	LoadProgress.setValue(1);
+	m_WtfToCall.SetLoadProtocolVersion(VersionChecker);
+	out >> m_WtfToCall;
+	LoadProgress.setValue(2);
+	m_LoanPool.SetLoadProtocolVersion(VersionChecker);
+	out >> m_LoanPool;
+	LoadProgress.setValue(3);
+	file.close();
+
+	m_PoolModel->setRowCount(m_LoanPool.GetLoans().size());
+	int RowCounter = 0;
+	for (auto i = m_LoanPool.GetLoans().constBegin(); i != m_LoanPool.GetLoans().constEnd(); ++i, ++RowCounter) {
+		m_PoolModel->setData(m_PoolModel->index(RowCounter, 0), i.value()->GetProperty("Issuer"), Qt::EditRole);
+		m_PoolModel->setData(m_PoolModel->index(RowCounter, 0), i.key(), Qt::UserRole);
+		m_PoolModel->setData(m_PoolModel->index(RowCounter, 1), i.value()->GetProperty("Facility"), Qt::EditRole);
+		m_PoolModel->setData(m_PoolModel->index(RowCounter, 2), i.value()->GetProperty("Scenario"), Qt::EditRole);
+	}
+	LoadProgress.setValue(4);
+}
+
+void LoanAssumptionsEditor::GuessAssumptions(bool OverrideManual) {
+	int MatchFound = 0;
+	QSharedPointer<LoanAssumption> CurrAss;
+	QProgressDialog LoadProgress("Searching for Matches", QString(), 0, m_PoolModel->rowCount()*m_Assumptions.size(), this);
+	LoadProgress.setCancelButton(nullptr);
+	LoadProgress.setWindowModality(Qt::WindowModal);
+	for (int i = 0; i < m_PoolModel->rowCount();++i){
+		for (auto j = m_Assumptions.constBegin(); j != m_Assumptions.constEnd(); ++j) {
+			CurrAss= m_DirtyAssumptions.value(j.key(), j.value());
+			if (!CurrAss) continue;
+			if (OverrideManual || m_PoolModel->data(m_PoolModel->index(i, 3), Qt::UserRole).isNull()) {
+				if (CurrAss->MatchPattern(m_PoolModel->data(m_PoolModel->index(i, 0), Qt::EditRole).toString())) {
+					m_PoolModel->setData(m_PoolModel->index(i, 3), j.key(), Qt::EditRole);
+					m_PoolModel->setData(m_PoolModel->index(i, 3), QVariant(), Qt::UserRole);
+					++MatchFound;
+				}
+				else if (CurrAss->MatchPattern(m_PoolModel->data(m_PoolModel->index(i, 1), Qt::EditRole).toString())) {
+					m_PoolModel->setData(m_PoolModel->index(i, 3), j.key(), Qt::EditRole);
+					m_PoolModel->setData(m_PoolModel->index(i, 3), QVariant(), Qt::UserRole);
+					++MatchFound;
+				}
+			}
+			LoadProgress.setValue(LoadProgress.value() + 1);
+		}
+	}
+	QMessageBox::information(this, tr("Results"), tr("%n Match(es) Found", "", MatchFound));
+}
+
+void LoanAssumptionsEditor::RemoveScenario() {
+	if (m_ScenarioList->selectionModel()->currentIndex().isValid()) {
+		auto currIdx = m_SortScenarios->mapToSource(m_ScenarioList->selectionModel()->currentIndex());
+		if (m_ScenariosModel->data(currIdx, Qt::UserRole) == RichTextDelegate::Added) {
+			QString key = m_ScenariosModel->data(currIdx, Qt::EditRole).toString();
+			for (int j = 0; j < m_PoolModel->rowCount(); ++j) {
+				if (key.compare(
+					m_PoolModel->data(m_PoolModel->index(j, 3), Qt::EditRole).toString()
+					, Qt::CaseInsensitive
+					) == 0) {
+					m_PoolModel->setData(m_PoolModel->index(j, 3), QVariant(), Qt::EditRole);
+					m_PoolModel->setData(m_PoolModel->index(j, 3), QVariant(), Qt::UserRole);
+				}
+			}
+			m_DirtyAssumptions.remove(key);
+			m_ScenariosModel->removeRow(currIdx.row());
+		}
+		else {
+			m_ScenariosModel->setData(currIdx, RichTextDelegate::Erased, Qt::UserRole);
+			m_DirtyAssumptions[m_ScenariosModel->data(currIdx, Qt::EditRole).toString()] = QSharedPointer<LoanAssumption>(nullptr);
+			ActiveAssumption.reset(nullptr);
+		}
+		m_ScenarioNameEdit->setEnabled(ActiveAssumption);
+		m_AliasLineEdit->setEnabled(ActiveAssumption);
+		AddSeniorAssumptionButton->setEnabled(ActiveAssumption);
+		AddMezzAssumptionButton->setEnabled(ActiveAssumption);
+		m_seniorDateCheck->setEnabled(ActiveAssumption);
+		m_SeniorDateEdit->setEnabled(ActiveAssumption);
+		m_MezzDateCheck->setEnabled(ActiveAssumption);
+		m_MezzDateEdit->setEnabled(ActiveAssumption);
+	}
+	RemoveScenarioButton->setEnabled(m_ScenariosModel->rowCount() > 0);
 }
 
 

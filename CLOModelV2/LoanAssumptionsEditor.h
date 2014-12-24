@@ -5,6 +5,8 @@
 #include <QHash>
 #include <QSharedPointer>
 #include <QFlags>
+#include "MtgCalculator.h"
+#include "Waterfall.h"
 #include "LoanAssumption.h"
 class QStandardItemModel;
 class QListView;
@@ -15,16 +17,22 @@ class QTableView;
 class QCheckBox;
 class QDateEdit;
 class QPushButton;
+class QTabWidget;
+class PoolTableProxy;
 class LoanAssumptionsEditor : public QWidget
 {
 	Q_OBJECT
 
 public:
 	LoanAssumptionsEditor(QWidget *parent=nullptr);
+	void AddLoanAssumption(const LoanAssumption& a);
+	void AddLoanToPool(Mortgage& a); 
 #ifndef NO_DATABASE
-	virtual void FillFromQuery();
+	void FillFromQuery();
 #endif
 private:
+	void CreateScenarioEditor();
+	void CreatePoolMatcher();
 	bool YesNoDialog(const QString& Title, const QString& Mess);
 	LoanAssumption BuildCurrentAssumption() const;
 	bool ScenExist(const QString& Teststr)const;
@@ -61,11 +69,25 @@ private:
 	QPushButton* SaveAllButton;
 	QPushButton* DiscardCurrentButton;
 	QPushButton* DiscardAllButton;
-
+	QTabWidget* BaseTab;
+	QStandardItemModel* m_PoolModel;
+	QTableView* m_PoolTable;
+	PoolTableProxy* m_PoolSorter;
+	int m_LastColSorted;
+	MtgCalculator m_LoanPool;
+	Waterfall m_WtfToExtension;
+	Waterfall m_WtfToCall;
+	QString m_LastModelLoaded;
+	QPushButton* GuessAssumptionsButton;
+	QPushButton* LoadPoolButton;
+	QCheckBox* OverrideManualScenariosCheck;
 	QHash<QString, QSharedPointer<LoanAssumption> > m_DirtyAssumptions;
 signals:
 	void ActiveAssumptionChanged();
 private slots:
+	void RemoveScenario();
+	void GuessAssumptions(bool OverrideManual);
+	void LoadModel();
 	void SeniorDateChanged(const QDate&);
 	void MezzDateChanged(const QDate&);
 	void CheckAllDirty();

@@ -99,11 +99,11 @@
     <Filter Include="Header Files\Deal Structure">
       <UniqueIdentifier>{85699230-dd78-469e-963f-8a79a0b57330}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Loans Assumptions">
-      <UniqueIdentifier>{6159e9d1-2ae5-4c0e-91b1-2bf730ef3b2e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Loans Assumptions">
+    <Filter Include="Source Files\Loans\Loans Assumptions">
       <UniqueIdentifier>{29d33f96-a463-46b6-b3fa-ca8fee13b894}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Loans\Loans Assumptions">
+      <UniqueIdentifier>{6159e9d1-2ae5-4c0e-91b1-2bf730ef3b2e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -231,7 +231,10 @@
       <Filter>Header Files\Triggers</Filter>
     </ClInclude>
     <ClInclude Include="LoanAssumption.h">
-      <Filter>Header Files\Loans Assumptions</Filter>
+      <Filter>Header Files\Loans\Loans Assumptions</Filter>
+    </ClInclude>
+    <ClInclude Include="PoolTableProxy.h">
+      <Filter>Header Files\Loans\Loans Assumptions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -302,16 +305,16 @@
       <Filter>Header Files\Widgets</Filter>
     </CustomBuild>
     <CustomBuild Include="LoanAssumptionsEditor.h">
-      <Filter>Header Files\Loans Assumptions</Filter>
+      <Filter>Header Files\Loans\Loans Assumptions</Filter>
     </CustomBuild>
     <CustomBuild Include="AssumptionsComboDelegate.h">
-      <Filter>Header Files\Loans Assumptions</Filter>
+      <Filter>Header Files\Loans\Loans Assumptions</Filter>
     </CustomBuild>
     <CustomBuild Include="LoanAssumptionDelegate.h">
-      <Filter>Header Files\Loans Assumptions</Filter>
+      <Filter>Header Files\Loans\Loans Assumptions</Filter>
     </CustomBuild>
     <CustomBuild Include="RichTextDelegate.h">
-      <Filter>Header Files\Loans Assumptions</Filter>
+      <Filter>Header Files\Loans\Loans Assumptions</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -613,10 +616,10 @@
       <Filter>Source Files\Vectors</Filter>
     </ClCompile>
     <ClCompile Include="LoanAssumption.cpp">
-      <Filter>Source Files\Loans Assumptions</Filter>
+      <Filter>Source Files\Loans\Loans Assumptions</Filter>
     </ClCompile>
     <ClCompile Include="LoanAssumptionsEditor.cpp">
-      <Filter>Source Files\Loans Assumptions</Filter>
+      <Filter>Source Files\Loans\Loans Assumptions</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_LoanAssumptionsEditor.cpp">
       <Filter>Generated Files\Debug</Filter>
@@ -625,7 +628,7 @@
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="AssumptionsComboDelegate.cpp">
-      <Filter>Source Files\Loans Assumptions</Filter>
+      <Filter>Source Files\Loans\Loans Assumptions</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_AssumptionsComboDelegate.cpp">
       <Filter>Generated Files\Debug</Filter>
@@ -634,7 +637,7 @@
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="LoanAssumptionDelegate.cpp">
-      <Filter>Source Files\Loans Assumptions</Filter>
+      <Filter>Source Files\Loans\Loans Assumptions</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_LoanAssumptionDelegate.cpp">
       <Filter>Generated Files\Debug</Filter>
@@ -643,7 +646,7 @@
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="RichTextDelegate.cpp">
-      <Filter>Source Files\Loans Assumptions</Filter>
+      <Filter>Source Files\Loans\Loans Assumptions</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_RichTextDelegate.cpp">
       <Filter>Generated Files\Debug</Filter>

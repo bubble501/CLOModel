@@ -30,12 +30,9 @@ void CheckAndEditDelegate::paint(QPainter *painter,const QStyleOptionViewItem &o
 
 
 QSize CheckAndEditDelegate::sizeHint(const QStyleOptionViewItem &option,const QModelIndex &index) const {
-	QPalette palette(option.palette);
 	bool selected = option.state & QStyle::State_Selected;
-	palette.setColor(QPalette::Active, QPalette::Window, selected ? option.palette.highlight().color() : option.palette.base().color());
-	palette.setColor(QPalette::Active, QPalette::WindowText, selected ? option.palette.highlightedText().color() : option.palette.text().color());
 	Styler->SetText(index.model()->data(index, Qt::DisplayRole).toString());
-	Styler->setPalette(palette);
+	Styler->setPalette(option.palette);
 	Styler->SetChecked(index.model()->data(index, Qt::UserRole + Qt::CheckStateRole).toInt() == Qt::Checked);
 	return Styler->sizeHint();
 }

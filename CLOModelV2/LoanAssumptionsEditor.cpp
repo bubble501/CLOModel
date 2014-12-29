@@ -38,16 +38,30 @@ LoanAssumptionsEditor::LoanAssumptionsEditor(QWidget *parent)
 	: QWidget(parent)
 	, ActiveAssumption(nullptr)
 	, m_LastColSorted(1)
+	, m_EnableLoad(true)
 {
 	setWindowIcon(QIcon(":/Icons/Logo.png"));
 	setWindowTitle(tr("Loan Scenarios Editor"));
 	BaseTab = new QTabWidget(this);
-	BaseTab->setTabPosition(QTabWidget::West);
-	QVBoxLayout* MainLay = new QVBoxLayout(this);
-	//MainLay->setMargin(0);
-	MainLay->addWidget(BaseTab);
+	BaseTab->setTabPosition(QTabWidget::West);	
 	CreateScenarioEditor();
 	CreatePoolMatcher();
+
+	LoadPoolButton = new QPushButton(this);
+	LoadPoolButton->setDefault(true);
+	LoadPoolButton->setEnabled(m_EnableLoad);
+	LoadPoolButton->setText(tr("Load Model"));
+	SavePoolButton = new QPushButton(this);
+	SavePoolButton->setEnabled(false);
+	SavePoolButton->setText(tr("Save Loan Pool"));
+	connect(LoadPoolButton, SIGNAL(clicked()), this, SLOT(LoadModel()));
+	connect(SavePoolButton, &QPushButton::clicked, this, &LoanAssumptionsEditor::SavePool);
+
+	QGridLayout* MainLay = new QGridLayout(this);
+	MainLay->addWidget(BaseTab,0,0,1,3);
+	MainLay->addItem(new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Preferred),1,0);
+	MainLay->addWidget(LoadPoolButton, 1, 1);
+	MainLay->addWidget(SavePoolButton, 1, 2);
 }
 void LoanAssumptionsEditor::CreateScenarioEditor() {
 	m_ScenariosModel = new QStandardItemModel(this);
@@ -497,47 +511,89 @@ void LoanAssumptionsEditor::CreatePoolMatcher() {
 	m_PoolTable->setEditTriggers(QAbstractItemView::CurrentChanged | QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
 	m_PoolTable->setSelectionMode(QAbstractItemView::SingleSelection);
 
-	LoadPoolButton = new QPushButton(this);
-	LoadPoolButton->setText(tr("Load Model"));
+	
 	GuessAssumptionsButton = new QPushButton(this);
 	GuessAssumptionsButton->setText(tr("Guess Scenarios"));
 	GuessAssumptionsButton->setEnabled(false);
-	OverrideManualScenariosCheck = new QCheckBox(this);
-	OverrideManualScenariosCheck->setText(tr("Override Manual Input"));
-	OverrideManualScenariosCheck->setChecked(false);
-	OverrideManualScenariosCheck->setEnabled(false);
+	AcceptAllOldButton = new QPushButton(this);
+	AcceptAllOldButton->setText(tr("Select all Current"));
+	AcceptAllOldButton->setEnabled(false);
+	AcceptAllNewButton = new QPushButton(this);
+	AcceptAllNewButton->setText(tr("Select all Suggested"));
+	AcceptAllNewButton->setEnabled(false);
+	AcceptAllNonEmptyButton = new QPushButton(this);
+	AcceptAllNonEmptyButton->setText(tr("Select all non-empty Suggested"));
+	AcceptAllNonEmptyButton->setEnabled(false);
+	
 
-	connect(GuessAssumptionsButton, &QPushButton::clicked, [&]() {GuessAssumptions(OverrideManualScenariosCheck->isChecked()); });
-	connect(LoadPoolButton, SIGNAL(clicked()), this, SLOT(LoadModel()));
+	
+	connect(GuessAssumptionsButton, &QPushButton::clicked, this, &LoanAssumptionsEditor::GuessAssumptions);
+	
 	connect(m_PoolTable->horizontalHeader(), &QHeaderView::sectionClicked, [&](int a) {
-		if (m_LastColSorted == a+1) {
-			m_PoolSorter->sort(a,Qt::DescendingOrder);
+		if (m_LastColSorted == a+1) 
 			m_LastColSorted = -(a+1);
-		}
-		else {
+		else 
 			m_LastColSorted = a+1;
-			m_PoolSorter->sort(a,Qt::AscendingOrder);
-		}
+		SortPool();
 	});
-	connect(m_PoolModel, &QStandardItemModel::dataChanged, [&](const QModelIndex&, const QModelIndex&) {
-		m_PoolSorter->sort((m_LastColSorted-1)* (m_LastColSorted <0 ? -1 : 1));
-	});
-	connect(m_PoolModel, &QStandardItemModel::dataChanged, this, &LoanAssumptionsEditor::SetPoolModelChecks,Qt::QueuedConnection);
+	connect(m_PoolModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(SortPool()));
+	connect(m_PoolModel, &QStandardItemModel::dataChanged, this, &LoanAssumptionsEditor::SetPoolModelChecks);
 	connect(m_PoolModel, &QStandardItemModel::rowsInserted, [&](const QModelIndex&, int,int) {
-		GuessAssumptionsButton->setEnabled(m_PoolModel->rowCount() > 0);
-		OverrideManualScenariosCheck->setEnabled(m_PoolModel->rowCount() > 0);
+		bool EnableItems = m_PoolModel->rowCount() > 0;
+		AcceptAllOldButton->setEnabled(EnableItems);
+		AcceptAllNewButton->setEnabled(EnableItems);
+		AcceptAllNonEmptyButton->setEnabled(EnableItems);
+		GuessAssumptionsButton->setEnabled(EnableItems);
+		SavePoolButton->setEnabled(EnableItems);
 	});
 	connect(m_PoolModel, &QStandardItemModel::rowsRemoved, [&](const QModelIndex&, int, int) {
-		GuessAssumptionsButton->setEnabled(m_PoolModel->rowCount() > 0);
-		OverrideManualScenariosCheck->setEnabled(m_PoolModel->rowCount() > 0);
+		bool EnableItems = m_PoolModel->rowCount() > 0;
+		AcceptAllOldButton->setEnabled(EnableItems);
+		AcceptAllNewButton->setEnabled(EnableItems);
+		AcceptAllNonEmptyButton->setEnabled(EnableItems);
+		GuessAssumptionsButton->setEnabled(EnableItems);
+		SavePoolButton->setEnabled(EnableItems);
+	});
+	connect(AcceptAllOldButton, &QPushButton::clicked, [&]() {
+		disconnect(m_PoolModel, &QStandardItemModel::dataChanged, this, &LoanAssumptionsEditor::SetPoolModelChecks);
+		for (int i = 0; i < m_PoolModel->rowCount(); ++i) {
+			m_PoolModel->setData(m_PoolModel->index(i, 2), Qt::Checked, Qt::UserRole + Qt::CheckStateRole);
+			m_PoolModel->setData(m_PoolModel->index(i, 3), Qt::Unchecked, Qt::UserRole + Qt::CheckStateRole);
+		}
+		connect(m_PoolModel, &QStandardItemModel::dataChanged, this, &LoanAssumptionsEditor::SetPoolModelChecks);
+	});
+	connect(AcceptAllNewButton, &QPushButton::clicked, [&]() {
+		disconnect(m_PoolModel, &QStandardItemModel::dataChanged, this, &LoanAssumptionsEditor::SetPoolModelChecks);
+		for (int i = 0; i < m_PoolModel->rowCount(); ++i) {
+			m_PoolModel->setData(m_PoolModel->index(i, 3), Qt::Checked, Qt::UserRole + Qt::CheckStateRole);
+			m_PoolModel->setData(m_PoolModel->index(i, 2), Qt::Unchecked, Qt::UserRole + Qt::CheckStateRole);
+		}
+		connect(m_PoolModel, &QStandardItemModel::dataChanged, this, &LoanAssumptionsEditor::SetPoolModelChecks);
+	});
+	connect(AcceptAllNonEmptyButton, &QPushButton::clicked, [&]() {
+		disconnect(m_PoolModel, &QStandardItemModel::dataChanged, this, &LoanAssumptionsEditor::SetPoolModelChecks);
+		for (int i = 0; i < m_PoolModel->rowCount(); ++i) {
+			if (m_PoolModel->data(m_PoolModel->index(i, 3),Qt::EditRole).toString().isEmpty()){
+				m_PoolModel->setData(m_PoolModel->index(i, 2), Qt::Checked, Qt::UserRole + Qt::CheckStateRole);
+				m_PoolModel->setData(m_PoolModel->index(i, 3), Qt::Unchecked, Qt::UserRole + Qt::CheckStateRole);
+			}
+			else {
+				m_PoolModel->setData(m_PoolModel->index(i, 3), Qt::Checked, Qt::UserRole + Qt::CheckStateRole);
+				m_PoolModel->setData(m_PoolModel->index(i, 2), Qt::Unchecked, Qt::UserRole + Qt::CheckStateRole);
+			}
+		}
+		connect(m_PoolModel, &QStandardItemModel::dataChanged, this, &LoanAssumptionsEditor::SetPoolModelChecks);
 	});
 
 	QWidget* TempTab = new QWidget(this);;
 	QGridLayout* mainLay = new QGridLayout(TempTab);
-	mainLay->addWidget(m_PoolTable, 0, 0,1,3);
-	mainLay->addWidget(LoadPoolButton, 1, 0);
-	mainLay->addWidget(GuessAssumptionsButton, 1, 1);
-	mainLay->addWidget(OverrideManualScenariosCheck, 1, 2);
+	mainLay->addItem(new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Preferred), 0, 0, 1, 3);
+	mainLay->addWidget(GuessAssumptionsButton, 0, 3);
+	mainLay->addWidget(m_PoolTable, 1, 0,1,4);
+	mainLay->addItem(new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Preferred), 2, 0);
+	mainLay->addWidget(AcceptAllOldButton, 2, 1);
+	mainLay->addWidget(AcceptAllNewButton, 2, 2);
+	mainLay->addWidget(AcceptAllNonEmptyButton, 2, 3);
 	BaseTab->addTab(TempTab, "Pool");
 }
 #ifndef NO_DATABASE
@@ -1471,13 +1527,12 @@ void LoanAssumptionsEditor::AddLoanAssumption(const LoanAssumption& a) {
 	m_ScenariosModel->setData(m_ScenariosModel->index(m_ScenariosModel->rowCount() - 1, 0), a.GetScenarioName(), Qt::EditRole);
 }
 
-void LoanAssumptionsEditor::AddLoanToPool(Mortgage& a) {
+void LoanAssumptionsEditor::AddLoanToPool(qint32 index,Mortgage& a) {
 	m_PoolModel->insertRow(m_PoolModel->rowCount());
 	m_PoolModel->setData(m_PoolModel->index(m_PoolModel->rowCount() - 1, 0), a.GetProperty("Issuer"), Qt::EditRole);
-	m_PoolModel->setData(m_PoolModel->index(m_PoolModel->rowCount() - 1, 0), m_LoanPool.GetLoans().size(), Qt::UserRole);
+	m_PoolModel->setData(m_PoolModel->index(m_PoolModel->rowCount() - 1, 0), index, Qt::UserRole);
 	m_PoolModel->setData(m_PoolModel->index(m_PoolModel->rowCount() - 1, 1), a.GetProperty("Facility"), Qt::EditRole);
 	m_PoolModel->setData(m_PoolModel->index(m_PoolModel->rowCount() - 1, 2), a.GetProperty("Scenario"), Qt::EditRole);
-	m_PoolModel->setData(m_PoolModel->index(m_PoolModel->rowCount() - 1, 2), true, Qt::UserRole + 24);
 	m_PoolModel->setData(m_PoolModel->index(m_PoolModel->rowCount() - 1, 2), Qt::Checked, Qt::UserRole + Qt::CheckStateRole);
 	m_LoanPool.AddLoan(a, m_LoanPool.GetLoans().size());
 }
@@ -1485,6 +1540,8 @@ void LoanAssumptionsEditor::AddLoanToPool(Mortgage& a) {
 void LoanAssumptionsEditor::LoadModel() {
 	QString ModelPath = QFileDialog::getOpenFileName(this, tr("Open Model"), GetFromConfig("Folders", "UnifiedResultsFolder", QString()), tr("CLO Models (*clom)"));
 	if (ModelPath.isNull()) return;
+	m_PoolModel->setRowCount(0);
+	m_LastModelLoaded.clear();
 	QFile file(ModelPath);
 	file.open(QIODevice::ReadOnly);
 	qint32 VersionChecker;
@@ -1498,6 +1555,7 @@ void LoanAssumptionsEditor::LoadModel() {
 	QProgressDialog LoadProgress("Loading Model", QString(), 0, 4, this);
 	LoadProgress.setCancelButton(nullptr); 
 	LoadProgress.setWindowModality(Qt::WindowModal);
+	m_LastModelLoaded = ModelPath;
 	{QDate Junk; out >> Junk; }
 	{bool Junk; out >> Junk; }
 	{bool Junk; out >> Junk; }
@@ -1519,13 +1577,13 @@ void LoanAssumptionsEditor::LoadModel() {
 		m_PoolModel->setData(m_PoolModel->index(RowCounter, 0), i.key(), Qt::UserRole);
 		m_PoolModel->setData(m_PoolModel->index(RowCounter, 1), i.value()->GetProperty("Facility"), Qt::EditRole);
 		m_PoolModel->setData(m_PoolModel->index(RowCounter, 2), i.value()->GetProperty("Scenario"), Qt::EditRole);
-		m_PoolModel->setData(m_PoolModel->index(RowCounter, 2), true, Qt::UserRole + 24);
 		m_PoolModel->setData(m_PoolModel->index(RowCounter, 2), Qt::Checked, Qt::UserRole + Qt::CheckStateRole);
 	}
 	LoadProgress.setValue(4);
 }
 
-void LoanAssumptionsEditor::GuessAssumptions(bool OverrideManual) {
+void LoanAssumptionsEditor::GuessAssumptions() {
+	if (!YesNoDialog(tr("Are you sure?"), tr("This action will potentially override the current inputs.\nAre you sure you want to continue?"))) return;
 	int MatchFound = 0;
 	QSharedPointer<LoanAssumption> CurrAss;
 	QProgressDialog LoadProgress("Searching for Matches", QString(), 0, m_PoolModel->rowCount()*m_Assumptions.size(), this);
@@ -1535,19 +1593,15 @@ void LoanAssumptionsEditor::GuessAssumptions(bool OverrideManual) {
 		for (auto j = m_Assumptions.constBegin(); j != m_Assumptions.constEnd(); ++j) {
 			CurrAss= m_DirtyAssumptions.value(j.key(), j.value());
 			if (!CurrAss) continue;
-			if (OverrideManual || m_PoolModel->data(m_PoolModel->index(i, 3), Qt::UserRole).isNull()) {
-				if (CurrAss->MatchPattern(m_PoolModel->data(m_PoolModel->index(i, 0), Qt::EditRole).toString())) {
-					m_PoolModel->setData(m_PoolModel->index(i, 3), j.key(), Qt::EditRole);
-					m_PoolModel->setData(m_PoolModel->index(i, 3), QVariant(), Qt::UserRole);
-					m_PoolModel->setData(m_PoolModel->index(i, 3), Qt::Checked, Qt::UserRole + Qt::CheckStateRole);
-					++MatchFound;
-				}
-				else if (CurrAss->MatchPattern(m_PoolModel->data(m_PoolModel->index(i, 1), Qt::EditRole).toString())) {
-					m_PoolModel->setData(m_PoolModel->index(i, 3), j.key(), Qt::EditRole);
-					m_PoolModel->setData(m_PoolModel->index(i, 3), QVariant(), Qt::UserRole);
-					m_PoolModel->setData(m_PoolModel->index(i, 3), Qt::Checked, Qt::UserRole + Qt::CheckStateRole);
-					++MatchFound;
-				}
+			if (CurrAss->MatchPattern(m_PoolModel->data(m_PoolModel->index(i, 0), Qt::EditRole).toString())) {
+				m_PoolModel->setData(m_PoolModel->index(i, 3), j.key(), Qt::EditRole);
+				m_PoolModel->setData(m_PoolModel->index(i, 3), Qt::Checked, Qt::UserRole + Qt::CheckStateRole);
+				++MatchFound;
+			}
+			else if (CurrAss->MatchPattern(m_PoolModel->data(m_PoolModel->index(i, 1), Qt::EditRole).toString())) {
+				m_PoolModel->setData(m_PoolModel->index(i, 3), j.key(), Qt::EditRole);
+				m_PoolModel->setData(m_PoolModel->index(i, 3), Qt::Checked, Qt::UserRole + Qt::CheckStateRole);
+				++MatchFound;
 			}
 			LoadProgress.setValue(LoadProgress.value() + 1);
 		}
@@ -1598,6 +1652,96 @@ void LoanAssumptionsEditor::SetPoolModelChecks(const QModelIndex& index, const Q
 			m_PoolModel->setData(m_PoolModel->index(index.row(), OtherCol), CurrVal ? Qt::Checked : Qt::Unchecked, Qt::UserRole + Qt::CheckStateRole);
 		}
 	}
+}
+
+void LoanAssumptionsEditor::SortPool() {
+	m_PoolSorter->sort(qAbs(m_LastColSorted) - 1, m_LastColSorted<0 ? Qt::DescendingOrder : Qt::AscendingOrder);
+}
+
+void LoanAssumptionsEditor::SavePool() {
+	if (!YesNoDialog(tr("Save Loan Pool"), tr("Are you sure you want to override the previous pool?\nPlease note that changes to the scenarios will not apply until the model is recalculated"))) return;
+	emit PoolSaved();
+	if (m_LastModelLoaded.isEmpty()) return;
+	bool SomethingToChange = false;
+	for (int i = 0; i < m_PoolModel->rowCount(); ++i) {
+		if (m_PoolModel->data(m_PoolModel->index(i, 3), Qt::UserRole + Qt::CheckStateRole).toInt() == Qt::Checked) {
+			Mortgage* CurrLoan = m_LoanPool.GetLoans().value(m_PoolModel->data(m_PoolModel->index(i, 0), Qt::UserRole).toInt(), nullptr);
+			if (CurrLoan) {
+				auto NewScenario = m_PoolModel->data(m_PoolModel->index(i, 3), Qt::EditRole).toString();
+				if (NewScenario.isEmpty()) CurrLoan->RemoveProperty("Scenario");
+				else CurrLoan->SetProperty("Scenario", NewScenario);
+				SomethingToChange = true;
+			}
+		}
+	}
+	if (!SomethingToChange) return;
+	QFile file(m_LastModelLoaded);
+	file.open(QIODevice::ReadOnly);
+	qint32 VersionChecker;
+	QDataStream out(&file);
+	out.setVersion(QDataStream::Qt_5_3);
+	out >> VersionChecker;
+	if (VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) {
+		file.close();
+		return;
+	}
+	QProgressDialog LoadProgress("Saving Model", QString(), 0, 10, this); 
+	LoadProgress.setValue(0);
+	LoadProgress.setCancelButton(nullptr);
+	LoadProgress.setWindowModality(Qt::WindowModal);
+	QDate OldLiborUpdateDate; out >> OldLiborUpdateDate;
+	LoadProgress.setValue(LoadProgress.value()+1);
+	bool OldUseForwardCurve; out >> OldUseForwardCurve;
+	LoadProgress.setValue(LoadProgress.value() + 1);
+	bool OldBaseCaseToCall; out >> OldBaseCaseToCall;
+	LoadProgress.setValue(LoadProgress.value() + 1);
+	Waterfall OldExtension; OldExtension.SetLoadProtocolVersion(VersionChecker); out >> OldExtension; 
+	LoadProgress.setValue(LoadProgress.value() + 1);
+	Waterfall OldCall; OldCall.SetLoadProtocolVersion(VersionChecker); out >> OldCall; 
+	LoadProgress.setValue(LoadProgress.value() + 1);
+	{MtgCalculator junk;	junk.SetLoadProtocolVersion(VersionChecker); out >> junk; }
+	LoadProgress.setValue(LoadProgress.value() + 1);
+	ConstantBaseRateTable OldConstTable; OldConstTable.SetLoadProtocolVersion(VersionChecker); out >> OldConstTable;
+	LoadProgress.setValue(LoadProgress.value() + 1);
+	ForwardBaseRateTable OldFwdTable; OldFwdTable.SetLoadProtocolVersion(VersionChecker); out >> OldFwdTable;
+	LoadProgress.setValue(LoadProgress.value() + 1);
+	file.close();
+	file.open(QIODevice::WriteOnly);
+	QDataStream In(&file);
+	In.setVersion(QDataStream::Qt_5_3);
+	In 
+		<< qint32(ModelVersionNumber)
+		<< OldLiborUpdateDate
+		<< OldUseForwardCurve 
+		<< OldBaseCaseToCall 
+		<< OldExtension
+		<< OldCall
+		<< m_LoanPool 
+		<< OldConstTable 
+		<< OldFwdTable
+	;
+	LoadProgress.setValue(LoadProgress.value() + 1);
+	file.close();
+}
+
+QHash<qint32, QString> LoanAssumptionsEditor::GetScenarios() const {
+	QHash<qint32, QString> Result;
+	for (int i = 0; i < m_PoolModel->rowCount(); ++i) {
+		if (m_PoolModel->data(m_PoolModel->index(i, 3), Qt::UserRole + Qt::CheckStateRole).toInt() == Qt::Checked) 
+			Result.insert(m_PoolModel->data(m_PoolModel->index(i, 0), Qt::UserRole).toInt(), m_PoolModel->data(m_PoolModel->index(i, 3), Qt::EditRole).toString());
+		else
+			Result.insert(m_PoolModel->data(m_PoolModel->index(i, 0), Qt::UserRole).toInt(), m_PoolModel->data(m_PoolModel->index(i, 2), Qt::EditRole).toString());
+	}
+	return Result;
+}
+
+void LoanAssumptionsEditor::SetEnableLoad(bool a) {
+	m_EnableLoad = a;
+	LoadPoolButton->setEnabled(m_EnableLoad);
+}
+
+int LoanAssumptionsEditor::LoanCount() const {
+	return m_LoanPool.GetLoans().count();
 }
 
 

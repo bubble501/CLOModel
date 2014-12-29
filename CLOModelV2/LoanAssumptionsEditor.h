@@ -25,8 +25,11 @@ class LoanAssumptionsEditor : public QWidget
 
 public:
 	LoanAssumptionsEditor(QWidget *parent=nullptr);
+	QHash<qint32, QString> GetScenarios() const;
 	void AddLoanAssumption(const LoanAssumption& a);
-	void AddLoanToPool(Mortgage& a); 
+	void AddLoanToPool(qint32 index , Mortgage& a); 
+	void SetEnableLoad(bool a);
+	int LoanCount() const;
 #ifndef NO_DATABASE
 	void FillFromQuery();
 #endif
@@ -80,14 +83,21 @@ private:
 	QString m_LastModelLoaded;
 	QPushButton* GuessAssumptionsButton;
 	QPushButton* LoadPoolButton;
-	QCheckBox* OverrideManualScenariosCheck;
+	QPushButton* AcceptAllOldButton;
+	QPushButton* AcceptAllNewButton;
+	QPushButton* AcceptAllNonEmptyButton;
+	QPushButton* SavePoolButton;
 	QHash<QString, QSharedPointer<LoanAssumption> > m_DirtyAssumptions;
+	bool m_EnableLoad;
 signals:
 	void ActiveAssumptionChanged();
+	void PoolSaved();
 private slots:
+	void SavePool();
+	void SortPool();
 	void SetPoolModelChecks(const QModelIndex& index, const QModelIndex&);
 	void RemoveScenario();
-	void GuessAssumptions(bool OverrideManual);
+	void GuessAssumptions();
 	void LoadModel();
 	void SeniorDateChanged(const QDate&);
 	void MezzDateChanged(const QDate&);

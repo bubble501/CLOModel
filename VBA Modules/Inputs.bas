@@ -10,7 +10,7 @@ Declare Function GetStressDM Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Rel
 'Declare Sub InspectWaterfall Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
 Declare Function WatFallStepEdit Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As String
 Declare Function TriggerEdit Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As String
-Declare Function GetLoansAssumption Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
+Declare Function LoadLoanScenario Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As String
 Public Sub GetInputFromStructure( _
     MortgagesSheet As String, _
     InputsSheet As String, _
@@ -31,7 +31,6 @@ Public Sub GetInputFromStructure( _
     Dim CouponStart As Range
     Dim OutstandingStart As Range
     Dim AnnuityStart As Range
-    Dim HaircutVecStart As Range
     Dim CPRcell As Range
     Dim CDRcell As Range
     Dim LScell As Range
@@ -68,8 +67,6 @@ Public Sub GetInputFromStructure( _
     Dim JuniorFeesCouponCell As Range
     Dim FixFloatStart As Range
     Dim FrequencyStart As Range
-    Dim CPRMultiStart As Range
-    Dim LSMultiStart As Range
     Dim CurrentOutStart As Range
     Dim OriginalOutStart As Range
     Dim CurrencyStart As Range
@@ -130,6 +127,10 @@ Public Sub GetInputFromStructure( _
     Dim MezzanineProperty As Range
     Dim PriceProperty As Range
     Dim StartingAdditionalProp As Range
+    Dim LoanScenarioProperty As Range
+    Dim CPRMultiStart As Range
+    Dim HaircutVecStart As Range
+    Dim LSMultiStart As Range
     'New Waterfall
     Dim WaterfallSheet As Worksheet
     Dim FirstStep As Range
@@ -173,6 +174,7 @@ Public Sub GetInputFromStructure( _
     Set MezzanineProperty = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("MezzanineProperty"), LookAt:=xlWhole, LookIn:=xlValues)
     Set PriceProperty = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("PriceProperty"), LookAt:=xlWhole, LookIn:=xlValues)
     Set StartingAdditionalProp = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("StartingAdditionalProp"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set LoanScenarioProperty = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("LoanScenarioProperty"), LookAt:=xlWhole, LookIn:=xlValues)
     ''''''''''''''''''''''''''''''''''''''''''''''''''''
     Set HaircutVecStart = Sheets(MortgagesSheet).Cells.Find(What:=FieldsLabels("HaircutVecHeader"), LookAt:=xlWhole, LookIn:=xlValues)
     Set TriggerStart = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("TriggerStart"), LookAt:=xlWhole, LookIn:=xlValues)
@@ -311,16 +313,13 @@ ReferenceRateFromBBg:
             End If
             Call AddInput(AllTheInputs, CStr(AnnuityStart.Offset(i, 0).Value))
             Call AddInput(AllTheInputs, CStr(FrequencyStart.Offset(i, 0).Value))
-            Call AddInput(AllTheInputs, CStr(CPRMultiStart.Offset(i, 0).Value))
-            Call AddInput(AllTheInputs, CStr(LSMultiStart.Offset(i, 0).Value))
-            If (HaircutVecStart Is Nothing) Then
-                Call AddInput(AllTheInputs, "0")
-            Else
-                Call AddInput(AllTheInputs, CStr(HaircutVecStart.Offset(i, 0).Value))
-            End If
             'Loans Properties
             Dim PropertyString As String
             PropertyString = ""
+            If Not (LoanScenarioProperty Is Nothing) Then PropertyString = PropertyString & "Scenario#=#" & CStr(LoanScenarioProperty.Offset(i, 0).Value) & "#,#"
+            If Not (CPRMultiStart Is Nothing) Then PropertyString = PropertyString & "PrepayMultiplier#=#" & CStr(CPRMultiStart.Offset(i, 0).Value) & "#,#"
+            If Not (CPRMultiStart Is Nothing) Then PropertyString = PropertyString & "LossMultiplier#=#" & CStr(LSMultiStart.Offset(i, 0).Value) & "#,#"
+            If Not (HaircutVecStart Is Nothing) Then PropertyString = PropertyString & "Haircut#=#" & CStr(HaircutVecStart.Offset(i, 0).Value) & "#,#"
             If Not (IssuerProperty Is Nothing) Then PropertyString = PropertyString & "Issuer#=#" & CStr(IssuerProperty.Offset(i, 0).Value) & "#,#"
             If Not (FacilityProperty Is Nothing) Then PropertyString = PropertyString & "Facility#=#" & CStr(FacilityProperty.Offset(i, 0).Value) & "#,#"
             If Not (CountryProperty Is Nothing) Then PropertyString = PropertyString & "Country#=#" & CStr(CountryProperty.Offset(i, 0).Value) & "#,#"
@@ -945,9 +944,7 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
     a.Add "Adjusted Size", "OutstandingHeader"
     a.Add "Annuity", "AnnuityHeader"
     a.Add "Payment Frequency (in Months)", "FrequencyHeader"
-    a.Add "CPR Multiplier", "CPRMultiHead"
-    a.Add "Loss Multiplier", "LSMultiHead"
-    a.Add "Haircut", "HaircutVecHeader"
+   
     a.Add "CPR", "CPRfield"
     a.Add "CDR", "CDRfield"
     a.Add "Original Amount", "OriginalOutHead"
@@ -1060,6 +1057,10 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
     a.Add "Price", "PriceProperty"
     a.Add "Additional Properties", "StartingAdditionalProp"
     a.Add "Reinvestement Window", "ReinvestementWindowCell"
+    a.Add "CPR Multiplier", "CPRMultiHead"
+    a.Add "Loss Multiplier", "LSMultiHead"
+    a.Add "Haircut", "HaircutVecHeader"
+    a.Add "Loan Scenario", "LoanScenarioProperty"
     'New waterfall steps
     a.Add "Waterfall", "WaterfallSheet"
     a.Add "Interest Waterfall", "InterestWaterfallHead"
@@ -1398,43 +1399,6 @@ Public Sub SeparateWaterfall( _
     Loop
     'Call InspectWaterfall(Params)
 End Sub
-Public Function GetLoanAssumption(Loan As String, Column As Long, refDate As Date)
-Attribute GetLoanAssumption.VB_Description = "Get Assumptions for Loans"
-Attribute GetLoanAssumption.VB_ProcData.VB_Invoke_Func = " \n14"
-'Column
-'0-Loan Identifier
-'1-Senior Price
-'2-Sub Price
-'3-Default
-'4-Senior Haircut Amt
-'5-Senior Haircut Period
-'6-Sub Haircut Amt
-'7-Sub Haircut Period
-'8-Prepay Month
-'9-View (1=Positive, 0=Neutral, -1=Uncertain, 2=Negative
-    If (Column < 0 Or Column > 9) Then
-        GetLoanAssumption = ""
-        Exit Function
-    End If
-    Dim result() As Variant
-    ReDim result(0 To 2)
-    result(0) = Loan
-    result(1) = Column
-    result(2) = Format(refDate, "yyyy-mm-dd")
-    Dim response As Double
-    response = GetLoansAssumption(result)
-    If (Column = 3) Then
-        If (response > 0#) Then
-            GetLoanAssumption = True
-        Else
-            GetLoanAssumption = False
-        End If
-    ElseIf (response < 0) Or (Column >= 4 And response = 0) Then
-        GetLoanAssumption = ""
-    Else
-        GetLoanAssumption = response
-    End If
-End Function
 Public Sub EditWaterfallStep(InputsSheet As String, Target As Range, FieldsLabels As Collection, IntrWF As Boolean)
      Dim AllTheInputs As New Collection
      Dim TriggerStart As Range
@@ -1572,5 +1536,50 @@ Public Sub EditTrigger(Target As Range)
                 .NumberFormat = "General"
             End If
         End With
+    Next i
+End Sub
+Public Sub EditLoanScenarios()
+    Application.ScreenUpdating = False
+    Dim FieldsLabels As New Collection
+    Call PopulateDafaultLabels(FieldsLabels)
+    Dim IssuerProperty As Range
+    Dim FacilityProperty As Range
+    Dim LoanScenarioProperty As Range
+    Dim MaturityStart As Range
+    Set IssuerProperty = Sheets("Loans Pool").Cells.Find(What:=FieldsLabels("IssuerProperty"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set FacilityProperty = Sheets("Loans Pool").Cells.Find(What:=FieldsLabels("FacilityProperty"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set LoanScenarioProperty = Sheets("Loans Pool").Cells.Find(What:=FieldsLabels("LoanScenarioProperty"), LookAt:=xlWhole, LookIn:=xlValues)
+    Set MaturityStart = Sheets("Loans Pool").Cells.Find(What:=FieldsLabels("MaturityHeader"), LookAt:=xlWhole, LookIn:=xlValues)
+    Dim i As Long
+    i = 0
+    Do While (True)
+        If (IsEmpty(MaturityStart.Offset(i + 1, 0))) Then Exit Do
+        If (MaturityStart.Offset(i + 1, 0).Value = "") Then Exit Do
+        i = i + 1
+    Loop
+    Dim result() As Variant
+    ReDim result(0 To (3 * i))
+    result(0) = i
+    Dim j As Long
+    i = 0
+    j = 1
+    Do While (True)
+        If (IsEmpty(MaturityStart.Offset(i + 1, 0))) Then Exit Do
+        If (MaturityStart.Offset(i + 1, 0).Value = "") Then Exit Do
+        result(j) = CStr(IssuerProperty.Offset(i + 1, 0).Value)
+        j = j + 1
+        result(j) = CStr(FacilityProperty.Offset(i + 1, 0).Value)
+        j = j + 1
+        result(j) = CStr(LoanScenarioProperty.Offset(i + 1, 0).Value)
+        j = j + 1
+        i = i + 1
+    Loop
+    Dim NewScenarios As String
+    NewScenarios = LoadLoanScenario(result)
+    If (NewScenarios = "") Then Exit Sub
+    Dim Singlescenario
+    Singlescenario = Split(NewScenarios, "#,#")
+    For i = LBound(Singlescenario) To UBound(Singlescenario)
+        LoanScenarioProperty.Offset(1 + i - LBound(Singlescenario), 0).Value = Singlescenario(i)
     Next i
 End Sub

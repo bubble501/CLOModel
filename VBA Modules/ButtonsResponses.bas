@@ -249,5 +249,7 @@ Sub Forward_Curves_Check()
     End If
     Application.ScreenUpdating = True
 End Sub
-
+Public Sub GuessScenario()
+    Call EditLoanScenarios
+End Sub
 

@@ -43,3 +43,11 @@ void CheckAndEdit::SetReadOnly(bool a) {
 void CheckAndEdit::ForceCheck(const QString& a) {
 	m_check->setChecked(!a.isEmpty());
 }
+
+Qt::CheckState CheckAndEdit::CheckState() const {
+	return m_check->checkState();
+}
+
+void CheckAndEdit::SetCheckState(Qt::CheckState a) {
+	m_check->setCheckState(a);
+}

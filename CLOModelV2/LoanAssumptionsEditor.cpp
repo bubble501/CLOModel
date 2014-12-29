@@ -38,7 +38,6 @@ LoanAssumptionsEditor::LoanAssumptionsEditor(QWidget *parent)
 	: QWidget(parent)
 	, ActiveAssumption(nullptr)
 	, m_LastColSorted(1)
-	, m_currentChanging(false)
 {
 	setWindowIcon(QIcon(":/Icons/Logo.png"));
 	setWindowTitle(tr("Loan Scenarios Editor"));
@@ -496,7 +495,7 @@ void LoanAssumptionsEditor::CreatePoolMatcher() {
 	m_PoolTable->setItemDelegateForColumn(2, new CheckAndEditDelegate(this));
 	m_PoolTable->setItemDelegateForColumn(3, new CheckAndEditDelegate(this));
 	m_PoolTable->setEditTriggers(QAbstractItemView::CurrentChanged | QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
-	m_PoolTable->setStyleSheet("QTableView::item{border: 0px; padding: 0px;}");
+	m_PoolTable->setSelectionMode(QAbstractItemView::SingleSelection);
 
 	LoadPoolButton = new QPushButton(this);
 	LoadPoolButton->setText(tr("Load Model"));
@@ -523,19 +522,7 @@ void LoanAssumptionsEditor::CreatePoolMatcher() {
 	connect(m_PoolModel, &QStandardItemModel::dataChanged, [&](const QModelIndex&, const QModelIndex&) {
 		m_PoolSorter->sort((m_LastColSorted-1)* (m_LastColSorted <0 ? -1 : 1));
 	});
-	connect(m_PoolModel, &QStandardItemModel::dataChanged, [&](const QModelIndex& index, const QModelIndex&) {
-		if (index.column() >= 2 && !m_currentChanging) {
-			m_currentChanging = true;
-			auto CurrVal = m_PoolModel->data(index, Qt::UserRole + Qt::CheckStateRole).toInt() == Qt::Checked;
-			m_PoolModel->setData(
-				m_PoolModel->index(index.row(), index.column()==2 ? 3:2)
-				, CurrVal ? Qt::Unchecked : Qt::Checked
-				, Qt::UserRole + Qt::CheckStateRole
-			);
-			m_currentChanging = false;
-		}
-		m_PoolSorter->sort((m_LastColSorted - 1)* (m_LastColSorted < 0 ? -1 : 1));
-	});
+	connect(m_PoolModel, &QStandardItemModel::dataChanged, this, &LoanAssumptionsEditor::SetPoolModelChecks,Qt::QueuedConnection);
 	connect(m_PoolModel, &QStandardItemModel::rowsInserted, [&](const QModelIndex&, int,int) {
 		GuessAssumptionsButton->setEnabled(m_PoolModel->rowCount() > 0);
 		OverrideManualScenariosCheck->setEnabled(m_PoolModel->rowCount() > 0);
@@ -1600,6 +1587,17 @@ void LoanAssumptionsEditor::RemoveScenario() {
 		m_MezzDateEdit->setEnabled(ActiveAssumption);
 	}
 	RemoveScenarioButton->setEnabled(m_ScenariosModel->rowCount() > 0);
+}
+
+void LoanAssumptionsEditor::SetPoolModelChecks(const QModelIndex& index, const QModelIndex&) {
+	if (index.column() >= 2) {
+		int OtherCol = (index.column() == 2 ? 3 : 2);
+		auto CurrVal = m_PoolModel->data(index, Qt::UserRole + Qt::CheckStateRole).toInt() != Qt::Checked;
+		auto PrevVal = m_PoolModel->data(m_PoolModel->index(index.row(), OtherCol), Qt::UserRole + Qt::CheckStateRole).toInt() == Qt::Checked;
+		if (CurrVal != PrevVal) {
+			m_PoolModel->setData(m_PoolModel->index(index.row(), OtherCol), CurrVal ? Qt::Checked : Qt::Unchecked, Qt::UserRole + Qt::CheckStateRole);
+		}
+	}
 }
 
 

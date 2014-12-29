@@ -82,10 +82,10 @@ private:
 	QPushButton* LoadPoolButton;
 	QCheckBox* OverrideManualScenariosCheck;
 	QHash<QString, QSharedPointer<LoanAssumption> > m_DirtyAssumptions;
-	bool m_currentChanging;
 signals:
 	void ActiveAssumptionChanged();
 private slots:
+	void SetPoolModelChecks(const QModelIndex& index, const QModelIndex&);
 	void RemoveScenario();
 	void GuessAssumptions(bool OverrideManual);
 	void LoadModel();

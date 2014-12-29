@@ -13,6 +13,8 @@ public:
 	QString GetText()const;
 	void SetChecked(bool a = true);
 	bool IsChecked()const;
+	Qt::CheckState CheckState() const;
+	void SetCheckState(Qt::CheckState a);
 	void SetReadOnly(bool a);
 private:
 	QCheckBox* m_check;

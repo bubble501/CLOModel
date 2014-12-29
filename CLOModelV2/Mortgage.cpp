@@ -8,6 +8,7 @@
 #include <QVariant>
 #include <QSqlRecord>
 #endif
+#include "LoanAssumption.h"
 
 Mortgage::Mortgage()
 	: m_PaymentFreq("1")
@@ -535,4 +536,24 @@ void Mortgage::FillDiscountOutstanding() {
 	for (int i = 0; i < m_CashFlows.Count(); ++i) {
 		m_CashFlows.AddFlow(m_CashFlows.GetDate(i), m_CashFlows.GetAmountOut(i)*PurchPrice, static_cast<qint32>(MtgCashFlow::MtgFlowType::OutstandingForOC));
 	}
+}
+
+void Mortgage::SetScenario(const LoanAssumption& value, bool OverrideCurrent) {
+	if (!HasProperty("Mezzanine")) return;
+	auto IsSenior = (GetProperty("Mezzanine").compare("Yes", Qt::CaseInsensitive) != 0) ? LoanAssumption::Senior : LoanAssumption::Mezz;
+
+	if (!HasProperty("MaturityExtension") || OverrideCurrent) SetProperty("MaturityExtension", value.GetAssumption(LoanAssumption::MaturityExtension, IsSenior));
+	if (!HasProperty("StartingHaircut") || OverrideCurrent) SetProperty("StartingHaircut", value.GetAssumption(LoanAssumption::InitialHaircut, IsSenior));
+	if (!HasProperty("PrepaymentFee") || OverrideCurrent) SetProperty("PrepaymentFee", value.GetAssumption(LoanAssumption::PrepaymentFee, IsSenior));
+	if (!HasProperty("DayCount") || OverrideCurrent) SetProperty("DayCount", value.GetAssumption(LoanAssumption::DayCount, IsSenior));
+	if (!HasProperty("Haircut") || OverrideCurrent) SetProperty("Haircut", value.GetAssumption(LoanAssumption::Haircut, IsSenior));
+	if (!HasProperty("PrepayMultiplier") || OverrideCurrent) SetProperty("PrepayMultiplier", value.GetAssumption(LoanAssumption::PrepayMultiplier, IsSenior));
+	if (!HasProperty("LossMultiplier") || OverrideCurrent) SetProperty("LossMultiplier", value.GetAssumption(LoanAssumption::LossMultiplier, IsSenior));
+	if (!HasProperty("CPR") || OverrideCurrent) SetProperty("CPR", value.GetAssumption(LoanAssumption::CPR, IsSenior));
+	if (!HasProperty("CDR") || OverrideCurrent) SetProperty("CDR", value.GetAssumption(LoanAssumption::CDR, IsSenior));
+	if (!HasProperty("LS") || OverrideCurrent) SetProperty("LS", value.GetAssumption(LoanAssumption::LS, IsSenior));
+	if (!HasProperty("RecoveryLag") || OverrideCurrent) SetProperty("RecoveryLag", value.GetAssumption(LoanAssumption::RecoveryLag, IsSenior));
+	if (!HasProperty("Delinquency") || OverrideCurrent) SetProperty("Delinquency", value.GetAssumption(LoanAssumption::Delinquency, IsSenior));
+	if (!HasProperty("DelinquencyLag") || OverrideCurrent) SetProperty("DelinquencyLag", value.GetAssumption(LoanAssumption::DelinquencyLag, IsSenior));
+	if (!HasProperty("Price") || OverrideCurrent) SetProperty("Price", value.GetAssumption(LoanAssumption::Price, IsSenior));
 }

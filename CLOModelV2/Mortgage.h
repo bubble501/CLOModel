@@ -9,7 +9,7 @@
 #include "BaseRateVect.h"
 #include "BaseRateTable.h"
 #include "DayCountVect.h"
-
+class LoanAssumption;
 class Mortgage : public BackwardInterface{
 private:
 	QString m_Properties;
@@ -48,6 +48,7 @@ public:
 #endif
 
 	//void SetFloatingRateBase(const BaseRateVector& a) { m_FloatRateBase = a; }
+	void SetScenario(const LoanAssumption& value, bool OverrideCurrent=false);
 	void SetFloatingRateBase(const QString& a) { m_FloatRateBase = BaseRateVector(a); }
 	void setFixedRate() { m_FloatingRateBaseValue = "0"; m_FloatRateBase = "ZERO"; }
 	const QDate& GetMaturityDate() const {return m_MaturityDate;}

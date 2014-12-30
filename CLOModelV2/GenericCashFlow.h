@@ -56,7 +56,7 @@ public:
 	virtual QString ToString() const;
 	virtual GenericCashFlow AggregateRange(const QDate& StartDate, const QDate& EndDate)const;
 	virtual void SetLabel(qint32 FlowTpe, const QString& Lab);
-	virtual QString GetLabel(qint32 FlowTpe) const { return m_CashFlowLabels.value(FlowTpe, QString()); }
+	virtual QString GetLabel(qint32 FlowTpe, const QString& DefaultLab = QString()) const { return m_CashFlowLabels.value(FlowTpe, DefaultLab); }
 	virtual void RemoveLabel(qint32 FlowTp) { m_CashFlowLabels.remove(FlowTp); }
 	virtual void ClearLabels() { m_CashFlowLabels.clear(); }
 	virtual GenericCashFlow ScaledCashFlows(double OriginalRefSize, double ResultSize, const QList<qint32>& Groups = QList<qint32>(), const QList<qint32>& ExcludeGroups = QList<qint32>()) const;

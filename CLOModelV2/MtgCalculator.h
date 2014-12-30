@@ -13,8 +13,6 @@ class MtgCalculator : public TemplAsyncCalculator <MtgCalculatorThread,MtgCashFl
 	Q_OBJECT
 public slots:
 	virtual bool StartCalculation() override;
-protected:
-	virtual void BeeReturned(int Ident, const MtgCashFlow& a) override;
 public:
 	virtual QString ReadyToCalculate() const override;
 	MtgCalculator(QObject* parent = 0);
@@ -70,8 +68,8 @@ private:
 	QDate StartDate;
 	MtgCashFlow m_AggregatedRes;
 protected:
+	virtual void BeeReturned(int Ident, const MtgCashFlow& a) override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
-signals:
 	friend QDataStream& operator<<(QDataStream & stream, const MtgCalculator& flows);
 	friend QDataStream& operator>>(QDataStream & stream, MtgCalculator& flows);
 };

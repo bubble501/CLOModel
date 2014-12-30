@@ -4,7 +4,6 @@
 #include <QWidget>
 #include <QHash>
 #include <QSharedPointer>
-#include <QFlags>
 #include "MtgCalculator.h"
 #include "Waterfall.h"
 #include "LoanAssumption.h"
@@ -19,6 +18,9 @@ class QDateEdit;
 class QPushButton;
 class QTabWidget;
 class PoolTableProxy;
+class QLabel;
+class QAbstractItemView;
+class QAbstractItemModel;
 class LoanAssumptionsEditor : public QWidget
 {
 	Q_OBJECT
@@ -34,8 +36,10 @@ public:
 	void FillFromQuery();
 #endif
 private:
+	static void SafeSetModel(QAbstractItemView* View, QAbstractItemModel* NewModel);
 	void CreateScenarioEditor();
 	void CreatePoolMatcher();
+	void CreateStructureComparison();
 	bool YesNoDialog(const QString& Title, const QString& Mess);
 	LoanAssumption BuildCurrentAssumption() const;
 	bool ScenExist(const QString& Teststr)const;
@@ -79,7 +83,10 @@ private:
 	int m_LastColSorted;
 	MtgCalculator m_LoanPool;
 	Waterfall m_WtfToExtension;
+	Waterfall m_NewWtfToExtension;
 	Waterfall m_WtfToCall;
+	Waterfall m_NewWtfToCall;
+	QPointer<MtgCalculator> m_NewLoans;
 	QString m_LastModelLoaded;
 	QPushButton* GuessAssumptionsButton;
 	QPushButton* LoadPoolButton;
@@ -87,12 +94,40 @@ private:
 	QPushButton* AcceptAllNewButton;
 	QPushButton* AcceptAllNonEmptyButton;
 	QPushButton* SavePoolButton;
+	QPushButton* CalculateNewStructureButton;
+	QLabel* m_OldSelectedTrancheLabel;
+	QLabel* m_NewSelectedTrancheLabel;
 	QHash<QString, QSharedPointer<LoanAssumption> > m_DirtyAssumptions;
 	bool m_EnableLoad;
+	enum {ColumnsInStructure=11};
+	enum {
+		TrancheNameCol=0
+		, CallDateCol = 1
+		, PriceCol = 2
+		, IRRCol = 3
+		, WALCol = 4
+		, DMCol = 5
+		, LossCol = 6
+		, IRRCallCol = 7
+		, WALCallCol = 8
+		, DMCallCol = 9
+		, LossCallCol = 10
+	};
+	enum { TestInfinityThreshold=10 };
+	QStandardItemModel* m_OriginalStructureModel;
+	QStandardItemModel* m_NewStructureModel;
+	QList<QSharedPointer<QStandardItemModel> > m_OriginalTranchesModels;
+	QList<QSharedPointer<QStandardItemModel> > m_NewTranchesModels;
+	QTableView* m_OldStrGenTable;
+	QTableView* m_OldStrDetTable;
+	QTableView* m_NewStrGenTable;
+	QTableView* m_NewStrDetTable;
+	QLabel* m_ModelNameLabel;
 signals:
 	void ActiveAssumptionChanged();
 	void PoolSaved();
 private slots:
+	void CalculateNewStructure();
 	void SavePool();
 	void SortPool();
 	void SetPoolModelChecks(const QModelIndex& index, const QModelIndex&);
@@ -108,5 +143,11 @@ private slots:
 	void MezzScenarioChanged(const QModelIndex& index);
 	void SaveScenario(const QString& key);
 	void DiscardScenario(const QString& key);
+	void OldGenTableSelect(const QModelIndex& index, const QModelIndex&);
+	void NewGenTableSelect(const QModelIndex& index, const QModelIndex&);
+	void AdjustOldGenTableHeight();
+	void AdjustNewGenTableHeight();
+	void LoanCalculationFinished();
+	void NewTranchesCalculated();
 };
 #endif // LOANASSUMPTIONSMODEL_H

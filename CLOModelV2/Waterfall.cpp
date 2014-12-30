@@ -1571,18 +1571,24 @@ bool Waterfall::CalculateTranchesCashFlows(){
 			}//End Cycle through the steps of the waterfall
 			
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			//Accrued But Unpaid Becomes Deferred
-			m_TotalJuniorFees.AddFlow(CurrentDate,
-				m_TotalJuniorFees.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::AccruedFlow))
-				- m_TotalJuniorFees.GetTotalFlow(CurrentDate, QList<qint32>() << static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow) << static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow))
-			, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow));
-			foreach(Tranche* SingleTranche, m_Tranches) {
-				for (qint32 CoupIdx = 0; CoupIdx<(1 << MaximumInterestsTypes); ++CoupIdx) {
-					if (SingleTranche->HasCoupon(CoupIdx))
-						SingleTranche->AddCashFlow(CurrentDate,
-							SingleTranche->GetCashFlow().GetAccrued(CurrentDate, CoupIdx)
-							- SingleTranche->GetCashFlow().GetInterest(CurrentDate, CoupIdx)
-						, TrancheCashFlow::TrancheFlowType::DeferredFlow);
+			//Accrued But Unpaid Becomes Deferred			
+			{
+				double NewDeferred =
+					m_TotalJuniorFees.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow))
+					+m_TotalJuniorFees.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::AccruedFlow))
+					- m_TotalJuniorFees.GetTotalFlow(CurrentDate, QList<qint32>() << static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow) << static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow))
+				;
+				if (NewDeferred>0.0) m_TotalJuniorFees.SetFlow(CurrentDate, NewDeferred, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow));
+				foreach(Tranche* SingleTranche, m_Tranches) {
+					for (qint32 CoupIdx = 0; CoupIdx<(1 << MaximumInterestsTypes); ++CoupIdx) {
+						if (SingleTranche->HasCoupon(CoupIdx)){
+							NewDeferred = 
+								SingleTranche->GetCashFlow().GetDeferred(CurrentDate, CoupIdx)
+								+SingleTranche->GetCashFlow().GetAccrued(CurrentDate, CoupIdx) 
+								- SingleTranche->GetCashFlow().GetInterest(CurrentDate, CoupIdx);
+							if (NewDeferred>0.0) SingleTranche->SetCashFlow(CurrentDate, NewDeferred, TrancheCashFlow::TrancheFlowType::DeferredFlow);
+						}
+					}
 				}
 			}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

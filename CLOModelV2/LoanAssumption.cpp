@@ -42,6 +42,7 @@ LoanAssumption& LoanAssumption::operator=(const LoanAssumption& a) {
 
 QString LoanAssumption::GetAssumption(AssumptionType at, Seniority sn) const {
 	QString Result( m_Assumptions[at][sn].trimmed());
+	if (Result.isEmpty()) return Result;
 	if (m_LastUpdate[sn].isNull()) return Result;
 	QRegExp AnchorMatch(QString("^(?:A\\s+") + VectorAnchorDateFormat + "\\s+)");
 	if (AnchorMatch.indexIn(Result) >= 0) return Result;

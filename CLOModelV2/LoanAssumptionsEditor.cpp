@@ -34,6 +34,7 @@
 #include "Mortgage.h"
 #include "PoolTableProxy.h"
 #include "CheckAndEditDelegate.h"
+#include <QScrollBar>
 LoanAssumptionsEditor::LoanAssumptionsEditor(QWidget *parent)
 	: QWidget(parent)
 	, ActiveAssumption(nullptr)
@@ -46,7 +47,10 @@ LoanAssumptionsEditor::LoanAssumptionsEditor(QWidget *parent)
 	BaseTab->setTabPosition(QTabWidget::West);	
 	CreateScenarioEditor();
 	CreatePoolMatcher();
+	CreateStructureComparison();
 
+	m_ModelNameLabel = new QLabel(this);
+	m_ModelNameLabel->setText(tr("No Model Loaded"));
 	LoadPoolButton = new QPushButton(this);
 	LoadPoolButton->setDefault(true);
 	LoadPoolButton->setEnabled(m_EnableLoad);
@@ -58,10 +62,11 @@ LoanAssumptionsEditor::LoanAssumptionsEditor(QWidget *parent)
 	connect(SavePoolButton, &QPushButton::clicked, this, &LoanAssumptionsEditor::SavePool);
 
 	QGridLayout* MainLay = new QGridLayout(this);
-	MainLay->addWidget(BaseTab,0,0,1,3);
+	MainLay->addWidget(BaseTab,0,0,1,4);
 	MainLay->addItem(new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Preferred),1,0);
-	MainLay->addWidget(LoadPoolButton, 1, 1);
-	MainLay->addWidget(SavePoolButton, 1, 2);
+	MainLay->addWidget(m_ModelNameLabel, 1, 1);
+	MainLay->addWidget(LoadPoolButton, 1, 2);
+	MainLay->addWidget(SavePoolButton, 1, 3);
 }
 void LoanAssumptionsEditor::CreateScenarioEditor() {
 	m_ScenariosModel = new QStandardItemModel(this);
@@ -101,7 +106,7 @@ void LoanAssumptionsEditor::CreateScenarioEditor() {
 	RemoveScenarioButton->setEnabled(false);
 
 	m_ScenarioList = new QListView(this);
-	m_ScenarioList->setModel(m_SortScenarios);
+	SafeSetModel(m_ScenarioList, m_SortScenarios);
 	m_ScenarioList->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	m_ScenarioList->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_ScenarioList->setItemDelegate(new RichTextDelegate(m_ScenarioList));
@@ -161,7 +166,7 @@ void LoanAssumptionsEditor::CreateScenarioEditor() {
 	m_MezzAsumptionsModel->setHorizontalHeaderLabels(QStringList() << tr("Assumption Type") << tr("Assumption value"));
 
 	m_SeniorTable = new QTableView(this);
-	m_SeniorTable->setModel(m_SeniorAsumptionsModel);
+	SafeSetModel(m_SeniorTable, m_SeniorAsumptionsModel);
 	m_SeniorTable->setItemDelegateForColumn(0, new AssumptionsComboDelegate(this));
 	m_SeniorTable->setItemDelegateForColumn(1, new LoanAssumptionDelegate(this));
 	m_SeniorTable->setEditTriggers(QAbstractItemView::CurrentChanged | QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
@@ -198,7 +203,7 @@ void LoanAssumptionsEditor::CreateScenarioEditor() {
 	SeniorLay->addLayout(SeniorLowerlay, 2, 0, 1, 3);
 
 	m_MezzTable = new QTableView(this);
-	m_MezzTable->setModel(m_MezzAsumptionsModel);
+	SafeSetModel(m_MezzTable, m_MezzAsumptionsModel);
 	m_MezzTable->setItemDelegateForColumn(0, new AssumptionsComboDelegate(this));
 	m_MezzTable->setItemDelegateForColumn(1, new LoanAssumptionDelegate(this));
 	m_MezzTable->setEditTriggers(QAbstractItemView::CurrentChanged | QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
@@ -298,7 +303,7 @@ void LoanAssumptionsEditor::CreateScenarioEditor() {
 	mainLay->addWidget(DiscardCurrentButton, 2, 2);
 	mainLay->addWidget(SaveAllButton, 2, 3);
 	mainLay->addWidget(SaveCurrentButton, 2, 4);
-	BaseTab->addTab(TempTab, "Scenarios Editor");
+	BaseTab->addTab(TempTab, tr("Scenarios Editor"));
 
 	connect(m_ScenariosModel, &QStandardItemModel::dataChanged, [&](const QModelIndex& index, const QModelIndex&) {
 		m_SortScenarios->sort(0);
@@ -501,7 +506,7 @@ void LoanAssumptionsEditor::CreatePoolMatcher() {
 	m_PoolSorter->setSourceModel(m_PoolModel);
 
 	m_PoolTable = new QTableView(this);
-	m_PoolTable->setModel(m_PoolSorter);
+	SafeSetModel(m_PoolTable, m_PoolSorter);
 	m_PoolTable->verticalHeader()->hide();
 	m_PoolTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	m_PoolTable->horizontalHeader()->setMinimumSectionSize(130);
@@ -545,6 +550,7 @@ void LoanAssumptionsEditor::CreatePoolMatcher() {
 		AcceptAllNonEmptyButton->setEnabled(EnableItems);
 		GuessAssumptionsButton->setEnabled(EnableItems);
 		SavePoolButton->setEnabled(EnableItems);
+		CalculateNewStructureButton->setEnabled(EnableItems);
 	});
 	connect(m_PoolModel, &QStandardItemModel::rowsRemoved, [&](const QModelIndex&, int, int) {
 		bool EnableItems = m_PoolModel->rowCount() > 0;
@@ -553,6 +559,7 @@ void LoanAssumptionsEditor::CreatePoolMatcher() {
 		AcceptAllNonEmptyButton->setEnabled(EnableItems);
 		GuessAssumptionsButton->setEnabled(EnableItems);
 		SavePoolButton->setEnabled(EnableItems);
+		CalculateNewStructureButton->setEnabled(EnableItems);
 	});
 	connect(AcceptAllOldButton, &QPushButton::clicked, [&]() {
 		disconnect(m_PoolModel, &QStandardItemModel::dataChanged, this, &LoanAssumptionsEditor::SetPoolModelChecks);
@@ -594,7 +601,7 @@ void LoanAssumptionsEditor::CreatePoolMatcher() {
 	mainLay->addWidget(AcceptAllOldButton, 2, 1);
 	mainLay->addWidget(AcceptAllNewButton, 2, 2);
 	mainLay->addWidget(AcceptAllNonEmptyButton, 2, 3);
-	BaseTab->addTab(TempTab, "Pool");
+	BaseTab->addTab(TempTab, tr("Pool"));
 }
 #ifndef NO_DATABASE
 void LoanAssumptionsEditor::FillFromQuery() {
@@ -1540,8 +1547,13 @@ void LoanAssumptionsEditor::AddLoanToPool(qint32 index,Mortgage& a) {
 void LoanAssumptionsEditor::LoadModel() {
 	QString ModelPath = QFileDialog::getOpenFileName(this, tr("Open Model"), GetFromConfig("Folders", "UnifiedResultsFolder", QString()), tr("CLO Models (*clom)"));
 	if (ModelPath.isNull()) return;
+	m_ModelNameLabel->setText(tr("No Model Loaded"));
 	m_PoolModel->setRowCount(0);
 	m_LastModelLoaded.clear();
+	SafeSetModel(m_OldStrDetTable, nullptr);
+	m_OriginalTranchesModels.clear();
+	m_NewTranchesModels.clear();
+	BaseTab->setTabEnabled(2,false);
 	QFile file(ModelPath);
 	file.open(QIODevice::ReadOnly);
 	qint32 VersionChecker;
@@ -1552,7 +1564,7 @@ void LoanAssumptionsEditor::LoadModel() {
 		file.close();
 		return;
 	}
-	QProgressDialog LoadProgress("Loading Model", QString(), 0, 4, this);
+	QProgressDialog LoadProgress(tr("Loading Model"), QString(), 0, 4, this);
 	LoadProgress.setCancelButton(nullptr); 
 	LoadProgress.setWindowModality(Qt::WindowModal);
 	m_LastModelLoaded = ModelPath;
@@ -1580,13 +1592,69 @@ void LoanAssumptionsEditor::LoadModel() {
 		m_PoolModel->setData(m_PoolModel->index(RowCounter, 2), Qt::Checked, Qt::UserRole + Qt::CheckStateRole);
 	}
 	LoadProgress.setValue(4);
+
+	m_ModelNameLabel->setText(tr("Model Loaded: %1").arg(m_WtfToExtension.GetDealName()));
+
+	m_OriginalStructureModel->setRowCount(m_WtfToExtension.GetTranchesCount());
+	for (int i = 0; i < m_WtfToExtension.GetTranchesCount(); ++i) {
+		m_OriginalStructureModel->setData(m_OriginalStructureModel->index(i, TrancheNameCol), m_WtfToExtension.GetTranche(i)->GetTrancheName(),Qt::EditRole);
+		m_OriginalStructureModel->setData(m_OriginalStructureModel->index(i, PriceCol), Commarize(m_WtfToExtension.GetTranche(i)->GetPrice(), 2), Qt::EditRole);
+		m_OriginalStructureModel->setData(m_OriginalStructureModel->index(i, PriceCol), m_WtfToExtension.GetTranche(i)->GetPrice(), Qt::UserRole);
+		m_OriginalStructureModel->setData(m_OriginalStructureModel->index(i, WALCol), Commarize(m_WtfToExtension.GetTranche(i)->GetWALife(m_WtfToExtension.GetCalculatedMtgPayments().GetDate(0)), 2), Qt::EditRole);
+		m_OriginalStructureModel->setData(m_OriginalStructureModel->index(i, LossCol), Commarize(m_WtfToExtension.GetTranche(i)->GetLossRate()*100.0, 2)+'%', Qt::EditRole);
+		if (m_WtfToCall.GetTranche(i)){
+			m_OriginalStructureModel->setData(m_OriginalStructureModel->index(i, CallDateCol), m_WtfToCall.GetCalledPeriod().toString("MMM-yy"), Qt::EditRole);
+			m_OriginalStructureModel->setData(m_OriginalStructureModel->index(i, CallDateCol), m_WtfToCall.GetCalledPeriod(), Qt::UserRole);
+			m_OriginalStructureModel->setData(m_OriginalStructureModel->index(i, WALCallCol), Commarize(m_WtfToCall.GetTranche(i)->GetWALife(m_WtfToCall.GetCalculatedMtgPayments().GetDate(0)), 2), Qt::EditRole);
+			m_OriginalStructureModel->setData(m_OriginalStructureModel->index(i, LossCallCol), Commarize(m_WtfToCall.GetTranche(i)->GetLossRate()*100.0, 2) + '%', Qt::EditRole);
+		}
+		else {
+			m_OriginalStructureModel->setData(m_OriginalStructureModel->index(i, CallDateCol), tr("N/A"), Qt::EditRole);
+			m_OriginalStructureModel->setData(m_OriginalStructureModel->index(i, CallDateCol), QVariant(), Qt::UserRole);
+			m_OriginalStructureModel->setData(m_OriginalStructureModel->index(i, WALCallCol), tr("N/A"), Qt::EditRole);
+			m_OriginalStructureModel->setData(m_OriginalStructureModel->index(i, LossCallCol), tr("N/A"), Qt::EditRole);
+		}
+		QStandardItemModel* CurrentModel = new QStandardItemModel(this);
+		const TrancheCashFlow& CurrentCF= m_WtfToExtension.GetTranche(i)->GetCashFlow();
+		auto CFTypes = CurrentCF.AvailableFlows();
+		std::sort(CFTypes.begin(), CFTypes.end());
+		CurrentModel->setColumnCount(CFTypes.size()+1);
+		CurrentModel->setRowCount(CurrentCF.Count());
+		CurrentModel->setHeaderData(0, Qt::Horizontal, tr("Date"));
+		for (int j = 0; j < CurrentCF.Count(); ++j) {
+			CurrentModel->setData(CurrentModel->index(j, 0), CurrentCF.GetDate(j).toString("MMM-yy"), Qt::EditRole);
+			CurrentModel->setData(CurrentModel->index(j, 0), CurrentCF.GetDate(j), Qt::UserRole);
+		}
+		for (int j = 0; j < CFTypes.size(); ++j) {
+			CurrentModel->setHeaderData(j+1, Qt::Horizontal, CurrentCF.GetLabel(CFTypes.at(j), tr("Flow %1").arg(j)));
+			for (int k = 0; k < CurrentCF.Count(); k++) {
+				switch (CFTypes.at(j)) {
+				case static_cast<qint32>(TrancheCashFlow::TrancheFlowType::OCFlow):
+				case static_cast<qint32>(TrancheCashFlow::TrancheFlowType::ICFlow) :
+				case static_cast<qint32>(TrancheCashFlow::TrancheFlowType::ICTarget) :
+				case static_cast<qint32>(TrancheCashFlow::TrancheFlowType::OCTarget) : {
+					double TestVal = CurrentCF.GetFlow(k, CFTypes.at(j));
+					if (TestVal>static_cast<double>(TestInfinityThreshold))CurrentModel->setData(CurrentModel->index(k, j + 1), "Infinity", Qt::EditRole);
+					else CurrentModel->setData(CurrentModel->index(k, j + 1), Commarize(TestVal*100.0, 2) + '%', Qt::EditRole);
+				}break;
+				default:
+					CurrentModel->setData(CurrentModel->index(k, j + 1), Commarize(CurrentCF.GetFlow(k, CFTypes.at(j))), Qt::EditRole);
+					break;
+				}
+				
+				CurrentModel->setData(CurrentModel->index(k, j + 1), CurrentCF.GetFlow(k, CFTypes.at(j)), Qt::UserRole);
+			}
+		}
+		m_OriginalTranchesModels.append(QSharedPointer<QStandardItemModel>(CurrentModel, [](QStandardItemModel* a) {a->deleteLater(); }));
+	}
+	BaseTab->setTabEnabled(2, true);
 }
 
 void LoanAssumptionsEditor::GuessAssumptions() {
 	if (!YesNoDialog(tr("Are you sure?"), tr("This action will potentially override the current inputs.\nAre you sure you want to continue?"))) return;
 	int MatchFound = 0;
 	QSharedPointer<LoanAssumption> CurrAss;
-	QProgressDialog LoadProgress("Searching for Matches", QString(), 0, m_PoolModel->rowCount()*m_Assumptions.size(), this);
+	QProgressDialog LoadProgress(tr("Searching for Matches"), QString(), 0, m_PoolModel->rowCount()*m_Assumptions.size(), this);
 	LoadProgress.setCancelButton(nullptr);
 	LoadProgress.setWindowModality(Qt::WindowModal);
 	for (int i = 0; i < m_PoolModel->rowCount();++i){
@@ -1743,6 +1811,361 @@ void LoanAssumptionsEditor::SetEnableLoad(bool a) {
 int LoanAssumptionsEditor::LoanCount() const {
 	return m_LoanPool.GetLoans().count();
 }
+
+void LoanAssumptionsEditor::CreateStructureComparison() {
+	m_OriginalStructureModel = new QStandardItemModel(this);
+	m_NewStructureModel = new QStandardItemModel(this);
+	m_OriginalStructureModel->setColumnCount(ColumnsInStructure);
+	m_NewStructureModel->setColumnCount(ColumnsInStructure);
+	m_OriginalStructureModel->setRowCount(0);
+	m_NewStructureModel->setRowCount(0);
+	m_OriginalStructureModel->setHorizontalHeaderLabels(QStringList() << tr("Tranche") << tr("Call Date") << tr("Price") << tr("IRR") << tr("WAL") << tr("DM") << tr("Loss") << tr("Call IRR") << tr("Call WAL") << tr("Call DM") << tr("Call Loss"));
+	m_NewStructureModel->setHorizontalHeaderLabels(QStringList() << tr("Tranche") << tr("Call Date") << tr("Price") << tr("IRR") << tr("WAL") << tr("DM") << tr("Loss") << tr("Call IRR") << tr("Call WAL") << tr("Call DM") << tr("Call Loss"));
+
+	m_OldStrGenTable = new QTableView(this);
+	SafeSetModel(m_OldStrGenTable, m_OriginalStructureModel);
+	connect(m_OldStrGenTable->selectionModel(), &QItemSelectionModel::currentChanged, this, &LoanAssumptionsEditor::OldGenTableSelect,Qt::QueuedConnection);
+	m_OldStrGenTable->verticalHeader()->hide();
+	m_OldStrGenTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+	m_OldStrGenTable->horizontalHeader()->setStretchLastSection(true);
+	m_OldStrGenTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+	m_OldStrGenTable->setSelectionMode(QAbstractItemView::ExtendedSelection);
+	m_OldStrGenTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+	m_OldStrGenTable->horizontalHeader()->setMinimumSectionSize(50);
+	m_OldStrGenTable->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+	m_OldStrGenTable->setAlternatingRowColors(true);
+	m_OldStrDetTable = new QTableView(this);
+	SafeSetModel(m_OldStrDetTable, nullptr);
+	m_OldStrDetTable->verticalHeader()->hide();
+	m_OldStrDetTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+	m_OldStrDetTable->horizontalHeader()->setStretchLastSection(true);
+	m_OldStrDetTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+	m_OldStrDetTable->setSelectionMode(QAbstractItemView::ExtendedSelection);
+	m_OldStrDetTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+	m_OldStrDetTable->horizontalHeader()->setMinimumSectionSize(50);
+	m_OldStrDetTable->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+	m_OldStrDetTable->setAlternatingRowColors(true);
+
+	m_NewStrGenTable = new QTableView(this);
+	SafeSetModel(m_NewStrGenTable, nullptr);
+	m_NewStrGenTable->verticalHeader()->hide();
+	m_NewStrGenTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+	m_NewStrGenTable->horizontalHeader()->setStretchLastSection(true);
+	m_NewStrGenTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+	m_NewStrGenTable->setSelectionMode(QAbstractItemView::ExtendedSelection);
+	m_NewStrGenTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+	m_NewStrGenTable->horizontalHeader()->setMinimumSectionSize(50);
+	m_NewStrGenTable->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+	m_NewStrGenTable->setAlternatingRowColors(true);
+	m_NewStrDetTable = new QTableView(this);
+	SafeSetModel(m_NewStrDetTable, nullptr);
+	m_NewStrDetTable->verticalHeader()->hide();
+	m_NewStrDetTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+	m_NewStrDetTable->horizontalHeader()->setStretchLastSection(true);
+	m_NewStrDetTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+	m_NewStrDetTable->setSelectionMode(QAbstractItemView::ExtendedSelection);
+	m_NewStrDetTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+	m_NewStrDetTable->horizontalHeader()->setMinimumSectionSize(50);
+	m_NewStrDetTable->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+	m_NewStrDetTable->setAlternatingRowColors(true);
+
+	connect(m_OriginalStructureModel, SIGNAL(rowsInserted(const QModelIndex&,int, int)), this, SLOT(AdjustOldGenTableHeight()), Qt::QueuedConnection);
+	connect(m_OriginalStructureModel, SIGNAL(rowsRemoved(const QModelIndex&, int, int)), this, SLOT(AdjustOldGenTableHeight()), Qt::QueuedConnection);
+	connect(m_OriginalStructureModel, SIGNAL(modelReset()), this, SLOT(AdjustOldGenTableHeight()), Qt::QueuedConnection);
+	connect(m_NewStructureModel, SIGNAL(rowsInserted(const QModelIndex&, int, int)), this, SLOT(AdjustNewGenTableHeight()), Qt::QueuedConnection);
+	connect(m_NewStructureModel, SIGNAL(rowsRemoved(const QModelIndex&, int, int)), this, SLOT(AdjustNewGenTableHeight()), Qt::QueuedConnection);
+	connect(m_NewStructureModel, SIGNAL(modelReset()), this, SLOT(AdjustNewGenTableHeight()), Qt::QueuedConnection);
+
+	connect(m_OldStrGenTable->verticalScrollBar(), &QScrollBar::valueChanged, m_NewStrGenTable->verticalScrollBar(), &QScrollBar::setValue);
+	connect(m_NewStrGenTable->verticalScrollBar(), &QScrollBar::valueChanged, m_OldStrGenTable->verticalScrollBar(), &QScrollBar::setValue);
+	connect(m_OldStrDetTable->verticalScrollBar(), &QScrollBar::valueChanged, m_NewStrDetTable->verticalScrollBar(), &QScrollBar::setValue);
+	connect(m_NewStrDetTable->verticalScrollBar(), &QScrollBar::valueChanged, m_OldStrDetTable->verticalScrollBar(), &QScrollBar::setValue);
+	connect(m_OldStrGenTable->horizontalScrollBar(), &QScrollBar::valueChanged, m_NewStrGenTable->horizontalScrollBar(), &QScrollBar::setValue);
+	connect(m_NewStrGenTable->horizontalScrollBar(), &QScrollBar::valueChanged, m_OldStrGenTable->horizontalScrollBar(), &QScrollBar::setValue);
+	connect(m_OldStrDetTable->horizontalScrollBar(), &QScrollBar::valueChanged, m_NewStrDetTable->horizontalScrollBar(), &QScrollBar::setValue);
+	connect(m_NewStrDetTable->horizontalScrollBar(), &QScrollBar::valueChanged, m_OldStrDetTable->horizontalScrollBar(), &QScrollBar::setValue);
+
+	connect(m_OriginalStructureModel, &QStandardItemModel::dataChanged, [&](const QModelIndex& index, const QModelIndex&) {
+		if (index.column() == PriceCol) {
+			const Tranche* ApplicableExtTran = m_WtfToExtension.GetTranche(index.row());
+			if (ApplicableExtTran) {
+				double NewIRR = ApplicableExtTran->GetIRR(m_OriginalStructureModel->data(index, Qt::UserRole).toDouble());
+				double NewDM = ApplicableExtTran->GetDiscountMargin(m_OriginalStructureModel->data(index, Qt::UserRole).toDouble());
+				m_OriginalStructureModel->setData(m_OriginalStructureModel->index(index.row(), IRRCol), Commarize(NewIRR*100.0, 2) + '%', Qt::EditRole);
+				m_OriginalStructureModel->setData(m_OriginalStructureModel->index(index.row(), IRRCol), NewIRR, Qt::UserRole);
+				m_OriginalStructureModel->setData(m_OriginalStructureModel->index(index.row(), DMCol), Commarize(NewDM), Qt::EditRole);
+				m_OriginalStructureModel->setData(m_OriginalStructureModel->index(index.row(), DMCol), NewDM, Qt::UserRole);
+			}
+			else {
+				m_OriginalStructureModel->setData(m_OriginalStructureModel->index(index.row(), IRRCol), tr("N/A"), Qt::EditRole);
+				m_OriginalStructureModel->setData(m_OriginalStructureModel->index(index.row(), IRRCol), QVariant(), Qt::UserRole);
+				m_OriginalStructureModel->setData(m_OriginalStructureModel->index(index.row(), DMCol), tr("N/A"), Qt::EditRole);
+				m_OriginalStructureModel->setData(m_OriginalStructureModel->index(index.row(), DMCol), QVariant(), Qt::UserRole);
+			}
+			const Tranche* ApplicableCallTran = m_WtfToCall.GetTranche(index.row());
+			if (ApplicableCallTran) {
+				double NewIRR = ApplicableCallTran->GetIRR(m_OriginalStructureModel->data(index, Qt::UserRole).toDouble());
+				double NewDM = ApplicableCallTran->GetDiscountMargin(m_OriginalStructureModel->data(index, Qt::UserRole).toDouble());
+				m_OriginalStructureModel->setData(m_OriginalStructureModel->index(index.row(), IRRCallCol), Commarize(NewIRR*100.0, 2) + '%', Qt::EditRole);
+				m_OriginalStructureModel->setData(m_OriginalStructureModel->index(index.row(), IRRCallCol), NewIRR, Qt::UserRole);
+				m_OriginalStructureModel->setData(m_OriginalStructureModel->index(index.row(), DMCallCol), Commarize(NewDM), Qt::EditRole);
+				m_OriginalStructureModel->setData(m_OriginalStructureModel->index(index.row(), DMCallCol), NewDM, Qt::UserRole);
+			}
+			else {
+				m_OriginalStructureModel->setData(m_OriginalStructureModel->index(index.row(), IRRCallCol), tr("N/A"), Qt::EditRole);
+				m_OriginalStructureModel->setData(m_OriginalStructureModel->index(index.row(), IRRCallCol), QVariant(), Qt::UserRole);
+				m_OriginalStructureModel->setData(m_OriginalStructureModel->index(index.row(), DMCallCol), tr("N/A"), Qt::EditRole);
+				m_OriginalStructureModel->setData(m_OriginalStructureModel->index(index.row(), DMCallCol), QVariant(), Qt::UserRole);
+			}
+		}
+	});
+	connect(m_NewStructureModel, &QStandardItemModel::dataChanged, [&](const QModelIndex& index, const QModelIndex&) {
+		if (index.column() == PriceCol) {
+			const Tranche* ApplicableExtTran = m_WtfToExtension.GetTranche(index.row());
+			if (ApplicableExtTran) {
+				double NewIRR = ApplicableExtTran->GetIRR(m_NewStructureModel->data(index, Qt::UserRole).toDouble());
+				double NewDM = ApplicableExtTran->GetDiscountMargin(m_NewStructureModel->data(index, Qt::UserRole).toDouble());
+				m_NewStructureModel->setData(m_NewStructureModel->index(index.row(), IRRCol), Commarize(NewIRR*100.0, 2) + '%', Qt::EditRole);
+				m_NewStructureModel->setData(m_NewStructureModel->index(index.row(), IRRCol), NewIRR, Qt::UserRole);
+				m_NewStructureModel->setData(m_NewStructureModel->index(index.row(), DMCol), Commarize(NewDM), Qt::EditRole);
+				m_NewStructureModel->setData(m_NewStructureModel->index(index.row(), DMCol), NewDM, Qt::UserRole);
+			}
+			else {
+				m_NewStructureModel->setData(m_NewStructureModel->index(index.row(), IRRCol), tr("N/A"), Qt::EditRole);
+				m_NewStructureModel->setData(m_NewStructureModel->index(index.row(), IRRCol), QVariant(), Qt::UserRole);
+				m_NewStructureModel->setData(m_NewStructureModel->index(index.row(), DMCol), tr("N/A"), Qt::EditRole);
+				m_NewStructureModel->setData(m_NewStructureModel->index(index.row(), DMCol), QVariant(), Qt::UserRole);
+			}
+			const Tranche* ApplicableCallTran = m_WtfToCall.GetTranche(index.row());
+			if (ApplicableCallTran) {
+				double NewIRR = ApplicableCallTran->GetIRR(m_NewStructureModel->data(index, Qt::UserRole).toDouble());
+				double NewDM = ApplicableCallTran->GetDiscountMargin(m_NewStructureModel->data(index, Qt::UserRole).toDouble());
+				m_NewStructureModel->setData(m_NewStructureModel->index(index.row(), IRRCallCol), Commarize(NewIRR*100.0, 2) + '%', Qt::EditRole);
+				m_NewStructureModel->setData(m_NewStructureModel->index(index.row(), IRRCallCol), NewIRR, Qt::UserRole);
+				m_NewStructureModel->setData(m_NewStructureModel->index(index.row(), DMCallCol), Commarize(NewDM), Qt::EditRole);
+				m_NewStructureModel->setData(m_NewStructureModel->index(index.row(), DMCallCol), NewDM, Qt::UserRole);
+			}
+			else {
+				m_NewStructureModel->setData(m_NewStructureModel->index(index.row(), IRRCallCol), tr("N/A"), Qt::EditRole);
+				m_NewStructureModel->setData(m_NewStructureModel->index(index.row(), IRRCallCol), QVariant(), Qt::UserRole);
+				m_NewStructureModel->setData(m_NewStructureModel->index(index.row(), DMCallCol), tr("N/A"), Qt::EditRole);
+				m_NewStructureModel->setData(m_NewStructureModel->index(index.row(), DMCallCol), QVariant(), Qt::UserRole);
+			}
+		}
+	});
+
+	CalculateNewStructureButton = new QPushButton(this);
+	CalculateNewStructureButton->setText(tr("Assess Impact"));
+	CalculateNewStructureButton->setEnabled(false);
+	connect(CalculateNewStructureButton, &QPushButton::clicked, this, &LoanAssumptionsEditor::CalculateNewStructure);
+
+	QLabel* BeforeLabel = new QLabel(this);
+	BeforeLabel->setText(tr("Before"));
+	BeforeLabel->setStyleSheet("QLabel { qproperty-alignment: 'AlignCenter'; font-size: 14px; font-weight: bold; }");
+	QLabel* AfterLabel = new QLabel(this);
+	AfterLabel->setText(tr("After"));
+	AfterLabel->setStyleSheet(BeforeLabel->styleSheet());
+
+	m_OldSelectedTrancheLabel = new QLabel(this);
+	m_OldSelectedTrancheLabel->setStyleSheet("QLabel { qproperty-alignment: 'AlignHCenter | AlignBottom'; font-size: 12px;}");
+	m_NewSelectedTrancheLabel = new QLabel(this);
+	m_NewSelectedTrancheLabel->setStyleSheet(m_OldSelectedTrancheLabel->styleSheet());
+
+	/*QFrame* MidLine = new QFrame(this);
+	MidLine->setFrameShape(QFrame::VLine);
+	MidLine->setFrameShadow(QFrame::Plain);
+	MidLine->setLineWidth(1);*/
+
+	QWidget* NewTab = new QWidget(this);;
+	QGridLayout* mainLay = new QGridLayout(NewTab);
+	mainLay->setHorizontalSpacing(mainLay->horizontalSpacing() * 4);
+	mainLay->addWidget(BeforeLabel, 0, 0);
+	//mainLay->addWidget(MidLine, 0, 1, 4, 1);
+	mainLay->addWidget(AfterLabel, 0, 1);
+	mainLay->addWidget(m_OldStrGenTable, 1, 0);
+ 	mainLay->addWidget(m_NewStrGenTable, 1, 1);
+	mainLay->addItem(new QSpacerItem(5, 5, QSizePolicy::Preferred, QSizePolicy::Fixed),2,0,1,2);
+	mainLay->addWidget(m_OldSelectedTrancheLabel, 3, 0);
+	mainLay->addWidget(m_NewSelectedTrancheLabel, 3,1);
+ 	mainLay->addWidget(m_OldStrDetTable, 4, 0);
+	mainLay->addWidget(m_NewStrDetTable, 4, 1);
+	mainLay->addWidget(CalculateNewStructureButton, 5, 0, 1, 2);
+	BaseTab->addTab(NewTab, tr("Notes"));
+	BaseTab->setTabEnabled(2, false);
+}
+
+void LoanAssumptionsEditor::CalculateNewStructure() {
+	if (m_NewLoans) return;
+	m_NewLoans = new MtgCalculator(this);
+	m_NewLoans->SetCPRass(m_LoanPool.GetCPRass());
+	m_NewLoans->SetCDRass(m_LoanPool.GetCDRass());
+	m_NewLoans->SetLSass(m_LoanPool.GetLSass());
+	m_NewLoans->SetRecoveryLag(m_LoanPool.GetRecoveryLag());
+	m_NewLoans->SetDelinquency(m_LoanPool.GetDelinquency());
+	m_NewLoans->SetDelinquencyLag(m_LoanPool.GetDelinquencyLag());
+	m_NewLoans->SetStartDate(m_LoanPool.GetStartDate());
+	for (int i = 0; i < m_PoolModel->rowCount(); ++i) {
+		Mortgage NewLoan(*(m_LoanPool.GetLoans().value(m_PoolModel->data(m_PoolModel->index(i, 0), Qt::UserRole).toInt())));
+		bool UseSuggestion = m_PoolModel->data(m_PoolModel->index(i, 3), Qt::UserRole + Qt::CheckStateRole).toInt() == Qt::Checked;
+		QString ScenarioToApply = m_PoolModel->data(m_PoolModel->index(i, 2 + (UseSuggestion ? 1 : 0)), Qt::EditRole).toString();
+		if (!ScenarioToApply.isEmpty()) {
+			auto CurrScen = m_DirtyAssumptions.value(ScenarioToApply, m_Assumptions.value(ScenarioToApply, QSharedPointer<LoanAssumption>(nullptr)));
+			if (CurrScen) {
+				NewLoan.SetScenario(*CurrScen);
+			}
+		}
+		m_NewLoans->AddLoan(NewLoan, m_PoolModel->data(m_PoolModel->index(i, 0), Qt::UserRole).toInt());
+	}
+	m_NewWtfToExtension = m_WtfToExtension;
+	m_NewWtfToCall = m_WtfToCall;
+	QProgressDialog* CalcProgress = new QProgressDialog(this);
+	CalcProgress->setLabelText(tr("Calculating Loans Cash Flows"));
+	CalcProgress->setRange(0,100);
+	CalcProgress->setCancelButtonText(tr("Cancel"));
+	CalcProgress->setWindowTitle(tr("Calculating"));
+	connect(CalcProgress, &QProgressDialog::canceled, m_NewLoans, &MtgCalculator::StopCalculation);
+	connect(CalcProgress, &QProgressDialog::canceled, CalcProgress, &QProgressDialog::deleteLater);
+	connect(m_NewLoans, &MtgCalculator::Calculated, CalcProgress, &QProgressDialog::deleteLater);
+	connect(m_NewLoans, &MtgCalculator::ProgressPct, CalcProgress, &QProgressDialog::setValue);
+	connect(m_NewLoans, &MtgCalculator::BeeError, CalcProgress, &QProgressDialog::deleteLater);
+	connect(m_NewLoans, &MtgCalculator::Calculated, this ,&LoanAssumptionsEditor::LoanCalculationFinished);
+	connect(m_NewLoans, &MtgCalculator::Calculated, m_NewLoans, &MtgCalculator::deleteLater);
+	connect(m_NewLoans, &MtgCalculator::BeeError, m_NewLoans, &MtgCalculator::deleteLater);
+	connect(CalcProgress, &QProgressDialog::canceled, m_NewLoans, &MtgCalculator::deleteLater);
+	m_NewLoans->StartCalculation();
+}
+void LoanAssumptionsEditor::LoanCalculationFinished() {
+	m_NewWtfToExtension.ResetMtgFlows();
+	m_NewWtfToExtension.AddMortgagesFlows(m_NewLoans->GetAggregatedResults());
+	m_NewWtfToExtension.CalculateTranchesCashFlows();
+	if (m_NewWtfToCall.GetTranchesCount() > 0) {
+		m_NewWtfToCall.ResetMtgFlows();
+		m_NewWtfToCall.AddMortgagesFlows(m_NewWtfToExtension.GetMortgagesPayments());
+		m_NewWtfToCall.CalculateTranchesCashFlows();
+	}
+	//////////////////////////////////////////////////////////////////////////
+	m_NewStructureModel->setRowCount(m_NewWtfToExtension.GetTranchesCount());
+	SafeSetModel(m_NewStrGenTable, m_NewStructureModel);
+	connect(m_NewStrGenTable->selectionModel(), &QItemSelectionModel::currentChanged, this, &LoanAssumptionsEditor::NewGenTableSelect, Qt::QueuedConnection);
+	for (int i = 0; i < m_NewWtfToExtension.GetTranchesCount(); ++i) {
+		m_NewStructureModel->setData(m_NewStructureModel->index(i, TrancheNameCol), m_NewWtfToExtension.GetTranche(i)->GetTrancheName(), Qt::EditRole);
+		m_NewStructureModel->setData(m_NewStructureModel->index(i, PriceCol), Commarize(m_NewWtfToExtension.GetTranche(i)->GetPrice(), 2), Qt::EditRole);
+		m_NewStructureModel->setData(m_NewStructureModel->index(i, PriceCol), m_NewWtfToExtension.GetTranche(i)->GetPrice(), Qt::UserRole);
+		m_NewStructureModel->setData(m_NewStructureModel->index(i, WALCol), Commarize(m_NewWtfToExtension.GetTranche(i)->GetWALife(m_NewWtfToExtension.GetCalculatedMtgPayments().GetDate(0)), 2), Qt::EditRole);
+		m_NewStructureModel->setData(m_NewStructureModel->index(i, LossCol), Commarize(m_NewWtfToExtension.GetTranche(i)->GetLossRate()*100.0, 2) + '%', Qt::EditRole);
+		if (m_NewWtfToCall.GetTranche(i)) {
+			m_NewStructureModel->setData(m_NewStructureModel->index(i, CallDateCol), m_NewWtfToCall.GetCalledPeriod().toString("MMM-yy"), Qt::EditRole);
+			m_NewStructureModel->setData(m_NewStructureModel->index(i, CallDateCol), m_NewWtfToCall.GetCalledPeriod(), Qt::UserRole);
+			m_NewStructureModel->setData(m_NewStructureModel->index(i, WALCallCol), Commarize(m_NewWtfToCall.GetTranche(i)->GetWALife(m_NewWtfToCall.GetCalculatedMtgPayments().GetDate(0)), 2), Qt::EditRole);
+			m_NewStructureModel->setData(m_NewStructureModel->index(i, LossCallCol), Commarize(m_NewWtfToCall.GetTranche(i)->GetLossRate()*100.0, 2) + '%', Qt::EditRole);
+		}
+		else {
+			m_NewStructureModel->setData(m_NewStructureModel->index(i, CallDateCol), tr("N/A"), Qt::EditRole);
+			m_NewStructureModel->setData(m_NewStructureModel->index(i, CallDateCol), QVariant(), Qt::UserRole);
+			m_NewStructureModel->setData(m_NewStructureModel->index(i, WALCallCol), tr("N/A"), Qt::EditRole);
+			m_NewStructureModel->setData(m_NewStructureModel->index(i, LossCallCol), tr("N/A"), Qt::EditRole);
+		}
+		QStandardItemModel* CurrentModel = new QStandardItemModel(this);
+		const TrancheCashFlow& CurrentCF = m_NewWtfToExtension.GetTranche(i)->GetCashFlow();
+		auto CFTypes = CurrentCF.AvailableFlows();
+		std::sort(CFTypes.begin(), CFTypes.end());
+		CurrentModel->setColumnCount(CFTypes.size() + 1);
+		CurrentModel->setRowCount(CurrentCF.Count());
+		CurrentModel->setHeaderData(0, Qt::Horizontal, tr("Date"));
+		for (int j = 0; j < CurrentCF.Count(); ++j) {
+			CurrentModel->setData(CurrentModel->index(j, 0), CurrentCF.GetDate(j).toString("MMM-yy"), Qt::EditRole);
+			CurrentModel->setData(CurrentModel->index(j, 0), CurrentCF.GetDate(j), Qt::UserRole);
+		}
+		for (int j = 0; j < CFTypes.size(); ++j) {
+			CurrentModel->setHeaderData(j + 1, Qt::Horizontal, CurrentCF.GetLabel(CFTypes.at(j), tr("Flow %1").arg(j)));
+			for (int k = 0; k < CurrentCF.Count(); k++) {
+				switch (CFTypes.at(j)) {
+				case static_cast<qint32>(TrancheCashFlow::TrancheFlowType::OCFlow) :
+				case static_cast<qint32>(TrancheCashFlow::TrancheFlowType::ICFlow) :
+				case static_cast<qint32>(TrancheCashFlow::TrancheFlowType::ICTarget) :
+				case static_cast<qint32>(TrancheCashFlow::TrancheFlowType::OCTarget) : {
+					double TestVal = CurrentCF.GetFlow(k, CFTypes.at(j));
+					if (TestVal>static_cast<double>(TestInfinityThreshold))CurrentModel->setData(CurrentModel->index(k, j + 1), "Infinity", Qt::EditRole);
+					else CurrentModel->setData(CurrentModel->index(k, j + 1), Commarize(TestVal*100.0, 2) + '%', Qt::EditRole);
+				}break;
+				default:
+					CurrentModel->setData(CurrentModel->index(k, j + 1), Commarize(CurrentCF.GetFlow(k, CFTypes.at(j))), Qt::EditRole);
+					break;
+				}
+
+				CurrentModel->setData(CurrentModel->index(k, j + 1), CurrentCF.GetFlow(k, CFTypes.at(j)), Qt::UserRole);
+			}
+		}
+		m_NewTranchesModels.append(QSharedPointer<QStandardItemModel>(CurrentModel, [](QStandardItemModel* a) {a->deleteLater(); }));
+	}
+	//////////////////////////////////////////////////////////////////////////
+	if (m_OldStrGenTable->selectionModel()->currentIndex().isValid()) {
+		m_NewStrGenTable->selectionModel()->setCurrentIndex(m_NewStrGenTable->model()->index(m_OldStrGenTable->selectionModel()->currentIndex().row(), 0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+	}
+}
+void LoanAssumptionsEditor::NewTranchesCalculated() {
+
+}
+void LoanAssumptionsEditor::SafeSetModel(QAbstractItemView* View, QAbstractItemModel* NewModel) {
+	QItemSelectionModel* ModToDelete = View->selectionModel();
+	View->setModel(NewModel);
+	if (ModToDelete) {
+		if (View->selectionModel() != ModToDelete)
+			ModToDelete->deleteLater();
+	}
+}
+
+void LoanAssumptionsEditor::NewGenTableSelect(const QModelIndex& index, const QModelIndex&) {
+	if (index.isValid()) {
+		m_NewSelectedTrancheLabel->setText(m_NewStructureModel->data(m_NewStructureModel->index(index.row(), TrancheNameCol), Qt::EditRole).toString());
+		SafeSetModel(m_NewStrDetTable, m_NewTranchesModels.at(index.row()).data());
+		if (m_OldStrGenTable->model())
+			m_OldStrGenTable->selectionModel()->setCurrentIndex(m_OriginalStructureModel->index(index.row(), 0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+	}
+	else {
+		m_NewSelectedTrancheLabel->setText(QString());
+		SafeSetModel(m_NewStrDetTable, nullptr);
+		m_OldStrGenTable->selectionModel()->setCurrentIndex(QModelIndex(), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+	}
+}
+
+void LoanAssumptionsEditor::OldGenTableSelect(const QModelIndex& index, const QModelIndex&) {
+	if (index.isValid()) {
+		m_OldSelectedTrancheLabel->setText(m_OriginalStructureModel->data(m_OriginalStructureModel->index(index.row(), TrancheNameCol), Qt::EditRole).toString());
+		SafeSetModel(m_OldStrDetTable, m_OriginalTranchesModels.at(index.row()).data());
+		if (m_NewStrGenTable->model())
+			m_NewStrGenTable->selectionModel()->setCurrentIndex(m_NewStructureModel->index(index.row(), 0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+	}
+	else {
+		m_OldSelectedTrancheLabel->setText(QString());
+		SafeSetModel(m_OldStrDetTable, nullptr);
+		m_NewStrGenTable->selectionModel()->setCurrentIndex(QModelIndex(), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+	}
+}
+
+void LoanAssumptionsEditor::AdjustOldGenTableHeight() {
+	int TotalSize = m_OldStrGenTable->horizontalHeader()->height() + 2 * m_OldStrGenTable->frameWidth() + m_OldStrGenTable->horizontalScrollBar()->height();
+	for (int i = 0; i<m_OldStrGenTable->model()->rowCount(); ++i)
+		TotalSize += m_OldStrGenTable->rowHeight(i);
+	m_OldStrGenTable->setMinimumHeight(TotalSize);
+	if (m_OldStrGenTable->model()->rowCount() > 0) {
+		m_OldStrGenTable->selectionModel()->setCurrentIndex(m_OldStrGenTable->model()->index(0, 0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+	}
+}
+
+void LoanAssumptionsEditor::AdjustNewGenTableHeight() {
+	int TotalSize = m_NewStrGenTable->horizontalHeader()->height() + 2 * m_NewStrGenTable->frameWidth() + m_NewStrGenTable->horizontalScrollBar()->height();
+	for (int i = 0; i<m_NewStrGenTable->model()->rowCount(); ++i)
+		TotalSize += m_NewStrGenTable->rowHeight(i);
+	m_NewStrGenTable->setMinimumHeight(TotalSize);
+	if (m_NewStrGenTable->model()->rowCount() > 0) {
+		m_NewStrGenTable->selectionModel()->setCurrentIndex(m_NewStrGenTable->model()->index(0, 0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+	}
+}
+
+
+
+
 
 
 

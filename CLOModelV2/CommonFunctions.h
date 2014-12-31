@@ -34,7 +34,7 @@ template<typename T> class QList;
 #include <QMutex>
 extern QMutex Db_Mutex;
 #endif // !NO_DATABASE
-
+extern const QString LoansPropertiesToSearch[2]; //Properties in which scenarios will be searched
 int MonthDiff(const QDate& FutureDte,const QDate& PresentDte);
 QString InfixToPostfix(const QString& a);
 enum class DayCountConvention : qint16 {
@@ -103,7 +103,7 @@ double GetLoanAssumption(const QString& LoanName, int columnIndex, QDate RefDate
 void PrintToTempFile(const QString& TempFileName, const QString& Message, bool PrintTime = true);
 bool ValidDayCount(qint16 a);
 QString NormaliseTriggerStructure(QString a);
-QString GetFromConfig(const QString& Domain, const QString& Field, const QString& DefaultValue);
+QString GetFromConfig(const QString& Domain, const QString& Field, const QString& DefaultValue=QString());
 #endif // CommonFunctions_h__
 
 

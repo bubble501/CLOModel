@@ -16,6 +16,7 @@
 #ifndef NO_DATABASE
 QMutex Db_Mutex;
 #endif
+const QString LoansPropertiesToSearch[] = { "Issuer", "Facility" };
 int MonthDiff(const QDate& FutureDte,const QDate& PresentDte){
 	int Result;
 	Result=(FutureDte.year()-PresentDte.year())*12;

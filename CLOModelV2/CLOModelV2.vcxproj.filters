@@ -236,6 +236,9 @@
     <ClInclude Include="PoolTableProxy.h">
       <Filter>Header Files\Loans\Loans Assumptions</Filter>
     </ClInclude>
+    <ClInclude Include="LoanAssMatcherResult.h">
+      <Filter>Header Files\Loans\Loans Assumptions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Resources.qrc">
@@ -320,6 +323,12 @@
       <Filter>Header Files\Loans\Loans Assumptions</Filter>
     </CustomBuild>
     <CustomBuild Include="CheckAndEdit.h">
+      <Filter>Header Files\Loans\Loans Assumptions</Filter>
+    </CustomBuild>
+    <CustomBuild Include="LoanAssMatcherThread.h">
+      <Filter>Header Files\Loans\Loans Assumptions</Filter>
+    </CustomBuild>
+    <CustomBuild Include="LoanAssMatcher.h">
       <Filter>Header Files\Loans\Loans Assumptions</Filter>
     </CustomBuild>
   </ItemGroup>
@@ -677,6 +686,27 @@
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_CheckAndEditDelegate.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_LoanAssMatcherThread.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_LoanAssMatcherThread.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="LoanAssMatcherResult.cpp">
+      <Filter>Source Files\Loans\Loans Assumptions</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_LoanAssMatcher.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_LoanAssMatcher.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="LoanAssMatcher.cpp">
+      <Filter>Source Files\Loans\Loans Assumptions</Filter>
+    </ClCompile>
+    <ClCompile Include="LoanAssMatcherThread.cpp">
+      <Filter>Source Files\Loans\Loans Assumptions</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

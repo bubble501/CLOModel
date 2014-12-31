@@ -439,13 +439,12 @@ void MtgCalculator::GuessLoanScenarios(bool OverrideAss) {
 	Db_Mutex.unlock();
 	foreach(Mortgage* SingleLoan, Loans) {
 		for (auto i = AvailableAssumptions.constBegin(); i != AvailableAssumptions.constEnd(); ++i) {
-			if (i.value()->MatchPattern(SingleLoan->GetProperty("Issuer"))) {
-				if (!SingleLoan->HasProperty("Scenario") || OverrideAss)
-					SingleLoan->SetProperty("Scenario", i.key());
-			}
-			else if (i.value()->MatchPattern(SingleLoan->GetProperty("Facility"))) {
-				if (!SingleLoan->HasProperty("Scenario") || OverrideAss)
-					SingleLoan->SetProperty("Scenario", i.key());
+			for (const QString& CurrProperty : LoansPropertiesToSearch) {
+				if (i.value()->MatchPattern(SingleLoan->GetProperty(CurrProperty))) {
+					if (!SingleLoan->HasProperty("Scenario") || OverrideAss)
+						SingleLoan->SetProperty("Scenario", i.key());
+					break;
+				}
 			}
 		}
 	}

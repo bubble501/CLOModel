@@ -13,9 +13,9 @@ MtgCalculatorThread::MtgCalculatorThread(int Identity,QObject* parent)
 {}
 void MtgCalculatorThread::run(){
 	if (Loan.CalculateCashFlows(StartDate, CPRass, CDRass, LSass, RecoveryLag, Delinquency, DelinquencyLag, m_OverrideAssumptions, m_DownloadScenario))
-		emit AnonimCalculated(m_ID);
+		emit AnonimCalculated(Identifier);
 	else
-		emit ErrorCalculation(m_ID);
+		emit ErrorCalculation(Identifier);
 	exec();
 }
 void MtgCalculatorThread::SetCPR(const QString& a) {CPRass=a;}

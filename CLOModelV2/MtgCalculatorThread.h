@@ -5,7 +5,6 @@
 class MtgCalculatorThread : public TemplAsyncThread <MtgCashFlow>{
 	Q_OBJECT
 protected:
-	int m_ID;
 	Mortgage Loan;
 	QString CPRass;
 	QString CDRass;
@@ -17,7 +16,7 @@ protected:
 	bool m_OverrideAssumptions;
 	bool m_DownloadScenario;
 public:
-	MtgCalculatorThread(int Identity,QObject* parent=0);
+	MtgCalculatorThread(int Identity,QObject* parent=nullptr);
 	void SetLoan(const Mortgage& a){Loan=a;}
 	const Mortgage& Getloan() const{return Loan;}
 	const MtgCashFlow& GetCashFlow()const{return Loan.GetCashFlow();}
@@ -46,6 +45,6 @@ protected slots:
 		emit Calculated(Identifier, Loan.GetCashFlow());
 	}
 public slots:
-	void run();
+	virtual void run() override;
 };
 #endif // MtgCalculatorThread_h__

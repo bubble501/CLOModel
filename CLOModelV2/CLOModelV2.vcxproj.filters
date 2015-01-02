@@ -233,9 +233,6 @@
     <ClInclude Include="LoanAssumption.h">
       <Filter>Header Files\Loans\Loans Assumptions</Filter>
     </ClInclude>
-    <ClInclude Include="PoolTableProxy.h">
-      <Filter>Header Files\Loans\Loans Assumptions</Filter>
-    </ClInclude>
     <ClInclude Include="LoanAssMatcherResult.h">
       <Filter>Header Files\Loans\Loans Assumptions</Filter>
     </ClInclude>
@@ -329,6 +326,9 @@
       <Filter>Header Files\Loans\Loans Assumptions</Filter>
     </CustomBuild>
     <CustomBuild Include="LoanAssMatcher.h">
+      <Filter>Header Files\Loans\Loans Assumptions</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ReadOnlyColProxy.h">
       <Filter>Header Files\Loans\Loans Assumptions</Filter>
     </CustomBuild>
   </ItemGroup>

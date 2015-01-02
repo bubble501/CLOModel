@@ -109,11 +109,7 @@ void TemplAsyncCalculator<ThreadType, ResultType>::Reset() {
 	m_ThreadPool.clear();
 	ClearResults();
 	BeesSent.clear();
-	#ifndef DebugLogging
-		m_SequentialComputation = false;
-	#else
-		m_SequentialComputation=true;
-	#endif
+	m_SequentialComputation = false;
 	BeesReturned = 0;
 }
 template <typename ThreadType, typename ResultType>

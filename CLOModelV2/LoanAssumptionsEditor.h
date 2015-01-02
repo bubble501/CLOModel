@@ -17,10 +17,12 @@ class QCheckBox;
 class QDateEdit;
 class QPushButton;
 class QTabWidget;
-class PoolTableProxy;
+class ReadOnlyColProxy;
 class QLabel;
 class QAbstractItemView;
 class QAbstractItemModel;
+class QProgressBar;
+class LoanAssMatcher;
 class LoanAssumptionsEditor : public QWidget
 {
 	Q_OBJECT
@@ -39,6 +41,7 @@ private:
 	static void SafeSetModel(QAbstractItemView* View, QAbstractItemModel* NewModel);
 	void CreateScenarioEditor();
 	void CreatePoolMatcher();
+	void CreateModelScanner();
 	void CreateStructureComparison();
 	bool YesNoDialog(const QString& Title, const QString& Mess);
 	LoanAssumption BuildCurrentAssumption() const;
@@ -51,7 +54,12 @@ private:
 	QStandardItemModel* m_AliasesModel;
 	QStandardItemModel* m_SeniorAsumptionsModel;
 	QStandardItemModel* m_MezzAsumptionsModel;
+	QStandardItemModel* m_ScanPoolsModel;
+	QStandardItemModel* m_ScannedModel;
 	QSortFilterProxyModel* m_SortScenarios;
+	QSortFilterProxyModel* m_ScannedPoolsProxy;
+	ReadOnlyColProxy* m_ScannedModelProxy;
+	int m_LastScannedColSorted;
 	QListView* m_ScenarioList;
 	QListView* m_AliasesList;
 	QTableView* m_SeniorTable;
@@ -76,11 +84,14 @@ private:
 	QPushButton* SaveAllButton;
 	QPushButton* DiscardCurrentButton;
 	QPushButton* DiscardAllButton;
+	QPushButton* m_ScanPoolsButton;
+	QPushButton* m_CancelScanPoolsButton;
+	QProgressBar* m_ScanProgress;
 	QTabWidget* BaseTab;
 	QStandardItemModel* m_PoolModel;
 	QTableView* m_PoolTable;
-	PoolTableProxy* m_PoolSorter;
-	int m_LastColSorted;
+	ReadOnlyColProxy* m_PoolSorter;
+	int m_LastPoolColSorted;
 	MtgCalculator m_LoanPool;
 	Waterfall m_WtfToExtension;
 	Waterfall m_NewWtfToExtension;
@@ -98,6 +109,12 @@ private:
 	QLabel* m_OldSelectedTrancheLabel;
 	QLabel* m_NewSelectedTrancheLabel;
 	QHash<QString, QSharedPointer<LoanAssumption> > m_DirtyAssumptions;
+	QListView* m_PoolScanFilterView;
+	QListView* m_PoolScanDealsView;
+	QTableView* m_PoolScanPoolView;
+	LoanAssMatcher* m_PoolMatcher;
+	QLineEdit* m_ModelsDirEdit;
+	bool m_ScanningPools;
 	bool m_EnableLoad;
 	enum {ColumnsInStructure=11};
 	enum {
@@ -130,6 +147,7 @@ private slots:
 	void CalculateNewStructure();
 	void SavePool();
 	void SortPool();
+	void SortScanned();
 	void SetPoolModelChecks(const QModelIndex& index, const QModelIndex&);
 	void RemoveScenario();
 	void GuessAssumptions();

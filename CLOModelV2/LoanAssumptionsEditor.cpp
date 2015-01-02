@@ -1,5 +1,3 @@
-#include "LoanAssumptionsEditor.h"
-#include "CommonFunctions.h"
 #ifndef NO_DATABASE
 #include <QSqlDatabase>
 #include <QSqlError>
@@ -7,6 +5,8 @@
 #include <QSqlRecord>
 #include <QVariant>
 #endif
+#include "LoanAssumptionsEditor.h"
+#include "CommonFunctions.h"
 #include <QProgressDialog>
 #include <QStandardItemModel>
 #include <QListView>
@@ -32,14 +32,18 @@
 #include "LoanAssumptionDelegate.h"
 #include "RichTextDelegate.h"
 #include "Mortgage.h"
-#include "PoolTableProxy.h"
+#include "ReadOnlyColProxy.h"
 #include "CheckAndEditDelegate.h"
 #include <QScrollBar>
+#include "LoanAssMatcher.h"
+#include <QProgressBar>
 LoanAssumptionsEditor::LoanAssumptionsEditor(QWidget *parent)
 	: QWidget(parent)
 	, ActiveAssumption(nullptr)
-	, m_LastColSorted(1)
+	, m_LastPoolColSorted(1)
+	, m_LastScannedColSorted(1)
 	, m_EnableLoad(true)
+	, m_ScanningPools(false)
 {
 	setWindowIcon(QIcon(":/Icons/Logo.png"));
 	setWindowTitle(tr("Loan Scenarios Editor"));
@@ -48,6 +52,7 @@ LoanAssumptionsEditor::LoanAssumptionsEditor(QWidget *parent)
 	CreateScenarioEditor();
 	CreatePoolMatcher();
 	CreateStructureComparison();
+	CreateModelScanner();
 
 	m_ModelNameLabel = new QLabel(this);
 	m_ModelNameLabel->setText(tr("No Model Loaded"));
@@ -502,7 +507,9 @@ void LoanAssumptionsEditor::CreatePoolMatcher() {
 	m_PoolModel->setRowCount(0);
 	m_PoolModel->setColumnCount(4);
 	m_PoolModel->setHorizontalHeaderLabels(QStringList() << "Issuer" << "Facility" << "Current Scenario" << "Suggested Scenario");
-	m_PoolSorter = new PoolTableProxy(this);
+	m_PoolSorter = new ReadOnlyColProxy(this);
+	m_PoolSorter->SetReadOnlyCol(0);
+	m_PoolSorter->SetReadOnlyCol(1);
 	m_PoolSorter->setSourceModel(m_PoolModel);
 
 	m_PoolTable = new QTableView(this);
@@ -535,13 +542,15 @@ void LoanAssumptionsEditor::CreatePoolMatcher() {
 	connect(GuessAssumptionsButton, &QPushButton::clicked, this, &LoanAssumptionsEditor::GuessAssumptions);
 	
 	connect(m_PoolTable->horizontalHeader(), &QHeaderView::sectionClicked, [&](int a) {
-		if (m_LastColSorted == a+1) 
-			m_LastColSorted = -(a+1);
+		if (m_LastPoolColSorted == a+1) 
+			m_LastPoolColSorted = -(a+1);
 		else 
-			m_LastColSorted = a+1;
+			m_LastPoolColSorted = a+1;
 		SortPool();
 	});
-	connect(m_PoolModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(SortPool()));
+	connect(m_PoolModel, &QStandardItemModel::dataChanged, [&](const QModelIndex& index, const QModelIndex&) {
+		if (index.column() == (qAbs(m_LastPoolColSorted) - 1)) SortPool();
+	});
 	connect(m_PoolModel, &QStandardItemModel::dataChanged, this, &LoanAssumptionsEditor::SetPoolModelChecks);
 	connect(m_PoolModel, &QStandardItemModel::rowsInserted, [&](const QModelIndex&, int,int) {
 		bool EnableItems = m_PoolModel->rowCount() > 0;
@@ -1723,7 +1732,10 @@ void LoanAssumptionsEditor::SetPoolModelChecks(const QModelIndex& index, const Q
 }
 
 void LoanAssumptionsEditor::SortPool() {
-	m_PoolSorter->sort(qAbs(m_LastColSorted) - 1, m_LastColSorted<0 ? Qt::DescendingOrder : Qt::AscendingOrder);
+	m_PoolSorter->sort(qAbs(m_LastPoolColSorted) - 1, m_LastPoolColSorted<0 ? Qt::DescendingOrder : Qt::AscendingOrder);
+}
+void LoanAssumptionsEditor::SortScanned() {
+	m_ScannedModelProxy->sort(qAbs(m_LastScannedColSorted) - 1, m_LastScannedColSorted<0 ? Qt::DescendingOrder : Qt::AscendingOrder);
 }
 
 void LoanAssumptionsEditor::SavePool() {
@@ -2162,6 +2174,186 @@ void LoanAssumptionsEditor::AdjustNewGenTableHeight() {
 		m_NewStrGenTable->selectionModel()->setCurrentIndex(m_NewStrGenTable->model()->index(0, 0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
 	}
 }
+
+void LoanAssumptionsEditor::CreateModelScanner() {
+	m_PoolMatcher = new LoanAssMatcher(this);
+
+	m_ScanPoolsModel = new QStandardItemModel(this);
+	m_ScanPoolsModel->setRowCount(0);
+	m_ScanPoolsModel->setColumnCount(1);
+	m_ScannedPoolsProxy = new QSortFilterProxyModel(this);
+	m_ScannedPoolsProxy->setSourceModel(m_ScanPoolsModel);
+	m_ScannedPoolsProxy->setFilterRole(Qt::UserRole);
+	m_ScannedPoolsProxy->setFilterKeyColumn(0);
+	m_ScannedModel = new QStandardItemModel(this);
+	m_ScannedModel->setColumnCount(4);
+	m_ScannedModel->setRowCount(0);
+	m_ScannedModel->setHorizontalHeaderLabels(QStringList() << tr("Issuer") << tr("Facility") << tr("Current Scenario") << tr("Detected Scenario"));
+	m_ScannedModelProxy = new ReadOnlyColProxy(this);
+	m_ScannedModelProxy->setSourceModel(m_ScannedModel);
+	m_ScannedModelProxy->SetReadOnlyCol(QList<qint32>() << 0 << 1 << 2);
+	m_ScannedModelProxy->setFilterKeyColumn(0);
+	m_ScannedModelProxy->setFilterRole(Qt::UserRole);
+
+	m_PoolScanFilterView = new QListView(this);
+	SafeSetModel(m_PoolScanFilterView, m_SortScenarios);
+	m_PoolScanFilterView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+	m_PoolScanFilterView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+	m_PoolScanFilterView->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+
+	m_PoolScanDealsView = new QListView(this);
+	m_PoolScanDealsView->setModel(m_ScannedPoolsProxy);
+	m_PoolScanDealsView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+	m_PoolScanDealsView->setSelectionMode(QAbstractItemView::SingleSelection);
+	m_PoolScanDealsView->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+
+	m_PoolScanPoolView = new QTableView(this);
+	m_PoolScanPoolView->setEditTriggers(QAbstractItemView::CurrentChanged | QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
+	m_PoolScanPoolView->setSelectionMode(QAbstractItemView::SingleSelection);
+	m_PoolScanPoolView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+	m_PoolScanPoolView->horizontalHeader()->setMinimumSectionSize(70);
+	m_PoolScanPoolView->horizontalHeader()->setStretchLastSection(true);
+	m_PoolScanPoolView->verticalHeader()->hide();
+	SafeSetModel(m_PoolScanPoolView, m_ScannedModelProxy);
+
+
+	QLabel* PoolScanFilterLaber = new QLabel(this);
+	PoolScanFilterLaber->setText(tr("Filter by Scenario"));
+	QLabel* ScannedPoolLaber = new QLabel(this);
+	ScannedPoolLaber->setText(tr("Loan Pools"));
+
+	QGroupBox* LeftGroup = new QGroupBox(this);
+	LeftGroup->setTitle(tr("Models"));
+	QVBoxLayout* LeftLay = new QVBoxLayout(LeftGroup);
+	LeftLay->addWidget(PoolScanFilterLaber);
+	LeftLay->addWidget(m_PoolScanFilterView);
+	LeftLay->addWidget(ScannedPoolLaber);
+	LeftLay->addWidget(m_PoolScanDealsView);
+
+	m_ScanPoolsButton = new QPushButton(this);
+	m_ScanPoolsButton->setText(tr("Start Scan"));
+	m_ModelsDirEdit = new QLineEdit(this);
+	m_ModelsDirEdit->setText(GetFromConfig("Folders", "UnifiedResultsFolder"));
+	QLabel* ModelFolderlabel = new QLabel(this);
+	ModelFolderlabel->setText(tr("Models Folder"));
+	QPushButton *ModelsDirBrowseButton = new QPushButton(this);
+	ModelsDirBrowseButton->setText("Browse"); //Ellipsis (...)
+	ModelsDirBrowseButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+	m_ScanProgress = new QProgressBar(this);
+	m_ScanProgress->setTextVisible(true);
+	m_ScanProgress->setRange(0, 100);
+	m_ScanProgress->hide();
+	m_ScanProgress->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+
+
+	QHBoxLayout* BottomLay = new QHBoxLayout;
+	BottomLay->addWidget(ModelFolderlabel);
+	BottomLay->addWidget(m_ModelsDirEdit);
+	BottomLay->addWidget(ModelsDirBrowseButton);
+	BottomLay->addWidget(m_ScanPoolsButton);
+
+	QWidget* TempTab = new QWidget(this);
+	QGridLayout* mainLay = new QGridLayout(TempTab);
+	mainLay->addWidget(LeftGroup, 0, 0);
+	mainLay->addWidget(m_PoolScanPoolView, 0, 1);
+	mainLay->addWidget(m_ScanProgress, 1, 0);
+	mainLay->addLayout(BottomLay, 1, 1);
+	BaseTab->addTab(TempTab, tr("Scan Models"));
+
+	connect(m_PoolScanDealsView->selectionModel(), &QItemSelectionModel::currentChanged, [&](const QModelIndex& index, const QModelIndex&) {
+		if (!index.isValid()) {
+			m_ScannedModel->setRowCount(0);
+			return;
+		}
+		QModelIndex CurrentIndex = m_ScannedPoolsProxy->mapToSource(index);
+		auto CurrAss=m_PoolMatcher->GetResult(m_ScanPoolsModel->data(CurrentIndex, Qt::UserRole + 2).toInt());
+		m_ScannedModel->setRowCount(CurrAss->ScenarioCount());
+		for (int i = 0; i < CurrAss->ScenarioCount(); ++i) {
+			m_ScannedModel->setData(m_ScannedModel->index(i, 0), CurrAss->GetIssuer(i), Qt::EditRole);
+			m_ScannedModel->setData(m_ScannedModel->index(i, 0), "#,#"+CurrAss->GetCurrScen(i) + "#,#" + CurrAss->GetDetectScen(i) + "#,#", Qt::UserRole);
+			m_ScannedModel->setData(m_ScannedModel->index(i, 1), CurrAss->GetFacility(i), Qt::EditRole);
+			m_ScannedModel->setData(m_ScannedModel->index(i, 2), CurrAss->GetCurrScen(i), Qt::EditRole);
+			m_ScannedModel->setData(m_ScannedModel->index(i, 3), CurrAss->GetDetectScen(i), Qt::EditRole);
+		}
+	});
+	connect(m_PoolScanPoolView->horizontalHeader(), &QHeaderView::sectionClicked, [&](int a) {
+		if (m_LastScannedColSorted == a + 1)
+			m_LastScannedColSorted = -(a + 1);
+		else
+			m_LastScannedColSorted = a + 1;
+		SortScanned();
+	});
+	connect(m_ScannedModel, &QStandardItemModel::dataChanged, [&](const QModelIndex& index, const QModelIndex&) {
+		if (index.column() == (qAbs(m_LastScannedColSorted) - 1)) SortScanned();
+	});
+	connect(m_PoolMatcher, &LoanAssMatcher::ProgressPct, m_ScanProgress, &QProgressBar::setValue);
+	connect(m_PoolScanFilterView->selectionModel(), &QItemSelectionModel::selectionChanged, [&](const QItemSelection & , const QItemSelection &) {
+		auto SelectedItems = m_PoolScanFilterView->selectionModel()->selectedIndexes();
+		if (SelectedItems.isEmpty()) {
+			m_ScannedPoolsProxy->setFilterRegExp(QString());
+			m_ScannedModelProxy->setFilterRegExp(QString());
+		}
+		else {
+			QString FilterRegExp;
+			for (auto i = SelectedItems.constBegin(); i != SelectedItems.constEnd(); ++i) {
+				FilterRegExp += "(?:#,#" + i->model()->data(*i, Qt::EditRole).toString() + "#,#)|";
+			}
+			FilterRegExp.chop(1);
+			m_ScannedPoolsProxy->setFilterRegExp(QRegExp(FilterRegExp, Qt::CaseInsensitive));
+			m_ScannedModelProxy->setFilterRegExp(QRegExp(FilterRegExp, Qt::CaseInsensitive));
+		}
+	});
+	connect(ModelsDirBrowseButton, &QPushButton::clicked, [&]() {
+		if (!m_ModelsDirEdit->isEnabled()) return;
+		QString NewFolder = QFileDialog::getExistingDirectory(this, tr("Select Models Directory"), m_ModelsDirEdit->text());
+		if (NewFolder.isEmpty()) return;
+		m_ModelsDirEdit->setText(NewFolder);
+	});
+	connect(m_ScanPoolsButton, &QPushButton::clicked, [&]() {
+		if (m_ScanningPools) {
+			m_ScanPoolsButton->setText(tr("Start Scan"));
+			m_PoolMatcher->StopCalculation();
+			m_ScanningPools = false;
+			m_ScanProgress->hide();
+		}
+		else{
+			m_ScanPoolsModel->setRowCount(0);
+			m_ScanningPools = true;
+			m_PoolMatcher->Reset();
+			m_PoolMatcher->SetFolderToScan(m_ModelsDirEdit->text());
+			for (auto i = m_Assumptions.constBegin(); i != m_Assumptions.constEnd(); ++i) {
+				m_PoolMatcher->AddAssumption(i.key(), *(m_DirtyAssumptions.value(i.key(), i.value())));
+			}
+			m_ScanProgress->show();
+			m_ScanPoolsButton->setText(tr("Stop"));
+			m_PoolMatcher->StartCalculation();
+		}
+	});
+	connect(m_PoolMatcher, &LoanAssMatcher::Calculated, [&]() {
+		m_ScanningPools = false;
+		m_ScanPoolsButton->setText(tr("Start Scan"));
+		m_ScanProgress->hide();
+	});
+	connect(m_PoolMatcher, &LoanAssMatcher::BeeCalculated, [&](int index) {
+		auto CurrentResult = m_PoolMatcher->GetResult(index-1);
+		if (!CurrentResult) return;
+		if (CurrentResult->isValid()) {
+			m_ScanPoolsModel->insertRow(m_ScanPoolsModel->rowCount());
+			m_ScanPoolsModel->setData(m_ScanPoolsModel->index(m_ScanPoolsModel->rowCount() - 1, 0), CurrentResult->GetDealName(), Qt::EditRole);
+			QString FilterString("#,#");
+			for (int i = 0; i < CurrentResult->ScenarioCount(); ++i) {
+				if (!FilterString.contains("#,#"+CurrentResult->GetDetectScen(i) + "#,#"))
+					FilterString += CurrentResult->GetDetectScen(i) + "#,#";
+			}
+			m_ScanPoolsModel->setData(m_ScanPoolsModel->index(m_ScanPoolsModel->rowCount() - 1, 0), FilterString, Qt::UserRole);
+			m_ScanPoolsModel->setData(m_ScanPoolsModel->index(m_ScanPoolsModel->rowCount() - 1, 0), CurrentResult->GetFilePath(), Qt::UserRole + 1);
+			m_ScanPoolsModel->setData(m_ScanPoolsModel->index(m_ScanPoolsModel->rowCount() - 1, 0), index - 1, Qt::UserRole + 2);
+			m_ScannedPoolsProxy->setFilterKeyColumn(0);
+		}
+	});
+}
+
+
 
 
 

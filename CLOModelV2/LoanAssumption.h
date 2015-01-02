@@ -3,7 +3,8 @@
 #include <QString>
 #include <QStringList>
 #include <QDate>
-class LoanAssumption {
+#include "BackwardCompatibilityInterface.h"
+class LoanAssumption :public BackwardInterface {
 public:
 	enum AssumptionType {
 		MaturityExtension = 0
@@ -139,5 +140,11 @@ public:
 	QString GetRawMezzHaircut() const { return GetRawAssumption(Haircut, Mezz); }
 	QString GetRawMezzPrepayMultiplier()const { return GetRawAssumption(PrepayMultiplier, Mezz); }
 	QString GetRawMezzLossMultiplier()const { return GetRawAssumption(LossMultiplier, Mezz); }
+protected:
+	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
+	friend QDataStream& operator<<(QDataStream & stream, const LoanAssumption& flows);
+	friend QDataStream& operator>>(QDataStream & stream, LoanAssumption& flows);
 };
+QDataStream& operator<<(QDataStream & stream, const LoanAssumption& flows);
+QDataStream& operator>>(QDataStream & stream, LoanAssumption& flows);
 #endif // LoanAssumption_h__

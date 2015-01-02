@@ -24,18 +24,18 @@ void LoanAssMatcherThread::run() {
 	{QDate Junk; out >> Junk; }
 	{bool Junk; out >> Junk; }
 	{bool Junk; out >> Junk; }
-	{Waterfall Junk; Junk.SetLoadProtocolVersion(VersionChecker); out >> Junk; }
+	QString NewModelName;
+	{Waterfall Junk; Junk.SetLoadProtocolVersion(VersionChecker); out >> Junk; NewModelName = Junk.GetDealName(); }
 	{Waterfall Junk; Junk.SetLoadProtocolVersion(VersionChecker); out >> Junk; }
 	QHash<qint32, Mortgage*> LoanPool;
-	{
-		MtgCalculator Junk;
-		Junk.SetLoadProtocolVersion(VersionChecker);
-		out >> Junk;
-		ModelFile.close();
-		LoanPool = Junk.GetLoans();
-	}
+	MtgCalculator Junk;
+	Junk.SetLoadProtocolVersion(VersionChecker);
+	out >> Junk;
+	ModelFile.close();
+	LoanPool = Junk.GetLoans();
+
 	for (auto i = LoanPool.constBegin(); i != LoanPool.constEnd(); ++i) {
-		for (auto j = m_AvailableAssumptions.constBegin(); j != m_AvailableAssumptions.constEnd(); ++j) {
+		for (auto j = m_AvailableAssumptions->constBegin(); j != m_AvailableAssumptions->constEnd(); ++j) {
 			if (j.value()->GetScenarioName().compare(i.value()->GetProperty("Scenario"),Qt::CaseInsensitive)==0) continue;
 			for (const QString& CurrProperty : LoansPropertiesToSearch) {
 				if (j.value()->MatchPattern(i.value()->GetProperty(CurrProperty))) {
@@ -47,7 +47,7 @@ void LoanAssMatcherThread::run() {
 	}
 	if (Result.ScenarioCount() > 0) {
 		Result.SetFilePath(m_ModelToScan);
-		Result.SetDealName(QFileInfo(ModelFile).completeBaseName());
+		Result.SetDealName(NewModelName.isEmpty() ? QFileInfo(ModelFile).completeBaseName() : NewModelName);
 	}
 	emit AnonimCalculated(Identifier);
 }

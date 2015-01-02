@@ -1,4 +1,5 @@
 #include "LoanAssMatcher.h"
+#include <QDir>
 #ifndef NO_DATABASE
 #include <QSqlDatabase>
 #include <QSqlError>
@@ -9,10 +10,12 @@
 LoanAssMatcher::LoanAssMatcher(QObject *parent)
 	: TemplAsyncCalculator<LoanAssMatcherThread, LoanAssMatcherResult>(parent)
 {
-
+	connect(this, &LoanAssMatcher::Calculated, [&]() {m_FilesInFolder.clear(); });
 }
 void LoanAssMatcher::GetAssumptionsDatabase() {
+	if (m_ContinueCalculation) return;
 #ifndef NO_DATABASE
+	QHash<QString, LoanAssumption*> NewAssumptions;
 	m_AvailableAssumptions.clear();
 	Db_Mutex.lock();
 	QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
@@ -37,17 +40,17 @@ void LoanAssMatcher::GetAssumptionsDatabase() {
 				FieldCount = 0;
 				auto LoanAssRecord = LoanAssQuery.record();
 				QString CurrentScenario = LoanAssRecord.value(FieldCount).toString(); ++FieldCount;
-				QSharedPointer<LoanAssumption> CurrentAss(nullptr);
-				for (auto i = m_AvailableAssumptions.begin(); i != m_AvailableAssumptions.end(); ++i) {
+				LoanAssumption* CurrentAss(nullptr);
+				for (auto i = NewAssumptions.begin(); i != NewAssumptions.end(); ++i) {
 					if (i.key().compare(CurrentScenario, Qt::CaseInsensitive) == 0) {
 						CurrentAss = i.value();
 						break;
 					}
 				}
 				if (!CurrentAss) {
-					CurrentAss = QSharedPointer<LoanAssumption>(new LoanAssumption(CurrentScenario));
+					CurrentAss = new LoanAssumption(CurrentScenario);
 					if (!LoanAssRecord.isNull(FieldCount)) CurrentAss->SetAliases(LoanAssRecord.value(FieldCount).toString());
-					m_AvailableAssumptions.insert(CurrentAss->GetScenarioName(), CurrentAss);
+					NewAssumptions.insert(CurrentAss->GetScenarioName(), CurrentAss);
 				}++FieldCount;
 				CurrentSenior = LoanAssRecord.value(FieldCount).toBool(); ++FieldCount;
 				if (!LoanAssRecord.isNull(FieldCount)) {
@@ -116,18 +119,109 @@ void LoanAssMatcher::GetAssumptionsDatabase() {
 	}
 	Db_Mutex.unlock();
 #endif
+	for (auto i = NewAssumptions.begin(); i != NewAssumptions.end(); ++i) {
+		m_AvailableAssumptions.insert(i.key(), QSharedPointer<LoanAssumption>(i.value()));
+	}
 }
 
 void LoanAssMatcher::AddAssumption(const QString& key,const LoanAssumption& a) {
+	if (m_ContinueCalculation) return;
 	m_AvailableAssumptions.remove(key);
 	m_AvailableAssumptions.insert(key, QSharedPointer<LoanAssumption>(new LoanAssumption(a)));
 }
 
 void LoanAssMatcher::RemoveAssumption(const QString& key) {
+	if (m_ContinueCalculation) return;
 	m_AvailableAssumptions.remove(key);
 }
 
-void LoanAssMatcher::Clear() {
+void LoanAssMatcher::Reset() {
+	if (m_ContinueCalculation) return;
 	m_AvailableAssumptions.clear();
 	m_FolderToScan.clear();
+	m_FilesInFolder.clear();
+	TemplAsyncCalculator<LoanAssMatcherThread, LoanAssMatcherResult>::Reset();
+}
+
+QString LoanAssMatcher::ReadyToCalculate() const {
+	QString Result;
+	if (NumBees()==0) Result += tr("No models found in the specified folder\n");
+	if (m_AvailableAssumptions.isEmpty()) Result += tr("No assumptions available\n");
+	return Result;
+}
+
+int LoanAssMatcher::NumBees() const {
+	if (!m_FilesInFolder.isEmpty()) return m_FilesInFolder.size();
+	QDir Source(m_FolderToScan);
+	if (!Source.exists()) return 0;
+	Source.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
+	Source.setNameFilters(QStringList() << "*.clom");
+	return Source.entryInfoList().size();
+}
+
+bool LoanAssMatcher::StartCalculation() {
+	if (m_ContinueCalculation) return false;
+	if (!ReadyToCalculate().isEmpty()) return false;
+	QDir Source(m_FolderToScan);
+	Source.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
+	Source.setNameFilters(QStringList() << "*.clom");
+	m_FilesInFolder= Source.entryInfoList();
+	BeesReturned = 0;
+	BeesSent.clear();
+	m_ContinueCalculation = true;
+	int NumberOfThreads = QThread::idealThreadCount();
+	if (m_SequentialComputation || NumberOfThreads < 1) NumberOfThreads = 1;
+	LoanAssMatcherThread* CurrentThread;
+	for (int i = 0; i < m_FilesInFolder.size() && i<NumberOfThreads; ++i) {
+		if (BeesSent.contains(i)) continue;
+		CurrentThread = AddThread(i);
+		CurrentThread->SetAvailableAssumptions(m_AvailableAssumptions);
+		CurrentThread->SetModelToScan(m_FilesInFolder.at(i).absoluteFilePath());
+		CurrentThread->start();
+	}
+	return true;
+}
+
+void LoanAssMatcher::BeeReturned(int Ident, const LoanAssMatcherResult& a) {
+	TemplAsyncCalculator<LoanAssMatcherThread, LoanAssMatcherResult>::BeeReturned(Ident, a);
+	if (!m_ContinueCalculation)return;
+	for (int i = 0; i < m_FilesInFolder.size(); ++i) {
+		if (BeesSent.contains(i)) continue;
+		LoanAssMatcherThread* CurrentThread = AddThread(i);
+		CurrentThread->SetAvailableAssumptions(m_AvailableAssumptions);
+		CurrentThread->SetModelToScan(m_FilesInFolder.at(i).absoluteFilePath());
+		CurrentThread->start();
+		return;
+	}
+}
+
+void LoanAssMatcher::SetFolderToScan(const QString& val) {
+	if (m_ContinueCalculation) return;
+	m_FolderToScan = val;
+	m_FilesInFolder.clear();
+}
+
+QDataStream& LoanAssMatcher::LoadOldVersion(QDataStream& stream) {
+	qint32 TempSize;
+	QString TempString; 
+	LoanAssumption TempAss("");
+	stream >> m_FolderToScan >> TempSize;
+	for (int i = 0; i < TempSize; ++i) {
+		stream >> TempString >> TempAss;
+		m_AvailableAssumptions.insert(TempString, QSharedPointer<LoanAssumption>(new LoanAssumption(TempAss)));
+	}
+	ResetProtocolVersion();
+	return stream;
+}
+
+QDataStream& operator<<(QDataStream & stream, const LoanAssMatcher& flows) {
+	stream << flows.m_FolderToScan << qint32(flows.m_AvailableAssumptions.size());
+	for (auto i = flows.m_AvailableAssumptions.constBegin(); i != flows.m_AvailableAssumptions.constEnd(); ++i) {
+		stream << i.key() << *(i.value());
+	}
+	return stream;
+}
+
+QDataStream& operator>>(QDataStream & stream, LoanAssMatcher& flows) {
+	return flows.LoadOldVersion(stream);
 }

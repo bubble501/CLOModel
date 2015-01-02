@@ -94,3 +94,39 @@ QString LoanAssumption::GelAliasString() const {
 	}
 	return Result;
 }
+
+QDataStream& LoanAssumption::LoadOldVersion(QDataStream& stream) {
+	qint32 OldAssumptionTypeSize, OldSenioritySize;
+	stream >> OldAssumptionTypeSize >> OldSenioritySize
+			>> m_ScenarioName >> m_Aliases;
+	for (int i = 0; i < qMin(static_cast<qint32>(SenioritySize), OldSenioritySize); ++i) {
+		stream >> m_LastUpdate[i];
+	}
+	for (int i = 0; i < qMin(static_cast<qint32>(AssumptionTypeSize), OldAssumptionTypeSize); ++i) {
+		for (int j = 0; j < qMin(static_cast<qint32>(SenioritySize), OldSenioritySize); ++j) {
+			stream >> m_Assumptions[i][j];
+		}
+	}
+	ResetProtocolVersion();
+	return stream;
+}
+
+QDataStream& operator<<(QDataStream & stream, const LoanAssumption& flows) {
+	stream << static_cast<qint32>(flows.AssumptionTypeSize) << static_cast<qint32>(flows.SenioritySize)
+		<< flows.m_ScenarioName
+		<< flows.m_Aliases
+	;
+	for (const QDate& SingleDate : flows.m_LastUpdate) {
+		stream << SingleDate;
+	}
+	for (auto i = std::begin(flows.m_Assumptions); i != std::end(flows.m_Assumptions); ++i) {
+		for (auto j = std::begin(*i); j != std::end(*i); ++j) {
+			stream << *j;
+		}
+	}
+	return stream;
+}
+
+QDataStream& operator>>(QDataStream & stream, LoanAssumption& flows) {
+	return flows.LoadOldVersion(stream);
+}

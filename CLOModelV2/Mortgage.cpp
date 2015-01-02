@@ -70,21 +70,43 @@ void Mortgage::SetInterest(const QString& a){
 	 IntegerVector DelinquencyLag,
 	 bool OverrideProperties,
 	 bool DownloadScenario
-	 )
- {
+	 ) {
 	 QDate AdjStartDate(StartDate.year(), StartDate.month(), 15);
 	 MtgCashFlow DelinquenciesFlows; //Delinquencies will be calculated separately and joined at the end
 	 m_CashFlows.Clear();
-	 qint32 MaturityExtension=0;
+	 qint32 MaturityExtension = 0;
 	 double StartingHaircut = 0.0;
 	 BloombergVector PrepaymentFee("0");
 	 BloombergVector HaircutVector("0");
 	 BloombergVector PrepayMultiplier("100");
 	 BloombergVector LossMultiplier("100");
 	 DayCountVector CurrentDayCountConvention(QString("%1").arg(static_cast<qint16>(DayCountConvention::CompN30360)));
+
+	 auto ApplyProperty = &([&]() {
+		 if (HasProperty("MaturityExtension")) MaturityExtension = GetProperty("MaturityExtension").toInt();
+		 if (HasProperty("StartingHaircut")) StartingHaircut = GetProperty("StartingHaircut").toDouble();
+		 if (HasProperty("PrepaymentFee")) PrepaymentFee = GetProperty("PrepaymentFee");
+		 if (HasProperty("DayCount")) { const DayCountVector TempDCV(GetProperty("DayCount")); if (!TempDCV.IsEmpty()) CurrentDayCountConvention = TempDCV; }
+		 if (HasProperty("Haircut")) HaircutVector = GetProperty("Haircut");
+		 if (HasProperty("PrepayMultiplier")) PrepayMultiplier = GetProperty("PrepayMultiplier");
+		 if (HasProperty("LossMultiplier")) LossMultiplier = GetProperty("LossMultiplier");
+		 if (!OverrideProperties) {
+			 if (HasProperty("CPR")) CPRVec = GetProperty("CPR");
+			 if (HasProperty("CDR")) CDRVec = GetProperty("CDR");
+			 if (HasProperty("LS")) LossVec = GetProperty("LS");
+			 if (HasProperty("RecoveryLag")) RecoveryLag = GetProperty("RecoveryLag");
+			 if (HasProperty("Delinquency")) Delinquency = GetProperty("Delinquency");
+			 if (HasProperty("DelinquencyLag")) DelinquencyLag = GetProperty("DelinquencyLag");
+		 }
+	 });
+
+#ifndef Assumptions_ExcelOverDB
+	 (*ApplyProperty)();
+#endif
+
 #ifndef NO_DATABASE
 	 if (HasProperty("Scenario") && HasProperty("Mezzanine") && DownloadScenario) {
-		//Download Scenario From Database
+		 //Download Scenario From Database
 		 Db_Mutex.lock();
 		 QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
 		 if (!db.isValid()) {
@@ -94,7 +116,7 @@ void Mortgage::SetInterest(const QString& a){
 					 "Driver={" + GetFromConfig("Database", "Driver", "SQL Server")
 					 + "}; "
 					 + GetFromConfig("Database", "DataSource", R"(Server=SYNSERVER2\SQLExpress; Initial Catalog = ABSDB; Integrated Security = SSPI; Trusted_Connection = Yes;)")
-				);
+					 );
 			 }
 		 }
 		 bool DbOpen = db.isOpen();
@@ -104,52 +126,39 @@ void Mortgage::SetInterest(const QString& a){
 			 LoanAssQuerry.setForwardOnly(true);
 			 LoanAssQuerry.prepare("{CALL " + GetFromConfig("Database", "GetLoanAssumptionStoredProc", "getLoanAssumption(:scenarioName,:isSenior)") + "}");
 			 LoanAssQuerry.bindValue(":scenarioName", GetProperty("Scenario"));
-			 LoanAssQuerry.bindValue(":isSenior", static_cast<bool>(GetProperty("Mezzanine").compare("Yes",Qt::CaseInsensitive)!=0));
+			 LoanAssQuerry.bindValue(":isSenior", static_cast<bool>(GetProperty("Mezzanine").compare("Yes", Qt::CaseInsensitive) != 0));
 			 if (LoanAssQuerry.exec()) {
 				 if (LoanAssQuerry.next()) {
-					auto DbgRecord = LoanAssQuerry.record();
-					int FieldCount = 0;
-					QString VecsAnchor;
-					if (!DbgRecord.isNull(FieldCount)) VecsAnchor = "A " + DbgRecord.value(FieldCount).toDate().toString("MM/dd/aaaa") + ' ';
-					if (!DbgRecord.isNull(FieldCount)) MaturityExtension = DbgRecord.value(FieldCount).toInt(); ++FieldCount;
-					if (!DbgRecord.isNull(FieldCount)) StartingHaircut = DbgRecord.value(FieldCount).toDouble(); ++FieldCount;
-					if (!DbgRecord.isNull(FieldCount)) PrepaymentFee = VecsAnchor+ DbgRecord.value(FieldCount).toString(); ++FieldCount;
-					if (!DbgRecord.isNull(FieldCount)) CurrentDayCountConvention = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
-					if (!OverrideProperties) {
-						if (!DbgRecord.isNull(FieldCount)) CPRVec = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
-						if (!DbgRecord.isNull(FieldCount)) CDRVec = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
-						if (!DbgRecord.isNull(FieldCount)) LossVec = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
-						if (!DbgRecord.isNull(FieldCount)) RecoveryLag = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
-						if (!DbgRecord.isNull(FieldCount)) Delinquency = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
-						if (!DbgRecord.isNull(FieldCount)) DelinquencyLag = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
-					}
-					else FieldCount += 6;
-					if (!HasProperty("Price") && !DbgRecord.isNull(FieldCount)) SetProperty("Price", QString::number(DbgRecord.value(FieldCount).toDouble(), 'f')); ++FieldCount;
-					if (!DbgRecord.isNull(FieldCount)) HaircutVector = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
-					if (!DbgRecord.isNull(FieldCount)) PrepayMultiplier = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
-					if (!DbgRecord.isNull(FieldCount)) LossMultiplier = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
+					 auto DbgRecord = LoanAssQuerry.record();
+					 int FieldCount = 0;
+					 QString VecsAnchor;
+					 if (!DbgRecord.isNull(FieldCount)) VecsAnchor = "A " + DbgRecord.value(FieldCount).toDate().toString("MM/dd/aaaa") + ' ';
+					 if (!DbgRecord.isNull(FieldCount)) MaturityExtension = DbgRecord.value(FieldCount).toInt(); ++FieldCount;
+					 if (!DbgRecord.isNull(FieldCount)) StartingHaircut = DbgRecord.value(FieldCount).toDouble(); ++FieldCount;
+					 if (!DbgRecord.isNull(FieldCount)) PrepaymentFee = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
+					 if (!DbgRecord.isNull(FieldCount)) CurrentDayCountConvention = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
+					 if (!OverrideProperties) {
+						 if (!DbgRecord.isNull(FieldCount)) CPRVec = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
+						 if (!DbgRecord.isNull(FieldCount)) CDRVec = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
+						 if (!DbgRecord.isNull(FieldCount)) LossVec = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
+						 if (!DbgRecord.isNull(FieldCount)) RecoveryLag = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
+						 if (!DbgRecord.isNull(FieldCount)) Delinquency = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
+						 if (!DbgRecord.isNull(FieldCount)) DelinquencyLag = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
+					 }
+					 else FieldCount += 6;
+					 if (!HasProperty("Price") && !DbgRecord.isNull(FieldCount)) SetProperty("Price", QString::number(DbgRecord.value(FieldCount).toDouble(), 'f')); ++FieldCount;
+					 if (!DbgRecord.isNull(FieldCount)) HaircutVector = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
+					 if (!DbgRecord.isNull(FieldCount)) PrepayMultiplier = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
+					 if (!DbgRecord.isNull(FieldCount)) LossMultiplier = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
 				 }
 			 }
 		 }
 		 Db_Mutex.unlock();
 	 }
 #endif
-
-	 if (HasProperty("MaturityExtension")) MaturityExtension = GetProperty("MaturityExtension").toInt();
-	 if (HasProperty("StartingHaircut")) StartingHaircut = GetProperty("StartingHaircut").toDouble();
-	 if (HasProperty("PrepaymentFee")) PrepaymentFee = GetProperty("PrepaymentFee");
-	 if (HasProperty("DayCount")) { const DayCountVector TempDCV(GetProperty("DayCount")); if (!TempDCV.IsEmpty()) CurrentDayCountConvention = TempDCV; }
-	 if (HasProperty("Haircut")) HaircutVector=GetProperty("Haircut");
-	 if (HasProperty("PrepayMultiplier")) PrepayMultiplier = GetProperty("PrepayMultiplier");
-	 if (HasProperty("LossMultiplier")) LossMultiplier = GetProperty("LossMultiplier");
-	 if (!OverrideProperties) {
-		 if (HasProperty("CPR")) CPRVec = GetProperty("CPR");
-		 if (HasProperty("CDR")) CDRVec = GetProperty("CDR");
-		 if (HasProperty("LS")) LossVec = GetProperty("LS");
-		 if (HasProperty("RecoveryLag")) RecoveryLag = GetProperty("RecoveryLag");
-		 if (HasProperty("Delinquency")) Delinquency = GetProperty("Delinquency");
-		 if (HasProperty("DelinquencyLag")) DelinquencyLag = GetProperty("DelinquencyLag");
-	 }
+#ifdef Assumptions_ExcelOverDB
+	 (*ApplyProperty)();
+#endif
 	 if (
 		 CPRVec.IsEmpty(0.0, 1.0)
 		 || CDRVec.IsEmpty(0.0, 1.0)

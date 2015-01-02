@@ -18,6 +18,7 @@ protected:
 public:
 	MtgCalculatorThread(int Identity,QObject* parent=nullptr);
 	void SetLoan(const Mortgage& a){Loan=a;}
+	void SetLoanProperty(const QString& pn, const QString& pv) { Loan.SetProperty(pn, pv); }
 	const Mortgage& Getloan() const{return Loan;}
 	const MtgCashFlow& GetCashFlow()const{return Loan.GetCashFlow();}
 	void SetCPR(const QString& a);

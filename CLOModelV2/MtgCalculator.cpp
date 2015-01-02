@@ -158,6 +158,12 @@ bool MtgCalculator::StartCalculation() {
 		if (BeesSent.contains(SingleLoan.key())) continue;
 		CurrentThread = AddThread(SingleLoan.key());
 		CurrentThread->SetLoan(*(SingleLoan.value()));
+		if (TempProperties.contains(SingleLoan.key())) {
+			const auto CurrProps = TempProperties.value(SingleLoan.key());
+			for (auto j = CurrProps->constBegin(); j != CurrProps->constEnd(); ++j) {
+				CurrentThread->SetLoanProperty(j.key(), j.value());
+			}
+		}
 		CurrentThread->SetCPR(m_CPRass);
 		CurrentThread->SetCDR(m_CDRass);
 		CurrentThread->SetLS(m_LSass);
@@ -174,6 +180,7 @@ bool MtgCalculator::StartCalculation() {
 }
 void MtgCalculator::BeeReturned(int Ident, const MtgCashFlow& a) {
 	m_AggregatedRes+=a;
+	if (Loans.contains(Ident)) Loans[Ident]->SetCashFlows(a);
 	TemplAsyncCalculator<MtgCalculatorThread, MtgCashFlow>::BeeReturned(Ident, a);
 	if (!m_ContinueCalculation)return;
 	MtgCalculatorThread* CurrentThread;
@@ -181,6 +188,12 @@ void MtgCalculator::BeeReturned(int Ident, const MtgCashFlow& a) {
 		if (BeesSent.contains(SingleLoan.key())) continue;
 		CurrentThread = AddThread(SingleLoan.key());
 		CurrentThread->SetLoan(*(SingleLoan.value()));
+		if (TempProperties.contains(SingleLoan.key())) {
+			const auto CurrProps = TempProperties.value(SingleLoan.key());
+			for (auto j = CurrProps->constBegin(); j != CurrProps->constEnd(); ++j) {
+				CurrentThread->SetLoanProperty(j.key(), j.value());
+			}
+		}
 		CurrentThread->SetCPR(m_CPRass);
 		CurrentThread->SetCDR(m_CDRass);
 		CurrentThread->SetLS(m_LSass);
@@ -203,6 +216,7 @@ void MtgCalculator::ClearLoans() {
 }
 void MtgCalculator::Reset(){
 	ClearLoans();
+	ClearTempProperties();
 	TemplAsyncCalculator<MtgCalculatorThread, MtgCashFlow>::Reset();
 }
 QString MtgCalculator::ReadyToCalculate()const{
@@ -295,11 +309,12 @@ void MtgCalculator::ClearResults() {
 }
 #ifndef NO_DATABASE
 void MtgCalculator::DownloadScenarios() {
+	ClearTempProperties();
 	QCache<QString, LoanAssumption> AssumptionCache;
-	foreach(Mortgage* i,Loans){
-		if (i->HasProperty("Scenario") && i->HasProperty("Mezzanine")) {
-			if (!AssumptionCache.contains(i->GetProperty("Scenario"))) {
-				LoanAssumption* DownloadedAssumption = new LoanAssumption(i->GetProperty("Scenario"));
+	for (auto i = Loans.constBegin(); i != Loans.constEnd(); ++i) { 
+		if (i.value()->HasProperty("Scenario") && i.value()->HasProperty("Mezzanine")) {
+			if (!AssumptionCache.contains(i.value()->GetProperty("Scenario"))) {
+				LoanAssumption* DownloadedAssumption = new LoanAssumption(i.value()->GetProperty("Scenario"));
 				Db_Mutex.lock();
 				QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
 				if (!db.isValid()) {
@@ -318,7 +333,7 @@ void MtgCalculator::DownloadScenarios() {
 					QSqlQuery LoanAssQuerry(db);
 					LoanAssQuerry.setForwardOnly(true);
 					LoanAssQuerry.prepare("{CALL " + GetFromConfig("Database", "GetLoanAssumptionStoredProc", "getLoanAssumption(:scenarioName,:isSenior)") + "}");
-					LoanAssQuerry.bindValue(":scenarioName", i->GetProperty("Scenario"));
+					LoanAssQuerry.bindValue(":scenarioName", i.value()->GetProperty("Scenario"));
 					LoanAssQuerry.bindValue(":isSenior", true);
 					if (LoanAssQuerry.exec()) {
 						if (LoanAssQuerry.next()) {
@@ -367,39 +382,74 @@ void MtgCalculator::DownloadScenarios() {
 				Db_Mutex.unlock();
 				AssumptionCache.insert(DownloadedAssumption->GetScenarioName(), DownloadedAssumption);
 			}
-			if (i->GetProperty("Mezzanine").compare("Yes", Qt::CaseInsensitive) == 0) {
-				auto CurrentAss = AssumptionCache.object(i->GetProperty("Scenario"));
-				if (!i->HasProperty("MaturityExtension") && !CurrentAss->GetRawMezzMaturityExtension().isEmpty()) i->SetProperty("MaturityExtension", CurrentAss->GetMezzMaturityExtension());
-				if (!i->HasProperty("StartingHaircut") && !CurrentAss->GetRawMezzInitialHaircut().isEmpty())  i->SetProperty("StartingHaircut", CurrentAss->GetMezzHaircut());
-				if (!i->HasProperty("PrepaymentFee") && !CurrentAss->GetRawMezzPrepaymentFee().isEmpty())i->SetProperty("PrepaymentFee", CurrentAss->GetMezzPrepaymentFee());
-				if (!i->HasProperty("DayCount") && !CurrentAss->GetRawMezzDayCount().isEmpty()) i->SetProperty("DayCount", CurrentAss->GetMezzDayCount());
-				if (!i->HasProperty("Haircut") && !CurrentAss->GetRawMezzHaircut().isEmpty()) i->SetProperty("Haircut", CurrentAss->GetMezzHaircut());
-				if (!i->HasProperty("PrepayMultiplier") && !CurrentAss->GetRawMezzPrepayMultiplier().isEmpty())i->SetProperty("PrepayMultiplier", CurrentAss->GetMezzPrepayMultiplier());
-				if (!i->HasProperty("LossMultiplier") && !CurrentAss->GetRawMezzLossMultiplier().isEmpty()) i->SetProperty("LossMultiplier", CurrentAss->GetMezzLossMultiplier());
-				if (!i->HasProperty("CPR") && !CurrentAss->GetRawMezzCPR().isEmpty()) i->SetProperty("CPR", CurrentAss->GetMezzCPR());
-				if (!i->HasProperty("CDR") && !CurrentAss->GetRawMezzCDR().isEmpty()) i->SetProperty("CDR", CurrentAss->GetMezzCDR());
-				if (!i->HasProperty("LS") && !CurrentAss->GetRawMezzLS().isEmpty()) i->SetProperty("LS", CurrentAss->GetMezzLS());
-				if (!i->HasProperty("RecoveryLag") && !CurrentAss->GetRawMezzRecoveryLag().isEmpty()) i->SetProperty("RecoveryLag", CurrentAss->GetMezzRecoveryLag());
-				if (!i->HasProperty("Delinquency") && !CurrentAss->GetRawMezzDelinquency().isEmpty())  i->SetProperty("Delinquency", CurrentAss->GetMezzDelinquency());
-				if (!i->HasProperty("DelinquencyLag") && !CurrentAss->GetRawMezzDelinquencyLag().isEmpty())  i->SetProperty("DelinquencyLag", CurrentAss->GetMezzDelinquencyLag());
-				if (!i->HasProperty("Price") && !CurrentAss->GetRawMezzPrice().isEmpty())  i->SetProperty("Price", CurrentAss->GetMezzPrice());
+			const bool OverrideCurrent=
+				#ifdef Assumptions_ExcelOverDB
+					false
+				#else
+					true
+				#endif
+			;
+			if (i.value()->GetProperty("Mezzanine").compare("Yes", Qt::CaseInsensitive) == 0) {
+				auto CurrentAss = AssumptionCache.object(i.value()->GetProperty("Scenario"));
+				if ((OverrideCurrent || !i.value()->HasProperty("MaturityExtension"))
+					&&!CurrentAss->GetRawMezzMaturityExtension().isEmpty()) AddTempProperty(i.key(),"MaturityExtension", CurrentAss->GetMezzMaturityExtension());
+				if ((OverrideCurrent || !i.value()->HasProperty("StartingHaircut"))
+					&& !CurrentAss->GetRawMezzInitialHaircut().isEmpty())  AddTempProperty(i.key(),"StartingHaircut", CurrentAss->GetMezzHaircut());
+				if ((OverrideCurrent || !i.value()->HasProperty("PrepaymentFee"))
+					&& !CurrentAss->GetRawMezzPrepaymentFee().isEmpty())AddTempProperty(i.key(),"PrepaymentFee", CurrentAss->GetMezzPrepaymentFee());
+				if ((OverrideCurrent || !i.value()->HasProperty("DayCount"))
+					&&!CurrentAss->GetRawMezzDayCount().isEmpty()) AddTempProperty(i.key(),"DayCount", CurrentAss->GetMezzDayCount());
+				if ((OverrideCurrent || !i.value()->HasProperty("Haircut"))
+					&& !CurrentAss->GetRawMezzHaircut().isEmpty()) AddTempProperty(i.key(),"Haircut", CurrentAss->GetMezzHaircut());
+				if ((OverrideCurrent || !i.value()->HasProperty("PrepayMultiplier"))
+					&& !CurrentAss->GetRawMezzPrepayMultiplier().isEmpty())AddTempProperty(i.key(),"PrepayMultiplier", CurrentAss->GetMezzPrepayMultiplier());
+				if ((OverrideCurrent || !i.value()->HasProperty("LossMultiplier"))
+					&& !CurrentAss->GetRawMezzLossMultiplier().isEmpty()) AddTempProperty(i.key(),"LossMultiplier", CurrentAss->GetMezzLossMultiplier());
+				if ((OverrideCurrent || !i.value()->HasProperty("CPR"))
+					&& !CurrentAss->GetRawMezzCPR().isEmpty()) AddTempProperty(i.key(),"CPR", CurrentAss->GetMezzCPR());
+				if ((OverrideCurrent || !i.value()->HasProperty("CDR"))
+					&& !CurrentAss->GetRawMezzCDR().isEmpty()) AddTempProperty(i.key(),"CDR", CurrentAss->GetMezzCDR());
+				if ((OverrideCurrent || !i.value()->HasProperty("LS"))
+					&& !CurrentAss->GetRawMezzLS().isEmpty()) AddTempProperty(i.key(),"LS", CurrentAss->GetMezzLS());
+				if ((OverrideCurrent || !i.value()->HasProperty("RecoveryLag"))
+					&& !CurrentAss->GetRawMezzRecoveryLag().isEmpty()) AddTempProperty(i.key(),"RecoveryLag", CurrentAss->GetMezzRecoveryLag());
+				if ((OverrideCurrent || !i.value()->HasProperty("Delinquency"))
+					&& !CurrentAss->GetRawMezzDelinquency().isEmpty())  AddTempProperty(i.key(),"Delinquency", CurrentAss->GetMezzDelinquency());
+				if ((OverrideCurrent || !i.value()->HasProperty("DelinquencyLag"))
+					&& !CurrentAss->GetRawMezzDelinquencyLag().isEmpty())  AddTempProperty(i.key(),"DelinquencyLag", CurrentAss->GetMezzDelinquencyLag());
+				if ((OverrideCurrent || !i.value()->HasProperty("Price"))
+					&& !CurrentAss->GetRawMezzPrice().isEmpty())  AddTempProperty(i.key(),"Price", CurrentAss->GetMezzPrice());
 			}
 			else {
-				auto CurrentAss = AssumptionCache.object(i->GetProperty("Scenario"));
-				if (!i->HasProperty("MaturityExtension") && !CurrentAss->GetRawSeniorMaturityExtension().isEmpty()) i->SetProperty("MaturityExtension", CurrentAss->GetSeniorMaturityExtension());
-				if (!i->HasProperty("StartingHaircut") && !CurrentAss->GetRawSeniorInitialHaircut().isEmpty())  i->SetProperty("StartingHaircut", CurrentAss->GetSeniorHaircut());
-				if (!i->HasProperty("PrepaymentFee") && !CurrentAss->GetRawSeniorPrepaymentFee().isEmpty())i->SetProperty("PrepaymentFee", CurrentAss->GetSeniorPrepaymentFee());
-				if (!i->HasProperty("DayCount") && !CurrentAss->GetRawSeniorDayCount().isEmpty()) i->SetProperty("DayCount", CurrentAss->GetSeniorDayCount());
-				if (!i->HasProperty("Haircut") && !CurrentAss->GetRawSeniorHaircut().isEmpty()) i->SetProperty("Haircut", CurrentAss->GetSeniorHaircut());
-				if (!i->HasProperty("PrepayMultiplier") && !CurrentAss->GetRawSeniorPrepayMultiplier().isEmpty())i->SetProperty("PrepayMultiplier", CurrentAss->GetSeniorPrepayMultiplier());
-				if (!i->HasProperty("LossMultiplier") && !CurrentAss->GetRawSeniorLossMultiplier().isEmpty()) i->SetProperty("LossMultiplier", CurrentAss->GetSeniorLossMultiplier());
-				if (!i->HasProperty("CPR") && !CurrentAss->GetRawSeniorCPR().isEmpty()) i->SetProperty("CPR", CurrentAss->GetSeniorCPR());
-				if (!i->HasProperty("CDR") && !CurrentAss->GetRawSeniorCDR().isEmpty()) i->SetProperty("CDR", CurrentAss->GetSeniorCDR());
-				if (!i->HasProperty("LS") && !CurrentAss->GetRawSeniorLS().isEmpty()) i->SetProperty("LS", CurrentAss->GetSeniorLS());
-				if (!i->HasProperty("RecoveryLag") && !CurrentAss->GetRawSeniorRecoveryLag().isEmpty()) i->SetProperty("RecoveryLag", CurrentAss->GetSeniorRecoveryLag());
-				if (!i->HasProperty("Delinquency") && !CurrentAss->GetRawSeniorDelinquency().isEmpty())  i->SetProperty("Delinquency", CurrentAss->GetSeniorDelinquency());
-				if (!i->HasProperty("DelinquencyLag") && !CurrentAss->GetRawSeniorDelinquencyLag().isEmpty())  i->SetProperty("DelinquencyLag", CurrentAss->GetSeniorDelinquencyLag());
-				if (!i->HasProperty("Price") && !CurrentAss->GetRawSeniorPrice().isEmpty())  i->SetProperty("Price", CurrentAss->GetSeniorPrice());
+				auto CurrentAss = AssumptionCache.object(i.value()->GetProperty("Scenario"));
+				if ((OverrideCurrent || !i.value()->HasProperty("MaturityExtension"))
+					&& !CurrentAss->GetRawSeniorMaturityExtension().isEmpty()) AddTempProperty(i.key(),"MaturityExtension", CurrentAss->GetSeniorMaturityExtension());
+				if ((OverrideCurrent || !i.value()->HasProperty("StartingHaircut"))
+					&& !CurrentAss->GetRawSeniorInitialHaircut().isEmpty())  AddTempProperty(i.key(),"StartingHaircut", CurrentAss->GetSeniorHaircut());
+				if ((OverrideCurrent || !i.value()->HasProperty("PrepaymentFee"))
+					&& !CurrentAss->GetRawSeniorPrepaymentFee().isEmpty())AddTempProperty(i.key(),"PrepaymentFee", CurrentAss->GetSeniorPrepaymentFee());
+				if ((OverrideCurrent || !i.value()->HasProperty("DayCount"))
+					&& !CurrentAss->GetRawSeniorDayCount().isEmpty()) AddTempProperty(i.key(),"DayCount", CurrentAss->GetSeniorDayCount());
+				if ((OverrideCurrent || !i.value()->HasProperty("Haircut"))
+					&& !CurrentAss->GetRawSeniorHaircut().isEmpty()) AddTempProperty(i.key(),"Haircut", CurrentAss->GetSeniorHaircut());
+				if ((OverrideCurrent || !i.value()->HasProperty("PrepayMultiplier"))
+					&& !CurrentAss->GetRawSeniorPrepayMultiplier().isEmpty())AddTempProperty(i.key(),"PrepayMultiplier", CurrentAss->GetSeniorPrepayMultiplier());
+				if ((OverrideCurrent || !i.value()->HasProperty("LossMultiplier"))
+					&& !CurrentAss->GetRawSeniorLossMultiplier().isEmpty()) AddTempProperty(i.key(),"LossMultiplier", CurrentAss->GetSeniorLossMultiplier());
+				if ((OverrideCurrent || !i.value()->HasProperty("CPR"))
+					&& !CurrentAss->GetRawSeniorCPR().isEmpty()) AddTempProperty(i.key(),"CPR", CurrentAss->GetSeniorCPR());
+				if ((OverrideCurrent || !i.value()->HasProperty("CDR"))
+					&& !CurrentAss->GetRawSeniorCDR().isEmpty()) AddTempProperty(i.key(),"CDR", CurrentAss->GetSeniorCDR());
+				if ((OverrideCurrent || !i.value()->HasProperty("LS"))
+					&& !CurrentAss->GetRawSeniorLS().isEmpty()) AddTempProperty(i.key(),"LS", CurrentAss->GetSeniorLS());
+				if ((OverrideCurrent || !i.value()->HasProperty("RecoveryLag"))
+					&& !CurrentAss->GetRawSeniorRecoveryLag().isEmpty()) AddTempProperty(i.key(),"RecoveryLag", CurrentAss->GetSeniorRecoveryLag());
+				if ((OverrideCurrent || !i.value()->HasProperty("Delinquency"))
+					&& !CurrentAss->GetRawSeniorDelinquency().isEmpty())  AddTempProperty(i.key(),"Delinquency", CurrentAss->GetSeniorDelinquency());
+				if ((OverrideCurrent || !i.value()->HasProperty("DelinquencyLag"))
+					&& !CurrentAss->GetRawSeniorDelinquencyLag().isEmpty())  AddTempProperty(i.key(),"DelinquencyLag", CurrentAss->GetSeniorDelinquencyLag());
+				if ((OverrideCurrent || !i.value()->HasProperty("Price"))
+					&& !CurrentAss->GetRawSeniorPrice().isEmpty())  AddTempProperty(i.key(),"Price", CurrentAss->GetSeniorPrice());
 			}
 		}
 	}
@@ -452,4 +502,19 @@ void MtgCalculator::GuessLoanScenarios(bool OverrideAss) {
 		delete i.value();
 	}
 }
+
+
+
 #endif
+void MtgCalculator::ClearTempProperties() {
+	for (auto i = TempProperties.begin(); i != TempProperties.end(); ++i)
+		delete i.value();
+	TempProperties.clear();
+}
+
+void MtgCalculator::AddTempProperty(qint32 LoanID, const QString& PropertyName, const QString& PropertyValue) {
+	if (!Loans.contains(LoanID) || PropertyName.isEmpty() || PropertyValue.isEmpty())return;
+	auto iter=TempProperties.find(LoanID);
+	if (iter == TempProperties.end()) iter=TempProperties.insert(LoanID, new QHash<QString, QString>());
+	iter.value()->operator[](PropertyName) = PropertyValue;
+}

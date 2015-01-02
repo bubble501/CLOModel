@@ -3,6 +3,7 @@
 #include <QDate>
 #include "TemplAsyncCalculator.h"
 #include <QList>
+#include <QPair>
 #include "MtgCashFlow.h"
 #include "CommonFunctions.h"
 #include "BaseRateTable.h"
@@ -55,6 +56,10 @@ public:
 	bool GetDownloadScenario() const { return m_DownloadScenario; }
 	void SetDownloadScenario(bool val) { m_DownloadScenario = val; }
 private:
+	void ClearTempProperties();
+	void AddTempProperty(qint32 LoanID, const QString& PropertyName, const QString& PropertyValue);
+	QHash<qint32, QHash<QString, QString>* > TempProperties;
+protected:
 	QHash<qint32, Mortgage*> Loans;
 	QString m_CPRass;
 	QString m_CDRass;
@@ -67,7 +72,6 @@ private:
 	bool m_UseStoredCashFlows;
 	QDate StartDate;
 	MtgCashFlow m_AggregatedRes;
-protected:
 	virtual void BeeReturned(int Ident, const MtgCashFlow& a) override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 	friend QDataStream& operator<<(QDataStream & stream, const MtgCalculator& flows);

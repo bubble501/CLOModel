@@ -2,9 +2,9 @@
     <qresource prefix="/Icons">
         <file alias="Logo.png">Resources/Logo.png</file>
         <file alias="Loading.gif">Resources/Loading2.gif</file>
-		<file alias="SplitterHandle.png">Resources/SplitterHandle.png</file>
+        <file alias="SplitterHandle.png">Resources/SplitterHandle.png</file>
     </qresource>
-	<qresource prefix="/Configs">
-		<file alias="GlobalConfigs.xml">Resources/GlobalConfigs.xml</file>
-	</qresource>
+    <qresource prefix="/Configs">
+        <file alias="GlobalConfigs.xml">Resources/GlobalConfigs.xml</file>
+    </qresource>
 </RCC>

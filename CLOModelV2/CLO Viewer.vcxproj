@@ -59,6 +59,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GenericCashFlow.cpp" />
+    <ClCompile Include="LoanAssumption.cpp" />
     <ClCompile Include="PhasedProgressWidget.cpp" />
     <ClCompile Include="PoolSizeTrigger.cpp" />
     <ClCompile Include="PrincipalProceeds.cpp" />
@@ -223,6 +224,7 @@
     <ClInclude Include="FloorCapVector.h" />
     <ClInclude Include="GenericCashFlow.h" />
     <ClInclude Include="IntegerVector.h" />
+    <ClInclude Include="LoanAssumption.h" />
     <ClInclude Include="Mortgage.h" />
     <ClInclude Include="MtgCashFlow.h" />
     <CustomBuild Include="PhasedProgressWidget.h">

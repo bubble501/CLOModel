@@ -302,6 +302,9 @@
     <ClCompile Include="FloorCapVector.cpp">
       <Filter>Source Files\Core Files</Filter>
     </ClCompile>
+    <ClCompile Include="LoanAssumption.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseRateVect.h">
@@ -420,6 +423,9 @@
     </ClInclude>
     <ClInclude Include="DuringStressTestTrigger.h">
       <Filter>Header Files\Core Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LoanAssumption.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

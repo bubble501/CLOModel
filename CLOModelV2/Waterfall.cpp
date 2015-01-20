@@ -1321,7 +1321,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					}
 					ProRataBonds.clear();
 					TotalPayable = Solution = 0.0;
-					if (SingleStep->GetParameter(WatFalPrior::wstParameters::PayAccrue).toInt() & static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Accrue)) {
+					
 						for (int h = 0; h<m_Tranches.size(); h++) {
 							if (m_Tranches.at(h)->GetProrataGroup(CurrSenGrpLvl) <= CurrSenGrp) {
 								TotalPayable += m_Tranches.at(h)->GetCashFlow().GetAmountOutstanding(CurrentDate);
@@ -1336,37 +1336,30 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						Solution += AvailablePrincipal.Total() + m_ReinvestmentTest.GetQueuedCash();
 						if (Solution == 0.0) Solution = 1.0;
 						TotalPayable = qMax(TotalPayable, 0.000001);
-						LOGDEBUG(QString("Old Assets: %1, Old Liab: %2, Test: %3").arg(Solution, 0, 'f').arg(TotalPayable, 0, 'f').arg(Solution / TotalPayable, 0, 'f'));
+					if (SingleStep->GetParameter(WatFalPrior::wstParameters::PayAccrue).toInt() & static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Accrue)) {
 						for (; ProRataBonds.size() > 0; ProRataBonds.dequeue()) {
 							if (m_Tranches[ProRataBonds.head()]->GetCashFlow().GetOCTest(CurrentDate) == 0.0) {
 								m_Tranches[ProRataBonds.head()]->SetCashFlow(CurrentDate, Solution / TotalPayable, TrancheCashFlow::TrancheFlowType::OCFlow);
-								m_Tranches[ProRataBonds.head()]->SetCashFlow(CurrentDate, Solution, TrancheCashFlow::TrancheFlowType::OCNumerator);
 							}
 						}
 					}
 					if (SingleStep->GetParameter(WatFalPrior::wstParameters::PayAccrue).toInt() & static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Pay)) {
-						double TestResult;
 						ProRataBonds.clear();
-						TotalPayable = Solution = 0.0;
 						TestTarget = -1.0;
 						if (SingleStep->HasParameter(WatFalPrior::wstParameters::TestTargetOverride)) {
 							TestTarget = SingleStep->GetParameter(WatFalPrior::wstParameters::TestTargetOverride).value<BloombergVector>().GetValue(CurrentDate);
 						}
-						bool FirstTestFound = false;
 						for (auto h = m_Tranches.begin(); h != m_Tranches.end();++h) {
 							if ((*h)->GetProrataGroup(CurrSenGrpLvl) == CurrSenGrp) {
-								if (!FirstTestFound) {
-									TestResult = (*h)->GetCashFlow().GetOCTest(CurrentDate);
-									FirstTestFound = true;
-								}
 								if (TestTarget <= 0.0) TestTarget = (*h)->GetMinOClevel();
-								if ((*h)->GetCashFlow().GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::OCTarget)) < TestTarget)
+								double CurrTrg = (*h)->GetCashFlow().GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::OCTarget));
+								if (CurrTrg<=0.0 || CurrTrg > TestTarget)
 									(*h)->SetCashFlow(CurrentDate, TestTarget, TrancheCashFlow::TrancheFlowType::OCTarget);
 							}
 						}
-						if (TestResult != 0.0  && FirstTestFound && TestTarget > 0.0) {
+						if (TestTarget > 0.0) {
 							//if it fails redeem notes until cured
-							if (TestResult < TestTarget) {
+							if (Solution / TotalPayable < TestTarget) {
 								double CurrAddColShare = SingleStep->GetParameter(WatFalPrior::wstParameters::AdditionalCollateralShare).value<BloombergVector>().GetValue(CurrentDate);
 								double CurrentRedemptionShare = SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionShare).value<BloombergVector>().GetValue(CurrentDate);
 								double NeedToCure;
@@ -1375,18 +1368,6 @@ bool Waterfall::CalculateTranchesCashFlows(){
 									PrintToTempFile("ReturnFalse.txt", "OC cure denominator is 0");
 									return false;
 								}
-								TotalPayable = Solution = 0.0;
-								//OC Numerator and Denominator
-								foreach(Tranche* SingleTranche ,m_Tranches) {
-									if (SingleTranche->GetProrataGroup(CurrSenGrpLvl) == CurrSenGrp) {
-										Solution = SingleTranche->GetCashFlow().GetOCNumerator(CurrentDate);
-										TotalPayable = Solution / TestResult;
-										break;
-									}
-								}
-
-								if (Solution == 0.0) Solution = 1.0;
-								TotalPayable = qMax(TotalPayable, 0.000001);
 								NeedToCure = ((TotalPayable*TestTarget) - Solution) / (CurrAddColShare + (CurrentRedemptionShare*TestTarget));
 								Q_ASSERT_X(NeedToCure >= 0.0, "OC Test", "Negative NeedToCure");
 								double FundsToRedemption, FundsToCollateral;
@@ -1446,27 +1427,27 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					TotalPayable = Solution = 0.0;
 					adjSeniorExpenses = AdjustCoupon(m_SeniorExpenses.GetValue(CurrentDate), RollingNextIPD, RollingNextIPD.addMonths(m_PaymentFrequency.GetValue(RollingNextIPD)), m_DealDayCountConvention.GetValue(CurrentDate));
 					adjSeniorFees = AdjustCoupon(m_SeniorFees.GetValue(CurrentDate), RollingNextIPD, RollingNextIPD.addMonths(m_PaymentFrequency.GetValue(RollingNextIPD)), m_DealDayCountConvention.GetValue(CurrentDate));
-					if (SingleStep->GetParameter(WatFalPrior::wstParameters::PayAccrue).toInt() & static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Accrue)) {
-						Solution = 
-							m_InterestAvailable 
-							+ m_MortgagesPayments.GetAccruedInterest(CurrentDate) 
-							- ((adjSeniorFees + adjSeniorExpenses)*(CurrentAssetSum / static_cast<double>(CurrentAssetCount)))
-							- m_SeniorExpensesFixed.GetValue(CurrentDate) 
-							- m_SeniorFeesFixed.GetValue(CurrentDate)
+					Solution =
+						m_InterestAvailable
+						+ m_MortgagesPayments.GetAccruedInterest(CurrentDate)
+						- ((adjSeniorFees + adjSeniorExpenses)*(CurrentAssetSum / static_cast<double>(CurrentAssetCount)))
+						- m_SeniorExpensesFixed.GetValue(CurrentDate)
+						- m_SeniorFeesFixed.GetValue(CurrentDate)
 						;
-						for (int h = 0; h < m_Tranches.size(); h++) {
-							if (m_Tranches.at(h)->GetProrataGroup(CurrSenGrpLvl) <= CurrSenGrp) {
-								if (!m_Tranches.at(h)->HasCoupon(CurrCoupIndx)) {
-									PrintToTempFile("ReturnFalse.txt", m_Tranches.at(h)->GetTrancheName() + " - Coupon not set in tranche");
-									return false;
-								}
-								AdjustedCoupon = AdjustCoupon((m_Tranches.at(h)->GetCoupon(CurrentDate, CurrCoupIndx)), RollingNextIPD, RollingNextIPD.addMonths(m_PaymentFrequency.GetValue(RollingNextIPD)), m_Tranches.at(h)->GetDayCount().GetValue(CurrentDate));
-								TotalPayable += AdjustedCoupon*(m_Tranches.at(h)->GetCashFlow().GetAmountOutstanding(CurrentDate) + m_Tranches.at(h)->GetCashFlow().GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | CurrCoupIndx));
-								if (m_Tranches.at(h)->GetProrataGroup(CurrSenGrpLvl) == CurrSenGrp)
-									ProRataBonds.enqueue(h);
+					for (int h = 0; h < m_Tranches.size(); h++) {
+						if (m_Tranches.at(h)->GetProrataGroup(CurrSenGrpLvl) <= CurrSenGrp) {
+							if (!m_Tranches.at(h)->HasCoupon(CurrCoupIndx)) {
+								PrintToTempFile("ReturnFalse.txt", m_Tranches.at(h)->GetTrancheName() + " - Coupon not set in tranche");
+								return false;
 							}
+							AdjustedCoupon = AdjustCoupon((m_Tranches.at(h)->GetCoupon(CurrentDate, CurrCoupIndx)), RollingNextIPD, RollingNextIPD.addMonths(m_PaymentFrequency.GetValue(RollingNextIPD)), m_Tranches.at(h)->GetDayCount().GetValue(CurrentDate));
+							TotalPayable += AdjustedCoupon*(m_Tranches.at(h)->GetCashFlow().GetAmountOutstanding(CurrentDate) + m_Tranches.at(h)->GetCashFlow().GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | CurrCoupIndx));
+							if (m_Tranches.at(h)->GetProrataGroup(CurrSenGrpLvl) == CurrSenGrp)
+								ProRataBonds.enqueue(h);
 						}
-						TotalPayable = qMax(TotalPayable, 0.000001);
+					}
+					TotalPayable = qMax(TotalPayable, 0.000001);
+					if (SingleStep->GetParameter(WatFalPrior::wstParameters::PayAccrue).toInt() & static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Accrue)) {
 						for (; !ProRataBonds.isEmpty(); ProRataBonds.dequeue()) {
 							if (m_Tranches[ProRataBonds.head()]->GetCashFlow().GetICTarget(CurrentDate) == 0.0)
 								m_Tranches[ProRataBonds.head()]->SetCashFlow(CurrentDate, Solution / TotalPayable, TrancheCashFlow::TrancheFlowType::ICFlow);
@@ -1474,26 +1455,19 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					}
 					if (SingleStep->GetParameter(WatFalPrior::wstParameters::PayAccrue).toInt() & static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Pay)) {
 						ProRataBonds.clear();
-						TotalPayable = Solution = 0.0;
-
 						TestTarget = -1.0;
 						if (SingleStep->HasParameter(WatFalPrior::wstParameters::TestTargetOverride)) {
 							TestTarget = SingleStep->GetParameter(WatFalPrior::wstParameters::TestTargetOverride).value<BloombergVector>().GetValue(CurrentDate);
 						}
-						bool FirstTestFound = false;
 						for (auto h = m_Tranches.begin(); h != m_Tranches.end(); ++h) {
 							if ((*h)->GetProrataGroup(CurrSenGrpLvl) == CurrSenGrp) {
-								if (!FirstTestFound) {
-									TotalPayable = (*h)->GetCashFlow().GetICTest(CurrentDate);
-									FirstTestFound = true;
-								}
 								if (TestTarget <= 0.0) TestTarget = (*h)->GetMinIClevel();
-								if ((*h)->GetCashFlow().GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::ICTarget)) < TestTarget)
+								double CurrTest = (*h)->GetCashFlow().GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::ICTarget));
+								if (CurrTest <= 0.0 || CurrTest < TestTarget)
 									(*h)->SetCashFlow(CurrentDate, TestTarget, TrancheCashFlow::TrancheFlowType::ICTarget);
 							}
 						}
-						if (TotalPayable != 0.0  && FirstTestFound && TestTarget > 0.0) {
-							
+						if (TotalPayable != 0.0 && TestTarget > 0.0) {
 							if (
 								TotalPayable < TestTarget //if it fails,
 								&& (// and you have funds available 
@@ -1631,10 +1605,6 @@ bool Waterfall::CalculateTranchesCashFlows(){
 		foreach(WatFalPrior* SingleStp, m_WaterfallStesps) {
 			SingleStp->ResetMissinAnchors();
 		}
-		foreach(Tranche* SingleTranche, m_Tranches) {
-			SingleTranche->GetCashFlow().RemoveFlow(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::OCNumerator));
-		}
-
 		//Check that there is no losses of cash flows
 		TrancheCashFlow CheckTranCashFlow;
 		MtgCashFlow CheckMtgCashFlow;

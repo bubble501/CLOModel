@@ -7,6 +7,7 @@
 #include "MtgCalculator.h"
 #include "Waterfall.h"
 #include "LoanAssumption.h"
+#include "WaterfallCalculator.h"
 class QStandardItemModel;
 class QListView;
 class QSortFilterProxyModel;
@@ -98,6 +99,7 @@ private:
 	Waterfall m_WtfToCall;
 	Waterfall m_NewWtfToCall;
 	QPointer<MtgCalculator> m_NewLoans;
+	QPointer<WaterfallCalculator> m_NewWatFalls;
 	QString m_LastModelLoaded;
 	QPushButton* GuessAssumptionsButton;
 	QPushButton* LoadPoolButton;
@@ -165,7 +167,6 @@ private slots:
 	void NewGenTableSelect(const QModelIndex& index, const QModelIndex&);
 	void AdjustOldGenTableHeight();
 	void AdjustNewGenTableHeight();
-	void LoanCalculationFinished();
 	void NewTranchesCalculated();
 };
 #endif // LOANASSUMPTIONSMODEL_H

@@ -15,16 +15,17 @@ signals :
 	void BeeError(int);
 	void Progress(double);
 	void ProgressPct(int);
+	void Stopped();
 public:
 	AbstrAsyncCalculator(QObject* parent = 0) :QObject(parent) { 
 		m_ContinueCalculation = false; 
-		connect(this, &AbstrAsyncCalculator::Progress, [&](double a) {
-			emit ProgressPct(static_cast<int>(a*100.0));
-		});
+		connect(this, &AbstrAsyncCalculator::Progress, this, &AbstrAsyncCalculator::SendPctSignal);
 	}
 	virtual QString ReadyToCalculate() const = 0;
+private slots:
+	void SendPctSignal(double a) {emit ProgressPct(static_cast<int>(a*100.0));}
 public slots:
-	virtual void StopCalculation() { m_ContinueCalculation = false; }
+	virtual void StopCalculation() { m_ContinueCalculation = false; emit Stopped(); }
 	virtual bool StartCalculation()=0;
 };
 #endif // AbstrAsyncCalculator_h__

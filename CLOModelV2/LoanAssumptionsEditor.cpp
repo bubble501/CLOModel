@@ -2007,7 +2007,7 @@ void LoanAssumptionsEditor::CreateStructureComparison() {
 }
 
 void LoanAssumptionsEditor::CalculateNewStructure() {
-	if (m_NewLoans) return;
+	if (m_NewLoans || m_NewWatFalls) return;
 	m_NewLoans = new MtgCalculator(this);
 	m_NewLoans->SetCPRass(m_LoanPool.GetCPRass());
 	m_NewLoans->SetCDRass(m_LoanPool.GetCDRass());
@@ -2028,33 +2028,62 @@ void LoanAssumptionsEditor::CalculateNewStructure() {
 		}
 		m_NewLoans->AddLoan(NewLoan, m_PoolModel->data(m_PoolModel->index(i, 0), Qt::UserRole).toInt());
 	}
-	m_NewWtfToExtension = m_WtfToExtension;
-	m_NewWtfToCall = m_WtfToCall;
+	m_NewWatFalls = new WaterfallCalculator(this);
+	
 	QProgressDialog* CalcProgress = new QProgressDialog(this);
-	CalcProgress->setLabelText(tr("Calculating Loans Cash Flows"));
+	CalcProgress->setLabelText(tr("Calculating Assets Cash Flows"));
 	CalcProgress->setRange(0,100);
 	CalcProgress->setCancelButtonText(tr("Cancel"));
 	CalcProgress->setWindowTitle(tr("Calculating"));
+	CalcProgress->show();
+
+	QProgressDialog* CalcProgress2 = new QProgressDialog(this);
+	CalcProgress2->setLabelText(tr("Calculating Liabilities Cash Flows"));
+	CalcProgress2->setRange(0, 100);
+	CalcProgress2->setCancelButtonText(tr("Cancel"));
+	CalcProgress2->setWindowTitle(tr("Calculating"));
+	CalcProgress2->hide();
+	
+	connect(m_NewLoans, &MtgCalculator::Calculated, [&]() {
+		m_NewWtfToExtension = m_WtfToExtension;
+		m_NewWtfToExtension.ResetMtgFlows();
+		m_NewWtfToExtension.AddMortgagesFlows(m_NewLoans->GetAggregatedResults());
+		m_NewWatFalls->AddWaterfall(m_NewWtfToExtension, 0);
+		if (m_WtfToCall.GetTranchesCount() > 0) {
+			m_NewWtfToCall = m_WtfToCall;
+			m_NewWtfToCall.ResetMtgFlows();
+			m_NewWtfToCall.AddMortgagesFlows(m_NewLoans->GetAggregatedResults());
+			m_NewWatFalls->AddWaterfall(m_NewWtfToCall, 1);
+		}
+		if (!m_NewWatFalls->StartCalculation()) { QMessageBox::critical(this, tr("Error"), tr("An error occurred during the calculations of liabilities cash flows")); }
+	});
+	connect(m_NewLoans, &MtgCalculator::Calculated, CalcProgress2, &QProgressDialog::show);
 	connect(CalcProgress, &QProgressDialog::canceled, m_NewLoans, &MtgCalculator::StopCalculation);
-	connect(CalcProgress, &QProgressDialog::canceled, CalcProgress, &QProgressDialog::deleteLater);
-	connect(m_NewLoans, &MtgCalculator::Calculated, CalcProgress, &QProgressDialog::deleteLater);
 	connect(m_NewLoans, &MtgCalculator::ProgressPct, CalcProgress, &QProgressDialog::setValue);
-	connect(m_NewLoans, &MtgCalculator::BeeError, CalcProgress, &QProgressDialog::deleteLater);
-	connect(m_NewLoans, &MtgCalculator::Calculated, this ,&LoanAssumptionsEditor::LoanCalculationFinished);
+	connect(m_NewLoans, &MtgCalculator::BeeError, m_NewLoans, &MtgCalculator::StopCalculation);
+	connect(m_NewLoans, &MtgCalculator::BeeError, [this]() {QMessageBox::critical(this,tr("Error"),tr("An error occurred during the calculations of assets cash flows")); });
 	connect(m_NewLoans, &MtgCalculator::Calculated, m_NewLoans, &MtgCalculator::deleteLater);
-	connect(m_NewLoans, &MtgCalculator::BeeError, m_NewLoans, &MtgCalculator::deleteLater);
-	connect(CalcProgress, &QProgressDialog::canceled, m_NewLoans, &MtgCalculator::deleteLater);
+	connect(m_NewLoans, &MtgCalculator::Calculated, CalcProgress, &QProgressDialog::deleteLater);
+	connect(m_NewLoans, &MtgCalculator::Stopped, m_NewLoans, &MtgCalculator::deleteLater);
+	connect(m_NewLoans, &MtgCalculator::Stopped, CalcProgress, &MtgCalculator::deleteLater);
+	connect(m_NewLoans, &MtgCalculator::Stopped, m_NewWatFalls, &MtgCalculator::deleteLater);
+	
+	connect(m_NewWatFalls, &WaterfallCalculator::Calculated, this, &LoanAssumptionsEditor::NewTranchesCalculated);
+	connect(CalcProgress2, &QProgressDialog::canceled, m_NewWatFalls, &WaterfallCalculator::StopCalculation);
+	connect(m_NewWatFalls, &WaterfallCalculator::ProgressPct, CalcProgress2, &QProgressDialog::setValue);
+	connect(m_NewWatFalls, &WaterfallCalculator::BeeError, m_NewWatFalls, &WaterfallCalculator::StopCalculation);
+	connect(m_NewWatFalls, &WaterfallCalculator::BeeError, [this]() {QMessageBox::critical(this, tr("Error"), tr("An error occurred during the calculations of liabilities cash flows")); });
+	connect(m_NewWatFalls, &WaterfallCalculator::Calculated, m_NewWatFalls, &WaterfallCalculator::deleteLater);
+	connect(m_NewWatFalls, &WaterfallCalculator::Calculated, CalcProgress2, &QProgressDialog::deleteLater);
+	connect(m_NewWatFalls, &WaterfallCalculator::Stopped, m_NewWatFalls, &WaterfallCalculator::deleteLater);
+	connect(m_NewWatFalls, &WaterfallCalculator::Stopped, CalcProgress2, &QProgressDialog::deleteLater);
+	
 	m_NewLoans->StartCalculation();
 }
-void LoanAssumptionsEditor::LoanCalculationFinished() {
-	m_NewWtfToExtension.ResetMtgFlows();
-	m_NewWtfToExtension.AddMortgagesFlows(m_NewLoans->GetAggregatedResults());
-	m_NewWtfToExtension.CalculateTranchesCashFlows();
-	if (m_NewWtfToCall.GetTranchesCount() > 0) {
-		m_NewWtfToCall.ResetMtgFlows();
-		m_NewWtfToCall.AddMortgagesFlows(m_NewWtfToExtension.GetMortgagesPayments());
-		m_NewWtfToCall.CalculateTranchesCashFlows();
-	}
+void LoanAssumptionsEditor::NewTranchesCalculated() {
+	m_NewWtfToExtension = *(m_NewWatFalls->GetResult(0));
+	if (m_NewWatFalls->GetResult(1))
+		m_NewWtfToCall = *(m_NewWatFalls->GetResult(1));
 	//////////////////////////////////////////////////////////////////////////
 	m_NewStructureModel->setRowCount(m_NewWtfToExtension.GetTranchesCount());
 	SafeSetModel(m_NewStrGenTable, m_NewStructureModel);
@@ -2114,9 +2143,6 @@ void LoanAssumptionsEditor::LoanCalculationFinished() {
 	if (m_OldStrGenTable->selectionModel()->currentIndex().isValid()) {
 		m_NewStrGenTable->selectionModel()->setCurrentIndex(m_NewStrGenTable->model()->index(m_OldStrGenTable->selectionModel()->currentIndex().row(), 0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
 	}
-}
-void LoanAssumptionsEditor::NewTranchesCalculated() {
-
 }
 void LoanAssumptionsEditor::SafeSetModel(QAbstractItemView* View, QAbstractItemModel* NewModel) {
 	QItemSelectionModel* ModToDelete = View->selectionModel();

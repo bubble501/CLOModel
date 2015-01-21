@@ -380,9 +380,9 @@ void StressTest::SaveResults(const QString& DestPath)const{
 		}
 		OldZip.close();
 		curDir.remove(OldName);
-		QFile::rename(NewName, OldName);
 	}
 	zip.close();
+	if (!OldName.isEmpty()) QFile::rename(NewName, OldName);
 }
 
 Waterfall StressTest::GetScenarioFromFile(const QString& DestPath, const QString& CPRscenario, const QString& CDRscenario, const QString& LSscenario, const QString& RecLagScenario, const QString& DelinqScenario, const QString& DelinqLagScenario) {

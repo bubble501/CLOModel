@@ -36,7 +36,7 @@ void LoanAssMatcherThread::run() {
 
 	for (auto i = LoanPool.constBegin(); i != LoanPool.constEnd(); ++i) {
 		for (auto j = m_AvailableAssumptions->constBegin(); j != m_AvailableAssumptions->constEnd(); ++j) {
-			if (j.value()->GetScenarioName().compare(i.value()->GetProperty("Scenario"),Qt::CaseInsensitive)==0) continue;
+			//if (j.value()->GetScenarioName().compare(i.value()->GetProperty("Scenario"),Qt::CaseInsensitive)==0) continue;
 			for (const QString& CurrProperty : LoansPropertiesToSearch) {
 				if (j.value()->MatchPattern(i.value()->GetProperty(CurrProperty))) {
 					Result.AddScenario(j.value()->GetScenarioName(), i.value()->GetProperty("Scenario"), i.value()->GetProperty("Facility"), i.value()->GetProperty("Issuer"), i.key());

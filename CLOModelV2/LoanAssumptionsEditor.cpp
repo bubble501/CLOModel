@@ -1573,22 +1573,23 @@ void LoanAssumptionsEditor::LoadModel() {
 		file.close();
 		return;
 	}
-	QProgressDialog LoadProgress(tr("Loading Model"), QString(), 0, 4, this);
-	LoadProgress.setCancelButton(nullptr); 
-	LoadProgress.setWindowModality(Qt::WindowModal);
+	QScopedPointer<QProgressDialog, QScopedPointerDeleteLater> LoadProgress(new QProgressDialog(tr("Loading Model"), QString(), 0, 4, this));
+	LoadProgress->setCancelButton(nullptr); 
+	LoadProgress->setWindowModality(Qt::WindowModal);
+	LoadProgress->show();
 	m_LastModelLoaded = ModelPath;
 	{QDate Junk; out >> Junk; }
 	{bool Junk; out >> Junk; }
 	{bool Junk; out >> Junk; }
 	m_WtfToExtension.SetLoadProtocolVersion(VersionChecker);
 	out >> m_WtfToExtension;
-	LoadProgress.setValue(1);
+	LoadProgress->setValue(1);
 	m_WtfToCall.SetLoadProtocolVersion(VersionChecker);
 	out >> m_WtfToCall;
-	LoadProgress.setValue(2);
+	LoadProgress->setValue(2);
 	m_LoanPool.SetLoadProtocolVersion(VersionChecker);
 	out >> m_LoanPool;
-	LoadProgress.setValue(3);
+	LoadProgress->setValue(3);
 	file.close();
 
 	m_PoolModel->setRowCount(m_LoanPool.GetLoans().size());
@@ -1600,7 +1601,7 @@ void LoanAssumptionsEditor::LoadModel() {
 		m_PoolModel->setData(m_PoolModel->index(RowCounter, 2), i.value()->GetProperty("Scenario"), Qt::EditRole);
 		m_PoolModel->setData(m_PoolModel->index(RowCounter, 2), Qt::Checked, Qt::UserRole + Qt::CheckStateRole);
 	}
-	LoadProgress.setValue(4);
+	LoadProgress->setValue(4);
 
 	m_ModelNameLabel->setText(tr("Model Loaded: %1").arg(m_WtfToExtension.GetDealName()));
 
@@ -1663,24 +1664,29 @@ void LoanAssumptionsEditor::GuessAssumptions() {
 	if (!YesNoDialog(tr("Are you sure?"), tr("This action will potentially override the current inputs.\nAre you sure you want to continue?"))) return;
 	int MatchFound = 0;
 	QSharedPointer<LoanAssumption> CurrAss;
-	QProgressDialog LoadProgress(tr("Searching for Matches"), QString(), 0, m_PoolModel->rowCount()*m_Assumptions.size(), this);
-	LoadProgress.setCancelButton(nullptr);
-	LoadProgress.setWindowModality(Qt::WindowModal);
+	QScopedPointer<QProgressDialog, QScopedPointerDeleteLater> LoadProgress(new QProgressDialog(tr("Searching for Matches"), QString(), 0, m_PoolModel->rowCount()*m_Assumptions.size(), this));
+	LoadProgress->setCancelButton(nullptr);
+	LoadProgress->setWindowModality(Qt::WindowModal);
+	LoadProgress->show();
 	for (int i = 0; i < m_PoolModel->rowCount();++i){
 		for (auto j = m_Assumptions.constBegin(); j != m_Assumptions.constEnd(); ++j) {
 			CurrAss= m_DirtyAssumptions.value(j.key(), j.value());
 			if (!CurrAss) continue;
 			if (CurrAss->MatchPattern(m_PoolModel->data(m_PoolModel->index(i, 0), Qt::EditRole).toString())) {
-				m_PoolModel->setData(m_PoolModel->index(i, 3), j.key(), Qt::EditRole);
-				m_PoolModel->setData(m_PoolModel->index(i, 3), Qt::Checked, Qt::UserRole + Qt::CheckStateRole);
-				++MatchFound;
+				if (m_PoolModel->data(m_PoolModel->index(i, 2)).toString().compare(j.key(),Qt::CaseInsensitive)!=0){
+					m_PoolModel->setData(m_PoolModel->index(i, 3), j.key(), Qt::EditRole);
+					m_PoolModel->setData(m_PoolModel->index(i, 3), Qt::Checked, Qt::UserRole + Qt::CheckStateRole);
+					++MatchFound;
+				}
 			}
 			else if (CurrAss->MatchPattern(m_PoolModel->data(m_PoolModel->index(i, 1), Qt::EditRole).toString())) {
-				m_PoolModel->setData(m_PoolModel->index(i, 3), j.key(), Qt::EditRole);
-				m_PoolModel->setData(m_PoolModel->index(i, 3), Qt::Checked, Qt::UserRole + Qt::CheckStateRole);
-				++MatchFound;
+				if (m_PoolModel->data(m_PoolModel->index(i, 2)).toString().compare(j.key(), Qt::CaseInsensitive) != 0) {
+					m_PoolModel->setData(m_PoolModel->index(i, 3), j.key(), Qt::EditRole);
+					m_PoolModel->setData(m_PoolModel->index(i, 3), Qt::Checked, Qt::UserRole + Qt::CheckStateRole);
+					++MatchFound;
+				}
 			}
-			LoadProgress.setValue(LoadProgress.value() + 1);
+			LoadProgress->setValue(LoadProgress->value() + 1);
 		}
 	}
 	QMessageBox::information(this, tr("Results"), tr("%n Match(es) Found", "", MatchFound));
@@ -1765,26 +1771,27 @@ void LoanAssumptionsEditor::SavePool() {
 		file.close();
 		return;
 	}
-	QProgressDialog LoadProgress("Saving Model", QString(), 0, 10, this); 
-	LoadProgress.setValue(0);
-	LoadProgress.setCancelButton(nullptr);
-	LoadProgress.setWindowModality(Qt::WindowModal);
+	QScopedPointer<QProgressDialog,QScopedPointerDeleteLater> LoadProgress(new QProgressDialog("Saving Model", QString(), 0, 10, this));
+	LoadProgress->setValue(0);
+	LoadProgress->setCancelButton(nullptr);
+	LoadProgress->setWindowModality(Qt::WindowModal);
+	LoadProgress->show();
 	QDate OldLiborUpdateDate; out >> OldLiborUpdateDate;
-	LoadProgress.setValue(LoadProgress.value()+1);
+	LoadProgress->setValue(LoadProgress->value() + 1);
 	bool OldUseForwardCurve; out >> OldUseForwardCurve;
-	LoadProgress.setValue(LoadProgress.value() + 1);
+	LoadProgress->setValue(LoadProgress->value() + 1);
 	bool OldBaseCaseToCall; out >> OldBaseCaseToCall;
-	LoadProgress.setValue(LoadProgress.value() + 1);
+	LoadProgress->setValue(LoadProgress->value() + 1);
 	Waterfall OldExtension; OldExtension.SetLoadProtocolVersion(VersionChecker); out >> OldExtension; 
-	LoadProgress.setValue(LoadProgress.value() + 1);
+	LoadProgress->setValue(LoadProgress->value() + 1);
 	Waterfall OldCall; OldCall.SetLoadProtocolVersion(VersionChecker); out >> OldCall; 
-	LoadProgress.setValue(LoadProgress.value() + 1);
+	LoadProgress->setValue(LoadProgress->value() + 1);
 	{MtgCalculator junk;	junk.SetLoadProtocolVersion(VersionChecker); out >> junk; }
-	LoadProgress.setValue(LoadProgress.value() + 1);
+	LoadProgress->setValue(LoadProgress->value() + 1);
 	ConstantBaseRateTable OldConstTable; OldConstTable.SetLoadProtocolVersion(VersionChecker); out >> OldConstTable;
-	LoadProgress.setValue(LoadProgress.value() + 1);
+	LoadProgress->setValue(LoadProgress->value() + 1);
 	ForwardBaseRateTable OldFwdTable; OldFwdTable.SetLoadProtocolVersion(VersionChecker); out >> OldFwdTable;
-	LoadProgress.setValue(LoadProgress.value() + 1);
+	LoadProgress->setValue(LoadProgress->value() + 1);
 	file.close();
 	file.open(QIODevice::WriteOnly);
 	QDataStream In(&file);
@@ -1800,7 +1807,7 @@ void LoanAssumptionsEditor::SavePool() {
 		<< OldConstTable 
 		<< OldFwdTable
 	;
-	LoadProgress.setValue(LoadProgress.value() + 1);
+	LoadProgress->setValue(LoadProgress->value() + 1);
 	file.close();
 }
 
@@ -2031,52 +2038,44 @@ void LoanAssumptionsEditor::CalculateNewStructure() {
 	m_NewWatFalls = new WaterfallCalculator(this);
 	
 	QProgressDialog* CalcProgress = new QProgressDialog(this);
-	CalcProgress->setLabelText(tr("Calculating Assets Cash Flows"));
+	CalcProgress->setLabelText(tr("Calculating Cash Flows"));
 	CalcProgress->setRange(0,100);
 	CalcProgress->setCancelButtonText(tr("Cancel"));
 	CalcProgress->setWindowTitle(tr("Calculating"));
+	CalcProgress->setAutoClose(false);
 	CalcProgress->show();
-
-	QProgressDialog* CalcProgress2 = new QProgressDialog(this);
-	CalcProgress2->setLabelText(tr("Calculating Liabilities Cash Flows"));
-	CalcProgress2->setRange(0, 100);
-	CalcProgress2->setCancelButtonText(tr("Cancel"));
-	CalcProgress2->setWindowTitle(tr("Calculating"));
-	CalcProgress2->hide();
 	
 	connect(m_NewLoans, &MtgCalculator::Calculated, [&]() {
 		m_NewWtfToExtension = m_WtfToExtension;
 		m_NewWtfToExtension.ResetMtgFlows();
 		m_NewWtfToExtension.AddMortgagesFlows(m_NewLoans->GetAggregatedResults());
 		m_NewWatFalls->AddWaterfall(m_NewWtfToExtension, 0);
+		m_NewWtfToCall = m_WtfToCall;
 		if (m_WtfToCall.GetTranchesCount() > 0) {
-			m_NewWtfToCall = m_WtfToCall;
 			m_NewWtfToCall.ResetMtgFlows();
 			m_NewWtfToCall.AddMortgagesFlows(m_NewLoans->GetAggregatedResults());
 			m_NewWatFalls->AddWaterfall(m_NewWtfToCall, 1);
 		}
 		if (!m_NewWatFalls->StartCalculation()) { QMessageBox::critical(this, tr("Error"), tr("An error occurred during the calculations of liabilities cash flows")); }
 	});
-	connect(m_NewLoans, &MtgCalculator::Calculated, CalcProgress2, &QProgressDialog::show);
 	connect(CalcProgress, &QProgressDialog::canceled, m_NewLoans, &MtgCalculator::StopCalculation);
 	connect(m_NewLoans, &MtgCalculator::ProgressPct, CalcProgress, &QProgressDialog::setValue);
 	connect(m_NewLoans, &MtgCalculator::BeeError, m_NewLoans, &MtgCalculator::StopCalculation);
 	connect(m_NewLoans, &MtgCalculator::BeeError, [this]() {QMessageBox::critical(this,tr("Error"),tr("An error occurred during the calculations of assets cash flows")); });
 	connect(m_NewLoans, &MtgCalculator::Calculated, m_NewLoans, &MtgCalculator::deleteLater);
-	connect(m_NewLoans, &MtgCalculator::Calculated, CalcProgress, &QProgressDialog::deleteLater);
 	connect(m_NewLoans, &MtgCalculator::Stopped, m_NewLoans, &MtgCalculator::deleteLater);
 	connect(m_NewLoans, &MtgCalculator::Stopped, CalcProgress, &MtgCalculator::deleteLater);
 	connect(m_NewLoans, &MtgCalculator::Stopped, m_NewWatFalls, &MtgCalculator::deleteLater);
 	
 	connect(m_NewWatFalls, &WaterfallCalculator::Calculated, this, &LoanAssumptionsEditor::NewTranchesCalculated);
-	connect(CalcProgress2, &QProgressDialog::canceled, m_NewWatFalls, &WaterfallCalculator::StopCalculation);
-	connect(m_NewWatFalls, &WaterfallCalculator::ProgressPct, CalcProgress2, &QProgressDialog::setValue);
+	connect(CalcProgress, &QProgressDialog::canceled, m_NewWatFalls, &WaterfallCalculator::StopCalculation);
+	connect(m_NewWatFalls, &WaterfallCalculator::ProgressPct, CalcProgress, &QProgressDialog::setValue);
 	connect(m_NewWatFalls, &WaterfallCalculator::BeeError, m_NewWatFalls, &WaterfallCalculator::StopCalculation);
 	connect(m_NewWatFalls, &WaterfallCalculator::BeeError, [this]() {QMessageBox::critical(this, tr("Error"), tr("An error occurred during the calculations of liabilities cash flows")); });
 	connect(m_NewWatFalls, &WaterfallCalculator::Calculated, m_NewWatFalls, &WaterfallCalculator::deleteLater);
-	connect(m_NewWatFalls, &WaterfallCalculator::Calculated, CalcProgress2, &QProgressDialog::deleteLater);
+	connect(m_NewWatFalls, &WaterfallCalculator::Calculated, CalcProgress, &QProgressDialog::deleteLater);
 	connect(m_NewWatFalls, &WaterfallCalculator::Stopped, m_NewWatFalls, &WaterfallCalculator::deleteLater);
-	connect(m_NewWatFalls, &WaterfallCalculator::Stopped, CalcProgress2, &QProgressDialog::deleteLater);
+	connect(m_NewWatFalls, &WaterfallCalculator::Stopped, CalcProgress, &QProgressDialog::deleteLater);
 	
 	m_NewLoans->StartCalculation();
 }

@@ -10,7 +10,8 @@
 LoanAssMatcher::LoanAssMatcher(QObject *parent)
 	: TemplAsyncCalculator<LoanAssMatcherThread, LoanAssMatcherResult>(parent)
 {
-	connect(this, &LoanAssMatcher::Calculated, [&]() {m_FilesInFolder.clear(); });
+	connect(this, &LoanAssMatcher::Calculated, this, &LoanAssMatcher::ClearFilesInFolder);
+	connect(this, &LoanAssMatcher::Stopped, this, &LoanAssMatcher::ClearFilesInFolder);
 }
 void LoanAssMatcher::GetAssumptionsDatabase() {
 	if (m_ContinueCalculation) return;

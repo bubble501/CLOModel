@@ -83,8 +83,8 @@ void ConsoleTestObj::BBVALTest() {
 	SingleLease.SetAnnuity("I");
 	SingleLease.SetInterest("0");
 	SingleLease.SetSize(835096.0);
-	SingleLease.SetPrepayMultiplier("0");
-	SingleLease.SetLossMultiplier("0");
+	SingleLease.SetProperty("PrepayMultiplier","0");
+	SingleLease.SetProperty("LossMultiplier", "0");
 
 	SingleLease.SetMaturityDate(QDate(2014, 10, 26));
 	TempUnit.AddLoan(SingleLease);

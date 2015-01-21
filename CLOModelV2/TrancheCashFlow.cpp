@@ -6,7 +6,6 @@
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
-#include <QSettings>
 #include <QVariant>
 #include "QSingleBbgResult.h"
 #endif
@@ -112,21 +111,22 @@ double TrancheCashFlow::GetTotalFlow(const QDate& a) const {
 #ifndef NO_DATABASE
 bool TrancheCashFlow::GetCashFlowsDatabase(const QString& TrancheID) {
 	if (TrancheID.isEmpty()) return false;
-	QSettings ConfigIni(":/Configs/GlobalConfigs.ini", QSettings::IniFormat);
-	ConfigIni.beginGroup("Database");
+	QMutexLocker DbLocker(&Db_Mutex);
 	QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
 	if (!db.isValid()) {
-		db = QSqlDatabase::addDatabase(ConfigIni.value("DBtype", "QODBC").toString(), "TwentyFourDB");
+		db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype", "QODBC"), "TwentyFourDB");
 		db.setDatabaseName(
-			"Driver={" + ConfigIni.value("Driver", "SQL Server").toString()
+			"Driver={" + GetFromConfig("Database", "Driver", "SQL Server")
 			+ "}; "
-			+ ConfigIni.value("DataSource", "Server=SYNSERVER2\\SQLExpress;Initial Catalog=ABSDB;Integrated Security=SSPI;Trusted_Connection=Yes;").toString()
+			+ GetFromConfig("Database", "DataSource", R"(Server=SYNSERVER2\SQLExpress;Initial Catalog=ABSDB;Integrated Security=SSPI;Trusted_Connection=Yes;)")
 			);
 	}
-	if (db.open()) {
+	bool DbOpen = db.isOpen();
+	if (!DbOpen) DbOpen = db.open();
+	if (DbOpen) {
 		QSqlQuery query(db);
 		query.setForwardOnly(true);
-		query.prepare("CALL " + ConfigIni.value("CashFlowsStoredProc", "getCashFlows").toString() + "(?)");
+		query.prepare("CALL " + GetFromConfig("Database", "CashFlowsStoredProc", "getCashFlows") + "(?)");
 		query.bindValue(0,TrancheID);
 		if (query.exec()) {
 			bool Cleared = false;
@@ -142,12 +142,9 @@ bool TrancheCashFlow::GetCashFlowsDatabase(const QString& TrancheID) {
 				AddFlow(query.value(0).toDate(), -query.value(4).toDouble(), TrancheFlowType::AmountOutstandingFlow);
 				AddFlow(query.value(0).toDate(), query.value(2).toDouble(), TrancheFlowType::DeferredFlow);
 			}
-			db.close();
-			ConfigIni.endGroup();
 			if (!Cleared) return false;
 			return true;
 		}
-		db.close();
 	}
 	return false;
 }

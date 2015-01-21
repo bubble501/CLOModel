@@ -26,6 +26,8 @@
 #include "TriggerStructHelperWidget.h"
 #include "TriggerHelperDialog.h"
 #include "FloorCapVector.h"
+#include "LoanAssumptionsEditor.h"
+#include "CheckAndEdit.h"
 int main(int argc, char *argv[]) {
 
 	//QApplication a(argc, argv);
@@ -33,13 +35,19 @@ int main(int argc, char *argv[]) {
 	//return a.exec();
 
 
+	QApplication a(argc, argv);
+	LoanAssumptionsEditor b;
+	b.FillFromQuery();
+	b.show();
+	return a.exec();
+
 	/*QApplication a(argc, argv);
 	StressViewer b;
 	b.show();
 	b.LoadStress("C:/Temp/StressResult.fcsr");
 	return a.exec();*/
 
-	Waterfall TempWtf, TempCallWaterfall;
+	/*Waterfall TempWtf, TempCallWaterfall;
 	QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/BaseCase.clo");
 	//QFile file("C:/Temp/.SavedInputs.clo");
 	file.open(QIODevice::ReadOnly);
@@ -58,7 +66,7 @@ int main(int argc, char *argv[]) {
 	out >> TempCallWaterfall;
 	file.close();
 	if (TempWtf.CalculateTranchesCashFlows()) qDebug() << "Calculation Finished Correctly";
-	else qDebug() << "Critical Error in Waterfall Calculation";
+	else qDebug() << "Critical Error in Waterfall Calculation";*/
 
 	/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	QApplication a(argc, argv);
@@ -70,7 +78,7 @@ int main(int argc, char *argv[]) {
 		, "20", "0.5", "0", "0", "0", "0"
 		).GetTranche("HARVT 10X A"));
 	return a.exec();
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	Waterfall TempWtf, TempCallWaterfall;
 	MtgCalculator TempMtg;
@@ -95,20 +103,12 @@ int main(int argc, char *argv[]) {
 	out >> TempMtg;
 	file.close();
 	
-
-	Mortgage TempMtg1;
-	TempMtg1.SetFloatingRateBase("EUR003M[3,5]");
-	TempMtg1.SetAnnuity("I");
-	TempMtg1.SetInterest("5");
-	TempMtg1.SetPaymentFreq("1");
-	TempMtg1.SetMaturityDate(QDate(2020, 5, 30));
-	TempMtg1.SetSize(1000000.0);
-	TempMtg1.SetHaircutVector("0 24S 50");
-	TempMtg.AddLoan(TempMtg1,TempMtg.GetLoans().size()+1);
-	TempMtg.ReadyToCalculate();
+	//TempWtf.CalculateTranchesCashFlows();
+	QApplication a(argc, argv);
+	TempMtg.DownloadScenarios();
+	TempMtg.SetSequentialComputation(true);
 	TempMtg.StartCalculation();
-	TempWtf.CalculateTranchesCashFlows();
-	
+	return a.exec();
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	QApplication a(argc, argv);
 	//QFile file("C:/Temp/Wrong 20#,#8#,#100#,#0#,#0#,#0.csw");
@@ -137,22 +137,18 @@ int main(int argc, char *argv[]) {
 	return a.exec();
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 
-	/*Mortgage TempMtg1;
+/*Mortgage TempMtg1;
 	TempMtg1.SetAnnuity("I");
 	TempMtg1.SetInterest("4.25");
 	TempMtg1.SetFloatingRateBase("EUR003M");
 	TempMtg1.SetPaymentFreq("3");
 	TempMtg1.SetMaturityDate(QDate(2020, 11, 15));
 	TempMtg1.SetSize(2030713.0);
-	TempMtg1.CalculateCashFlows(QDate(2014, 9, 19), "0", "0", "0");
-
-	/ *TempMtg1.SetProperty("PrepaymentFee", "10");
-	TempMtg1.SetAnnuity("A");
-	TempMtg1.SetInterest("2.5");
-	TempMtg1.SetPaymentFreq("6");
-	TempMtg1.SetMaturityDate(QDate(2018, 5, 30));
-	TempMtg1.SetSize(500000.0);
-	TempMtg1.CalculateCashFlows(QDate(2014, 5, 30), "0", "0", "0");* /
+	TempMtg1.SetProperty("Scenario", "AVR");
+	TempMtg1.SetProperty("Mezzanine", "No");
+	TempMtg1.CalculateCashFlows(QDate(2014, 9, 19), "10", "2", "50");
+	PrintToTempFile("DownloadResults", TempMtg1.GetCashFlow().ToPlainText());
+	
 
 
 	Mortgage TempMtg2;

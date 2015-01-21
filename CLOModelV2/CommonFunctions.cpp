@@ -12,6 +12,11 @@
 #include <boost/math/tools/roots.hpp>
 #include <QStack>
 #include "AbstractTrigger.h"
+#include <QXmlStreamReader>
+#ifndef NO_DATABASE
+QMutex Db_Mutex;
+#endif
+const QString LoansPropertiesToSearch[] = { "Issuer", "Facility" };
 int MonthDiff(const QDate& FutureDte,const QDate& PresentDte){
 	int Result;
 	Result=(FutureDte.year()-PresentDte.year())*12;
@@ -255,8 +260,7 @@ void PrintToTempFile(const QString& TempFileName, const QString& Message, bool P
 	TempWrite << (PrintTime ? QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm "):QString()) + Message + '\n';
 	TempFile.close();
 }
-#include <QSettings>
-#include <QRegExp>
+
 //UGLY!!!
 double GetLoanAssumption(const QString& LoanName, int columnIndex, QDate RefDate) {
 /*columnIndex
@@ -277,9 +281,7 @@ double GetLoanAssumption(const QString& LoanName, int columnIndex, QDate RefDate
 	int FoundLoan = -1;
 	int LineCounter = 0;
 	if (columnIndex >= 0 && columnIndex <= 9 && !LoanName.isEmpty()) {
-		QSettings ConfigIni(":/Configs/GlobalConfigs.ini", QSettings::IniFormat);
-		ConfigIni.beginGroup("Folders");
-		QFile AssumptionsFile(ConfigIni.value("UnifiedResultsFolder", "Z:/24AM/Monitoring/Model Results").toString() + '/' + ConfigIni.value("AssumptionsFile", "Loans Assumptions").toString());
+		QFile AssumptionsFile(GetFromConfig("Folders", "UnifiedResultsFolder", R"(\\synserver2\Company Share\24AM\Monitoring\Model Results)") + '/' + GetFromConfig("Folders", "AssumptionsFile", "Loans Assumptions"));
 		if (AssumptionsFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
 			QString CurrentLoan;
 			QTextStream Streamer(&AssumptionsFile);
@@ -415,4 +417,39 @@ QString NormaliseTriggerStructure(QString a) {
 	a.replace("true", "t");
 	a.replace(QRegExp("\\s"), "");
 	return a.toUpper();
+}
+
+QString GetFromConfig(const QString& Domain, const QString& Field, const QString& DefaultValue) {
+	QFile Source(":/Configs/GlobalConfigs.xml");
+	Source.open(QIODevice::ReadOnly);
+	QXmlStreamReader xml(&Source);
+	bool DomainFound=false;
+	bool FieldFound = false;
+	while (!xml.atEnd() && !xml.hasError()) {
+		xml.readNext();
+		if (xml.isStartElement()) {
+			if (xml.name()==Domain) {
+				if (DomainFound) return DefaultValue;
+				DomainFound = true;
+			}
+			else if (DomainFound && xml.name() == Field) {
+				if (FieldFound) return DefaultValue;
+				FieldFound = true;
+			}
+		}
+		else if (xml.isEndElement()) {
+			if (xml.name() == Domain) {
+				if (!DomainFound) return DefaultValue;
+				DomainFound = false;
+			}
+			else if (xml.name() == Field) {
+				if (!FieldFound) return DefaultValue;
+				FieldFound = false;
+			}
+		}
+		else if (xml.isCharacters() && FieldFound) {
+			return xml.text().toString();
+		}
+	}
+	return DefaultValue;
 }

@@ -57,6 +57,7 @@
     <ClInclude Include="BoolVector.h" />
     <ClInclude Include="CommonFunctions.h" />
     <ClInclude Include="IntegerVector.h" />
+    <ClInclude Include="LoanAssumption.h" />
     <ClInclude Include="Mortgage.h" />
     <ClInclude Include="MtgCashFlow.h" />
     <CustomBuild Include="QBbgWorker.h">
@@ -362,6 +363,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="IntegerVector.cpp" />
+    <ClCompile Include="LoanAssumption.cpp" />
     <ClCompile Include="Mortgage.cpp" />
     <ClCompile Include="MtgCalculator.cpp" />
     <ClCompile Include="MtgCalculatorThread.cpp" />

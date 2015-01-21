@@ -9,12 +9,13 @@ MtgCalculatorThread::MtgCalculatorThread(int Identity,QObject* parent)
 	, Delinquency("0")
 	, DelinquencyLag("0")
 	, m_OverrideAssumptions(false)
+	, m_DownloadScenario(false)
 {}
 void MtgCalculatorThread::run(){
-	if(Loan.CalculateCashFlows(StartDate, CPRass, CDRass, LSass, RecoveryLag, Delinquency, DelinquencyLag,m_OverrideAssumptions))
-		emit AnonimCalculated(m_ID);
+	if (Loan.CalculateCashFlows(StartDate, CPRass, CDRass, LSass, RecoveryLag, Delinquency, DelinquencyLag, m_OverrideAssumptions, m_DownloadScenario))
+		emit AnonimCalculated(Identifier);
 	else
-		emit ErrorCalculation(m_ID);
+		emit ErrorCalculation(Identifier);
 	exec();
 }
 void MtgCalculatorThread::SetCPR(const QString& a) {CPRass=a;}

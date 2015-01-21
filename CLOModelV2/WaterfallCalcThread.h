@@ -6,7 +6,7 @@
 class WaterfallCalcThread : public TemplAsyncThread<Waterfall> {
 	Q_OBJECT
 public:
-	WaterfallCalcThread(int ID,QObject* parent=0);
+	WaterfallCalcThread(int ID,QObject* parent=nullptr);
 	void SetWaterfall(const Waterfall& a){LocalFall=a;}
 protected:
 	Waterfall LocalFall;

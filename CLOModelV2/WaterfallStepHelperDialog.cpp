@@ -21,7 +21,7 @@ WaterfallStepHelperDialog::WaterfallStepHelperDialog(QWidget *parent)
 	, Cleared(false)
 {
 	setWindowIcon(QIcon(":/Icons/Logo.png"));
-	setWindowTitle("Edit Waterfall Step");
+	setWindowTitle(tr("Edit Waterfall Step"));
 	
 	StepSelectorModel = new QStandardItemModel(this);
 	StepSelectorModel->setColumnCount(2);

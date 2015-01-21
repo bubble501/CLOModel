@@ -7,8 +7,9 @@
 #include "CommonFunctions.h"
 #include <QDate>
 #include <QString>
+#include <QHBoxLayout>
 #include <QFile>
-#include <QSettings>
+#include <QIcon>
 #include <QApplication>
 #include <QTextStream>
 #include "DateTrigger.h"
@@ -19,6 +20,7 @@
 #include "WaterfallStepHelperDialog.h"
 #include "TriggerHelperDialog.h"
 #include "DuringStressTestTrigger.h"
+#include "LoanAssumptionsEditor.h"
 void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	bool RunStress;
 	CentralUnit TempUnit;
@@ -39,11 +41,8 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			BaseRte = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 			Ann=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			frq = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
-			prem=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
-			lossm=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
-			Hairc=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			Properties = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
-			if (sze >= 0.01) TempUnit.AddLoan(Matur, sze, Intr, Ann, frq, BaseRte, lossm, prem, Hairc, Properties);
+			if (sze >= 0.01) TempUnit.AddLoan(Matur, sze, Intr, Ann, frq, BaseRte, Properties);
 		}
 	}
 	{//Tranches
@@ -409,9 +408,7 @@ double __stdcall CLOReturnRate(LPSAFEARRAY *ArrayData){
 	QFile file(Filename);
 	bool UsingClom = false;
 	if (!file.exists()) {
-		QSettings ConfigIni(":/Configs/GlobalConfigs.ini", QSettings::IniFormat);
-		ConfigIni.beginGroup("Folders");
-		file.setFileName(ConfigIni.value("UnifiedResultsFolder", "\\\\synserver2\\Company Share\\24AM\\Monitoring\\Model Results").toString() + '\\' + DealName + ".clom");
+		file.setFileName(GetFromConfig("Folders", "UnifiedResultsFolder", R"(\\synserver2\Company Share\24AM\Monitoring\Model Results)") + '\\' + DealName + ".clom");
 		if (!file.exists())return 0.0;
 		UsingClom = true;
 	}
@@ -457,9 +454,7 @@ double __stdcall CLODiscountMargin(LPSAFEARRAY *ArrayData){
 	QFile file(Filename);
 	bool UsingClom = false;
 	if(!file.exists()){
-		QSettings ConfigIni(":/Configs/GlobalConfigs.ini", QSettings::IniFormat);
-		ConfigIni.beginGroup("Folders");
-		file.setFileName(ConfigIni.value("UnifiedResultsFolder", "\\\\synserver2\\Company Share\\24AM\\Monitoring\\Model Results").toString() + '\\' + DealName + ".clom");
+		file.setFileName(GetFromConfig("Folders", "UnifiedResultsFolder", R"(\\synserver2\Company Share\24AM\Monitoring\Model Results)") + '\\' + DealName + ".clom");
 		if (!file.exists())return 0.0;
 		UsingClom = true;
 	}
@@ -505,9 +500,7 @@ double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
 	QFile file(Filename);
 	bool UsingClom = false;
 	if (!file.exists()){
-		QSettings ConfigIni(":/Configs/GlobalConfigs.ini", QSettings::IniFormat);
-		ConfigIni.beginGroup("Folders");
-		file.setFileName(ConfigIni.value("UnifiedResultsFolder", "\\\\synserver2\\Company Share\\24AM\\Monitoring\\Model Results").toString() + '\\' + DealName + ".clom");
+		file.setFileName(GetFromConfig("Folders", "UnifiedResultsFolder", R"(\\synserver2\Company Share\24AM\Monitoring\Model Results)") + '\\' + DealName + ".clom");
 		if (!file.exists())return 0.0;
 		UsingClom = true;
 	}
@@ -669,9 +662,9 @@ BSTR __stdcall TriggerEdit(LPSAFEARRAY *ArrayData) {
 	if (!SUCCEEDED(hr))return NULL;
 	QString CurrentTrig = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 	SafeArrayUnaccessData(*ArrayData);
-	char *argv[] = { "NoArgumnets" };
-	int argc = sizeof(argv) / sizeof(char*) - 1;
 	{
+		char *argv[] = { "NoArgumnets" };
+		int argc = sizeof(argv) / sizeof(char*) - 1;
 		QApplication a(argc, argv);
 		TriggerHelperDialog TrigDialog;
 		TrigDialog.SetCurrentPars(CurrentTrig);
@@ -684,21 +677,55 @@ BSTR __stdcall TriggerEdit(LPSAFEARRAY *ArrayData) {
 	}
 	return NULL;
 }
-//Ugly!!!
-double __stdcall GetLoansAssumption(LPSAFEARRAY *ArrayData) {
-	ExcelCommons::InitExcelOLE();
-	int ColumnIndex;
+//SAFEARRAY* __stdcall LoadLoanScenario(LPSAFEARRAY *ArrayData) {
+BSTR __stdcall LoadLoanScenario(LPSAFEARRAY *ArrayData) {
 	VARIANT HUGEP *pdFreq;
 	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
-	if (SUCCEEDED(hr)) {
-		QString LoanName = QString::fromStdWString(pdFreq->bstrVal).trimmed(); pdFreq++;
-		ColumnIndex = pdFreq->intVal; pdFreq++;
-		QDate RefDate = QDate::fromString(QString::fromStdWString(pdFreq->bstrVal).trimmed(),"yyyy-MM-dd"); pdFreq++;
-		SafeArrayUnaccessData(*ArrayData);
-		return GetLoanAssumption(LoanName.trimmed(), ColumnIndex, RefDate);
+	if (!SUCCEEDED(hr))return NULL;
+	const int NumOfLoans = pdFreq->intVal; pdFreq++;
+	Mortgage TempMtg;
+	char *argv[] = { "NoArgumnets" };
+	int argc = sizeof(argv) / sizeof(char*) - 1;
+	QApplication a(argc, argv);
+	auto TempDialog = new QDialog();
+	TempDialog->setWindowIcon(QIcon(":/Icons/Logo.png"));
+	TempDialog->setWindowTitle(QObject::tr("Loan Scenarios Editor"));
+	QHBoxLayout* DialogLay = new QHBoxLayout(TempDialog);
+	LoanAssumptionsEditor* ScenariosEditor = new LoanAssumptionsEditor(TempDialog);
+	QObject::connect(ScenariosEditor, &LoanAssumptionsEditor::PoolSaved, TempDialog, &QDialog::accept);
+	DialogLay->addWidget(ScenariosEditor);
+	ScenariosEditor->SetEnableLoad(false);
+	ScenariosEditor->FillFromQuery();
+	QScopedPointer<QDialog, QScopedPointerDeleteLater> DialogScope(TempDialog);
+	QString CurrField;
+	for (int i = 0; i < NumOfLoans; ++i) {
+		CurrField = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+		if (CurrField.isEmpty()) TempMtg.RemoveProperty("Issuer");
+		else TempMtg.SetProperty("Issuer", CurrField);
+		CurrField = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+		if (CurrField.isEmpty()) TempMtg.RemoveProperty("Facility");
+		else TempMtg.SetProperty("Facility", CurrField);
+		CurrField = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+		if (CurrField.isEmpty()) TempMtg.RemoveProperty("Scenario");
+		else TempMtg.SetProperty("Scenario", CurrField);
+		ScenariosEditor->AddLoanToPool(ScenariosEditor->LoanCount(), TempMtg);
 	}
-	return -1.0;
+	SafeArrayUnaccessData(*ArrayData);
+	if (DialogScope->exec() == QDialog::Accepted) {
+		auto Result = ScenariosEditor->GetScenarios();
+		auto ResultKeys = Result.keys();
+		std::sort(ResultKeys.begin(), ResultKeys.end());
+		QString TotalString;
+		for (auto i = ResultKeys.constBegin(); i != ResultKeys.constEnd(); ++i) {
+			if (i != ResultKeys.constBegin()) TotalString.append("#,#");
+			TotalString.append(Result.value(*i));
+		}
+		return SysAllocStringByteLen(TotalString.toStdString().c_str(), TotalString.size());
+	}
+	return NULL;
 }
+
+
 /*!
 \file ExcelInput.cpp
 \brief Excel exported functions

@@ -3,6 +3,7 @@
 #include <QDate>
 #include "TemplAsyncCalculator.h"
 #include <QList>
+#include <QPair>
 #include "MtgCashFlow.h"
 #include "CommonFunctions.h"
 #include "BaseRateTable.h"
@@ -13,8 +14,6 @@ class MtgCalculator : public TemplAsyncCalculator <MtgCalculatorThread,MtgCashFl
 	Q_OBJECT
 public slots:
 	virtual bool StartCalculation() override;
-protected:
-	virtual void BeeReturned(int Ident, const MtgCashFlow& a) override;
 public:
 	virtual QString ReadyToCalculate() const override;
 	MtgCalculator(QObject* parent = 0);
@@ -48,11 +47,19 @@ public:
 #ifndef NO_DATABASE
 	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll=false);
 	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll=false);
+	void DownloadScenarios();
+	void GuessLoanScenarios(bool OverrideAss);
 #endif
 	void SetOverrideAssumptions(bool a) { m_OverrideAssumptions = a; }
 	bool GetOverrideAssumptions()const { return m_OverrideAssumptions; }
 	const MtgCashFlow& GetAggregatedResults()const { return m_AggregatedRes; }
+	bool GetDownloadScenario() const { return m_DownloadScenario; }
+	void SetDownloadScenario(bool val) { m_DownloadScenario = val; }
 private:
+	void ClearTempProperties();
+	void AddTempProperty(qint32 LoanID, const QString& PropertyName, const QString& PropertyValue);
+	QHash<qint32, QHash<QString, QString>* > TempProperties;
+protected:
 	QHash<qint32, Mortgage*> Loans;
 	QString m_CPRass;
 	QString m_CDRass;
@@ -61,12 +68,12 @@ private:
 	QString m_Delinquency;
 	QString m_DelinquencyLag;
 	bool m_OverrideAssumptions;
+	bool m_DownloadScenario;
 	bool m_UseStoredCashFlows;
 	QDate StartDate;
 	MtgCashFlow m_AggregatedRes;
-protected:
+	virtual void BeeReturned(int Ident, const MtgCashFlow& a) override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
-signals:
 	friend QDataStream& operator<<(QDataStream & stream, const MtgCalculator& flows);
 	friend QDataStream& operator>>(QDataStream & stream, MtgCalculator& flows);
 };

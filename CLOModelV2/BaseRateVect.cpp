@@ -8,7 +8,6 @@
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
-#include <QSettings>
 #include <QVariant>
 #endif
 
@@ -45,7 +44,7 @@ BaseRateVector::BaseRateVector(const QString& Vec,const QDate& Anchor)
 	
 }
 bool BaseRateVector::IsValid() const{
-	if (!AbstractBbgVect::IsValid("\\S+", false)) return false;
+	if (!AbstractBbgVect::IsValid(R"**([^\s,\[\]]+(?:\[(?:(?:-?\d*\.?\d+)|(?:(?:-?\d*\.?\d+)?(?:,-?\d*\.?\d+)))\])?)**", false)) return false;
 	QRegExp rx("\\[(-?\\d*\\.?\\d+),(-?\\d*\\.?\\d+)\\]");
 	for (int pos = 0; (pos = rx.indexIn(m_Vector, pos)) >= 0; pos += rx.matchedLength()) {
 		if (rx.cap(1).toDouble() > rx.cap(2).toDouble()) return false;
@@ -53,7 +52,7 @@ bool BaseRateVector::IsValid() const{
 	return true;
 }
 QRegExpValidator* BaseRateVector::GetValidator(QObject* parent) const {
-	return AbstractBbgVect::GetValidator("\\S+", false, parent);
+	return AbstractBbgVect::GetValidator(R"**([^\s,\[\]]+(?:\[(?:(?:-?\d*\.?\d+)|(?:(?:-?\d*\.?\d+)?(?:,-?\d*\.?\d+)))\])?)**", false, parent);
 }
 void BaseRateVector::UnpackVector(){
 	m_VectVal.clear();
@@ -204,22 +203,23 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ConstantBaseRateTable& Refe
 		if (!ReferencesValues.GetValues().contains(GetValue(i))) AllRefFound = false;
 	}
 	if (AllRefFound) return CompileReferenceRateValue(ReferencesValues);
-	QDate MinUpdateDate;
-	QSettings ConfigIni(":/Configs/GlobalConfigs.ini", QSettings::IniFormat);
-	ConfigIni.beginGroup("Database");
+	QDate MinUpdateDate;;
+	QMutexLocker DbLocker(&Db_Mutex);
 	QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
 	if (!db.isValid()) {
-		db = QSqlDatabase::addDatabase(ConfigIni.value("DBtype", "QODBC").toString(), "TwentyFourDB");
+		db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype", "QODBC"), "TwentyFourDB");
 		db.setDatabaseName(
-			"Driver={" + ConfigIni.value("Driver", "SQL Server").toString()
+			"Driver={" + GetFromConfig("Database", "Driver", "SQL Server")
 			+ "}; "
-			+ ConfigIni.value("DataSource", "Server=SYNSERVER2\\SQLExpress;Initial Catalog=ABSDB;Integrated Security=SSPI;Trusted_Connection=Yes;").toString()
+			+ GetFromConfig("Database", "DataSource", R"(Server=SYNSERVER2\SQLExpress;Initial Catalog=ABSDB;Integrated Security=SSPI;Trusted_Connection=Yes;)")
 			);
 	}
-	if (db.open()) {
+	bool DbOpen = db.isOpen();
+	if (!DbOpen) DbOpen = db.open();
+	if (DbOpen) {
 		QSqlQuery query(db);
 		query.setForwardOnly(true);
-		query.prepare("{CALL "+ ConfigIni.value("ConstBaseRatesStoredProc", "getLatestIndexPrices").toString()+"}");
+		query.prepare("{CALL " + GetFromConfig("Database", "ConstBaseRatesStoredProc", "getLatestIndexPrices") + "}");
 		if (query.exec()) {
 			while (query.next()) {
 				if (
@@ -232,7 +232,6 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ConstantBaseRateTable& Refe
 					
 			}
 			db.close();
-			ConfigIni.endGroup();
 			ReferencesValues.SetUpdateDate(MinUpdateDate);
 			return CompileReferenceRateValue(ReferencesValues);
 		}
@@ -248,21 +247,22 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ForwardBaseRateTable& Refer
 	}
 	if (AllRefFound) return CompileReferenceRateValue(ReferencesValues);
 	QDate MinUpdateDate;
-	QSettings ConfigIni(":/Configs/GlobalConfigs.ini", QSettings::IniFormat);
-	ConfigIni.beginGroup("Database");
+	QMutexLocker DbLocker(&Db_Mutex);
 	QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
 	if (!db.isValid()) {
-		db = QSqlDatabase::addDatabase(ConfigIni.value("DBtype", "QODBC").toString(), "TwentyFourDB");
+		db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype", "QODBC"), "TwentyFourDB");
 		db.setDatabaseName(
-			"Driver={" + ConfigIni.value("Driver", "SQL Server").toString()
+			"Driver={" + GetFromConfig("Database", "Driver", "SQL Server")
 			+ "}; "
-			+ ConfigIni.value("DataSource", "Server=SYNSERVER2\\SQLExpress;Initial Catalog=ABSDB;Integrated Security=SSPI;Trusted_Connection=Yes;").toString()
+			+ GetFromConfig("Database",  "DataSource", R"(Server=SYNSERVER2\SQLExpress;Initial Catalog=ABSDB;Integrated Security=SSPI;Trusted_Connection=Yes;)")
 			);
 	}
-	if (db.open()) {
+	bool DbOpen = db.isOpen();
+	if (!DbOpen) DbOpen = db.open();
+	if (DbOpen) {
 		QSqlQuery query(db);
 		query.setForwardOnly(true);
-		query.prepare("{CALL " + ConfigIni.value("ForwardBaseRatesStoredProc", "getForwardCurveMatrix").toString() + "}");
+		query.prepare("{CALL " + GetFromConfig("Database", "ForwardBaseRatesStoredProc", "getForwardCurveMatrix") + "}");
 		if (query.exec()) {
 			QHash < QString, QHash<QDate, double> > QueryResults;
 			while (query.next()) {
@@ -276,7 +276,6 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ForwardBaseRateTable& Refer
 					
 			}
 			db.close();
-			ConfigIni.endGroup();
 			for (QHash < QString, QHash<QDate, double> >::const_iterator i = QueryResults.constBegin(); i != QueryResults.constEnd(); ++i) {
 				ReferencesValues.SetValue(i.key(), i.value().keys(), i.value().values());
 			}

@@ -35,6 +35,11 @@
     <Filter Include="Header Files\Core">
       <UniqueIdentifier>{1c66b12c-cd83-4be3-b600-608955df767c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Form Files">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+      <ParseFiles>true</ParseFiles>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\qrc_Resources.cpp">
@@ -343,6 +348,84 @@
     <ClCompile Include="FloorCapVector.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_LoanAssumptionsEditor.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_LoanAssumptionsEditor.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_AssumptionsComboDelegate.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_AssumptionsComboDelegate.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_LoanAssumptionDelegate.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_LoanAssumptionDelegate.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_RichTextDelegate.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_RichTextDelegate.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="LoanAssumption.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="LoanAssumptionDelegate.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="LoanAssumptionsEditor.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="RichTextDelegate.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="AssumptionsComboDelegate.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_CheckAndEditDelegate.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_CheckAndEditDelegate.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_CheckAndEdit.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_CheckAndEdit.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_LoanAssMatcher.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_LoanAssMatcher.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_LoanAssMatcherThread.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_LoanAssMatcherThread.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="LoanAssMatcherThread.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="LoanAssMatcherResult.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="LoanAssMatcher.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="CheckAndEditDelegate.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="CheckAndEdit.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Resources.qrc">
@@ -501,6 +584,33 @@
     <CustomBuild Include="TriggerHelperDialog.h">
       <Filter>Header Files\Core</Filter>
     </CustomBuild>
+    <CustomBuild Include="AssumptionsComboDelegate.h">
+      <Filter>Header Files\Core</Filter>
+    </CustomBuild>
+    <CustomBuild Include="LoanAssumptionDelegate.h">
+      <Filter>Header Files\Core</Filter>
+    </CustomBuild>
+    <CustomBuild Include="LoanAssumptionsEditor.h">
+      <Filter>Header Files\Core</Filter>
+    </CustomBuild>
+    <CustomBuild Include="RichTextDelegate.h">
+      <Filter>Header Files\Core</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CheckAndEdit.h">
+      <Filter>Header Files\Core</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CheckAndEditDelegate.h">
+      <Filter>Header Files\Core</Filter>
+    </CustomBuild>
+    <CustomBuild Include="LoanAssMatcher.h">
+      <Filter>Header Files\Core</Filter>
+    </CustomBuild>
+    <CustomBuild Include="LoanAssMatcherThread.h">
+      <Filter>Header Files\Core</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ReadOnlyColProxy.h">
+      <Filter>Header Files\Core</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DayCountVect.h">
@@ -546,6 +656,12 @@
       <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="DuringStressTestTrigger.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="LoanAssumption.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="LoanAssMatcherResult.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
   </ItemGroup>

@@ -23,7 +23,6 @@ public:
 		OCFlow = 11,
 		ICFlow = 12,
 		OCTarget = 211,
-		OCNumerator=311,
 		ICTarget = 212,
 		DeferredFlow = 1 << (MaximumInterestsTypes + 1),
 		AccruedFlow = 1 << (MaximumInterestsTypes + 2),

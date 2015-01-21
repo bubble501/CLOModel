@@ -23,9 +23,6 @@ public:
 		, const QString& Annuity
 		, const QString& Freq = "1"
 		, const QString& floatBase = "ZERO"
-		, const QString& LossMult = "100"
-		, const QString& PrepayMult = "100"
-		, const QString& HaicutVect = "0"
 		, const QString& Properties = ""
 		);
 #ifndef NO_BLOOMBERG

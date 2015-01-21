@@ -257,9 +257,6 @@ QDataStream& operator<<(QDataStream & stream, const StressTest& flows){
 	stream << flows.ShowProgress;
 	stream << flows.UseFastVersion;
 	std::for_each(std::begin(flows.m_AssumptionsRef), std::end(flows.m_AssumptionsRef), [&stream](QSet<QString>* i) {stream << *i; });
-	/*for (int i = 0; i < NumStressDimentsions; ++i) {
-		stream << *(flows.m_AssumptionsRef[i]);
-	}*/
 	stream << static_cast<qint32>(flows.Results.size());
 	for (auto i = flows.Results.constBegin(); i != flows.Results.constEnd(); ++i) {
 		stream << i.key() << *(i.value());
@@ -304,7 +301,7 @@ void StressTest::SaveResults(const QString& DestPath)const{
 		NewName = DestinationPath + QString("StressResult%1.fcsr");
 		for (quint64 i = 0; true; ++i) {
 			if (!QFile::exists(NewName.arg(i))) {
-				NewName.arg(i);
+				NewName=NewName.arg(i);
 				break;
 			}
 		}
@@ -382,7 +379,7 @@ void StressTest::SaveResults(const QString& DestPath)const{
 
 		}
 		OldZip.close();
-		if(!curDir.remove(OldName))return;
+		curDir.remove(OldName);
 		QFile::rename(NewName, OldName);
 	}
 	zip.close();
@@ -555,8 +552,11 @@ void StressTest::GatherResults() {
 }
 
 void StressTest::ResetScenarios() {
-	std::for_each(std::begin(m_AssumptionsRef), std::end(m_AssumptionsRef), [](QSet<QString>* a) { a->clear(); });
-	//for (int i = 0; i < NumStressDimentsions; i++) m_AssumptionsRef[i]->clear();
+	std::for_each(
+		std::begin(m_AssumptionsRef)
+		, std::end(m_AssumptionsRef)
+		, [](QSet<QString>* a) { a->clear(); }
+	);
 }
 
 

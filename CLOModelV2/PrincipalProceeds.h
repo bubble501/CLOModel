@@ -7,13 +7,17 @@ protected:
 	double m_Scheduled;
 	double m_Prepay;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
+	virtual void NormaliseValues() {
+		if (qAbs(m_Scheduled) < 0.01) m_Scheduled = 0.0;
+		if (qAbs(m_Prepay) < 0.01) m_Prepay = 0.0;
+	}
 public:
 	const double& GetPrepay() const { return m_Prepay; }
-	void SetPrepay(const double& val) { if (qAbs(val) >= 0.01) m_Prepay = val; }
-	void AddPrepay(const double& val) { if (qAbs(val) >= 0.01) m_Prepay += val; }
+	void SetPrepay(const double& val) { m_Prepay = qMax(val,0.0); NormaliseValues(); }
+	void AddPrepay(const double& val) { if (qAbs(val) >= 0.01) m_Prepay += val; NormaliseValues(); }
 	const double& GetScheduled() const { return m_Scheduled; }
-	void SetScheduled(const double& val) { if (qAbs(val) >= 0.01) m_Scheduled = val; }
-	void AddScheduled(const double& val) { if (qAbs(val) >= 0.01) m_Scheduled += val; }
+	void SetScheduled(const double& val) { m_Scheduled = qMax(val, 0.0); NormaliseValues(); }
+	void AddScheduled(const double& val) { if (qAbs(val) >= 0.01) m_Scheduled += val; NormaliseValues(); }
 	PrincipalRecip() :m_Scheduled(0.0), m_Prepay(0.0) {}
 	PrincipalRecip(const PrincipalRecip& a) :m_Scheduled(a.m_Scheduled), m_Prepay(a.m_Prepay) {}
 	PrincipalRecip& operator=(const PrincipalRecip& a) { m_Scheduled = a.m_Scheduled; m_Prepay = a.m_Prepay; return *this; }
@@ -24,12 +28,14 @@ public:
 		double Temp = qMin(a, m_Scheduled);
 		m_Scheduled -= Temp;
 		m_Prepay -= a - Temp;
+		NormaliseValues();
 		return *this;
 	}
 	PrincipalRecip& operator+=(double a) {
 		if (qAbs(a) < 0.01) return *this;
 		if (a < 0.0) return operator-=(-a);
 		m_Scheduled += a;
+		NormaliseValues();
 		return *this;
 	}
 	PrincipalRecip operator+(double a) { PrincipalRecip Result(*this); Result += a; return Result; }

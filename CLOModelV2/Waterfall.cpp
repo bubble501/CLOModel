@@ -731,10 +731,11 @@ bool Waterfall::CalculateTranchesCashFlows(){
 				//Process the current reinvestments
 				const MtgCashFlow& ReinvFlows = m_ReinvestmentTest.ProcessQueue(CurrentDate, CurrentPeriodIndex,m_LegalFinal);
 				if (!ReinvFlows.IsEmpty()) {
-					m_MortgagesPayments.AddFlow(ReinvFlows);
 					m_InterestAvailable += ReinvFlows.GetInterest(CurrentDate);
 					m_PrincipalAvailable.AddScheduled(ReinvFlows.GetScheduled(CurrentDate));
 					m_PrincipalAvailable.AddPrepay(ReinvFlows.GetPrepay(CurrentDate));
+					m_ReinvestmentTest.RemoveBondFlow(CurrentDate);
+					m_MortgagesPayments.AddFlow(m_ReinvestmentTest.GetBondCashFlow());
 				}
 			}
 			if (CurrentDate > m_MortgagesPayments.GetDate(0)) {
@@ -804,10 +805,11 @@ bool Waterfall::CalculateTranchesCashFlows(){
 									m_ReinvestmentTest.QueueReinvestments(PayablePrincipal, CurrentDate);
 									const MtgCashFlow& ReinvFlows = m_ReinvestmentTest.ProcessQueue(CurrentDate, CurrentPeriodIndex, m_LegalFinal);
 									if (!ReinvFlows.IsEmpty()){
-										m_MortgagesPayments.AddFlow(ReinvFlows);
 										m_InterestAvailable += ReinvFlows.GetInterest(CurrentDate);
 										m_PrincipalAvailable.AddScheduled(ReinvFlows.GetScheduled(CurrentDate));
 										m_PrincipalAvailable.AddPrepay(ReinvFlows.GetPrepay(CurrentDate));
+										m_ReinvestmentTest.RemoveBondFlow(CurrentDate);
+										m_MortgagesPayments.AddFlow(m_ReinvestmentTest.GetBondCashFlow());
 									}
 								}								
 							}
@@ -1393,10 +1395,11 @@ bool Waterfall::CalculateTranchesCashFlows(){
 									m_ReinvestmentTest.QueueReinvestments(FundsToCollateral, CurrentDate);
 									const MtgCashFlow& ReinvFlows = m_ReinvestmentTest.ProcessQueue(CurrentDate, CurrentPeriodIndex, m_LegalFinal);
 									if (!ReinvFlows.IsEmpty()) {
-										m_MortgagesPayments.AddFlow(ReinvFlows);
 										AvailableInterest += ReinvFlows.GetInterest(CurrentDate);
 										AvailablePrincipal.AddScheduled(ReinvFlows.GetScheduled(CurrentDate));
 										AvailablePrincipal.AddPrepay(ReinvFlows.GetPrepay(CurrentDate));
+										m_ReinvestmentTest.RemoveBondFlow(CurrentDate);
+										m_MortgagesPayments.AddFlow(m_ReinvestmentTest.GetBondCashFlow());
 									}
 								}
 								//Redeem
@@ -1530,10 +1533,11 @@ bool Waterfall::CalculateTranchesCashFlows(){
 							m_ReinvestmentTest.QueueReinvestments(PayablePrincipal, CurrentDate);
 							const MtgCashFlow& ReinvFlows = m_ReinvestmentTest.ProcessQueue(CurrentDate, CurrentPeriodIndex, m_LegalFinal);
 							if (!ReinvFlows.IsEmpty()) {
-								m_MortgagesPayments.AddFlow(ReinvFlows);
 								AvailableInterest += ReinvFlows.GetInterest(CurrentDate);
 								AvailablePrincipal.AddScheduled(ReinvFlows.GetScheduled(CurrentDate));
 								AvailablePrincipal.AddPrepay(ReinvFlows.GetPrepay(CurrentDate));
+								m_ReinvestmentTest.RemoveBondFlow(CurrentDate);
+								m_MortgagesPayments.AddFlow(m_ReinvestmentTest.GetBondCashFlow());
 							}
 						}
 					}	

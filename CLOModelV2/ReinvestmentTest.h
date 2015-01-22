@@ -59,6 +59,7 @@ public:
 	void SetReinvestmentSpreadOverTime(const QString& val) { m_ReinvestmentSpreadOverTime = val; }
 	void CompileReferenceRateValue(ForwardBaseRateTable& Values) { ReinvestmentBond.CompileReferenceRateValue(Values); }
 	void CompileReferenceRateValue(ConstantBaseRateTable& Values) { ReinvestmentBond.CompileReferenceRateValue(Values); }
+	void RemoveBondFlow(const QDate& a);
 #ifndef NO_DATABASE
 	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll = false) { ReinvestmentBond.GetBaseRatesDatabase(Values, DownloadAll); }
 	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll = false) { ReinvestmentBond.GetBaseRatesDatabase(Values, DownloadAll); }

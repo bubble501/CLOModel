@@ -89,7 +89,8 @@ ReinvestmentTest& ReinvestmentTest::operator=(const ReinvestmentTest& a){
 	ReinvestQueue = a.ReinvestQueue;
 	return *this;
 }
-void ReinvestmentTest::CalculateBondCashFlows(double Size, QDate StartDate, unsigned int Period, const QDate& MaxMaturity) {
+void ReinvestmentTest::CalculateBondCashFlows(double Size, QDate StartDate, int Period, const QDate& MaxMaturity) {
+	Q_ASSERT_X(Period >= 0, "CalculateBondCashFlows", "Trying to calculate cash flows with negative period");
 	ReinvestmentBond.ResetFlows();
 	bool NullDates[] = {
 		CPRAssumption.GetAnchorDate().isNull()
@@ -199,7 +200,7 @@ void ReinvestmentTest::QueueReinvestments(double Amount, const QDate& CurrentDat
 	}
 }
 
-const MtgCashFlow& ReinvestmentTest::ProcessQueue(const QDate& CurrentDate, unsigned int Period, const QDate& MaxMaturity) {
+const MtgCashFlow& ReinvestmentTest::ProcessQueue(const QDate& CurrentDate, int Period, const QDate& MaxMaturity) {
 	QDate Normaliseddate(CurrentDate.year(), CurrentDate.month(), 15);
 	ReinvestmentBond.ResetFlows();
 	auto ReinvIter = ReinvestQueue.find(Normaliseddate);
@@ -210,7 +211,8 @@ const MtgCashFlow& ReinvestmentTest::ProcessQueue(const QDate& CurrentDate, unsi
 	return ReinvestmentBond.GetCashFlow();
 }
 
-double ReinvestmentTest::GetQueuedCash(const QDate& StartDate) const {
+double ReinvestmentTest::GetQueuedCash(QDate StartDate) const {
+	if (!StartDate.isNull()) StartDate.setDate(StartDate.year(), StartDate.month(), 15);
 	double Result = 0.0;
 	for (auto i = ReinvestQueue.begin(); i != ReinvestQueue.end(); ++i) {
 		if (!StartDate.isNull() && i.key()<StartDate) continue;
@@ -218,8 +220,6 @@ double ReinvestmentTest::GetQueuedCash(const QDate& StartDate) const {
 	}
 	return Result;
 }
-
-
 
 QDataStream& operator>>(QDataStream & stream, ReinvestmentTest& flows) {
 	return flows.LoadOldVersion(stream);

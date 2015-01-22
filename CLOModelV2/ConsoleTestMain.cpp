@@ -35,11 +35,11 @@ int main(int argc, char *argv[]) {
 	//return a.exec();
 
 
-	QApplication a(argc, argv);
+	/*QApplication a(argc, argv);
 	LoanAssumptionsEditor b;
 	b.FillFromQuery();
 	b.show();
-	return a.exec();
+	return a.exec();*/
 
 	/*QApplication a(argc, argv);
 	StressViewer b;
@@ -78,11 +78,11 @@ int main(int argc, char *argv[]) {
 		, "20", "0.5", "0", "0", "0", "0"
 		).GetTranche("HARVT 10X A"));
 	return a.exec();
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	Waterfall TempWtf, TempCallWaterfall;
 	MtgCalculator TempMtg;
-	QFile file("Z:/24AM/Monitoring/Model Results/HARVT 10X.clom");
+	QFile file("Z:/24AM/Monitoring/Model Results/CGMSE 2015-1.clom");
 	file.open(QIODevice::ReadOnly);
 	qint32 VersionChecker;
 	QDataStream out(&file);
@@ -103,13 +103,13 @@ int main(int argc, char *argv[]) {
 	out >> TempMtg;
 	file.close();
 	
-	//TempWtf.CalculateTranchesCashFlows();
-	QApplication a(argc, argv);
-	TempMtg.DownloadScenarios();
-	TempMtg.SetSequentialComputation(true);
-	TempMtg.StartCalculation();
-	return a.exec();
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	TempWtf.CalculateTranchesCashFlows();
+// 	QApplication a(argc, argv);
+// 	TempMtg.DownloadScenarios();
+// 	TempMtg.SetSequentialComputation(true);
+// 	TempMtg.StartCalculation();
+// 	return a.exec();
+	/*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	QApplication a(argc, argv);
 	//QFile file("C:/Temp/Wrong 20#,#8#,#100#,#0#,#0#,#0.csw");
 	QFile file("C:/Temp/20#,#8#,#100#,#0#,#0#,#0.csw");

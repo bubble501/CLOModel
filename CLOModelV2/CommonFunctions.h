@@ -17,7 +17,7 @@ template<typename T> class QList;
 //#define Assumptions_ExcelOverDB // If this symbol is defined, the manual input of properties in excel, if any, will overwrite any scenario property set in the database 
 //#define SAVE_EXCEL_INPUTS
 //#define SaveLoanTape
-//#define DebugLogging
+#define DebugLogging
 //#define PrintAggregatedMtgFlows
 
 #ifdef DebugLogging

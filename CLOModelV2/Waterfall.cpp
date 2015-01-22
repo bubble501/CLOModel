@@ -139,6 +139,7 @@ Waterfall::Waterfall(const Waterfall& a)
 	, m_CalledPeriod(a.m_CalledPeriod)
 	, m_TriggersResults(a.m_TriggersResults)
 	, m_IsStressTest(a.m_IsStressTest)
+	, m_LegalFinal(a.m_LegalFinal)
 {
 	m_LoadProtocolVersion = a.m_LoadProtocolVersion;
 	for(QList<Tranche*>::const_iterator i=a.m_Tranches.constBegin();i!=a.m_Tranches.constEnd();i++){
@@ -218,6 +219,7 @@ Waterfall& Waterfall::operator=(const Waterfall& a){
 	m_CalledPeriod = a.m_CalledPeriod;
 	m_TriggersResults = a.m_TriggersResults;
 	m_IsStressTest = a.m_IsStressTest;
+	m_LegalFinal = a.m_LegalFinal;
 	ResetTranches();
 	for(QList<Tranche*>::const_iterator i=a.m_Tranches.constBegin();i!=a.m_Tranches.constEnd();i++){
 		m_Tranches.append(new Tranche(**i));

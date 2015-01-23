@@ -8,9 +8,6 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QScrollBar>
-#ifdef _DEBUG
-#include <QApplication>
-#endif
 WaterfallViewer::WaterfallViewer(QWidget* parent/* =0 */)
 	:QWidget(parent)
 {

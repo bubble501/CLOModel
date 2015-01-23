@@ -240,9 +240,6 @@ void StandaloneStress::Start() {
 	Stresser->SetStructure(TempWaterfall);
 	Stresser->SetUseFastVersion(FastStressBox->isChecked());
 	hide();
-#ifdef _DEBUG
-	Stresser->UseMultithread(false);
-#endif // _DEBUG
 	Stresser->RunStressTest();
 }
 void StandaloneStress::Finished(){
@@ -251,11 +248,7 @@ void StandaloneStress::Finished(){
 	if(QMessageBox::information(this,tr("Finished"),tr("Stress Test Finished Successfully"))==QMessageBox::Ok) qApp->quit();
 }
 void StandaloneStress::FinishedEroors() {
-#ifdef _DEBUG
-	QDir dir(OutPathEdit->text());
-	Stresser->SaveResults(dir.absolutePath());
-#endif // _DEBUG
-	if (QMessageBox::critical(this, tr("Finished"), tr("Errors Occured during calculation of stress test\nNo results were saved")) == QMessageBox::Ok) qApp->quit();
+	if (QMessageBox::critical(this, tr("Finished"), tr("Errors Occurred during calculation of stress test\nNo results were saved")) == QMessageBox::Ok) qApp->quit();
 }
 
 

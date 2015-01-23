@@ -114,10 +114,6 @@ void ReinvestmentTest::CalculateBondCashFlows(double Size, QDate StartDate, int 
 	ReinvestmentBond.SetSize(Size / qMax(CurrentPrice, 0.01));
 	if (WALAssumption.GetAnchorDate().isNull()) ReinvestmentBond.SetMaturityDate(StartDate.addDays(RoundUp(365.25*WALAssumption.GetValue(Period))));
 	else ReinvestmentBond.SetMaturityDate(StartDate.addDays(RoundUp(365.25*WALAssumption.GetValue(StartDate))));
-#ifdef _DEBUG
-	int currWAl=WALAssumption.GetValue(StartDate);
-#endif // _DEBUG
-
 	if (!MaxMaturity.isNull() && ReinvestmentBond.GetMaturityDate() > MaxMaturity) ReinvestmentBond.SetMaturityDate(MaxMaturity);
 	ReinvestmentBond.CalculateCashFlows(
 		StartDate

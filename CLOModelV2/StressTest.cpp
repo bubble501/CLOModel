@@ -14,8 +14,9 @@
 #include <QDataStream>
 #include "WaterfallCalculator.h"
 #include "ScenarioApplier.h"
-#include <QBuffer>
+#include <QProgressDialog>
 #include "PhasedProgressWidget.h"
+#include <QIcon>
 StressTest::StressTest(QObject* parent)
 	: QObject(parent)
 	, SequentialComputation(false)
@@ -310,6 +311,25 @@ void StressTest::SaveResults(const QString& DestPath)const{
 		NewName = OldName;
 		OldName = QString();
 	}
+	QScopedPointer<QProgressDialog, QScopedPointerDeleteLater> SaveProgress(nullptr);
+	if (ShowProgress) {
+		int Oldcount = 0;
+		if (!OldName.isEmpty()) {
+			QuaZip OldZip(OldName);
+			if (OldZip.open(QuaZip::mdUnzip)) {
+				Oldcount = qMax(0, OldZip.getEntriesCount() - 1);
+				OldZip.close();
+			}
+		}
+		SaveProgress.reset(new QProgressDialog(nullptr));
+		SaveProgress->setCancelButton(nullptr);
+		SaveProgress->setWindowTitle(tr("Please Wait..."));
+		SaveProgress->setWindowIcon(QIcon(":/Icons/Logo.png"));
+		SaveProgress->setLabelText("Saving Results");
+		SaveProgress->setRange(0, 1 + Results.size() + Oldcount);
+		SaveProgress->setValue(0);
+		SaveProgress->show();
+	}
 
 
 	QDir curDir;
@@ -319,12 +339,13 @@ void StressTest::SaveResults(const QString& DestPath)const{
 	QuaZipFile TargetFile(&zip);
 	QuaZipNewInfo ZipFileInfo("StressTestInputs");
 	UsedFileNames << "StressTestInputs";
-	if (!TargetFile.open(QIODevice::WriteOnly, ZipFileInfo))return;
+	if (TargetFile.open(QIODevice::WriteOnly, ZipFileInfo))
 	{
 		QDataStream out(&TargetFile);
 		out.setVersion(QDataStream::Qt_5_3);
 		out << qint32(ModelVersionNumber) << StartDate << SequentialComputation << ShowProgress << UseFastVersion << (*BaseCalculator) << Structure;
 		TargetFile.close();
+		if (ShowProgress) UpdateSaveProgress(SaveProgress.data(), SaveProgress->value() + 1);
 	}
 	ZipFileInfo.dateTime = QDateTime::currentDateTime();
 	for (auto i = Results.constBegin(); i != Results.constEnd(); ++i) {
@@ -335,6 +356,7 @@ void StressTest::SaveResults(const QString& DestPath)const{
 			out.setVersion(QDataStream::Qt_5_3);
 			out << qint32(ModelVersionNumber) << *(i.value());
 			TargetFile.close();
+			if (ShowProgress) UpdateSaveProgress(SaveProgress.data(), SaveProgress->value() + 1);
 		}
 	}
 
@@ -347,34 +369,21 @@ void StressTest::SaveResults(const QString& DestPath)const{
 			if (OldFile.open(QIODevice::ReadOnly)) {
 				if (UsedFileNames.contains(OldFile.getActualFileName())) {
 					OldFile.close();
+					if (ShowProgress) UpdateSaveProgress(SaveProgress.data(), SaveProgress->value() + 1);
 					continue;
 				}
-				QDataStream Reader(&OldFile);
-				Reader.setVersion(QDataStream::Qt_5_3);
-				
-				qint32 VesionCheck;
-				Waterfall TempWF;
 				if (!OldFile.getFileInfo(&OldFileInfo)) {
 					OldFileInfo.dateTime = QDateTime::currentDateTime();
 				}
-				Reader >> VesionCheck;
-				if (VesionCheck<qint32(MinimumSupportedVersion) || VesionCheck>qint32(ModelVersionNumber)) {
-					OldFile.close();
-					continue;
-				}
-				TempWF.SetLoadProtocolVersion(VesionCheck);
-				Reader >> TempWF;
-
 				ZipFileInfo.name = OldFile.getActualFileName();
 				ZipFileInfo.dateTime = OldFileInfo.dateTime;
 				UsedFileNames << ZipFileInfo.name;
-				OldFile.close();
 				if (TargetFile.open(QIODevice::WriteOnly, ZipFileInfo)) {
-					QDataStream Writer(&TargetFile);
-					Writer.setVersion(QDataStream::Qt_5_3);
-					Writer << qint32(ModelVersionNumber) << TempWF;
+					TargetFile.write(OldFile.readAll());
 					TargetFile.close();
+					if (ShowProgress) UpdateSaveProgress(SaveProgress.data(), SaveProgress->value() + 1);
 				}
+				OldFile.close();
 			}
 
 		}
@@ -543,6 +552,7 @@ void StressTest::GatherResults() {
 	}
 	TranchesCalculator->ClearResults();
 	if (ProgressForm) {
+		ProgressForm->hide();
 		ProgressForm->deleteLater();
 	}
 	if (m_ErrorsOccured)
@@ -599,6 +609,11 @@ void StressTest::CompileBaseRates(ConstantBaseRateTable& Values) {
 void StressTest::CompileBaseRates(ForwardBaseRateTable& Values) {
 	Structure.CompileReferenceRateValue(Values);
 	BaseCalculator->CompileReferenceRateValue(Values);
+}
+
+void StressTest::UpdateSaveProgress(QProgressDialog* prog, int val) const {
+	prog->setValue(val);
+	QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 }
 
 

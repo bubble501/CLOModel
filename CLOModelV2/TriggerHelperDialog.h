@@ -36,6 +36,7 @@ private:
 	QWidget* CreatePoolSizeTriggerWidget();
 	QWidget* CreateTrancheTriggerWidget();
 	QWidget* CreateDelinquencyTriggerWidget();
+	QWidget* CreateCumulativeLossTriggerWidget();
 
 
 	QDateEdit* DateTrigger_dateEdit;
@@ -50,6 +51,8 @@ private:
 	QDoubleSpinBox* TrancheTrigger_SizeMultEditor;
 	QComboBox* TrancheTrigger_SizeSideCombo;
 	QComboBox* TrancheTrigger_SeniorSideCombo;
+	QComboBox* CumLoss_SideCombo;
+	QLineEdit* CumLoss_VecEditor;
 
 };
 

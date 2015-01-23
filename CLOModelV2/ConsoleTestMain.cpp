@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
 	
 	Waterfall TempWtf, TempCallWaterfall;
 	MtgCalculator TempMtg;
-	QFile file("Z:/24AM/Monitoring/Model Results/CGMSE 2015-1.clom");
+	QFile file("Z:/24AM/Monitoring/Model Results/HARVT 10X.clom");
 	file.open(QIODevice::ReadOnly);
 	qint32 VersionChecker;
 	QDataStream out(&file);

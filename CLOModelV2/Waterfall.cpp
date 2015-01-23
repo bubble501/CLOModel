@@ -9,6 +9,7 @@
 #include "VectorTrigger.h"
 #include "PoolSizeTrigger.h"
 #include "TrancheTrigger.h"
+#include "CumulativeLossTrigger.h"
 #include <QStack>
 #include "AssumptionSet.h"
 #include "DelinquencyTrigger.h"
@@ -171,6 +172,9 @@ Waterfall::Waterfall(const Waterfall& a)
 		case AbstractTrigger::TriggerType::DuringStressTestTrigger:
 			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DuringStressTestTrigger(*(i.value().dynamicCast<DuringStressTestTrigger>()))));
 			break;
+		case AbstractTrigger::TriggerType::CumulativeLossTrigger:
+			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new CumulativeLossTrigger(*(i.value().dynamicCast<CumulativeLossTrigger>()))));
+			break;
 		default:
 			break;
 		}
@@ -252,6 +256,9 @@ Waterfall& Waterfall::operator=(const Waterfall& a){
 			break;
 		case AbstractTrigger::TriggerType::DuringStressTestTrigger:
 			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DuringStressTestTrigger(*(i.value().dynamicCast<DuringStressTestTrigger>()))));
+			break;
+		case AbstractTrigger::TriggerType::CumulativeLossTrigger:
+			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new CumulativeLossTrigger(*(i.value().dynamicCast<CumulativeLossTrigger>()))));
 			break;
 		default:
 			break;
@@ -1823,6 +1830,9 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream){
 			case AbstractTrigger::TriggerType::DuringStressTestTrigger:
 				TempTrig.reset(new DuringStressTestTrigger());
 				break;
+			case AbstractTrigger::TriggerType::CumulativeLossTrigger:
+				TempTrig.reset(new CumulativeLossTrigger());
+				break;
 			}
 			TempTrig->SetLoadProtocolVersion(m_LoadProtocolVersion);
 			stream >> (*TempTrig);
@@ -2210,6 +2220,16 @@ bool Waterfall::EvaluateTrigger(quint32 TrigID, int PeriodIndex, const QDate& Cu
 	}
 	case AbstractTrigger::TriggerType::DuringStressTestTrigger:{
 		return CurrentTrigger.dynamicCast<DuringStressTestTrigger>()->Passing(m_IsStressTest);
+	}
+	case AbstractTrigger::TriggerType::CumulativeLossTrigger:{
+		double TotalLoss = 0.0;
+		for (int CumIter = 0; CumIter <= PeriodIndex; ++CumIter) {
+			TotalLoss += m_MortgagesPayments.GetLoss(CumIter);
+		}
+		CumulativeLossTrigger TempTrig(*CurrentTrigger.dynamicCast<CumulativeLossTrigger>());
+		if (!TempTrig.HasAnchor())
+			TempTrig.SetAnchorDate(m_MortgagesPayments.GetDate(0));
+		return TempTrig.Passing(TotalLoss, m_MortgagesPayments.GetDate(PeriodIndex));
 	}
 	default:
 		return false;

@@ -14,6 +14,7 @@
 #include "BloombergVector.h"
 #include "DateTrigger.h"
 #include "PoolSizeTrigger.h"
+#include "CumulativeLossTrigger.h"
 #include "TrancheTrigger.h"
 TriggerHelperDialog::TriggerHelperDialog(QDialog *parent)
 	: QDialog(parent)
@@ -32,6 +33,7 @@ TriggerHelperDialog::TriggerHelperDialog(QDialog *parent)
 	TriggerTypeCombo->addItem("Tranche", static_cast<quint8>(AbstractTrigger::TriggerType::TrancheTrigger));
 	TriggerTypeCombo->addItem("Delinquencies", static_cast<quint8>(AbstractTrigger::TriggerType::DelinquencyTrigger));
 	TriggerTypeCombo->addItem("During Stress Test", static_cast<quint8>(AbstractTrigger::TriggerType::DuringStressTestTrigger));
+	TriggerTypeCombo->addItem("Cumulative Loss Trigger", static_cast<quint8>(AbstractTrigger::TriggerType::CumulativeLossTrigger));
 	TriggerTypeCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	
 	QLabel *TriggerLabelLabel = new QLabel(this);
@@ -53,7 +55,8 @@ TriggerHelperDialog::TriggerHelperDialog(QDialog *parent)
 	TriggerBuilderBase->addWidget(CreatePoolSizeTriggerWidget());
 	TriggerBuilderBase->addWidget(CreateTrancheTriggerWidget());
 	TriggerBuilderBase->addWidget(CreateDelinquencyTriggerWidget());
-	TriggerBuilderBase->addWidget(new QWidget(TriggerBuilderBase));
+	TriggerBuilderBase->addWidget(new QWidget(TriggerBuilderBase)); //DuringStressTestTrigger
+	TriggerBuilderBase->addWidget(CreateCumulativeLossTriggerWidget());
 	
 	
 
@@ -480,4 +483,59 @@ void TriggerHelperDialog::SetCurrentPars(const QString& pars) {
 	else {
 		if (AllPars.at(1).isEmpty()) TriggerLabelEdit->setText("Trigger");
 	}
+}
+
+QWidget* TriggerHelperDialog::CreateCumulativeLossTriggerWidget() {
+	QWidget* Result = new QWidget(this);
+	QGridLayout *ResLay = new QGridLayout(Result);
+	int CountRow = 0;
+
+	QLabel* VecLabel = new QLabel(Result);
+	VecLabel->setText(tr("Size cumulative losses that the trigger targets"));
+	CumLoss_VecEditor = new QLineEdit(Result);
+	CumLoss_VecEditor->setToolTip(tr("Accepts Vectors"));
+	CumLoss_VecEditor->setValidator(BloombergVector().GetValidator(PoolTrigger_VecEditor));
+	connect(TriggerBuilderBase, &QStackedWidget::currentChanged, [&](int) {
+		CumLoss_VecEditor->clear();
+		if (TriggerBuilderBase->currentWidget()->children().contains(CumLoss_VecEditor))
+			SetParameter(0, QString());
+	});
+	connect(CumLoss_VecEditor, &QLineEdit::textChanged, [&](const QString& NewVec) {
+		if (TriggerBuilderBase->currentWidget()->children().contains(CumLoss_VecEditor))
+			SetParameter(0, NewVec);
+	});
+	connect(this, &TriggerHelperDialog::ImportParam, [&](int parIdx, const QString& parVal) {
+		if (parIdx == 0) CumLoss_VecEditor->setText(parVal);
+	});
+	ResLay->addWidget(VecLabel, CountRow, 0);
+	ResLay->addWidget(CumLoss_VecEditor, CountRow, 1);
+	CountRow++;
+
+	QLabel* SideLabel = new QLabel(Result);
+	SideLabel->setText(tr("Side of the cumulative losses where the trigger passes"));
+	CumLoss_SideCombo = new QComboBox(Result);
+	CumLoss_SideCombo->addItem("Bigger", static_cast<quint8>(PoolSizeTrigger::TriggerSide::Bigger));
+	CumLoss_SideCombo->addItem("Smaller", static_cast<quint8>(PoolSizeTrigger::TriggerSide::Smaller));
+	CumLoss_SideCombo->addItem("Exactly", static_cast<quint8>(PoolSizeTrigger::TriggerSide::Exactly));
+	CumLoss_SideCombo->addItem("Bigger or Equal", static_cast<quint8>(PoolSizeTrigger::TriggerSide::BiggerOrEqual));
+	CumLoss_SideCombo->addItem("Smaller or Equal", static_cast<quint8>(PoolSizeTrigger::TriggerSide::SmallerOrEqual));
+	connect(TriggerBuilderBase, &QStackedWidget::currentChanged, [&](int) {
+		CumLoss_SideCombo->setCurrentIndex(0);
+		if (TriggerBuilderBase->currentWidget()->children().contains(CumLoss_SideCombo))
+			SetParameter(1, QString::number(CumLoss_SideCombo->itemData(0).toInt()));
+	});
+	connect(CumLoss_SideCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [&](int NewIndex) {
+		if (TriggerBuilderBase->currentWidget()->children().contains(CumLoss_SideCombo))
+			SetParameter(1, QString::number(CumLoss_SideCombo->itemData(NewIndex).toInt()));
+	});
+	connect(this, &TriggerHelperDialog::ImportParam, [&](int parIdx, const QString& parVal) {
+		if (parIdx == 1) CumLoss_SideCombo->setCurrentIndex(CumLoss_SideCombo->findData(parVal.toInt()));
+	});
+	ResLay->addWidget(SideLabel, CountRow, 0);
+	ResLay->addWidget(CumLoss_SideCombo, CountRow, 1);
+	CountRow++;
+
+
+	ResLay->addItem(new QSpacerItem(20, 20, QSizePolicy::Preferred, QSizePolicy::Expanding), CountRow, 0, 1, 2);
+	return Result;
 }

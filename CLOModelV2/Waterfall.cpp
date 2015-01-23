@@ -9,6 +9,7 @@
 #include "VectorTrigger.h"
 #include "PoolSizeTrigger.h"
 #include "TrancheTrigger.h"
+#include "CumulativeLossTrigger.h"
 #include <QStack>
 #include "AssumptionSet.h"
 #include "DelinquencyTrigger.h"
@@ -139,6 +140,7 @@ Waterfall::Waterfall(const Waterfall& a)
 	, m_CalledPeriod(a.m_CalledPeriod)
 	, m_TriggersResults(a.m_TriggersResults)
 	, m_IsStressTest(a.m_IsStressTest)
+	, m_LegalFinal(a.m_LegalFinal)
 {
 	m_LoadProtocolVersion = a.m_LoadProtocolVersion;
 	for(QList<Tranche*>::const_iterator i=a.m_Tranches.constBegin();i!=a.m_Tranches.constEnd();i++){
@@ -169,6 +171,9 @@ Waterfall::Waterfall(const Waterfall& a)
 			break;
 		case AbstractTrigger::TriggerType::DuringStressTestTrigger:
 			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DuringStressTestTrigger(*(i.value().dynamicCast<DuringStressTestTrigger>()))));
+			break;
+		case AbstractTrigger::TriggerType::CumulativeLossTrigger:
+			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new CumulativeLossTrigger(*(i.value().dynamicCast<CumulativeLossTrigger>()))));
 			break;
 		default:
 			break;
@@ -218,6 +223,7 @@ Waterfall& Waterfall::operator=(const Waterfall& a){
 	m_CalledPeriod = a.m_CalledPeriod;
 	m_TriggersResults = a.m_TriggersResults;
 	m_IsStressTest = a.m_IsStressTest;
+	m_LegalFinal = a.m_LegalFinal;
 	ResetTranches();
 	for(QList<Tranche*>::const_iterator i=a.m_Tranches.constBegin();i!=a.m_Tranches.constEnd();i++){
 		m_Tranches.append(new Tranche(**i));
@@ -250,6 +256,9 @@ Waterfall& Waterfall::operator=(const Waterfall& a){
 			break;
 		case AbstractTrigger::TriggerType::DuringStressTestTrigger:
 			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DuringStressTestTrigger(*(i.value().dynamicCast<DuringStressTestTrigger>()))));
+			break;
+		case AbstractTrigger::TriggerType::CumulativeLossTrigger:
+			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new CumulativeLossTrigger(*(i.value().dynamicCast<CumulativeLossTrigger>()))));
 			break;
 		default:
 			break;
@@ -729,10 +738,11 @@ bool Waterfall::CalculateTranchesCashFlows(){
 				//Process the current reinvestments
 				const MtgCashFlow& ReinvFlows = m_ReinvestmentTest.ProcessQueue(CurrentDate, CurrentPeriodIndex,m_LegalFinal);
 				if (!ReinvFlows.IsEmpty()) {
-					m_MortgagesPayments.AddFlow(ReinvFlows);
 					m_InterestAvailable += ReinvFlows.GetInterest(CurrentDate);
 					m_PrincipalAvailable.AddScheduled(ReinvFlows.GetScheduled(CurrentDate));
 					m_PrincipalAvailable.AddPrepay(ReinvFlows.GetPrepay(CurrentDate));
+					m_ReinvestmentTest.RemoveBondFlow(CurrentDate);
+					m_MortgagesPayments.AddFlow(m_ReinvestmentTest.GetBondCashFlow());
 				}
 			}
 			if (CurrentDate > m_MortgagesPayments.GetDate(0)) {
@@ -802,10 +812,11 @@ bool Waterfall::CalculateTranchesCashFlows(){
 									m_ReinvestmentTest.QueueReinvestments(PayablePrincipal, CurrentDate);
 									const MtgCashFlow& ReinvFlows = m_ReinvestmentTest.ProcessQueue(CurrentDate, CurrentPeriodIndex, m_LegalFinal);
 									if (!ReinvFlows.IsEmpty()){
-										m_MortgagesPayments.AddFlow(ReinvFlows);
 										m_InterestAvailable += ReinvFlows.GetInterest(CurrentDate);
 										m_PrincipalAvailable.AddScheduled(ReinvFlows.GetScheduled(CurrentDate));
 										m_PrincipalAvailable.AddPrepay(ReinvFlows.GetPrepay(CurrentDate));
+										m_ReinvestmentTest.RemoveBondFlow(CurrentDate);
+										m_MortgagesPayments.AddFlow(m_ReinvestmentTest.GetBondCashFlow());
 									}
 								}								
 							}
@@ -1391,10 +1402,11 @@ bool Waterfall::CalculateTranchesCashFlows(){
 									m_ReinvestmentTest.QueueReinvestments(FundsToCollateral, CurrentDate);
 									const MtgCashFlow& ReinvFlows = m_ReinvestmentTest.ProcessQueue(CurrentDate, CurrentPeriodIndex, m_LegalFinal);
 									if (!ReinvFlows.IsEmpty()) {
-										m_MortgagesPayments.AddFlow(ReinvFlows);
 										AvailableInterest += ReinvFlows.GetInterest(CurrentDate);
 										AvailablePrincipal.AddScheduled(ReinvFlows.GetScheduled(CurrentDate));
 										AvailablePrincipal.AddPrepay(ReinvFlows.GetPrepay(CurrentDate));
+										m_ReinvestmentTest.RemoveBondFlow(CurrentDate);
+										m_MortgagesPayments.AddFlow(m_ReinvestmentTest.GetBondCashFlow());
 									}
 								}
 								//Redeem
@@ -1528,10 +1540,11 @@ bool Waterfall::CalculateTranchesCashFlows(){
 							m_ReinvestmentTest.QueueReinvestments(PayablePrincipal, CurrentDate);
 							const MtgCashFlow& ReinvFlows = m_ReinvestmentTest.ProcessQueue(CurrentDate, CurrentPeriodIndex, m_LegalFinal);
 							if (!ReinvFlows.IsEmpty()) {
-								m_MortgagesPayments.AddFlow(ReinvFlows);
 								AvailableInterest += ReinvFlows.GetInterest(CurrentDate);
 								AvailablePrincipal.AddScheduled(ReinvFlows.GetScheduled(CurrentDate));
 								AvailablePrincipal.AddPrepay(ReinvFlows.GetPrepay(CurrentDate));
+								m_ReinvestmentTest.RemoveBondFlow(CurrentDate);
+								m_MortgagesPayments.AddFlow(m_ReinvestmentTest.GetBondCashFlow());
 							}
 						}
 					}	
@@ -1816,6 +1829,9 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream){
 				break;
 			case AbstractTrigger::TriggerType::DuringStressTestTrigger:
 				TempTrig.reset(new DuringStressTestTrigger());
+				break;
+			case AbstractTrigger::TriggerType::CumulativeLossTrigger:
+				TempTrig.reset(new CumulativeLossTrigger());
 				break;
 			}
 			TempTrig->SetLoadProtocolVersion(m_LoadProtocolVersion);
@@ -2204,6 +2220,16 @@ bool Waterfall::EvaluateTrigger(quint32 TrigID, int PeriodIndex, const QDate& Cu
 	}
 	case AbstractTrigger::TriggerType::DuringStressTestTrigger:{
 		return CurrentTrigger.dynamicCast<DuringStressTestTrigger>()->Passing(m_IsStressTest);
+	}
+	case AbstractTrigger::TriggerType::CumulativeLossTrigger:{
+		double TotalLoss = 0.0;
+		for (int CumIter = 0; CumIter <= PeriodIndex; ++CumIter) {
+			TotalLoss += m_MortgagesPayments.GetLoss(CumIter);
+		}
+		CumulativeLossTrigger TempTrig(*CurrentTrigger.dynamicCast<CumulativeLossTrigger>());
+		if (!TempTrig.HasAnchor())
+			TempTrig.SetAnchorDate(m_MortgagesPayments.GetDate(0));
+		return TempTrig.Passing(TotalLoss, m_MortgagesPayments.GetDate(PeriodIndex));
 	}
 	default:
 		return false;

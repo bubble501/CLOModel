@@ -20,7 +20,7 @@ public:
 	const IntegerVector& GetReinvDelay()const { return m_ReinvestmentDelay; }
 	const BloombergVector& GetReinvPrice()const { return ReinvestmentPrice; }
 	void ClearFlows() { m_Reinvested.Clear(); ReinvestmentBond.ResetFlows(); }
-	double GetQueuedCash(const QDate& StartDate=QDate()) const;
+	double GetQueuedCash(QDate StartDate=QDate()) const;
 	bool ReinvestQueueueEmpty() const { return ReinvestQueue.isEmpty(); }
 	void ResetReinvestQueueue() { ReinvestQueue.clear(); }
 	void SetupReinvBond(
@@ -40,10 +40,10 @@ public:
 		, const QString& DelinquencyLag = "0"
 	);
 	void QueueReinvestments(double Amount, const QDate& CurrentDate);
-	const MtgCashFlow& ProcessQueue(const QDate& CurrentDate, unsigned int Period, const QDate& MaxMaturity=QDate());
+	const MtgCashFlow& ProcessQueue(const QDate& CurrentDate, int Period, const QDate& MaxMaturity=QDate());
 	void SetMissingAnchors(const QDate& a);
 	void SetReinvestementPeriod(const QDate& ReinvPer);
-	void CalculateBondCashFlows(double Size, QDate StartDate, unsigned int Period, const QDate& MaxMaturity = QDate());
+	void CalculateBondCashFlows(double Size, QDate StartDate, int Period, const QDate& MaxMaturity = QDate());
 	const MtgCashFlow& GetBondCashFlow() const;
 	void SetCPR(const QString& a);
 	void SetCDR(const QString& a);
@@ -59,6 +59,7 @@ public:
 	void SetReinvestmentSpreadOverTime(const QString& val) { m_ReinvestmentSpreadOverTime = val; }
 	void CompileReferenceRateValue(ForwardBaseRateTable& Values) { ReinvestmentBond.CompileReferenceRateValue(Values); }
 	void CompileReferenceRateValue(ConstantBaseRateTable& Values) { ReinvestmentBond.CompileReferenceRateValue(Values); }
+	void RemoveBondFlow(const QDate& a);
 #ifndef NO_DATABASE
 	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll = false) { ReinvestmentBond.GetBaseRatesDatabase(Values, DownloadAll); }
 	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll = false) { ReinvestmentBond.GetBaseRatesDatabase(Values, DownloadAll); }

@@ -18,6 +18,7 @@ class PhasedProgressWidget;
 class MtgCashFlow;
 class WaterfallCalculator;
 class ScenarioApplier;
+class QProgressDialog;
 class StressTest:public QObject , public BackwardInterface{
 	Q_OBJECT
 private:
@@ -139,12 +140,14 @@ private slots:
 	void StoppedCalculation() { ResetStressTest(); }
 	void GatherResults();
 	void ErrorInCalculation() { m_ErrorsOccured = true; }
+	void UpdateSaveProgress(QProgressDialog* prog,int val) const;
 signals:
 	void CurrentScenarioCalculated();
 	void AllLoansCalculated();
 	void AllFinished();
 	void FinishedWithErrors();
 	void ErrorsOccured();
+	
 
 };
 QDataStream& operator<<(QDataStream & stream, const StressTest& flows);

@@ -20,6 +20,7 @@
 #include "WaterfallStepHelperDialog.h"
 #include "TriggerHelperDialog.h"
 #include "DuringStressTestTrigger.h"
+#include "CumulativeLossTrigger.h"
 #include "LoanAssumptionsEditor.h"
 void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	bool RunStress;
@@ -145,6 +146,12 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 				TempTrigger.reset(new PoolSizeTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
 				TempTrigger.dynamicCast<PoolSizeTrigger>()->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
 				TempTrigger.dynamicCast<PoolSizeTrigger>()->SetSide(static_cast<PoolSizeTrigger::TriggerSide>(pdFreq->intVal)); pdFreq++;
+				TempUnit.SetTrigger(i + 1, TempTrigger);
+				break;
+			case static_cast<int>(AbstractTrigger::TriggerType::CumulativeLossTrigger) :
+				TempTrigger.reset(new CumulativeLossTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+				TempTrigger.dynamicCast<CumulativeLossTrigger>()->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+				TempTrigger.dynamicCast<CumulativeLossTrigger>()->SetSide(static_cast<CumulativeLossTrigger::TriggerSide>(pdFreq->intVal)); pdFreq++;
 				TempUnit.SetTrigger(i + 1, TempTrigger);
 				break;
 			case static_cast<int>(AbstractTrigger::TriggerType::TrancheTrigger) :
@@ -617,6 +624,11 @@ BSTR __stdcall WatFallStepEdit(LPSAFEARRAY *ArrayData) {
 				TempIter = AvailableTriggers.insert(i, QSharedPointer<AbstractTrigger>(new PoolSizeTrigger(QString::fromWCharArray(pdFreq->bstrVal)))); pdFreq++;
 				TempIter->dynamicCast<PoolSizeTrigger>()->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
 				TempIter->dynamicCast<PoolSizeTrigger>()->SetSide(static_cast<PoolSizeTrigger::TriggerSide>(pdFreq->intVal)); pdFreq++;
+				break;
+			case static_cast<int>(AbstractTrigger::TriggerType::CumulativeLossTrigger) :
+				TempIter = AvailableTriggers.insert(i, QSharedPointer<AbstractTrigger>(new CumulativeLossTrigger(QString::fromWCharArray(pdFreq->bstrVal)))); pdFreq++;
+				TempIter->dynamicCast<CumulativeLossTrigger>()->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+				TempIter->dynamicCast<CumulativeLossTrigger>()->SetSide(static_cast<CumulativeLossTrigger::TriggerSide>(pdFreq->intVal)); pdFreq++;
 				break;
 			case static_cast<int>(AbstractTrigger::TriggerType::TrancheTrigger) :
 				TempIter = AvailableTriggers.insert(i, QSharedPointer<AbstractTrigger>(new TrancheTrigger(QString::fromWCharArray(pdFreq->bstrVal)))); pdFreq++;

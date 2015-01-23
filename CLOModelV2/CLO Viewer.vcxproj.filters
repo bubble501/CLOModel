@@ -305,6 +305,9 @@
     <ClCompile Include="LoanAssumption.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CumulativeLossTrigger.cpp">
+      <Filter>Source Files\Core Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseRateVect.h">
@@ -426,6 +429,9 @@
     </ClInclude>
     <ClInclude Include="LoanAssumption.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CumulativeLossTrigger.h">
+      <Filter>Header Files\Core Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

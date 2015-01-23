@@ -12,6 +12,7 @@ public:
 		,TrancheTrigger=3
 		,DelinquencyTrigger=4
 		,DuringStressTestTrigger=5
+		, CumulativeLossTrigger=6
 	};
 protected:
 	TriggerType m_TriggerType;

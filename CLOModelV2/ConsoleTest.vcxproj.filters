@@ -426,6 +426,9 @@
     <ClCompile Include="CheckAndEdit.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
+    <ClCompile Include="CumulativeLossTrigger.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Resources.qrc">
@@ -662,6 +665,9 @@
       <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="LoanAssMatcherResult.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="CumulativeLossTrigger.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
   </ItemGroup>

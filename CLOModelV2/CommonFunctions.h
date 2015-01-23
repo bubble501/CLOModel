@@ -4,6 +4,10 @@
 #include <QMetaType>
 #include <typeinfo>
 #include <QString>
+#ifdef _DEBUG
+#include <QDebug>
+#endif // _DEBUG
+
 class QDate;
 class DayCountVector;
 class BloombergVector;

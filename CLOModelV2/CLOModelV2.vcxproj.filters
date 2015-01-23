@@ -236,6 +236,9 @@
     <ClInclude Include="LoanAssMatcherResult.h">
       <Filter>Header Files\Loans\Loans Assumptions</Filter>
     </ClInclude>
+    <ClInclude Include="CumulativeLossTrigger.h">
+      <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Resources.qrc">
@@ -707,6 +710,9 @@
     </ClCompile>
     <ClCompile Include="LoanAssMatcherThread.cpp">
       <Filter>Source Files\Loans\Loans Assumptions</Filter>
+    </ClCompile>
+    <ClCompile Include="CumulativeLossTrigger.cpp">
+      <Filter>Source Files\Triggers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

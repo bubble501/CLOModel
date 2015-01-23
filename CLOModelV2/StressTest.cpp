@@ -14,8 +14,9 @@
 #include <QDataStream>
 #include "WaterfallCalculator.h"
 #include "ScenarioApplier.h"
-#include <QBuffer>
+#include <QProgressDialog>
 #include "PhasedProgressWidget.h"
+#include <QIcon>
 StressTest::StressTest(QObject* parent)
 	: QObject(parent)
 	, SequentialComputation(false)
@@ -257,9 +258,6 @@ QDataStream& operator<<(QDataStream & stream, const StressTest& flows){
 	stream << flows.ShowProgress;
 	stream << flows.UseFastVersion;
 	std::for_each(std::begin(flows.m_AssumptionsRef), std::end(flows.m_AssumptionsRef), [&stream](QSet<QString>* i) {stream << *i; });
-	/*for (int i = 0; i < NumStressDimentsions; ++i) {
-		stream << *(flows.m_AssumptionsRef[i]);
-	}*/
 	stream << static_cast<qint32>(flows.Results.size());
 	for (auto i = flows.Results.constBegin(); i != flows.Results.constEnd(); ++i) {
 		stream << i.key() << *(i.value());
@@ -304,7 +302,7 @@ void StressTest::SaveResults(const QString& DestPath)const{
 		NewName = DestinationPath + QString("StressResult%1.fcsr");
 		for (quint64 i = 0; true; ++i) {
 			if (!QFile::exists(NewName.arg(i))) {
-				NewName.arg(i);
+				NewName=NewName.arg(i);
 				break;
 			}
 		}
@@ -312,6 +310,25 @@ void StressTest::SaveResults(const QString& DestPath)const{
 	else {
 		NewName = OldName;
 		OldName = QString();
+	}
+	QScopedPointer<QProgressDialog, QScopedPointerDeleteLater> SaveProgress(nullptr);
+	if (ShowProgress) {
+		int Oldcount = 0;
+		if (!OldName.isEmpty()) {
+			QuaZip OldZip(OldName);
+			if (OldZip.open(QuaZip::mdUnzip)) {
+				Oldcount = qMax(0, OldZip.getEntriesCount() - 1);
+				OldZip.close();
+			}
+		}
+		SaveProgress.reset(new QProgressDialog(nullptr));
+		SaveProgress->setCancelButton(nullptr);
+		SaveProgress->setWindowTitle(tr("Please Wait..."));
+		SaveProgress->setWindowIcon(QIcon(":/Icons/Logo.png"));
+		SaveProgress->setLabelText("Saving Results");
+		SaveProgress->setRange(0, 1 + Results.size() + Oldcount);
+		SaveProgress->setValue(0);
+		SaveProgress->show();
 	}
 
 
@@ -322,12 +339,13 @@ void StressTest::SaveResults(const QString& DestPath)const{
 	QuaZipFile TargetFile(&zip);
 	QuaZipNewInfo ZipFileInfo("StressTestInputs");
 	UsedFileNames << "StressTestInputs";
-	if (!TargetFile.open(QIODevice::WriteOnly, ZipFileInfo))return;
+	if (TargetFile.open(QIODevice::WriteOnly, ZipFileInfo))
 	{
 		QDataStream out(&TargetFile);
 		out.setVersion(QDataStream::Qt_5_3);
 		out << qint32(ModelVersionNumber) << StartDate << SequentialComputation << ShowProgress << UseFastVersion << (*BaseCalculator) << Structure;
 		TargetFile.close();
+		if (ShowProgress) UpdateSaveProgress(SaveProgress.data(), SaveProgress->value() + 1);
 	}
 	ZipFileInfo.dateTime = QDateTime::currentDateTime();
 	for (auto i = Results.constBegin(); i != Results.constEnd(); ++i) {
@@ -338,6 +356,7 @@ void StressTest::SaveResults(const QString& DestPath)const{
 			out.setVersion(QDataStream::Qt_5_3);
 			out << qint32(ModelVersionNumber) << *(i.value());
 			TargetFile.close();
+			if (ShowProgress) UpdateSaveProgress(SaveProgress.data(), SaveProgress->value() + 1);
 		}
 	}
 
@@ -350,42 +369,29 @@ void StressTest::SaveResults(const QString& DestPath)const{
 			if (OldFile.open(QIODevice::ReadOnly)) {
 				if (UsedFileNames.contains(OldFile.getActualFileName())) {
 					OldFile.close();
+					if (ShowProgress) UpdateSaveProgress(SaveProgress.data(), SaveProgress->value() + 1);
 					continue;
 				}
-				QDataStream Reader(&OldFile);
-				Reader.setVersion(QDataStream::Qt_5_3);
-				
-				qint32 VesionCheck;
-				Waterfall TempWF;
 				if (!OldFile.getFileInfo(&OldFileInfo)) {
 					OldFileInfo.dateTime = QDateTime::currentDateTime();
 				}
-				Reader >> VesionCheck;
-				if (VesionCheck<qint32(MinimumSupportedVersion) || VesionCheck>qint32(ModelVersionNumber)) {
-					OldFile.close();
-					continue;
-				}
-				TempWF.SetLoadProtocolVersion(VesionCheck);
-				Reader >> TempWF;
-
 				ZipFileInfo.name = OldFile.getActualFileName();
 				ZipFileInfo.dateTime = OldFileInfo.dateTime;
 				UsedFileNames << ZipFileInfo.name;
-				OldFile.close();
 				if (TargetFile.open(QIODevice::WriteOnly, ZipFileInfo)) {
-					QDataStream Writer(&TargetFile);
-					Writer.setVersion(QDataStream::Qt_5_3);
-					Writer << qint32(ModelVersionNumber) << TempWF;
+					TargetFile.write(OldFile.readAll());
 					TargetFile.close();
+					if (ShowProgress) UpdateSaveProgress(SaveProgress.data(), SaveProgress->value() + 1);
 				}
+				OldFile.close();
 			}
 
 		}
 		OldZip.close();
-		if(!curDir.remove(OldName))return;
-		QFile::rename(NewName, OldName);
+		curDir.remove(OldName);
 	}
 	zip.close();
+	if (!OldName.isEmpty()) QFile::rename(NewName, OldName);
 }
 
 Waterfall StressTest::GetScenarioFromFile(const QString& DestPath, const QString& CPRscenario, const QString& CDRscenario, const QString& LSscenario, const QString& RecLagScenario, const QString& DelinqScenario, const QString& DelinqLagScenario) {
@@ -546,6 +552,7 @@ void StressTest::GatherResults() {
 	}
 	TranchesCalculator->ClearResults();
 	if (ProgressForm) {
+		ProgressForm->hide();
 		ProgressForm->deleteLater();
 	}
 	if (m_ErrorsOccured)
@@ -555,8 +562,11 @@ void StressTest::GatherResults() {
 }
 
 void StressTest::ResetScenarios() {
-	std::for_each(std::begin(m_AssumptionsRef), std::end(m_AssumptionsRef), [](QSet<QString>* a) { a->clear(); });
-	//for (int i = 0; i < NumStressDimentsions; i++) m_AssumptionsRef[i]->clear();
+	std::for_each(
+		std::begin(m_AssumptionsRef)
+		, std::end(m_AssumptionsRef)
+		, [](QSet<QString>* a) { a->clear(); }
+	);
 }
 
 
@@ -599,6 +609,11 @@ void StressTest::CompileBaseRates(ConstantBaseRateTable& Values) {
 void StressTest::CompileBaseRates(ForwardBaseRateTable& Values) {
 	Structure.CompileReferenceRateValue(Values);
 	BaseCalculator->CompileReferenceRateValue(Values);
+}
+
+void StressTest::UpdateSaveProgress(QProgressDialog* prog, int val) const {
+	prog->setValue(val);
+	QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 }
 
 

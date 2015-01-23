@@ -427,6 +427,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F9CAB0C8-0759-4618-88C9-3AE4C64D4B09}</ProjectGuid>
     <Keyword>Qt4VSv1.0</Keyword>
+    <ProjectName>StandaloneStress</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

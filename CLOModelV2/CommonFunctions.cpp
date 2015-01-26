@@ -264,7 +264,7 @@ bool IsHoliday(const QDate& a/*, const QString& CountryCode*/) {
 }
 bool ValidDayCount(qint16 a) {
 	DayCountConvention b;
-	switch (a) {
+	switch (a & (((1 << CompoundShift) - 1))) {
 	case static_cast<qint16>(DayCountConvention::ACTACT) :
 	case static_cast<qint16>(DayCountConvention::ACT360) :
 	case static_cast<qint16>(DayCountConvention::ACT365) :
@@ -277,31 +277,7 @@ bool ValidDayCount(qint16 a) {
 	case static_cast<qint16>(DayCountConvention::AFBACTACT) :
 	case static_cast<qint16>(DayCountConvention::NISDAACTACT) :
 	case static_cast<qint16>(DayCountConvention::NAFBACTACT) :
-	case static_cast<qint16>(DayCountConvention::CompACTACT) :
-	case static_cast<qint16>(DayCountConvention::CompACT360) :
-	case static_cast<qint16>(DayCountConvention::CompACT365) :
-	case static_cast<qint16>(DayCountConvention::CompN30360) :
-	case static_cast<qint16>(DayCountConvention::CompNACTACT) :
-	case static_cast<qint16>(DayCountConvention::CompNACT360) :
-	case static_cast<qint16>(DayCountConvention::CompNACT365) :
-	case static_cast<qint16>(DayCountConvention::CompISMA30360) :
-	case static_cast<qint16>(DayCountConvention::CompISDAACTACT) :
-	case static_cast<qint16>(DayCountConvention::CompAFBACTACT) :
-	case static_cast<qint16>(DayCountConvention::CompNISDAACTACT) :
-	case static_cast<qint16>(DayCountConvention::CompNAFBACTACT) :
-	case static_cast<qint16>(DayCountConvention::ContCompACTACT) :
-	case static_cast<qint16>(DayCountConvention::ContCompACT360) :
-	case static_cast<qint16>(DayCountConvention::ContCompACT365) :
-	case static_cast<qint16>(DayCountConvention::ContCompN30360) :
-	case static_cast<qint16>(DayCountConvention::ContCompNACTACT) :
-	case static_cast<qint16>(DayCountConvention::ContCompNACT360) :
-	case static_cast<qint16>(DayCountConvention::ContCompNACT365) :
-	case static_cast<qint16>(DayCountConvention::ContCompISMA30360) :
-	case static_cast<qint16>(DayCountConvention::ContCompISDAACTACT) :
-	case static_cast<qint16>(DayCountConvention::ContCompAFBACTACT) :
-	case static_cast<qint16>(DayCountConvention::ContCompNISDAACTACT) :
-	case static_cast<qint16>(DayCountConvention::ContCompNAFBACTACT) :
-		return true;
+		return (a >> CompoundShift)<=2;
 	default:
 		return false;
 	}
@@ -314,73 +290,6 @@ void PrintToTempFile(const QString& TempFileName, const QString& Message, bool P
 	QTextStream  TempWrite(&TempFile);
 	TempWrite << (PrintTime ? QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm "):QString()) + Message + '\n';
 	TempFile.close();
-}
-
-//UGLY!!!
-double GetLoanAssumption(const QString& LoanName, int columnIndex, QDate RefDate) {
-/*columnIndex
-0-Loan Identifier
-1-Senior Price
-2-Sub Price
-3-Default
-4-Senior Haircut Amt
-5-Senior Haircut Period
-6-Sub Haircut Amt
-7-Sub Haircut Period
-8-Prepay Period
-9-View
-*/
-	
-	QStringList Assumptions;
-	QStringList AKAs;
-	int FoundLoan = -1;
-	int LineCounter = 0;
-	if (columnIndex >= 0 && columnIndex <= 9 && !LoanName.isEmpty()) {
-		QFile AssumptionsFile(GetFromConfig("Folders", "UnifiedResultsFolder", R"(\\synserver2\Company Share\24AM\Monitoring\Model Results)") + '/' + GetFromConfig("Folders", "AssumptionsFile", "Loans Assumptions"));
-		if (AssumptionsFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-			QString CurrentLoan;
-			QTextStream Streamer(&AssumptionsFile);
-			while (!Streamer.atEnd() && FoundLoan < 0) {
-				CurrentLoan = Streamer.readLine();
-				CurrentLoan=CurrentLoan.right(CurrentLoan.size() - 1);
-				CurrentLoan=CurrentLoan.left(CurrentLoan.size() - 1);
-				Assumptions = CurrentLoan.split("#,#");
-				AKAs = Assumptions.first().split("$,$");
-				QRegExp WholeWordRX;
-				WholeWordRX.setCaseSensitivity(Qt::CaseInsensitive);
-				for (FoundLoan = 0; FoundLoan < AKAs.size(); ++FoundLoan) {
-					WholeWordRX.setPattern("\\b" + LoanName + "\\b");
-					if (AKAs.at(FoundLoan).contains(WholeWordRX))
-						break;
-					WholeWordRX.setPattern("\\b" + AKAs.at(FoundLoan) + "\\b");
-					if (LoanName.contains(WholeWordRX))
-						break;
-				}
-				if (FoundLoan >= AKAs.size()) FoundLoan = -1;
-				++LineCounter;
-			}
-			AssumptionsFile.close();
-		}
-	}
-	if (FoundLoan < 0) {
-		return -1.0;
-	}
-	else {
-		switch (columnIndex) {
-		case 0: //Scenario Name
-			return static_cast<double>(LineCounter);
-		case 3: //Default
-			return (Assumptions.at(3) == "False" ? 0.0 : 1.0);
-		case 5: //Senior Haircut Period
-		case 7: //Sub Haircut Period
-		case 8: //Prepay Period
-			if (RefDate.isNull()) RefDate = QDate::currentDate();
-			if (Assumptions.at(columnIndex).isEmpty()) return 0.0;
-			return qMax(1.0,static_cast<double>(Assumptions.at(columnIndex).toDouble() - MonthDiff(RefDate,QDate::fromString(Assumptions.last(), "yyyy-MM-dd"))));
-		default:
-			return Assumptions.at(columnIndex).toDouble();
-		}
-	}
 }
 
 QString InfixToPostfix(const QString& a) {

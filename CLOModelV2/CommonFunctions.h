@@ -101,7 +101,7 @@ double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, const QS
 double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, double BaseRate, const DayCountVector& Daycount, double Guess = 0.05);
 double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const BloombergVector& BaseRate, const DayCountVector& Daycount, double Guess = 0.05);
 double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const QString& BaseRate, const DayCountVector& Daycount, double Guess = 0.05);
-double AdjustCoupon(double AnnualCoupon, QDate PrevIPD, QDate CurrIPD, DayCountConvention DayCount);
+double AdjustCoupon(double AnnualCoupon /*Annualised Coupon*/, QDate PrevIPD, QDate CurrIPD, DayCountConvention DayCount);
 bool IsHoliday(const QDate& a/*,const QString& CountryCode*/);
 bool removeDir(const QString& dirName);
 double GetLoanAssumption(const QString& LoanName, int columnIndex, QDate RefDate);

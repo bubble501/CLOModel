@@ -273,7 +273,7 @@ void StressViewer::UpdateTable() {
 						CurrentItem->setData(Qt::UserRole, CurrentData);
 						break;
 					case 2:
-						CurrentData = CurrTran->GetWALife(CurrTran->GetSettlementDate());
+						CurrentData = CurrTran->GetWALife();
 						if ((i == 0 && j == 0) || CurrentData > MaxDisc) MaxDisc = CurrentData;
 						if ((!Minset || CurrentData < MinDisc) && CurrentData>0) { MinDisc = CurrentData; Minset = true; }
 						CurrentItem = new QTableWidgetItem(Commarize(CurrentData, 2));

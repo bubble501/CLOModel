@@ -531,7 +531,7 @@ double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
 	const Tranche* TranchPoint=TempWaterfall.GetTranche(TrancheName);
 	if(!TranchPoint) return 0.0;
 	Tranche TempTranche(*TranchPoint);
-	return TempTranche.GetWALife(StartDate);
+	return TempTranche.GetWALife(/*StartDate*/);
 }
 double __stdcall GetStressLoss(LPSAFEARRAY *ArrayData) {
 	QString FolderPath;

@@ -418,11 +418,11 @@ double Tranche::GetWALife(const QDate& StartDate)const{
 		CurrentPrinc=CashFlow.GetPrincipal(i);
 		if(CurrentPrinc>0){
 			RunningSum+=CurrentPrinc;
-			Result+=CurrentPrinc*static_cast<double>(StartDate.daysTo(CashFlow.GetDate(i)))/365.25;
+			Result+=CurrentPrinc*static_cast<double>(StartDate.daysTo(CashFlow.GetDate(i)));
 		}
 	}
 	if (RunningSum<=0) return 0.0;
-	return Result/RunningSum;
+	return (Result / 365.25) / RunningSum;
 }
 void Tranche::SetPaymentFrequency(const QString& a){
 	IntegerVector TempVect(a);

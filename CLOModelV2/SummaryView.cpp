@@ -282,7 +282,7 @@ void SummaryView::DisplayStructure(){
 		StructureTable->setItem(i,8,new QTableWidgetItem(Structure.GetTranche(i)->GetReferenceRate(0)));
 		StructureTable->setItem(i,9,new QTableWidgetItem(Structure.GetTranche(i)->GetCouponVector(0)));
 		StructureTable->setItem(i,11,new QTableWidgetItem(Commarize(Structure.GetTranche(i)->GetIRR()*100.0,2U)+'%'));
-		StructureTable->setItem(i,12,new QTableWidgetItem(Commarize(Structure.GetTranche(i)->GetWALife(Structure.GetTranche(0)->GetSettlementDate()),2U)));
+		StructureTable->setItem(i,12,new QTableWidgetItem(Commarize(Structure.GetTranche(i)->GetWALife(),2U)));
 		StructureTable->setItem(i,13,new QTableWidgetItem(Commarize(Structure.GetTranche(i)->GetDiscountMargin())));
 		StructureTable->setItem(i,14,new QTableWidgetItem(Commarize(Structure.GetTranche(i)->GetLossRate()*100.0,2U)+'%'));
 

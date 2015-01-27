@@ -135,6 +135,7 @@ public:
 	double GetIRR() const;
 	double GetIRR(double NewPrice) const;
 	double GetWALife(const QDate& StartDate) const;
+	double GetWALife() const { return GetWALife(SettlementDate); }
 	const QDate& GetSettlementDate() const{return SettlementDate;}
 	void SetSettlementDate(const QDate& a){SettlementDate=a;}
 	friend QDataStream& operator<<(QDataStream & stream, const Tranche& flows);

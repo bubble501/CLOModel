@@ -82,7 +82,7 @@ void QBbgWorker::Send() {
 				UsedField.append(CurrentSingle->GetField());
 			}
 			if (GroupIter == CurrentList->begin()) {
-				for (QHash<QString, QString>::const_iterator OvrIter = CurrentSingle->GetOverrides().constBegin(); OvrIter != CurrentSingle->GetOverrides().constEnd(); OvrIter++) {
+				for (auto OvrIter = CurrentSingle->GetOverrides().constBegin(); OvrIter != CurrentSingle->GetOverrides().constEnd(); OvrIter++) {
 					Element CurrentOverrides = request.getElement("overrides").appendElement();
 					CurrentOverrides.setElement("fieldId", OvrIter.key().toLatin1().data());
 					CurrentOverrides.setElement("value", OvrIter.value().toLatin1().data());

@@ -12,6 +12,7 @@ QDataStream& operator<<(QDataStream& stream, const QBloombergLib::QBbgRequest& f
 QDataStream& operator>>(QDataStream& stream, QBloombergLib::QBbgRequest& flows);
 #endif
 namespace QBloombergLib {
+	typedef QHash<QString, QString> Overrides;
 	class QBbgWorker;
 	class QSingleBbgRequest;
 	class BLOOMBERG_EXPORT QBbgRequest: public BackwardInterface
@@ -46,8 +47,8 @@ namespace QBloombergLib {
 		void AddRequest(const QSingleBbgRequest& a);
 		void AddRequest(qint64 ID, const QString& Secur, const QString& Field, YellowKeys YellowKey = Mtge);
 		void AddRequest(const QString& Secur, const QString& Field, YellowKeys YellowKey = Mtge);
-		void AddRequest(qint64 ID, const QString& Secur, const QString& Field, const QHash<QString, QString>& Overrides, YellowKeys YellowKey = Mtge);
-		void AddRequest(const QString& Secur, const QString& Field, const QHash<QString, QString>& Overrides, YellowKeys YellowKey = Mtge);
+		void AddRequest(qint64 ID, const QString& Secur, const QString& Field, const Overrides& Overr, YellowKeys YellowKey = Mtge);
+		void AddRequest(const QString& Secur, const QString& Field, const Overrides& Overr, YellowKeys YellowKey = Mtge);
 		qint32 GetErrorCode() const;
 		QString GetErrorString() const;
 		bool HasErrors() const;

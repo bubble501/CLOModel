@@ -7,11 +7,13 @@
 #include "QBbgRequest.h"
 #include <QObject>
 #include <QMap>
+#include <QHash>
 #include <QScopedPointer>
 #ifdef QBBG_PRIVATE
 #include <blpapi_session.h>
 #endif
 namespace QBloombergLib {
+
 	class BLOOMBERG_EXPORT QBbgWorker	: public QObject
 #ifdef QBBG_PRIVATE
 		, private BloombergLP::blpapi::EventHandler

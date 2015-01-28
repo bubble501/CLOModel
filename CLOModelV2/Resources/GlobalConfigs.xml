@@ -10,6 +10,7 @@
 		<GetLoanAssumptionStoredProc>getLoanAssumption(:scenarioName,:isSenior)</GetLoanAssumptionStoredProc>
 		<GetAllLoanAssumptionStoredProc>getAllLoanAssumptions</GetAllLoanAssumptionStoredProc>
 		<RemoveLoanAssumptionStoredProc>removeLoanAssumption(:scenarioName)</RemoveLoanAssumptionStoredProc>
+		<GetPrepaySpeedStoredProc>getPrepaySpeedOverrides(:TrancheID)</GetPrepaySpeedStoredProc>
 		<SetLoanAssumptionStoredProc>setLoanAssumption(:OldScenName,:scenarioName,:scanarioAlias,:seniorScenario,:scenarioMaturityExtension,:scenarioInitialHaircut,:scenarioPrepaymentFee,:scenarioDayCount,:scenarioCPR,:scenarioCDR,:scenarioLS,:scenarioRecoveryLag,:scenarioDelinquency,:scenarioDelinquencyLag,:scenarioPrice,:scenarioHaircut,:scenarioPrepayMultiplier,:scenarioLossMultiplier,:scenarioUpdateDate)</SetLoanAssumptionStoredProc>
 	</Database>
 	<Folders>

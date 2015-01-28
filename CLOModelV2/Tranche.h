@@ -127,6 +127,7 @@ public:
 	double GetBondFactor() const {return OutstandingAmt/OriginalAmt;}
 #ifndef NO_BLOOMBERG
 	void GetDataFromBloomberg();
+	void GetCashFlowsFromBloomberg();
 #endif
 	double GetLossRate() const;
 	double GetDiscountMargin() const;

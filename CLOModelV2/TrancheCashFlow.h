@@ -34,7 +34,7 @@ public:
 
 	virtual double GetTotalFlow(int index)const override;
 	virtual double GetTotalFlow(const QDate& a)const override;
-
+	virtual QString GetLabel(qint32 FlowTpe, const QString& DefaultLab = QString()) const override;
 	template<class T> double GetTotalInterest(const T& index)const {
 		static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetInterest can be used only with int or QDate");
 		double Result = 0;
@@ -92,12 +92,13 @@ public:
 		return GetFlow(a, static_cast<qint32>(TrancheFlowType::InterestFlow) | CouponIdx);
 	}
 	double GetInitialOutstanding()const{return OutstandingAmt;}
-	void SetInitialOutstanding(double a){OutstandingAmt=a;}
+	void SetInitialOutstanding(double a);
 	virtual void AddFlow(QDate Dte, double Amt, qint32 FlwTpe) override;
 	virtual void AddFlow(const QDate& Dte, double Amt, TrancheFlowType FlwTpe);
 	virtual void SetFlow(QDate Dte, double Amt, qint32 FlwTpe) override;
 	virtual void SetFlow(const QDate& Dte, double Amt, TrancheFlowType FlwTpe);
 	using GenericCashFlow::AddFlow;
+	using GenericCashFlow::SetFlow;
 	virtual TrancheCashFlow& operator=(const TrancheCashFlow& a);
 	QDate GetLastFlowDate(bool IncludeDeferred = false) const;
 	int GetLastFlowIndex(bool IncludeDeferred = false) const;

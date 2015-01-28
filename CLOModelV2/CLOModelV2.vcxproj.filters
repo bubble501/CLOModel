@@ -239,6 +239,9 @@
     <ClInclude Include="CumulativeLossTrigger.h">
       <Filter>Header Files\Triggers</Filter>
     </ClInclude>
+    <ClInclude Include="DeferredInterestTrigger.h">
+      <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Resources.qrc">
@@ -712,6 +715,9 @@
       <Filter>Source Files\Loans\Loans Assumptions</Filter>
     </ClCompile>
     <ClCompile Include="CumulativeLossTrigger.cpp">
+      <Filter>Source Files\Triggers</Filter>
+    </ClCompile>
+    <ClCompile Include="DeferredInterestTrigger.cpp">
       <Filter>Source Files\Triggers</Filter>
     </ClCompile>
   </ItemGroup>

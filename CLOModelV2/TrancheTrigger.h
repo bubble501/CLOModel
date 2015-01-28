@@ -43,7 +43,7 @@ public:
 	const BloombergVector& GetTargetSize() const { return m_TargetSize; }
 	void SetTargetSize(const QString& val) { m_TargetSize = val; }
 	void SetSizeMultiplier(double mult);
-	void ResetSizeMultiplier() { m_TargetSize.SetDivisor(100.0); }
+	void ResetSizeMultiplier() { m_TargetSize.SetDivisor(1.0); }
 	virtual QString ToString() const override;
 	bool HasAnchor()const;
 	void FillMissingAnchorDate(const QDate& a);

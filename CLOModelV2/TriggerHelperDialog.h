@@ -37,6 +37,7 @@ private:
 	QWidget* CreateTrancheTriggerWidget();
 	QWidget* CreateDelinquencyTriggerWidget();
 	QWidget* CreateCumulativeLossTriggerWidget();
+	QWidget* CreateDeferredInterestTriggerWidget();
 
 
 	QDateEdit* DateTrigger_dateEdit;
@@ -48,11 +49,20 @@ private:
 	QLineEdit* TrancheTrigger_SenEditor;
 	QLineEdit* TrancheTrigger_SenLvlEditor;
 	QLineEdit* TrancheTrigger_SizeEditor;
+	QLineEdit* DeferredTrigger_SenEditor;
+	QLineEdit* DeferredTrigger_SenLvlEditor;
+	QLineEdit* DeferredTrigger_SizeEditor;
+	QLineEdit* DeferredTrigger_CouponEditor;
 	QDoubleSpinBox* TrancheTrigger_SizeMultEditor;
 	QComboBox* TrancheTrigger_SizeSideCombo;
 	QComboBox* TrancheTrigger_SeniorSideCombo;
+	QDoubleSpinBox* DeferredTrigger_SizeMultEditor;
+	QComboBox* DeferredTrigger_SizeSideCombo;
+	QComboBox* DeferredTrigger_SeniorSideCombo;
+	QComboBox* DeferredTrigger_CouponSideCombo;
 	QComboBox* CumLoss_SideCombo;
 	QLineEdit* CumLoss_VecEditor;
+
 
 };
 

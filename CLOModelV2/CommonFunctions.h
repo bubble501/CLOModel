@@ -6,6 +6,7 @@
 #include <QString>
 #ifdef _DEBUG
 #include <QDebug>
+#define DEBUG_ITEM auto
 #endif // _DEBUG
 
 class QDate;

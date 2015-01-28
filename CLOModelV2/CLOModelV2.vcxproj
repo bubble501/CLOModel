@@ -77,6 +77,7 @@
     <ClInclude Include="CumulativeLossTrigger.h" />
     <ClInclude Include="DateTrigger.h" />
     <ClInclude Include="DayCountVect.h" />
+    <ClInclude Include="DeferredInterestTrigger.h" />
     <ClInclude Include="DelinquencyTrigger.h" />
     <CustomBuild Include="LoanAssumptionDelegate.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath);$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
@@ -371,6 +372,7 @@
     <ClCompile Include="CumulativeLossTrigger.cpp" />
     <ClCompile Include="DateTrigger.cpp" />
     <ClCompile Include="DayCountVect.cpp" />
+    <ClCompile Include="DeferredInterestTrigger.cpp" />
     <ClCompile Include="DelinquencyTrigger.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_CheckAndEdit.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>

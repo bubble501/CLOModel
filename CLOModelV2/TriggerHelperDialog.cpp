@@ -16,6 +16,7 @@
 #include "PoolSizeTrigger.h"
 #include "CumulativeLossTrigger.h"
 #include "TrancheTrigger.h"
+#include "DeferredInterestTrigger.h"
 TriggerHelperDialog::TriggerHelperDialog(QDialog *parent)
 	: QDialog(parent)
 	, FirstCombodeleted(false)
@@ -34,6 +35,7 @@ TriggerHelperDialog::TriggerHelperDialog(QDialog *parent)
 	TriggerTypeCombo->addItem("Delinquencies", static_cast<quint8>(AbstractTrigger::TriggerType::DelinquencyTrigger));
 	TriggerTypeCombo->addItem("During Stress Test", static_cast<quint8>(AbstractTrigger::TriggerType::DuringStressTestTrigger));
 	TriggerTypeCombo->addItem("Cumulative Loss Trigger", static_cast<quint8>(AbstractTrigger::TriggerType::CumulativeLossTrigger));
+	TriggerTypeCombo->addItem("Deferred Interest Trigger", static_cast<quint8>(AbstractTrigger::TriggerType::DeferredInterestTrigger));
 	TriggerTypeCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	
 	QLabel *TriggerLabelLabel = new QLabel(this);
@@ -57,7 +59,7 @@ TriggerHelperDialog::TriggerHelperDialog(QDialog *parent)
 	TriggerBuilderBase->addWidget(CreateDelinquencyTriggerWidget());
 	TriggerBuilderBase->addWidget(new QWidget(TriggerBuilderBase)); //DuringStressTestTrigger
 	TriggerBuilderBase->addWidget(CreateCumulativeLossTriggerWidget());
-	
+	TriggerBuilderBase->addWidget(CreateDeferredInterestTriggerWidget());
 	
 
 	AcceptButton = new QPushButton(this);
@@ -428,7 +430,202 @@ QWidget* TriggerHelperDialog::CreateTrancheTriggerWidget() {
 	ResLay->addItem(new QSpacerItem(20, 20, QSizePolicy::Preferred, QSizePolicy::Expanding), CountRow, 0, 1, 2);
 	return Result;
 }
+QWidget* TriggerHelperDialog::CreateDeferredInterestTriggerWidget() {
+	QWidget* Result = new QWidget(this);
+	QGridLayout *ResLay = new QGridLayout(Result);
+	int CountRow = 0;
 
+	{
+		QLabel* VecLabel = new QLabel(Result);
+		VecLabel->setText(tr("Seniority group that represent the target of the trigger"));
+		DeferredTrigger_SenEditor = new QLineEdit(Result);
+		DeferredTrigger_SenEditor->setToolTip(tr("This is the pro-rata level of the tranches.\nAccepts vectors."));
+		DeferredTrigger_SenEditor->setValidator(IntegerVector().GetValidator(DeferredTrigger_SenEditor));
+		connect(TriggerBuilderBase, &QStackedWidget::currentChanged, [&](int) {
+			DeferredTrigger_SenEditor->clear();
+			if (TriggerBuilderBase->currentWidget()->children().contains(DeferredTrigger_SenEditor))
+				SetParameter(0, QString());
+		});
+		connect(DeferredTrigger_SenEditor, &QLineEdit::textChanged, [&](const QString& NewVec) {
+			if (TriggerBuilderBase->currentWidget()->children().contains(DeferredTrigger_SenEditor))
+				SetParameter(0, NewVec);
+		});
+		connect(this, &TriggerHelperDialog::ImportParam, [&](int parIdx, const QString& parVal) {
+			if (parIdx == 0) DeferredTrigger_SenEditor->setText(parVal);
+		});
+		ResLay->addWidget(VecLabel, CountRow, 0);
+		ResLay->addWidget(DeferredTrigger_SenEditor, CountRow, 1);
+		CountRow++;
+	}
+	{
+		QLabel* VecLabel = new QLabel(Result);
+		VecLabel->setText(tr("Level of seniority the seniority group refers to"));
+		DeferredTrigger_SenLvlEditor = new QLineEdit(Result);
+		DeferredTrigger_SenLvlEditor->setToolTip(tr("This is the depth of the pro-rata group.\nAccepts vectors.\nNormally 1"));
+		DeferredTrigger_SenLvlEditor->setValidator(IntegerVector().GetValidator(DeferredTrigger_SenLvlEditor));
+		connect(TriggerBuilderBase, &QStackedWidget::currentChanged, [&](int) {
+			DeferredTrigger_SenLvlEditor->setText("1");
+			if (TriggerBuilderBase->currentWidget()->children().contains(DeferredTrigger_SenLvlEditor))
+				SetParameter(1, "1");
+		});
+		connect(DeferredTrigger_SenLvlEditor, &QLineEdit::textChanged, [&](const QString& NewVec) {
+			if (TriggerBuilderBase->currentWidget()->children().contains(DeferredTrigger_SenLvlEditor))
+				SetParameter(1, NewVec);
+		});
+		connect(this, &TriggerHelperDialog::ImportParam, [&](int parIdx, const QString& parVal) {
+			if (parIdx == 1) DeferredTrigger_SenLvlEditor->setText(parVal);
+		});
+		ResLay->addWidget(VecLabel, CountRow, 0);
+		ResLay->addWidget(DeferredTrigger_SenLvlEditor, CountRow, 1);
+		CountRow++;
+	}
+	{
+		QLabel* VecLabel = new QLabel(Result);
+		VecLabel->setText(tr("Target size of the Deferred Interest"));
+		DeferredTrigger_SizeEditor = new QLineEdit(Result);
+		DeferredTrigger_SizeEditor->setValidator(BloombergVector().GetValidator(DeferredTrigger_SizeEditor));
+		connect(TriggerBuilderBase, &QStackedWidget::currentChanged, [&](int) {
+			DeferredTrigger_SizeEditor->setText("0");
+			if (TriggerBuilderBase->currentWidget()->children().contains(DeferredTrigger_SizeEditor))
+				SetParameter(2, "0");
+		});
+		connect(DeferredTrigger_SizeEditor, &QLineEdit::textChanged, [&](const QString& NewVec) {
+			if (TriggerBuilderBase->currentWidget()->children().contains(DeferredTrigger_SizeEditor))
+				SetParameter(2, NewVec);
+		});
+		connect(this, &TriggerHelperDialog::ImportParam, [&](int parIdx, const QString& parVal) {
+			if (parIdx == 2) DeferredTrigger_SizeEditor->setText(parVal);
+		});
+		ResLay->addWidget(VecLabel, CountRow, 0);
+		ResLay->addWidget(DeferredTrigger_SizeEditor, CountRow, 1);
+		CountRow++;
+	}
+	{
+		QLabel* VecLabel = new QLabel(Result);
+		VecLabel->setText(tr("Target Coupon that is deferring interest"));
+		DeferredTrigger_CouponEditor = new QLineEdit(Result);
+		DeferredTrigger_CouponEditor->setValidator(IntegerVector().GetValidator(DeferredTrigger_CouponEditor));
+		connect(TriggerBuilderBase, &QStackedWidget::currentChanged, [&](int) {
+			DeferredTrigger_CouponEditor->setText("1");
+			if (TriggerBuilderBase->currentWidget()->children().contains(DeferredTrigger_CouponEditor))
+				SetParameter(6, "1");
+		});
+		connect(DeferredTrigger_CouponEditor, &QLineEdit::textChanged, [&](const QString& NewVec) {
+			if (TriggerBuilderBase->currentWidget()->children().contains(DeferredTrigger_CouponEditor))
+				SetParameter(6, NewVec);
+		});
+		connect(this, &TriggerHelperDialog::ImportParam, [&](int parIdx, const QString& parVal) {
+			if (parIdx == 6) DeferredTrigger_CouponEditor->setText(parVal);
+		});
+		ResLay->addWidget(VecLabel, CountRow, 0);
+		ResLay->addWidget(DeferredTrigger_CouponEditor, CountRow, 1);
+		DeferredTrigger_CouponEditor->setEnabled(false);
+		CountRow++;
+	}
+	{
+		QLabel* VecLabel = new QLabel(Result);
+		VecLabel->setText(tr("Multiplier that will be applied to the target size"));
+		DeferredTrigger_SizeMultEditor = new QDoubleSpinBox(Result);
+		DeferredTrigger_SizeMultEditor->setSingleStep(0.5);
+		connect(TriggerBuilderBase, &QStackedWidget::currentChanged, [&](int) {
+			DeferredTrigger_SizeMultEditor->setValue(1.0);
+			if (TriggerBuilderBase->currentWidget()->children().contains(DeferredTrigger_SizeMultEditor))
+				SetParameter(5, "1.0");
+		});
+		connect(DeferredTrigger_SizeMultEditor, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), [&](double NewVal) {
+			if (TriggerBuilderBase->currentWidget()->children().contains(DeferredTrigger_SizeMultEditor))
+				SetParameter(5, QString::number(NewVal, 'f'));
+		});
+		connect(this, &TriggerHelperDialog::ImportParam, [&](int parIdx, const QString& parVal) {
+			if (parIdx == 5) DeferredTrigger_SizeMultEditor->setValue(parVal.toDouble());
+		});
+
+		ResLay->addWidget(VecLabel, CountRow, 0);
+		ResLay->addWidget(DeferredTrigger_SizeMultEditor, CountRow, 1);
+		CountRow++;
+	}
+	{
+		QLabel* SideLabel = new QLabel(Result);
+		SideLabel->setText(tr("Side of the seniority ladder the trigger applies too"));
+		DeferredTrigger_SeniorSideCombo = new QComboBox(Result);
+		DeferredTrigger_SeniorSideCombo->addItem("Senior", static_cast<quint8>(DeferredInterestTrigger::TriggerSenioritySide::Senior));
+		DeferredTrigger_SeniorSideCombo->addItem("Junior", static_cast<quint8>(DeferredInterestTrigger::TriggerSenioritySide::Junior));
+		DeferredTrigger_SeniorSideCombo->addItem("Exactly", static_cast<quint8>(DeferredInterestTrigger::TriggerSenioritySide::Exactly));
+		DeferredTrigger_SeniorSideCombo->addItem("Senior or Equal", static_cast<quint8>(DeferredInterestTrigger::TriggerSenioritySide::SeniorOrEqual));
+		DeferredTrigger_SeniorSideCombo->addItem("Junior or Equal", static_cast<quint8>(DeferredInterestTrigger::TriggerSenioritySide::JuniorOrEqual));
+		connect(TriggerBuilderBase, &QStackedWidget::currentChanged, [&](int) {
+			DeferredTrigger_SeniorSideCombo->setCurrentIndex(0);
+			if (TriggerBuilderBase->currentWidget()->children().contains(DeferredTrigger_SeniorSideCombo))
+				SetParameter(3, QString::number(DeferredTrigger_SeniorSideCombo->itemData(0).toInt()));
+		});
+		connect(DeferredTrigger_SeniorSideCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [&](int NewIndex) {
+			if (TriggerBuilderBase->currentWidget()->children().contains(DeferredTrigger_SeniorSideCombo))
+				SetParameter(3, QString::number(DeferredTrigger_SeniorSideCombo->itemData(NewIndex).toInt()));
+		});
+		connect(this, &TriggerHelperDialog::ImportParam, [&](int parIdx, const QString& parVal) {
+			if (parIdx == 3) DeferredTrigger_SeniorSideCombo->setCurrentIndex(DeferredTrigger_SeniorSideCombo->findData(parVal.toInt()));
+		});
+		ResLay->addWidget(SideLabel, CountRow, 0);
+		ResLay->addWidget(DeferredTrigger_SeniorSideCombo, CountRow, 1);
+		CountRow++;
+	}
+	{
+		QLabel* SideLabel = new QLabel(Result);
+		SideLabel->setText(tr("Side of the size where the trigger passes"));
+		DeferredTrigger_SizeSideCombo = new QComboBox(Result);
+		DeferredTrigger_SizeSideCombo->addItem("Bigger", static_cast<quint8>(DeferredInterestTrigger::TriggerSizeSide::Bigger));
+		DeferredTrigger_SizeSideCombo->addItem("Smaller", static_cast<quint8>(DeferredInterestTrigger::TriggerSizeSide::Smaller));
+		DeferredTrigger_SizeSideCombo->addItem("Exactly", static_cast<quint8>(DeferredInterestTrigger::TriggerSizeSide::Exactly));
+		DeferredTrigger_SizeSideCombo->addItem("Bigger or Equal", static_cast<quint8>(DeferredInterestTrigger::TriggerSizeSide::BiggerOrEqual));
+		DeferredTrigger_SizeSideCombo->addItem("Smaller or Equal", static_cast<quint8>(DeferredInterestTrigger::TriggerSizeSide::SmallerOrEqual));
+		connect(TriggerBuilderBase, &QStackedWidget::currentChanged, [&](int) {
+			DeferredTrigger_SizeSideCombo->setCurrentIndex(0);
+			if (TriggerBuilderBase->currentWidget()->children().contains(DeferredTrigger_SizeSideCombo))
+				SetParameter(4, QString::number(DeferredTrigger_SizeSideCombo->itemData(0).toInt()));
+		});
+		connect(DeferredTrigger_SizeSideCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [&](int NewIndex) {
+			if (TriggerBuilderBase->currentWidget()->children().contains(DeferredTrigger_SizeSideCombo))
+				SetParameter(4, QString::number(DeferredTrigger_SizeSideCombo->itemData(NewIndex).toInt()));
+		});
+		connect(this, &TriggerHelperDialog::ImportParam, [&](int parIdx, const QString& parVal) {
+			if (parIdx == 4) DeferredTrigger_SizeSideCombo->setCurrentIndex(DeferredTrigger_SizeSideCombo->findData(parVal.toInt()));
+		});
+		ResLay->addWidget(SideLabel, CountRow, 0);
+		ResLay->addWidget(DeferredTrigger_SizeSideCombo, CountRow, 1);
+		CountRow++;
+	}
+	{
+		QLabel* SideLabel = new QLabel(Result);
+		SideLabel->setText(tr("Side of the coupon that the trigger should consider"));
+		DeferredTrigger_CouponSideCombo = new QComboBox(Result);
+		DeferredTrigger_CouponSideCombo->addItem("Bigger", static_cast<quint8>(DeferredInterestTrigger::TriggerCouponSide::Bigger));
+		DeferredTrigger_CouponSideCombo->addItem("Smaller", static_cast<quint8>(DeferredInterestTrigger::TriggerCouponSide::Smaller));
+		DeferredTrigger_CouponSideCombo->addItem("Exactly", static_cast<quint8>(DeferredInterestTrigger::TriggerCouponSide::Exactly));
+		DeferredTrigger_CouponSideCombo->addItem("Bigger or Equal", static_cast<quint8>(DeferredInterestTrigger::TriggerCouponSide::BiggerOrEqual));
+		DeferredTrigger_CouponSideCombo->addItem("Smaller or Equal", static_cast<quint8>(DeferredInterestTrigger::TriggerCouponSide::SmallerOrEqual));
+		connect(TriggerBuilderBase, &QStackedWidget::currentChanged, [&](int) {
+			DeferredTrigger_CouponSideCombo->setCurrentIndex(2);
+			if (TriggerBuilderBase->currentWidget()->children().contains(DeferredTrigger_CouponSideCombo))
+				SetParameter(7, QString::number(DeferredTrigger_CouponSideCombo->itemData(2).toInt()));
+		});
+		connect(DeferredTrigger_CouponSideCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [&](int NewIndex) {
+			if (TriggerBuilderBase->currentWidget()->children().contains(DeferredTrigger_CouponSideCombo))
+				SetParameter(7, QString::number(DeferredTrigger_CouponSideCombo->itemData(NewIndex).toInt()));
+		});
+		connect(this, &TriggerHelperDialog::ImportParam, [&](int parIdx, const QString& parVal) {
+			if (parIdx == 7) DeferredTrigger_CouponSideCombo->setCurrentIndex(DeferredTrigger_CouponSideCombo->findData(parVal.toInt()));
+		});
+		ResLay->addWidget(SideLabel, CountRow, 0);
+		ResLay->addWidget(DeferredTrigger_CouponSideCombo, CountRow, 1);
+		DeferredTrigger_CouponSideCombo->setEnabled(false);
+		CountRow++;
+	}
+
+
+
+	ResLay->addItem(new QSpacerItem(20, 20, QSizePolicy::Preferred, QSizePolicy::Expanding), CountRow, 0, 1, 2);
+	return Result;
+}
 QWidget* TriggerHelperDialog::CreateDelinquencyTriggerWidget() {
 	QWidget* Result = new QWidget(this);
 	QGridLayout *ResLay = new QGridLayout(Result);

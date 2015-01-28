@@ -72,6 +72,7 @@ double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, const QS
 	return CalculateNPV(Dte,Flws,BloombergVector(Interest),Daycount);
 }
 double CalculateIRR(const QList<QDate>& Dte, const QList<double>& Flws, const DayCountVector& Daycount, double Guess) {
+	if (Flws.size() <= 1 || Dte.size() != Flws.size() || Daycount.IsEmpty()) return 0.0;
 	if (Guess <= 0 || Guess > 10) Guess = 0.05;
 	boost::math::tools::eps_tolerance<double> tol(std::numeric_limits<double>::digits / 2);
 	boost::uintmax_t MaxIter(MaximumIRRIterations);
@@ -86,6 +87,7 @@ double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, double Ba
 }
 
 double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const BloombergVector& BaseRate, const DayCountVector& Daycount, double Guess) {
+	if (Flws.size() <= 1 || Dte.size() != Flws.size() || BaseRate.IsEmpty() || Daycount.IsEmpty()) return 0.0;
 	if (Guess <= 0 || Guess>10) Guess = 0.05;
 	boost::math::tools::eps_tolerance<double> tol(std::numeric_limits<double>::digits / 2);
 	boost::uintmax_t MaxIter(MaximumIRRIterations);

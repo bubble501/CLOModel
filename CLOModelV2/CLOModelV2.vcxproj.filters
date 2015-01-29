@@ -742,4 +742,9 @@
       <Filter>Resource Files</Filter>
     </Xml>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="Build Instructions.markdown">
+      <Filter>Documentation</Filter>
+    </Text>
+  </ItemGroup>
 </Project>

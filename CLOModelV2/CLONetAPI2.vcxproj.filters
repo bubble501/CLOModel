@@ -278,9 +278,6 @@
     <ClCompile Include="MtgCashFlow.cpp">
       <Filter>Source Files\Loans</Filter>
     </ClCompile>
-    <ClCompile Include="ProgressWidget.cpp">
-      <Filter>Source Files\Widgets</Filter>
-    </ClCompile>
     <ClCompile Include="RepaymentVector.cpp">
       <Filter>Source Files\Vectors</Filter>
     </ClCompile>

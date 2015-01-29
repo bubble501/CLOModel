@@ -6,10 +6,10 @@
 #include "CommonFunctions.h"
 #include <QMessageBox>
 #include <QDir>
-#include "ProgressWidget.h"
 #include "ExcelCommons.h"
 #include "ExcelOutput.h"
 #include <QStringList>
+#include <QIcon>
 CentralUnit::CentralUnit(QObject* parent)
 	:QObject(parent)
 	,Stresser(nullptr)
@@ -270,11 +270,16 @@ void CentralUnit::CalculationStep1(){
 		return;
 	}
 	if(MtgsProgress) MtgsProgress->deleteLater();
-	MtgsProgress=new ProgressWidget;
-	MtgsProgress->SetValue(0);
-	MtgsProgress->SetTitle("Calculating Loans");
-	MtgsProgress->SetMax(LoansCalculator.NumBees());
-	connect(&LoansCalculator,SIGNAL(BeeCalculated(int)),MtgsProgress,SLOT(SetValue(int)));
+	MtgsProgress=new QProgressDialog();
+	MtgsProgress->setWindowIcon(QIcon(":/Icons/Logo.png"));
+	MtgsProgress->setWindowTitle(tr("Please Wait"));
+	MtgsProgress->setRange(0, 100);
+	MtgsProgress->setValue(0);
+	MtgsProgress->setAutoClose(false);
+	MtgsProgress->setLabelText(tr("Calculating Loans"));
+	MtgsProgress->setCancelButtonText(tr("Cancel"));
+	connect(&LoansCalculator, &MtgCalculator::ProgressPct, MtgsProgress, &QProgressDialog::setValue);
+	connect(MtgsProgress, &QProgressDialog::canceled, &LoansCalculator, &MtgCalculator::StopCalculation);
 	MtgsProgress->show();
 	QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 	if (!LoansCalculator.StartCalculation()) {
@@ -285,9 +290,8 @@ void CentralUnit::CalculationStep1(){
 }
 void CentralUnit::CalculationStep2(){
 	LOGDEBUG("Reached CalculationStep2");
-	MtgsProgress->SetValue(0);
-	MtgsProgress->SetTitle("Calculating Tranches");
-	MtgsProgress->SetMax(1);
+	MtgsProgress->setLabelText(tr("Calculating Tranches"));
+	MtgsProgress->setAutoClose(true);
 	QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 	Structure.ResetMtgFlows();
 	Structure.AddMortgagesFlows(LoansCalculator.GetAggregatedResults());
@@ -332,6 +336,9 @@ void CentralUnit::CalculationStep2(){
 			return;
 		}
 		ParallWatFalls->AddWaterfall(CallStructure,1);
+		connect(ParallWatFalls, &WaterfallCalculator::ProgressPct, MtgsProgress, &QProgressDialog::setValue);
+		disconnect(MtgsProgress, &QProgressDialog::canceled,nullptr,nullptr);
+		connect(MtgsProgress, &QProgressDialog::canceled, ParallWatFalls, &WaterfallCalculator::StopCalculation);
 		ParallWatFalls->StartCalculation();
 	}
 
@@ -339,7 +346,7 @@ void CentralUnit::CalculationStep2(){
 void CentralUnit::CheckCalculationDone()
 {
 	LOGDEBUG("Reached Calculation Done");
-	MtgsProgress->SetValue(1);
+	MtgsProgress->setValue(100);
 	QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 	if(MtgsProgress) MtgsProgress->deleteLater();
 	Tranche TempTranche;

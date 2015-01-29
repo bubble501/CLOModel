@@ -96,9 +96,6 @@
     <ClCompile Include="MtgCashFlow.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
-    <ClCompile Include="ProgressWidget.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
     <ClCompile Include="QBbgRequest.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
@@ -199,12 +196,6 @@
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_QBbgWorker.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_ProgressWidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_ProgressWidget.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_MtgCalculatorThread.cpp">
@@ -447,9 +438,6 @@
       <Filter>Header Files\Core</Filter>
     </CustomBuild>
     <CustomBuild Include="MtgCalculatorThread.h">
-      <Filter>Header Files\Core</Filter>
-    </CustomBuild>
-    <CustomBuild Include="ProgressWidget.h">
       <Filter>Header Files\Core</Filter>
     </CustomBuild>
     <CustomBuild Include="QBbgWorker.h">

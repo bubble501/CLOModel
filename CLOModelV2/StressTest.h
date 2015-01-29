@@ -9,7 +9,6 @@
 #include <QDataStream>
 #include "Waterfall.h"
 #include "AssumptionSet.h"
-#include "ProgressWidget.h"
 #include <QScopedPointer>
 #include <QSharedPointer>
 #include <QPointer>

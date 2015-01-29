@@ -594,6 +594,17 @@ DefaultExchange:
                 Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
                 Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 2).Value))
                 Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 3).Value))
+            Case 7 'Deferred Interest Trigger
+                Call AddInput(AllTheInputs, CLng(7))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 2).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 3).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 4).Value))
+                Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 5).Value))
+                Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 6).Value))
+                Call AddInput(AllTheInputs, CDbl(TriggerStart.Offset(i, 7).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 8).Value))
+                Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 9).Value))
             Case Else
                 Exit Sub
         End Select
@@ -1111,6 +1122,8 @@ Public Function FromStringToTriggerType(a As String) As Long
             FromStringToTriggerType = 5
         Case "CUMULATIVE LOSS TRIGGER"
             FromStringToTriggerType = 6
+        Case UCase("Deferred Interest Trigger")
+            FromStringToTriggerType = 7
         Case ""
             Exit Function
         Case Else
@@ -1140,6 +1153,8 @@ Public Function FromTriggerTypeToString(a As Long) As String
             FromTriggerTypeToString = "During Stress Test Trigger"
         Case 6
             FromTriggerTypeToString = "Cumulative Loss Trigger"
+        Case 7
+            FromTriggerTypeToString = "Deferred Interest Trigger"
         Case ""
             Exit Function
         Case Else
@@ -1471,6 +1486,17 @@ Public Sub EditWaterfallStep(InputsSheet As String, Target As Range, FieldsLabel
                 Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
                 Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 2).Value))
                 Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 3).Value))
+            Case 7 'Deferred Interest Trigger
+                Call AddInput(AllTheInputs, CLng(7))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 2).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 3).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 4).Value))
+                Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 5).Value))
+                Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 6).Value))
+                Call AddInput(AllTheInputs, CDbl(TriggerStart.Offset(i, 7).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 8).Value))
+                Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 9).Value))
             Case Else
                 Exit Sub
         End Select
@@ -1522,7 +1548,7 @@ Public Sub EditTrigger(Target As Range)
         CurrentTrigStruct = ""
     Else
         CurrentTrigStruct = CStr(FromStringToTriggerType(Target.Value))
-        For i = 1 To 8
+        For i = 1 To 9
            CurrentTrigStruct = CurrentTrigStruct & "#" & Target.Offset(0, i).Value
         Next i
     End If
@@ -1539,7 +1565,7 @@ Public Sub EditTrigger(Target As Range)
     Else
         Target.Value = FromTriggerTypeToString(CLng(StepParts(LBound(StepParts))))
     End If
-    For i = LBound(StepParts) + 1 To LBound(StepParts) + 8
+    For i = LBound(StepParts) + 1 To LBound(StepParts) + 9
         With Target.Offset(0, i - LBound(StepParts))
             If i > UBound(StepParts) Then
                 .ClearContents

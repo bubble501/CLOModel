@@ -13,6 +13,7 @@ public:
 		,DelinquencyTrigger=4
 		,DuringStressTestTrigger=5
 		, CumulativeLossTrigger=6
+		, DeferredInterestTrigger=7
 	};
 protected:
 	TriggerType m_TriggerType;

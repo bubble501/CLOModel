@@ -12,16 +12,16 @@
 TrancheCashFlow::TrancheCashFlow(double ThrancheOutstanding)
 	:OutstandingAmt(ThrancheOutstanding)
 {
-	for (qint32 i = static_cast<qint32>(TrancheFlowType::InterestFlow); i < (static_cast<qint32>(TrancheFlowType::InterestFlow) << 1); ++i) {
+	/*for (qint32 i = static_cast<qint32>(TrancheFlowType::InterestFlow); i < (static_cast<qint32>(TrancheFlowType::InterestFlow) << 1); ++i) {
 		SetLabel(i, QString("Interest %1").arg(i - static_cast<qint32>(TrancheFlowType::InterestFlow) + 1));
-	}
-	for (qint32 i = static_cast<qint32>(TrancheFlowType::DeferredFlow); i < (static_cast<qint32>(TrancheFlowType::DeferredFlow) << 1); ++i) {
-		SetLabel(i, QString("Deferred Interest %1").arg(i - static_cast<qint32>(TrancheFlowType::DeferredFlow) + 1));
+	}*/
+	for (qint32 i = static_cast<qint32>(TrancheFlowType::DeferredFlow); i < (static_cast<qint32>(TrancheFlowType::DeferredFlow) | static_cast<qint32>(TrancheFlowType::InterestFlow)); ++i) {
+		//SetLabel(i, QString("Deferred Interest %1").arg(i - static_cast<qint32>(TrancheFlowType::DeferredFlow) + 1));
 		SetStock(i);
 	}
-	for (qint32 i = static_cast<qint32>(TrancheFlowType::AccruedFlow); i < (static_cast<qint32>(TrancheFlowType::AccruedFlow) << 1); ++i) {
+	/*for (qint32 i = static_cast<qint32>(TrancheFlowType::AccruedFlow); i < (static_cast<qint32>(TrancheFlowType::AccruedFlow) | static_cast<qint32>(TrancheFlowType::InterestFlow)); ++i) {
 		SetLabel(i, QString("Accrued Interest %1").arg(i - static_cast<qint32>(TrancheFlowType::AccruedFlow) + 1));
-	}
+	}*/
 	SetLabel(static_cast<qint32>(TrancheFlowType::PrincipalFlow), "Principal");
 	SetLabel(static_cast<qint32>(TrancheFlowType::AmountOutstandingFlow), "Amount Outstanding");
 	SetLabel(static_cast<qint32>(TrancheFlowType::OCFlow), "OC Test");
@@ -35,7 +35,16 @@ TrancheCashFlow::TrancheCashFlow(double ThrancheOutstanding)
 	SetStock(static_cast<qint32>(TrancheFlowType::PDLOutstanding));
 	Aggregate(Monthly);
 }
-
+QString TrancheCashFlow::GetLabel(qint32 FlowTpe, const QString& DefaultLab /*= QString()*/) const {
+	if (m_CashFlowLabels.contains(FlowTpe)) return GenericCashFlow::GetLabel(FlowTpe, DefaultLab);
+	if (FlowTpe >= static_cast<qint32>(TrancheFlowType::InterestFlow) && FlowTpe < (static_cast<qint32>(TrancheFlowType::InterestFlow) << 1))
+		return QString("Interest %1").arg((FlowTpe & ~static_cast<qint32>(TrancheFlowType::InterestFlow)) + 1);
+	if (FlowTpe >= static_cast<qint32>(TrancheFlowType::DeferredFlow) && FlowTpe <( static_cast<qint32>(TrancheFlowType::DeferredFlow) | static_cast<qint32>(TrancheFlowType::InterestFlow)))
+		return QString("Deferred Interest %1").arg((FlowTpe & ~static_cast<qint32>(TrancheFlowType::DeferredFlow)) + 1);
+	if (FlowTpe >= static_cast<qint32>(TrancheFlowType::AccruedFlow) && FlowTpe < (static_cast<qint32>(TrancheFlowType::AccruedFlow) | static_cast<qint32>(TrancheFlowType::InterestFlow)))
+		return QString("Accrued Interest %1").arg((FlowTpe & ~static_cast<qint32>(TrancheFlowType::AccruedFlow)) + 1);
+	return GenericCashFlow::GetLabel(FlowTpe, DefaultLab);
+}
 
 TrancheCashFlow::TrancheCashFlow(const TrancheCashFlow& a)
 	:OutstandingAmt(a.OutstandingAmt)
@@ -156,17 +165,33 @@ bool TrancheCashFlow::GetCashFlowsBloomberg(const QBloombergLib::QSingleBbgResul
 			a.GetHeader() != "MTG_CASH_FLOW" 
 			&&  a.GetHeader() != "EXTENDED_CASH_FLOW"
 			&&  a.GetHeader() != "HIST_CASH_FLOW"
+			&&  a.GetHeader() != "DES_CASH_FLOW"
 		)
 		|| a.HasErrors()
 		|| a.GetNumRows() == 0
 	) return false;
-	for (int i = 0; i < a.GetNumRows(); ++i) {
-		const QDate CurrentDate = a.GetTableResult(i, 1)->GetDate();
-		AddFlow(CurrentDate, a.GetTableResult(i, 3)->GetDouble(), TrancheFlowType::InterestFlow);
-		AddFlow(CurrentDate, a.GetTableResult(i, 4)->GetDouble(), TrancheFlowType::PrincipalFlow);
-		AddFlow(CurrentDate, -a.GetTableResult(i, 4)->GetDouble(), TrancheFlowType::AmountOutstandingFlow);
-		if (i == 0) {
+	Clear();
+	if (a.GetHeader() == "DES_CASH_FLOW") {
+		OutstandingAmt = 0.0;
+		for (int i = 0; i < a.GetNumRows(); ++i) {
+			OutstandingAmt += a.GetTableResult(i, 2)->GetDouble();
+		}
+		for (int i = 0; i < a.GetNumRows(); ++i) {
+			const QDate CurrentDate = a.GetTableResult(i, 0)->GetDate();
+			AddFlow(CurrentDate, a.GetTableResult(i, 1)->GetDouble(), TrancheFlowType::InterestFlow);
+			AddFlow(CurrentDate, a.GetTableResult(i, 2)->GetDouble(), TrancheFlowType::PrincipalFlow);
+			AddFlow(CurrentDate, -a.GetTableResult(i, 2)->GetDouble(), TrancheFlowType::AmountOutstandingFlow);
+		}
+	}
+	else { //Mtge cash flow
+		if (a.GetNumRows() > 0) {
 			OutstandingAmt = a.GetTableResult(0, 4)->GetDouble() + a.GetTableResult(0, 5)->GetDouble();
+		}
+		for (int i = 0; i < a.GetNumRows(); ++i) {
+			const QDate CurrentDate = a.GetTableResult(i, 1)->GetDate();
+			AddFlow(CurrentDate, a.GetTableResult(i, 3)->GetDouble(), TrancheFlowType::InterestFlow);
+			AddFlow(CurrentDate, a.GetTableResult(i, 4)->GetDouble(), TrancheFlowType::PrincipalFlow);
+			AddFlow(CurrentDate, -a.GetTableResult(i, 4)->GetDouble(), TrancheFlowType::AmountOutstandingFlow);
 		}
 	}
 	return true;
@@ -235,5 +260,25 @@ void TrancheCashFlow::SetStartingDeferredInterest(const double& val, qint32 Coup
 bool TrancheCashFlow::HasFlowType(qint32 FlowTpe) const {
 	return GenericCashFlow::HasFlowType(FlowTpe) || StartingDeferredInterest.contains(FlowTpe);
 }
+
+void TrancheCashFlow::SetInitialOutstanding(double a) {
+	if (a == OutstandingAmt) return;
+	/*auto OldOut = SingleFlow(static_cast<qint32>(TrancheFlowType::AmountOutstandingFlow)).ScaledCashFlows(OutstandingAmt,a);
+	RemoveFlow(static_cast<qint32>(TrancheFlowType::AmountOutstandingFlow));
+	for (int i = 0; i < OldOut.Count(); ++i) {
+		GenericCashFlow::SetFlow(
+			OldOut.GetDate(i)
+			, OldOut.GetFlow(i, static_cast<qint32>(TrancheFlowType::AmountOutstandingFlow))
+			, static_cast<qint32>(TrancheFlowType::AmountOutstandingFlow)
+		);
+	}*/
+	TrancheCashFlow Tempfl;
+	Tempfl.AddFlow(GenericCashFlow::ScaledCashFlows(OutstandingAmt, a));
+	Tempfl.OutstandingAmt = a;
+	Tempfl.StartingDeferredInterest = StartingDeferredInterest;
+	operator=(Tempfl);
+}
+
+
 
 

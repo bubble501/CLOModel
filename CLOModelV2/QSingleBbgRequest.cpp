@@ -35,9 +35,9 @@ void QSingleBbgRequest::SetExtension(const QString& val) {
 	m_Extension = QBbgRequest::String2YellowKey(val.trimmed());
 }
 
-void QSingleBbgRequest::SetOverrides(const QHash<QString, QString>& Overrides) {
+void QSingleBbgRequest::SetOverrides(const Overrides& Overr) {
 	ClearOverrides();
-	for (QHash<QString, QString>::const_iterator i = Overrides.constBegin(); i != Overrides.constEnd(); i++) {
+	for (auto i = Overr.constBegin(); i != Overr.constEnd(); i++) {
 		if (i.value().isEmpty()) continue;
 		if (i.key().isEmpty()) continue;
 		QString TempKey = i.key().trimmed().toUpper();
@@ -66,7 +66,7 @@ void QSingleBbgRequest::SetAutoConstantRates(bool val) {
 		}
 	}
 	else {
-		QHash<QString, QString>::iterator CheckIter = m_Overrides.find("APPLY_FWD_RATE");
+		auto CheckIter = m_Overrides.find("APPLY_FWD_RATE");
 		if (CheckIter != m_Overrides.end()) {
 			if (CheckIter.value() == "N") {
 				m_Overrides.erase(CheckIter);
@@ -111,7 +111,7 @@ void QSingleBbgRequest::SetResultID(qint64 val) {
 	m_ResultID = val;
 }
 
-const QHash<QString, QString>& QSingleBbgRequest::GetOverrides() const {
+const Overrides& QSingleBbgRequest::GetOverrides() const {
 	return m_Overrides;
 }
 
@@ -138,7 +138,7 @@ QDataStream& operator<<(QDataStream & stream, const QSingleBbgRequest& flows) {
 		<< flows.m_AutoConstantRates
 		<< static_cast<quint32>(flows.m_Overrides.size())
 		;
-	for (QHash<QString, QString>::const_iterator i = flows.m_Overrides.constBegin(); i != flows.m_Overrides.constEnd(); i++) {
+	for (auto i = flows.m_Overrides.constBegin(); i != flows.m_Overrides.constEnd(); i++) {
 		stream << i.key()
 			<< i.value()
 			;

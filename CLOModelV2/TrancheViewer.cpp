@@ -32,7 +32,7 @@ void TrancheViewer::SetTranche(const Tranche& a){
 	const auto& Temp = a.GetCashFlow();
 	MainTable->setRowCount(a.GetCashFlow().Count());
 	int EmptyDeferred=0;
-	for (qint32 i = static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow);i < (static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) << 1); ++i) {
+	for (qint32 i = static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow); i < (static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow)); ++i) {
 		if (a.GetCashFlow().HasFlowType(i)) EmptyDeferred++;
 	}
 	bool EmptyIC = !a.GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::ICFlow));
@@ -68,7 +68,7 @@ void TrancheViewer::SetTranche(const Tranche& a){
 		MainTable->setItem(i, ColumnIter++, new QTableWidgetItem(Commarize(a.GetCashFlow().GetAmountOutstanding(i))));
 		MainTable->setItem(i, ColumnIter++, new QTableWidgetItem(Commarize(a.GetCashFlow().GetTotalInterest(i))));
 		MainTable->setItem(i, ColumnIter++, new QTableWidgetItem(Commarize(a.GetCashFlow().GetPrincipal(i))));
-		for (qint32 j = static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow); j < (static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) << 1); ++j) {
+		for (qint32 j = static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow); j < (static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow)); ++j) {
 			if (a.GetCashFlow().HasFlowType(j)) MainTable->setItem(i, ColumnIter++, new QTableWidgetItem(Commarize(a.GetCashFlow().GetFlow(i, j))));
 		}
 		if (!EmptyOC) {

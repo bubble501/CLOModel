@@ -118,16 +118,16 @@ void QBbgRequest::AddRequest(qint64 ID, const QString& Secur, const QString& Fie
 	AddRequest(Temp);
 }
 void QBbgRequest::AddRequest(const QString& Secur, const QString& Field, YellowKeys YellowKey) { AddRequest(++MaxID, Secur, Field, YellowKey); }
-void QBbgRequest::AddRequest(qint64 ID, const QString& Secur, const QString& Field, const QHash<QString, QString>& Overrides, YellowKeys YellowKey) {
+void QBbgRequest::AddRequest(qint64 ID, const QString& Secur, const QString& Field, const Overrides& Overr, YellowKeys YellowKey) {
 	QSingleBbgRequest Temp;
 	Temp.SetField(Field);
 	Temp.SetSecurity(Secur);
 	Temp.SetResultID(ID);
-	Temp.SetOverrides(Overrides);
+	Temp.SetOverrides(Overr);
 	Temp.SetExtension(YellowKey);
 	AddRequest(Temp);
 }
-void QBbgRequest::AddRequest(const QString& Secur, const QString& Field, const QHash<QString, QString>& Overrides, YellowKeys YellowKey) { AddRequest(++MaxID, Secur, Field, Overrides, YellowKey); }
+void QBbgRequest::AddRequest(const QString& Secur, const QString& Field, const Overrides& Overr, YellowKeys YellowKey) { AddRequest(++MaxID, Secur, Field, Overr, YellowKey); }
 void  QBbgRequest::RequestGroups(QHash<qint64, QList<qint64>* >& Result, qint64 StartingID)const {
 	for (QHash<qint64, QList<qint64>* >::iterator i = Result.begin(); i != Result.end(); i++)
 		delete (i.value());

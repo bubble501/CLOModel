@@ -22,6 +22,7 @@
 #include "DuringStressTestTrigger.h"
 #include "CumulativeLossTrigger.h"
 #include "LoanAssumptionsEditor.h"
+#include "DeferredInterestTrigger.h"
 void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	bool RunStress;
 	CentralUnit TempUnit;
@@ -162,6 +163,18 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 				TempTrigger.dynamicCast<TrancheTrigger>()->SetSenioritySide(static_cast<TrancheTrigger::TriggerSenioritySide>(pdFreq->intVal)); pdFreq++;
 				TempTrigger.dynamicCast<TrancheTrigger>()->SetSizeSide(static_cast<TrancheTrigger::TriggerSizeSide>(pdFreq->intVal)); pdFreq++;
 				TempTrigger.dynamicCast<TrancheTrigger>()->SetSizeMultiplier(pdFreq->dblVal); pdFreq++;
+				TempUnit.SetTrigger(i + 1, TempTrigger);
+				break;
+			case static_cast<int>(AbstractTrigger::TriggerType::DeferredInterestTrigger) :
+				TempTrigger.reset(new DeferredInterestTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+				TempTrigger.dynamicCast<DeferredInterestTrigger>()->SetTargetSeniority(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+				TempTrigger.dynamicCast<DeferredInterestTrigger>()->SetTargetSeniorityLevel(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+				TempTrigger.dynamicCast<DeferredInterestTrigger>()->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+				TempTrigger.dynamicCast<DeferredInterestTrigger>()->SetSenioritySide(static_cast<DeferredInterestTrigger::TriggerSenioritySide>(pdFreq->intVal)); pdFreq++;
+				TempTrigger.dynamicCast<DeferredInterestTrigger>()->SetSizeSide(static_cast<DeferredInterestTrigger::TriggerSizeSide>(pdFreq->intVal)); pdFreq++;
+				TempTrigger.dynamicCast<DeferredInterestTrigger>()->SetSizeMultiplier(pdFreq->dblVal); pdFreq++;
+				TempTrigger.dynamicCast<DeferredInterestTrigger>()->SetTargetCoupon(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+				TempTrigger.dynamicCast<DeferredInterestTrigger>()->SetCouponSide(static_cast<DeferredInterestTrigger::TriggerCouponSide>(pdFreq->intVal)); pdFreq++;
 				TempUnit.SetTrigger(i + 1, TempTrigger);
 				break;
 			case static_cast<int>(AbstractTrigger::TriggerType::DelinquencyTrigger) :
@@ -531,7 +544,7 @@ double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
 	const Tranche* TranchPoint=TempWaterfall.GetTranche(TrancheName);
 	if(!TranchPoint) return 0.0;
 	Tranche TempTranche(*TranchPoint);
-	return TempTranche.GetWALife(StartDate);
+	return TempTranche.GetWALife(/*StartDate*/);
 }
 double __stdcall GetStressLoss(LPSAFEARRAY *ArrayData) {
 	QString FolderPath;
@@ -639,6 +652,17 @@ BSTR __stdcall WatFallStepEdit(LPSAFEARRAY *ArrayData) {
 				TempIter->dynamicCast<TrancheTrigger>()->SetSizeSide(static_cast<TrancheTrigger::TriggerSizeSide>(pdFreq->intVal)); pdFreq++;
 				TempIter->dynamicCast<TrancheTrigger>()->SetSizeMultiplier(pdFreq->dblVal); pdFreq++;
 				break;
+			case static_cast<int>(AbstractTrigger::TriggerType::DeferredInterestTrigger) :
+				TempIter = AvailableTriggers.insert(i, QSharedPointer<AbstractTrigger>(new DeferredInterestTrigger(QString::fromWCharArray(pdFreq->bstrVal)))); pdFreq++;
+				TempIter->dynamicCast<DeferredInterestTrigger>()->SetTargetSeniority(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+				TempIter->dynamicCast<DeferredInterestTrigger>()->SetTargetSeniorityLevel(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+				TempIter->dynamicCast<DeferredInterestTrigger>()->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+				TempIter->dynamicCast<DeferredInterestTrigger>()->SetSenioritySide(static_cast<DeferredInterestTrigger::TriggerSenioritySide>(pdFreq->intVal)); pdFreq++;
+				TempIter->dynamicCast<DeferredInterestTrigger>()->SetSizeSide(static_cast<DeferredInterestTrigger::TriggerSizeSide>(pdFreq->intVal)); pdFreq++;
+				TempIter->dynamicCast<DeferredInterestTrigger>()->SetSizeMultiplier(pdFreq->dblVal); pdFreq++;
+				TempIter->dynamicCast<DeferredInterestTrigger>()->SetTargetCoupon(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+				TempIter->dynamicCast<DeferredInterestTrigger>()->SetCouponSide(static_cast<DeferredInterestTrigger::TriggerCouponSide>(pdFreq->intVal)); pdFreq++;
+				break;
 			case static_cast<int>(AbstractTrigger::TriggerType::DelinquencyTrigger) :
 				TempIter = AvailableTriggers.insert(i, QSharedPointer<AbstractTrigger>(new DelinquencyTrigger(QString::fromWCharArray(pdFreq->bstrVal)))); pdFreq++;
 				TempIter->dynamicCast<DelinquencyTrigger>()->SetTarget(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
@@ -646,6 +670,8 @@ BSTR __stdcall WatFallStepEdit(LPSAFEARRAY *ArrayData) {
 			case static_cast<int>(AbstractTrigger::TriggerType::DuringStressTestTrigger) :
 				AvailableTriggers.insert(i, QSharedPointer<AbstractTrigger>(new DuringStressTestTrigger(QString::fromWCharArray(pdFreq->bstrVal)))); pdFreq++;
 				break;
+			default:
+				return NULL;
 			}
 		}
 	}

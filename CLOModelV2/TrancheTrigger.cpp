@@ -160,6 +160,6 @@ void TrancheTrigger::FillMissingAnchorDate(const QDate& a) {
 }
 
 void TrancheTrigger::SetSizeMultiplier(double mult) {
-	if (mult == 0.0) return ResetSizeMultiplier();  
-	m_TargetSize*=mult;
+	 return ResetSizeMultiplier();  
+	 if (mult != 0.0) m_TargetSize *= mult;
 }

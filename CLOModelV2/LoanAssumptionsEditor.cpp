@@ -1610,12 +1610,12 @@ void LoanAssumptionsEditor::LoadModel() {
 		m_OriginalStructureModel->setData(m_OriginalStructureModel->index(i, TrancheNameCol), m_WtfToExtension.GetTranche(i)->GetTrancheName(),Qt::EditRole);
 		m_OriginalStructureModel->setData(m_OriginalStructureModel->index(i, PriceCol), Commarize(m_WtfToExtension.GetTranche(i)->GetPrice(), 2), Qt::EditRole);
 		m_OriginalStructureModel->setData(m_OriginalStructureModel->index(i, PriceCol), m_WtfToExtension.GetTranche(i)->GetPrice(), Qt::UserRole);
-		m_OriginalStructureModel->setData(m_OriginalStructureModel->index(i, WALCol), Commarize(m_WtfToExtension.GetTranche(i)->GetWALife(m_WtfToExtension.GetCalculatedMtgPayments().GetDate(0)), 2), Qt::EditRole);
+		m_OriginalStructureModel->setData(m_OriginalStructureModel->index(i, WALCol), Commarize(m_WtfToExtension.GetTranche(i)->GetWALife(/*m_WtfToExtension.GetCalculatedMtgPayments().GetDate(0)*/), 2), Qt::EditRole);
 		m_OriginalStructureModel->setData(m_OriginalStructureModel->index(i, LossCol), Commarize(m_WtfToExtension.GetTranche(i)->GetLossRate()*100.0, 2)+'%', Qt::EditRole);
 		if (m_WtfToCall.GetTranche(i)){
 			m_OriginalStructureModel->setData(m_OriginalStructureModel->index(i, CallDateCol), m_WtfToCall.GetCalledPeriod().toString("MMM-yy"), Qt::EditRole);
 			m_OriginalStructureModel->setData(m_OriginalStructureModel->index(i, CallDateCol), m_WtfToCall.GetCalledPeriod(), Qt::UserRole);
-			m_OriginalStructureModel->setData(m_OriginalStructureModel->index(i, WALCallCol), Commarize(m_WtfToCall.GetTranche(i)->GetWALife(m_WtfToCall.GetCalculatedMtgPayments().GetDate(0)), 2), Qt::EditRole);
+			m_OriginalStructureModel->setData(m_OriginalStructureModel->index(i, WALCallCol), Commarize(m_WtfToCall.GetTranche(i)->GetWALife(/*m_WtfToCall.GetCalculatedMtgPayments().GetDate(0)*/), 2), Qt::EditRole);
 			m_OriginalStructureModel->setData(m_OriginalStructureModel->index(i, LossCallCol), Commarize(m_WtfToCall.GetTranche(i)->GetLossRate()*100.0, 2) + '%', Qt::EditRole);
 		}
 		else {
@@ -2091,12 +2091,12 @@ void LoanAssumptionsEditor::NewTranchesCalculated() {
 		m_NewStructureModel->setData(m_NewStructureModel->index(i, TrancheNameCol), m_NewWtfToExtension.GetTranche(i)->GetTrancheName(), Qt::EditRole);
 		m_NewStructureModel->setData(m_NewStructureModel->index(i, PriceCol), Commarize(m_NewWtfToExtension.GetTranche(i)->GetPrice(), 2), Qt::EditRole);
 		m_NewStructureModel->setData(m_NewStructureModel->index(i, PriceCol), m_NewWtfToExtension.GetTranche(i)->GetPrice(), Qt::UserRole);
-		m_NewStructureModel->setData(m_NewStructureModel->index(i, WALCol), Commarize(m_NewWtfToExtension.GetTranche(i)->GetWALife(m_NewWtfToExtension.GetCalculatedMtgPayments().GetDate(0)), 2), Qt::EditRole);
+		m_NewStructureModel->setData(m_NewStructureModel->index(i, WALCol), Commarize(m_NewWtfToExtension.GetTranche(i)->GetWALife(/*m_NewWtfToExtension.GetCalculatedMtgPayments().GetDate(0)*/), 2), Qt::EditRole);
 		m_NewStructureModel->setData(m_NewStructureModel->index(i, LossCol), Commarize(m_NewWtfToExtension.GetTranche(i)->GetLossRate()*100.0, 2) + '%', Qt::EditRole);
 		if (m_NewWtfToCall.GetTranche(i)) {
 			m_NewStructureModel->setData(m_NewStructureModel->index(i, CallDateCol), m_NewWtfToCall.GetCalledPeriod().toString("MMM-yy"), Qt::EditRole);
 			m_NewStructureModel->setData(m_NewStructureModel->index(i, CallDateCol), m_NewWtfToCall.GetCalledPeriod(), Qt::UserRole);
-			m_NewStructureModel->setData(m_NewStructureModel->index(i, WALCallCol), Commarize(m_NewWtfToCall.GetTranche(i)->GetWALife(m_NewWtfToCall.GetCalculatedMtgPayments().GetDate(0)), 2), Qt::EditRole);
+			m_NewStructureModel->setData(m_NewStructureModel->index(i, WALCallCol), Commarize(m_NewWtfToCall.GetTranche(i)->GetWALife(/*m_NewWtfToCall.GetCalculatedMtgPayments().GetDate(0)*/), 2), Qt::EditRole);
 			m_NewStructureModel->setData(m_NewStructureModel->index(i, LossCallCol), Commarize(m_NewWtfToCall.GetTranche(i)->GetLossRate()*100.0, 2) + '%', Qt::EditRole);
 		}
 		else {

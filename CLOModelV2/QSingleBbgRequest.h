@@ -28,8 +28,8 @@ namespace QBloombergLib {
 		void SetResultID(qint64 val);
 		void SetSecurity(const QString& val);
 		void SetField(const QString& val);
-		const QHash<QString, QString>& GetOverrides() const;
-		void SetOverrides(const QHash<QString, QString>& Overrides);
+		const Overrides& GetOverrides() const;
+		void SetOverrides(const Overrides& Overr);
 		void SetOverride(QString Name, const QString& Value);
 		void ClearOverrides();
 		bool IsValidReq() const;
@@ -44,7 +44,7 @@ namespace QBloombergLib {
 		QString m_Security;
 		QBbgRequest::YellowKeys m_Extension;
 		QString m_Field;
-		QHash<QString, QString> m_Overrides;
+		Overrides m_Overrides;
 		bool m_AutoConstantRates;
 	protected:
 		bool SameOverrides(const QSingleBbgRequest& a)const;

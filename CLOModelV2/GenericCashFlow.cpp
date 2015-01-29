@@ -310,7 +310,7 @@ QString GenericCashFlow::ToString() const {
 	QList<qint32> FlowsTypesList = FlowsTypes.toList();
 	std::sort(FlowsTypesList.begin(), FlowsTypesList.end());
 	for (QList<qint32>::const_iterator SecIter = FlowsTypesList.constBegin(); SecIter != FlowsTypesList.constEnd(); ++SecIter) {
-		Result += '\t'+ m_CashFlowLabels.value(*SecIter, QString("Flow %1").arg(*SecIter));
+		Result += '\t' + GetLabel(*SecIter, QString("Flow %1").arg(*SecIter));
 	}
 	for (QMap<QDate, QHash<qint32, double>* >::const_iterator MainIter = m_CashFlows.constBegin(); MainIter != m_CashFlows.constEnd(); ++MainIter) {
 		Result += '\n' + MainIter.key().toString("dd-MM-yyyy");
@@ -324,11 +324,11 @@ QString GenericCashFlow::ToString() const {
 GenericCashFlow GenericCashFlow::SingleFlow(qint32 FlowTpe) const {
 	GenericCashFlow Result;
 	Result.Aggregate(m_AggregationLevel);
+	if (IsStock(FlowTpe)) Result.SetStock(FlowTpe);
 	for (QMap<QDate, QHash<qint32, double>* >::const_iterator MainIter = m_CashFlows.constBegin(); MainIter != m_CashFlows.constEnd(); ++MainIter) {
 		Result.SetFlow(MainIter.key(), GetFlow(MainIter.key(),FlowTpe), FlowTpe);
 	}
-	if (IsStock(FlowTpe)) Result.SetStock(FlowTpe);
-	if (m_CashFlowLabels.contains(FlowTpe)) Result.SetLabel(FlowTpe,m_CashFlowLabels.value(FlowTpe));
+	if (!GetLabel(FlowTpe).isEmpty()) Result.SetLabel(FlowTpe, GetLabel(FlowTpe));
 	return Result;
 }
 GenericCashFlow GenericCashFlow::SingleDate(const QDate& a) const {
@@ -340,8 +340,8 @@ GenericCashFlow GenericCashFlow::SingleDate(const QDate& a) const {
 			auto AllFlws = AvailableFlows(a);
 			for (auto SecondIter = AllFlws.constBegin(); SecondIter != AllFlws.constEnd(); ++SecondIter) {
 				Result.SetFlow(a, GetFlow(a, *SecondIter), *SecondIter);
-				if (m_CashFlowLabels.contains(*SecondIter)) 
-					Result.SetLabel(*SecondIter, m_CashFlowLabels.value(*SecondIter));
+				if (!GetLabel(*SecondIter).isEmpty()) 
+					Result.SetLabel(*SecondIter, GetLabel(*SecondIter));
 			}
 			return Result;
 		}
@@ -446,12 +446,14 @@ GenericCashFlow GenericCashFlow::ScaledCashFlows(double OriginalRefSize, double 
 	if (ResultSize == 0.0 || OriginalRefSize == 0.0) return Result;
 	const double ScaleRatio = ResultSize/OriginalRefSize ;
 	for (auto i = m_CashFlows.constBegin(); i != m_CashFlows.constEnd(); ++i) {
-		for (auto j = i.value()->constBegin(); j != i.value()->constEnd(); ++j) {
-			if ((Groups.isEmpty() || Groups.contains(j.key())) && !ExcludeGroups.contains(j.key())) {
-				Result.SetFlow(i.key(), GetFlow(i.key(), j.key())*ScaleRatio, j.key());
+		auto FlwTpe = this->AvailableFlows(i.key());
+		for (auto j = FlwTpe.constBegin(); j != FlwTpe.constEnd(); ++j) {
+		//for (auto j = i.value()->constBegin(); j != i.value()->constEnd(); ++j) {
+			if ((Groups.isEmpty() || Groups.contains(*j)) && !ExcludeGroups.contains(*j)) {
+				Result.SetFlow(i.key(), GetFlow(i.key(), *j)*ScaleRatio, *j);
 			}
 			else {
-				Result.SetFlow(i.key(), GetFlow(i.key(), j.key()), j.key());
+				Result.SetFlow(i.key(), GetFlow(i.key(), *j), *j);
 			}
 		}
 	}
@@ -464,7 +466,7 @@ QString GenericCashFlow::ToPlainText(bool UseHeaders /*= true*/) const {
 	auto AllFlows = AvailableFlows();
 	std::sort(AllFlows.begin(),AllFlows.end());
 	for (auto j = AllFlows.constBegin(); j != AllFlows.constEnd(); ++j) {
-		if (UseHeaders) Result += '\t' + m_CashFlowLabels.value(*j, QString("Flow %1").arg(*j));
+		if (UseHeaders) Result += '\t' + GetLabel(*j, QString("Flow %1").arg(*j));
 		else  Result += QString("%1").arg(*j);
 	}
 	for (auto i = m_CashFlows.constBegin(); i != m_CashFlows.constEnd(); ++i) {
@@ -489,7 +491,7 @@ QString GenericCashFlow::ToXML() const {
 	for (auto j = AllFlows.constBegin(); j != AllFlows.constEnd(); ++j) {
 		Writer.writeStartElement("Flow");
 		Writer.writeAttribute("id", QString::number(*j));
-		if (m_CashFlowLabels.contains(*j)) Writer.writeTextElement("Label", m_CashFlowLabels.value(*j));
+		if (!GetLabel(*j).isEmpty()) Writer.writeTextElement("Label", GetLabel(*j));
 		else Writer.writeEmptyElement("Label");
 		for (auto i = m_CashFlows.constBegin(); i != m_CashFlows.constEnd(); ++i) {
 			Writer.writeStartElement("SingleFlow");

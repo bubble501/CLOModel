@@ -13,6 +13,7 @@
 #include <QStack>
 #include "AbstractTrigger.h"
 #include <QXmlStreamReader>
+#include <QFile>
 #ifndef NO_DATABASE
 QMutex Db_Mutex;
 #endif
@@ -72,6 +73,7 @@ double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, const QS
 	return CalculateNPV(Dte,Flws,BloombergVector(Interest),Daycount);
 }
 double CalculateIRR(const QList<QDate>& Dte, const QList<double>& Flws, const DayCountVector& Daycount, double Guess) {
+	if (Flws.size() <= 1 || Dte.size() != Flws.size() || Daycount.IsEmpty()) return 0.0;
 	if (Guess <= 0 || Guess > 10) Guess = 0.05;
 	boost::math::tools::eps_tolerance<double> tol(std::numeric_limits<double>::digits / 2);
 	boost::uintmax_t MaxIter(MaximumIRRIterations);
@@ -86,6 +88,7 @@ double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, double Ba
 }
 
 double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const BloombergVector& BaseRate, const DayCountVector& Daycount, double Guess) {
+	if (Flws.size() <= 1 || Dte.size() != Flws.size() || BaseRate.IsEmpty() || Daycount.IsEmpty()) return 0.0;
 	if (Guess <= 0 || Guess>10) Guess = 0.05;
 	boost::math::tools::eps_tolerance<double> tol(std::numeric_limits<double>::digits / 2);
 	boost::uintmax_t MaxIter(MaximumIRRIterations);
@@ -121,20 +124,36 @@ bool removeDir(const QString & dirName)
 	return result;
 }
 
-double AdjustCoupon(double AnnualCoupon, QDate PrevIPD, QDate CurrIPD, DayCountConvention DayCount) {
-	if (PrevIPD.isNull() || CurrIPD.isNull()) return AnnualCoupon;
-	if (AnnualCoupon == 0.0) return 0.0;
-	if (PrevIPD > CurrIPD) {
+double AdjustCoupon(double AnnualCoupon /*Annualised Coupon*/, QDate PrevIPD /*Interesty start accrual date*/, QDate CurrIPD /*Interesty end accrual date*/, DayCountConvention DayCount) {
+	if (PrevIPD.isNull() || CurrIPD.isNull()) return AnnualCoupon; //If dates are invalid return the annual coupon
+	if (AnnualCoupon == 0.0) return 0.0; //If the annual coupon is 0 there is no need to adjust it
+	if (PrevIPD > CurrIPD) { //If start accrual is after end accrual invert the two dates
 		QDate Temp = PrevIPD;
 		PrevIPD = CurrIPD;
 		CurrIPD = Temp;
 	}
-	double TimeFactor;
+	double TimeFactor; //This is the factor by which the coupon must be adjusted
 	int Offset = 0;
+	/*
+	DayCount is a 16 bit integer;
+	the bit 1 to CompoundShift contain the day count convention Bloomberg code (see DAY COUNT CODES - MBS <HELP>)
+	if the interest is accrued according to the compounding formula the bit CompoundShift+1 is set 
+	if the interest is accrued according to the continuous compounding formula the bit CompoundShift+2 is set
+	if the interest is accrued according to the simple compounding formula neither bit is set
+	*/
+	// check the first CompoundShift bits of the DayCount
 	switch (static_cast<DayCountConvention>(static_cast<qint16>(DayCount) & (((1 << CompoundShift)-1)))) {
 	case DayCountConvention::ISMA30360:
+		//if an accrual date falls on day 31 move it to day 30
 		if (PrevIPD.day() == 31) PrevIPD.setDate(PrevIPD.year(), PrevIPD.month(), 30);
 		if (CurrIPD.day() == 31) CurrIPD.setDate(CurrIPD.year(), CurrIPD.month(), 30);
+		/* The adjustment factor is:
+			(
+				(360 * difference in years of the two dates)
+				+ (30 * difference in months of the two dates)
+				+ difference in days of the two dates
+			)/360
+		*/
 		TimeFactor=(
 			(360.0*static_cast<double>(CurrIPD.year() - PrevIPD.year())) +
 			(30.0*static_cast<double>(CurrIPD.month() - PrevIPD.month())) +
@@ -142,10 +161,19 @@ double AdjustCoupon(double AnnualCoupon, QDate PrevIPD, QDate CurrIPD, DayCountC
 			) / 360.0;
 		break;
 	case DayCountConvention::N30360:
-		if (PrevIPD.day() == 31) PrevIPD.setDate(PrevIPD.year(), PrevIPD.month(), 30);
-		if (CurrIPD.day() == 31 && PrevIPD.day() == 30) CurrIPD.setDate(CurrIPD.year(), CurrIPD.month(), 30);
+		if (PrevIPD.day() == 31) PrevIPD.setDate(PrevIPD.year(), PrevIPD.month(), 30); //if start accrue falls on the 31st move it to the 30th
+		if (CurrIPD.day() == 31 && PrevIPD.day() == 30) CurrIPD.setDate(CurrIPD.year(), CurrIPD.month(), 30); //if end accrue falls on the 31st and start accrue falls on the 30th move end accrue to the 30th
+		// if the previous IPD was on the last day of Feb set an offset to simulate it happening on the 30th of Feb
 		if (PrevIPD.day() == 29 && PrevIPD.month() == 2 && QDate::isLeapYear(PrevIPD.year())) Offset = 1;
 		if (PrevIPD.day() == 28 && PrevIPD.month() == 2 && !QDate::isLeapYear(PrevIPD.year())) Offset = 2;
+		/* The adjustment factor is:
+			(
+				(360 * difference in years of the two dates)
+				+ (30 * difference in months of the two dates)
+				+ difference in days of the two dates
+				- Offset
+			)/360
+		*/
 		TimeFactor = (
 				(360.0*static_cast<double>(CurrIPD.year() - PrevIPD.year())) +
 				(30.0*static_cast<double>(CurrIPD.month() - PrevIPD.month())) +
@@ -153,63 +181,93 @@ double AdjustCoupon(double AnnualCoupon, QDate PrevIPD, QDate CurrIPD, DayCountC
 			) /360.0;
 		break;
 	case DayCountConvention::ISDAACTACT:
+		// For non nominal day count conventions move payment dates that are in weekends or bank holidays
 		while (IsHoliday(CurrIPD)) CurrIPD = CurrIPD.addDays(1);
 		while (IsHoliday(PrevIPD)) PrevIPD = PrevIPD.addDays(1);
+		//fall through next case
 	case DayCountConvention::NISDAACTACT:
+		// if any of the date is a leap year
 		if (QDate::isLeapYear(CurrIPD.year()) || QDate::isLeapYear(PrevIPD.year())) {
+			//Adjust the coupon by the actual days between the accrual dates
 			TimeFactor = (
+				//days from start accrual date to end of year divided by days in that year (365 or 366 if it's leap)
 				(static_cast<double>(PrevIPD.daysTo(QDate(PrevIPD.year(), 12, 31))) / static_cast<double>(PrevIPD.daysInYear()))
+				// Full years between the two dates
+				+ qMax(0.0, static_cast<double>(CurrIPD.year() - PrevIPD.year()-1))
+				//days start of year to end accrual date to end of year divided by days in that year (365 or 366 if it's leap)
 				+ (static_cast<double>(QDate(CurrIPD.year(), 1, 1).daysTo(CurrIPD)) / static_cast<double>(CurrIPD.daysInYear()))
 			);
 		}
-		else return AdjustCoupon(AnnualCoupon, PrevIPD, CurrIPD, DayCountConvention::ACT365);
+		//Otherwise this is the same as ACT/365
+		else return AdjustCoupon(AnnualCoupon, PrevIPD, CurrIPD, static_cast<DayCountConvention>((static_cast<qint16>(DayCount)& (0x3 << CompoundShift)) | static_cast<qint16>(DayCountConvention::ACT365)));
 		break;
 	case DayCountConvention::ACT360:
+		// For non nominal day count conventions move payment dates that are in weekends or bank holidays
 		while (IsHoliday(CurrIPD)) CurrIPD = CurrIPD.addDays(1);
 		while (IsHoliday(PrevIPD)) PrevIPD = PrevIPD.addDays(1);
+		//fall through next case
 	case DayCountConvention::NACT360:
+		//Difference between the dates divided 360
 		TimeFactor = static_cast<double>(PrevIPD.daysTo(CurrIPD)) / 360.0;
 		break;
 	case DayCountConvention::ACT365:
+		// For non nominal day count conventions move payment dates that are in weekends or bank holidays
 		while (IsHoliday(CurrIPD)) CurrIPD = CurrIPD.addDays(1);
 		while (IsHoliday(PrevIPD)) PrevIPD = PrevIPD.addDays(1);
+		//fall through next case
 	case DayCountConvention::NACT365:
+		//Difference between the dates divided 365
 		TimeFactor = static_cast<double>(PrevIPD.daysTo(CurrIPD)) / 365.0;
 		break;
 	case DayCountConvention::AFBACTACT:
+		// For non nominal day count conventions move payment dates that are in weekends or bank holidays
 		while (IsHoliday(CurrIPD)) CurrIPD = CurrIPD.addDays(1);
 		while (IsHoliday(PrevIPD)) PrevIPD = PrevIPD.addDays(1);
-	case DayCountConvention::NAFBACTACT:
-		for (QDate TempDate = PrevIPD; TempDate <= CurrIPD; TempDate = TempDate.addYears(1)) {
+		//fall through next case
+	case DayCountConvention::NAFBACTACT:{
+		// if any date between start and end accrue is in a leap year use the difference between the dates divided 366
+		bool FoundLeap = false;
+		for (QDate TempDate = PrevIPD; TempDate <= CurrIPD && !FoundLeap; TempDate = TempDate.addYears(1)) {
 			if (QDate(TempDate.year(), 2, 29).isValid()) {
-				if(QDate(TempDate.year(), 2, 29) >= PrevIPD && QDate(TempDate.year(), 2, 29) <= CurrIPD)
+				if (QDate(TempDate.year(), 2, 29) >= PrevIPD && QDate(TempDate.year(), 2, 29) <= CurrIPD) {
 					TimeFactor = static_cast<double>(PrevIPD.daysTo(CurrIPD)) / 366.0;
+					FoundLeap = true;
+				}
 			}
 		}
-		TimeFactor = static_cast<double>(PrevIPD.daysTo(CurrIPD)) / 365.0;
+		//otherwise use the difference between the dates divided 365
+		if (!FoundLeap) TimeFactor = static_cast<double>(PrevIPD.daysTo(CurrIPD)) / 365.0;
 		break;
+	}
 	case DayCountConvention::ACTACT:
+		// For non nominal day count conventions move payment dates that are in weekends or bank holidays
 		while (IsHoliday(CurrIPD)) CurrIPD = CurrIPD.addDays(1);
 		while (IsHoliday(PrevIPD)) PrevIPD = PrevIPD.addDays(1);
+		//fall through next case
 	case DayCountConvention::NACTACT:
+		//difference between the dates divided by days in the end accrue year
 		TimeFactor = static_cast<double>(PrevIPD.daysTo(CurrIPD)) / CurrIPD.daysInYear();
 		break;
 	default:
 		TimeFactor = 1.0;
 	}
+	//Check the CompoundShift+1 th bit, if it's set calculate the interest as ((1+r)^t)-1
 	if (static_cast<qint16>(DayCount)& (1 << CompoundShift)) //Compounded
 		return qPow(1.0 + AnnualCoupon, TimeFactor) - 1.0;
+	//Check the CompoundShift+2 th bit, if it's set calculate the interest as e^(r*t)
 	else if (static_cast<qint16>(DayCount)& (1 << (1 + CompoundShift))) //Continuously Compounded
 		return qExp(AnnualCoupon*TimeFactor);
+	//Otherwise calculate the interest as r*t
 	else //Simple
 		return AnnualCoupon * TimeFactor;
 }
 bool IsHoliday(const QDate& a/*, const QString& CountryCode*/) {
+	//TODO check for bank holidays
 	return a.dayOfWeek() >= 6;
 }
 bool ValidDayCount(qint16 a) {
 	DayCountConvention b;
-	switch (a) {
+	switch (a & (((1 << CompoundShift) - 1))) {
 	case static_cast<qint16>(DayCountConvention::ACTACT) :
 	case static_cast<qint16>(DayCountConvention::ACT360) :
 	case static_cast<qint16>(DayCountConvention::ACT365) :
@@ -222,110 +280,20 @@ bool ValidDayCount(qint16 a) {
 	case static_cast<qint16>(DayCountConvention::AFBACTACT) :
 	case static_cast<qint16>(DayCountConvention::NISDAACTACT) :
 	case static_cast<qint16>(DayCountConvention::NAFBACTACT) :
-	case static_cast<qint16>(DayCountConvention::CompACTACT) :
-	case static_cast<qint16>(DayCountConvention::CompACT360) :
-	case static_cast<qint16>(DayCountConvention::CompACT365) :
-	case static_cast<qint16>(DayCountConvention::CompN30360) :
-	case static_cast<qint16>(DayCountConvention::CompNACTACT) :
-	case static_cast<qint16>(DayCountConvention::CompNACT360) :
-	case static_cast<qint16>(DayCountConvention::CompNACT365) :
-	case static_cast<qint16>(DayCountConvention::CompISMA30360) :
-	case static_cast<qint16>(DayCountConvention::CompISDAACTACT) :
-	case static_cast<qint16>(DayCountConvention::CompAFBACTACT) :
-	case static_cast<qint16>(DayCountConvention::CompNISDAACTACT) :
-	case static_cast<qint16>(DayCountConvention::CompNAFBACTACT) :
-	case static_cast<qint16>(DayCountConvention::ContCompACTACT) :
-	case static_cast<qint16>(DayCountConvention::ContCompACT360) :
-	case static_cast<qint16>(DayCountConvention::ContCompACT365) :
-	case static_cast<qint16>(DayCountConvention::ContCompN30360) :
-	case static_cast<qint16>(DayCountConvention::ContCompNACTACT) :
-	case static_cast<qint16>(DayCountConvention::ContCompNACT360) :
-	case static_cast<qint16>(DayCountConvention::ContCompNACT365) :
-	case static_cast<qint16>(DayCountConvention::ContCompISMA30360) :
-	case static_cast<qint16>(DayCountConvention::ContCompISDAACTACT) :
-	case static_cast<qint16>(DayCountConvention::ContCompAFBACTACT) :
-	case static_cast<qint16>(DayCountConvention::ContCompNISDAACTACT) :
-	case static_cast<qint16>(DayCountConvention::ContCompNAFBACTACT) :
-		return true;
+		return (a >> CompoundShift)<=2; //Special case
+		//return NumberOfSetBits(a >> CompoundShift) <= 1; //General case
 	default:
 		return false;
 	}
 }
 
-#include <QFile>
+
 void PrintToTempFile(const QString& TempFileName, const QString& Message, bool PrintTime) {
 	QFile TempFile("C:/Temp/" + TempFileName +".log");
 	if (!TempFile.open(QIODevice::Append | QIODevice::Text)) return;
 	QTextStream  TempWrite(&TempFile);
 	TempWrite << (PrintTime ? QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm "):QString()) + Message + '\n';
 	TempFile.close();
-}
-
-//UGLY!!!
-double GetLoanAssumption(const QString& LoanName, int columnIndex, QDate RefDate) {
-/*columnIndex
-0-Loan Identifier
-1-Senior Price
-2-Sub Price
-3-Default
-4-Senior Haircut Amt
-5-Senior Haircut Period
-6-Sub Haircut Amt
-7-Sub Haircut Period
-8-Prepay Period
-9-View
-*/
-	
-	QStringList Assumptions;
-	QStringList AKAs;
-	int FoundLoan = -1;
-	int LineCounter = 0;
-	if (columnIndex >= 0 && columnIndex <= 9 && !LoanName.isEmpty()) {
-		QFile AssumptionsFile(GetFromConfig("Folders", "UnifiedResultsFolder", R"(\\synserver2\Company Share\24AM\Monitoring\Model Results)") + '/' + GetFromConfig("Folders", "AssumptionsFile", "Loans Assumptions"));
-		if (AssumptionsFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-			QString CurrentLoan;
-			QTextStream Streamer(&AssumptionsFile);
-			while (!Streamer.atEnd() && FoundLoan < 0) {
-				CurrentLoan = Streamer.readLine();
-				CurrentLoan=CurrentLoan.right(CurrentLoan.size() - 1);
-				CurrentLoan=CurrentLoan.left(CurrentLoan.size() - 1);
-				Assumptions = CurrentLoan.split("#,#");
-				AKAs = Assumptions.first().split("$,$");
-				QRegExp WholeWordRX;
-				WholeWordRX.setCaseSensitivity(Qt::CaseInsensitive);
-				for (FoundLoan = 0; FoundLoan < AKAs.size(); ++FoundLoan) {
-					WholeWordRX.setPattern("\\b" + LoanName + "\\b");
-					if (AKAs.at(FoundLoan).contains(WholeWordRX))
-						break;
-					WholeWordRX.setPattern("\\b" + AKAs.at(FoundLoan) + "\\b");
-					if (LoanName.contains(WholeWordRX))
-						break;
-				}
-				if (FoundLoan >= AKAs.size()) FoundLoan = -1;
-				++LineCounter;
-			}
-			AssumptionsFile.close();
-		}
-	}
-	if (FoundLoan < 0) {
-		return -1.0;
-	}
-	else {
-		switch (columnIndex) {
-		case 0: //Scenario Name
-			return static_cast<double>(LineCounter);
-		case 3: //Default
-			return (Assumptions.at(3) == "False" ? 0.0 : 1.0);
-		case 5: //Senior Haircut Period
-		case 7: //Sub Haircut Period
-		case 8: //Prepay Period
-			if (RefDate.isNull()) RefDate = QDate::currentDate();
-			if (Assumptions.at(columnIndex).isEmpty()) return 0.0;
-			return qMax(1.0,static_cast<double>(Assumptions.at(columnIndex).toDouble() - MonthDiff(RefDate,QDate::fromString(Assumptions.last(), "yyyy-MM-dd"))));
-		default:
-			return Assumptions.at(columnIndex).toDouble();
-		}
-	}
 }
 
 QString InfixToPostfix(const QString& a) {
@@ -452,4 +420,9 @@ QString GetFromConfig(const QString& Domain, const QString& Field, const QString
 		}
 	}
 	return DefaultValue;
+}
+int NumberOfSetBits(quint32 i) {
+	i = i - ((i >> 1) & 0x55555555);
+	i = (i & 0x33333333) + ((i >> 2) & 0x33333333);
+	return (((i + (i >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24;
 }

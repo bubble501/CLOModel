@@ -8,6 +8,7 @@
 #include "DateTrigger.h"
 #include "VectorTrigger.h"
 #include "PoolSizeTrigger.h"
+#include "DeferredInterestTrigger.h"
 #include "TrancheTrigger.h"
 #include "CumulativeLossTrigger.h"
 #include <QStack>
@@ -175,6 +176,9 @@ Waterfall::Waterfall(const Waterfall& a)
 		case AbstractTrigger::TriggerType::CumulativeLossTrigger:
 			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new CumulativeLossTrigger(*(i.value().dynamicCast<CumulativeLossTrigger>()))));
 			break;
+		case AbstractTrigger::TriggerType::DeferredInterestTrigger:
+			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DeferredInterestTrigger(*(i.value().dynamicCast<DeferredInterestTrigger>()))));
+			break;
 		default:
 			break;
 		}
@@ -259,6 +263,9 @@ Waterfall& Waterfall::operator=(const Waterfall& a){
 			break;
 		case AbstractTrigger::TriggerType::CumulativeLossTrigger:
 			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new CumulativeLossTrigger(*(i.value().dynamicCast<CumulativeLossTrigger>()))));
+			break;
+		case AbstractTrigger::TriggerType::DeferredInterestTrigger:
+			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DeferredInterestTrigger(*(i.value().dynamicCast<DeferredInterestTrigger>()))));
 			break;
 		default:
 			break;
@@ -1833,6 +1840,9 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream){
 			case AbstractTrigger::TriggerType::CumulativeLossTrigger:
 				TempTrig.reset(new CumulativeLossTrigger());
 				break;
+			case AbstractTrigger::TriggerType::DeferredInterestTrigger:
+				TempTrig.reset(new DeferredInterestTrigger());
+				break;
 			}
 			TempTrig->SetLoadProtocolVersion(m_LoadProtocolVersion);
 			stream >> (*TempTrig);
@@ -2230,6 +2240,12 @@ bool Waterfall::EvaluateTrigger(quint32 TrigID, int PeriodIndex, const QDate& Cu
 		if (!TempTrig.HasAnchor())
 			TempTrig.SetAnchorDate(m_MortgagesPayments.GetDate(0));
 		return TempTrig.Passing(TotalLoss, m_MortgagesPayments.GetDate(PeriodIndex));
+	}
+	case AbstractTrigger::TriggerType::DeferredInterestTrigger:{
+		DeferredInterestTrigger TempTrig(*CurrentTrigger.dynamicCast<DeferredInterestTrigger>());
+		if (!TempTrig.HasAnchor())
+			TempTrig.FillMissingAnchorDate(m_MortgagesPayments.GetDate(0));
+		return TempTrig.Passing(m_Tranches, CurrentIPD);
 	}
 	default:
 		return false;

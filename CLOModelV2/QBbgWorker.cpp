@@ -82,9 +82,9 @@ void QBbgWorker::Send() {
 				UsedField.append(CurrentSingle->GetField());
 			}
 			if (GroupIter == CurrentList->begin()) {
-				for (QHash<QString, QString>::const_iterator OvrIter = CurrentSingle->GetOverrides().constBegin(); OvrIter != CurrentSingle->GetOverrides().constEnd(); OvrIter++) {
+				for (auto OvrIter = CurrentSingle->GetOverrides().constBegin(); OvrIter != CurrentSingle->GetOverrides().constEnd(); OvrIter++) {
 					Element CurrentOverrides = request.getElement("overrides").appendElement();
-					CurrentOverrides.setElement("fieldId", OvrIter.value().toLatin1().data());
+					CurrentOverrides.setElement("fieldId", OvrIter.key().toLatin1().data());
 					CurrentOverrides.setElement("value", OvrIter.value().toLatin1().data());
 				}
 			}
@@ -165,6 +165,7 @@ void QBbgWorker::handleResponseEvent(const BloombergLP::blpapi::Event& event) {
 	qint32 NumVals, NumFieldExep;
 	while (iter.next()) {
 		Message message = iter.message();
+		//message.print(std::cout);
 		const QList<qint64>* CurrentGroup = Groups.value(message.correlationId().asInteger(), nullptr);
 		if (CurrentGroup) {
 			if (message.hasElement("responseError")) {

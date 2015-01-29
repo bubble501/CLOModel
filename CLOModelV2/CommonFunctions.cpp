@@ -48,7 +48,7 @@ QString Commarize(double num,unsigned int precision){
 }
 
 double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, double Interest, const DayCountVector& Daycount) {
-	if(Dte.size()!=Flws.size() || Dte.size()==0 || Dte.size()<2) return 0.0;
+	if (Dte.size() != Flws.size() || Dte.isEmpty() || Daycount.IsEmpty()) return 0.0;
 	double Result=Flws.at(0);
 	double DiscountFactor=1.0;
 	for(int i=1;i<Dte.size();i++){
@@ -58,10 +58,10 @@ double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, double I
 	return Result;
 }
 double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, const BloombergVector& Interest, const DayCountVector& Daycount) {
-	if(Dte.size()!=Flws.size() || Dte.size()<2) return 0.0;
+	if (Dte.size() != Flws.size() || Dte.isEmpty() || Interest.IsEmpty() || Daycount.IsEmpty()) return 0.0;
 	BloombergVector AdjInterest(Interest);
-	if(AdjInterest.GetAnchorDate().isNull()) AdjInterest.SetAnchorDate(Dte.at(1));
-	double Result=Flws.at(0);
+	if (AdjInterest.GetAnchorDate().isNull() && Dte.size()>1) AdjInterest.SetAnchorDate(Dte.at(1));
+	double Result=Flws.first();
 	double DiscountFactor=1.0;
 	for(int i=1;i<Dte.size();i++){
 		DiscountFactor *= 1.0 + AdjustCoupon(AdjInterest.GetValue(Dte.at(i)), Dte.at(i - 1), Dte.at(i), Daycount.GetValue(Dte.at(i)));

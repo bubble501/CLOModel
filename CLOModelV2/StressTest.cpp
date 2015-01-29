@@ -147,7 +147,7 @@ void StressTest::RunStressTest() {
 void StressTest::BaseForFastCalculated() {
 	disconnect(BaseCalculator, SIGNAL(Calculated()), this, SLOT(BaseForFastCalculated()));
 	if (!ContinueCalculation) return StoppedCalculation();
-	BaseApplier->SetBaseFlows(BaseCalculator->GetAggregatedResults());
+	BaseApplier->SetBaseFlows(*BaseCalculator->GetAggregatedResults());
 	RunCurrentScenario();
 }
 void StressTest::RunCurrentScenario() {
@@ -190,7 +190,7 @@ void StressTest::RunCurrentScenario() {
 void StressTest::SlowLoansCalculated() {
 	if (!ContinueCalculation)  return StoppedCalculation();
 	Structure.ResetMtgFlows();
-	Structure.AddMortgagesFlows(BaseCalculator->GetAggregatedResults());
+	Structure.AddMortgagesFlows(*BaseCalculator->GetAggregatedResults());
 	AssumptionSet CurrentAss(
 		*(m_CPRscenarios.constBegin() + CurrentAssumption[AssCPR])
 		, *(m_CDRscenarios.constBegin() + CurrentAssumption[AssCDR])

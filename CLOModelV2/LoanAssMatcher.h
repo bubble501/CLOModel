@@ -25,7 +25,7 @@ protected:
 	virtual void BeeReturned(int Ident, const LoanAssMatcherResult& a) override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 private slots:
-	void ClearFilesInFolder() { m_FilesInFolder.clear(); }
+	void ClearFilesInFolder() { RETURN_WHEN_RUNNING(true, ) m_FilesInFolder.clear(); }
 private:
 	QFileInfoList m_FilesInFolder;
 	friend QDataStream& operator<<(QDataStream & stream, const LoanAssMatcher& flows);

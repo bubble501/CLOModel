@@ -294,7 +294,7 @@ void CentralUnit::CalculationStep2(){
 	MtgsProgress->setAutoClose(true);
 	QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 	Structure.ResetMtgFlows();
-	Structure.AddMortgagesFlows(LoansCalculator.GetAggregatedResults());
+	if (LoansCalculator.GetAggregatedResults()) Structure.AddMortgagesFlows(*LoansCalculator.GetAggregatedResults());
 	Structure.SetUseCall(false);
 	QString TmpStr=Structure.ReadyToCalculate();
 	if(!TmpStr.isEmpty()){

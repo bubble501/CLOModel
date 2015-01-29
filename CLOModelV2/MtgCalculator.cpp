@@ -17,6 +17,7 @@ MtgCalculator::MtgCalculator(QObject* parent)
 	, m_DownloadScenario(false)
 {}
 void MtgCalculator::AddLoan(const Mortgage& a, qint32 Index) {
+	RETURN_WHEN_RUNNING(true, )
 	auto FoundLn = Loans.find(Index);
 	if (FoundLn != Loans.end()) {
 		delete FoundLn.value();
@@ -25,7 +26,7 @@ void MtgCalculator::AddLoan(const Mortgage& a, qint32 Index) {
 	Loans.insert(Index, new Mortgage(a));
 }
 bool MtgCalculator::StartCalculation() {
-	if (m_ContinueCalculation) return false;
+	RETURN_WHEN_RUNNING(true, false)
 	if (!ReadyToCalculate().isEmpty()) return false;
 	{//Check if all base rates are valid
 		bool CheckAgain = false;
@@ -179,6 +180,7 @@ bool MtgCalculator::StartCalculation() {
 	return true;
 }
 void MtgCalculator::BeeReturned(int Ident, const MtgCashFlow& a) {
+	RETURN_WHEN_RUNNING(false, )
 	m_AggregatedRes+=a;
 	if (Loans.contains(Ident)) Loans[Ident]->SetCashFlows(a);
 	TemplAsyncCalculator<MtgCalculatorThread, MtgCashFlow>::BeeReturned(Ident, a);
@@ -209,17 +211,20 @@ void MtgCalculator::BeeReturned(int Ident, const MtgCashFlow& a) {
 }
 
 void MtgCalculator::ClearLoans() {
+	RETURN_WHEN_RUNNING(true, )
 	for (auto i = Loans.begin(); i != Loans.end(); i++) {
 		delete i.value();
 	}
 	Loans.clear();
 }
 void MtgCalculator::Reset(){
+	RETURN_WHEN_RUNNING(true, )
 	ClearLoans();
 	ClearTempProperties();
 	TemplAsyncCalculator<MtgCalculatorThread, MtgCashFlow>::Reset();
 }
 QString MtgCalculator::ReadyToCalculate()const{
+	RETURN_WHEN_RUNNING(true, "Calculator Already Running\n" )
 	QString Result;
 	QString TempStr;
 	if (StartDate.isNull()) Result += "Invalid Start Date\n";
@@ -238,6 +243,7 @@ QString MtgCalculator::ReadyToCalculate()const{
 }
 
 QDataStream& operator<<(QDataStream & stream, const MtgCalculator& flows) {
+	if (flows.m_ContinueCalculation) return stream;
 	stream
 		<< static_cast<qint32>(flows.Loans.size())
 		<< flows.m_UseStoredCashFlows
@@ -255,6 +261,7 @@ QDataStream& operator<<(QDataStream & stream, const MtgCalculator& flows) {
 	return flows.SaveToStream(stream);
 }
 QDataStream& MtgCalculator::LoadOldVersion(QDataStream& stream) {
+	RETURN_WHEN_RUNNING(true, stream)
 	Reset();
 	qint32 tempInt, TempKey;
 	stream >> tempInt;
@@ -277,19 +284,23 @@ QDataStream& MtgCalculator::LoadOldVersion(QDataStream& stream) {
 }
 
 void MtgCalculator::CompileReferenceRateValue(ForwardBaseRateTable& Values) {
+	RETURN_WHEN_RUNNING(true, )
 	for (auto i = Loans.begin(); i != Loans.end(); i++)
 		i.value()->CompileReferenceRateValue(Values);
 }
 void MtgCalculator::CompileReferenceRateValue(ConstantBaseRateTable& Values) {
+	RETURN_WHEN_RUNNING(true, )
 	for (auto i = Loans.begin(); i != Loans.end(); i++)
 		i.value()->CompileReferenceRateValue(Values);
 }
 #ifndef NO_DATABASE
 void MtgCalculator::GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll) {
+	RETURN_WHEN_RUNNING(true, )
 	for (auto i = Loans.begin(); i != Loans.end(); i++)
 		i.value()->GetBaseRatesDatabase(Values, DownloadAll);
 }
 void MtgCalculator::GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll) {
+	RETURN_WHEN_RUNNING(true, )
 	for (auto i = Loans.begin(); i != Loans.end(); i++)
 		i.value()->GetBaseRatesDatabase(Values, DownloadAll);
 }
@@ -298,17 +309,20 @@ QDataStream& operator>>(QDataStream & stream, MtgCalculator& flows) {
 	return flows.LoadOldVersion(stream);
 }
 void MtgCalculator::SetLoans(const QHash<qint32, Mortgage*>& a) {
+	RETURN_WHEN_RUNNING(true, )
 	ClearLoans();
 	for (auto i = a.constBegin(); i != a.constEnd(); ++i) {
 		Loans.insert(i.key(), new Mortgage(*(i.value())));
 	}
 }
 void MtgCalculator::ClearResults() {
+	RETURN_WHEN_RUNNING(true, )
 	m_AggregatedRes.Clear();
 	TemplAsyncCalculator<MtgCalculatorThread, MtgCashFlow>::ClearResults();
 }
 #ifndef NO_DATABASE
 void MtgCalculator::DownloadScenarios() {
+	RETURN_WHEN_RUNNING(true, )
 	ClearTempProperties();
 	QCache<QString, LoanAssumption> AssumptionCache;
 	for (auto i = Loans.constBegin(); i != Loans.constEnd(); ++i) { 
@@ -456,6 +470,7 @@ void MtgCalculator::DownloadScenarios() {
 }
 
 void MtgCalculator::GuessLoanScenarios(bool OverrideAss) {
+	RETURN_WHEN_RUNNING(true, )
 	QHash<QString,LoanAssumption*> AvailableAssumptions;
 	Db_Mutex.lock();
 	{
@@ -507,12 +522,14 @@ void MtgCalculator::GuessLoanScenarios(bool OverrideAss) {
 
 #endif
 void MtgCalculator::ClearTempProperties() {
+	RETURN_WHEN_RUNNING(true, )
 	for (auto i = TempProperties.begin(); i != TempProperties.end(); ++i)
 		delete i.value();
 	TempProperties.clear();
 }
 
 void MtgCalculator::AddTempProperty(qint32 LoanID, const QString& PropertyName, const QString& PropertyValue) {
+	RETURN_WHEN_RUNNING(true, )
 	if (!Loans.contains(LoanID) || PropertyName.isEmpty() || PropertyValue.isEmpty())return;
 	auto iter=TempProperties.find(LoanID);
 	if (iter == TempProperties.end()) iter=TempProperties.insert(LoanID, new QHash<QString, QString>());

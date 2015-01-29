@@ -30,6 +30,57 @@
 #include "CheckAndEdit.h"
 int main(int argc, char *argv[]) {
 
+	QList<QDate> FlowDates;
+	FlowDates 
+		<< QDate(2013, 6, 1)
+// 		<< QDate(2015, 9, 1)
+// 		<< QDate(2015, 12, 1)
+// 		<< QDate(2016, 3, 1)
+// 		<< QDate(2016, 6, 1)
+// 		<< QDate(2016, 9, 1)
+// 		<< QDate(2016, 12, 1)
+// 		<< QDate(2017, 3, 1)
+// 		<< QDate(2017, 6, 1)
+// 		<< QDate(2017, 9, 1)
+// 		<< QDate(2017, 12, 1)
+// 		<< QDate(2018, 3, 1)
+// 		<< QDate(2018, 6, 1)
+// 		<< QDate(2018, 9, 1)
+// 		<< QDate(2018, 12, 1)
+// 		<< QDate(2019, 3, 1)
+// 		<< QDate(2019, 6, 1)
+// 		<< QDate(2019, 9, 1)
+// 		<< QDate(2019, 12, 1)
+// 		<< QDate(2020, 3, 1)
+		<< QDate(2015, 6, 1)
+	;
+	QList<double> Flows;
+	Flows << -100.00000
+// 		<< 1.27778
+// 		<< 1.26389
+// 		<< 1.26389
+// 		<< 1.27778
+// 		<< 1.27778
+// 		<< 1.26389
+// 		<< 1.25000
+// 		<< 1.27778
+// 		<< 1.27778
+// 		<< 1.26389
+// 		<< 1.25000
+// 		<< 1.27778
+// 		<< 1.27778
+// 		<< 1.26389
+// 		<< 1.25000
+// 		<< 1.27778
+// 		<< 1.27778
+// 		<< 1.26389
+// 		<< 1.26389
+		<< 110.1389
+	;
+	qDebug() << CalculateNPV(FlowDates, Flows, "A 06/01/2013 5 12S 6" , DayCountVector("106"));
+	qDebug() << CalculateNPV(FlowDates, Flows, "A 06/01/2013 5 11S 6", DayCountVector("106"));
+	qDebug() << CalculateNPV(FlowDates, Flows, 0.06, DayCountVector("106"));
+
 	//QApplication a(argc, argv);
 	//ConsoleTestObj b;
 	//return a.exec();

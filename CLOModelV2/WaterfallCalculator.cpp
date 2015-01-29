@@ -3,13 +3,14 @@ WaterfallCalculator::WaterfallCalculator(QObject* parent)
 	:TemplAsyncCalculator <WaterfallCalcThread, Waterfall>(parent)
 {}
 void WaterfallCalculator::AddWaterfall(const Waterfall& a, qint32 ID) {
+	RETURN_WHEN_RUNNING(true, )
 	if (m_Cascades.contains(ID)) {
 		delete m_Cascades[ID];
 	}
 	m_Cascades[ID] = new Waterfall(a);
 }
 bool WaterfallCalculator::StartCalculation() {
-	if (m_ContinueCalculation) return false;
+	RETURN_WHEN_RUNNING(true, false)
 	BeesReturned = 0;
 	BeesSent.clear();
 	if (!ReadyToCalculate().isEmpty()) return false;
@@ -29,8 +30,8 @@ bool WaterfallCalculator::StartCalculation() {
 	return true;
 }
 void WaterfallCalculator::BeeReturned(int Ident, const Waterfall& a) {
+	RETURN_WHEN_RUNNING(false, )
 	TemplAsyncCalculator <WaterfallCalcThread, Waterfall > ::BeeReturned(Ident, a);
-	if (!m_ContinueCalculation) return;
 	WaterfallCalcThread* CurrentThread;
 	for (auto SingleWaterfall = m_Cascades.begin(); SingleWaterfall != m_Cascades.end(); ++SingleWaterfall) {
 		if (BeesSent.contains(SingleWaterfall.key())) continue;
@@ -41,6 +42,7 @@ void WaterfallCalculator::BeeReturned(int Ident, const Waterfall& a) {
 	}
 }
 QString WaterfallCalculator::ReadyToCalculate() const {
+	RETURN_WHEN_RUNNING(true, "Calculator Already Running\n")
 	QString Res = "";
 	for (auto i = m_Cascades.constBegin(); i != m_Cascades.constEnd(); ++i) {
 		Res += i.value()->ReadyToCalculate();
@@ -49,11 +51,13 @@ QString WaterfallCalculator::ReadyToCalculate() const {
 }
 
 void WaterfallCalculator::Reset() {
+	RETURN_WHEN_RUNNING(true, )
 	ClearWaterfalls();
 	TemplAsyncCalculator<WaterfallCalcThread, Waterfall>::Reset();
 }
 
 void WaterfallCalculator::ClearWaterfalls() {
+	RETURN_WHEN_RUNNING(true, )
 	for (auto i = m_Cascades.begin(); i != m_Cascades.end(); ++i) {
 		delete i.value();
 	}

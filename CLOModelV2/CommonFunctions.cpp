@@ -254,9 +254,9 @@ double AdjustCoupon(double AnnualCoupon /*Annualised Coupon*/, QDate PrevIPD /*I
 	//Check the CompoundShift+1 th bit, if it's set calculate the interest as ((1+r)^t)-1
 	if (static_cast<qint16>(DayCount)& (1 << CompoundShift)) //Compounded
 		return qPow(1.0 + AnnualCoupon, TimeFactor) - 1.0;
-	//Check the CompoundShift+2 th bit, if it's set calculate the interest as e^(r*t)
+	//Check the CompoundShift+2 th bit, if it's set calculate the interest as (e^(r*t))-1
 	else if (static_cast<qint16>(DayCount)& (1 << (1 + CompoundShift))) //Continuously Compounded
-		return qExp(AnnualCoupon*TimeFactor);
+		return qExp(AnnualCoupon*TimeFactor)-1.0;
 	//Otherwise calculate the interest as r*t
 	else //Simple
 		return AnnualCoupon * TimeFactor;

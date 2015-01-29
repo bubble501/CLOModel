@@ -15,11 +15,11 @@ TrancheCashFlow::TrancheCashFlow(double ThrancheOutstanding)
 	/*for (qint32 i = static_cast<qint32>(TrancheFlowType::InterestFlow); i < (static_cast<qint32>(TrancheFlowType::InterestFlow) << 1); ++i) {
 		SetLabel(i, QString("Interest %1").arg(i - static_cast<qint32>(TrancheFlowType::InterestFlow) + 1));
 	}*/
-	for (qint32 i = static_cast<qint32>(TrancheFlowType::DeferredFlow); i < (static_cast<qint32>(TrancheFlowType::DeferredFlow) << 1); ++i) {
+	for (qint32 i = static_cast<qint32>(TrancheFlowType::DeferredFlow); i < (static_cast<qint32>(TrancheFlowType::DeferredFlow) | static_cast<qint32>(TrancheFlowType::InterestFlow)); ++i) {
 		//SetLabel(i, QString("Deferred Interest %1").arg(i - static_cast<qint32>(TrancheFlowType::DeferredFlow) + 1));
 		SetStock(i);
 	}
-	/*for (qint32 i = static_cast<qint32>(TrancheFlowType::AccruedFlow); i < (static_cast<qint32>(TrancheFlowType::AccruedFlow) << 1); ++i) {
+	/*for (qint32 i = static_cast<qint32>(TrancheFlowType::AccruedFlow); i < (static_cast<qint32>(TrancheFlowType::AccruedFlow) | static_cast<qint32>(TrancheFlowType::InterestFlow)); ++i) {
 		SetLabel(i, QString("Accrued Interest %1").arg(i - static_cast<qint32>(TrancheFlowType::AccruedFlow) + 1));
 	}*/
 	SetLabel(static_cast<qint32>(TrancheFlowType::PrincipalFlow), "Principal");

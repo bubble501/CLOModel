@@ -46,7 +46,7 @@ public:
 	template<class T> double GetTotalDeferred(const T& index)const {
 		static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetDeferred can be used only with int or QDate");
 		double Result = 0;
-		for (qint32 i = static_cast<qint32>(TrancheFlowType::DeferredFlow); i < (static_cast<qint32>(TrancheFlowType::DeferredFlow) << 1); ++i) {
+		for (qint32 i = static_cast<qint32>(TrancheFlowType::DeferredFlow); i < (static_cast<qint32>(TrancheFlowType::DeferredFlow) | static_cast<qint32>(TrancheFlowType::InterestFlow)); ++i) {
 			Result += GetFlow(index, i);
 		}
 		return Result;
@@ -54,7 +54,7 @@ public:
 	template<class T> double GetTotalAccrued(const T& index)const {
 		static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetAccrued can be used only with int or QDate");
 		double Result = 0;
-		for (qint32 i = static_cast<qint32>(TrancheFlowType::AccruedFlow); i < (static_cast<qint32>(TrancheFlowType::AccruedFlow) << 1); ++i) {
+		for (qint32 i = static_cast<qint32>(TrancheFlowType::AccruedFlow); i < (static_cast<qint32>(TrancheFlowType::AccruedFlow) | static_cast<qint32>(TrancheFlowType::InterestFlow)); ++i) {
 			Result += GetFlow(index, i);
 		}
 		return Result;

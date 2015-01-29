@@ -13,6 +13,7 @@
 #include <QStack>
 #include "AbstractTrigger.h"
 #include <QXmlStreamReader>
+#include <QFile>
 #ifndef NO_DATABASE
 QMutex Db_Mutex;
 #endif
@@ -279,13 +280,14 @@ bool ValidDayCount(qint16 a) {
 	case static_cast<qint16>(DayCountConvention::AFBACTACT) :
 	case static_cast<qint16>(DayCountConvention::NISDAACTACT) :
 	case static_cast<qint16>(DayCountConvention::NAFBACTACT) :
-		return (a >> CompoundShift)<=2;
+		return (a >> CompoundShift)<=2; //Special case
+		//return NumberOfSetBits(a >> CompoundShift) <= 1; //General case
 	default:
 		return false;
 	}
 }
 
-#include <QFile>
+
 void PrintToTempFile(const QString& TempFileName, const QString& Message, bool PrintTime) {
 	QFile TempFile("C:/Temp/" + TempFileName +".log");
 	if (!TempFile.open(QIODevice::Append | QIODevice::Text)) return;
@@ -418,4 +420,9 @@ QString GetFromConfig(const QString& Domain, const QString& Field, const QString
 		}
 	}
 	return DefaultValue;
+}
+int NumberOfSetBits(quint32 i) {
+	i = i - ((i >> 1) & 0x55555555);
+	i = (i & 0x33333333) + ((i >> 2) & 0x33333333);
+	return (((i + (i >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24;
 }

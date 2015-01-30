@@ -2,31 +2,25 @@
 All the components are designed to build on all [platforms supported by Qt](http://doc.qt.io/qt-5/supported-platforms.html) however, the excel interaction relies on comdef.h that is a component of Visual C and available on windows only
 ## Pre-Requisites
 ### C++11
-*Developed using MSVC13*
-
+*Developed using MSVC13*<br/>
 To build the code you'll need a compiler conforming to [C++11 standard](http://en.wikipedia.org/wiki/C%2B%2B11).<br/>
 The code is compatible with the subset of the standard implemented by MSVC.<br/>
 [GCC](https://gcc.gnu.org/), Visual Studio's MSVC and XCode's LLVM are all valid compilers
 ### Boost
-*Developed using version 1.57.0*
-
+*Developed using version 1.57.0*<br/>
 [Download](http://www.boost.org/users/download/) and unpack the library. There is no need to build it.
 ### Qt
-*Developed using version 5.3.2*
-
+*Developed using version 5.3.2*<br/>
 [Download](http://www.qt.io/download-open-source/) and install Qt libraries, the open source version is sufficient.<br/>
 If you use versions of the library higher than 5.9, minor changes in the code may be required in order for it to compile successfully.
 ### zlib
-*Developed using version 1.2.8*
-
+*Developed using version 1.2.8*<br/>
 [Download](http://www.zlib.net/) the compiled DLL of the library or download the source code and compile it as a dynamic library following the instructions included with the source.
 ### Bloomberg
-*Developed using version 3.7.5.1*
-
+*Developed using version 3.7.5.1*<br/>
 [Download](http://www.bloomberglabs.com/api/libraries/) the Bloomberg API library for C++.
 ### Quazip
-*Developed using version 0.7.1*
-
+*Developed using version 0.7.1*<br/>
 [Download](http://sourceforge.net/projects/quazip/) and build Quazip library using the instructions below
 <pre><code>Unpack the source code in a path that does not contain spaces (we'll refer to this path as [path-to-quazip], we'll also refer to the path where you downloaded zlib as [path-to-zlib], no spaces allowed in it either)
 Open the Qt terminal as administrator
@@ -46,9 +40,11 @@ make install
 The library will be installed in C:\Quazip; to change this path change the PREFIX value above.
 </code></pre>
 ### KDChart
-*Developed using version 2.5.1*
-
+*Developed using version 2.5.1*<br/>
 [Download](https://customers.kdab.com/download.php) KDChart source code (registration to the website may be required) and build it using the instructions included.
+### Simstring
+*Developed using version 1.0*<br/>
+[Download](http://chokkan.org/software/simstring/) and unpack the simstring library. There is no need to build it
 ## Set up the environment
 The following environmental variables are needed in order to be able to compile the code. All the path should NOT contain any space
     <ul><li>[How to set environment variables in Windows](http://www.computerhope.com/issues/ch000549.htm)</li>
@@ -58,11 +54,15 @@ The following environmental variables are needed in order to be able to compile 
 <li>BOOSTPATH - Path to the boost folder of the Boost C++ library. (e.g. C:\Boost\Boost-1.57)</li>
 <li>KDCHARTPATH - Path to the include folder of the KDChart library. (e.g. C:\KDAB\KDChart-2.5.1)</li>
 <li>QUAZIPPATH - Path to the include folder of the Quazip library. (e.g. C:\Quazip)</li>
-<li>ZLIBPATH - Path to the include folder of the zlib library. (e.g. C:\Zlib)</li></ul>
+<li>ZLIBPATH - Path to the include folder of the zlib library. (e.g. C:\Zlib)</li>
+<li>SIMSTRINGPATH - Path to the include folder of the simstring library. (e.g. C:\simstring-1.0)</li></ul>
+To build the Installer you'll need to define these additional variables:
+<ul><li>QTPATH - Path to the include folder of the Qt Libraries. (e.g. C:\Qt5\5.3\msvc2013)</li></ul>
 ## Visual Studio
 [Download](http://www.qt.io/download-open-source) and install the Qt Visual Studio Addin.<br/>
 [Download](http://wixtoolset.org/) and install WiX Toolset<br/>
 Open the solution file.<br/>
 Build the projects individually (Do not use "Build Solution" as it will incur in a race condition an possibly fail).
 ## Documentation
-To generate the library documentation use the [Doxigen](www.doxygen.org) toolset. Just open the .doxyfile file included using doxywizard.exe
+To generate the library documentation use the [Doxigen](www.doxygen.org) toolset. Just open the .doxyfile file included using doxywizard.exe.<br/>
+You'll need to generate the .Net documentation before building the Installer otherwise it will fail.

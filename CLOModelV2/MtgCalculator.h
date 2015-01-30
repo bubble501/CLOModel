@@ -10,11 +10,13 @@
 #include "MtgCalculatorThread.h"
 class Mortgage;
 class MtgCashFlow;
+namespace simstring { class reader; }
 class MtgCalculator : public TemplAsyncCalculator <MtgCalculatorThread,MtgCashFlow>{
 	Q_OBJECT
 public slots:
 	virtual bool StartCalculation() override;
 public:
+	virtual QHash<QString, double> GetGeographicBreakdown() const;
 	virtual QString ReadyToCalculate() const override;
 	MtgCalculator(QObject* parent = 0);
 	virtual ~MtgCalculator() { Reset(); }
@@ -60,6 +62,8 @@ private:
 	void AddTempProperty(qint32 LoanID, const QString& PropertyName, const QString& PropertyValue);
 	QHash<qint32, QHash<QString, QString>* > TempProperties;
 protected:
+	QString GetGeography(const QString& guess, simstring::reader& dbr) const;
+	QString GetCountryISOCode(QString name) const;
 	QHash<qint32, Mortgage*> Loans;
 	QString m_CPRass;
 	QString m_CDRass;

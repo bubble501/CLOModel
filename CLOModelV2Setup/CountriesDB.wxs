@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <DirectoryRef Id="COUNTYDB" />
+    </Fragment>
+    <Fragment>
+        <ComponentGroup Id="CountiesDBGroup">
+            <Component Id="cmp33D91B1FA1192B6C3095A310CCC08BAE" Directory="COUNTYDB" Guid="*">
+                <File Id="filF1EA788AC1DE4BDB706368109D7C8967" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb" />
+            </Component>
+            <Component Id="cmp0C0786CF4BECDAD5CF3BCD5B75D51488" Directory="COUNTYDB" Guid="*">
+                <File Id="fil0386CCD55886D4ADDBF0F00025EB92B1" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.1.cdb" />
+            </Component>
+            <Component Id="cmp7EE3917166FA8EA1F164B3D23160212C" Directory="COUNTYDB" Guid="*">
+                <File Id="filF8244DEEE9A49468484C497D68DDB017" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.10.cdb" />
+            </Component>
+            <Component Id="cmpC5688567F495FD248100B97EE4589D37" Directory="COUNTYDB" Guid="*">
+                <File Id="fil84EF92918A9205F73A391E32A8ECE307" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.11.cdb" />
+            </Component>
+            <Component Id="cmp16DD3AEC5A6BCE3C82F524A4025A89FD" Directory="COUNTYDB" Guid="*">
+                <File Id="fil55713B119296EAD6EEF0ECA32D5D6698" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.12.cdb" />
+            </Component>
+            <Component Id="cmp8432DDD91DC39BD936D40BAEAA7C6DAC" Directory="COUNTYDB" Guid="*">
+                <File Id="filF917ED441E699521FA7279F4256505AF" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.13.cdb" />
+            </Component>
+            <Component Id="cmp10B50B4C3126E4C4862C0C85AB2401E5" Directory="COUNTYDB" Guid="*">
+                <File Id="filDC17C8F3F6CEC8A23AC2D4F348870524" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.14.cdb" />
+            </Component>
+            <Component Id="cmp5374AB77BD41C38E305179915C38F9C3" Directory="COUNTYDB" Guid="*">
+                <File Id="fil82645A7AD59CC8119148A703D0C33BEA" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.15.cdb" />
+            </Component>
+            <Component Id="cmpC119A888FD9B1ABB77A5FBF874A573F3" Directory="COUNTYDB" Guid="*">
+                <File Id="filFA3DD53D069CE9FB23B27B03E2D9AB0F" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.16.cdb" />
+            </Component>
+            <Component Id="cmp599A616B13439394055992C8689B91EA" Directory="COUNTYDB" Guid="*">
+                <File Id="fil1802EB38F3CBB1BC989A7AB47E2288A8" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.17.cdb" />
+            </Component>
+            <Component Id="cmp4E3EF588C05E4BFDC3DDB9A514D2D5B4" Directory="COUNTYDB" Guid="*">
+                <File Id="fil08CA531623EACB1D501E39EB19AAA939" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.18.cdb" />
+            </Component>
+            <Component Id="cmp8427E6AFFE92E709C16070F8BDE65356" Directory="COUNTYDB" Guid="*">
+                <File Id="fil1F23D41F63CF4C4F4D8905909BA810F0" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.19.cdb" />
+            </Component>
+            <Component Id="cmp084D4BE1D3E2DDF8F1B44306C1091BEB" Directory="COUNTYDB" Guid="*">
+                <File Id="filE2EC091EFB9001A5EB490045AD80E613" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.2.cdb" />
+            </Component>
+            <Component Id="cmp35F829E79A32ECBD3AC3EAAA8AA42107" Directory="COUNTYDB" Guid="*">
+                <File Id="fil906B647BE8D0577FA900D922DDDE49F3" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.20.cdb" />
+            </Component>
+            <Component Id="cmp1F33946105F7B75C3C7F21635A38B550" Directory="COUNTYDB" Guid="*">
+                <File Id="filB44B7A0C9FF7A4DCBFF49A0FE80EDB2C" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.21.cdb" />
+            </Component>
+            <Component Id="cmp8B60B691D3D086306D59E774807263DE" Directory="COUNTYDB" Guid="*">
+                <File Id="fil69D1D81BCF2A56E6B4D6CA3763B003FA" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.22.cdb" />
+            </Component>
+            <Component Id="cmpDC193DF0069D4354CFFF3F308063315F" Directory="COUNTYDB" Guid="*">
+                <File Id="fil56811C3C083D65462B3D59E604EE9B5A" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.23.cdb" />
+            </Component>
+            <Component Id="cmp218A9ACB8E490F06116139D2C6D257A7" Directory="COUNTYDB" Guid="*">
+                <File Id="filBF1D44A6DBE58959C57BC887E7D7EA26" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.25.cdb" />
+            </Component>
+            <Component Id="cmp6FB6A90546D8F6A6025DDE44B4580A9D" Directory="COUNTYDB" Guid="*">
+                <File Id="fil71F1968D68062BFE4E3131F3925EA477" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.26.cdb" />
+            </Component>
+            <Component Id="cmpD458DD77849CEC9F4EE1E63D90A6B552" Directory="COUNTYDB" Guid="*">
+                <File Id="filE6EA76294385E15933AAC9186961620D" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.28.cdb" />
+            </Component>
+            <Component Id="cmpB1BF29FD44D70B81759940F6CE529957" Directory="COUNTYDB" Guid="*">
+                <File Id="filCC1BC17FFD738164C841CD2F1A422768" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.3.cdb" />
+            </Component>
+            <Component Id="cmp0698EAFB0CA4BBDBFBE873D1B9487AAA" Directory="COUNTYDB" Guid="*">
+                <File Id="fil99F0BD05DDD1787ABD4ECCF071122C46" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.30.cdb" />
+            </Component>
+            <Component Id="cmp28E1C8DC98941FDE66652BB330CEFF8B" Directory="COUNTYDB" Guid="*">
+                <File Id="fil76F2F12D7E03165DC7083736834A59EC" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.31.cdb" />
+            </Component>
+            <Component Id="cmpA27FAD09A111163301C56BCDA515B400" Directory="COUNTYDB" Guid="*">
+                <File Id="filC09F1FC91E7E6FA7D562A2290906B990" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.34.cdb" />
+            </Component>
+            <Component Id="cmp46FFDB0C631A9C83BA8063AFAD64AECC" Directory="COUNTYDB" Guid="*">
+                <File Id="fil75639865EA6C44C6FE879291DABFF754" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.35.cdb" />
+            </Component>
+            <Component Id="cmp8B37F7190CDD5F905C3C7DAA603F87CE" Directory="COUNTYDB" Guid="*">
+                <File Id="fil877F3B62F245D63D7D38D8F07EB67CF5" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.4.cdb" />
+            </Component>
+            <Component Id="cmp305FCFB618B0C1ABCE88C4D44EE2F227" Directory="COUNTYDB" Guid="*">
+                <File Id="fil5ED9AD42A5D925C336DE15DD1BFF11F1" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.42.cdb" />
+            </Component>
+            <Component Id="cmp0722DC74859C4E2EB81A34F626153A87" Directory="COUNTYDB" Guid="*">
+                <File Id="fil7FE7F0CBC2AC27E649BA3B64CAF5E699" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.5.cdb" />
+            </Component>
+            <Component Id="cmp05A84B9911633A362D72CB7DFA1DAE5D" Directory="COUNTYDB" Guid="*">
+                <File Id="filC2F878747F7A7047779810C1395FE07A" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.50.cdb" />
+            </Component>
+            <Component Id="cmpCD20DD301AAEA3D3AD54D1FC3542BE18" Directory="COUNTYDB" Guid="*">
+                <File Id="fil842DBB5FCF17BE20094104F19F0292CB" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.6.cdb" />
+            </Component>
+            <Component Id="cmp6942EEC02113D64308299A746AD8CA87" Directory="COUNTYDB" Guid="*">
+                <File Id="fil097626213E1460C0E174FA1BCEE4E57B" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.7.cdb" />
+            </Component>
+            <Component Id="cmp09FBCC6BBF577EB2F2487EC30096B94E" Directory="COUNTYDB" Guid="*">
+                <File Id="filF182FDBB92A02D14A10DC0912769450D" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.8.cdb" />
+            </Component>
+            <Component Id="cmp8129E43A524A7C449EBF300A3E1E671F" Directory="COUNTYDB" Guid="*">
+                <File Id="fil6BBB8BE40519F05B94ECD85CF80643D5" KeyPath="yes" Source="$(var.CountriesDBDir)\ISO3166-1.ssdb.9.cdb" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

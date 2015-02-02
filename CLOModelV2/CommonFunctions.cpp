@@ -14,6 +14,7 @@
 #include "AbstractTrigger.h"
 #include <QXmlStreamReader>
 #include <QFile>
+#include "simstring.h"
 #ifndef NO_DATABASE
 QMutex Db_Mutex;
 #endif
@@ -48,7 +49,7 @@ QString Commarize(double num,unsigned int precision){
 }
 
 double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, double Interest, const DayCountVector& Daycount) {
-	if(Dte.size()!=Flws.size() || Dte.size()==0 || Dte.size()<2) return 0.0;
+	if (Dte.size() != Flws.size() || Dte.isEmpty() || Daycount.IsEmpty()) return 0.0;
 	double Result=Flws.at(0);
 	double DiscountFactor=1.0;
 	for(int i=1;i<Dte.size();i++){
@@ -58,10 +59,10 @@ double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, double I
 	return Result;
 }
 double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, const BloombergVector& Interest, const DayCountVector& Daycount) {
-	if(Dte.size()!=Flws.size() || Dte.size()<2) return 0.0;
+	if (Dte.size() != Flws.size() || Dte.isEmpty() || Interest.IsEmpty() || Daycount.IsEmpty()) return 0.0;
 	BloombergVector AdjInterest(Interest);
-	if(AdjInterest.GetAnchorDate().isNull()) AdjInterest.SetAnchorDate(Dte.at(1));
-	double Result=Flws.at(0);
+	if (AdjInterest.GetAnchorDate().isNull() && Dte.size()>1) AdjInterest.SetAnchorDate(Dte.at(1));
+	double Result=Flws.first();
 	double DiscountFactor=1.0;
 	for(int i=1;i<Dte.size();i++){
 		DiscountFactor *= 1.0 + AdjustCoupon(AdjInterest.GetValue(Dte.at(i)), Dte.at(i - 1), Dte.at(i), Daycount.GetValue(Dte.at(i)));
@@ -254,9 +255,9 @@ double AdjustCoupon(double AnnualCoupon /*Annualised Coupon*/, QDate PrevIPD /*I
 	//Check the CompoundShift+1 th bit, if it's set calculate the interest as ((1+r)^t)-1
 	if (static_cast<qint16>(DayCount)& (1 << CompoundShift)) //Compounded
 		return qPow(1.0 + AnnualCoupon, TimeFactor) - 1.0;
-	//Check the CompoundShift+2 th bit, if it's set calculate the interest as e^(r*t)
+	//Check the CompoundShift+2 th bit, if it's set calculate the interest as (e^(r*t))-1
 	else if (static_cast<qint16>(DayCount)& (1 << (1 + CompoundShift))) //Continuously Compounded
-		return qExp(AnnualCoupon*TimeFactor);
+		return qExp(AnnualCoupon*TimeFactor)-1.0;
 	//Otherwise calculate the interest as r*t
 	else //Simple
 		return AnnualCoupon * TimeFactor;
@@ -425,4 +426,83 @@ int NumberOfSetBits(quint32 i) {
 	i = i - ((i >> 1) & 0x55555555);
 	i = (i & 0x33333333) + ((i >> 2) & 0x33333333);
 	return (((i + (i >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24;
+}
+void BuildDBCountries(const QString& path) {
+	if (QFile::exists(path)) {
+		/*if (
+		QMessageBox::question(this, tr("Are you sure?"), tr("This action will overwrite the existing DB\nAre you sure you want to continue?"))
+		!= QMessageBox::Yes) return EnableUserInput();*/
+		QFileInfo FiletoDelete(path);
+		QDir ParDir = FiletoDelete.absoluteDir();
+		ParDir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
+		ParDir.setNameFilters(QStringList() << "*.ssdb.*.cdb");
+		auto FilesInFolder = ParDir.entryInfoList(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
+		for (auto fifi = FilesInFolder.constBegin(); fifi != FilesInFolder.constEnd(); ++fifi) {
+			if (FiletoDelete.baseName() == fifi->baseName()) {
+				QFile::remove(fifi->absoluteFilePath());
+			}
+		}
+		QFile::remove(FiletoDelete.absoluteFilePath());
+	}
+	else {
+		QDir TmpDir =QFileInfo(path).absoluteDir();
+		if (!TmpDir.exists()) TmpDir.mkpath(".");
+	}
+	int CountCountries = 0;
+	{
+		QFile InputFile(":/DataSources/ISO3166-1.xml");
+		InputFile.open(QIODevice::ReadOnly);
+		QXmlStreamReader xml(&InputFile);
+		while (!xml.atEnd() && !xml.hasError()) {
+			xml.readNext();
+			if (xml.isStartElement()) {
+				if (xml.name() == "Country") ++CountCountries;
+			}
+		}
+		if (xml.hasError()) return;
+		InputFile.close();
+	}
+
+
+	simstring::ngram_generator gen(3, false);
+	simstring::writer_base<std::wstring> dbw(gen, path.toStdString());
+	QStringList NameList;
+	{
+		QFile InputFile(":/DataSources/ISO3166-1.xml");
+		InputFile.open(QIODevice::ReadOnly);
+		bool CountryFound = false;
+		bool NameFound = false;
+		QXmlStreamReader xml(&InputFile);
+		while (!xml.atEnd() && !xml.hasError()) {
+			xml.readNext();
+			if (xml.isStartElement()) {
+				if (xml.name() == "Country") {
+					if (CountryFound) { dbw.close(); return; }
+					CountryFound = true;
+				}
+				else if (CountryFound && xml.name() == "Name") {
+					if (NameFound) { dbw.close(); return; }
+					NameFound = true;
+				}
+			}
+			else if (xml.isEndElement()) {
+				if (xml.name() == "Country") {
+					if (!CountryFound || NameFound) { dbw.close(); return; }
+					CountryFound = false;
+				}
+				else if (xml.name() == "Name") {
+					if (!NameFound) { dbw.close(); return; }
+					NameFound = false;
+				}
+			}
+			else if (xml.isCharacters() && NameFound) {
+				NameList = xml.text().toString().split("#,#", QString::SkipEmptyParts);
+				for (auto nli = NameList.constBegin(); nli != NameList.constEnd(); ++nli) dbw.insert(nli->trimmed().toLower().toStdWString());
+			}
+		}
+		if (xml.hasError()) { dbw.close(); return; }
+		InputFile.close();
+	}
+	dbw.close();
+	return;
 }

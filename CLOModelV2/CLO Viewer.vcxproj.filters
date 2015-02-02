@@ -59,12 +59,6 @@
     <ClCompile Include="GeneratedFiles\Release\moc_MtgCalculatorThread.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_ProgressWidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_ProgressWidget.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_StandaloneViewer.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
@@ -168,9 +162,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ChartsWidget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ProgressWidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="StressViewer.cpp">
@@ -308,6 +299,9 @@
     <ClCompile Include="CumulativeLossTrigger.cpp">
       <Filter>Source Files\Core Files</Filter>
     </ClCompile>
+    <ClCompile Include="DeferredInterestTrigger.cpp">
+      <Filter>Source Files\Core Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseRateVect.h">
@@ -433,6 +427,9 @@
     <ClInclude Include="CumulativeLossTrigger.h">
       <Filter>Header Files\Core Files</Filter>
     </ClInclude>
+    <ClInclude Include="DeferredInterestTrigger.h">
+      <Filter>Header Files\Core Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MtgCalculator.h">
@@ -454,9 +451,6 @@
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="ChartsWidget.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="ProgressWidget.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="StressViewer.h">

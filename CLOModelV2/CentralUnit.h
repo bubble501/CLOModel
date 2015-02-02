@@ -7,9 +7,9 @@
 #include "StressTest.h"
 #include "BaseRateTable.h"
 #include <QPointer>
+#include <QProgressDialog>
 #define NumberOfPlots 9
 class WaterfallCalculator;
-class ProgressWidget;
 class CentralUnit : public QObject{
 	Q_OBJECT
 public:
@@ -155,7 +155,7 @@ public:
 	const Waterfall& GetCallStructure() { return CallStructure; }
 private:
 	AbstractBaseRateTable* LastRateTable;
-	QPointer<ProgressWidget> MtgsProgress;
+	QPointer<QProgressDialog> MtgsProgress;
 	WaterfallCalculator* ParallWatFalls;
 	MtgCalculator LoansCalculator;
 	Waterfall Structure;

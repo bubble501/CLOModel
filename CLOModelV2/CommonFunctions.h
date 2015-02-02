@@ -43,6 +43,7 @@ extern QMutex Db_Mutex;
 extern const QString LoansPropertiesToSearch[2]; //Properties in which scenarios will be searched
 int MonthDiff(const QDate& FutureDte,const QDate& PresentDte);
 QString InfixToPostfix(const QString& a);
+void BuildDBCountries(const QString& path);
 enum class DayCountConvention : qint16 {
 	Invalid = 0
 	//Simple

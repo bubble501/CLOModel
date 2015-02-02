@@ -7,4 +7,7 @@
     <qresource prefix="/Configs">
         <file alias="GlobalConfigs.xml">Resources/GlobalConfigs.xml</file>
     </qresource>
+    <qresource prefix="/DataSources">
+        <file alias="ISO3166-1.xml">Resources/ISO3166-1.xml</file>
+    </qresource>
 </RCC>

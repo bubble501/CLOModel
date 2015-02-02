@@ -28,7 +28,10 @@
 #include "FloorCapVector.h"
 #include "LoanAssumptionsEditor.h"
 #include "CheckAndEdit.h"
+
 int main(int argc, char *argv[]) {
+
+	
 
 	//QApplication a(argc, argv);
 	//ConsoleTestObj b;
@@ -102,7 +105,7 @@ int main(int argc, char *argv[]) {
 	TempMtg.SetLoadProtocolVersion(VersionChecker);
 	out >> TempMtg;
 	file.close();
-	
+	auto Testing = TempMtg.GetGeographicBreakdown();
 	TempWtf.CalculateTranchesCashFlows();
 // 	QApplication a(argc, argv);
 // 	TempMtg.DownloadScenarios();

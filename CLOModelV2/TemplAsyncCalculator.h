@@ -40,6 +40,7 @@ protected:
 
 template <typename ThreadType, typename ResultType>
 QDataStream& TemplAsyncCalculator<ThreadType, ResultType>::LoadOldVersion(QDataStream& stream) {
+	RETURN_WHEN_RUNNING(true,stream)
 	qint32 TempSize,TempKey;
 	ResultType* TempRes=nullptr;
 	ClearResults();
@@ -57,6 +58,7 @@ QDataStream& TemplAsyncCalculator<ThreadType, ResultType>::LoadOldVersion(QDataS
 
 template <typename ThreadType, typename ResultType>
 QDataStream& TemplAsyncCalculator<ThreadType, ResultType>::SaveToStream(QDataStream& stream) const {
+	RETURN_WHEN_RUNNING(true, stream)
 	stream << m_SequentialComputation << static_cast<qint32>(m_Result.size());
 	for (auto i = m_Result.constBegin(); i != m_Result.constEnd(); ++i) {
 		stream << i.key() << *(i.value());
@@ -67,6 +69,7 @@ QDataStream& TemplAsyncCalculator<ThreadType, ResultType>::SaveToStream(QDataStr
 
 template <typename ThreadType, typename ResultType>
 void TemplAsyncCalculator<ThreadType, ResultType>::ClearResults() {
+	RETURN_WHEN_RUNNING(true, )
 	for (auto j = m_Result.begin(); j != m_Result.end(); j++) {
 		delete j.value();
 	}
@@ -77,11 +80,7 @@ void TemplAsyncCalculator<ThreadType, ResultType>::ClearResults() {
 template <typename ThreadType, typename ResultType>
 TemplAsyncCalculator<ThreadType, ResultType>::TemplAsyncCalculator(QObject* parent)
 	:AbstrAsyncCalculator(parent)
-	#ifndef DebugLogging
-		, m_SequentialComputation(false)
-	#else
-		, m_SequentialComputation(true)
-	#endif		
+	, m_SequentialComputation(false)	
 	, BeesReturned(0) {
 	static_assert(std::is_base_of<QThread, TemplAsyncThread<ResultType> >::value, "ThreadType must inherit from TemplAsyncThread");
 	static_assert(std::is_object<ThreadType>::value, "ThreadType can't be a reference or pointer");
@@ -95,6 +94,7 @@ TemplAsyncCalculator<ThreadType, ResultType>::~TemplAsyncCalculator() {
 }
 template <typename ThreadType, typename ResultType>
 void TemplAsyncCalculator<ThreadType, ResultType>::Reset() {
+	RETURN_WHEN_RUNNING(true, )
 	m_ContinueCalculation = false;
 	ThreadType* CurrentRunning;
 	for (auto j = m_ThreadPool.begin(); j != m_ThreadPool.end(); j++) {
@@ -109,7 +109,6 @@ void TemplAsyncCalculator<ThreadType, ResultType>::Reset() {
 	m_ThreadPool.clear();
 	ClearResults();
 	BeesSent.clear();
-	m_SequentialComputation = false;
 	BeesReturned = 0;
 }
 template <typename ThreadType, typename ResultType>
@@ -137,6 +136,7 @@ ThreadType* TemplAsyncCalculator<ThreadType, ResultType>::AddThread(qint32 Key) 
 }
 template <typename ThreadType, typename ResultType>
 void TemplAsyncCalculator<ThreadType, ResultType>::BeeReturned(int Ident, const ResultType& a) {
+	RETURN_WHEN_RUNNING(false, )
 	auto FindRe = m_Result.find(Ident);
 	if (FindRe != m_Result.end()) {
 		delete FindRe.value();

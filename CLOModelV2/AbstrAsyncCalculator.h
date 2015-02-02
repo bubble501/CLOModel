@@ -5,6 +5,9 @@
 #include <QObject>
 #include <QHash>
 #include <atomic>
+#ifndef RETURN_WHEN_RUNNING
+#define RETURN_WHEN_RUNNING(rvr,retval) if(m_ContinueCalculation == rvr) return retval;
+#endif
 class AbstrAsyncCalculator : public QObject, public BackwardInterface {
 	Q_OBJECT
 protected:

@@ -9,14 +9,18 @@
 #include <QSqlRecord>
 #include <QVariant>
 #endif
+#include <QProcessEnvironment>
 #include "LoanAssumption.h"
 #include <QCache>
+#include "simstring.h"
+#include <QXmlStreamReader>
 MtgCalculator::MtgCalculator(QObject* parent)
 	:TemplAsyncCalculator <MtgCalculatorThread, MtgCashFlow>(parent)
 	,m_UseStoredCashFlows(true)
 	, m_DownloadScenario(false)
 {}
 void MtgCalculator::AddLoan(const Mortgage& a, qint32 Index) {
+	RETURN_WHEN_RUNNING(true, )
 	auto FoundLn = Loans.find(Index);
 	if (FoundLn != Loans.end()) {
 		delete FoundLn.value();
@@ -25,7 +29,7 @@ void MtgCalculator::AddLoan(const Mortgage& a, qint32 Index) {
 	Loans.insert(Index, new Mortgage(a));
 }
 bool MtgCalculator::StartCalculation() {
-	if (m_ContinueCalculation) return false;
+	RETURN_WHEN_RUNNING(true, false)
 	if (!ReadyToCalculate().isEmpty()) return false;
 	{//Check if all base rates are valid
 		bool CheckAgain = false;
@@ -179,6 +183,7 @@ bool MtgCalculator::StartCalculation() {
 	return true;
 }
 void MtgCalculator::BeeReturned(int Ident, const MtgCashFlow& a) {
+	RETURN_WHEN_RUNNING(false, )
 	m_AggregatedRes+=a;
 	if (Loans.contains(Ident)) Loans[Ident]->SetCashFlows(a);
 	TemplAsyncCalculator<MtgCalculatorThread, MtgCashFlow>::BeeReturned(Ident, a);
@@ -209,17 +214,20 @@ void MtgCalculator::BeeReturned(int Ident, const MtgCashFlow& a) {
 }
 
 void MtgCalculator::ClearLoans() {
+	RETURN_WHEN_RUNNING(true, )
 	for (auto i = Loans.begin(); i != Loans.end(); i++) {
 		delete i.value();
 	}
 	Loans.clear();
 }
 void MtgCalculator::Reset(){
+	RETURN_WHEN_RUNNING(true, )
 	ClearLoans();
 	ClearTempProperties();
 	TemplAsyncCalculator<MtgCalculatorThread, MtgCashFlow>::Reset();
 }
 QString MtgCalculator::ReadyToCalculate()const{
+	RETURN_WHEN_RUNNING(true, "Calculator Already Running\n" )
 	QString Result;
 	QString TempStr;
 	if (StartDate.isNull()) Result += "Invalid Start Date\n";
@@ -238,6 +246,7 @@ QString MtgCalculator::ReadyToCalculate()const{
 }
 
 QDataStream& operator<<(QDataStream & stream, const MtgCalculator& flows) {
+	if (flows.m_ContinueCalculation) return stream;
 	stream
 		<< static_cast<qint32>(flows.Loans.size())
 		<< flows.m_UseStoredCashFlows
@@ -255,6 +264,7 @@ QDataStream& operator<<(QDataStream & stream, const MtgCalculator& flows) {
 	return flows.SaveToStream(stream);
 }
 QDataStream& MtgCalculator::LoadOldVersion(QDataStream& stream) {
+	RETURN_WHEN_RUNNING(true, stream)
 	Reset();
 	qint32 tempInt, TempKey;
 	stream >> tempInt;
@@ -277,19 +287,23 @@ QDataStream& MtgCalculator::LoadOldVersion(QDataStream& stream) {
 }
 
 void MtgCalculator::CompileReferenceRateValue(ForwardBaseRateTable& Values) {
+	RETURN_WHEN_RUNNING(true, )
 	for (auto i = Loans.begin(); i != Loans.end(); i++)
 		i.value()->CompileReferenceRateValue(Values);
 }
 void MtgCalculator::CompileReferenceRateValue(ConstantBaseRateTable& Values) {
+	RETURN_WHEN_RUNNING(true, )
 	for (auto i = Loans.begin(); i != Loans.end(); i++)
 		i.value()->CompileReferenceRateValue(Values);
 }
 #ifndef NO_DATABASE
 void MtgCalculator::GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll) {
+	RETURN_WHEN_RUNNING(true, )
 	for (auto i = Loans.begin(); i != Loans.end(); i++)
 		i.value()->GetBaseRatesDatabase(Values, DownloadAll);
 }
 void MtgCalculator::GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll) {
+	RETURN_WHEN_RUNNING(true, )
 	for (auto i = Loans.begin(); i != Loans.end(); i++)
 		i.value()->GetBaseRatesDatabase(Values, DownloadAll);
 }
@@ -298,17 +312,20 @@ QDataStream& operator>>(QDataStream & stream, MtgCalculator& flows) {
 	return flows.LoadOldVersion(stream);
 }
 void MtgCalculator::SetLoans(const QHash<qint32, Mortgage*>& a) {
+	RETURN_WHEN_RUNNING(true, )
 	ClearLoans();
 	for (auto i = a.constBegin(); i != a.constEnd(); ++i) {
 		Loans.insert(i.key(), new Mortgage(*(i.value())));
 	}
 }
 void MtgCalculator::ClearResults() {
+	RETURN_WHEN_RUNNING(true, )
 	m_AggregatedRes.Clear();
 	TemplAsyncCalculator<MtgCalculatorThread, MtgCashFlow>::ClearResults();
 }
 #ifndef NO_DATABASE
 void MtgCalculator::DownloadScenarios() {
+	RETURN_WHEN_RUNNING(true, )
 	ClearTempProperties();
 	QCache<QString, LoanAssumption> AssumptionCache;
 	for (auto i = Loans.constBegin(); i != Loans.constEnd(); ++i) { 
@@ -456,6 +473,7 @@ void MtgCalculator::DownloadScenarios() {
 }
 
 void MtgCalculator::GuessLoanScenarios(bool OverrideAss) {
+	RETURN_WHEN_RUNNING(true, )
 	QHash<QString,LoanAssumption*> AvailableAssumptions;
 	Db_Mutex.lock();
 	{
@@ -507,14 +525,133 @@ void MtgCalculator::GuessLoanScenarios(bool OverrideAss) {
 
 #endif
 void MtgCalculator::ClearTempProperties() {
+	RETURN_WHEN_RUNNING(true, )
 	for (auto i = TempProperties.begin(); i != TempProperties.end(); ++i)
 		delete i.value();
 	TempProperties.clear();
 }
 
 void MtgCalculator::AddTempProperty(qint32 LoanID, const QString& PropertyName, const QString& PropertyValue) {
+	RETURN_WHEN_RUNNING(true, )
 	if (!Loans.contains(LoanID) || PropertyName.isEmpty() || PropertyValue.isEmpty())return;
 	auto iter=TempProperties.find(LoanID);
 	if (iter == TempProperties.end()) iter=TempProperties.insert(LoanID, new QHash<QString, QString>());
 	iter.value()->operator[](PropertyName) = PropertyValue;
+}
+
+QHash<QString, double> MtgCalculator::GetGeographicBreakdown() const {
+	QHash<QString, double> Result;
+	auto InsertUnknown([&Result](const QString& check, double Size) ->bool {
+		if (check.isEmpty()) {
+			auto Curres = Result.find("Unknown");
+			if (Curres == Result.end()) Result.insert("Unknown", Size);
+			else Curres.value() += Size;
+			return true;
+		}
+		return false;
+	});
+	double SumOut=0.0;
+	if (Loans.isEmpty()) return Result;
+	QString CurrentGuess;
+	simstring::reader dbr;
+	const std::string DbRootFolder(qgetenv("CLO_MODEL_FOLDER").constData());
+	if (DbRootFolder.empty()) return Result;
+	if (!QFile::exists(QString::fromStdString(DbRootFolder + "CountriesDB\\ISO3166-1.ssdb"))) BuildDBCountries(QString::fromStdString(DbRootFolder + "CountriesDB\\ISO3166-1.ssdb"));
+	if (!dbr.open(DbRootFolder + "CountriesDB\\ISO3166-1.ssdb")) return Result;
+	for (auto i = Loans.constBegin(); i != Loans.constEnd(); ++i) {
+		if ((*i)->GetSize()<0.01) continue;
+		SumOut += (*i)->GetSize();
+		CurrentGuess = (*i)->GetProperty("Country");
+		if (!InsertUnknown(CurrentGuess, (*i)->GetSize())) {
+			CurrentGuess = GetGeography(CurrentGuess, dbr);
+			if (!InsertUnknown(CurrentGuess, (*i)->GetSize())) {
+				CurrentGuess = GetCountryISOCode(CurrentGuess);
+				if (!InsertUnknown(CurrentGuess, (*i)->GetSize())) {
+					auto Curres = Result.find(CurrentGuess);
+					if (Curres==Result.end()) Result.insert(CurrentGuess, (*i)->GetSize());
+					else Curres.value() += (*i)->GetSize();
+				}
+			}
+		}
+	}
+	dbr.close();
+	if (SumOut <= 0.0 || Result.isEmpty()) return QHash<QString, double>();
+	for (auto i = Result.begin(); i != Result.end(); ++i) {
+		i.value() /=  SumOut;
+	}
+	return Result;
+}
+
+QString MtgCalculator::GetGeography(const QString& guess, simstring::reader& dbr) const{
+	double simThreshold=0.6;
+	std::vector<std::wstring> simMatches;
+	do {
+		simMatches.clear();
+		dbr.retrieve(guess.toLower().toStdWString(), simstring::cosine, simThreshold, std::back_inserter(simMatches));
+		simThreshold += 0.1;
+	} while (simMatches.size() > 1 && simThreshold<1.0);
+	if (simMatches.empty()) return QString();
+	return QString::fromStdWString(simMatches.front());
+}
+
+QString MtgCalculator::GetCountryISOCode(QString name) const {
+	name = name.trimmed().toLower();
+	QFile InputFile(":/DataSources/ISO3166-1.xml");
+	InputFile.open(QIODevice::ReadOnly);
+	bool NameMatched = false;
+	QString CurrentCode;
+	bool CountryFound = false;
+	bool NameFound = false;
+	bool CodeFound = false;
+	QXmlStreamReader xml(&InputFile);
+	QStringList PossibleNames;
+	while (!xml.atEnd() && !xml.hasError()) {
+		xml.readNext();
+		if (xml.isStartElement()) {
+			if (xml.name() == "Country") {
+				if (CountryFound) return QString(); 
+				CountryFound = true;
+			}
+			else if (xml.name() == "Name") {
+				if (NameFound || CodeFound || !CountryFound) return QString();
+				NameFound = true;
+			}
+			else if (xml.name() == "Alpha-2") {
+				if (NameFound || CodeFound || !CountryFound) return QString();
+				CodeFound = true;
+			}
+		}
+		else if (xml.isEndElement()) {
+			if (xml.name() == "Country") {
+				if (!CountryFound || NameFound || CodeFound) return QString();
+				CountryFound = false;
+				NameMatched = false;
+				CurrentCode.clear();
+			}
+			else if (xml.name() == "Name") {
+				if (!NameFound) return QString();
+				NameFound = false;
+			}
+			else if (xml.name() == "Alpha-2") {
+				if (!CodeFound) return QString();
+				CodeFound = false;
+			}
+		}
+		else if (xml.isCharacters()) {
+			if (NameFound) {
+				PossibleNames = xml.text().toString().split("#,#", QString::SkipEmptyParts);
+				for (auto pni = PossibleNames.constBegin(); !NameMatched && pni != PossibleNames.constEnd(); ++pni) {
+					if (name.compare(*pni, Qt::CaseInsensitive) == 0) 
+						NameMatched = true;
+				}
+			}
+			else if (CodeFound) {
+				CurrentCode = xml.text().toString();
+			}
+			if ((NameFound || CodeFound) && NameMatched && !CurrentCode.isEmpty()) {
+				return CurrentCode.trimmed().toUpper();
+			}
+		}
+	}
+	return QString();
 }

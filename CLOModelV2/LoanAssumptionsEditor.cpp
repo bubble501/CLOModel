@@ -2048,12 +2048,12 @@ void LoanAssumptionsEditor::CalculateNewStructure() {
 	connect(m_NewLoans, &MtgCalculator::Calculated, [&]() {
 		m_NewWtfToExtension = m_WtfToExtension;
 		m_NewWtfToExtension.ResetMtgFlows();
-		m_NewWtfToExtension.AddMortgagesFlows(m_NewLoans->GetAggregatedResults());
+		if (m_NewLoans->GetAggregatedResults()) m_NewWtfToExtension.AddMortgagesFlows(*m_NewLoans->GetAggregatedResults());
 		m_NewWatFalls->AddWaterfall(m_NewWtfToExtension, 0);
 		m_NewWtfToCall = m_WtfToCall;
 		if (m_WtfToCall.GetTranchesCount() > 0) {
 			m_NewWtfToCall.ResetMtgFlows();
-			m_NewWtfToCall.AddMortgagesFlows(m_NewLoans->GetAggregatedResults());
+			if (m_NewLoans->GetAggregatedResults()) m_NewWtfToCall.AddMortgagesFlows(*m_NewLoans->GetAggregatedResults());
 			m_NewWatFalls->AddWaterfall(m_NewWtfToCall, 1);
 		}
 		if (!m_NewWatFalls->StartCalculation()) { QMessageBox::critical(this, tr("Error"), tr("An error occurred during the calculations of liabilities cash flows")); }

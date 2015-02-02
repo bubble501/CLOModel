@@ -6,6 +6,7 @@ ScenarioApplier::ScenarioApplier(QObject* parent)
 {}
 
 void ScenarioApplier::AddAssumption(const AssumptionSet& a, qint32 idx) {
+	RETURN_WHEN_RUNNING(true, )
 	auto FoundAss = m_Scenarios.find(idx);
 	if (FoundAss != m_Scenarios.end()) {
 		delete FoundAss.value();
@@ -15,7 +16,7 @@ void ScenarioApplier::AddAssumption(const AssumptionSet& a, qint32 idx) {
 }
 
 bool ScenarioApplier::StartCalculation() {
-	if (m_ContinueCalculation) return false;
+	RETURN_WHEN_RUNNING(true, false)
 	BeesReturned = 0;
 	BeesSent.clear();
 	ClearResults();
@@ -37,8 +38,8 @@ bool ScenarioApplier::StartCalculation() {
 	return true;
 }
 void ScenarioApplier::BeeReturned(int Ident, const MtgCashFlow& a) {
+	RETURN_WHEN_RUNNING(false, )
 	TemplAsyncCalculator<ApplyFlowThread, MtgCashFlow>::BeeReturned(Ident, a);
-	if (!m_ContinueCalculation) return;
 	ApplyFlowThread* CurrentThread;
 	for (auto SingleScen = m_Scenarios.constBegin(); SingleScen != m_Scenarios.constEnd(); ++SingleScen) {
 		if (BeesSent.contains(SingleScen.key())) continue;
@@ -50,16 +51,19 @@ void ScenarioApplier::BeeReturned(int Ident, const MtgCashFlow& a) {
 	}
 }
 void ScenarioApplier::Reset() {
+	RETURN_WHEN_RUNNING(true, )
 	ClearScenarios();
 	TemplAsyncCalculator<ApplyFlowThread, MtgCashFlow>::Reset();
 }
 void ScenarioApplier::ClearScenarios() {
+	RETURN_WHEN_RUNNING(true, )
 	for (auto i = m_Scenarios.begin(); i != m_Scenarios.end(); ++i) {
 		delete i.value();
 	}
 	m_Scenarios.clear();
 }
 QString ScenarioApplier::ReadyToCalculate()const {
+	RETURN_WHEN_RUNNING(true, "Calculator Already Running\n")
 	QString Result;
 	if (m_BaseFlows.IsEmpty()) Result += "Invalid Base Flows\n";
 	for (auto i = m_Scenarios.constBegin(); i != m_Scenarios.constEnd(); i++) {
@@ -71,6 +75,7 @@ QString ScenarioApplier::ReadyToCalculate()const {
 }
 
 QDataStream& operator<<(QDataStream & stream, const ScenarioApplier& flows) {
+	if (flows.m_ContinueCalculation) return stream;
 	stream << flows.m_BaseFlows;
 	stream << static_cast<qint32>(flows.m_Scenarios.size());
 	for (auto i = flows.m_Scenarios.begin(); i != flows.m_Scenarios.end(); i++) {
@@ -79,6 +84,7 @@ QDataStream& operator<<(QDataStream & stream, const ScenarioApplier& flows) {
 	return flows.SaveToStream(stream);
 }
 QDataStream& ScenarioApplier::LoadOldVersion(QDataStream& stream) {
+	RETURN_WHEN_RUNNING(true, stream)
 	Reset();
 	qint32 TempSize, TempKey;
 	stream >> m_BaseFlows;

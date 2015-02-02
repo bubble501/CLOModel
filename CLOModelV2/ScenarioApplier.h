@@ -16,7 +16,7 @@ public:
 	ScenarioApplier(QObject* parent = 0);
 	virtual ~ScenarioApplier() { Reset(); }
 	const MtgCashFlow& GetBaseFlows() const { return m_BaseFlows; }
-	virtual void SetBaseFlows(const MtgCashFlow& val) { m_BaseFlows = val; }
+	virtual void SetBaseFlows(const MtgCashFlow& val) { RETURN_WHEN_RUNNING(true, ) m_BaseFlows = val; }
 	virtual void ClearScenarios();
 	virtual const AssumptionSet* GetAssumption(qint32 idx)const { return m_Scenarios.value(idx, nullptr); }
 	virtual QList<qint32> GetAssumptionKeys()const { return m_Scenarios.keys(); }

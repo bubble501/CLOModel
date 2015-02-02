@@ -10,11 +10,13 @@
 #include "MtgCalculatorThread.h"
 class Mortgage;
 class MtgCashFlow;
+namespace simstring { class reader; }
 class MtgCalculator : public TemplAsyncCalculator <MtgCalculatorThread,MtgCashFlow>{
 	Q_OBJECT
 public slots:
 	virtual bool StartCalculation() override;
 public:
+	virtual QHash<QString, double> GetGeographicBreakdown() const;
 	virtual QString ReadyToCalculate() const override;
 	MtgCalculator(QObject* parent = 0);
 	virtual ~MtgCalculator() { Reset(); }
@@ -28,19 +30,19 @@ public:
 	void SetStartDate(const QDate& a){StartDate=a;}
 	const QDate& GetStartDate()const { return StartDate; }
 	bool GetUseStoredCashFlows() const { return m_UseStoredCashFlows; }
-	void SetUseStoredCashFlows(bool val) { m_UseStoredCashFlows = val; }
+	void SetUseStoredCashFlows(bool val) { RETURN_WHEN_RUNNING(true, ) m_UseStoredCashFlows = val; }
 	const QString& GetCPRass() const { return m_CPRass; }
-	void SetCPRass(const QString& val) { m_CPRass = val; }
+	void SetCPRass(const QString& val) { RETURN_WHEN_RUNNING(true, ) m_CPRass = val; }
 	const QString& GetCDRass() const { return m_CDRass; }
-	void SetCDRass(const QString& val) { m_CDRass = val; }
+	void SetCDRass(const QString& val) { RETURN_WHEN_RUNNING(true, ) m_CDRass = val; }
 	const QString& GetLSass() const { return m_LSass; }
-	void SetLSass(const QString& val) { m_LSass = val; }
+	void SetLSass(const QString& val) { RETURN_WHEN_RUNNING(true, ) m_LSass = val; }
 	const QString& GetRecoveryLag() const { return m_RecoveryLag; }
-	void SetRecoveryLag(const QString& val) { m_RecoveryLag = val; }
+	void SetRecoveryLag(const QString& val) { RETURN_WHEN_RUNNING(true, ) m_RecoveryLag = val; }
 	const QString& GetDelinquency() const { return m_Delinquency; }
-	void SetDelinquency(const QString& val) { m_Delinquency = val; }
+	void SetDelinquency(const QString& val) { RETURN_WHEN_RUNNING(true, ) m_Delinquency = val; }
 	const QString& GetDelinquencyLag() const { return m_DelinquencyLag; }
-	void SetDelinquencyLag(const QString& val) { m_DelinquencyLag = val; }
+	void SetDelinquencyLag(const QString& val) { RETURN_WHEN_RUNNING(true, ) m_DelinquencyLag = val; }
 	void CompileReferenceRateValue(ForwardBaseRateTable& Values);
 	void CompileReferenceRateValue(ConstantBaseRateTable& Values);
 	void ClearLoans();
@@ -50,16 +52,18 @@ public:
 	void DownloadScenarios();
 	void GuessLoanScenarios(bool OverrideAss);
 #endif
-	void SetOverrideAssumptions(bool a) { m_OverrideAssumptions = a; }
+	void SetOverrideAssumptions(bool a) { RETURN_WHEN_RUNNING(true, ) m_OverrideAssumptions = a; }
 	bool GetOverrideAssumptions()const { return m_OverrideAssumptions; }
-	const MtgCashFlow& GetAggregatedResults()const { return m_AggregatedRes; }
+	const MtgCashFlow* GetAggregatedResults()const { RETURN_WHEN_RUNNING(true, nullptr) return &m_AggregatedRes; }
 	bool GetDownloadScenario() const { return m_DownloadScenario; }
-	void SetDownloadScenario(bool val) { m_DownloadScenario = val; }
+	void SetDownloadScenario(bool val) { RETURN_WHEN_RUNNING(true, ) m_DownloadScenario = val; }
 private:
 	void ClearTempProperties();
 	void AddTempProperty(qint32 LoanID, const QString& PropertyName, const QString& PropertyValue);
 	QHash<qint32, QHash<QString, QString>* > TempProperties;
 protected:
+	QString GetGeography(const QString& guess, simstring::reader& dbr) const;
+	QString GetCountryISOCode(QString name) const;
 	QHash<qint32, Mortgage*> Loans;
 	QString m_CPRass;
 	QString m_CDRass;

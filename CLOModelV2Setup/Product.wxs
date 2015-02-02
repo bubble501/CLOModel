@@ -48,7 +48,6 @@
 		<Feature Id="ModelSetup" Title="CLO Model 2.0 Setup" Level="1" Description="Installs the new components" ConfigurableDirectory="INSTALLFOLDER">
 			<ComponentGroupRef Id="RequiredLibraries" />
 			<ComponentGroupRef Id="RequiredPlugins" />
-			<ComponentGroupRef Id="CountiesDBGroup" />
 			<ComponentGroupRef Id="FileAssociation" />
 			<ComponentRef Id='SetEnviromnment' />
 			<ComponentRef Id='INSTALLFOLDER'/>

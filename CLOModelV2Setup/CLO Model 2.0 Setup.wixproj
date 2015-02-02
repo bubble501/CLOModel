@@ -24,7 +24,6 @@
     <DefineConstants>CountriesDBDir=$(SolutionDir)CLOModelV2\Resources\CountriesDB</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="CountriesDB.wxs" />
     <Compile Include="Product.wxs" />
   </ItemGroup>
   <ItemGroup>
@@ -32,7 +31,7 @@
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" />
   <PropertyGroup>
-    <PreBuildEvent>"$(WIX)bin\Heat.exe" dir "$(SolutionDir)CLOModelV2\Resources\CountriesDB" -cg CountiesDBGroup -dr COUNTYDB -scom -sreg -srd -v -var var.CountriesDBDir -ag -out "$(ProjectDir)CountriesDB.wxs"</PreBuildEvent>
+    <PreBuildEvent />
   </PropertyGroup>
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.

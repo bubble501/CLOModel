@@ -9,6 +9,7 @@
 #include <QSqlRecord>
 #include <QVariant>
 #endif
+#include <QProcessEnvironment>
 #include "LoanAssumption.h"
 #include <QCache>
 #include "simstring.h"
@@ -554,7 +555,8 @@ QHash<QString, double> MtgCalculator::GetGeographicBreakdown() const {
 	QString CurrentGuess;
 	simstring::reader dbr;
 	const std::string DbRootFolder(qgetenv("CLO_MODEL_FOLDER").constData());
-	if (DbRootFolder.empty())  return Result;
+	if (DbRootFolder.empty()) return Result;
+	if (!QFile::exists(QString::fromStdString(DbRootFolder + "CountriesDB\\ISO3166-1.ssdb"))) BuildDBCountries(QString::fromStdString(DbRootFolder + "CountriesDB\\ISO3166-1.ssdb"));
 	if (!dbr.open(DbRootFolder + "CountriesDB\\ISO3166-1.ssdb")) return Result;
 	for (auto i = Loans.constBegin(); i != Loans.constEnd(); ++i) {
 		if ((*i)->GetSize()<0.01) continue;

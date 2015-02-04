@@ -103,7 +103,10 @@
 			<Directory Id="ProgramFilesFolder">
 				<Directory Id="INSTALLFOLDER" Name="CLO Model 2.0">
 					<Directory Id="COUNTYDB" Name="CountriesDB" />
-					<Directory Id="PLUGINSDIR" Name="platforms" />
+					<Directory Id="PLUGINSDIR" Name="plugins">
+						<Directory Id="SQLDRIVERSDIR" Name="sqldrivers" />
+					</Directory>
+					<Directory Id="PLATFORMSDIR" Name="platforms" />
 					<Directory Id="MANUALSDIR" Name="Manual" />
 				</Directory>
 			</Directory>
@@ -161,9 +164,12 @@
 				<File Id="BloombergLib" Name="blpapi3_32.dll" Source="$(env.BLPPATH)\lib\blpapi3_32.dll" KeyPath="yes" />
 			</Component>
 		</ComponentGroup>
-		<ComponentGroup Id="RequiredPlugins" Directory="PLUGINSDIR">
-			<Component Id="QtWindows" Guid="1A642659-CEC0-487F-9E4A-173A3D6B2262">
+		<ComponentGroup Id="RequiredPlugins">
+			<Component Id="QtWindows" Guid="1A642659-CEC0-487F-9E4A-173A3D6B2262" Directory="PLATFORMSDIR">
 				<File Id="WindowsPlugin" Name="qwindows.dll" Source="$(env.QTPATH)\plugins\platforms\qwindows.dll" KeyPath="yes" />
+			</Component>
+			<Component Id="QtODBCdriver" Guid="6498A06E-3B13-4EC4-9CBB-4533E07C44D2" Directory="SQLDRIVERSDIR">
+				<File Id="QODBCPlugin" Name="qsqlpsql.dll" Source="$(env.QTPATH)\plugins\sqldrivers\qsqlpsql.dll" KeyPath="yes" />
 			</Component>
 		</ComponentGroup>	
 		<ComponentGroup Id="FileAssociation" Directory="INSTALLFOLDER">
@@ -199,7 +205,8 @@
 			<CreateFolder />
 			<Environment Id="LibrariesPath" Action="set" Name="PATH" Permanent="yes" Part="last" System="yes" Value="[INSTALLFOLDER]"/>
 			<Environment Id="CloModelFolder" Action="set" Name="CLO_MODEL_FOLDER" Permanent="no" Part="all" System="no" Value="[INSTALLFOLDER]"/>
-			<Environment Id="PlatformsPath" Action="set" Name="QT_QPA_PLATFORM_PLUGIN_PATH" Permanent="yes" Part="last" System="yes" Value="[PLUGINSDIR]"/>
+			<Environment Id="PlatformsPath" Action="set" Name="QT_QPA_PLATFORM_PLUGIN_PATH" Permanent="no" Part="last" System="yes" Value="[PLATFORMSDIR]"/>
+			<Environment Id="PluginsPath" Action="set" Name="QT_PLUGIN_PATH" Permanent="no" Part="last" System="yes" Value="[PLUGINSDIR]"/>
 		</Component>
 		<Component Id="RemoveOldQtCore" Directory="System16Dir" Guid="5BEE9902-7DF2-4625-93BF-1FC951DE5B5A">
 			<RemoveFile Id="RemoveQtCore" Directory="System16Dir" Name="QtCore4.dll" On="install"/>

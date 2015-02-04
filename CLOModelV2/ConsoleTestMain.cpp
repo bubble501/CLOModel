@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
 	
 	Waterfall TempWtf, TempCallWaterfall;
 	MtgCalculator TempMtg;
-	QFile file("Z:/24AM/Monitoring/Model Results/HARVT 10X.clom");
+	QFile file("Z:/24AM/Monitoring/Model Results/DRYD 2015-35X.clom");
 	file.open(QIODevice::ReadOnly);
 	qint32 VersionChecker;
 	QDataStream out(&file);
@@ -105,8 +105,9 @@ int main(int argc, char *argv[]) {
 	TempMtg.SetLoadProtocolVersion(VersionChecker);
 	out >> TempMtg;
 	file.close();
-	auto Testing = TempMtg.GetGeographicBreakdown();
 	TempWtf.CalculateTranchesCashFlows();
+	
+	PrintToTempFile("Class F Flows", TempWtf.GetTranche("DRYD 15-35X F")->GetCashFlow().ToPlainText(), false);
 // 	QApplication a(argc, argv);
 // 	TempMtg.DownloadScenarios();
 // 	TempMtg.SetSequentialComputation(true);

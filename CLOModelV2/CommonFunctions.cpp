@@ -429,9 +429,6 @@ int NumberOfSetBits(quint32 i) {
 }
 void BuildDBCountries(const QString& path) {
 	if (QFile::exists(path)) {
-		/*if (
-		QMessageBox::question(this, tr("Are you sure?"), tr("This action will overwrite the existing DB\nAre you sure you want to continue?"))
-		!= QMessageBox::Yes) return EnableUserInput();*/
 		QFileInfo FiletoDelete(path);
 		QDir ParDir = FiletoDelete.absoluteDir();
 		ParDir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
@@ -448,22 +445,6 @@ void BuildDBCountries(const QString& path) {
 		QDir TmpDir =QFileInfo(path).absoluteDir();
 		if (!TmpDir.exists()) TmpDir.mkpath(".");
 	}
-	int CountCountries = 0;
-	{
-		QFile InputFile(":/DataSources/ISO3166-1.xml");
-		InputFile.open(QIODevice::ReadOnly);
-		QXmlStreamReader xml(&InputFile);
-		while (!xml.atEnd() && !xml.hasError()) {
-			xml.readNext();
-			if (xml.isStartElement()) {
-				if (xml.name() == "Country") ++CountCountries;
-			}
-		}
-		if (xml.hasError()) return;
-		InputFile.close();
-	}
-
-
 	simstring::ngram_generator gen(3, false);
 	simstring::writer_base<std::wstring> dbw(gen, path.toStdString());
 	QStringList NameList;

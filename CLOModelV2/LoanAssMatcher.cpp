@@ -27,6 +27,7 @@ void LoanAssMatcher::GetAssumptionsDatabase() {
 			+ "}; "
 			+ GetFromConfig("Database", "DataSource")
 			);
+		db.setConnectOptions("SQL_ATTR_ODBC_VERSION=SQL_OV_ODBC3");
 	}
 	bool DbOpen = db.isOpen();
 	if (!DbOpen) DbOpen = db.open();

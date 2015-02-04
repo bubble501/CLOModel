@@ -729,6 +729,9 @@
     <Xml Include="Resources\GlobalConfigs.xml">
       <Filter>Resource Files</Filter>
     </Xml>
+    <Xml Include="Resources\ISO3166-1.xml">
+      <Filter>Resource Files</Filter>
+    </Xml>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Build Instructions.markdown">

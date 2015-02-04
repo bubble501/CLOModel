@@ -1468,8 +1468,9 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					TotalPayable = qMax(TotalPayable, 0.000001);
 					if (SingleStep->GetParameter(WatFalPrior::wstParameters::PayAccrue).toInt() & static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Accrue)) {
 						for (; !ProRataBonds.isEmpty(); ProRataBonds.dequeue()) {
-							if (m_Tranches[ProRataBonds.head()]->GetCashFlow().GetICTarget(CurrentDate) == 0.0)
-								m_Tranches[ProRataBonds.head()]->SetCashFlow(CurrentDate, Solution / TotalPayable, TrancheCashFlow::TrancheFlowType::ICFlow);
+							if (m_Tranches[ProRataBonds.head()]->GetCashFlow().GetICTarget(CurrentDate) == 0.0) {
+									m_Tranches[ProRataBonds.head()]->SetCashFlow(CurrentDate, qMax(0.0,Solution / TotalPayable), TrancheCashFlow::TrancheFlowType::ICFlow);
+							}
 						}
 					}
 					if (SingleStep->GetParameter(WatFalPrior::wstParameters::PayAccrue).toInt() & static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Pay)) {
@@ -1580,7 +1581,9 @@ bool Waterfall::CalculateTranchesCashFlows(){
 								SingleTranche->GetCashFlow().GetDeferred(CurrentDate, CoupIdx)
 								+SingleTranche->GetCashFlow().GetAccrued(CurrentDate, CoupIdx) 
 								- SingleTranche->GetCashFlow().GetInterest(CurrentDate, CoupIdx);
-							if (NewDeferred>0.0) SingleTranche->SetCashFlow(CurrentDate, NewDeferred, TrancheCashFlow::TrancheFlowType::DeferredFlow);
+							if (qAbs(NewDeferred) < 0.01)NewDeferred = 0.0;
+							if (NewDeferred>=0.0) 
+								SingleTranche->SetCashFlow(CurrentDate, NewDeferred, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | CoupIdx);
 						}
 					}
 				}

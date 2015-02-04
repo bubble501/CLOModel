@@ -621,7 +621,10 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="Resources\GlobalConfigs.xml" />
+    <Xml Include="Resources\GlobalConfigs.xml">
+      <SubType>Designer</SubType>
+    </Xml>
+    <Xml Include="Resources\ISO3166-1.xml" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Build Instructions.markdown" />

@@ -1098,10 +1098,10 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
 End Sub
 
 Private Function FromStringToInterestType(a As String) As Long
-    If (UCase(a) = "FIXED") Then
-        FromStringToInterestType = 0
-    Else
+    If (UCase(a) = "FLOAT") Then
         FromStringToInterestType = 1
+    Else
+        FromStringToInterestType = 0
     End If
 End Function
 

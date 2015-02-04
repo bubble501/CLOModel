@@ -15,9 +15,9 @@ TrancheCashFlow::TrancheCashFlow(double ThrancheOutstanding)
 	/*for (qint32 i = static_cast<qint32>(TrancheFlowType::InterestFlow); i < (static_cast<qint32>(TrancheFlowType::InterestFlow) << 1); ++i) {
 		SetLabel(i, QString("Interest %1").arg(i - static_cast<qint32>(TrancheFlowType::InterestFlow) + 1));
 	}*/
-	for (qint32 i = static_cast<qint32>(TrancheFlowType::DeferredFlow); i < (static_cast<qint32>(TrancheFlowType::DeferredFlow) | static_cast<qint32>(TrancheFlowType::InterestFlow)); ++i) {
+	for (qint32 i = 0; i < (1 << MaximumInterestsTypes); ++i) {
 		//SetLabel(i, QString("Deferred Interest %1").arg(i - static_cast<qint32>(TrancheFlowType::DeferredFlow) + 1));
-		SetStock(i);
+		SetStock(static_cast<qint32>(TrancheFlowType::DeferredFlow) | i);
 	}
 	/*for (qint32 i = static_cast<qint32>(TrancheFlowType::AccruedFlow); i < (static_cast<qint32>(TrancheFlowType::AccruedFlow) | static_cast<qint32>(TrancheFlowType::InterestFlow)); ++i) {
 		SetLabel(i, QString("Accrued Interest %1").arg(i - static_cast<qint32>(TrancheFlowType::AccruedFlow) + 1));

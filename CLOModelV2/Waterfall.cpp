@@ -1581,7 +1581,9 @@ bool Waterfall::CalculateTranchesCashFlows(){
 								SingleTranche->GetCashFlow().GetDeferred(CurrentDate, CoupIdx)
 								+SingleTranche->GetCashFlow().GetAccrued(CurrentDate, CoupIdx) 
 								- SingleTranche->GetCashFlow().GetInterest(CurrentDate, CoupIdx);
-							if (NewDeferred>0.0) SingleTranche->SetCashFlow(CurrentDate, NewDeferred, TrancheCashFlow::TrancheFlowType::DeferredFlow);
+							if (qAbs(NewDeferred) < 0.01)NewDeferred = 0.0;
+							if (NewDeferred>=0.0) 
+								SingleTranche->SetCashFlow(CurrentDate, NewDeferred, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | CoupIdx);
 						}
 					}
 				}

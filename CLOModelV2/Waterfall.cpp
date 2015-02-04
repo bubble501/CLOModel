@@ -1468,8 +1468,9 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					TotalPayable = qMax(TotalPayable, 0.000001);
 					if (SingleStep->GetParameter(WatFalPrior::wstParameters::PayAccrue).toInt() & static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Accrue)) {
 						for (; !ProRataBonds.isEmpty(); ProRataBonds.dequeue()) {
-							if (m_Tranches[ProRataBonds.head()]->GetCashFlow().GetICTarget(CurrentDate) == 0.0)
-								m_Tranches[ProRataBonds.head()]->SetCashFlow(CurrentDate, Solution / TotalPayable, TrancheCashFlow::TrancheFlowType::ICFlow);
+							if (m_Tranches[ProRataBonds.head()]->GetCashFlow().GetICTarget(CurrentDate) == 0.0) {
+									m_Tranches[ProRataBonds.head()]->SetCashFlow(CurrentDate, qMax(0.0,Solution / TotalPayable), TrancheCashFlow::TrancheFlowType::ICFlow);
+							}
 						}
 					}
 					if (SingleStep->GetParameter(WatFalPrior::wstParameters::PayAccrue).toInt() & static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Pay)) {

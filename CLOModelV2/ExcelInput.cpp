@@ -48,8 +48,8 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		}
 	}
 	{//Tranches
-		QString DayCnt, TrName, Curr, BasRt, TrancheISIN, IPDfrq, ProRat;
-		QList<QString> RefRt, coup;
+		QString TrName, Curr, BasRt, TrancheISIN, IPDfrq, ProRat;
+        QList<QString> RefRt, coup, DayCnt;
 		QList<Tranche::TrancheInterestType>IntrTpe;
 		int TempSize;
 		double origOut,currOut,OClim,IClim,Price,Exchan,startingDeferred/*,coup*/;
@@ -81,7 +81,10 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			Price=pdFreq->dblVal;pdFreq++;
 			Exchan=pdFreq->dblVal;pdFreq++;
 			SettDate=QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd");pdFreq++;
-			DayCnt = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+            TempSize = pdFreq->intVal; pdFreq++;
+            for (int i = 0; i < TempSize; ++i) {
+                DayCnt.append(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+            }
 			startingDeferred = pdFreq->dblVal; pdFreq++;
 			TempUnit.AddTranche(TrName, TrancheISIN, ProRat, origOut, Curr, currOut, IntrTpe, coup, RefRt, PrevIPD, BasRt, IPDfrq, SettDate, startingDeferred, /*RefRtVal,*/ OClim, IClim, Price, Exchan, "Mtge", DayCnt);
 		}

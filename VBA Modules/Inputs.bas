@@ -10,7 +10,9 @@ Declare Function GetStressDM Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Rel
 'Declare Sub InspectWaterfall Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
 Declare Function WatFallStepEdit Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As String
 Declare Function TriggerEdit Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As String
-Declare Function LoadLoanScenario Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As String
+'Declare Function LoadLoanScenario Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As String
+Declare Function LoadLoanScenario Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As String
+
 Public Sub GetInputFromStructure( _
     MortgagesSheet As String, _
     InputsSheet As String, _
@@ -383,6 +385,7 @@ DefaultExchange:
         On Error GoTo 0
         Call AddInput(AllTheInputs, Format(SettleDateCell.Offset(0, 1).Value, "yyyy-mm-dd"))
         'Call AddInput(AllTheInputs, AccruedIntrStart.Offset(i, 0).Value)
+        Call AddInput(AllTheInputs, CLng(1))
         If (DayCountHead Is Nothing) Then
             Call AddInput(AllTheInputs, "102")
         Else
@@ -1098,10 +1101,10 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
 End Sub
 
 Private Function FromStringToInterestType(a As String) As Long
-    If (UCase(a) = "FLOAT") Then
-        FromStringToInterestType = 1
-    Else
+    If (UCase(a) = "FIXED") Then
         FromStringToInterestType = 0
+    Else
+        FromStringToInterestType = 1
     End If
 End Function
 

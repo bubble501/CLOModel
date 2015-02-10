@@ -11,7 +11,6 @@
 #endif
 Tranche::Tranche()
 	: LastPaymentDate(2000, 1, 1)
-	, m_DayCount(DayCountConvention::ACT360)
 	, Currency("GBP")
 	, Price(100)
 	, BloombergExtension("Mtge")
@@ -28,6 +27,7 @@ Tranche::Tranche()
 	TempCoup->SetDivisor(10000.0);
 	Coupon.insert(0, TempCoup);
 	InterestType.insert(0, FloatingInterest);
+    m_DayCount.insert(0, new DayCountVector(DayCountConvention::ACT360));
 	ReferenceRate.insert(-1, new BaseRateVector("BP0003M"));
 }
 Tranche::~Tranche() {
@@ -40,14 +40,15 @@ void Tranche::ClearInterest() {
 		delete (i.value());
 	for (QHash<qint32, BaseRateVector*>::iterator i = ReferenceRate.begin(); i != ReferenceRate.end(); ++i)
 		delete (i.value());
-	
+    for (auto i = m_DayCount.begin(); i != m_DayCount.end(); ++i)
+        delete (i.value());
 	Coupon.clear();
 	ReferenceRateValue.clear();
 	ReferenceRate.clear();
+    m_DayCount.clear();
 }
 Tranche::Tranche(const Tranche& a)
 	: LastPaymentDate(a.LastPaymentDate)
-	, m_DayCount(a.m_DayCount)
 	, Currency(a.Currency)
 	, Price(a.Price)
 	, BloombergExtension(a.BloombergExtension)
@@ -72,10 +73,11 @@ Tranche::Tranche(const Tranche& a)
 		ReferenceRateValue.insert(i.key(), new BloombergVector(*(i.value())));
 	for (QHash<qint32, BaseRateVector*>::const_iterator i = a.ReferenceRate.constBegin(); i != a.ReferenceRate.constEnd(); ++i)
 		ReferenceRate.insert(i.key(), new BaseRateVector(*(i.value())));
+    for (auto i = a.m_DayCount.constBegin(); i != a.m_DayCount.constEnd(); ++i)
+        m_DayCount.insert(i.key(), new DayCountVector(*(i.value())));
 }
 Tranche& Tranche::operator=(const Tranche& a){
 	LastPaymentDate=a.LastPaymentDate;
-	m_DayCount = a.m_DayCount;
 	Currency=a.Currency;
 	Price=a.Price;
 	BloombergExtension=a.BloombergExtension;
@@ -100,6 +102,8 @@ Tranche& Tranche::operator=(const Tranche& a){
 		ReferenceRateValue.insert(i.key(), new BloombergVector(*(i.value())));
 	for (QHash<qint32, BaseRateVector*>::const_iterator i = a.ReferenceRate.constBegin(); i != a.ReferenceRate.constEnd(); ++i)
 		ReferenceRate.insert(i.key(), new BaseRateVector(*(i.value())));
+    for (auto i = a.m_DayCount.constBegin(); i != a.m_DayCount.constEnd(); ++i)
+        m_DayCount.insert(i.key(), new DayCountVector(*(i.value())));
 	return *this;
 }
 void Tranche::SetOriginalAmount(double a){if(a>=0.0) OriginalAmt=a/ExchangeRate;}
@@ -297,7 +301,6 @@ void Tranche::GetDataFromBloomberg() {
 		TempReq.AddRequest(13, IdentityCode, "ID_ISIN", BdpExt);
 		TempReq.AddRequest(14, IdentityCode, "DAY_CNT", BdpExt);
 
-
 		Bee.StartRequestSync(TempReq);
 		if (Bee.GetRequest().HasErrors()) return;
 
@@ -356,8 +359,18 @@ void Tranche::GetDataFromBloomberg() {
 		if (Bee.GetResult(13)->HasErrors()) ISINcode = "";
 		else ISINcode = Bee.GetResult(13)->GetString();
 
-		if (Bee.GetResult(14)->HasErrors()) m_DayCount = QString::number(static_cast<qint16>(DayCountConvention::ACT360));
-		else m_DayCount = QString::number(static_cast<int>(Bee.GetResult(14)->GetDouble()));
+        if (Bee.GetResult(14)->HasErrors()) {
+            if (m_DayCount.contains(0))
+                m_DayCount[0]->operator=(QString::number(static_cast<qint16>(DayCountConvention::ACT360)));
+            else
+                m_DayCount.insert(0, new DayCountVector(DayCountConvention::ACT360));
+        }
+        else {
+            if (m_DayCount.contains(0))
+                m_DayCount[0]->operator=(Bee.GetResult(14)->GetString());
+            else
+                m_DayCount.insert(0, new DayCountVector(Bee.GetResult(14)->GetString()));
+        }
 	}
 	DownloadBaseRates();
 	GetCashFlowsFromBloomberg();
@@ -452,7 +465,7 @@ double Tranche::GetDiscountMargin() const {return GetDiscountMargin(Price);}
 double Tranche::GetDiscountMargin(double NewPrice)const{
 	if(/*GetLossRate()>0.0000 ||*/ OutstandingAmt<0.01) return 0.0;
 	
-	double AccruedInterest = AdjustCoupon(GetTotalCoupon(0), LastPaymentDate, SettlementDate, m_DayCount.GetValue(SettlementDate));
+	double AccruedInterest = AdjustCoupon(GetTotalCoupon(0), LastPaymentDate, SettlementDate, m_DayCount.value(0)->GetValue(SettlementDate));
 	QDate TempDate;
 	QList<QDate> FlowsDates;
 	QList<double> FlowsValues;
@@ -460,7 +473,7 @@ double Tranche::GetDiscountMargin(double NewPrice)const{
 	FlowsValues.append(-OutstandingAmt*((NewPrice/100.0)+AccruedInterest));
 	for (int i=0;i<CashFlow.Count();i++){
 		TempDate = CashFlow.GetDate(i);
-		while (AdjHolidays(m_DayCount.GetValue(TempDate)) && IsHoliday(TempDate))
+        while (AdjHolidays(m_DayCount.value(0)->GetValue(TempDate)) && IsHoliday(TempDate))
 			TempDate = TempDate.addDays(1);
 		FlowsDates.append(TempDate);
 		FlowsValues.append(CashFlow.GetTotalFlow(i));
@@ -476,13 +489,13 @@ double Tranche::GetDiscountMargin(double NewPrice)const{
 		ApplicableRate = ReferenceRateValue.value(0, ReferenceRateValue.value(-1, nullptr));
 		if (ApplicableRate->IsEmpty()) return 0.0;
 	}
-	return qMax(0.0, CalculateDM(FlowsDates, FlowsValues, *ApplicableRate, m_DayCount));
+    return qMax(0.0, CalculateDM(FlowsDates, FlowsValues, *ApplicableRate, *(m_DayCount.value(0))));
 }
 double Tranche::GetIRR() const {return GetIRR(Price);}
 double Tranche::GetIRR(double NewPrice)const{
 	if(/*GetLossRate()>0.0000 ||*/ OutstandingAmt<0.01) return 0.0;
 
-	double AccruedInterest = AdjustCoupon(GetTotalCoupon(0), LastPaymentDate, SettlementDate, m_DayCount.GetValue(SettlementDate));
+    double AccruedInterest = AdjustCoupon(GetTotalCoupon(0), LastPaymentDate, SettlementDate, m_DayCount.value(0)->GetValue(SettlementDate));
 	QList<QDate> FlowsDates;
 	QList<double> FlowsValues;
 	QDate TempDate;
@@ -490,11 +503,11 @@ double Tranche::GetIRR(double NewPrice)const{
 	FlowsValues.append(-OutstandingAmt*((NewPrice/100.0)+AccruedInterest));
 	for (int i=0;i<CashFlow.Count();i++){
 		TempDate = CashFlow.GetDate(i);
-		while (AdjHolidays(m_DayCount.GetValue(TempDate)) && IsHoliday(TempDate)) TempDate = TempDate.addDays(1);
+        while (AdjHolidays(m_DayCount.value(0)->GetValue(TempDate)) && IsHoliday(TempDate)) TempDate = TempDate.addDays(1);
 		FlowsDates.append(TempDate);
 		FlowsValues.append(CashFlow.GetTotalFlow(i));
 	}
-	return qMax(0.0,CalculateIRR(FlowsDates,FlowsValues,m_DayCount));
+    return qMax(0.0, CalculateIRR(FlowsDates, FlowsValues, *(m_DayCount.value(0))));
 }
 double Tranche::GetWALife(const QDate& StartDate)const{
 	if(OutstandingAmt<0.01 || StartDate.isNull()) return 0.0;
@@ -527,7 +540,6 @@ QDataStream& operator<<(QDataStream & stream, const Tranche& flows){
 		<< flows.MinOClevel
 		<< flows.MinIClevel
 		<< flows.LastPaymentDate
-		<< flows.m_DayCount
 		<< flows.ExchangeRate
 		<< flows.PaymentFrequency
 		<< flows.SettlementDate
@@ -546,6 +558,9 @@ QDataStream& operator<<(QDataStream & stream, const Tranche& flows){
 	stream << static_cast<qint32>(flows.ReferenceRateValue.size());
 	for (QHash<qint32, BloombergVector*>::const_iterator i = flows.ReferenceRateValue.constBegin(); i != flows.ReferenceRateValue.constEnd(); ++i) 
 		stream << i.key() << *(i.value());
+    stream << static_cast<qint32>(flows.m_DayCount.size());
+    for (auto i = flows.m_DayCount.constBegin(); i != flows.m_DayCount.constEnd(); ++i)
+        stream << i.key() << *(i.value());
 	return stream;
 }
 QDataStream& operator>>(QDataStream & stream, Tranche& flows){
@@ -556,6 +571,7 @@ QDataStream& Tranche::LoadOldVersion(QDataStream& stream){
 	qint16 TempShort;
 	BloombergVector* TempBV;
 	BaseRateVector* TempBRV;
+    DayCountVector* TempDCV;
 	stream >> TrancheName;
 	stream >> ISINcode;
 	stream >> OriginalAmt;
@@ -568,7 +584,6 @@ QDataStream& Tranche::LoadOldVersion(QDataStream& stream){
 	stream >> MinOClevel;
 	stream >> MinIClevel;
 	stream >> LastPaymentDate;
-	m_DayCount.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> m_DayCount;
 	stream >> ExchangeRate;
 	PaymentFrequency.SetLoadProtocolVersion(m_LoadProtocolVersion); stream >> PaymentFrequency;
 	stream >> SettlementDate;
@@ -601,6 +616,13 @@ QDataStream& Tranche::LoadOldVersion(QDataStream& stream){
 		stream >> TempKey >> (*TempBV);
 		ReferenceRateValue.insert(TempKey, TempBV);
 	}
+    stream >> TempSize;
+    for (qint32 i = 0; i < TempSize; i++) {
+        TempDCV = new DayCountVector();
+        TempDCV->SetLoadProtocolVersion(m_LoadProtocolVersion);
+        stream >> TempKey >> (*TempDCV);
+        m_DayCount.insert(TempKey, TempDCV);
+    }
 	ResetProtocolVersion();
 	return stream;
 }
@@ -615,15 +637,11 @@ double Tranche::GetPrice(double DiscountMargin) const {
 	return (Result.first + Result.second) / 2.0;
 }
 
-QString Tranche::GetReferenceRate(qint32 CoupIndex) const {
-	if (ReferenceRate.contains(CoupIndex)) 
-		return ReferenceRate.value(CoupIndex)->GetVector(); 
-	return "";
+BaseRateVector Tranche::GetReferenceRate(qint32 CoupIndex) const {
+    return GetCouponPart(CoupIndex, ReferenceRate);
 }
-QString Tranche::GetReferenceRateValue(qint32 CoupIndex) const {
-	if (ReferenceRateValue.contains(CoupIndex))
-		return ReferenceRateValue.value(CoupIndex)->GetVector();
-	return "";
+BloombergVector Tranche::GetReferenceRateValue(qint32 CoupIndex) const {
+    return GetCouponPart(CoupIndex, ReferenceRateValue);
 }
 double Tranche::GetReferenceRateValue(int index, qint32 CoupIndex) const { 
 	if (ReferenceRateValue.contains(CoupIndex))
@@ -635,25 +653,19 @@ double Tranche::GetReferenceRateValue(const QDate& index, qint32 CoupIndex) cons
 		return ReferenceRateValue.value(CoupIndex)->GetValue(index);
 	return 0.0;
 }
-QString Tranche::GetCouponVector(qint32 CoupIndex ) const {
-	if (Coupon.contains(CoupIndex))
-		return Coupon.value(CoupIndex)->GetVector();
-	return "";
+BloombergVector Tranche::GetCouponVector(qint32 CoupIndex) const
+{
+    return GetCouponPart(CoupIndex, Coupon);
+}
+DayCountVector Tranche::GetDayCount(qint32 CoupIndex) const
+{
+    return GetCouponPart(CoupIndex, m_DayCount);
 }
 void Tranche::SetCoupon(const QString& a, qint32 CoupIndex ) {
-	if (CoupIndex<0 || CoupIndex>=(1 << MaximumInterestsTypes)) return;
-	if (Coupon.contains(CoupIndex)) 
-		(*(Coupon[CoupIndex])) = a;
-	else 
-		Coupon.insert(CoupIndex, new BloombergVector(a));
+    SetCouponPart(a, CoupIndex, Coupon);
 }
 void Tranche::SetReferenceRate(const QString& a, qint32 CoupIndex ) {
-	if (CoupIndex<0 || CoupIndex >= (1 << MaximumInterestsTypes)) return;
-	if (BaseRateVector(a).IsEmpty() /*&& !a.isEmpty()*/) return;
-	if (ReferenceRate.contains(CoupIndex))
-		(*(ReferenceRate[CoupIndex])) = a;
-	else
-		ReferenceRate.insert(CoupIndex, new BaseRateVector(a));
+    SetCouponPart(a, CoupIndex, ReferenceRate);
 }
 
 void Tranche::SetDefaultRefRate(const QString& a) {
@@ -663,7 +675,10 @@ void Tranche::SetDefaultRefRate(const QString& a) {
 	else
 		ReferenceRate.insert(-1, new BaseRateVector(a));
 }
-
+void Tranche::SetDayCount(QString val, qint32 CoupIndex)
+{
+    SetCouponPart(val, CoupIndex, m_DayCount);
+}
 void Tranche::SetInterestType(TrancheInterestType a, qint32 CoupIndex ) {
 	if (CoupIndex<0 || CoupIndex >= (1 << MaximumInterestsTypes)) return;
 	InterestType[CoupIndex] = a;
@@ -688,6 +703,10 @@ bool Tranche::HasCoupon(qint32 CoupIdx) const {
 			|| ReferenceRate.contains(CoupIdx)
 		);
 }
+
+
+
+
 
 
 

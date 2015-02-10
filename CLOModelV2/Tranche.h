@@ -20,7 +20,7 @@ public:
 		FloatingInterest /*!< Floating Rate Coupon*/
 	};
 private:
-	DayCountVector m_DayCount;
+    QHash<qint32, DayCountVector*> m_DayCount;
 	QString ISINcode;
 	QString TrancheName;
 	double OriginalAmt;
@@ -49,6 +49,32 @@ protected:
 	void DownloadBaseRates() const;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 	static bool AdjHolidays(DayCountConvention a);
+    template<typename T>
+    T GetCouponPart(qint32 CoupIndex, const QHash<qint32, T*>& vec) const
+    {
+        static_assert(std::is_base_of<AbstractBbgVect, T>::value, "GetCouponPart requires a hash of vectors");
+        if (vec.contains(CoupIndex))
+            return *(vec.value(CoupIndex));
+        return T();
+    }
+    template<typename T>
+    void SetCouponPart(const QString& val, qint32 CoupIndex, QHash<qint32, T*>& vec)
+    {
+        static_assert(std::is_base_of<AbstractBbgVect, T>::value, "SetCouponPart requires a hash of vectors");
+        if(CoupIndex < 0 || CoupIndex >= (1 << MaximumInterestsTypes)) return;
+        auto iter = vec.find(CoupIndex);
+        if (T(val).IsEmpty()) {
+            //return; //TODO check this
+            if (iter != vec.end()) {
+                delete iter.value();
+                vec.erase(iter);
+            }
+        }
+        if (iter != vec.end())
+            iter.value()->operator=(val);
+        else
+            vec.insert(CoupIndex, new T(val));
+    }
 public:
 	Tranche();
 	Tranche(const Tranche& a);
@@ -63,9 +89,10 @@ public:
 	double GetOutstandingAmt() const {return OutstandingAmt;}
 	double GetBaseCurrencyOutsanding() const {return OutstandingAmt*ExchangeRate;}
 	double GetBaseCurrencyOriginal() const {return OriginalAmt*ExchangeRate;}
-	QList<qint32> GetCouponIndexes() { return Coupon.keys(); }
-	QList<qint32> GetInterestTypeIndexes() { return InterestType.keys(); }
-	QList<qint32> GetReferenceRateIndexes() { return ReferenceRate.keys(); }
+    QList<qint32> GetCouponIndexes() const { return Coupon.keys(); }
+	QList<qint32> GetInterestTypeIndexes() const { return InterestType.keys(); }
+    QList<qint32> GetReferenceRateIndexes()const { return ReferenceRate.keys(); }
+    QList<qint32> GetDayCountsIndexes()const { return m_DayCount.keys(); }
 	TrancheInterestType GetInterestType(qint32 CoupIndex /*= 0*/) const { return InterestType.value(CoupIndex, InvalidType); }
 	double GetTotalCoupon(const QDate& index, int Frequency = 12) const;
 	double GetTotalCoupon(int index, int Frequency = 12) const;
@@ -73,8 +100,8 @@ public:
 	double GetCoupon(int index, qint32 CoupIndex /*= 0*/, int Frequency = 12) const;
 	double GetRawCoupon(int index, qint32 CoupIndex /*= 0*/, int Frequency = 12) const;
 	double GetRawCoupon(const QDate& index, qint32 CoupIndex /*= 0*/, int Frequency = 12) const;
-	QString GetReferenceRate(qint32 CoupIndex/*=0*/) const;
-	QString GetReferenceRateValue(qint32 CoupIndex=0) const;
+	BaseRateVector GetReferenceRate(qint32 CoupIndex/*=0*/) const;
+    BloombergVector GetReferenceRateValue(qint32 CoupIndex = 0) const;
 	double GetReferenceRateValue(int index, qint32 CoupIndex /*= 0*/) const;
 	double GetReferenceRateValue(const QDate& index, qint32 CoupIndex /*= 0*/) const;
 	double GetPrice() const {return Price;}
@@ -86,19 +113,19 @@ public:
 	double GetMinOClevel() const {return MinOClevel;}
 	double GetMinIClevel() const {return MinIClevel;}
 	const QDate& GetLastPaymentDate() const {return LastPaymentDate;}
-	QString GetDefaultRefRate() const { return GetReferenceRate(-1); }
+    BaseRateVector GetDefaultRefRate() const { return GetReferenceRate(-1); }
 	double GetExchangeRate() const {return ExchangeRate;}
-	QString GetPaymentFrequency() const{return PaymentFrequency.GetVector();}
+	const IntegerVector& GetPaymentFrequency() const{return PaymentFrequency;}
 	const QString& GetISIN() const {return ISINcode;}
-	QString GetCouponVector(qint32 CoupIndex /*= 0*/) const;
+    BloombergVector GetCouponVector(qint32 CoupIndex) const;
 	void SetISIN(const QString& a){ISINcode=a;}
 	void SetTrancheName(const QString& a){TrancheName=a;}
 	void SetCurrency(const QString& a){Currency=a;}
 	void SetOriginalAmount(double a);
 	void SetOutstandingAmt(double a);
-	void SetInterestType(TrancheInterestType a, qint32 CoupIndex /*= 0*/);
-	void SetCoupon(const QString& a, qint32 CoupIndex /*= 0*/);
-	void SetReferenceRate(const QString& a, qint32 CoupIndex /*= 0*/);
+	void SetInterestType(TrancheInterestType a, qint32 CoupIndex);
+	void SetCoupon(const QString& a, qint32 CoupIndex);
+	void SetReferenceRate(const QString& a, qint32 CoupIndex);
 	bool GetUseForwardCurve() const { return m_UseForwardCurve; }
 	void CompileReferenceRateValue(ConstantBaseRateTable& Values)const;
 	void CompileReferenceRateValue(ForwardBaseRateTable& Values)const;
@@ -107,8 +134,8 @@ public:
 	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll = false)const;
 	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll = false)const;
 #endif
-	const DayCountVector& GetDayCount() const { return m_DayCount; }
-	void SetDayCount(QString val) { m_DayCount = val; }
+    DayCountVector GetDayCount(qint32 CoupIndex) const;
+    void SetDayCount(QString val, qint32 CoupIndex);
 	void SetPrice(double a){if(a>0) Price=a;}
 	void SetBloombergExtension(const QString& a);
 	void SetProrataGroup(const QString& a){ProrataGroup.SetSeniorityScale(a);}

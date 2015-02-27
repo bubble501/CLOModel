@@ -624,7 +624,7 @@ void LoanAssumptionsEditor::FillFromQuery() {
 			+ "}; "
 			+ GetFromConfig("Database", "DataSource", R"(Server=SYNSERVER2\SQLExpress; Initial Catalog = ABSDB; Integrated Security = SSPI; Trusted_Connection = Yes;)")
 			);
-		db.setConnectOptions("SQL_ATTR_ODBC_VERSION=SQL_OV_ODBC3");
+		
 	}
 	bool DbOpen = db.isOpen();
 	if (!DbOpen) DbOpen = db.open();
@@ -1369,7 +1369,7 @@ void LoanAssumptionsEditor::SaveScenario(const QString& key) {
 			+ "}; "
 			+ GetFromConfig("Database", "DataSource", R"(Server=SYNSERVER2\SQLExpress; Initial Catalog = ABSDB; Integrated Security = SSPI; Trusted_Connection = Yes;)")
 			);
-		db.setConnectOptions("SQL_ATTR_ODBC_VERSION=SQL_OV_ODBC3");
+		
 	}
 	bool DbOpen = db.isOpen();
 	if (!DbOpen) DbOpen = db.open();

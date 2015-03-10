@@ -1,11 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- Auto-generated file for mscomct2.ocx built by heat.exe -->
 <Include xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<?if $(var.Platform) = x64 ?>
-		<?define SystemDir = "SysWOW64" ?>
-	<?else ?>
-		<?define SystemDir = "system32" ?>
-	<?endif ?>
     <Fragment>
         <DirectoryRef Id="TARGETDIR">
 			<Directory Id="WindowsDirBEC200BC31EC4EAEB8C76D7D228C047F" Name="Windows">

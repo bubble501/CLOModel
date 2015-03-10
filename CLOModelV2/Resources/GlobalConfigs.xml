@@ -3,7 +3,7 @@
 	<Database>
 		<DBtype>QODBC</DBtype>
 		<Driver>SQL Server</Driver>
-		<DataSource>Server=SYNSERVER2\SQLExpress;Initial Catalog=ABSDB;Integrated Security=SSPI;Trusted_Connection=Yes;</DataSource>
+		<DataSource>Server=twe-sql02;Initial Catalog=ABSDB;Integrated Security=SSPI;Trusted_Connection=Yes;</DataSource>
 		<ConstBaseRatesStoredProc>getLatestIndexPrices</ConstBaseRatesStoredProc>
 		<ForwardBaseRatesStoredProc>getForwardCurveMatrix</ForwardBaseRatesStoredProc>
 		<CashFlowsStoredProc>getCashFlows</CashFlowsStoredProc>

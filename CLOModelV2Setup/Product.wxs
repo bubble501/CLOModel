@@ -171,7 +171,7 @@
 				<File Id="WindowsPlugin" Name="qwindows.dll" Source="$(env.QTPATH)\plugins\platforms\qwindows.dll" KeyPath="yes" />
 			</Component>
 			<Component Id="QtODBCdriver" Guid="6498A06E-3B13-4EC4-9CBB-4533E07C44D2" Directory="SQLDRIVERSDIR">
-				<File Id="QODBCPlugin" Name="qsqlpsql.dll" Source="$(env.QTPATH)\plugins\sqldrivers\qsqlpsql.dll" KeyPath="yes" />
+				<File Id="QODBCPlugin" Name="qsqlodbc.dll" Source="$(env.QTPATH)\plugins\sqldrivers\qsqlodbc.dll" KeyPath="yes" />
 			</Component>
 		</ComponentGroup>	
 		<ComponentGroup Id="FileAssociation" Directory="INSTALLFOLDER">
@@ -196,10 +196,10 @@
 					<RegistryValue Type='string' Value='CLOViewer' />
 				</RegistryKey>
 				<RegistryKey Id="ApplicationRegIcon" Root="HKCU" Key="SOFTWARE\Classes\CLO.BaseCase\DefaultIcon" ForceCreateOnInstall="yes">
-					<RegistryValue Type='string' Value='"\\SYNSERVER2\Company Share\24AM\Analytics\CLO Model\LogoIcon.ico"' />
+					<RegistryValue Type='string' Value='"Z:\24AM\Analytics\CLO Model\LogoIcon.ico"' />
 				</RegistryKey>
 				<RegistryKey Id="ApplicationRegComand" Root="HKCU" Key="SOFTWARE\Classes\CLO.BaseCase\shell\Open\command" ForceCreateOnInstall="yes">
-					<RegistryValue Type='string' Value='"\\SYNSERVER2\Company Share\24AM\Analytics\CLO Model\CLOViewer.exe" "%1"' />
+					<RegistryValue Type='string' Value='"Z:\24AM\Analytics\CLO Model\CLOViewer.exe" "%1"' />
 				</RegistryKey>
 			</Component>
 		</ComponentGroup>

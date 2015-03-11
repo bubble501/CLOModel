@@ -16,6 +16,7 @@
 #include "VectorTrigger.h"
 #include "PoolSizeTrigger.h"
 #include "TrancheTrigger.h"
+#include "PDLtrigger.h"
 #include "DelinquencyTrigger.h"
 #include "WaterfallStepHelperDialog.h"
 #include "TriggerHelperDialog.h"
@@ -87,7 +88,8 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
             }
 			startingDeferred = pdFreq->dblVal; pdFreq++;
 			TempUnit.AddTranche(TrName, TrancheISIN, ProRat, origOut, Curr, currOut, IntrTpe, coup, RefRt, PrevIPD, BasRt, IPDfrq, SettDate, startingDeferred, /*RefRtVal,*/ OClim, IClim, Price, Exchan, "Mtge", DayCnt);
-		}
+            LOGDEBUG("Tranche Added");
+        }
 	}
 	
 	{ //Waterfall Steps
@@ -189,6 +191,18 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 				TempTrigger.reset(new DuringStressTestTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
 				TempUnit.SetTrigger(i + 1, TempTrigger);
 				break;
+            case static_cast<int>(AbstractTrigger::TriggerType::PDLTrigger) :
+                TempTrigger.reset(new PDLTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+                TempTrigger.dynamicCast<PDLTrigger>()->SetTargetSeniority(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                TempTrigger.dynamicCast<PDLTrigger>()->SetTargetSeniorityLevel(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                TempTrigger.dynamicCast<PDLTrigger>()->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                TempTrigger.dynamicCast<PDLTrigger>()->SetSenioritySide(static_cast<PDLTrigger::TriggerSenioritySide>(pdFreq->intVal)); pdFreq++;
+                TempTrigger.dynamicCast<PDLTrigger>()->SetSizeSide(static_cast<PDLTrigger::TriggerSizeSide>(pdFreq->intVal)); pdFreq++;
+                TempTrigger.dynamicCast<PDLTrigger>()->SetSizeMultiplier(pdFreq->dblVal); pdFreq++;
+                TempUnit.SetTrigger(i + 1, TempTrigger);
+                break;
+            default:
+                PrintToTempFile("Error", "Unhanded Trigger Type in Input");
 			}
 		}
 	}
@@ -728,16 +742,17 @@ BSTR __stdcall LoadLoanScenario(LPSAFEARRAY *ArrayData) {
 	char *argv[] = { "NoArgumnets" };
 	int argc = sizeof(argv) / sizeof(char*) - 1;
 	QApplication a(argc, argv);
-	auto TempDialog = new QDialog();
-	TempDialog->setWindowIcon(QIcon(":/Icons/Logo.png"));
-	TempDialog->setWindowTitle(QObject::tr("Loan Scenarios Editor"));
-	QHBoxLayout* DialogLay = new QHBoxLayout(TempDialog);
-	LoanAssumptionsEditor* ScenariosEditor = new LoanAssumptionsEditor(TempDialog);
-	QObject::connect(ScenariosEditor, &LoanAssumptionsEditor::PoolSaved, TempDialog, &QDialog::accept);
+    QDialog TempDialog;
+	TempDialog.setWindowIcon(QIcon(":/Icons/Logo.png"));
+	TempDialog.setWindowTitle(QObject::tr("Loan Scenarios Editor"));
+    TempDialog.setModal(true);
+	QHBoxLayout* DialogLay = new QHBoxLayout(&TempDialog);
+	LoanAssumptionsEditor* ScenariosEditor = new LoanAssumptionsEditor(&TempDialog);
+	QObject::connect(ScenariosEditor, &LoanAssumptionsEditor::PoolSaved, &TempDialog, &QDialog::accept);
 	DialogLay->addWidget(ScenariosEditor);
 	ScenariosEditor->SetEnableLoad(false);
 	ScenariosEditor->FillFromQuery();
-	QScopedPointer<QDialog, QScopedPointerDeleteLater> DialogScope(TempDialog);
+	
 	QString CurrField;
 	for (int i = 0; i < NumOfLoans; ++i) {
 		CurrField = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
@@ -752,7 +767,7 @@ BSTR __stdcall LoadLoanScenario(LPSAFEARRAY *ArrayData) {
 		ScenariosEditor->AddLoanToPool(ScenariosEditor->LoanCount(), TempMtg);
 	}
 	SafeArrayUnaccessData(*ArrayData);
-	if (DialogScope->exec() == QDialog::Accepted) {
+    if (TempDialog.exec() == QDialog::Accepted) {
 		auto Result = ScenariosEditor->GetScenarios();
 		auto ResultKeys = Result.keys();
 		std::sort(ResultKeys.begin(), ResultKeys.end());
@@ -761,8 +776,10 @@ BSTR __stdcall LoadLoanScenario(LPSAFEARRAY *ArrayData) {
 			if (i != ResultKeys.constBegin()) TotalString.append("#,#");
 			TotalString.append(Result.value(*i));
 		}
+        a.quit();
 		return SysAllocStringByteLen(TotalString.toStdString().c_str(), TotalString.size());
 	}
+    a.quit();
 	return NULL;
 }
 

@@ -146,6 +146,7 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB -DCLOMODELV2_LIB -DNOMINMAX -DQT_SQL_LIB -D_WINDLL  "-IC:\Quazip\include" "-IC:\Zlib\include" "-I$(BOOSTPATH)\." "-IC:\KDAB\KDChart-2.5.1\include\KDChart" "-I$(BLPPATH)\include" "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtSql"</Command>
     </CustomBuild>
+    <ClInclude Include="PDLtrigger.h" />
     <ClInclude Include="PoolSizeTrigger.h" />
     <CustomBuild Include="ReadOnlyColProxy.h">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -562,6 +563,7 @@
     <ClCompile Include="MtgCalculator.cpp" />
     <ClCompile Include="MtgCalculatorThread.cpp" />
     <ClCompile Include="MtgCashFlow.cpp" />
+    <ClCompile Include="PDLtrigger.cpp" />
     <ClCompile Include="PhasedProgressWidget.cpp" />
     <ClCompile Include="PoolSizeTrigger.cpp" />
     <ClCompile Include="PrincipalProceeds.cpp" />
@@ -702,7 +704,7 @@
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties MocDir=".\GeneratedFiles\$(ConfigurationName)" UicDir=".\GeneratedFiles" RccDir=".\GeneratedFiles" lupdateOptions="" lupdateOnBuild="0" lreleaseOptions="" Qt5Version_x0020_Win32="$(DefaultQtVersion)" MocOptions="" />
+      <UserProperties MocDir=".\GeneratedFiles\$(ConfigurationName)" UicDir=".\GeneratedFiles" RccDir=".\GeneratedFiles" lupdateOptions="" lupdateOnBuild="0" lreleaseOptions="" Qt5Version_x0020_Win32="msvc2013" MocOptions="" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

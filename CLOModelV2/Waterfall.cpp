@@ -15,6 +15,7 @@
 #include "AssumptionSet.h"
 #include "DelinquencyTrigger.h"
 #include "DuringStressTestTrigger.h"
+#include "PDLtrigger.h"
 const WatFalPrior* Waterfall::GetStep(int Index)const {
 	if (Index<0 || Index >= m_WaterfallStesps.size()) return nullptr;
 	return m_WaterfallStesps.at(Index);
@@ -179,7 +180,11 @@ Waterfall::Waterfall(const Waterfall& a)
 		case AbstractTrigger::TriggerType::DeferredInterestTrigger:
 			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DeferredInterestTrigger(*(i.value().dynamicCast<DeferredInterestTrigger>()))));
 			break;
+        case AbstractTrigger::TriggerType::PDLTrigger:
+            m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new PDLTrigger(*(i.value().dynamicCast<PDLTrigger>()))));
+            break;
 		default:
+            Q_ASSERT_X(false, "Waterfall::CopyConstructor", "Unhandled Trigger Type");
 			break;
 		}
 	}
@@ -267,7 +272,11 @@ Waterfall& Waterfall::operator=(const Waterfall& a){
 		case AbstractTrigger::TriggerType::DeferredInterestTrigger:
 			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DeferredInterestTrigger(*(i.value().dynamicCast<DeferredInterestTrigger>()))));
 			break;
+        case AbstractTrigger::TriggerType::PDLTrigger:
+            m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new PDLTrigger(*(i.value().dynamicCast<PDLTrigger>()))));
+            break;
 		default:
+            Q_ASSERT_X(false, "Waterfall::operator=", "Unhandled Trigger Type");
 			break;
 		}
 	}
@@ -1852,6 +1861,11 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream){
 			case AbstractTrigger::TriggerType::DeferredInterestTrigger:
 				TempTrig.reset(new DeferredInterestTrigger());
 				break;
+            case AbstractTrigger::TriggerType::PDLTrigger:
+                TempTrig.reset(new PDLTrigger());
+                break;
+            default:
+                Q_ASSERT_X(false, "Waterfall::LoadOldVersion", "Unhadled Trigger Type");
 			}
 			TempTrig->SetLoadProtocolVersion(m_LoadProtocolVersion);
 			stream >> (*TempTrig);
@@ -2259,7 +2273,14 @@ bool Waterfall::EvaluateTrigger(quint32 TrigID, int PeriodIndex, const QDate& Cu
 			TempTrig.FillMissingAnchorDate(m_MortgagesPayments.GetDate(0));
 		return TempTrig.Passing(m_Tranches, CurrentIPD);
 	}
+    case AbstractTrigger::TriggerType::PDLTrigger:{
+        PDLTrigger TempTrig(*CurrentTrigger.dynamicCast<PDLTrigger>());
+        if (!TempTrig.HasAnchor())
+            TempTrig.FillMissingAnchorDate(m_MortgagesPayments.GetDate(0));
+        return TempTrig.Passing(m_Tranches, m_MortgagesPayments.GetAmountOut(PeriodIndex)+m_InterestAvailable+m_PrincipalAvailable.Total() , CurrentIPD);
+    }
 	default:
+        Q_ASSERT_X(false, "Waterfall::EvaluateTrigger", "Unhadled Trigger Type");
 		return false;
 	}
 }

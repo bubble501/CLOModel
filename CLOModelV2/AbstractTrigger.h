@@ -14,6 +14,7 @@ public:
 		,DuringStressTestTrigger=5
 		, CumulativeLossTrigger=6
 		, DeferredInterestTrigger=7
+        , PDLTrigger=8
 	};
 protected:
 	TriggerType m_TriggerType;

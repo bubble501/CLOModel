@@ -28,10 +28,62 @@
 #include "FloorCapVector.h"
 #include "LoanAssumptionsEditor.h"
 #include "CheckAndEdit.h"
-
+#include <QHBoxLayout>
+#include <QIcon>
+QString LoadLoanScenario(const int NumOfLoans, QStringList ArrayData)
+{
+    Mortgage TempMtg;
+    char *argv[] = { "NoArgumnets" };
+    int argc = sizeof(argv) / sizeof(char*) - 1;
+    QApplication a(argc, argv);
+    auto TempDialog = new QDialog();
+    TempDialog->setWindowIcon(QIcon(":/Icons/Logo.png"));
+    TempDialog->setWindowTitle(QObject::tr("Loan Scenarios Editor"));
+    TempDialog->setModal(true);
+    QHBoxLayout* DialogLay = new QHBoxLayout(TempDialog);
+    LoanAssumptionsEditor* ScenariosEditor = new LoanAssumptionsEditor(TempDialog);
+    QObject::connect(ScenariosEditor, &LoanAssumptionsEditor::PoolSaved, TempDialog, &QDialog::accept);
+    DialogLay->addWidget(ScenariosEditor);
+    ScenariosEditor->SetEnableLoad(false);
+    ScenariosEditor->FillFromQuery();
+    QScopedPointer<QDialog> DialogScope(TempDialog);
+    QString CurrField;
+    for (int i = 0; i < NumOfLoans; ++i) {
+        CurrField = ArrayData.takeFirst();
+        if (CurrField.isEmpty()) TempMtg.RemoveProperty("Issuer");
+        else TempMtg.SetProperty("Issuer", CurrField);
+        CurrField = ArrayData.takeFirst();
+        if (CurrField.isEmpty()) TempMtg.RemoveProperty("Facility");
+        else TempMtg.SetProperty("Facility", CurrField);
+        CurrField = ArrayData.takeFirst();
+        if (CurrField.isEmpty()) TempMtg.RemoveProperty("Scenario");
+        else TempMtg.SetProperty("Scenario", CurrField);
+        ScenariosEditor->AddLoanToPool(ScenariosEditor->LoanCount(), TempMtg);
+    }
+    if (DialogScope->exec() == QDialog::Accepted) {
+        auto Result = ScenariosEditor->GetScenarios();
+        auto ResultKeys = Result.keys();
+        std::sort(ResultKeys.begin(), ResultKeys.end());
+        QString TotalString;
+        for (auto i = ResultKeys.constBegin(); i != ResultKeys.constEnd(); ++i) {
+            if (i != ResultKeys.constBegin()) TotalString.append("#,#");
+            TotalString.append(Result.value(*i));
+        }
+        DialogScope.reset();
+        a.quit();
+        return TotalString;
+    }
+    a.quit();
+    return QString();
+}
 int main(int argc, char *argv[]) {
 
-	
+    qDebug() << LoadLoanScenario(4, QStringList() 
+        << "3AB OPTIQUE DEVELOPPEMENT SAS" << "AAFFP 5" << ""
+        << "Ahlsell AB" << "TLB" << ""
+        << "AVR Holding" << "TLB" << ""
+        << "AHT Cooling Systems GmbH & Co KG" << "TLB1" << ""
+        );
 
 	//QApplication a(argc, argv);
 	//ConsoleTestObj b;
@@ -81,7 +133,7 @@ int main(int argc, char *argv[]) {
 		, "20", "0.5", "0", "0", "0", "0"
 		).GetTranche("HARVT 10X A"));
 	return a.exec();
-	*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	Waterfall TempWtf, TempCallWaterfall;
 	MtgCalculator TempMtg;
@@ -113,7 +165,7 @@ int main(int argc, char *argv[]) {
 // 	TempMtg.SetSequentialComputation(true);
 // 	TempMtg.StartCalculation();
 // 	return a.exec();
-	/*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	QApplication a(argc, argv);
 	//QFile file("C:/Temp/Wrong 20#,#8#,#100#,#0#,#0#,#0.csw");
 	QFile file("C:/Temp/20#,#8#,#100#,#0#,#0#,#0.csw");

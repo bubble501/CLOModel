@@ -38,7 +38,7 @@ private:
 	QWidget* CreateDelinquencyTriggerWidget();
 	QWidget* CreateCumulativeLossTriggerWidget();
 	QWidget* CreateDeferredInterestTriggerWidget();
-
+    QWidget* CreatePDLWidget();
 
 	QDateEdit* DateTrigger_dateEdit;
 	QComboBox* DateTrigger_SideCombo;

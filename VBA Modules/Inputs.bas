@@ -607,7 +607,17 @@ DefaultExchange:
                 Call AddInput(AllTheInputs, CDbl(TriggerStart.Offset(i, 7).Value))
                 Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 8).Value))
                 Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 9).Value))
+            Case 3 'PDL Trigger
+                Call AddInput(AllTheInputs, CLng(3))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 2).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 3).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 4).Value))
+                Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 5).Value))
+                Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 6).Value))
+                Call AddInput(AllTheInputs, CDbl(TriggerStart.Offset(i, 7).Value))
             Case Else
+                Call MsgBox("Unhandled Trigger Type", vbCritical, "Error")
                 Exit Sub
         End Select
         i = i + 1
@@ -1503,7 +1513,17 @@ Public Sub EditWaterfallStep(InputsSheet As String, Target As Range, FieldsLabel
                 Call AddInput(AllTheInputs, CDbl(TriggerStart.Offset(i, 7).Value))
                 Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 8).Value))
                 Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 9).Value))
+            Case 8 'PDL Trigger
+                Call AddInput(AllTheInputs, CLng(3))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 2).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 3).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 4).Value))
+                Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 5).Value))
+                Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 6).Value))
+                Call AddInput(AllTheInputs, CDbl(TriggerStart.Offset(i, 7).Value))
             Case Else
+                Call MsgBox("Unhandled Trigger Type", vbCritical, "Error")
                 Exit Sub
         End Select
         i = i + 1

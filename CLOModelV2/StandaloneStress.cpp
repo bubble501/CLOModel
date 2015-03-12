@@ -20,7 +20,6 @@
 #include "CommonFunctions.h"
 #include "BloombergVector.h"
 #include "MtgCalculator.h"
-#include <QSettings>
 #include <QGroupBox>
 StandaloneStress::StandaloneStress(QWidget *parent)
 	: QWidget(parent)
@@ -296,9 +295,7 @@ void StandaloneStress::BrowseModel(){
 	QString StdPath;
 	if (dir.exists() && !InPathEdit->text().isEmpty()) StdPath = dir.absolutePath();
 	else {
-		QSettings ConfigIni(":/Configs/GlobalConfigs.ini", QSettings::IniFormat);
-		ConfigIni.beginGroup("Folders");
-		StdPath=ConfigIni.value("UnifiedResultsFolder", "\\\\synserver2\\Company Share\\24AM\\Monitoring\\Model Results").toString();
+        StdPath = GetFromConfig("Folders", "UnifiedResultsFolder");
 	}
 	QString SelectedDir = QFileDialog::getOpenFileName(this, tr("Select Model File"), StdPath, tr("CLO Model Files (*.clom)"));
 	if(!SelectedDir.isEmpty()) InPathEdit->setText(SelectedDir);

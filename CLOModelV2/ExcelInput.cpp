@@ -441,11 +441,11 @@ double __stdcall CLOReturnRate(LPSAFEARRAY *ArrayData){
 	double NewPrice=pdFreq->dblVal;pdFreq++;
 	SafeArrayUnaccessData(*ArrayData);
 	Waterfall TempWaterfall;
-	QString Filename=FolderPath+"\\BaseCase.clo";
+	QString Filename=FolderPath+"/BaseCase.clo";
 	QFile file(Filename);
 	bool UsingClom = false;
 	if (!file.exists()) {
-		file.setFileName(GetFromConfig("Folders", "UnifiedResultsFolder", R"(\\synserver2\Company Share\24AM\Monitoring\Model Results)") + '\\' + DealName + ".clom");
+		file.setFileName(GetFromConfig("Folders", "UnifiedResultsFolder") + '/' + DealName + ".clom");
 		if (!file.exists())return 0.0;
 		UsingClom = true;
 	}
@@ -487,11 +487,11 @@ double __stdcall CLODiscountMargin(LPSAFEARRAY *ArrayData){
 	double NewPrice=pdFreq->dblVal;pdFreq++;
 	SafeArrayUnaccessData(*ArrayData);
 	Waterfall TempWaterfall;
-	QString Filename=FolderPath+"\\BaseCase.clo";
+	QString Filename=FolderPath+"/BaseCase.clo";
 	QFile file(Filename);
 	bool UsingClom = false;
 	if(!file.exists()){
-		file.setFileName(GetFromConfig("Folders", "UnifiedResultsFolder", R"(\\synserver2\Company Share\24AM\Monitoring\Model Results)") + '\\' + DealName + ".clom");
+		file.setFileName(GetFromConfig("Folders", "UnifiedResultsFolder") + '/' + DealName + ".clom");
 		if (!file.exists())return 0.0;
 		UsingClom = true;
 	}
@@ -687,7 +687,17 @@ BSTR __stdcall WatFallStepEdit(LPSAFEARRAY *ArrayData) {
 			case static_cast<int>(AbstractTrigger::TriggerType::DuringStressTestTrigger) :
 				AvailableTriggers.insert(i, QSharedPointer<AbstractTrigger>(new DuringStressTestTrigger(QString::fromWCharArray(pdFreq->bstrVal)))); pdFreq++;
 				break;
+            case static_cast<int>(AbstractTrigger::TriggerType::PDLTrigger) :
+                TempIter = AvailableTriggers.insert(i, QSharedPointer<AbstractTrigger>(new PDLTrigger(QString::fromWCharArray(pdFreq->bstrVal)))); pdFreq++;
+                TempIter->dynamicCast<PDLTrigger>()->SetTargetSeniority(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                TempIter->dynamicCast<PDLTrigger>()->SetTargetSeniorityLevel(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                TempIter->dynamicCast<PDLTrigger>()->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                TempIter->dynamicCast<PDLTrigger>()->SetSenioritySide(static_cast<PDLTrigger::TriggerSenioritySide>(pdFreq->intVal)); pdFreq++;
+                TempIter->dynamicCast<PDLTrigger>()->SetSizeSide(static_cast<PDLTrigger::TriggerSizeSide>(pdFreq->intVal)); pdFreq++;
+                TempIter->dynamicCast<PDLTrigger>()->SetSizeMultiplier(pdFreq->dblVal); pdFreq++;
+                break;
 			default:
+                Q_ASSERT_X(false, "ExcelInput::WatFallStepEdit", "Unhandled trigger type");
 				return NULL;
 			}
 		}

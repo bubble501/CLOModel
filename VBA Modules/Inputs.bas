@@ -607,8 +607,8 @@ DefaultExchange:
                 Call AddInput(AllTheInputs, CDbl(TriggerStart.Offset(i, 7).Value))
                 Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 8).Value))
                 Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 9).Value))
-            Case 3 'PDL Trigger
-                Call AddInput(AllTheInputs, CLng(3))
+            Case 8 'PDL Trigger
+                Call AddInput(AllTheInputs, CLng(8))
                 Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
                 Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 2).Value))
                 Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 3).Value))

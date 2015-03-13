@@ -91,7 +91,7 @@ void CentralUnit::AddTranche(
 	, double Price
 	, double FxRate
 	, const QString& BbgExt
-	, const QString& DayCount
+    , const QList<QString>& DayCount
 ){
 	Tranche TempTrnch;
 	TempTrnch.SetTrancheName(Name);
@@ -106,6 +106,8 @@ void CentralUnit::AddTranche(
 		TempTrnch.SetCoupon(Coupon.at(i), i);
 	for (int i = 0; i < RefRte.size(); i++)
 		TempTrnch.SetReferenceRate(RefRte.at(i), i);
+    for (int i = 0; i < DayCount.size(); i++)
+        TempTrnch.SetDayCount(DayCount.at(i), i);
 	TempTrnch.SetLastPaymentDate(LastPayDte);
 	TempTrnch.SetDefaultRefRate(DefRefRte);
 	TempTrnch.SetPaymentFrequency(PayFreq);
@@ -115,7 +117,6 @@ void CentralUnit::AddTranche(
 	TempTrnch.SetPrice(Price);
 	TempTrnch.SetExchangeRate(FxRate);
 	TempTrnch.SetBloombergExtension(BbgExt);
-	TempTrnch.SetDayCount(DayCount);
 	TempTrnch.SetStartingDeferredInterest(StartingDeferredInterest);
 	Structure.AddTranche(TempTrnch);
 	if (Stresser)Stresser->SetStructure(Structure);

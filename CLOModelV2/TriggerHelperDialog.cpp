@@ -16,6 +16,7 @@
 #include "PoolSizeTrigger.h"
 #include "CumulativeLossTrigger.h"
 #include "TrancheTrigger.h"
+#include "PDLtrigger.h"
 #include "DeferredInterestTrigger.h"
 TriggerHelperDialog::TriggerHelperDialog(QDialog *parent)
 	: QDialog(parent)
@@ -36,6 +37,7 @@ TriggerHelperDialog::TriggerHelperDialog(QDialog *parent)
 	TriggerTypeCombo->addItem("During Stress Test", static_cast<quint8>(AbstractTrigger::TriggerType::DuringStressTestTrigger));
 	TriggerTypeCombo->addItem("Cumulative Loss Trigger", static_cast<quint8>(AbstractTrigger::TriggerType::CumulativeLossTrigger));
 	TriggerTypeCombo->addItem("Deferred Interest Trigger", static_cast<quint8>(AbstractTrigger::TriggerType::DeferredInterestTrigger));
+    TriggerTypeCombo->addItem("PDL Trigger", static_cast<quint8>(AbstractTrigger::TriggerType::PDLTrigger));
 	TriggerTypeCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	
 	QLabel *TriggerLabelLabel = new QLabel(this);
@@ -60,7 +62,7 @@ TriggerHelperDialog::TriggerHelperDialog(QDialog *parent)
 	TriggerBuilderBase->addWidget(new QWidget(TriggerBuilderBase)); //DuringStressTestTrigger
 	TriggerBuilderBase->addWidget(CreateCumulativeLossTriggerWidget());
 	TriggerBuilderBase->addWidget(CreateDeferredInterestTriggerWidget());
-	
+    TriggerBuilderBase->addWidget(CreatePDLWidget());
 
 	AcceptButton = new QPushButton(this);
 	AcceptButton->setText(tr("OK"));
@@ -430,6 +432,174 @@ QWidget* TriggerHelperDialog::CreateTrancheTriggerWidget() {
 	ResLay->addItem(new QSpacerItem(20, 20, QSizePolicy::Preferred, QSizePolicy::Expanding), CountRow, 0, 1, 2);
 	return Result;
 }
+QWidget* TriggerHelperDialog::CreatePDLWidget()
+{
+    QWidget* Result = new QWidget(this);
+    QGridLayout *ResLay = new QGridLayout(Result);
+    int CountRow = 0;
+
+    {
+        QLabel* VecLabel = new QLabel(Result);
+        VecLabel->setText(tr("Seniority group that represent the target of the trigger"));
+        TrancheTrigger_SenEditor = new QLineEdit(Result);
+        TrancheTrigger_SenEditor->setToolTip(tr("This is the pro-rata level of the tranches whose PDL is considered.\nAccepts vectors."));
+        TrancheTrigger_SenEditor->setValidator(IntegerVector().GetValidator(TrancheTrigger_SenEditor));
+        connect(TriggerBuilderBase, &QStackedWidget::currentChanged, [&](int)
+        {
+            TrancheTrigger_SenEditor->clear();
+            if (TriggerBuilderBase->currentWidget()->children().contains(TrancheTrigger_SenEditor))
+                SetParameter(0, QString());
+        });
+        connect(TrancheTrigger_SenEditor, &QLineEdit::textChanged, [&](const QString& NewVec)
+        {
+            if (TriggerBuilderBase->currentWidget()->children().contains(TrancheTrigger_SenEditor))
+                SetParameter(0, NewVec);
+        });
+        connect(this, &TriggerHelperDialog::ImportParam, [&](int parIdx, const QString& parVal)
+        {
+            if (parIdx == 0) TrancheTrigger_SenEditor->setText(parVal);
+        });
+        ResLay->addWidget(VecLabel, CountRow, 0);
+        ResLay->addWidget(TrancheTrigger_SenEditor, CountRow, 1);
+        CountRow++;
+    }
+    {
+        QLabel* VecLabel = new QLabel(Result);
+        VecLabel->setText(tr("Level of seniority the seniority group refers to"));
+        TrancheTrigger_SenLvlEditor = new QLineEdit(Result);
+        TrancheTrigger_SenLvlEditor->setToolTip(tr("This is the depth of the pro-rata group.\nAccepts vectors.\nNormally 1"));
+        TrancheTrigger_SenLvlEditor->setValidator(IntegerVector().GetValidator(TrancheTrigger_SenLvlEditor));
+        connect(TriggerBuilderBase, &QStackedWidget::currentChanged, [&](int)
+        {
+            TrancheTrigger_SenLvlEditor->setText("1");
+            if (TriggerBuilderBase->currentWidget()->children().contains(TrancheTrigger_SenLvlEditor))
+                SetParameter(1, "1");
+        });
+        connect(TrancheTrigger_SenLvlEditor, &QLineEdit::textChanged, [&](const QString& NewVec)
+        {
+            if (TriggerBuilderBase->currentWidget()->children().contains(TrancheTrigger_SenLvlEditor))
+                SetParameter(1, NewVec);
+        });
+        connect(this, &TriggerHelperDialog::ImportParam, [&](int parIdx, const QString& parVal)
+        {
+            if (parIdx == 1) TrancheTrigger_SenLvlEditor->setText(parVal);
+        });
+        ResLay->addWidget(VecLabel, CountRow, 0);
+        ResLay->addWidget(TrancheTrigger_SenLvlEditor, CountRow, 1);
+        CountRow++;
+    }
+    {
+        QLabel* VecLabel = new QLabel(Result);
+        VecLabel->setText(tr("Target size of the PDL"));
+        TrancheTrigger_SizeEditor = new QLineEdit(Result);
+        TrancheTrigger_SizeEditor->setValidator(BloombergVector().GetValidator(TrancheTrigger_SizeEditor));
+        connect(TriggerBuilderBase, &QStackedWidget::currentChanged, [&](int)
+        {
+            TrancheTrigger_SizeEditor->setText("0");
+            if (TriggerBuilderBase->currentWidget()->children().contains(TrancheTrigger_SizeEditor))
+                SetParameter(2, "0");
+        });
+        connect(TrancheTrigger_SizeEditor, &QLineEdit::textChanged, [&](const QString& NewVec)
+        {
+            if (TriggerBuilderBase->currentWidget()->children().contains(TrancheTrigger_SizeEditor))
+                SetParameter(2, NewVec);
+        });
+        connect(this, &TriggerHelperDialog::ImportParam, [&](int parIdx, const QString& parVal)
+        {
+            if (parIdx == 2) TrancheTrigger_SizeEditor->setText(parVal);
+        });
+        ResLay->addWidget(VecLabel, CountRow, 0);
+        ResLay->addWidget(TrancheTrigger_SizeEditor, CountRow, 1);
+        CountRow++;
+    }
+    {
+        QLabel* VecLabel = new QLabel(Result);
+        VecLabel->setText(tr("Multiplier that will be applied to the target size"));
+        TrancheTrigger_SizeMultEditor = new QDoubleSpinBox(Result);
+        TrancheTrigger_SizeMultEditor->setSingleStep(0.5);
+        connect(TriggerBuilderBase, &QStackedWidget::currentChanged, [&](int)
+        {
+            TrancheTrigger_SizeMultEditor->setValue(1.0);
+            if (TriggerBuilderBase->currentWidget()->children().contains(TrancheTrigger_SizeMultEditor))
+                SetParameter(5, "1.0");
+        });
+        connect(TrancheTrigger_SizeMultEditor, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), [&](double NewVal)
+        {
+            if (TriggerBuilderBase->currentWidget()->children().contains(TrancheTrigger_SizeMultEditor))
+                SetParameter(5, QString::number(NewVal, 'f'));
+        });
+        connect(this, &TriggerHelperDialog::ImportParam, [&](int parIdx, const QString& parVal)
+        {
+            if (parIdx == 5) TrancheTrigger_SizeMultEditor->setValue(parVal.toDouble());
+        });
+
+        ResLay->addWidget(VecLabel, CountRow, 0);
+        ResLay->addWidget(TrancheTrigger_SizeMultEditor, CountRow, 1);
+        CountRow++;
+    }
+    {
+        QLabel* SideLabel = new QLabel(Result);
+        SideLabel->setText(tr("Side of the seniority ladder where the PDL is computed"));
+        TrancheTrigger_SeniorSideCombo = new QComboBox(Result);
+        TrancheTrigger_SeniorSideCombo->addItem("Senior", static_cast<quint8>(TrancheTrigger::TriggerSenioritySide::Senior));
+        TrancheTrigger_SeniorSideCombo->addItem("Junior", static_cast<quint8>(TrancheTrigger::TriggerSenioritySide::Junior));
+        TrancheTrigger_SeniorSideCombo->addItem("Exactly", static_cast<quint8>(TrancheTrigger::TriggerSenioritySide::Exactly));
+        TrancheTrigger_SeniorSideCombo->addItem("Senior or Equal", static_cast<quint8>(TrancheTrigger::TriggerSenioritySide::SeniorOrEqual));
+        TrancheTrigger_SeniorSideCombo->addItem("Junior or Equal", static_cast<quint8>(TrancheTrigger::TriggerSenioritySide::JuniorOrEqual));
+        connect(TriggerBuilderBase, &QStackedWidget::currentChanged, [&](int)
+        {
+            TrancheTrigger_SeniorSideCombo->setCurrentIndex(0);
+            if (TriggerBuilderBase->currentWidget()->children().contains(TrancheTrigger_SeniorSideCombo))
+                SetParameter(3, QString::number(TrancheTrigger_SeniorSideCombo->itemData(0).toInt()));
+        });
+        connect(TrancheTrigger_SeniorSideCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [&](int NewIndex)
+        {
+            if (TriggerBuilderBase->currentWidget()->children().contains(TrancheTrigger_SeniorSideCombo))
+                SetParameter(3, QString::number(TrancheTrigger_SeniorSideCombo->itemData(NewIndex).toInt()));
+        });
+        connect(this, &TriggerHelperDialog::ImportParam, [&](int parIdx, const QString& parVal)
+        {
+            if (parIdx == 3) TrancheTrigger_SeniorSideCombo->setCurrentIndex(TrancheTrigger_SeniorSideCombo->findData(parVal.toInt()));
+        });
+        ResLay->addWidget(SideLabel, CountRow, 0);
+        ResLay->addWidget(TrancheTrigger_SeniorSideCombo, CountRow, 1);
+        CountRow++;
+    }
+    {
+        QLabel* SideLabel = new QLabel(Result);
+        SideLabel->setText(tr("Side of the group size where the trigger passes"));
+        TrancheTrigger_SizeSideCombo = new QComboBox(Result);
+        TrancheTrigger_SizeSideCombo->addItem("Bigger", static_cast<quint8>(TrancheTrigger::TriggerSizeSide::Bigger));
+        TrancheTrigger_SizeSideCombo->addItem("Smaller", static_cast<quint8>(TrancheTrigger::TriggerSizeSide::Smaller));
+        TrancheTrigger_SizeSideCombo->addItem("Exactly", static_cast<quint8>(TrancheTrigger::TriggerSizeSide::Exactly));
+        TrancheTrigger_SizeSideCombo->addItem("Bigger or Equal", static_cast<quint8>(TrancheTrigger::TriggerSizeSide::BiggerOrEqual));
+        TrancheTrigger_SizeSideCombo->addItem("Smaller or Equal", static_cast<quint8>(TrancheTrigger::TriggerSizeSide::SmallerOrEqual));
+        connect(TriggerBuilderBase, &QStackedWidget::currentChanged, [&](int)
+        {
+            TrancheTrigger_SizeSideCombo->setCurrentIndex(0);
+            if (TriggerBuilderBase->currentWidget()->children().contains(TrancheTrigger_SizeSideCombo))
+                SetParameter(4, QString::number(TrancheTrigger_SizeSideCombo->itemData(0).toInt()));
+        });
+        connect(TrancheTrigger_SizeSideCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [&](int NewIndex)
+        {
+            if (TriggerBuilderBase->currentWidget()->children().contains(TrancheTrigger_SizeSideCombo))
+                SetParameter(4, QString::number(TrancheTrigger_SizeSideCombo->itemData(NewIndex).toInt()));
+        });
+        connect(this, &TriggerHelperDialog::ImportParam, [&](int parIdx, const QString& parVal)
+        {
+            if (parIdx == 4) TrancheTrigger_SizeSideCombo->setCurrentIndex(TrancheTrigger_SizeSideCombo->findData(parVal.toInt()));
+        });
+        ResLay->addWidget(SideLabel, CountRow, 0);
+        ResLay->addWidget(TrancheTrigger_SizeSideCombo, CountRow, 1);
+        CountRow++;
+    }
+
+
+
+    ResLay->addItem(new QSpacerItem(20, 20, QSizePolicy::Preferred, QSizePolicy::Expanding), CountRow, 0, 1, 2);
+    return Result;
+}
+
 QWidget* TriggerHelperDialog::CreateDeferredInterestTriggerWidget() {
 	QWidget* Result = new QWidget(this);
 	QGridLayout *ResLay = new QGridLayout(Result);
@@ -626,7 +796,10 @@ QWidget* TriggerHelperDialog::CreateDeferredInterestTriggerWidget() {
 	ResLay->addItem(new QSpacerItem(20, 20, QSizePolicy::Preferred, QSizePolicy::Expanding), CountRow, 0, 1, 2);
 	return Result;
 }
-QWidget* TriggerHelperDialog::CreateDelinquencyTriggerWidget() {
+
+
+QWidget* TriggerHelperDialog::CreateDelinquencyTriggerWidget()
+{
 	QWidget* Result = new QWidget(this);
 	QGridLayout *ResLay = new QGridLayout(Result);
 	int CountRow = 0;

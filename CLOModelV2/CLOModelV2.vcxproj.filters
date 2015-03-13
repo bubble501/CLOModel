@@ -242,6 +242,9 @@
     <ClInclude Include="DeferredInterestTrigger.h">
       <Filter>Header Files\Triggers</Filter>
     </ClInclude>
+    <ClInclude Include="PDLtrigger.h">
+      <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Resources.qrc">
@@ -706,6 +709,9 @@
       <Filter>Source Files\Triggers</Filter>
     </ClCompile>
     <ClCompile Include="DeferredInterestTrigger.cpp">
+      <Filter>Source Files\Triggers</Filter>
+    </ClCompile>
+    <ClCompile Include="PDLtrigger.cpp">
       <Filter>Source Files\Triggers</Filter>
     </ClCompile>
   </ItemGroup>

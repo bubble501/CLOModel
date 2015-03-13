@@ -342,7 +342,7 @@ void MtgCalculator::DownloadScenarios() {
 							+ "}; "
 							+ GetFromConfig("Database", "DataSource", R"(Server=SYNSERVER2\SQLExpress; Initial Catalog = ABSDB; Integrated Security = SSPI; Trusted_Connection = Yes;)")
 							);
-						db.setConnectOptions("SQL_ATTR_ODBC_VERSION=SQL_OV_ODBC3");
+						
 					}
 				}
 				bool DbOpen = db.isOpen();
@@ -487,7 +487,7 @@ void MtgCalculator::GuessLoanScenarios(bool OverrideAss) {
 					+ "}; "
 					+ GetFromConfig("Database", "DataSource", R"(Server=SYNSERVER2\SQLExpress; Initial Catalog = ABSDB; Integrated Security = SSPI; Trusted_Connection = Yes;)")
 					);
-				db.setConnectOptions("SQL_ATTR_ODBC_VERSION=SQL_OV_ODBC3");
+				
 			}
 		}
 		bool DbOpen = db.isOpen();
@@ -566,14 +566,12 @@ QHash<QString, double> MtgCalculator::GetGeographicBreakdown() const {
 		CurrentGuess = (*i)->GetProperty("Country");
 		if (!InsertUnknown(CurrentGuess, (*i)->GetSize())) {
 			CurrentGuess = GetGeography(CurrentGuess, dbr);
-			if (!InsertUnknown(CurrentGuess, (*i)->GetSize())) {
-				CurrentGuess = GetCountryISOCode(CurrentGuess);
-				if (!InsertUnknown(CurrentGuess, (*i)->GetSize())) {
-					auto Curres = Result.find(CurrentGuess);
-					if (Curres==Result.end()) Result.insert(CurrentGuess, (*i)->GetSize());
-					else Curres.value() += (*i)->GetSize();
-				}
-			}
+            CurrentGuess = GetCountryISOCode(CurrentGuess);
+            if (!InsertUnknown(CurrentGuess, (*i)->GetSize())) {
+                auto Curres = Result.find(CurrentGuess);
+                if (Curres == Result.end()) Result.insert(CurrentGuess, (*i)->GetSize());
+                else Curres.value() += (*i)->GetSize();
+            }
 		}
 	}
 	dbr.close();
@@ -587,24 +585,24 @@ QHash<QString, double> MtgCalculator::GetGeographicBreakdown() const {
 QString MtgCalculator::GetGeography(const QString& guess, simstring::reader& dbr) const{
 	double simThreshold=0.6;
 	std::vector<std::wstring> simMatches;
+    QString Result;
 	do {
 		simMatches.clear();
 		dbr.retrieve(guess.toLower().toStdWString(), simstring::cosine, simThreshold, std::back_inserter(simMatches));
-		simThreshold += 0.1;
+        if (!simMatches.empty()) Result = QString::fromStdWString(simMatches.front());
+		simThreshold += 0.05;
 	} while (simMatches.size() > 1 && simThreshold<1.0);
-	if (simMatches.empty()) return QString();
-	return QString::fromStdWString(simMatches.front());
+    return Result;
 }
 
 QString MtgCalculator::GetCountryISOCode(QString name) const {
 	name = name.trimmed().toLower();
+    if (name.isEmpty()) return QString();
 	QFile InputFile(":/DataSources/ISO3166-1.xml");
 	InputFile.open(QIODevice::ReadOnly);
 	bool NameMatched = false;
 	QString CurrentCode;
 	bool CountryFound = false;
-	bool NameFound = false;
-	bool CodeFound = false;
 	QXmlStreamReader xml(&InputFile);
 	QStringList PossibleNames;
 	while (!xml.atEnd() && !xml.hasError()) {
@@ -615,43 +613,25 @@ QString MtgCalculator::GetCountryISOCode(QString name) const {
 				CountryFound = true;
 			}
 			else if (xml.name() == "Name") {
-				if (NameFound || CodeFound || !CountryFound) return QString();
-				NameFound = true;
+				if (!CountryFound) return QString();
+                PossibleNames = xml.readElementText().split("#,#", QString::SkipEmptyParts);
+                for (auto pni = PossibleNames.constBegin(); !NameMatched && pni != PossibleNames.constEnd(); ++pni) {
+                    if (name.compare(*pni, Qt::CaseInsensitive) == 0)
+                        NameMatched = true;
+                }
 			}
 			else if (xml.name() == "Alpha-2") {
-				if (NameFound || CodeFound || !CountryFound) return QString();
-				CodeFound = true;
+				if (!CountryFound) return QString();
+                CurrentCode = xml.readElementText();
 			}
 		}
 		else if (xml.isEndElement()) {
 			if (xml.name() == "Country") {
-				if (!CountryFound || NameFound || CodeFound) return QString();
+				if (!CountryFound) return QString();
+                if (NameMatched && !CurrentCode.isEmpty()) return CurrentCode.trimmed().toUpper();
 				CountryFound = false;
 				NameMatched = false;
 				CurrentCode.clear();
-			}
-			else if (xml.name() == "Name") {
-				if (!NameFound) return QString();
-				NameFound = false;
-			}
-			else if (xml.name() == "Alpha-2") {
-				if (!CodeFound) return QString();
-				CodeFound = false;
-			}
-		}
-		else if (xml.isCharacters()) {
-			if (NameFound) {
-				PossibleNames = xml.text().toString().split("#,#", QString::SkipEmptyParts);
-				for (auto pni = PossibleNames.constBegin(); !NameMatched && pni != PossibleNames.constEnd(); ++pni) {
-					if (name.compare(*pni, Qt::CaseInsensitive) == 0) 
-						NameMatched = true;
-				}
-			}
-			else if (CodeFound) {
-				CurrentCode = xml.text().toString();
-			}
-			if ((NameFound || CodeFound) && NameMatched && !CurrentCode.isEmpty()) {
-				return CurrentCode.trimmed().toUpper();
 			}
 		}
 	}

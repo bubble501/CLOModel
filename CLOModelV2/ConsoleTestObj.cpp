@@ -144,7 +144,7 @@ void ConsoleTestObj::BBVALTest() {
 		, 100.0
 		, 1.0
 		, "Mtge"
-		, "102"
+        , QList<QString>() << "102"
 		);
 	TempCoup.clear(); TempCoup << "20";
 	TempUnit.AddTranche(
@@ -167,7 +167,7 @@ void ConsoleTestObj::BBVALTest() {
 		, 100.0
 		, 1.0
 		, "Mtge"
-		, "102"
+        , QList<QString>() << "102"
 		);
 	TempCoup.clear(); TempCoup << "41";
 	TempUnit.AddTranche(
@@ -190,7 +190,7 @@ void ConsoleTestObj::BBVALTest() {
 		, 100.0
 		, 1.0
 		, "Mtge"
-		, "102"
+        , QList<QString>() << "102"
 		);
 	TempCoup.clear(); TempCoup << "80";
 	TempUnit.AddTranche(
@@ -213,7 +213,7 @@ void ConsoleTestObj::BBVALTest() {
 		, 100.0
 		, 1.0
 		, "Mtge"
-		, "102"
+		, QList<QString>() << "102"
 		);
 	TempUnit.GetBaseRatesDatabase(ConstantBaseRateTable());
 	//Waterfall
@@ -1567,7 +1567,7 @@ void ConsoleTestObj::SlateTest() {
 		, 100.0
 		, 1.0
 		, "Mtge"
-		, "102"
+        , QList<QString>() << "102"
 		);
 	TempCoup.clear(); TempCoup << "100";
 	TempUnit.AddTranche(
@@ -1590,7 +1590,7 @@ void ConsoleTestObj::SlateTest() {
 		, 100.0
 		, 1.0
 		, "Mtge"
-		, "102"
+        , QList<QString>() << "102"
 		);
 	TempCoup.clear(); TempCoup << "250";
 	TempUnit.AddTranche(
@@ -1613,7 +1613,7 @@ void ConsoleTestObj::SlateTest() {
 		, 100.0
 		, 1.0
 		, "Mtge"
-		, "102"
+        , QList<QString>() << "102"
 		);
 	/*ConstantBaseRateTable LiborCurve;
 	LiborCurve.SetValue("LIBOR", 0.0053);*/

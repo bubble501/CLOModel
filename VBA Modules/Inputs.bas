@@ -1,16 +1,17 @@
 Attribute VB_Name = "Inputs"
 Option Explicit
-Declare Sub RunModel Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
+Declare Sub RunModel Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant)
 'Declare Sub RunModel Lib "Z:\24AM\Analytics\CLO Model\ExcelDllCLOModelLoanTape.dll" (ArrayData() As Variant) 'This will also save the loan pool file
-Declare Function CLODiscountMargin Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
-Declare Function CLOWALife Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
-Declare Function CLOReturnRate Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
-Declare Function GetStressLoss Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
-Declare Function GetStressDM Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As Double
+Declare Function CLODiscountMargin Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As Double
+Declare Function CLOWALife Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As Double
+Declare Function CLOReturnRate Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As Double
+Declare Function GetStressLoss Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As Double
+Declare Function GetStressDM Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As Double
 'Declare Sub InspectWaterfall Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
-Declare Function WatFallStepEdit Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As String
-Declare Function TriggerEdit Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As String
-Declare Function LoadLoanScenario Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant) As String
+Declare Function WatFallStepEdit Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As String
+Declare Function TriggerEdit Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As String
+Declare Function LoadLoanScenario Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As String
+
 Public Sub GetInputFromStructure( _
     MortgagesSheet As String, _
     InputsSheet As String, _
@@ -383,6 +384,7 @@ DefaultExchange:
         On Error GoTo 0
         Call AddInput(AllTheInputs, Format(SettleDateCell.Offset(0, 1).Value, "yyyy-mm-dd"))
         'Call AddInput(AllTheInputs, AccruedIntrStart.Offset(i, 0).Value)
+        Call AddInput(AllTheInputs, CLng(1))
         If (DayCountHead Is Nothing) Then
             Call AddInput(AllTheInputs, "102")
         Else
@@ -605,7 +607,17 @@ DefaultExchange:
                 Call AddInput(AllTheInputs, CDbl(TriggerStart.Offset(i, 7).Value))
                 Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 8).Value))
                 Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 9).Value))
+            Case 8 'PDL Trigger
+                Call AddInput(AllTheInputs, CLng(8))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 2).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 3).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 4).Value))
+                Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 5).Value))
+                Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 6).Value))
+                Call AddInput(AllTheInputs, CDbl(TriggerStart.Offset(i, 7).Value))
             Case Else
+                Call MsgBox("Unhandled Trigger Type", vbCritical, "Error")
                 Exit Sub
         End Select
         i = i + 1
@@ -855,14 +867,14 @@ DefaultExchange:
         Dim countDates As Long
         CountFwd = 0
         Do While (True)
-            If (IsEmpty(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(2, (CountFwd * 2) + 1))) Then Exit Do
+            If (IsEmpty(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(3, (CountFwd * 2) + 1))) Then Exit Do
             CountFwd = CountFwd + 1
         Loop
         Call AddInput(AllTheInputs, CountFwd)
         CountFwd = 0
         Do While (True)
-            If (IsEmpty(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(2, (CountFwd * 2) + 1))) Then Exit Do
-            Call AddInput(AllTheInputs, CStr(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(2, (CountFwd * 2) + 1)))
+            If (IsEmpty(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(3, (CountFwd * 2) + 1))) Then Exit Do
+            Call AddInput(AllTheInputs, CStr(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(1, (CountFwd * 2) + 1)))
             If LocalUseFwd Then
                 countDates = 0
                 Do While (True)
@@ -878,7 +890,7 @@ DefaultExchange:
                     countDates = countDates + 1
                 Loop
             Else
-                Call AddInput(AllTheInputs, CDbl(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(4, (CountFwd * 2) + 2).Value))
+                Call AddInput(AllTheInputs, CDbl(Sheets(FieldsLabels("ForwardCurvesSheet")).Cells(3, (CountFwd * 2) + 2).Value))
             End If
             CountFwd = CountFwd + 1
         Loop
@@ -1098,10 +1110,10 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
 End Sub
 
 Private Function FromStringToInterestType(a As String) As Long
-    If (UCase(a) = "FLOAT") Then
-        FromStringToInterestType = 1
-    Else
+    If (UCase(a) = "FIXED") Then
         FromStringToInterestType = 0
+    Else
+        FromStringToInterestType = 1
     End If
 End Function
 
@@ -1124,6 +1136,8 @@ Public Function FromStringToTriggerType(a As String) As Long
             FromStringToTriggerType = 6
         Case UCase("Deferred Interest Trigger")
             FromStringToTriggerType = 7
+        Case UCase("PDL Trigger")
+            FromStringToTriggerType = 8
         Case ""
             Exit Function
         Case Else
@@ -1155,6 +1169,8 @@ Public Function FromTriggerTypeToString(a As Long) As String
             FromTriggerTypeToString = "Cumulative Loss Trigger"
         Case 7
             FromTriggerTypeToString = "Deferred Interest Trigger"
+        Case 8
+            FromTriggerTypeToString = "PDL Trigger"
         Case ""
             Exit Function
         Case Else
@@ -1497,7 +1513,17 @@ Public Sub EditWaterfallStep(InputsSheet As String, Target As Range, FieldsLabel
                 Call AddInput(AllTheInputs, CDbl(TriggerStart.Offset(i, 7).Value))
                 Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 8).Value))
                 Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 9).Value))
+            Case 8 'PDL Trigger
+                Call AddInput(AllTheInputs, CLng(3))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 2).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 3).Value))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 4).Value))
+                Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 5).Value))
+                Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 6).Value))
+                Call AddInput(AllTheInputs, CDbl(TriggerStart.Offset(i, 7).Value))
             Case Else
+                Call MsgBox("Unhandled Trigger Type", vbCritical, "Error")
                 Exit Sub
         End Select
         i = i + 1
@@ -1619,6 +1645,7 @@ Public Sub EditLoanScenarios()
     If (NewScenarios = "") Then Exit Sub
     Dim Singlescenario
     Singlescenario = Split(NewScenarios, "#,#")
+    Application.ScreenUpdating = False
     For i = LBound(Singlescenario) To UBound(Singlescenario)
         LoanScenarioProperty.Offset(1 + i - LBound(Singlescenario), 0).Value = Singlescenario(i)
     Next i

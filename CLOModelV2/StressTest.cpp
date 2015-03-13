@@ -35,6 +35,7 @@ StressTest::StressTest(QObject* parent)
 	connect(this, SIGNAL(CurrentScenarioCalculated()), this, SLOT(GoToNextScenario()),Qt::QueuedConnection);
 	connect(BaseCalculator, SIGNAL(BeeError(int)), this, SLOT(ErrorInCalculation()), Qt::QueuedConnection);
 	connect(this, SIGNAL(AllLoansCalculated()), TranchesCalculator, SLOT(StartCalculation()), Qt::QueuedConnection);
+    //connect(this, &StressTest::AllLoansCalculated, [&]() { BaseApplier->ClearResults(); BaseApplier->ClearScenarios(); BaseCalculator->ClearLoans(); BaseCalculator->ClearResults(); });
 	//connect(this, SIGNAL(AllLoansCalculated()), this, SLOT(ReachedWaterfallCalc()));
 	
 	connect(TranchesCalculator, SIGNAL(Calculated()), this, SLOT(GatherResults()), Qt::QueuedConnection);
@@ -136,6 +137,8 @@ void StressTest::RunStressTest() {
 	}
 	if (UseFastVersion) {
 		connect(BaseCalculator, SIGNAL(Calculated()), this, SLOT(BaseForFastCalculated()));
+        if (ShowProgress)
+            connect(BaseCalculator, SIGNAL(Progress(double)), ProgressForm, SLOT(SetPhaseProgress(double)));
 		if (!BaseCalculator->StartCalculation()){
 			QMessageBox::critical(0, "Invalid Input", "A base rate in the loans is invalid");
 			return;
@@ -146,6 +149,8 @@ void StressTest::RunStressTest() {
 }
 void StressTest::BaseForFastCalculated() {
 	disconnect(BaseCalculator, SIGNAL(Calculated()), this, SLOT(BaseForFastCalculated()));
+    if (ShowProgress)
+        disconnect(BaseCalculator, SIGNAL(Progress(double)), ProgressForm, SLOT(SetPhaseProgress(double)));
 	if (!ContinueCalculation) return StoppedCalculation();
 	BaseApplier->SetBaseFlows(*BaseCalculator->GetAggregatedResults());
 	RunCurrentScenario();

@@ -15,6 +15,7 @@
 #include "AssumptionSet.h"
 #include "DelinquencyTrigger.h"
 #include "DuringStressTestTrigger.h"
+#include "PDLtrigger.h"
 const WatFalPrior* Waterfall::GetStep(int Index)const {
 	if (Index<0 || Index >= m_WaterfallStesps.size()) return nullptr;
 	return m_WaterfallStesps.at(Index);
@@ -179,7 +180,11 @@ Waterfall::Waterfall(const Waterfall& a)
 		case AbstractTrigger::TriggerType::DeferredInterestTrigger:
 			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DeferredInterestTrigger(*(i.value().dynamicCast<DeferredInterestTrigger>()))));
 			break;
+        case AbstractTrigger::TriggerType::PDLTrigger:
+            m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new PDLTrigger(*(i.value().dynamicCast<PDLTrigger>()))));
+            break;
 		default:
+            Q_ASSERT_X(false, "Waterfall::CopyConstructor", "Unhandled Trigger Type");
 			break;
 		}
 	}
@@ -267,7 +272,11 @@ Waterfall& Waterfall::operator=(const Waterfall& a){
 		case AbstractTrigger::TriggerType::DeferredInterestTrigger:
 			m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DeferredInterestTrigger(*(i.value().dynamicCast<DeferredInterestTrigger>()))));
 			break;
+        case AbstractTrigger::TriggerType::PDLTrigger:
+            m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new PDLTrigger(*(i.value().dynamicCast<PDLTrigger>()))));
+            break;
 		default:
+            Q_ASSERT_X(false, "Waterfall::operator=", "Unhandled Trigger Type");
 			break;
 		}
 	}
@@ -631,15 +640,21 @@ bool Waterfall::CalculateTranchesCashFlows(){
 			bool KeepSearching = false;
 			ConstantBaseRateTable TempTable;
 			if (m_GICBaseRateValue.IsEmpty()) {
-				m_GICBaseRateValue = m_GICBaseRate.CompileReferenceRateValue(TempTable);
-				if (m_GICBaseRateValue.IsEmpty()) {
-					PrintToTempFile("ReturnFalse.txt", "Missing Base Rate Value");
-					return false;
-				}
+                if (m_GICBaseRate.IsEmpty()) { 
+                    m_GICBaseRateValue = "0";
+                }
+                else{
+                    m_GICBaseRateValue = m_GICBaseRate.CompileReferenceRateValue(TempTable);
+                    if (m_GICBaseRateValue.IsEmpty()) {
+                        PrintToTempFile("ReturnFalse.txt", "Missing Base Rate Value");
+                        return false;
+                    }
+                }
 			}
 			for (QList<Tranche*>::const_iterator SingleTranche = m_Tranches.constBegin(); SingleTranche != m_Tranches.constEnd(); ++SingleTranche) {
-				for (QHash<qint32, BloombergVector*>::const_iterator SingleRate = (*SingleTranche)->GetRefRateValues().constBegin();SingleRate != (*SingleTranche)->GetRefRateValues().constEnd(); ++SingleRate) {
-					if (SingleRate.value()->IsEmpty()) {
+                auto keysList = (*SingleTranche)->GetReferenceRateIndexes();
+                for (auto SingleRate = keysList.constBegin(); SingleRate != keysList.constEnd(); ++SingleRate) {
+                    if ((*SingleTranche)->GetInterestType(*SingleRate)==Tranche::FloatingInterest && (*SingleTranche)->GetReferenceRateValue(*SingleRate).IsEmpty()) {
 						KeepSearching = true;
 						(*SingleTranche)->CompileReferenceRateValue(TempTable);
 						break;
@@ -862,7 +877,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						- m_TotalSeniorExpenses.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow))
 						- m_TotalSeniorExpenses.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow))
 					;
-					TotalPayable += m_SeniorExpensesFixed.GetValue(CurrentDate);
+					TotalPayable += m_SeniorExpensesFixed.GetValue(CurrentDate)*static_cast<double>(m_PaymentFrequency.GetValue(CurrentDate))/12.0;
 					if(TotalPayable>=0.01){
 						if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 1) {
 							m_TotalSeniorExpenses.AddFlow(CurrentDate, qMin(AvailableInterest, TotalPayable), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
@@ -882,7 +897,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						- m_TotalSeniorFees.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow))
 						- m_TotalSeniorFees.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow))
 						;
-					TotalPayable += m_SeniorFeesFixed.GetValue(CurrentDate);
+                    TotalPayable += m_SeniorFeesFixed.GetValue(CurrentDate)*static_cast<double>(m_PaymentFrequency.GetValue(CurrentDate)) / 12.0;;
 					if(TotalPayable>=0.01){
 						if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 1) {
 							m_TotalSeniorFees.AddFlow(CurrentDate, qMin(AvailableInterest, TotalPayable), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
@@ -904,7 +919,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 							+ (AdjustCoupon(m_JuniorFeesCoupon, RollingLastIPD, RollingNextIPD, m_DealDayCountConvention.GetValue(CurrentDate))*(m_TotalJuniorFees.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow)) + m_StartingDeferredJunFees))
 							;
 						m_StartingDeferredJunFees = 0.0;
-						TotalPayable += m_JuniorFeesFixed.GetValue(CurrentDate);
+                        TotalPayable += m_JuniorFeesFixed.GetValue(CurrentDate)*static_cast<double>(m_PaymentFrequency.GetValue(CurrentDate)) / 12.0;;
 						TotalPayable = qMax(TotalPayable, 0.0);
 						m_TotalJuniorFees.AddFlow(CurrentDate, TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::AccruedFlow));
 					}
@@ -1021,7 +1036,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 									PrintToTempFile("ReturnFalse.txt", SingleTranche->GetTrancheName() + " - Coupon not set in tranche");
 									return false;
 								}
-								AdjustedCoupon = AdjustCoupon(SingleTranche->GetCoupon(CurrentDate, CurrCoupIndx), RollingLastIPD, RollingNextIPD, SingleTranche->GetDayCount().GetValue(CurrentDate));
+                                AdjustedCoupon = AdjustCoupon(SingleTranche->GetCoupon(CurrentDate, CurrCoupIndx), RollingLastIPD, RollingNextIPD, SingleTranche->GetDayCount(CurrCoupIndx).GetValue(CurrentDate));
 								Solution = SingleTranche->GetCashFlow().GetDeferred(CurrentDate, CurrCoupIndx);
 								Solution += SingleTranche->GetCashFlow().GetAmountOutstanding(CurrentDate);
 								Solution *= AdjustedCoupon;
@@ -1301,7 +1316,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 					Solution = qMin(TotalPayable - m_MortgagesPayments.GetAmountOut(CurrentDate) - AvailablePrincipal.Total(), TestTarget);
 					if (Solution >= 0.01) {
 						foreach(const int& SingleBond, ProRataBonds) {
-							m_Tranches[SingleBond]->AddCashFlow(CurrentDate, qMax(0.0, Solution - AvailableInterest)* m_Tranches.at(SingleBond)->GetCashFlow().GetAmountOutstanding(CurrentDate) / TestTarget, TrancheCashFlow::TrancheFlowType::PDLOutstanding);
+							m_Tranches[SingleBond]->SetCashFlow(CurrentDate, qMax(0.0, Solution - AvailableInterest)* m_Tranches.at(SingleBond)->GetCashFlow().GetAmountOutstanding(CurrentDate) / TestTarget, TrancheCashFlow::TrancheFlowType::PDLOutstanding);
 							m_Tranches[SingleBond]->AddCashFlow(CurrentDate, qMin(AvailableInterest, Solution)* m_Tranches.at(SingleBond)->GetCashFlow().GetAmountOutstanding(CurrentDate) / TestTarget, TrancheCashFlow::TrancheFlowType::PDLCured);
 						}
 						TotalPayable = qMin(AvailableInterest, Solution);
@@ -1459,7 +1474,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 								PrintToTempFile("ReturnFalse.txt", m_Tranches.at(h)->GetTrancheName() + " - Coupon not set in tranche");
 								return false;
 							}
-							AdjustedCoupon = AdjustCoupon((m_Tranches.at(h)->GetCoupon(CurrentDate, CurrCoupIndx)), RollingNextIPD, RollingNextIPD.addMonths(m_PaymentFrequency.GetValue(RollingNextIPD)), m_Tranches.at(h)->GetDayCount().GetValue(CurrentDate));
+                            AdjustedCoupon = AdjustCoupon((m_Tranches.at(h)->GetCoupon(CurrentDate, CurrCoupIndx)), RollingNextIPD, RollingNextIPD.addMonths(m_PaymentFrequency.GetValue(RollingNextIPD)), m_Tranches.at(h)->GetDayCount(CurrCoupIndx).GetValue(CurrentDate));
 							TotalPayable += AdjustedCoupon*(m_Tranches.at(h)->GetCashFlow().GetAmountOutstanding(CurrentDate) + m_Tranches.at(h)->GetCashFlow().GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | CurrCoupIndx));
 							if (m_Tranches.at(h)->GetProrataGroup(CurrSenGrpLvl) == CurrSenGrp)
 								ProRataBonds.enqueue(h);
@@ -1504,7 +1519,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 									Solution = 0.0;
 									for (int h = 0; h<m_Tranches.size(); h++) {
 										if (m_Tranches.at(h)->GetProrataGroup(CurrSenGrpLvl) <= CurrSenGrp && m_Tranches.at(h)->GetProrataGroup(CurrSenGrpLvl) >= SolutionDegree) {
-											AdjustedCoupon = AdjustCoupon((m_Tranches.at(h)->GetCoupon(CurrentDate, CurrCoupIndx)), RollingNextIPD, RollingNextIPD.addMonths((m_PaymentFrequency.GetValue(RollingNextIPD))), m_Tranches.at(h)->GetDayCount().GetValue(CurrentDate));
+                                            AdjustedCoupon = AdjustCoupon((m_Tranches.at(h)->GetCoupon(CurrentDate, CurrCoupIndx)), RollingNextIPD, RollingNextIPD.addMonths((m_PaymentFrequency.GetValue(RollingNextIPD))), m_Tranches.at(h)->GetDayCount(CurrCoupIndx).GetValue(CurrentDate));
 											Solution += AdjustedCoupon*(m_Tranches.at(h)->GetCashFlow().GetAmountOutstanding(CurrentDate) + m_Tranches.at(h)->GetCashFlow().GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | CurrCoupIndx));
 										}
 									}
@@ -1846,6 +1861,11 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream){
 			case AbstractTrigger::TriggerType::DeferredInterestTrigger:
 				TempTrig.reset(new DeferredInterestTrigger());
 				break;
+            case AbstractTrigger::TriggerType::PDLTrigger:
+                TempTrig.reset(new PDLTrigger());
+                break;
+            default:
+                Q_ASSERT_X(false, "Waterfall::LoadOldVersion", "Unhadled Trigger Type");
 			}
 			TempTrig->SetLoadProtocolVersion(m_LoadProtocolVersion);
 			stream >> (*TempTrig);
@@ -1915,7 +1935,10 @@ QString Waterfall::ReadyToCalculate()const{
 		if (m_Reserves.at(ResIter)->GetReserveFundCurrent() < 0.0) Result += QString("Reserve %1 Current Amount\n").arg(ResIter + 1);
 	}
 	foreach(const Tranche* SingleTranche, m_Tranches) {
-		if (SingleTranche->GetDayCount().IsEmpty()) Result += "Tranche Day Count Convention\n";
+        const auto tempCoupons= SingleTranche->GetDayCountsIndexes();
+        for (auto singlCoup = tempCoupons.constBegin(); singlCoup != tempCoupons.constEnd(); ++singlCoup) {
+            if (SingleTranche->GetDayCount(*singlCoup).IsEmpty()) Result += "Tranche Day Count Convention\n";
+        }
 		if (IntegerVector(SingleTranche->GetPaymentFrequency()).IsEmpty(1)) Result += "Tranche payment Frequency\n";
 		if (SingleTranche->GetOriginalAmount() < 0.0) Result += "Tranche Original Amount";
 		if (SingleTranche->GetOutstandingAmt() < 0.0) Result += "Tranche Amount Outstanding";
@@ -2250,7 +2273,14 @@ bool Waterfall::EvaluateTrigger(quint32 TrigID, int PeriodIndex, const QDate& Cu
 			TempTrig.FillMissingAnchorDate(m_MortgagesPayments.GetDate(0));
 		return TempTrig.Passing(m_Tranches, CurrentIPD);
 	}
+    case AbstractTrigger::TriggerType::PDLTrigger:{
+        PDLTrigger TempTrig(*CurrentTrigger.dynamicCast<PDLTrigger>());
+        if (!TempTrig.HasAnchor())
+            TempTrig.FillMissingAnchorDate(m_MortgagesPayments.GetDate(0));
+        return TempTrig.Passing(m_Tranches, m_MortgagesPayments.GetAmountOut(PeriodIndex)+m_InterestAvailable+m_PrincipalAvailable.Total() , CurrentIPD);
+    }
 	default:
+        Q_ASSERT_X(false, "Waterfall::EvaluateTrigger", "Unhadled Trigger Type");
 		return false;
 	}
 }

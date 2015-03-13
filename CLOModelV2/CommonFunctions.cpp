@@ -194,13 +194,13 @@ double AdjustCoupon(double AnnualCoupon /*Annualised Coupon*/, QDate PrevIPD /*I
 				//days from start accrual date to end of year divided by days in that year (365 or 366 if it's leap)
 				(static_cast<double>(PrevIPD.daysTo(QDate(PrevIPD.year(), 12, 31))) / static_cast<double>(PrevIPD.daysInYear()))
 				// Full years between the two dates
-				+ qMax(0.0, static_cast<double>(CurrIPD.year() - PrevIPD.year()-1))
+				+ static_cast<double>(CurrIPD.year() - PrevIPD.year()-1)
 				//days start of year to end accrual date to end of year divided by days in that year (365 or 366 if it's leap)
 				+ (static_cast<double>(QDate(CurrIPD.year(), 1, 1).daysTo(CurrIPD)) / static_cast<double>(CurrIPD.daysInYear()))
 			);
 		}
 		//Otherwise this is the same as ACT/365
-		else return AdjustCoupon(AnnualCoupon, PrevIPD, CurrIPD, static_cast<DayCountConvention>((static_cast<qint16>(DayCount)& (0x3 << CompoundShift)) | static_cast<qint16>(DayCountConvention::ACT365)));
+		else return AdjustCoupon(AnnualCoupon, PrevIPD, CurrIPD, static_cast<DayCountConvention>((static_cast<qint16>(DayCount)& ((~0) << CompoundShift)) | static_cast<qint16>(DayCountConvention::NACT365)));
 		break;
 	case DayCountConvention::ACT360:
 		// For non nominal day count conventions move payment dates that are in weekends or bank holidays
@@ -211,15 +211,15 @@ double AdjustCoupon(double AnnualCoupon /*Annualised Coupon*/, QDate PrevIPD /*I
 		//Difference between the dates divided 360
 		TimeFactor = static_cast<double>(PrevIPD.daysTo(CurrIPD)) / 360.0;
 		break;
-	case DayCountConvention::ACT365:
-		// For non nominal day count conventions move payment dates that are in weekends or bank holidays
-		while (IsHoliday(CurrIPD)) CurrIPD = CurrIPD.addDays(1);
-		while (IsHoliday(PrevIPD)) PrevIPD = PrevIPD.addDays(1);
-		//fall through next case
-	case DayCountConvention::NACT365:
-		//Difference between the dates divided 365
-		TimeFactor = static_cast<double>(PrevIPD.daysTo(CurrIPD)) / 365.0;
-		break;
+    case DayCountConvention::ACT365:
+        // For non nominal day count conventions move payment dates that are in weekends or bank holidays
+        while (IsHoliday(CurrIPD)) CurrIPD = CurrIPD.addDays(1);
+        while (IsHoliday(PrevIPD)) PrevIPD = PrevIPD.addDays(1);
+        //fall through next case
+    case DayCountConvention::NACT365:
+        //Difference between the dates divided 365
+        TimeFactor = static_cast<double>(PrevIPD.daysTo(CurrIPD)) / 365.0;
+        break;
 	case DayCountConvention::AFBACTACT:
 		// For non nominal day count conventions move payment dates that are in weekends or bank holidays
 		while (IsHoliday(CurrIPD)) CurrIPD = CurrIPD.addDays(1);

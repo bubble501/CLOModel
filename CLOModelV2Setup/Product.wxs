@@ -7,7 +7,11 @@
 		</Condition>
 		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
 		<MediaTemplate EmbedCab="yes" />
-
+        <?if $(var.Platform) = x64 ?>
+            <?define SystemDir = "SysWOW64" ?>
+        <?else ?>
+            <?define SystemDir = "system32" ?>
+        <?endif ?>
 		<Property Id="FOUNDQT4CORE">
 			<DirectorySearch Id="CheckQtCore4Dir" Path="[System16Dir]" Depth="0">
 				<FileSearch Id="CheckQtCore" Name="QtCore4.dll" />
@@ -79,15 +83,13 @@
 			<ComponentRef Id ='RemoveOldzlib'/>
 			<Condition Level='1'>FOUNDZLIB</Condition>
 		</Feature>
-		<Feature Id='InstallMsCom' Title='Install MS Com 2 toolkit' Level='1' Display='hidden'>
-			<ComponentRef Id ='MSCOM2'/>
-			<Condition Level='0'>FOUNDMSCOM</Condition>
-		</Feature>
 		<Feature Id="VCRedist" Title="Visual C++ 12.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
 			<MergeRef Id="VCRedist"/>
 		</Feature>
-		
-
+        <Feature Id='InstallMsCom' Title='Install MS Com 2 toolkit' Level='1' Display='hidden'>
+            <ComponentRef Id ='MSCOM2'/>
+            <Condition Level='0'>FOUNDMSCOM</Condition>
+        </Feature>
 		<UIRef Id="WixUI_Mondo" />
 		<UIRef Id="WixUI_ErrorProgressText" />
 		<WixVariable Id="WixUILicenseRtf" Value="..\Documentation\License.rtf"/>
@@ -137,13 +139,13 @@
 				<File Id="Qt5PrintSupport" Name="Qt5PrintSupport.dll" Source="$(env.QTPATH)\bin\Qt5PrintSupport.dll" KeyPath="yes" />
 			</Component>
 			<Component Id="icudt" Guid="9E3B7C4F-BF32-4E80-9404-4716251AC8ED">
-				<File Id="icudt52" Name="icudt52.dll" Source="$(env.QTPATH)\bin\icudt52.dll" KeyPath="yes" />
+				<File Id="icudt53" Name="icudt53.dll" Source="$(env.QTPATH)\bin\icudt53.dll" KeyPath="yes" />
 			</Component>
 			<Component Id="icuin" Guid="26E9C49C-6E1A-4DA5-A717-B7C3C0C500EA">
-				<File Id="icuin52" Name="icuin52.dll" Source="$(env.QTPATH)\bin\icuin52.dll" KeyPath="yes" />
+				<File Id="icuin53" Name="icuin53.dll" Source="$(env.QTPATH)\bin\icuin53.dll" KeyPath="yes" />
 			</Component>
 			<Component Id="icuuc" Guid="CB2405C6-B6A6-4EE7-96CA-E72A011E1263">
-				<File Id="icuuc52" Name="icuuc52.dll" Source="$(env.QTPATH)\bin\icuuc52.dll" KeyPath="yes" />
+				<File Id="icuuc53" Name="icuuc53.dll" Source="$(env.QTPATH)\bin\icuuc53.dll" KeyPath="yes" />
 			</Component>
 			<Component Id="libEGL" Guid="725196F9-811B-4031-9AF9-8268F1981017">
 				<File Id="libEGL" Name="libEGL.dll" Source="$(env.QTPATH)\bin\libEGL.dll" KeyPath="yes" />
@@ -169,7 +171,7 @@
 				<File Id="WindowsPlugin" Name="qwindows.dll" Source="$(env.QTPATH)\plugins\platforms\qwindows.dll" KeyPath="yes" />
 			</Component>
 			<Component Id="QtODBCdriver" Guid="6498A06E-3B13-4EC4-9CBB-4533E07C44D2" Directory="SQLDRIVERSDIR">
-				<File Id="QODBCPlugin" Name="qsqlpsql.dll" Source="$(env.QTPATH)\plugins\sqldrivers\qsqlpsql.dll" KeyPath="yes" />
+				<File Id="QODBCPlugin" Name="qsqlodbc.dll" Source="$(env.QTPATH)\plugins\sqldrivers\qsqlodbc.dll" KeyPath="yes" />
 			</Component>
 		</ComponentGroup>	
 		<ComponentGroup Id="FileAssociation" Directory="INSTALLFOLDER">
@@ -194,10 +196,10 @@
 					<RegistryValue Type='string' Value='CLOViewer' />
 				</RegistryKey>
 				<RegistryKey Id="ApplicationRegIcon" Root="HKCU" Key="SOFTWARE\Classes\CLO.BaseCase\DefaultIcon" ForceCreateOnInstall="yes">
-					<RegistryValue Type='string' Value='"\\SYNSERVER2\Company Share\24AM\Analytics\CLO Model\LogoIcon.ico"' />
+					<RegistryValue Type='string' Value='"Z:\24AM\Analytics\CLO Model\LogoIcon.ico"' />
 				</RegistryKey>
 				<RegistryKey Id="ApplicationRegComand" Root="HKCU" Key="SOFTWARE\Classes\CLO.BaseCase\shell\Open\command" ForceCreateOnInstall="yes">
-					<RegistryValue Type='string' Value='"\\SYNSERVER2\Company Share\24AM\Analytics\CLO Model\CLOViewer.exe" "%1"' />
+					<RegistryValue Type='string' Value='"Z:\24AM\Analytics\CLO Model\CLOViewer.exe" "%1"' />
 				</RegistryKey>
 			</Component>
 		</ComponentGroup>

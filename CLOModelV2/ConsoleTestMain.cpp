@@ -28,11 +28,10 @@
 #include "FloorCapVector.h"
 #include "LoanAssumptionsEditor.h"
 #include "CheckAndEdit.h"
+#include <QHBoxLayout>
+#include <QIcon>
 
 int main(int argc, char *argv[]) {
-
-	
-
 	//QApplication a(argc, argv);
 	//ConsoleTestObj b;
 	//return a.exec();
@@ -85,7 +84,7 @@ int main(int argc, char *argv[]) {
 	
 	Waterfall TempWtf, TempCallWaterfall;
 	MtgCalculator TempMtg;
-	QFile file("Z:/24AM/Monitoring/Model Results/DRYD 2015-35X.clom");
+	QFile file("Z:/24AM/Monitoring/Model Results/Celeste 2015-1.clom");
 	file.open(QIODevice::ReadOnly);
 	qint32 VersionChecker;
 	QDataStream out(&file);
@@ -107,7 +106,7 @@ int main(int argc, char *argv[]) {
 	file.close();
 	TempWtf.CalculateTranchesCashFlows();
 	
-	PrintToTempFile("Class F Flows", TempWtf.GetTranche("DRYD 15-35X F")->GetCashFlow().ToPlainText(), false);
+	//PrintToTempFile("Class F Flows", TempWtf.GetTranche("DRYD 15-35X F")->GetCashFlow().ToPlainText(), false);
 // 	QApplication a(argc, argv);
 // 	TempMtg.DownloadScenarios();
 // 	TempMtg.SetSequentialComputation(true);

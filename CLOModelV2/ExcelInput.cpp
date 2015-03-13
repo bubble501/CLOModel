@@ -16,6 +16,7 @@
 #include "VectorTrigger.h"
 #include "PoolSizeTrigger.h"
 #include "TrancheTrigger.h"
+#include "PDLtrigger.h"
 #include "DelinquencyTrigger.h"
 #include "WaterfallStepHelperDialog.h"
 #include "TriggerHelperDialog.h"
@@ -48,8 +49,8 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		}
 	}
 	{//Tranches
-		QString DayCnt, TrName, Curr, BasRt, TrancheISIN, IPDfrq, ProRat;
-		QList<QString> RefRt, coup;
+		QString TrName, Curr, BasRt, TrancheISIN, IPDfrq, ProRat;
+        QList<QString> RefRt, coup, DayCnt;
 		QList<Tranche::TrancheInterestType>IntrTpe;
 		int TempSize;
 		double origOut,currOut,OClim,IClim,Price,Exchan,startingDeferred/*,coup*/;
@@ -81,10 +82,14 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			Price=pdFreq->dblVal;pdFreq++;
 			Exchan=pdFreq->dblVal;pdFreq++;
 			SettDate=QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd");pdFreq++;
-			DayCnt = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+            TempSize = pdFreq->intVal; pdFreq++;
+            for (int i = 0; i < TempSize; ++i) {
+                DayCnt.append(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+            }
 			startingDeferred = pdFreq->dblVal; pdFreq++;
 			TempUnit.AddTranche(TrName, TrancheISIN, ProRat, origOut, Curr, currOut, IntrTpe, coup, RefRt, PrevIPD, BasRt, IPDfrq, SettDate, startingDeferred, /*RefRtVal,*/ OClim, IClim, Price, Exchan, "Mtge", DayCnt);
-		}
+            LOGDEBUG("Tranche Added");
+        }
 	}
 	
 	{ //Waterfall Steps
@@ -186,6 +191,18 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 				TempTrigger.reset(new DuringStressTestTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
 				TempUnit.SetTrigger(i + 1, TempTrigger);
 				break;
+            case static_cast<int>(AbstractTrigger::TriggerType::PDLTrigger) :
+                TempTrigger.reset(new PDLTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+                TempTrigger.dynamicCast<PDLTrigger>()->SetTargetSeniority(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                TempTrigger.dynamicCast<PDLTrigger>()->SetTargetSeniorityLevel(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                TempTrigger.dynamicCast<PDLTrigger>()->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                TempTrigger.dynamicCast<PDLTrigger>()->SetSenioritySide(static_cast<PDLTrigger::TriggerSenioritySide>(pdFreq->intVal)); pdFreq++;
+                TempTrigger.dynamicCast<PDLTrigger>()->SetSizeSide(static_cast<PDLTrigger::TriggerSizeSide>(pdFreq->intVal)); pdFreq++;
+                TempTrigger.dynamicCast<PDLTrigger>()->SetSizeMultiplier(pdFreq->dblVal); pdFreq++;
+                TempUnit.SetTrigger(i + 1, TempTrigger);
+                break;
+            default:
+                PrintToTempFile("Error", "Unhanded Trigger Type in Input");
 			}
 		}
 	}
@@ -424,11 +441,11 @@ double __stdcall CLOReturnRate(LPSAFEARRAY *ArrayData){
 	double NewPrice=pdFreq->dblVal;pdFreq++;
 	SafeArrayUnaccessData(*ArrayData);
 	Waterfall TempWaterfall;
-	QString Filename=FolderPath+"\\BaseCase.clo";
+	QString Filename=FolderPath+"/BaseCase.clo";
 	QFile file(Filename);
 	bool UsingClom = false;
 	if (!file.exists()) {
-		file.setFileName(GetFromConfig("Folders", "UnifiedResultsFolder", R"(\\synserver2\Company Share\24AM\Monitoring\Model Results)") + '\\' + DealName + ".clom");
+		file.setFileName(GetFromConfig("Folders", "UnifiedResultsFolder") + '/' + DealName + ".clom");
 		if (!file.exists())return 0.0;
 		UsingClom = true;
 	}
@@ -470,11 +487,11 @@ double __stdcall CLODiscountMargin(LPSAFEARRAY *ArrayData){
 	double NewPrice=pdFreq->dblVal;pdFreq++;
 	SafeArrayUnaccessData(*ArrayData);
 	Waterfall TempWaterfall;
-	QString Filename=FolderPath+"\\BaseCase.clo";
+	QString Filename=FolderPath+"/BaseCase.clo";
 	QFile file(Filename);
 	bool UsingClom = false;
 	if(!file.exists()){
-		file.setFileName(GetFromConfig("Folders", "UnifiedResultsFolder", R"(\\synserver2\Company Share\24AM\Monitoring\Model Results)") + '\\' + DealName + ".clom");
+		file.setFileName(GetFromConfig("Folders", "UnifiedResultsFolder") + '/' + DealName + ".clom");
 		if (!file.exists())return 0.0;
 		UsingClom = true;
 	}
@@ -670,7 +687,17 @@ BSTR __stdcall WatFallStepEdit(LPSAFEARRAY *ArrayData) {
 			case static_cast<int>(AbstractTrigger::TriggerType::DuringStressTestTrigger) :
 				AvailableTriggers.insert(i, QSharedPointer<AbstractTrigger>(new DuringStressTestTrigger(QString::fromWCharArray(pdFreq->bstrVal)))); pdFreq++;
 				break;
+            case static_cast<int>(AbstractTrigger::TriggerType::PDLTrigger) :
+                TempIter = AvailableTriggers.insert(i, QSharedPointer<AbstractTrigger>(new PDLTrigger(QString::fromWCharArray(pdFreq->bstrVal)))); pdFreq++;
+                TempIter->dynamicCast<PDLTrigger>()->SetTargetSeniority(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                TempIter->dynamicCast<PDLTrigger>()->SetTargetSeniorityLevel(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                TempIter->dynamicCast<PDLTrigger>()->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                TempIter->dynamicCast<PDLTrigger>()->SetSenioritySide(static_cast<PDLTrigger::TriggerSenioritySide>(pdFreq->intVal)); pdFreq++;
+                TempIter->dynamicCast<PDLTrigger>()->SetSizeSide(static_cast<PDLTrigger::TriggerSizeSide>(pdFreq->intVal)); pdFreq++;
+                TempIter->dynamicCast<PDLTrigger>()->SetSizeMultiplier(pdFreq->dblVal); pdFreq++;
+                break;
 			default:
+                Q_ASSERT_X(false, "ExcelInput::WatFallStepEdit", "Unhandled trigger type");
 				return NULL;
 			}
 		}
@@ -725,16 +752,17 @@ BSTR __stdcall LoadLoanScenario(LPSAFEARRAY *ArrayData) {
 	char *argv[] = { "NoArgumnets" };
 	int argc = sizeof(argv) / sizeof(char*) - 1;
 	QApplication a(argc, argv);
-	auto TempDialog = new QDialog();
-	TempDialog->setWindowIcon(QIcon(":/Icons/Logo.png"));
-	TempDialog->setWindowTitle(QObject::tr("Loan Scenarios Editor"));
-	QHBoxLayout* DialogLay = new QHBoxLayout(TempDialog);
-	LoanAssumptionsEditor* ScenariosEditor = new LoanAssumptionsEditor(TempDialog);
-	QObject::connect(ScenariosEditor, &LoanAssumptionsEditor::PoolSaved, TempDialog, &QDialog::accept);
+    QDialog TempDialog;
+	TempDialog.setWindowIcon(QIcon(":/Icons/Logo.png"));
+	TempDialog.setWindowTitle(QObject::tr("Loan Scenarios Editor"));
+    TempDialog.setModal(true);
+	QHBoxLayout* DialogLay = new QHBoxLayout(&TempDialog);
+	LoanAssumptionsEditor* ScenariosEditor = new LoanAssumptionsEditor(&TempDialog);
+	QObject::connect(ScenariosEditor, &LoanAssumptionsEditor::PoolSaved, &TempDialog, &QDialog::accept);
 	DialogLay->addWidget(ScenariosEditor);
 	ScenariosEditor->SetEnableLoad(false);
 	ScenariosEditor->FillFromQuery();
-	QScopedPointer<QDialog, QScopedPointerDeleteLater> DialogScope(TempDialog);
+	
 	QString CurrField;
 	for (int i = 0; i < NumOfLoans; ++i) {
 		CurrField = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
@@ -749,7 +777,7 @@ BSTR __stdcall LoadLoanScenario(LPSAFEARRAY *ArrayData) {
 		ScenariosEditor->AddLoanToPool(ScenariosEditor->LoanCount(), TempMtg);
 	}
 	SafeArrayUnaccessData(*ArrayData);
-	if (DialogScope->exec() == QDialog::Accepted) {
+    if (TempDialog.exec() == QDialog::Accepted) {
 		auto Result = ScenariosEditor->GetScenarios();
 		auto ResultKeys = Result.keys();
 		std::sort(ResultKeys.begin(), ResultKeys.end());
@@ -758,8 +786,10 @@ BSTR __stdcall LoadLoanScenario(LPSAFEARRAY *ArrayData) {
 			if (i != ResultKeys.constBegin()) TotalString.append("#,#");
 			TotalString.append(Result.value(*i));
 		}
+        a.quit();
 		return SysAllocStringByteLen(TotalString.toStdString().c_str(), TotalString.size());
 	}
+    a.quit();
 	return NULL;
 }
 

@@ -877,7 +877,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						- m_TotalSeniorExpenses.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow))
 						- m_TotalSeniorExpenses.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow))
 					;
-					TotalPayable += m_SeniorExpensesFixed.GetValue(CurrentDate);
+					TotalPayable += m_SeniorExpensesFixed.GetValue(CurrentDate)*static_cast<double>(m_PaymentFrequency.GetValue(CurrentDate))/12.0;
 					if(TotalPayable>=0.01){
 						if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 1) {
 							m_TotalSeniorExpenses.AddFlow(CurrentDate, qMin(AvailableInterest, TotalPayable), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
@@ -897,7 +897,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						- m_TotalSeniorFees.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow))
 						- m_TotalSeniorFees.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow))
 						;
-					TotalPayable += m_SeniorFeesFixed.GetValue(CurrentDate);
+                    TotalPayable += m_SeniorFeesFixed.GetValue(CurrentDate)*static_cast<double>(m_PaymentFrequency.GetValue(CurrentDate)) / 12.0;;
 					if(TotalPayable>=0.01){
 						if (SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 1) {
 							m_TotalSeniorFees.AddFlow(CurrentDate, qMin(AvailableInterest, TotalPayable), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
@@ -919,7 +919,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 							+ (AdjustCoupon(m_JuniorFeesCoupon, RollingLastIPD, RollingNextIPD, m_DealDayCountConvention.GetValue(CurrentDate))*(m_TotalJuniorFees.GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow)) + m_StartingDeferredJunFees))
 							;
 						m_StartingDeferredJunFees = 0.0;
-						TotalPayable += m_JuniorFeesFixed.GetValue(CurrentDate);
+                        TotalPayable += m_JuniorFeesFixed.GetValue(CurrentDate)*static_cast<double>(m_PaymentFrequency.GetValue(CurrentDate)) / 12.0;;
 						TotalPayable = qMax(TotalPayable, 0.0);
 						m_TotalJuniorFees.AddFlow(CurrentDate, TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::AccruedFlow));
 					}

@@ -1465,8 +1465,8 @@ bool Waterfall::CalculateTranchesCashFlows(){
 						m_InterestAvailable
 						+ m_MortgagesPayments.GetAccruedInterest(CurrentDate)
 						- ((adjSeniorFees + adjSeniorExpenses)*(CurrentAssetSum / static_cast<double>(CurrentAssetCount)))
-						- m_SeniorExpensesFixed.GetValue(CurrentDate)
-						- m_SeniorFeesFixed.GetValue(CurrentDate)
+                        - m_SeniorExpensesFixed.GetValue(CurrentDate)*static_cast<double>(m_PaymentFrequency.GetValue(CurrentDate)) / 12.0
+                        - m_SeniorFeesFixed.GetValue(CurrentDate)*static_cast<double>(m_PaymentFrequency.GetValue(CurrentDate)) / 12.0
 						;
 					for (int h = 0; h < m_Tranches.size(); h++) {
 						if (m_Tranches.at(h)->GetProrataGroup(CurrSenGrpLvl) <= CurrSenGrp) {
@@ -1511,7 +1511,7 @@ bool Waterfall::CalculateTranchesCashFlows(){
 								)
 							) { //redeem senior notes until cured								
 								SolutionDegree = 1;
-								InterestPayableBefore = (m_InterestAvailable + m_MortgagesPayments.GetAccruedInterest(CurrentDate) - ((adjSeniorExpenses + adjSeniorFees) * (CurrentAssetSum / static_cast<double>(CurrentAssetCount))) - m_SeniorExpensesFixed.GetValue(CurrentDate) - m_SeniorFeesFixed.GetValue(CurrentDate)) / TestTarget;
+                                InterestPayableBefore = (m_InterestAvailable + m_MortgagesPayments.GetAccruedInterest(CurrentDate) - ((adjSeniorExpenses + adjSeniorFees) * (CurrentAssetSum / static_cast<double>(CurrentAssetCount))) - ((m_SeniorExpensesFixed.GetValue(CurrentDate) + m_SeniorFeesFixed.GetValue(CurrentDate))*static_cast<double>(m_PaymentFrequency.GetValue(CurrentDate)) / 12.0)) / TestTarget;
 								TotalPayable = 0.0;
 								bool SolutionFound;
 								do {

@@ -472,7 +472,7 @@ double Waterfall::GetCreditEnhancement(int TrancheIndex,int TimeIndex)const{
 		if(ReserveSum<=0.0) return 0.0;
 		return 1.0-(Runningsum/ReserveSum); //(m_CalculatedMtgPayments.GetAmountOut(m_Tranches.first()->GetCashFlow().GetDate(TimeIndex))/Runningsum)-1.0;
 	}else{
-		ReserveSum=m_CalculatedMtgPayments.GetAmountOut(0);
+		ReserveSum=m_MortgagesPayments.GetAmountOut(0);
 		ReserveSum += m_PrincipalAvailable.Total();
 		for (QList<ReserveFund*>::const_iterator ResIter = m_Reserves.constBegin(); ResIter != m_Reserves.constEnd(); ResIter++) {
 			if (TrancheIndex<=(*ResIter)->GetReserveFundFreed())

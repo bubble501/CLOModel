@@ -14,7 +14,6 @@ class DayCountVector;
 class BloombergVector;
 template<typename T> class QList;
 
-#define SeniorityStringSeparator '-'
 #define MaximumInterestsTypes 8
 #define MaximumIRRIterations 10000 //INT_MAX-1
 #define CompoundShift 10

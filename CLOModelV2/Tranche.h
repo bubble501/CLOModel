@@ -107,7 +107,7 @@ public:
 	double GetPrice() const {return Price;}
 	const QString& GetBloombergExtension() const{return BloombergExtension;}
 	const Seniority& GetProrataGroup() const{return ProrataGroup;}
-	quint32 GetProrataGroup(int SeliorityScaleLevel) const { return ProrataGroup.GetSeniorityAtLevel(SeliorityScaleLevel); }
+	quint32 GetProrataGroup(int SeliorityScaleLevel) const { return ProrataGroup.GetSeniority(SeliorityScaleLevel); }
 	const TrancheCashFlow& GetCashFlow() const {return CashFlow;}
 	TrancheCashFlow& GetCashFlow() {return CashFlow;}
 	double GetMinOClevel() const {return MinOClevel;}

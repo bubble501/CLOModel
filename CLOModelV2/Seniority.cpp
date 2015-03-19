@@ -27,14 +27,15 @@ bool Seniority::SetSeniorityScale(const QString& a)
     QRegExp seniorityRX('(' + validNumber + "(?:G" + validNumber + "(?:R" + validNumber + ")?)?)(?:"
         + static_cast<char>(SeniorityStringSeparator)
         +'(' + validNumber + "(?:G" + validNumber + "(?:R" + validNumber + ")?)?))*");
-    QRegExp singleLvlRX('(' + validNumber + ")(?:G(" + validNumber + ")(?:R(" + validNumber + ")?)?");
+    QRegExp singleLvlRX("^(" + validNumber + ")(?:G(" + validNumber + ")(?:R(" + validNumber + ")?)?)?$");
     if (!seniorityRX.exactMatch(a.trimmed())) return false;
-    for (int i = 1; i < seniorityRX.captureCount(); ++i) {
-        singleLvlRX.indexIn(seniorityRX.cap(i));
+    for (int i = 1; i <= seniorityRX.captureCount(); ++i) {
+        if (seniorityRX.cap(i).isEmpty()) continue;
+        singleLvlRX.exactMatch(seniorityRX.cap(i));
         AddSeniorityLevel(
             singleLvlRX.cap(1).toUInt()
-            , singleLvlRX.captureCount() > 2 ? singleLvlRX.cap(2).toUInt() : 1
-            , singleLvlRX.captureCount() > 3 ? singleLvlRX.cap(3).toUInt() : 1
+            , singleLvlRX.cap(2).isEmpty()  ? 1:singleLvlRX.cap(2).toUInt() 
+            , singleLvlRX.cap(3).isEmpty()  ? 1:singleLvlRX.cap(3).toUInt() 
             );
     }
     return true;
@@ -65,7 +66,7 @@ QString Seniority::ToString() const
     for (int i = 0; i < m_SeniorityScale.size(); ++i) {
         if (!Result.isEmpty()) Result.append(static_cast<char>(SeniorityStringSeparator));
         Result += QString::number(m_SeniorityScale.at(i));
-        if (m_GroupScale.at(i) > 1) {
+        if (m_GroupScale.at(i) > 1 || m_RankScale.at(i) > 1) {
             Result += 'G' + QString::number(m_GroupScale.at(i));
             if (m_RankScale.at(i) > 1)
                 Result += 'R' + QString::number(m_RankScale.at(i));

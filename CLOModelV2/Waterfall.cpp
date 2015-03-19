@@ -591,12 +591,12 @@ double Waterfall::RedeemNotes(double AvailableFunds, int GroupTarget, int Selior
         return ((AvailableFunds - TotalPayable) >= 0.01 ? (AvailableFunds - TotalPayable) : 0.0);
     }
     QMap<quint32, double> groupAccrue;
-    QHash < quint32, QSharedPointer<QList<quint32> > > groupRanks;
+    QHash < quint32, QList<quint32> * > groupRanks;
     auto groupKeys = groups.keys();
     for (auto i = groupKeys.constBegin(); i != groupKeys.constEnd(); ++i) {
         auto currVals = groups.values(*i);
         groupAccrue.insert(*i, 0.0);
-        groupRanks.insert(*i, QSharedPointer<QList<quint32> >(new QList<quint32>()));
+        groupRanks.insert(*i, new QList<quint32>());
         for (auto j = currVals.constBegin(); j != currVals.constEnd(); ++j) {
             groupAccrue[*i] += (**j)->GetCashFlow().GetAmountOutstanding(TargetDate);
             if (!groupRanks.value(*i)->contains((**j)->GetProrataGroup().GetRank(SeliorityScaleLevel)))
@@ -607,7 +607,7 @@ double Waterfall::RedeemNotes(double AvailableFunds, int GroupTarget, int Selior
     for (auto i = groupAccrue.begin(); i != groupAccrue.end(); ++i) {
         i.value() *= AvailableFunds / TotalPayable;
         auto currentGroup = groups.values(i.key());
-        for (auto j = groupRanks[*i]->begin(); j != groupRanks[*i]->end() && i.value()>0.01; ++j) {
+        for (auto j = groupRanks[i.key()]->begin(); j != groupRanks[i.key()]->end() && i.value()>0.01; ++j) {
             double sumRank = 0.0;
             for (QList<Tranche*>::iterator &singleTranche : currentGroup) {
                 if ((*singleTranche)->GetProrataGroup().GetRank(SeliorityScaleLevel) != *j) continue;
@@ -623,13 +623,19 @@ double Waterfall::RedeemNotes(double AvailableFunds, int GroupTarget, int Selior
             }
             else {
                 for (QList<Tranche*>::iterator &singleTranche : currentGroup) {
+                    if ((*singleTranche)->GetProrataGroup().GetRank(SeliorityScaleLevel) != *j) continue;
                     double Paymade = i.value()*(*singleTranche)->GetCashFlow().GetAmountOutstanding(TargetDate) / sumRank;
                     (*singleTranche)->AddCashFlow(TargetDate, Paymade, TrancheCashFlow::TrancheFlowType::PrincipalFlow);
                     (*singleTranche)->AddCashFlow(TargetDate, -Paymade, TrancheCashFlow::TrancheFlowType::AmountOutstandingFlow);
                 }
+                i.value() = 0.0;
             }
+           
         }
+        Q_ASSERT(i.value() > -0.01);
     }
+    for (auto i = groupRanks.begin(); i != groupRanks.end(); ++i)
+        delete i.value();
     return 0.0;
 }
 double Waterfall::RedeemSequential(double AvailableFunds, const QDate& TargetDate, int SeliorityScaleLevel, int MaxGroup)
@@ -2026,9 +2032,10 @@ QString Waterfall::ReadyToCalculate()const
             if (SingleTranche->GetDayCount(*singlCoup).IsEmpty()) Result += "Tranche Day Count Convention\n";
         }
         if (IntegerVector(SingleTranche->GetPaymentFrequency()).IsEmpty(1)) Result += "Tranche payment Frequency\n";
-        if (SingleTranche->GetOriginalAmount() < 0.0) Result += "Tranche Original Amount";
-        if (SingleTranche->GetOutstandingAmt() < 0.0) Result += "Tranche Amount Outstanding";
-        if (SingleTranche->GetPrice() < 0.0) Result += "Tranche Price";
+        if (SingleTranche->GetOriginalAmount() < 0.0) Result += "Tranche Original Amount\n";
+        if (SingleTranche->GetOutstandingAmt() < 0.0) Result += "Tranche Amount Outstanding\n";
+        if (SingleTranche->GetPrice() < 0.0) Result += "Tranche Price\n";
+        if (!SingleTranche->GetProrataGroup().isValid()) Result += "Tranche Seniority Structure\n";
     }
     foreach(const WatFalPrior* SingleStep, m_WaterfallStesps)
     {

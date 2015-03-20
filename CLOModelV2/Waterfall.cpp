@@ -871,7 +871,7 @@ bool Waterfall::CalculateTranchesCashFlows()
                 }
                 IsCallPaymentDate = IsCallPaymentDate || (!m_CallDate.isNull() && CurrentDate >= m_CallDate);
             }
-
+            IsCallPaymentDate = IsCallPaymentDate || CurrentDate >= m_LegalFinal;
             if ((CurrentDate.year()<RollingNextIPD.year() || (CurrentDate.year() == RollingNextIPD.year() && CurrentDate.month()<RollingNextIPD.month())) && !IsMaturityDate) {
                 //This is not a Tranche payment date
                 foreach(const WatFalPrior* SingleStep, m_WaterfallStesps)

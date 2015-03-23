@@ -5,7 +5,6 @@
 #include <typeinfo>
 #include <QString>
 #ifdef _DEBUG
-#include <QDebug>
 #define DEBUG_ITEM auto
 #endif // _DEBUG
 
@@ -25,15 +24,18 @@ template<typename T> class QList;
 //#define PrintAggregatedMtgFlows
 
 #ifdef DebugLogging
+#include <QDebug>
 #define LOGASSERT(CheckExp,LogMsg) ((CheckExp) ? qt_noop() : PrintToTempFile("DebugLog.log",LogMsg)); Q_ASSERT_X(CheckExp,"LOGASSERT",LogMsg)
 #define LOGDEBUG(LogMsg) PrintToTempFile("DebugLog",LogMsg,false)
 #define LOGTOFILE(LogFile,LogMsg) PrintToTempFile(LogFile,LogMsg)
 #define LOGCONDITIONALLY(Condition,LogMsg) ((Condition) ? PrintToTempFile("ConditionalLog",LogMsg): qt_noop())
+#define LOGCONSOLE(LogMsg) qDebug() << LogMsg
 #else
 #define LOGASSERT(CheckExp,LogMsg)
 #define LOGDEBUG(LogMsg)
 #define LOGTOFILE(LogFile,LogMsg)
 #define LOGCONDITIONALLY(Condition,LogMsg)
+#define LOGCONSOLE(LogMsg)
 #endif
 #ifndef NO_DATABASE
 #include <QMutex>

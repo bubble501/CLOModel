@@ -607,7 +607,7 @@ double Waterfall::RedeemNotes(double AvailableFunds, int GroupTarget, int Selior
     for (auto i = groupAccrue.begin(); i != groupAccrue.end(); ++i) {
         i.value() *= AvailableFunds / TotalPayable;
         auto currentGroup = groups.values(i.key());
-        for (auto j = groupRanks[i.key()]->begin(); j != groupRanks[i.key()]->end() && i.value()>0.01; ++j) {
+        for (auto j = groupRanks[i.key()]->begin(); j != groupRanks[i.key()]->end() && i.value()>=0.01; ++j) {
             double sumRank = 0.0;
             for (QList<Tranche*>::iterator &singleTranche : currentGroup) {
                 if ((*singleTranche)->GetProrataGroup().GetRank(SeliorityScaleLevel) != *j) continue;
@@ -1172,8 +1172,8 @@ bool Waterfall::CalculateTranchesCashFlows()
                         }
                     }
                 }
-                                                                  break;
-                                                                  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                break;
+ ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 case WatFalPrior::WaterfallStepType::wst_DeferredInterest:{
                     ProRataBonds.clear();
                     TotalPayable = Solution = 0.0;
@@ -1239,8 +1239,8 @@ bool Waterfall::CalculateTranchesCashFlows()
                         ProRataBonds.clear();
                     }
                 }
-                                                                          break;
-                                                                          ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                break;
+                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 case  WatFalPrior::WaterfallStepType::wst_Principal:{
                     int CurrSenGrpLvl = SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetValue(CurrentDate);
                     int CurrSenGrp = SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate);
@@ -1251,8 +1251,8 @@ bool Waterfall::CalculateTranchesCashFlows()
                     TotalPayable = RedeemNotes(AvailablePrincipal.Total(), CurrSenGrp, CurrSenGrpLvl, CurrentDate);
                     AvailablePrincipal -= AvailablePrincipal.Total() - TotalPayable;
                 }
-                                                                    break;
-                                                                    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                break;
+                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 case WatFalPrior::WaterfallStepType::wst_Turbo:{
                     int CurrSenGrpLvl = SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroupLevel).value<IntegerVector>().GetValue(CurrentDate);
                     int CurrSenGrp = SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroup).value<IntegerVector>().GetValue(CurrentDate);

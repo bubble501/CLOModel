@@ -33,7 +33,6 @@
 
 int main(int argc, char *argv[]) {
 
-
 	//QApplication a(argc, argv);
 	//ConsoleTestObj b;
 	//return a.exec();
@@ -82,11 +81,11 @@ int main(int argc, char *argv[]) {
 		, "20", "0.5", "0", "0", "0", "0"
 		).GetTranche("HARVT 10X A"));
 	return a.exec();
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	Waterfall TempWtf, TempCallWaterfall;
 	MtgCalculator TempMtg;
-	QFile file("Z:/24AM/Monitoring/Model Results/Celeste 2015-1.clom");
+	QFile file("Z:/24AM/Monitoring/Model Results/HNRS 2.clom");
 	file.open(QIODevice::ReadOnly);
 	qint32 VersionChecker;
 	QDataStream out(&file);
@@ -101,10 +100,10 @@ int main(int argc, char *argv[]) {
 	{bool Junk; out >> Junk; }
 	TempWtf.SetLoadProtocolVersion(VersionChecker);
 	out >> TempWtf;
-	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
+	/*TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempCallWaterfall;
 	TempMtg.SetLoadProtocolVersion(VersionChecker);
-	out >> TempMtg;
+	out >> TempMtg;*/
 	file.close();
 	TempWtf.CalculateTranchesCashFlows();
 	
@@ -114,7 +113,7 @@ int main(int argc, char *argv[]) {
 // 	TempMtg.SetSequentialComputation(true);
 // 	TempMtg.StartCalculation();
 // 	return a.exec();
-	*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	QApplication a(argc, argv);
 	QFile file("C:/Temp/.SavedInputs.clo");
 	//QFile file("C:/Temp/20#,#8#,#100#,#0#,#0#,#0.csw");

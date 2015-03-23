@@ -23,15 +23,19 @@ bool Seniority::SetSeniorityScale(const QString& a)
 {
     Clear();
     if (a.isEmpty()) return false;
+    const QStringList senLvls = a.split(static_cast<char>(SeniorityStringSeparator),QString::SkipEmptyParts);
     const QString validNumber("0*[1-9]\\d*");
-    QRegExp seniorityRX('(' + validNumber + "(?:G" + validNumber + "(?:R" + validNumber + ")?)?)(?:"
+   /* QRegExp seniorityRX('(' + validNumber + "(?:G" + validNumber + "(?:R" + validNumber + ")?)?)(?:"
         + static_cast<char>(SeniorityStringSeparator)
-        +'(' + validNumber + "(?:G" + validNumber + "(?:R" + validNumber + ")?)?))*");
+        +'(' + validNumber + "(?:G" + validNumber + "(?:R" + validNumber + ")?)?))*");*/
     QRegExp singleLvlRX("^(" + validNumber + ")(?:G(" + validNumber + ")(?:R(" + validNumber + ")?)?)?$");
-    if (!seniorityRX.exactMatch(a.trimmed())) return false;
-    for (int i = 1; i <= seniorityRX.captureCount(); ++i) {
-        if (seniorityRX.cap(i).isEmpty()) continue;
-        singleLvlRX.exactMatch(seniorityRX.cap(i));
+    //if (!seniorityRX.exactMatch(a.trimmed())) return false;
+    for (auto i = senLvls.constBegin(); i!=senLvls.constEnd();++i){
+        if (!singleLvlRX.exactMatch(*i)) {
+            Clear();
+            return false;
+        }
+        LOGCONSOLE(singleLvlRX.capturedTexts());
         AddSeniorityLevel(
             singleLvlRX.cap(1).toUInt()
             , singleLvlRX.cap(2).isEmpty()  ? 1:singleLvlRX.cap(2).toUInt() 

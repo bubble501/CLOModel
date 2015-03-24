@@ -38,11 +38,11 @@ int main(int argc, char *argv[]) {
 	//return a.exec();
 
 
-	/*QApplication a(argc, argv);
+	QApplication a(argc, argv);
 	LoanAssumptionsEditor b;
 	b.FillFromQuery();
 	b.show();
-	return a.exec();*/
+	return a.exec();
 
 	/*QApplication a(argc, argv);
 	StressViewer b;
@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
 		, "20", "0.5", "0", "0", "0", "0"
 		).GetTranche("HARVT 10X A"));
 	return a.exec();
-	*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	Waterfall TempWtf, TempCallWaterfall;
 	MtgCalculator TempMtg;
@@ -100,10 +100,10 @@ int main(int argc, char *argv[]) {
 	{bool Junk; out >> Junk; }
 	TempWtf.SetLoadProtocolVersion(VersionChecker);
 	out >> TempWtf;
-	/*TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
+	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempCallWaterfall;
 	TempMtg.SetLoadProtocolVersion(VersionChecker);
-	out >> TempMtg;*/
+	out >> TempMtg;
 	file.close();
 	TempWtf.CalculateTranchesCashFlows();
 	
@@ -113,7 +113,7 @@ int main(int argc, char *argv[]) {
 // 	TempMtg.SetSequentialComputation(true);
 // 	TempMtg.StartCalculation();
 // 	return a.exec();
-	/*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	QApplication a(argc, argv);
 	QFile file("C:/Temp/.SavedInputs.clo");
 	//QFile file("C:/Temp/20#,#8#,#100#,#0#,#0#,#0.csw");

@@ -2362,7 +2362,7 @@ void LoanAssumptionsEditor::CreateModelScanner() {
 		m_ScanProgress->hide();
 	});
 	connect(m_PoolMatcher, &LoanAssMatcher::BeeCalculated, [&](int index) {
-		auto CurrentResult = m_PoolMatcher->GetResult(index-1);
+		auto CurrentResult = m_PoolMatcher->GetResult(index);
 		if (!CurrentResult) return;
 		if (CurrentResult->isValid()) {
 			m_ScanPoolsModel->insertRow(m_ScanPoolsModel->rowCount());
@@ -2374,7 +2374,7 @@ void LoanAssumptionsEditor::CreateModelScanner() {
 			}
 			m_ScanPoolsModel->setData(m_ScanPoolsModel->index(m_ScanPoolsModel->rowCount() - 1, 0), FilterString, Qt::UserRole);
 			m_ScanPoolsModel->setData(m_ScanPoolsModel->index(m_ScanPoolsModel->rowCount() - 1, 0), CurrentResult->GetFilePath(), Qt::UserRole + 1);
-			m_ScanPoolsModel->setData(m_ScanPoolsModel->index(m_ScanPoolsModel->rowCount() - 1, 0), index - 1, Qt::UserRole + 2);
+			m_ScanPoolsModel->setData(m_ScanPoolsModel->index(m_ScanPoolsModel->rowCount() - 1, 0), index , Qt::UserRole + 2);
 			m_ScannedPoolsProxy->setFilterKeyColumn(0);
 		}
 	});

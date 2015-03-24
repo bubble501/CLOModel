@@ -1606,6 +1606,7 @@ Public Sub EditTrigger(Target As Range)
 End Sub
 Public Sub EditLoanScenarios()
     Application.ScreenUpdating = False
+    Application.Calculation = xlCalculationManual
     Dim FieldsLabels As New Collection
     Call PopulateDafaultLabels(FieldsLabels)
     Dim IssuerProperty As Range
@@ -1645,8 +1646,9 @@ Public Sub EditLoanScenarios()
     If (NewScenarios = "") Then Exit Sub
     Dim Singlescenario
     Singlescenario = Split(NewScenarios, "#,#")
-    Application.ScreenUpdating = False
     For i = LBound(Singlescenario) To UBound(Singlescenario)
         LoanScenarioProperty.Offset(1 + i - LBound(Singlescenario), 0).Value = Singlescenario(i)
     Next i
+    Application.Calculation = xlCalculationAutomatic
+    Application.ScreenUpdating = True
 End Sub

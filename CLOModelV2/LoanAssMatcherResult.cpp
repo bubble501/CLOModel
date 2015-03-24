@@ -11,15 +11,15 @@ LoanAssMatcherResult& LoanAssMatcherResult::operator=(const LoanAssMatcherResult
 	return *this;
 }
 
-LoanAssMatcherResult::LoanAssMatcherResult(const LoanAssMatcherResult& a) : m_DealName(a.m_DealName)
-, m_FilePath(a.m_FilePath)
-, m_LoanID(a.m_LoanID)
-, m_Issuer(a.m_Issuer)
-, m_Facility(a.m_Facility)
-, m_CurrScen(a.m_CurrScen)
-, m_DetectedScen(a.m_DetectedScen) {
-
-}
+LoanAssMatcherResult::LoanAssMatcherResult(const LoanAssMatcherResult& a) 
+    : m_DealName(a.m_DealName)
+    , m_FilePath(a.m_FilePath)
+    , m_LoanID(a.m_LoanID)
+    , m_Issuer(a.m_Issuer)
+    , m_Facility(a.m_Facility)
+    , m_CurrScen(a.m_CurrScen)
+    , m_DetectedScen(a.m_DetectedScen)
+{}
 
 void LoanAssMatcherResult::AddScenario(const QString& DetectedScen, const QString& CurrScen, const QString& Facility, const QString& Issuer, qint32 LoanID) {
 	for (int i = 0; i < m_LoanID.size(); ++i) {

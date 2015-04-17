@@ -66,7 +66,6 @@ Public Sub GetInputFromStructure( _
     Dim ExcahngeRateTableStart As Range
     Dim ImpliedCEStart As Range
     Dim JuniorFeesCouponCell As Range
-    Dim FixFloatStart As Range
     Dim FrequencyStart As Range
     Dim CurrentOutStart As Range
     Dim OriginalOutStart As Range
@@ -273,7 +272,6 @@ Public Sub GetInputFromStructure( _
     Set ExcahngeRateTableStart = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("ExcahngeRateTableHead"), LookAt:=xlWhole, LookIn:=xlValues)
     Set ExcahngeRateTableStart = Range(ExcahngeRateTableStart, ExcahngeRateTableStart.End(xlDown).Offset(0, 1))
     Set JuniorFeesCouponCell = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("JuniorFeesCouponField"), LookAt:=xlWhole, LookIn:=xlValues)
-    Set FixFloatStart = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("FixFloatHead"), LookAt:=xlWhole, LookIn:=xlValues)
     If (RunStressTest) Then
         Set StressCPRCell = Sheets(StressTestSheet).Cells.Find(What:=FieldsLabels("StressCPRField"), LookAt:=xlWhole, LookIn:=xlFormulas)
         Set StressCDRStart = Sheets(StressTestSheet).Cells.Find(What:=FieldsLabels("StressCDRHead"), LookAt:=xlWhole, LookIn:=xlFormulas)
@@ -1035,7 +1033,6 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
     a.Add "ISIN", "IsinFldsHeader"
     a.Add "Pro rata group", "BondRataGroupHeader"
     a.Add "Price", "BondPriceHeader"
-    a.Add "Fixed/Floating", "FixFloatHead"
     a.Add "OC test", "OCLimitHeader"
     a.Add "IC test", "ICLimitHeader"
     a.Add "Trigger Type", "TriggerStart"

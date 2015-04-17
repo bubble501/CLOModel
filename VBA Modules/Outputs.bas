@@ -130,8 +130,8 @@ Public Sub PrintTranche( _
         End If
         If (PrintOCtest) Then
             TargetCell.Offset(i, ColOffset).Value = Data(i, ColOffset)
-            If (TargetOCtest(i - LBound(Data, 1) + LBound(TargetICtest)) > 0) Then
-                TargetCell.Offset(i, ColOffset).NumberFormat = "[Red][<" + Format(TargetOCtest(i - LBound(Data, 1) + LBound(TargetICtest)), "0.0000") + "]0%;[>=10]""Infinity"";0%"
+            If (TargetOCtest(i - LBound(Data, 1) + LBound(TargetOCtest)) > 0) Then
+                TargetCell.Offset(i, ColOffset).NumberFormat = "[Red][<" + Format(TargetOCtest(i - LBound(Data, 1) + LBound(TargetOCtest)), "0.0000") + "]0%;[>=10]""Infinity"";0%"
             Else
                 TargetCell.Offset(i, ColOffset).NumberFormat = "[<10]0%;[>=10]""Infinity"""
             End If

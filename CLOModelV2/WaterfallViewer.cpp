@@ -139,6 +139,8 @@ void WaterfallViewer::AddStep(const WatFalPrior& a){
 		ApplicableTable->setItem(ApplicableTable->rowCount() - 1, ciStep, new QTableWidgetItem("Senior Fees"));
 	break;
 	case WatFalPrior::WaterfallStepType::wst_Interest:
+        ApplicableTable = InterestTable;
+        ApplicableUsedCols = &m_IWUsedCols;
 		m_IWUsedCols << ciStep << ciSeniorityGroup << ciSeniorityGroupLevel << ciCouponIndex;
 		InterestTable->setRowCount(InterestTable->rowCount()+1);
 		InterestTable->setItem(InterestTable->rowCount() - 1, ciStep, new QTableWidgetItem("Interest"));
@@ -147,6 +149,8 @@ void WaterfallViewer::AddStep(const WatFalPrior& a){
 		InterestTable->setItem(InterestTable->rowCount() - 1, ciCouponIndex, new QTableWidgetItem(a.GetParameter(WatFalPrior::wstParameters::CouponIndex).value<IntegerVector>().GetVector()));
 	break;
 	case WatFalPrior::WaterfallStepType::wst_Principal:
+        ApplicableTable = PrincipalTable;
+        ApplicableUsedCols = &m_PWUsedCols;
 		m_PWUsedCols << ciStep << ciSeniorityGroup << ciSeniorityGroupLevel;
 		PrincipalTable->setRowCount(PrincipalTable->rowCount()+1);
 		PrincipalTable->setItem(PrincipalTable->rowCount() - 1, ciStep, new QTableWidgetItem("Principal"));

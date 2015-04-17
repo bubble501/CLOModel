@@ -720,7 +720,7 @@ bool Waterfall::CalculateTranchesCashFlows()
             for (QList<Tranche*>::const_iterator SingleTranche = m_Tranches.constBegin(); SingleTranche != m_Tranches.constEnd(); ++SingleTranche) {
                 auto keysList = (*SingleTranche)->GetReferenceRateIndexes();
                 for (auto SingleRate = keysList.constBegin(); SingleRate != keysList.constEnd(); ++SingleRate) {
-                    if ((*SingleTranche)->GetInterestType(*SingleRate) == Tranche::FloatingInterest && (*SingleTranche)->GetReferenceRateValue(*SingleRate).IsEmpty()) {
+                    if (!(*SingleTranche)->GetCouponVector(*SingleRate).IsEmpty() && (*SingleTranche)->GetReferenceRateValue(*SingleRate).IsEmpty()) {
                         KeepSearching = true;
                         (*SingleTranche)->CompileReferenceRateValue(TempTable);
                         break;
@@ -1157,14 +1157,31 @@ bool Waterfall::CalculateTranchesCashFlows()
                                 AvailableInterest = 0.0;
                             }
                             else {
-                                //Pay pro-rata in equal parts
-                                LOGDEBUG("Reached Pay Interest on 0 Outstanding");
+                                // Pro rata based on original outstanding
+                                Solution = 0.0;
                                 foreach(qint32 h, ProRataBonds)
                                 {
-                                    m_Tranches[h]->AddCashFlow(CurrentDate
-                                        , AvailableInterest / static_cast<double>(ProRataBonds.size())
-                                        , static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow) | CurrCoupIndx
-                                        );
+                                    Solution += m_Tranches.at(h)->GetOriginalAmount();
+                                }
+                                if (Solution > 0.0) {
+                                    foreach(qint32 h, ProRataBonds)
+                                    {
+                                        m_Tranches[h]->AddCashFlow(CurrentDate
+                                            , AvailableInterest * m_Tranches.at(h)->GetOriginalAmount() / Solution
+                                            , static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow) | CurrCoupIndx
+                                            );
+                                    }
+                                }
+                                else {
+                                    //Pay pro-rata in equal parts
+                                    LOGDEBUG("Reached Pay Interest on 0 Outstanding");
+                                    foreach(qint32 h, ProRataBonds)
+                                    {
+                                        m_Tranches[h]->AddCashFlow(CurrentDate
+                                            , AvailableInterest / static_cast<double>(ProRataBonds.size())
+                                            , static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow) | CurrCoupIndx
+                                            );
+                                    }
                                 }
                                 ProRataBonds.clear();
                                 AvailableInterest = 0.0;
@@ -1229,11 +1246,25 @@ bool Waterfall::CalculateTranchesCashFlows()
                             }
                         }
                         else {
-                            //Pro-rata equal parts
-                            LOGDEBUG("Reached Pay Deferred on 0 Outstanding");
+                            //Pro-Rata based on original outstanding
+                            Solution = 0.0;
                             foreach(qint32 h, ProRataBonds)
                             {
-                                m_Tranches[h]->AddCashFlow(CurrentDate, FundsToUse / static_cast<double>(ProRataBonds.size()), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow) | CurrCoupIndx);
+                                Solution += m_Tranches.at(h)->GetOriginalAmount();
+                            }
+                            if (Solution > 0.0) {
+                                foreach(qint32 h, ProRataBonds)
+                                {
+                                    m_Tranches[h]->AddCashFlow(CurrentDate, FundsToUse*m_Tranches.at(h)->GetOriginalAmount() / Solution, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow) | CurrCoupIndx);
+                                }
+                            }
+                            else {
+                                //Pro-rata equal parts
+                                LOGDEBUG("Reached Pay Deferred on 0 Outstanding");
+                                foreach(qint32 h, ProRataBonds)
+                                {
+                                    m_Tranches[h]->AddCashFlow(CurrentDate, FundsToUse / static_cast<double>(ProRataBonds.size()), static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow) | CurrCoupIndx);
+                                }
                             }
                         }
                         ProRataBonds.clear();

@@ -21,6 +21,7 @@ HRESULT ExcelOutput::PrintMortgagesRepLines(
 	bool PrintDelinquencies,
 	bool PrintWAL
 	){
+    LOGDEBUG("Reached PrintMortgagesRepLines");
 		ExcelCommons::InitExcelOLE();
 		int NumOfCols=
 			PrintCounter
@@ -266,6 +267,7 @@ HRESULT ExcelOutput::PlotMortgagesFlows(
 	bool PrintTotalPrincipal,
 	bool PrintLoss
 	){
+    LOGDEBUG("Reached PlotMortgagesFlows");
 		ExcelCommons::InitExcelOLE();
 		SAFEARRAYBOUND  Bound;
 		Bound.lLbound   = 1;
@@ -473,6 +475,7 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 	bool PrintICtest,
 	bool PrintPDL
 	){
+    LOGDEBUG("Reached PrintTrancheFlow");
 		ExcelCommons::InitExcelOLE();
 		QString ColorString=QString("%1,%2,%3").arg(BackgrndCol.red()).arg(BackgrndCol.green()).arg(BackgrndCol.blue());
 		int NumOfCols=
@@ -709,6 +712,7 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 
 
 HRESULT ExcelOutput::PrintMergedCell(const QString& msg, const QString& TargetCell, int RowDim, int ColDim,const QColor& FillColor){
+    LOGDEBUG("Reached PrintMergedCell");
 	ExcelCommons::InitExcelOLE();
 	QString ColorString=
 		QString("%1,%2,%3").arg(FillColor.red()).arg(FillColor.green()).arg(FillColor.blue());
@@ -772,6 +776,7 @@ HRESULT ExcelOutput::PrintMergedCell(const QString& msg, const QString& TargetCe
 	return hr;
 }
 HRESULT ExcelOutput::PrintColumn(const QString& Title, const QList<double>& Values ,const QString& TargetCell,const QString& ValFormat,const QColor& FillColor){
+    LOGDEBUG("Reached PrintColumn");
 	ExcelCommons::InitExcelOLE();
 	QString ColorString=
 		QString("%1,%2,%3").arg(FillColor.red()).arg(FillColor.green()).arg(FillColor.blue());
@@ -853,6 +858,7 @@ HRESULT ExcelOutput::PrintColumn(const QString& Title, const QList<double>& Valu
 	return hr;
 }
 HRESULT ExcelOutput::PrintDataColumn(const QList<double>& Values ,const QString& TargetCell,const QString& ValFormat){
+    LOGDEBUG("Reached PrintDataColumn");
 	ExcelCommons::InitExcelOLE();
 	SAFEARRAYBOUND  Bound;
 	Bound.lLbound   = 1;
@@ -928,6 +934,7 @@ HRESULT ExcelOutput::PlotTranchesDynamic(
 	int DestinationIndex,
 	const QDate& CallDate
 	){
+    LOGDEBUG("Reached PlotTranchesDynamic");
 		ExcelCommons::InitExcelOLE();
 		SAFEARRAYBOUND  Bound[2];
 		Bound[0].lLbound   = 1;
@@ -1075,6 +1082,7 @@ HRESULT ExcelOutput::PlotOCTest(
 	int DestinationIndex,
 	const QDate& CallDate
 	){
+    LOGDEBUG("Reached PlotOCTest");
 		ExcelCommons::InitExcelOLE();
 		SAFEARRAYBOUND  Bound[2];
 		Bound[0].lLbound   = 1;
@@ -1222,6 +1230,7 @@ HRESULT ExcelOutput::PlotICTest(
 	int DestinationIndex,
 	const QDate& CallDate
 	){
+    LOGDEBUG("Reached PlotICTest");
 		ExcelCommons::InitExcelOLE();
 		SAFEARRAYBOUND  Bound[2];
 		Bound[0].lLbound   = 1;
@@ -1369,6 +1378,7 @@ HRESULT ExcelOutput::PlotAnnualExcess(
 	int DestinationIndex,
 	const QDate& CallDate
 	){
+    LOGDEBUG("Reached PlotAnnualExcess");
 		ExcelCommons::InitExcelOLE();
 		SAFEARRAYBOUND  Bound[1];
 		Bound[0].lLbound   = 1;
@@ -1480,6 +1490,7 @@ HRESULT ExcelOutput::PlotCostFunding(
 	int DestinationIndex,
 	const QDate& CallDate
 	){
+    LOGDEBUG("Reached PlotCostFunding");
 		ExcelCommons::InitExcelOLE();
 		SAFEARRAYBOUND  Bound[1];
 		Bound[0].lLbound   = 1;
@@ -1608,6 +1619,7 @@ HRESULT ExcelOutput::PlotEquityReturn(
 	const QString& DestinationSheet,
 	int DestinationIndex
 	){
+    LOGDEBUG("Reached PlotEquityReturn");
 		ExcelCommons::InitExcelOLE();
 		SAFEARRAYBOUND  Bound[1];
 		Bound[0].lLbound   = 1;
@@ -1721,6 +1733,7 @@ HRESULT ExcelOutput::PlotCallToEquity(
 	int DestinationIndex,
 	const QDate& CallDate
 	){
+    LOGDEBUG("Reached PlotCallToEquity");
 		ExcelCommons::InitExcelOLE();
 		SAFEARRAYBOUND  Bound[1];
 		Bound[0].lLbound   = 1;
@@ -1828,6 +1841,7 @@ HRESULT ExcelOutput::PlotCPRLS(
 	const QString& DestinationSheet,
 	int DestinationIndex
 	){
+    LOGDEBUG(QString("Reached PlotCPRLS Args:\n%1\n%2").arg(DestinationSheet).arg(DestinationIndex));
 		ExcelCommons::InitExcelOLE();
 		SAFEARRAYBOUND  Bound[1];
 		Bound[0].lLbound   = 1;
@@ -1859,7 +1873,7 @@ HRESULT ExcelOutput::PlotCPRLS(
 					CPRIter->vt = VT_R8;
 					CPRIter->dblVal = TempDbl;
 				}
-				TempDbl=1.0-qPow(1.0-(source.GetCalculatedMtgPayments().GetLoss(i)/(source.GetCalculatedMtgPayments().GetAmountOut(i-1)-source.GetCalculatedMtgPayments().GetScheduled(i))),12.0);
+                TempDbl = 1.0 - qPow(1.0 - (source.GetCalculatedMtgPayments().GetLoss(i) / (source.GetCalculatedMtgPayments().GetAmountOut(i - 1) - source.GetCalculatedMtgPayments().GetScheduled(i) - source.GetCalculatedMtgPayments().GetPrepay(i))), 12.0);
 				if(TempDbl<=1.00){
 					LSIter->vt = VT_R8;
 					LSIter->dblVal =  TempDbl;
@@ -1871,8 +1885,9 @@ HRESULT ExcelOutput::PlotCPRLS(
 			SafeArrayUnaccessData(DatesArray);
 			SafeArrayUnaccessData(CPRArray);
 			SafeArrayUnaccessData(LSArray);
+            LOGDEBUG("Vectors Done PlotCPRLS");
 		}
-
+        
 		static DISPID dispid = 0;
 		DISPPARAMS Params;
 		VARIANTARG Command[6];
@@ -1892,7 +1907,7 @@ HRESULT ExcelOutput::PlotCPRLS(
 			Command[CurrentCmdIndex--].parray = CPRArray;
 			Command[CurrentCmdIndex].vt = VT_ARRAY | VT_VARIANT;
 			Command[CurrentCmdIndex--].parray = LSArray;
-
+            LOGDEBUG("Command Prepared PlotCPRLS");
 			Params.rgdispidNamedArgs = NULL;
 			Params.rgvarg=Command;
 			Params.cArgs = 6;
@@ -1907,7 +1922,7 @@ HRESULT ExcelOutput::PlotCPRLS(
 					SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
 					SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
 					SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&DatesIter);
-					for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+                    for (int i = 1; i < source.GetCalculatedMtgPayments().Count(); i++)
 					{
 						SysFreeString(DatesIter->bstrVal);
 						DatesIter++;
@@ -1918,12 +1933,14 @@ HRESULT ExcelOutput::PlotCPRLS(
 			}
 			hr = ExcelCommons::pExcelDisp->Invoke(dispid,IID_NULL,LOCALE_SYSTEM_DEFAULT,
 				DISPATCH_METHOD, &Params, NULL, NULL, NULL);
+            LOGDEBUG("Invoked PlotCPRLS");
 			if(FAILED(hr))
 			{
+                LOGDEBUG("Invoke Failed PlotCPRLS");
 				SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
 				SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
 				SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&DatesIter);
-				for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+                for (int i = 1; i < source.GetCalculatedMtgPayments().Count(); i++)
 				{
 					SysFreeString(DatesIter->bstrVal);
 					DatesIter++;
@@ -1934,17 +1951,23 @@ HRESULT ExcelOutput::PlotCPRLS(
 		}
 		catch(_com_error &ce)
 		{
+            LOGDEBUG("Exception trown PlotCPRLS");
 			hr = ce.Error();
 		}
 		SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
 		SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
+        LOGDEBUG("Freed strings PlotCPRLS");
 		SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&DatesIter);
-		for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+        for (int i = 1; i < source.GetCalculatedMtgPayments().Count(); i++)
 		{
+            LOGDEBUG(QString("Aptemting Date %1 %2").arg(i).arg(QString::fromStdWString(DatesIter->bstrVal)));
 			SysFreeString(DatesIter->bstrVal);
 			DatesIter++;
 		}
+        
 		SafeArrayUnaccessData(DatesArray);
+        LOGDEBUG("Freed Dates PlotCPRLS");
+        LOGDEBUG("Reached End " + QString::number(hr, 16));
 		return hr;
 }
 

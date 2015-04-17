@@ -120,7 +120,6 @@ void ConsoleTestObj::BBVALTest() {
 	TempUnit.AddLoan(SingleLease);
 
 	//Tranches
-	QList<Tranche::TrancheInterestType> TempFlowType; TempFlowType << Tranche::TrancheInterestType::FloatingInterest;
 	QList<QString> TempRef; TempRef << "EUR003M";
 
 	QList<QString> TempCoup; TempCoup << "15";
@@ -131,7 +130,6 @@ void ConsoleTestObj::BBVALTest() {
 		, 750000000.0
 		, "EUR"
 		, 34083075.00
-		, TempFlowType
 		, TempCoup
 		, TempRef
 		, QDate(2014, 8, 26)
@@ -154,7 +152,6 @@ void ConsoleTestObj::BBVALTest() {
 		, 1606200000.0
 		, "EUR"
 		, 72992313.42
-		, TempFlowType
 		, TempCoup
 		, TempRef
 		, QDate(2014, 8, 26)
@@ -177,7 +174,6 @@ void ConsoleTestObj::BBVALTest() {
 		, 82500000.0
 		, "EUR"
 		, 82500000.0
-		, TempFlowType
 		, TempCoup
 		, TempRef
 		, QDate(2014, 8, 26)
@@ -200,7 +196,6 @@ void ConsoleTestObj::BBVALTest() {
 		, 61300000.0
 		, "EUR"
 		, 61300000.0
-		, TempFlowType
 		, TempCoup
 		, TempRef
 		, QDate(2014, 8, 26)
@@ -1542,7 +1537,6 @@ void ConsoleTestObj::SlateTest() {
 	
 
 	//Tranches
-	QList<Tranche::TrancheInterestType> TempFlowType; TempFlowType << Tranche::TrancheInterestType::FloatingInterest;
 	QList<QString> TempRef; TempRef << "LIBOR";
 
 	QList<QString> TempCoup;
@@ -1554,7 +1548,6 @@ void ConsoleTestObj::SlateTest() {
 		, 164000352.477
 		, "GBP"
 		, 164000352.477
-		, TempFlowType
 		, TempCoup
 		, TempRef
 		, QDate(2014, 8, 1)
@@ -1577,7 +1570,6 @@ void ConsoleTestObj::SlateTest() {
 		, 36000077
 		, "GBP"
 		, 36000077
-		, TempFlowType
 		, TempCoup
 		, TempRef
 		, QDate(2014, 8, 1)
@@ -1600,7 +1592,6 @@ void ConsoleTestObj::SlateTest() {
 		, 4000000.0
 		, "EUR"
 		, 4000000.0
-		, TempFlowType
 		, TempCoup
 		, TempRef
 		, QDate(2014, 8, 1)

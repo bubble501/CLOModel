@@ -70,7 +70,19 @@ QDataStream& TrancheCashFlow::LoadOldVersion(QDataStream& stream) {
 	return GenericCashFlow::LoadOldVersion(stream);
 }
 
-QDate TrancheCashFlow::GetLastFlowDate(bool IncludeDeferred ) const {
+bool TrancheCashFlow::HasAnyInterest(TrancheFlowType base) const
+{
+    if (base != TrancheFlowType::InterestFlow && base != TrancheFlowType::DeferredFlow && base != TrancheFlowType::AccruedFlow)
+        return false;
+    for (qint32 i = 0; i < (1 << MaximumInterestsTypes); ++i) {
+        if (HasFlowType(static_cast<qint32>(base) | i))
+            return true;
+    }
+    return false;
+}
+
+QDate TrancheCashFlow::GetLastFlowDate(bool IncludeDeferred) const
+{
 	for (QMap<QDate, QHash<qint32, double>* >::const_iterator i = m_CashFlows.constEnd() - 1; true; --i) {
 		for (QHash<qint32, double>::const_iterator j = i.value()->constBegin(); j != i.value()->constEnd(); ++j) {
 			if ((
@@ -262,7 +274,23 @@ bool TrancheCashFlow::HasFlowType(qint32 FlowTpe) const {
 	return GenericCashFlow::HasFlowType(FlowTpe) || StartingDeferredInterest.contains(FlowTpe);
 }
 
-void TrancheCashFlow::SetInitialOutstanding(double a) {
+bool TrancheCashFlow::HasInterest() const
+{
+    return HasAnyInterest(TrancheFlowType::InterestFlow);
+}
+
+bool TrancheCashFlow::HasDeferred() const
+{
+    return HasAnyInterest(TrancheFlowType::DeferredFlow);
+}
+
+bool TrancheCashFlow::HasAccrued() const
+{
+    return HasAnyInterest(TrancheFlowType::AccruedFlow);
+}
+
+void TrancheCashFlow::SetInitialOutstanding(double a)
+{
 	if (a == OutstandingAmt) return;
 	/*auto OldOut = SingleFlow(static_cast<qint32>(TrancheFlowType::AmountOutstandingFlow)).ScaledCashFlows(OutstandingAmt,a);
 	RemoveFlow(static_cast<qint32>(TrancheFlowType::AmountOutstandingFlow));

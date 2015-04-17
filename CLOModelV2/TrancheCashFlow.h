@@ -12,9 +12,6 @@ class TrancheCashFlow : public GenericCashFlow {
 private:
 	double OutstandingAmt;
 	QHash<qint32,double> StartingDeferredInterest;
-protected:
-	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
-	
 public:
 	enum class TrancheFlowType : qint32{
 		InterestFlow = 1 << MaximumInterestsTypes,
@@ -38,24 +35,24 @@ public:
 	template<class T> double GetTotalInterest(const T& index)const {
 		static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetInterest can be used only with int or QDate");
 		double Result = 0;
-		for (qint32 i = static_cast<qint32>(TrancheFlowType::InterestFlow); i < (static_cast<qint32>(TrancheFlowType::InterestFlow) << 1); ++i) {
-			Result += GetFlow(index, i);
+        for (qint32 i = 0; i < (1 << MaximumInterestsTypes); ++i) {
+            Result += GetFlow(index, static_cast<qint32>(TrancheFlowType::InterestFlow) | i);
 		}
 		return Result;
 	}
 	template<class T> double GetTotalDeferred(const T& index)const {
 		static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetDeferred can be used only with int or QDate");
 		double Result = 0;
-		for (qint32 i = static_cast<qint32>(TrancheFlowType::DeferredFlow); i < (static_cast<qint32>(TrancheFlowType::DeferredFlow) | static_cast<qint32>(TrancheFlowType::InterestFlow)); ++i) {
-			Result += GetFlow(index, i);
+		for (qint32 i = 0; i < (1 << MaximumInterestsTypes) ; ++i) {
+            Result += GetFlow(index, static_cast<qint32>(TrancheFlowType::DeferredFlow) | i);
 		}
 		return Result;
 	}
 	template<class T> double GetTotalAccrued(const T& index)const {
 		static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetAccrued can be used only with int or QDate");
 		double Result = 0;
-		for (qint32 i = static_cast<qint32>(TrancheFlowType::AccruedFlow); i < (static_cast<qint32>(TrancheFlowType::AccruedFlow) | static_cast<qint32>(TrancheFlowType::InterestFlow)); ++i) {
-			Result += GetFlow(index, i);
+        for (qint32 i = 0; i < (1 << MaximumInterestsTypes); ++i) {
+            Result += GetFlow(index, static_cast<qint32>(TrancheFlowType::AccruedFlow) | i);
 		}
 		return Result;
 	}
@@ -106,6 +103,9 @@ public:
 	void SetStartingDeferredInterest(const double& val, qint32 CoupIdx/*=0*/);
 	void ResetStartingDeferredInterest() { StartingDeferredInterest.clear(); }
 	virtual bool HasFlowType(qint32 FlowTpe)const override;
+    virtual bool HasInterest() const;
+    virtual bool HasDeferred() const;
+    virtual bool HasAccrued() const;
 	virtual void LoadFromXML(const QString& Source) override;
 #ifndef NO_DATABASE
 	virtual bool GetCashFlowsDatabase(const QString& TrancheID);
@@ -115,6 +115,9 @@ public:
 #endif
 	virtual TrancheCashFlow ScaledCashFlows(double OldSize, double NewSize)const;
 	virtual TrancheCashFlow ScaledCashFlows(double NewSize) const { return ScaledCashFlows(OutstandingAmt, NewSize); }
+protected:
+    virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
+    bool HasAnyInterest(TrancheFlowType base) const;
 	friend QDataStream& operator<<(QDataStream & stream, const TrancheCashFlow& flows);
 	friend QDataStream& operator>>(QDataStream & stream, TrancheCashFlow& flows);
 };

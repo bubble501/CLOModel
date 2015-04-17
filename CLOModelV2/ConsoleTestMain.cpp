@@ -38,11 +38,11 @@ int main(int argc, char *argv[]) {
 	//return a.exec();
 
 
-	QApplication a(argc, argv);
+	/*QApplication a(argc, argv);
 	LoanAssumptionsEditor b;
 	b.FillFromQuery();
 	b.show();
-	return a.exec();
+	return a.exec();*/
 
 	/*QApplication a(argc, argv);
 	StressViewer b;
@@ -113,9 +113,9 @@ int main(int argc, char *argv[]) {
 // 	TempMtg.SetSequentialComputation(true);
 // 	TempMtg.StartCalculation();
 // 	return a.exec();
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	QApplication a(argc, argv);
-	QFile file("C:/Temp/.SavedInputs.clo");
+	QFile file("C:/Temp/BaseCase.clo");
 	//QFile file("C:/Temp/20#,#8#,#100#,#0#,#0#,#0.csw");
 	//QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/BaseCase.clo");
 	file.open(QIODevice::ReadOnly);
@@ -135,6 +135,7 @@ int main(int argc, char *argv[]) {
  	TempWtf.SetLoadProtocolVersion(VersionChecker);
  	out >> TempWtf;
  	file.close();
+    ExcelOutput::PlotCPRLS(TempWtf, "Graphical Output", 8);
 	TempWtf.CalculateTranchesCashFlows();
 	SummaryView Check;
 	Check.show();

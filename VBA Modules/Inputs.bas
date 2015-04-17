@@ -120,6 +120,9 @@ Public Sub GetInputFromStructure( _
     Dim GICBaseRateCell As Range
     Dim ReinvestementWindowCell As Range
     Dim DealDaycountCell As Range
+    Dim AdditionalCouponBase As Range
+    Dim AdditionalRefRateBase As Range
+    Dim AdditionalDayCountBase As Range
     'loans assumptions
     Dim IssuerProperty As Range
     Dim FacilityProperty As Range
@@ -349,6 +352,19 @@ ReferenceRateFromBBg:
     Else
         Call AddInput(AllTheInputs, CLng(BondStart.End(xlDown).Row - BondStart.Row))
     End If
+    Dim NumOfTrancheCoupon As Long
+    NumOfTrancheCoupon = 1
+    Do While (True)
+        On Error Resume Next
+        Set AdditionalCouponBase = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("AdditionalCouponBase") + Format(NumOfTrancheCoupon + 1, "0"), LookAt:=xlWhole, LookIn:=xlValues)
+        Set AdditionalRefRateBase = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("AdditionalRefRateBase") + Format(NumOfTrancheCoupon + 1, "0"), LookAt:=xlWhole, LookIn:=xlValues)
+        Set AdditionalDayCountBase = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("AdditionalDayCountBase") + Format(NumOfTrancheCoupon + 1, "0"), LookAt:=xlWhole, LookIn:=xlValues)
+        On Error GoTo 0
+        If AdditionalCouponBase Is Nothing Or AdditionalRefRateBase Is Nothing Or AdditionalDayCountBase Is Nothing Then Exit Do
+        NumOfTrancheCoupon = NumOfTrancheCoupon + 1
+    Loop
+    
+    Dim AdditionalIter As Long
     i = 1
     Do While (True)
         If IsEmpty(BondStart.Offset(i, 0)) Then Exit Do
@@ -362,12 +378,38 @@ ReferenceRateFromBBg:
         Call AddInput(AllTheInputs, OriginalOutStart.Offset(i, 0).Value)
         Call AddInput(AllTheInputs, CStr(CurrencyStart.Offset(i, 0).Value))
         Call AddInput(AllTheInputs, CurrentOutStart.Offset(i, 0).Value)
-        Call AddInput(AllTheInputs, CLng(1))
-        Call AddInput(AllTheInputs, FromStringToInterestType(FixFloatStart.Offset(i, 0).Value))
-        Call AddInput(AllTheInputs, CLng(1))
-        Call AddInput(AllTheInputs, CStr(TrancheCouponStart.Offset(i, 0).Value))
-        Call AddInput(AllTheInputs, CLng(1))
-        Call AddInput(AllTheInputs, CStr(RefRateStart.Offset(i, 0).Value))
+        Call AddInput(AllTheInputs, NumOfTrancheCoupon)
+        If CStr(TrancheCouponStart.Offset(i, 0).Value) = "" Then
+            Call AddInput(AllTheInputs, "0")
+        Else
+            Call AddInput(AllTheInputs, CStr(TrancheCouponStart.Offset(i, 0).Value))
+        End If
+        AdditionalIter = 2
+        While (AdditionalIter <= NumOfTrancheCoupon)
+            Set AdditionalCouponBase = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("AdditionalCouponBase") + Format(AdditionalIter, "0"), LookAt:=xlWhole, LookIn:=xlValues)
+            If CStr(AdditionalCouponBase.Offset(i, 0).Value) = "" Then
+                Call AddInput(AllTheInputs, "0")
+            Else
+                Call AddInput(AllTheInputs, CStr(AdditionalCouponBase.Offset(i, 0).Value))
+            End If
+            AdditionalIter = AdditionalIter + 1
+        Wend
+        Call AddInput(AllTheInputs, NumOfTrancheCoupon)
+        If CStr(RefRateStart.Offset(i, 0).Value) = "" Then
+            Call AddInput(AllTheInputs, "ZERO")
+        Else
+            Call AddInput(AllTheInputs, CStr(RefRateStart.Offset(i, 0).Value))
+        End If
+        AdditionalIter = 2
+        While (AdditionalIter <= NumOfTrancheCoupon)
+            Set AdditionalRefRateBase = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("AdditionalRefRateBase") + Format(AdditionalIter, "0"), LookAt:=xlWhole, LookIn:=xlValues)
+            If CStr(AdditionalRefRateBase.Offset(i, 0).Value) = "" Then
+                Call AddInput(AllTheInputs, "ZERO")
+            Else
+                Call AddInput(AllTheInputs, CStr(AdditionalRefRateBase.Offset(i, 0).Value))
+            End If
+            AdditionalIter = AdditionalIter + 1
+        Wend
         Call AddInput(AllTheInputs, Format(PrevIPDCell.Offset(0, 1).Value, "yyyy-mm-dd"))
         Call AddInput(AllTheInputs, CStr(InterestBaseCell.Offset(0, 1).Value))
         Call AddInput(AllTheInputs, CStr(IPDfrequencyCell.Offset(0, 1)))
@@ -384,12 +426,22 @@ DefaultExchange:
         On Error GoTo 0
         Call AddInput(AllTheInputs, Format(SettleDateCell.Offset(0, 1).Value, "yyyy-mm-dd"))
         'Call AddInput(AllTheInputs, AccruedIntrStart.Offset(i, 0).Value)
-        Call AddInput(AllTheInputs, CLng(1))
+        Call AddInput(AllTheInputs, CLng(NumOfTrancheCoupon))
         If (DayCountHead Is Nothing) Then
             Call AddInput(AllTheInputs, "102")
         Else
             Call AddInput(AllTheInputs, CStr(DayCountHead.Offset(i, 0).Value))
         End If
+        AdditionalIter = 2
+        While (AdditionalIter <= NumOfTrancheCoupon)
+            Set AdditionalDayCountBase = Sheets(InputsSheet).Cells.Find(What:=FieldsLabels("AdditionalDayCountBase") + Format(AdditionalIter, "0"), LookAt:=xlWhole, LookIn:=xlValues)
+            If CStr(AdditionalDayCountBase.Offset(i, 0).Value) = "" Then
+                Call AddInput(AllTheInputs, "102")
+            Else
+                Call AddInput(AllTheInputs, CStr(AdditionalDayCountBase.Offset(i, 0).Value))
+            End If
+            AdditionalIter = AdditionalIter + 1
+        Wend
         If (CurrentDeferredCell Is Nothing) Then
             Call AddInput(AllTheInputs, 0#)
         Else
@@ -1107,6 +1159,9 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
     a.Add "Reserve Index", "ReserveIndexHead"
     a.Add "Triggers", "TriggersHead"
     a.Add "Accrue/Pay", "AccruePayHead"
+    a.Add "Coupon ", "AdditionalCouponBase"
+    a.Add "Ref rate ", "AdditionalRefRateBase"
+    a.Add "Day count ", "AdditionalDayCountBase"
 End Sub
 
 Private Function FromStringToInterestType(a As String) As Long

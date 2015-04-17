@@ -12,13 +12,6 @@
 #include "DayCountVect.h"
 #include "Seniority.h"
 class  Tranche : public BackwardInterface {
-public:
-	//! Enum defining what type of coupon the tranche is paying
-	enum TrancheInterestType{
-		InvalidType=-1,
-		FixedInterest, /*!< Fixed Coupon*/
-		FloatingInterest /*!< Floating Rate Coupon*/
-	};
 private:
     QHash<qint32, DayCountVector*> m_DayCount;
 	QString ISINcode;
@@ -26,7 +19,6 @@ private:
 	double OriginalAmt;
 	QString Currency;
 	double OutstandingAmt;
-	QHash<qint32,TrancheInterestType> InterestType;
 	QHash<qint32, BloombergVector*> Coupon;
 	QHash<qint32, BaseRateVector*> ReferenceRate;
 	mutable QHash<qint32, BloombergVector*> ReferenceRateValue;
@@ -90,10 +82,8 @@ public:
 	double GetBaseCurrencyOutsanding() const {return OutstandingAmt*ExchangeRate;}
 	double GetBaseCurrencyOriginal() const {return OriginalAmt*ExchangeRate;}
     QList<qint32> GetCouponIndexes() const { return Coupon.keys(); }
-	QList<qint32> GetInterestTypeIndexes() const { return InterestType.keys(); }
     QList<qint32> GetReferenceRateIndexes()const { return ReferenceRate.keys(); }
     QList<qint32> GetDayCountsIndexes()const { return m_DayCount.keys(); }
-	TrancheInterestType GetInterestType(qint32 CoupIndex /*= 0*/) const { return InterestType.value(CoupIndex, InvalidType); }
 	double GetTotalCoupon(const QDate& index, int Frequency = 12) const;
 	double GetTotalCoupon(int index, int Frequency = 12) const;
 	double GetCoupon(const QDate& index, qint32 CoupIndex /*= 0*/, int Frequency = 12) const;
@@ -123,7 +113,6 @@ public:
 	void SetCurrency(const QString& a){Currency=a;}
 	void SetOriginalAmount(double a);
 	void SetOutstandingAmt(double a);
-	void SetInterestType(TrancheInterestType a, qint32 CoupIndex);
 	void SetCoupon(const QString& a, qint32 CoupIndex);
 	void SetReferenceRate(const QString& a, qint32 CoupIndex);
 	bool GetUseForwardCurve() const { return m_UseForwardCurve; }

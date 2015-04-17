@@ -78,7 +78,6 @@ void CentralUnit::AddTranche(
 	, double OrigAmnt
 	, const QString& Crncy
 	, double OutstandingAmt
-	, const QList<Tranche::TrancheInterestType>& IntrTyp
 	, const QList< QString>& Coupon
 	, const  QList< QString>& RefRte
 	, const QDate& LastPayDte
@@ -100,8 +99,6 @@ void CentralUnit::AddTranche(
 	TempTrnch.SetOriginalAmount(OrigAmnt);
 	TempTrnch.SetCurrency(Crncy);
 	TempTrnch.SetOutstandingAmt(OutstandingAmt);
-	for (int i = 0; i < IntrTyp.size();i++)
-		TempTrnch.SetInterestType(IntrTyp.at(i), i);
 	for (int i = 0; i < Coupon.size(); i++)
 		TempTrnch.SetCoupon(Coupon.at(i), i);
 	for (int i = 0; i < RefRte.size(); i++)
@@ -139,7 +136,9 @@ void CentralUnit::AddWaterfallStep(
 	){
 	WatFalPrior TempStep;
 	if (!ArgSeniorityGroup.isEmpty()) { TempStep.SetParameter(WatFalPrior::wstParameters::SeniorityGroup, ArgSeniorityGroup); }
-	if (!ArgSeniorityGroupLevel.isEmpty()) { TempStep.SetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel, ArgSeniorityGroupLevel); }
+	if (!ArgSeniorityGroupLevel.isEmpty()) { 
+        TempStep.SetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel, ArgSeniorityGroupLevel); 
+    }
 	if (!ArgRedemptionGroup.isEmpty()) { TempStep.SetParameter(WatFalPrior::wstParameters::RedemptionGroup, ArgRedemptionGroup); }
 	if (!ArgRedemptionGroupLevel.isEmpty()) { TempStep.SetParameter(WatFalPrior::wstParameters::RedemptionGroupLevel, ArgRedemptionGroupLevel); }
 	if (!ArgRedemptionShare.isEmpty()) { TempStep.SetParameter(WatFalPrior::wstParameters::RedemptionShare, ArgRedemptionShare); }
@@ -427,13 +426,13 @@ void CentralUnit::CheckCalculationDone()
 		{
 			
 			ExcelOutput::PrintTrancheFlow(*Structure.GetTranche(i), ExcelCommons::CellOffset(TranchesOutputAddress, 1, (i>0 ? 1 : 0) + ClolumnCount), i % 2 == 0 ? QColor(235, 241, 222) : QColor(216, 228, 188), i == 0, true, true, true, false
-				, Structure.GetTranche(i)->GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow))
+				, Structure.GetTranche(i)->GetCashFlow().HasDeferred()
 				, Structure.GetTranche(i)->GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::OCFlow))
 				, Structure.GetTranche(i)->GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::ICFlow))
 				, Structure.GetTranche(i)->GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PDLCured)) || Structure.GetTranche(i)->GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PDLOutstanding))
 				);
 			ClolumnCount += 3
-				+ (Structure.GetTranche(i)->GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow)) ? 1 : 0)
+                + (Structure.GetTranche(i)->GetCashFlow().HasDeferred() ? 1 : 0)
 				+ (Structure.GetTranche(i)->GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::OCFlow)) ? 1 : 0)
 				+ (Structure.GetTranche(i)->GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::ICFlow)) ? 1 : 0)
 				+ (Structure.GetTranche(i)->GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PDLCured)) || Structure.GetTranche(i)->GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PDLOutstanding)) ? 2 : 0)
@@ -497,13 +496,13 @@ void CentralUnit::CheckCalculationDone()
 			ClolumnCount=0;
 			for (int i = 0; i < CallStructure.GetTranchesCount(); i++) {
 				ExcelOutput::PrintTrancheFlow(*CallStructure.GetTranche(i), ExcelCommons::CellOffset(TranchesOutputAddress, 4 + Structure.GetTranche(i)->GetCashFlow().Count(), (i>0 ? 1 : 0) + ClolumnCount), i % 2 == 0 ? QColor(235, 241, 222) : QColor(216, 228, 188), i == 0, true, true, true, false
-					, CallStructure.GetTranche(i)->GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow))
+					, CallStructure.GetTranche(i)->GetCashFlow().HasDeferred()
 					, CallStructure.GetTranche(i)->GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::OCFlow))
 					, CallStructure.GetTranche(i)->GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::ICFlow))
 					, CallStructure.GetTranche(i)->GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PDLCured)) || CallStructure.GetTranche(i)->GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PDLOutstanding))
 					);
 				ClolumnCount += 3
-					+ (CallStructure.GetTranche(i)->GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow)) ? 1 : 0)
+                    + (CallStructure.GetTranche(i)->GetCashFlow().HasDeferred() ? 1 : 0)
 					+ (CallStructure.GetTranche(i)->GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::OCFlow)) ? 1 : 0)
 					+ (CallStructure.GetTranche(i)->GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::ICFlow)) ? 1 : 0)
 					+ (CallStructure.GetTranche(i)->GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PDLCured)) || CallStructure.GetTranche(i)->GetCashFlow().HasFlowType(static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PDLOutstanding)) ? 2 : 0)
@@ -571,6 +570,7 @@ void CentralUnit::CheckCalculationDone()
 		ExcelOutput::PlotCostFunding(Structure,PlotsSheet,PlotIndexes[5],RunCall ? CallStructure.GetCalledPeriod():QDate());
 	if(!PlotsSheet.isEmpty() && PlotIndexes[6]>0)
 		ExcelOutput::PlotCPRLS(Structure,PlotsSheet,PlotIndexes[6]);
+    LOGDEBUG("Finished PlotCPRLS");
 	if(!PlotsSheet.isEmpty() && PlotIndexes[7]>0)
 		ExcelOutput::PlotEquityReturn(Structure,PlotsSheet,PlotIndexes[7]);
 	if(!PlotsSheet.isEmpty() && PlotIndexes[8]>0)

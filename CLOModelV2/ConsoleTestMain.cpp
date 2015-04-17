@@ -32,6 +32,7 @@
 #include <QIcon>
 
 int main(int argc, char *argv[]) {
+
 	//QApplication a(argc, argv);
 	//ConsoleTestObj b;
 	//return a.exec();
@@ -80,11 +81,11 @@ int main(int argc, char *argv[]) {
 		, "20", "0.5", "0", "0", "0", "0"
 		).GetTranche("HARVT 10X A"));
 	return a.exec();
-	*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	Waterfall TempWtf, TempCallWaterfall;
 	MtgCalculator TempMtg;
-	QFile file("Z:/24AM/Monitoring/Model Results/Celeste 2015-1.clom");
+	QFile file("Z:/24AM/Monitoring/Model Results/HNRS 2.clom");
 	file.open(QIODevice::ReadOnly);
 	qint32 VersionChecker;
 	QDataStream out(&file);
@@ -112,10 +113,10 @@ int main(int argc, char *argv[]) {
 // 	TempMtg.SetSequentialComputation(true);
 // 	TempMtg.StartCalculation();
 // 	return a.exec();
-	/*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	QApplication a(argc, argv);
-	//QFile file("C:/Temp/Wrong 20#,#8#,#100#,#0#,#0#,#0.csw");
-	QFile file("C:/Temp/20#,#8#,#100#,#0#,#0#,#0.csw");
+	QFile file("C:/Temp/BaseCase.clo");
+	//QFile file("C:/Temp/20#,#8#,#100#,#0#,#0#,#0.csw");
 	//QFile file("Z:/24AM/Personal Folders/LB/CLO 2.0/Analytics/CLO Model/Converted Models/BaseCase.clo");
 	file.open(QIODevice::ReadOnly);
 	qint32 VersionChecker;
@@ -126,14 +127,16 @@ int main(int argc, char *argv[]) {
 	file.close();
 	return 1;
 	}
-	//{bool Junk; out >> Junk; }
+	{bool Junk; out >> Junk; }
+
 	Waterfall TempWtf;
-	Tranche TempTr;
-	TempWtf.AddTranche(TempTr);
-// 	TempWtf.SetLoadProtocolVersion(VersionChecker);
-// 	out >> TempWtf;
-// 	file.close();
-	//TempWtf.CalculateTranchesCashFlows();
+	//Tranche TempTr;
+	//TempWtf.AddTranche(TempTr);
+ 	TempWtf.SetLoadProtocolVersion(VersionChecker);
+ 	out >> TempWtf;
+ 	file.close();
+    ExcelOutput::PlotCPRLS(TempWtf, "Graphical Output", 8);
+	TempWtf.CalculateTranchesCashFlows();
 	SummaryView Check;
 	Check.show();
 	Check.SetStructure(TempWtf);

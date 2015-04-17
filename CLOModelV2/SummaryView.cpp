@@ -35,7 +35,6 @@ SummaryView::SummaryView(QWidget* parent)
 		<< "Current Amount"
 		<< "Bond Factor"
 		<< "Implied CE"
-		<< "Fixed/Float"
 		<< "Reference Rate"
 		<< "Coupon"
 		<< "Price"
@@ -278,23 +277,22 @@ void SummaryView::DisplayStructure(){
 		StructureTable->setItem(i,4,new QTableWidgetItem(Commarize(Structure.GetTranche(i)->GetOutstandingAmt())));
 		StructureTable->setItem(i,5,new QTableWidgetItem(Commarize(Structure.GetTranche(i)->GetBondFactor()*100.0,2U)+'%'));
 		StructureTable->setItem(i,6,new QTableWidgetItem(Commarize(Structure.GetCreditEnhancement(i)*100.0,2U)+'%'));
-		StructureTable->setItem(i,7,new QTableWidgetItem(Structure.GetTranche(i)->GetInterestType(0)==Tranche::FloatingInterest ? "Float":"Fixed"));
-		StructureTable->setItem(i,8,new QTableWidgetItem(Structure.GetTranche(i)->GetReferenceRate(0).GetVector()));
-        StructureTable->setItem(i, 9, new QTableWidgetItem(Structure.GetTranche(i)->GetCouponVector(0).GetVector()));
-		StructureTable->setItem(i,11,new QTableWidgetItem(Commarize(Structure.GetTranche(i)->GetIRR()*100.0,2U)+'%'));
-		StructureTable->setItem(i,12,new QTableWidgetItem(Commarize(Structure.GetTranche(i)->GetWALife(),2U)));
-		StructureTable->setItem(i,13,new QTableWidgetItem(Commarize(Structure.GetTranche(i)->GetDiscountMargin())));
-		StructureTable->setItem(i,14,new QTableWidgetItem(Commarize(Structure.GetTranche(i)->GetLossRate()*100.0,2U)+'%'));
+		StructureTable->setItem(i,7,new QTableWidgetItem(Structure.GetTranche(i)->GetReferenceRate(0).GetVector()));
+        StructureTable->setItem(i, 8, new QTableWidgetItem(Structure.GetTranche(i)->GetCouponVector(0).GetVector()));
+		StructureTable->setItem(i,10,new QTableWidgetItem(Commarize(Structure.GetTranche(i)->GetIRR()*100.0,2U)+'%'));
+		StructureTable->setItem(i,11,new QTableWidgetItem(Commarize(Structure.GetTranche(i)->GetWALife(),2U)));
+		StructureTable->setItem(i,12,new QTableWidgetItem(Commarize(Structure.GetTranche(i)->GetDiscountMargin())));
+		StructureTable->setItem(i,13,new QTableWidgetItem(Commarize(Structure.GetTranche(i)->GetLossRate()*100.0,2U)+'%'));
 
 		PricesLabel.append(new QLineEdit(this));
 		PricesLabel.last()->setText(Commarize(Structure.GetTranche(i)->GetPrice(),2U));
 		PricesLabel.last()->setValidator(new QDoubleValidator(0.0,200.0,2,this));
 		PricesLabel.last()->setObjectName(QString("%1").arg(i));
 		connect(PricesLabel.last(),SIGNAL(textEdited(QString)),this,SLOT(PriceChanged()));
-		StructureTable->setCellWidget(i,10,PricesLabel.last());
+		StructureTable->setCellWidget(i,9,PricesLabel.last());
 
 		for(int j=0;j<StructureTable->columnCount();j++){
-			if(j!=10)
+			if(j!=9)
 				StructureTable->item(i,j)->setBackgroundColor(
 					Structure.GetTranche(i)->GetProrataGroup(0)%2==0 ? QColor(235,241,222) : QColor(216,228,188)
 				);

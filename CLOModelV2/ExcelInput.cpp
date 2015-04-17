@@ -51,23 +51,19 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	{//Tranches
 		QString TrName, Curr, BasRt, TrancheISIN, IPDfrq, ProRat;
         QList<QString> RefRt, coup, DayCnt;
-		QList<Tranche::TrancheInterestType>IntrTpe;
 		int TempSize;
 		double origOut,currOut,OClim,IClim,Price,Exchan,startingDeferred/*,coup*/;
 		QDate PrevIPD,SettDate;
 		NumElements=pdFreq++->intVal;
 		LOGDEBUG(QString("Numero Tranches: %1").arg(NumElements));
 		for(int i=0;i<NumElements;i++){
-			RefRt.clear(); coup.clear(); IntrTpe.clear();
+			RefRt.clear(); coup.clear();
 			TrName=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			TrancheISIN=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			ProRat = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 			origOut=pdFreq->dblVal;pdFreq++;
 			Curr=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			currOut=pdFreq->dblVal;pdFreq++;
-			TempSize = pdFreq->intVal; pdFreq++;
-			for (int i = 0; i < TempSize;++i)
-				{IntrTpe.append(static_cast<Tranche::TrancheInterestType>(pdFreq->intVal)); pdFreq++;}
 			TempSize = pdFreq->intVal; pdFreq++;
 			for (int i = 0; i < TempSize; ++i)
 				{coup.append(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;}
@@ -87,7 +83,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
                 DayCnt.append(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
             }
 			startingDeferred = pdFreq->dblVal; pdFreq++;
-			TempUnit.AddTranche(TrName, TrancheISIN, ProRat, origOut, Curr, currOut, IntrTpe, coup, RefRt, PrevIPD, BasRt, IPDfrq, SettDate, startingDeferred, /*RefRtVal,*/ OClim, IClim, Price, Exchan, "Mtge", DayCnt);
+			TempUnit.AddTranche(TrName, TrancheISIN, ProRat, origOut, Curr, currOut, coup, RefRt, PrevIPD, BasRt, IPDfrq, SettDate, startingDeferred, /*RefRtVal,*/ OClim, IClim, Price, Exchan, "Mtge", DayCnt);
             LOGDEBUG("Tranche Added");
         }
 	}

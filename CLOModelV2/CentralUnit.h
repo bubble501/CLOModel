@@ -35,7 +35,6 @@ public:
 		, double OrigAmnt
 		, const QString& Crncy
 		, double OutstandingAmt
-		, const  QList<Tranche::TrancheInterestType>& IntrTyp
 		, const QList<QString>& Coupon
 		, const QList<QString>& RefRte
 		, const QDate& LastPayDte

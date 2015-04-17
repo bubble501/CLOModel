@@ -26,7 +26,6 @@ Tranche::Tranche()
 	BloombergVector* TempCoup = new BloombergVector("0");
 	TempCoup->SetDivisor(10000.0);
 	Coupon.insert(0, TempCoup);
-	InterestType.insert(0, FloatingInterest);
     m_DayCount.insert(0, new DayCountVector(DayCountConvention::ACT360));
 	ReferenceRate.insert(-1, new BaseRateVector("BP0003M"));
 }
@@ -52,7 +51,6 @@ Tranche::Tranche(const Tranche& a)
 	, Currency(a.Currency)
 	, Price(a.Price)
 	, BloombergExtension(a.BloombergExtension)
-	, InterestType(a.InterestType)
 	, ProrataGroup(a.ProrataGroup)
 	, MinIClevel(a.MinIClevel)
 	, MinOClevel(a.MinOClevel)
@@ -81,7 +79,6 @@ Tranche& Tranche::operator=(const Tranche& a){
 	Currency=a.Currency;
 	Price=a.Price;
 	BloombergExtension=a.BloombergExtension;
-	InterestType=a.InterestType;
 	ProrataGroup=a.ProrataGroup;
 	MinIClevel=a.MinIClevel;
 	MinOClevel=a.MinOClevel;
@@ -207,7 +204,7 @@ double Tranche::GetCoupon(const QDate& index, qint32 CoupIndex , int Frequency) 
 	BloombergVector TempCoupon=*(Coupon.value(CoupIndex));
 	if(TempCoupon.GetAnchorDate().isNull()) TempCoupon.SetAnchorDate(LastPaymentDate);
 	if (TempCoupon.GetAnchorDate().isNull()) TempCoupon.SetAnchorDate(index);
-	if(InterestType.value(CoupIndex,InvalidType)==FloatingInterest){
+    if (!ReferenceRate.value(CoupIndex)->IsEmpty()) {
 		bool DownloadRates = !ReferenceRateValue.contains(CoupIndex);
 		if (!DownloadRates) DownloadRates = ReferenceRateValue.value(CoupIndex)->IsEmpty();
 		if (DownloadRates)
@@ -316,10 +313,7 @@ void Tranche::GetDataFromBloomberg() {
 		if (Bee.GetResult(4)->HasErrors()) LastPaymentDate = QDate();
 		else LastPaymentDate = Bee.GetResult(4)->GetDate();
 
-		if (Bee.GetResult(5)->GetString().contains("FLT")) InterestType[0] = FloatingInterest;
-		else InterestType[0] = FixedInterest;
-
-		if (InterestType[0] == FloatingInterest) {
+        if (Bee.GetResult(5)->GetString().contains("FLT")) {
 			if (Bee.GetResult(6)->HasErrors()) { if (Coupon.contains(0)) *(Coupon[0]) = ""; else Coupon.insert(0, new BloombergVector()); }
 			else { if (Coupon.contains(0)) *(Coupon[0]) = Bee.GetResult(6)->GetString(); else Coupon.insert(0, new BloombergVector(Bee.GetResult(6)->GetString())); }
 
@@ -545,10 +539,6 @@ QDataStream& operator<<(QDataStream & stream, const Tranche& flows){
 		<< flows.SettlementDate
 		<< flows.m_UseForwardCurve
 	;
-	
-	stream << static_cast<qint32>(flows.InterestType.size());
-	for (QHash<qint32, Tranche::TrancheInterestType>::const_iterator i = flows.InterestType.constBegin(); i != flows.InterestType.constEnd(); ++i) 
-		stream << i.key() << static_cast<qint32>(i.value());
 	stream << static_cast<qint32>(flows.Coupon.size());
 	for (QHash<qint32, BloombergVector*>::const_iterator i = flows.Coupon.constBegin(); i != flows.Coupon.constEnd(); ++i) 
 		stream << i.key() << *(i.value());
@@ -590,11 +580,6 @@ QDataStream& Tranche::LoadOldVersion(QDataStream& stream){
 	stream >> m_UseForwardCurve;
 
 	ClearInterest();
-	stream >> TempSize;
-	for (qint32 i = 0; i < TempSize; i++) {
-		stream >> TempKey >> TempInt;
-		InterestType.insert(TempKey, static_cast<TrancheInterestType>(TempInt));
-	}
 	stream >> TempSize;
 	for (qint32 i = 0; i < TempSize; i++) {
 		TempBV = new BloombergVector();
@@ -663,6 +648,8 @@ DayCountVector Tranche::GetDayCount(qint32 CoupIndex) const
 }
 void Tranche::SetCoupon(const QString& a, qint32 CoupIndex ) {
     SetCouponPart(a, CoupIndex, Coupon);
+    if (Coupon.contains(CoupIndex))
+        Coupon[CoupIndex]->SetDivisor(10000);
 }
 void Tranche::SetReferenceRate(const QString& a, qint32 CoupIndex ) {
     SetCouponPart(a, CoupIndex, ReferenceRate);
@@ -679,10 +666,7 @@ void Tranche::SetDayCount(QString val, qint32 CoupIndex)
 {
     SetCouponPart(val, CoupIndex, m_DayCount);
 }
-void Tranche::SetInterestType(TrancheInterestType a, qint32 CoupIndex ) {
-	if (CoupIndex<0 || CoupIndex >= (1 << MaximumInterestsTypes)) return;
-	InterestType[CoupIndex] = a;
-}
+
 
 bool Tranche::AdjHolidays(DayCountConvention a) {
 	return
@@ -696,12 +680,9 @@ bool Tranche::AdjHolidays(DayCountConvention a) {
 
 bool Tranche::HasCoupon(qint32 CoupIdx) const {
 	return 
-		InterestType.contains(CoupIdx)
-		&& Coupon.contains(CoupIdx)
-		&& (
-			InterestType.value(CoupIdx) != TrancheInterestType::FloatingInterest
-			|| ReferenceRate.contains(CoupIdx)
-		);
+        Coupon.contains(CoupIdx)
+		&& ReferenceRate.contains(CoupIdx)
+	;
 }
 
 

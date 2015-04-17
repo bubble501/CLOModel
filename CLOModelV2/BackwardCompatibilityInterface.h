@@ -3,8 +3,8 @@
 #include "CommonFunctions.h"
 #include <QtGlobal>
 //! The current Version of the Model
-#define ModelVersionNumber 186
-#define MinimumSupportedVersion 186
+#define ModelVersionNumber 188
+#define MinimumSupportedVersion 188
 
 class BackwardInterface {
 public:

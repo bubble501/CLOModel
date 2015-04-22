@@ -1300,7 +1300,7 @@ bool Waterfall::CalculateTranchesCashFlows()
                     AvailableInterest += TotalPayable - (AvailableInterest*SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionShare).value<BloombergVector>().GetValue(CurrentDate));
                 }
                                                                break;
-                                                               ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 case WatFalPrior::WaterfallStepType::wst_AllocPrepayFees:{
                     int CurrSenGrpLvl = SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroupLevel).value<IntegerVector>().GetValue(CurrentDate);
                     int CurrSenGrp = SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroup).value<IntegerVector>().GetValue(CurrentDate);
@@ -1769,7 +1769,6 @@ bool Waterfall::CalculateTranchesCashFlows()
         foreach(ReserveFund* SingleRes, m_Reserves)
         {
             CheckResults -= SingleRes->GetStartingReserve();
-            SingleRes->ClearFlows();
         }
         LOGDEBUG(QString("After Reserve Funds:\t%1").arg(CheckResults, 0, 'f'));
         CheckMtgCashFlow.Clear();

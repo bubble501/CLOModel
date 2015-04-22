@@ -10,6 +10,9 @@ m_ReserveToInterest(true)
 		m_ReserveVects[i].SetVector("0");
 		m_ReserveVects[i].SetDivisor(1.0);
 	}
+    m_ReserveFundFlows.SetLabel(static_cast<qint32>(ReserveFlowsType::ReplenishFromInterest), "Replenish from Interest");
+    m_ReserveFundFlows.SetLabel(static_cast<qint32>(ReserveFlowsType::ReplenishFromPrincipal), "Replenish from Principal");
+    m_ReserveFundFlows.SetLabel(static_cast<qint32>(ReserveFlowsType::ShortFall), "ShortFall");
 }
 ReserveFund::ReserveFund(const ReserveFund& a)
 :m_ReserveFundCurrent(a.m_ReserveFundCurrent),

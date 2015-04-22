@@ -69,7 +69,7 @@ protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 private:
 	enum VectorType {
-		ResTarget
+		ResTarget=0
 		,ResMultiple
 		,ResFloor
 		,ResCap

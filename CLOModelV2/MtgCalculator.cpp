@@ -188,8 +188,7 @@ void MtgCalculator::BeeReturned(int Ident, const MtgCashFlow& a) {
 	m_AggregatedRes+=a;
     if (m_SaveIndividualFlows) if(Loans.contains(Ident)) Loans[Ident]->SetCashFlows(a);
 	TemplAsyncCalculator<MtgCalculatorThread, MtgCashFlow>::BeeReturned(Ident, a);
-    delete m_Result.value(Ident);
-    m_Result.remove(Ident);
+    RemoveResult(Ident);
 	if (!m_ContinueCalculation)return;
 	MtgCalculatorThread* CurrentThread;
 	for (auto SingleLoan = Loans.constBegin(); SingleLoan != Loans.constEnd(); ++SingleLoan) {

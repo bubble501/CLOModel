@@ -34,9 +34,21 @@ protected:
 	virtual ThreadType* AddThread(qint32 Key);
 	virtual void BeeReturned(int Ident, const ResultType& a);
 	virtual void HandleErrorInCalculation(int a) { BeeReturned(a, ResultType()); }
+    virtual void RemoveResult(qint32 Key);
 	virtual QDataStream& SaveToStream(QDataStream& stream) const final;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 };
+
+template <typename ThreadType, typename ResultType>
+void TemplAsyncCalculator<ThreadType, ResultType>::RemoveResult(qint32 Key)
+{
+    auto i=m_Result.find(Key);
+    if (i == m_Result.end())
+        return;
+    delete i.value();
+    m_Result.erase(i);
+}
+
 
 template <typename ThreadType, typename ResultType>
 QDataStream& TemplAsyncCalculator<ThreadType, ResultType>::LoadOldVersion(QDataStream& stream) {

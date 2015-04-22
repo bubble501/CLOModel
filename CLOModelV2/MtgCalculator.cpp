@@ -18,6 +18,7 @@ MtgCalculator::MtgCalculator(QObject* parent)
 	:TemplAsyncCalculator <MtgCalculatorThread, MtgCashFlow>(parent)
 	,m_UseStoredCashFlows(true)
 	, m_DownloadScenario(false)
+    , m_SaveIndividualFlows(false)
 {}
 void MtgCalculator::AddLoan(const Mortgage& a, qint32 Index) {
 	RETURN_WHEN_RUNNING(true, )
@@ -185,8 +186,10 @@ bool MtgCalculator::StartCalculation() {
 void MtgCalculator::BeeReturned(int Ident, const MtgCashFlow& a) {
 	RETURN_WHEN_RUNNING(false, )
 	m_AggregatedRes+=a;
-	if (Loans.contains(Ident)) Loans[Ident]->SetCashFlows(a);
+    if (m_SaveIndividualFlows) if(Loans.contains(Ident)) Loans[Ident]->SetCashFlows(a);
 	TemplAsyncCalculator<MtgCalculatorThread, MtgCashFlow>::BeeReturned(Ident, a);
+    delete m_Result.value(Ident);
+    m_Result.remove(Ident);
 	if (!m_ContinueCalculation)return;
 	MtgCalculatorThread* CurrentThread;
 	for (auto SingleLoan = Loans.constBegin(); SingleLoan != Loans.constEnd(); ++SingleLoan) {
@@ -321,8 +324,18 @@ void MtgCalculator::SetLoans(const QHash<qint32, Mortgage*>& a) {
 void MtgCalculator::ClearResults() {
 	RETURN_WHEN_RUNNING(true, )
 	m_AggregatedRes.Clear();
+    for (auto i = Loans.begin(); i != Loans.end(); i++)
+        i.value()->ResetFlows();
 	TemplAsyncCalculator<MtgCalculatorThread, MtgCashFlow>::ClearResults();
 }
+
+const MtgCashFlow* MtgCalculator::GetResult(qint32 key) const
+{
+    if (Loans.value(key, nullptr))
+        return &(Loans.value(key)->GetCashFlow());
+    return nullptr;
+}
+
 #ifndef NO_DATABASE
 void MtgCalculator::DownloadScenarios() {
 	RETURN_WHEN_RUNNING(true, )

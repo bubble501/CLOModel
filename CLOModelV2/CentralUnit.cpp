@@ -263,6 +263,16 @@ void CentralUnit::CalculationStep1(){
 	LoansCalculator.SetDelinquency(Structure.GetReinvestmentTest().GetDelinquency().GetVector());
 	LoansCalculator.SetDelinquencyLag(Structure.GetReinvestmentTest().GetDelinquencyLag().GetVector());
 	LoansCalculator.SetStartDate(PoolCutOff);
+#ifdef SAVE_EXCEL_INPUTS
+    QString Filename = "C:\\Temp\\ModelInputs";
+    QFile file(Filename);
+    if (file.open(QIODevice::WriteOnly)) {
+        QDataStream out(&file);
+        out.setVersion(QDataStream::Qt_5_3);
+        out << qint32(ModelVersionNumber) << LoansCalculator << Structure;
+        file.close();
+    }
+#endif // SAVE_EXCEL_INPUTS
 	QString TmpStr = LoansCalculator.ReadyToCalculate();
 	if (!TmpStr.isEmpty()) {
 		QMessageBox::critical(0, "Invalid Input", "The following Inputs are missing or invalid:\n" + TmpStr);
@@ -383,7 +393,7 @@ void CentralUnit::CheckCalculationDone()
 	}
 	emit CalculationFinished();
 	if (m_SaveBaseCase) {
-		QDir UnifiedDir(GetFromConfig("Folders", "UnifiedResultsFolder", R"(\\synserver2\Company Share\24AM\Monitoring\Model Results)"));
+		QDir UnifiedDir(GetFromConfig("Folders", "UnifiedResultsFolder"));
 		if (UnifiedDir.exists()) {
 			QString AdjDealName = Structure.GetDealName();
 			if (AdjDealName.isEmpty() && Structure.GetTranchesCount() > 0) {

@@ -22,6 +22,8 @@ public:
 	virtual ~MtgCalculator() { Reset(); }
 	virtual void Reset() override;
 	virtual void ClearResults() override;
+    virtual QList<qint32> GetResultsKeys() const override { return Loans.keys(); }
+    virtual const MtgCashFlow* GetResult(qint32 key)const override;
 	virtual int NumBees() const override { return Loans.size(); }
 	void AddLoan(const Mortgage& a, qint32 Index);
 	const QHash<qint32, Mortgage*>& GetLoans() const { return Loans; }
@@ -57,6 +59,8 @@ public:
 	const MtgCashFlow* GetAggregatedResults()const { RETURN_WHEN_RUNNING(true, nullptr) return &m_AggregatedRes; }
 	bool GetDownloadScenario() const { return m_DownloadScenario; }
 	void SetDownloadScenario(bool val) { RETURN_WHEN_RUNNING(true, ) m_DownloadScenario = val; }
+    bool SaveIndividualFlows() const { return m_SaveIndividualFlows; }
+    void SaveIndividualFlows(bool val) { m_SaveIndividualFlows = val; }
 private:
 	void ClearTempProperties();
 	void AddTempProperty(qint32 LoanID, const QString& PropertyName, const QString& PropertyValue);
@@ -74,7 +78,8 @@ protected:
 	bool m_OverrideAssumptions;
 	bool m_DownloadScenario;
 	bool m_UseStoredCashFlows;
-	QDate StartDate;
+    bool m_SaveIndividualFlows;
+    QDate StartDate;
 	MtgCashFlow m_AggregatedRes;
 	virtual void BeeReturned(int Ident, const MtgCashFlow& a) override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;

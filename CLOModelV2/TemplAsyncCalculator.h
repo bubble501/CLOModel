@@ -146,9 +146,10 @@ void TemplAsyncCalculator<ThreadType, ResultType>::BeeReturned(int Ident, const 
 	m_ThreadPool.remove(Ident);
 	//emit BeeCalculated(++BeesReturned);
     ++BeesReturned;
+    Q_ASSERT(BeesReturned <= NumBees());
     emit BeeCalculated(Ident);
 	emit Progress(static_cast<double>(BeesReturned) / static_cast<double>(NumBees()));
-	if (BeesReturned == NumBees() && m_ContinueCalculation) {
+    if (BeesReturned == NumBees() && m_ContinueCalculation) {
 		m_ContinueCalculation = false;
 		emit Calculated();
 	}

@@ -270,7 +270,7 @@ void ConsoleTestObj::BBVALTest() {
 
 void ConsoleTestObj::PrintOutput() {
 	if (!Tested) return;
-	const QHash<qint32, MtgCashFlow*>& res = Tested->GetResults();
+	const QHash<qint32, MtgCashFlow*>& res = Tested->GetResults(); //Wrong
 	MtgCashFlow TotRes;
 	for (QHash<qint32, MtgCashFlow*>::const_iterator i = res.constBegin(); i != res.constEnd(); ++i) {
 		TotRes.AddFlow(*(i.value()));

@@ -719,9 +719,17 @@ void LoanAssumptionsEditor::FillFromQuery() {
 	Db_Mutex.unlock();
 	FillScenariosModel();
 }
-
 #endif
-
+void LoanAssumptionsEditor::closeEvent(QCloseEvent * ev)
+{
+    if (m_PoolMatcher)
+        m_PoolMatcher->StopCalculation();
+    if(m_NewWatFalls)
+        m_NewWatFalls->StopCalculation();
+    if (m_NewLoans)
+        m_NewLoans->StopCalculation();
+    m_LoanPool.StopCalculation();
+}
 void LoanAssumptionsEditor::FillScenariosModel() {
 	m_ScenariosModel->setRowCount(m_Assumptions.size());
 	int RawIndex = 0;
@@ -1709,6 +1717,7 @@ void LoanAssumptionsEditor::RemoveScenario() {
 				}
 			}
 			m_DirtyAssumptions.remove(key);
+            m_Assumptions.remove(key);
 			m_ScenariosModel->removeRow(currIdx.row());
 		}
 		else {

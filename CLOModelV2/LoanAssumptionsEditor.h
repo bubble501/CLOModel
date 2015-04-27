@@ -38,6 +38,8 @@ public:
 #ifndef NO_DATABASE
 	void FillFromQuery();
 #endif
+protected:
+    void closeEvent(QCloseEvent * ev);
 private:
 	static void SafeSetModel(QAbstractItemView* View, QAbstractItemModel* NewModel);
 	void CreateScenarioEditor();

@@ -14,8 +14,6 @@
 #include "BloombergVector.h"
 #include "BaseRateVect.h"
 #include "BaseRateTable.h"
-#include "QBbgRequest.h"
-#include "QBbgWorker.h"
 #include <QTime>
 #include <QTextStream>
 #include "DateTrigger.h"
@@ -32,7 +30,7 @@
 #include <QIcon>
 
 int main(int argc, char *argv[]) {
-
+    
 	//QApplication a(argc, argv);
 	//ConsoleTestObj b;
 	//return a.exec();
@@ -82,10 +80,10 @@ int main(int argc, char *argv[]) {
 		).GetTranche("HARVT 10X A"));
 	return a.exec();
 	*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
+    QApplication a(argc, argv);
 	Waterfall TempWtf, TempCallWaterfall;
 	MtgCalculator TempMtg;
-	QFile file("Z:/24AM/Monitoring/Model Results/ALBA 2015-1.clom");
+	QFile file("Z:/24AM/Monitoring/Model Results/AVOCA 10X.clom");
 	file.open(QIODevice::ReadOnly);
 	qint32 VersionChecker;
 	QDataStream out(&file);
@@ -100,6 +98,8 @@ int main(int argc, char *argv[]) {
 	{bool Junk; out >> Junk; }
 	TempWtf.SetLoadProtocolVersion(VersionChecker);
 	out >> TempWtf;
+    const Tranche* Test=TempWtf.GetTranche("BH0W305");
+
 	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
 	out >> TempCallWaterfall;
 	TempMtg.SetLoadProtocolVersion(VersionChecker);

@@ -6,7 +6,7 @@
 #include <QDate>
 #define MaximumInterestsTypes 8
 #ifndef NO_BLOOMBERG
-namespace QBloombergLib {class QSingleBbgResult;}
+namespace QBbgLib { class QBbgAbstractResponse; }
 #endif
 class TrancheCashFlow : public GenericCashFlow {
 private:
@@ -111,7 +111,7 @@ public:
 	virtual bool GetCashFlowsDatabase(const QString& TrancheID);
 #endif
 #ifndef NO_BLOOMBERG
-	virtual bool GetCashFlowsBloomberg(const QBloombergLib::QSingleBbgResult& a);
+    virtual bool GetCashFlowsBloomberg(const QBbgLib::QBbgAbstractResponse* a);
 #endif
 	virtual TrancheCashFlow ScaledCashFlows(double OldSize, double NewSize)const;
 	virtual TrancheCashFlow ScaledCashFlows(double NewSize) const { return ScaledCashFlows(OutstandingAmt, NewSize); }

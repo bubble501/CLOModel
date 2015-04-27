@@ -33,9 +33,6 @@
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
-    <Filter Include="Header Files\Bloomberg">
-      <UniqueIdentifier>{92eb567b-275d-4857-8be3-8c8696fce5c5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Excel">
       <UniqueIdentifier>{d48535b9-b402-4c17-9752-aa285aaf6404}</UniqueIdentifier>
     </Filter>
@@ -47,9 +44,6 @@
     </Filter>
     <Filter Include="Header Files\Widgets">
       <UniqueIdentifier>{9eb62358-91e5-4334-8946-33c7df1141ca}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Bloomberg">
-      <UniqueIdentifier>{7cf50c95-1b3a-495b-882c-965ea6ec7768}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Deal Structure">
       <UniqueIdentifier>{95bcf971-7209-4d16-b39c-3d02ad627dd5}</UniqueIdentifier>
@@ -105,6 +99,36 @@
     <Filter Include="Header Files\Loans\Loans Assumptions">
       <UniqueIdentifier>{6159e9d1-2ae5-4c0e-91b1-2bf730ef3b2e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private Implementations">
+      <UniqueIdentifier>{5c767700-1794-4da5-8ac8-c08ad9cc89da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private Implementations\Common Items">
+      <UniqueIdentifier>{22f248d3-0730-49f8-a79c-7b26e24ce0c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private Implementations\Deal Structure">
+      <UniqueIdentifier>{d7269c2c-20c2-45e2-a2e2-ed98ad315e96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private Implementations\Excel">
+      <UniqueIdentifier>{8395d43b-ec0a-4ed1-83ff-4bea3e565608}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private Implementations\Interfaces">
+      <UniqueIdentifier>{2450d2ae-89d8-434f-86cd-a837aff02db8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private Implementations\Loans">
+      <UniqueIdentifier>{89b795cd-91e4-4701-a3bd-c73323199338}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private Implementations\Stress Test">
+      <UniqueIdentifier>{a66228de-1153-4714-82d4-20b9d3552c7d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private Implementations\Triggers">
+      <UniqueIdentifier>{15f032b8-a2b4-469b-9249-90fc5738c848}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private Implementations\Vectors">
+      <UniqueIdentifier>{96a26521-d3bf-464b-a9d2-137d17ab46fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private Implementations\Widgets">
+      <UniqueIdentifier>{edaf6a75-2a6c-4447-bbd3-14b2e70cf882}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReinvestmentTest.h">
@@ -151,21 +175,6 @@
     </ClInclude>
     <ClInclude Include="ReserveFund.h">
       <Filter>Header Files\Deal Structure</Filter>
-    </ClInclude>
-    <ClInclude Include="QBbgRequest.h">
-      <Filter>Header Files\Bloomberg</Filter>
-    </ClInclude>
-    <ClInclude Include="QBbgResultsIterator.h">
-      <Filter>Header Files\Bloomberg</Filter>
-    </ClInclude>
-    <ClInclude Include="QProjectGlobals.h">
-      <Filter>Header Files\Bloomberg</Filter>
-    </ClInclude>
-    <ClInclude Include="QSingleBbgRequest.h">
-      <Filter>Header Files\Bloomberg</Filter>
-    </ClInclude>
-    <ClInclude Include="QSingleBbgResult.h">
-      <Filter>Header Files\Bloomberg</Filter>
     </ClInclude>
     <ClInclude Include="CommonFunctions.h">
       <Filter>Header Files\Common Items</Filter>
@@ -279,9 +288,6 @@
     </CustomBuild>
     <CustomBuild Include="WaterfallViewer.h">
       <Filter>Header Files\Widgets</Filter>
-    </CustomBuild>
-    <CustomBuild Include="QBbgWorker.h">
-      <Filter>Header Files\Bloomberg</Filter>
     </CustomBuild>
     <CustomBuild Include="CentralUnit.h">
       <Filter>Header Files</Filter>
@@ -479,27 +485,6 @@
     </ClCompile>
     <ClCompile Include="ReserveFund.cpp">
       <Filter>Source Files\Deal Structure</Filter>
-    </ClCompile>
-    <ClCompile Include="QBbgRequest.cpp">
-      <Filter>Source Files\Bloomberg</Filter>
-    </ClCompile>
-    <ClCompile Include="QBbgResultsIterator.cpp">
-      <Filter>Source Files\Bloomberg</Filter>
-    </ClCompile>
-    <ClCompile Include="QBbgWorker.cpp">
-      <Filter>Source Files\Bloomberg</Filter>
-    </ClCompile>
-    <ClCompile Include="QSingleBbgRequest.cpp">
-      <Filter>Source Files\Bloomberg</Filter>
-    </ClCompile>
-    <ClCompile Include="QSingleBbgResult.cpp">
-      <Filter>Source Files\Bloomberg</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_QBbgWorker.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_QBbgWorker.cpp">
-      <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="CommonFunctions.cpp">
       <Filter>Source Files\Common Items</Filter>

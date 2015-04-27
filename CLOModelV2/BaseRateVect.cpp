@@ -2,8 +2,12 @@
 #include <QRegExp>
 #include <QStringList>
 #include "CommonFunctions.h"
-#include "QBbgWorker.h"
-#include "QSingleBbgRequest.h"
+#ifndef NO_BLOOMBERG
+#include <QbbgReferenceDataRequest.h>
+#include <QBbgReferenceDataResponse.h>
+#include <QBbgRequestGroup.h>
+#include <QBbgManager.h>
+#endif // !NO_BLOOMBERG
 #ifndef NO_DATABASE
 #include <QSqlDatabase>
 #include <QSqlError>
@@ -150,41 +154,48 @@ BloombergVector BaseRateVector::GetRefRateValueFromBloomberg(ConstantBaseRateTab
 			) RatesToDownload.append(GetValue(i));
 	}
 	if (!RatesToDownload.isEmpty()) {
-		QBloombergLib::QBbgWorker Bee;
-		QString CurrentResult;
-		QDate MinUpdateDate, CurrentUpdateDate;
-		QBloombergLib::QBbgRequest BbgReq;
-		foreach(const QString& SingleRate, RatesToDownload) {
-			BbgReq.AddRequest(SingleRate, "PX_LAST", QBloombergLib::QBbgRequest::Index);
-			//BbgReq.AddRequest(SingleRate, "PX_SETTLE_LAST_DT", "Index");
-			BbgReq.AddRequest(SingleRate, "LAST_UPDATE", QBloombergLib::QBbgRequest::Index);
-		}
-		Bee.StartRequestSync(BbgReq);
-		if (!Bee.GetRequest().HasErrors()) {
-			for (QBloombergLib::QBbgResultsIterator i = Bee.GetResultIterator(); i.IsValid(); ++i) {
-				if (!i->HasErrors()) {
-					const QBloombergLib::QSingleBbgRequest* Temp = Bee.GetRequest().FindRequest(i.ResultID());
-					if (Temp->GetField() == "PX_LAST") {
-						Values.GetValues().insert(
-							Temp->GetSecurity(),
-							i->GetDouble() / 100.0
-							);
-					}
-					else {
-						CurrentUpdateDate = i->GetDate();
-						if (MinUpdateDate.isNull() || MinUpdateDate > CurrentUpdateDate) MinUpdateDate = CurrentUpdateDate;
-					}
-				}
-				else { if (Bee.GetRequest().FindRequest(i.ResultID())->GetField() == "PX_LAST") return BloombergVector(); }
-			}
-			Values.SetUpdateDate(MinUpdateDate);
-		}
-		else return BloombergVector();
+        QBbgLib::QBbgRequestGroup BbgReq;
+        QHash<qint32, QPair<qint64, qint64> > RequestHash;
+		QDate MinUpdateDate;
+        QBbgLib::QBbgSecurity TempSecurity;
+        TempSecurity.setExtension(QBbgLib::QBbgSecurity::Index);
+        QBbgLib::QBbgReferenceDataRequest TempPriceRq, TempUpdateRq;
+        TempPriceRq.setField("PX_LAST");
+        TempUpdateRq.setField("LAST_UPDATE");
+        QPair<qint64, qint64> TempIndexPair;
+        for (int i = 0; i < RatesToDownload.size(); ++i) {
+            TempSecurity.setName(RatesToDownload.at(i));
+            TempPriceRq.setSecurity(TempSecurity);
+            TempUpdateRq.setSecurity(TempSecurity);
+            TempIndexPair.first = BbgReq.addRequest(TempPriceRq);
+            TempIndexPair.second = BbgReq.addRequest(TempUpdateRq);
+            RequestHash.insert(i, TempIndexPair);
+        }
+        QBbgLib::QBbgManager bbgMan;
+        const auto & bbgResults=bbgMan.processRequest(BbgReq);
+        const QBbgLib::QBbgReferenceDataResponse* PriceResponse;
+        const QBbgLib::QBbgReferenceDataResponse* DateResponse;
+        for (auto i = RequestHash.constBegin(); i != RequestHash.constEnd(); ++i) {
+            PriceResponse = dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(bbgResults.value(i.value().first,nullptr));
+            DateResponse = dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(bbgResults.value(i.value().second, nullptr));
+            if (Q_UNLIKELY(!PriceResponse)) 
+                return BloombergVector();
+            if (!PriceResponse->hasErrors()) {
+                Values.GetValues().insert(RatesToDownload.at(i.key()), PriceResponse->value().toDouble() / 100.0);
+                if (Q_UNLIKELY(!DateResponse))
+                    continue;
+                if (!DateResponse->hasErrors()) {
+                    if (MinUpdateDate.isNull() || MinUpdateDate > DateResponse->value().toDate()) 
+                        MinUpdateDate = DateResponse->value().toDate();
+                }
+            }
+            else {
+                return BloombergVector();
+            }
+        }
+        if(MinUpdateDate.isValid())
+            Values.SetUpdateDate(MinUpdateDate);
 	}
-	/*for (QStringList::const_iterator i = RatesToDownload.constBegin(); i != RatesToDownload.constEnd(); i++) {
-		//Avoid infinite loop if download is unsuccessful
-		if (!Values.Contains(*i)) return BloombergVector();
-	}*/
 	return CompileReferenceRateValue(Values);
 }
 BloombergVector BaseRateVector::GetRefRateValueFromBloomberg(ForwardBaseRateTable& Values)const {

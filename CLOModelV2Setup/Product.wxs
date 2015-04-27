@@ -165,6 +165,9 @@
 			<Component Id="BloombergAPI" Guid="1D169B22-9620-49D9-A620-0C3FFB61C551">
 				<File Id="BloombergLib" Name="blpapi3_32.dll" Source="$(env.BLPPATH)\lib\blpapi3_32.dll" KeyPath="yes" />
 			</Component>
+            <Component Id="QtBloombergAPI" Guid="7A5A6087-0456-43EC-97C8-2AF308B812F9">
+                <File Id="QBbgLib" Name="QBbgLib.dll" Source="$(env.QBBGLIBPATH)\Win32\Release\QBbgLib.dll" KeyPath="yes" />
+            </Component>
 		</ComponentGroup>
 		<ComponentGroup Id="RequiredPlugins">
 			<Component Id="QtWindows" Guid="1A642659-CEC0-487F-9E4A-173A3D6B2262" Directory="PLATFORMSDIR">

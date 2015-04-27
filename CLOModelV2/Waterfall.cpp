@@ -4,7 +4,6 @@
 #include <QSet>
 #include <qmath.h>
 #include "Waterfall.h"
-#include "QBbgWorker.h"
 #include "DateTrigger.h"
 #include "VectorTrigger.h"
 #include "PoolSizeTrigger.h"
@@ -16,6 +15,14 @@
 #include "DelinquencyTrigger.h"
 #include "DuringStressTestTrigger.h"
 #include "PDLtrigger.h"
+#ifndef NO_BLOOMBERG
+#include <QBbgManager.h>
+#include <QBbgRequestGroup.h>
+#include <QbbgReferenceDataRequest.h>
+#include <QBbgReferenceDataResponse.h>
+#endif // !NO_BLOOMBERG
+
+
 const WatFalPrior* Waterfall::GetStep(int Index)const
 {
     if (Index<0 || Index >= m_WaterfallStesps.size()) return nullptr;
@@ -440,24 +447,43 @@ int Waterfall::FindTrancheIndex(const QString& Tranchename)const
         if (m_Tranches.at(j)->GetISIN() == Tranchename) return j;
     }
 #ifndef NO_BLOOMBERG
-    QBloombergLib::QBbgWorker ISINparser;
-    QBloombergLib::QBbgRequest ISINRequest;
-    ISINRequest.AddRequest(Tranchename, "NAME");
-    ISINRequest.AddRequest(Tranchename, "ID_ISIN");
-    ISINRequest.AddRequest(Tranchename, "ID_CUSIP");
-    ISINRequest.AddRequest(Tranchename, "ID_BB_GLOBAL");
-    ISINRequest.AddRequest(Tranchename, "ID_BB_UNIQU");
-    ISINparser.StartRequestSync(ISINRequest);
-    if (!ISINparser.GetRequest().HasErrors()) {
-        for (QBloombergLib::QBbgResultsIterator RespIter = ISINparser.GetResultIterator(); RespIter.IsValid(); ++RespIter) {
-            if (!RespIter->HasErrors()) {
-                for (int i = 0; i < m_Tranches.size(); i++) {
-                    if (
-                        RespIter->GetString().compare(m_Tranches.at(i)->GetTrancheName().trimmed(), Qt::CaseInsensitive) == 0
-                        || RespIter->GetString().compare(m_Tranches.at(i)->GetISIN().trimmed(), Qt::CaseInsensitive) == 0
-                        ) return i;
-                }
-            }
+    QBbgLib::QBbgManager ISINparser;
+    QBbgLib::QBbgRequestGroup ISINRequest;
+    QBbgLib::QBbgReferenceDataRequest SingleRq;
+    const QString FieldsToSearch[] = { "NAME",
+        "ID_ISIN",
+        "ID_CUSIP",
+        "ID_BB_GLOBAL",
+        "ID_BB_UNIQUE",
+        "ID_BB",
+        "ID_SEDOL1",
+        "ID_SEDOL2",
+        "ID_SEDOL3",
+        "ID_SEDOL4",
+        "ID_SEDOL5" };
+    SingleRq.setSecurity(QBbgLib::QBbgSecurity(Tranchename, QBbgLib::QBbgSecurity::Mtge));
+    for (auto i = std::begin(FieldsToSearch); i != std::end(FieldsToSearch); ++i) {
+        SingleRq.setField(*i);
+        ISINRequest.addRequest(SingleRq);
+    }
+    SingleRq.setSecurity(QBbgLib::QBbgSecurity(Tranchename, QBbgLib::QBbgSecurity::Corp));
+    for (auto i = std::begin(FieldsToSearch); i != std::end(FieldsToSearch); ++i) {
+        SingleRq.setField(*i);
+        ISINRequest.addRequest(SingleRq);
+    }
+    const auto& bbgResult = ISINparser.processRequest(ISINRequest);
+    const QBbgLib::QBbgReferenceDataResponse* CurrentResponse;
+    for (auto RespIter = bbgResult.constBegin(); RespIter != bbgResult.constEnd(); ++RespIter) {
+        if (RespIter.value()->hasErrors())
+            continue;
+        CurrentResponse = dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(RespIter.value());
+        if (!CurrentResponse)
+            continue;
+        for (int i = 0; i < m_Tranches.size(); i++) {
+            if (CurrentResponse->value().toString().compare(m_Tranches.at(i)->GetISIN().trimmed(), Qt::CaseInsensitive) == 0)
+                return i;
+            if (CurrentResponse->value().toString().compare(m_Tranches.at(i)->GetTrancheName().trimmed(), Qt::CaseInsensitive) == 0) 
+                return i;
         }
     }
 #endif 

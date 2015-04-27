@@ -96,21 +96,6 @@
     <ClCompile Include="MtgCashFlow.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
-    <ClCompile Include="QBbgRequest.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="QBbgResultsIterator.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="QBbgWorker.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="QSingleBbgRequest.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="QSingleBbgResult.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
     <ClCompile Include="ReinvestmentTest.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
@@ -190,12 +175,6 @@
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_StressTest.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_QBbgWorker.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_QBbgWorker.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_MtgCalculatorThread.cpp">
@@ -443,9 +422,6 @@
     <CustomBuild Include="MtgCalculatorThread.h">
       <Filter>Header Files\Core</Filter>
     </CustomBuild>
-    <CustomBuild Include="QBbgWorker.h">
-      <Filter>Header Files\Core</Filter>
-    </CustomBuild>
     <CustomBuild Include="StressTest.h">
       <Filter>Header Files\Core</Filter>
     </CustomBuild>
@@ -504,21 +480,6 @@
       <Filter>Header Files\Core</Filter>
     </CustomBuild>
     <CustomBuild Include="MtgCashFlow.h">
-      <Filter>Header Files\Core</Filter>
-    </CustomBuild>
-    <CustomBuild Include="QBbgRequest.h">
-      <Filter>Header Files\Core</Filter>
-    </CustomBuild>
-    <CustomBuild Include="QBbgResultsIterator.h">
-      <Filter>Header Files\Core</Filter>
-    </CustomBuild>
-    <CustomBuild Include="QProjectGlobals.h">
-      <Filter>Header Files\Core</Filter>
-    </CustomBuild>
-    <CustomBuild Include="QSingleBbgRequest.h">
-      <Filter>Header Files\Core</Filter>
-    </CustomBuild>
-    <CustomBuild Include="QSingleBbgResult.h">
       <Filter>Header Files\Core</Filter>
     </CustomBuild>
     <CustomBuild Include="ReinvestmentTest.h">

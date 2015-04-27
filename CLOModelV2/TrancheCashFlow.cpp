@@ -7,8 +7,10 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QVariant>
-#include "QSingleBbgResult.h"
 #endif
+#ifndef NO_BLOOMBERG
+#include <QBbgReferenceDataResponse.h>
+#endif // !NO_BLOOMBERG
 TrancheCashFlow::TrancheCashFlow(double ThrancheOutstanding)
 	:OutstandingAmt(ThrancheOutstanding)
 {
@@ -172,42 +174,40 @@ bool TrancheCashFlow::GetCashFlowsDatabase(const QString& TrancheID) {
 }
 #endif
 #ifndef NO_BLOOMBERG
-bool TrancheCashFlow::GetCashFlowsBloomberg(const QBloombergLib::QSingleBbgResult& a) {
-	if (
-		(
-			a.GetHeader() != "MTG_CASH_FLOW" 
-			&&  a.GetHeader() != "EXTENDED_CASH_FLOW"
-			&&  a.GetHeader() != "HIST_CASH_FLOW"
-			&&  a.GetHeader() != "DES_CASH_FLOW"
-		)
-		|| a.HasErrors()
-		|| a.GetNumRows() == 0
-	) return false;
-	Clear();
-	if (a.GetHeader() == "DES_CASH_FLOW") {
-		OutstandingAmt = 0.0;
-		for (int i = 0; i < a.GetNumRows(); ++i) {
-			OutstandingAmt += a.GetTableResult(i, 2)->GetDouble();
-		}
-		for (int i = 0; i < a.GetNumRows(); ++i) {
-			const QDate CurrentDate = a.GetTableResult(i, 0)->GetDate();
-			AddFlow(CurrentDate, a.GetTableResult(i, 1)->GetDouble(), TrancheFlowType::InterestFlow);
-			AddFlow(CurrentDate, a.GetTableResult(i, 2)->GetDouble(), TrancheFlowType::PrincipalFlow);
-			AddFlow(CurrentDate, -a.GetTableResult(i, 2)->GetDouble(), TrancheFlowType::AmountOutstandingFlow);
-		}
-	}
-	else { //Mtge cash flow
-		if (a.GetNumRows() > 0) {
-			OutstandingAmt = a.GetTableResult(0, 4)->GetDouble() + a.GetTableResult(0, 5)->GetDouble();
-		}
-		for (int i = 0; i < a.GetNumRows(); ++i) {
-			const QDate CurrentDate = a.GetTableResult(i, 1)->GetDate();
-			AddFlow(CurrentDate, a.GetTableResult(i, 3)->GetDouble(), TrancheFlowType::InterestFlow);
-			AddFlow(CurrentDate, a.GetTableResult(i, 4)->GetDouble(), TrancheFlowType::PrincipalFlow);
-			AddFlow(CurrentDate, -a.GetTableResult(i, 4)->GetDouble(), TrancheFlowType::AmountOutstandingFlow);
-		}
-	}
-	return true;
+bool TrancheCashFlow::GetCashFlowsBloomberg(const QBbgLib::QBbgAbstractResponse* a) {
+    if (a->hasErrors()) 
+        return false;
+    if (a->responseType() == QBbgLib::QBbgAbstractResponse::ReferenceDataResponse) {
+        const QBbgLib::QBbgReferenceDataResponse* const casted = dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(a);
+        Q_ASSERT(casted);
+        if (casted->header() != "MTG_CASH_FLOW" && casted->header() != "EXTENDED_CASH_FLOW" && casted->header() != "DES_CASH_FLOW" && casted->header() != "HIST_CASH_FLOW")
+            return false;
+        if (casted->rows() <= 0)
+            return false;
+        Clear();
+        if (casted->header() == "DES_CASH_FLOW") {
+            OutstandingAmt = 0.0;
+            for (int i = 0; i < casted->rows(); ++i)
+                OutstandingAmt += casted->getTableValue(i, 2)->value().toDouble();
+            for (int i = 0; i < casted->rows(); ++i) {
+                const QDate CurrentDate = casted->getTableValue(i, 0)->value().toDate();
+                AddFlow(CurrentDate, casted->getTableValue(i, 1)->value().toDouble(), TrancheFlowType::InterestFlow);
+                AddFlow(CurrentDate, casted->getTableValue(i, 2)->value().toDouble(), TrancheFlowType::PrincipalFlow);
+                AddFlow(CurrentDate, -casted->getTableValue(i, 2)->value().toDouble(), TrancheFlowType::AmountOutstandingFlow);
+            }
+        }
+        else { // "MTG_CASH_FLOW", "HIST_CASH_FLOW" or "EXTENDED_CASH_FLOW"
+            OutstandingAmt = casted->getTableValue(0, 4)->value().toDouble() + casted->getTableValue(0, 5)->value().toDouble();
+            for (int i = 0; i < casted->rows(); ++i) {
+                const QDate CurrentDate = casted->getTableValue(i, 1)->value().toDate();
+                AddFlow(CurrentDate, casted->getTableValue(i, 3)->value().toDouble(), TrancheFlowType::InterestFlow);
+                AddFlow(CurrentDate, casted->getTableValue(i, 4)->value().toDouble(), TrancheFlowType::PrincipalFlow);
+                SetFlow(CurrentDate, casted->getTableValue(i, 5)->value().toDouble(), TrancheFlowType::AmountOutstandingFlow);
+            }
+        }
+        return true;
+    }
+	return false;
 }
 #endif
 TrancheCashFlow TrancheCashFlow::ScaledCashFlows(double OldSize,double NewSize) const {

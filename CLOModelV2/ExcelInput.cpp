@@ -533,7 +533,7 @@ double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
 	QFile file(Filename);
 	bool UsingClom = false;
 	if (!file.exists()){
-		file.setFileName(GetFromConfig("Folders", "UnifiedResultsFolder", R"(\\synserver2\Company Share\24AM\Monitoring\Model Results)") + '\\' + DealName + ".clom");
+		file.setFileName(GetFromConfig("Folders", "UnifiedResultsFolder") + '\\' + DealName + ".clom");
 		if (!file.exists())return 0.0;
 		UsingClom = true;
 	}

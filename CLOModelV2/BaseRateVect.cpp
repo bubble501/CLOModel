@@ -231,7 +231,7 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ConstantBaseRateTable& Refe
 	if (DbOpen) {
 		QSqlQuery query(db);
 		query.setForwardOnly(true);
-		query.prepare("{CALL " + GetFromConfig("Database", "ConstBaseRatesStoredProc", "getLatestIndexPrices") + "}");
+		query.prepare("{CALL " + GetFromConfig("Database", "ConstBaseRatesStoredProc") + "}");
 		if (query.exec()) {
 			while (query.next()) {
 				if (
@@ -262,11 +262,11 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ForwardBaseRateTable& Refer
 	QMutexLocker DbLocker(&Db_Mutex);
 	QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
 	if (!db.isValid()) {
-		db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype", "QODBC"), "TwentyFourDB");
+		db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype"), "TwentyFourDB");
 		db.setDatabaseName(
-			"Driver={" + GetFromConfig("Database", "Driver", "SQL Server")
+			"Driver={" + GetFromConfig("Database", "Driver")
 			+ "}; "
-			+ GetFromConfig("Database",  "DataSource", R"(Server=SYNSERVER2\SQLExpress;Initial Catalog=ABSDB;Integrated Security=SSPI;Trusted_Connection=Yes;)")
+			+ GetFromConfig("Database",  "DataSource")
 			);
 		
 	}
@@ -275,7 +275,7 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ForwardBaseRateTable& Refer
 	if (DbOpen) {
 		QSqlQuery query(db);
 		query.setForwardOnly(true);
-		query.prepare("{CALL " + GetFromConfig("Database", "ForwardBaseRatesStoredProc", "getForwardCurveMatrix") + "}");
+		query.prepare("{CALL " + GetFromConfig("Database", "ForwardBaseRatesStoredProc") + "}");
 		if (query.exec()) {
 			QHash < QString, QHash<QDate, double> > QueryResults;
 			while (query.next()) {

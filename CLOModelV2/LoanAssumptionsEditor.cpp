@@ -37,6 +37,7 @@
 #include <QScrollBar>
 #include "LoanAssMatcher.h"
 #include <QProgressBar>
+#include <QCloseEvent>
 LoanAssumptionsEditor::LoanAssumptionsEditor(QWidget *parent)
 	: QWidget(parent)
 	, ActiveAssumption(nullptr)
@@ -618,11 +619,11 @@ void LoanAssumptionsEditor::FillFromQuery() {
 	Db_Mutex.lock();
 	QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
 	if (!db.isValid()) {
-		db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype", "QODBC"), "TwentyFourDB");
+		db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype"), "TwentyFourDB");
 		db.setDatabaseName(
-			"Driver={" + GetFromConfig("Database", "Driver", "SQL Server")
+			"Driver={" + GetFromConfig("Database", "Driver")
 			+ "}; "
-			+ GetFromConfig("Database", "DataSource", R"(Server=SYNSERVER2\SQLExpress; Initial Catalog = ABSDB; Integrated Security = SSPI; Trusted_Connection = Yes;)")
+			+ GetFromConfig("Database", "DataSource")
 			);
 		
 	}
@@ -631,7 +632,7 @@ void LoanAssumptionsEditor::FillFromQuery() {
 	if (DbOpen) {
 		QSqlQuery LoanAssQuery(db);
 		LoanAssQuery.setForwardOnly(true);
-		LoanAssQuery.prepare("{CALL " + GetFromConfig("Database", "GetAllLoanAssumptionStoredProc", "getAllLoanAssumptions") + "}");
+		LoanAssQuery.prepare("{CALL " + GetFromConfig("Database", "GetAllLoanAssumptionStoredProc") + "}");
 		if (LoanAssQuery.exec()) {
 			bool CurrentSenior;
 			int FieldCount;
@@ -729,6 +730,7 @@ void LoanAssumptionsEditor::closeEvent(QCloseEvent * ev)
     if (m_NewLoans)
         m_NewLoans->StopCalculation();
     m_LoanPool.StopCalculation();
+    ev->accept();
 }
 void LoanAssumptionsEditor::FillScenariosModel() {
 	m_ScenariosModel->setRowCount(m_Assumptions.size());
@@ -1371,11 +1373,11 @@ void LoanAssumptionsEditor::SaveScenario(const QString& key) {
 	QMutexLocker DbLocker(&Db_Mutex);
 	QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
 	if (!db.isValid()) {
-		db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype", "QODBC"), "TwentyFourDB");
+		db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype"), "TwentyFourDB");
 		db.setDatabaseName(
-			"Driver={" + GetFromConfig("Database", "Driver", "SQL Server")
+			"Driver={" + GetFromConfig("Database", "Driver")
 			+ "}; "
-			+ GetFromConfig("Database", "DataSource", R"(Server=SYNSERVER2\SQLExpress; Initial Catalog = ABSDB; Integrated Security = SSPI; Trusted_Connection = Yes;)")
+			+ GetFromConfig("Database", "DataSource")
 			);
 		
 	}
@@ -1391,7 +1393,7 @@ void LoanAssumptionsEditor::SaveScenario(const QString& key) {
 		}
 		QSqlQuery RemoveAssQuery(db);
 		RemoveAssQuery.setForwardOnly(true);
-		RemoveAssQuery.prepare("{CALL " + GetFromConfig("Database", "RemoveLoanAssumptionStoredProc", "removeLoanAssumption(:scenarioName)") + "}");
+		RemoveAssQuery.prepare("{CALL " + GetFromConfig("Database", "RemoveLoanAssumptionStoredProc") + "}");
 		RemoveAssQuery.bindValue(":scenarioName", key);
 		if (!RemoveAssQuery.exec()) {
 			QMessageBox::critical(this, "Error", "Failed to commit changes to the database, try again later.");
@@ -1410,7 +1412,7 @@ void LoanAssumptionsEditor::SaveScenario(const QString& key) {
 	QSqlQuery SetSeniorAssQuery(db);
 	QString TmpString;
 	SetSeniorAssQuery.setForwardOnly(true);
-	SetSeniorAssQuery.prepare("{CALL " + GetFromConfig("Database", "SetLoanAssumptionStoredProc", "") + "}");
+	SetSeniorAssQuery.prepare("{CALL " + GetFromConfig("Database", "SetLoanAssumptionStoredProc") + "}");
 	SetSeniorAssQuery.bindValue(":OldScenName", key);
 	SetSeniorAssQuery.bindValue(":scenarioName", CurrAss->GetScenarioName());
 	TmpString = CurrAss->GelAliasString(); SetSeniorAssQuery.bindValue(":scanarioAlias", TmpString.isEmpty() ? QVariant(QVariant::String) : TmpString);
@@ -1436,7 +1438,7 @@ void LoanAssumptionsEditor::SaveScenario(const QString& key) {
 	}
 	QSqlQuery SetMezzAssQuery(db);
 	SetMezzAssQuery.setForwardOnly(true);
-	SetMezzAssQuery.prepare("{CALL " + GetFromConfig("Database", "SetLoanAssumptionStoredProc", "") + "}");
+	SetMezzAssQuery.prepare("{CALL " + GetFromConfig("Database", "SetLoanAssumptionStoredProc") + "}");
 	SetMezzAssQuery.bindValue(":OldScenName", key);
 	SetMezzAssQuery.bindValue(":scenarioName", CurrAss->GetScenarioName());
 	TmpString = CurrAss->GelAliasString(); SetMezzAssQuery.bindValue(":scanarioAlias", TmpString.isEmpty() ? QVariant(QVariant::String) : TmpString);
@@ -1564,7 +1566,7 @@ void LoanAssumptionsEditor::AddLoanToPool(qint32 index,Mortgage& a) {
 }
 
 void LoanAssumptionsEditor::LoadModel() {
-	QString ModelPath = QFileDialog::getOpenFileName(this, tr("Open Model"), GetFromConfig("Folders", "UnifiedResultsFolder", QString()), tr("CLO Models (*clom)"));
+	QString ModelPath = QFileDialog::getOpenFileName(this, tr("Open Model"), GetFromConfig("Folders", "UnifiedResultsFolder"), tr("CLO Models (*clom)"));
 	if (ModelPath.isNull()) return;
 	m_ModelNameLabel->setText(tr("No Model Loaded"));
 	m_PoolModel->setRowCount(0);

@@ -180,6 +180,7 @@ private:
 	bool m_BaseCaseToCall;
 	ForwardBaseRateTable m_OverrideForwards;
 	ConstantBaseRateTable m_OverrideConstants;
+    void showErrorDialog(const QString& errList);
 signals:
 	void LoopStarted();
 	void StressLoopStarted();

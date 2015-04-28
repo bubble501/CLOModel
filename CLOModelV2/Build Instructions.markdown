@@ -10,7 +10,7 @@ The code is compatible with the subset of the standard implemented by MSVC.<br/>
 *Developed using version 1.57.0*<br/>
 [Download](http://www.boost.org/users/download/) and unpack the library. There is no need to build it.
 ### Qt
-*Developed using version 5.3.2*<br/>
+*Developed using version 5.4.1*<br/>
 [Download](http://www.qt.io/download-open-source/) and install Qt libraries, the open source version is sufficient.<br/>
 If you use versions of the library higher than 5.9, minor changes in the code may be required in order for it to compile successfully.
 ### zlib

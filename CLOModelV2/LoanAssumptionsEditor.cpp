@@ -245,12 +245,14 @@ void LoanAssumptionsEditor::CreateScenarioEditor() {
 	MezzLowerlay->addWidget(RemoveMezzAssumptionButton);
 	MezzLay->addLayout(MezzLowerlay, 2, 0, 1, 3);
 
-	QWidget* RightSection = new QWidget(this);
-	QVBoxLayout* RightLay = new QVBoxLayout(RightSection);
+	m_ScenarioEditorRightSection = new QWidget(this);
+	QVBoxLayout* RightLay = new QVBoxLayout(m_ScenarioEditorRightSection);
 	RightLay->addWidget(NamesGroup);
 	RightLay->addWidget(SeniorGroup);
 	RightLay->addWidget(MezzGroup);
-	RightSection->setMinimumWidth(400);
+	m_ScenarioEditorRightSection->setMinimumWidth(400);
+    m_ScenarioEditorRightSection->setEnabled(false);
+
 
 	QWidget* LeftSection = new QWidget(this);
 	QGridLayout* LeftLay = new QGridLayout(LeftSection);
@@ -264,7 +266,7 @@ void LoanAssumptionsEditor::CreateScenarioEditor() {
 	QSplitter* MainSplit = new QSplitter(this);
 	MainSplit->setOrientation(Qt::Horizontal);
 	MainSplit->addWidget(LeftSection);
-	MainSplit->addWidget(RightSection);
+	MainSplit->addWidget(m_ScenarioEditorRightSection);
 	MainSplit->setChildrenCollapsible(false);
 	MainSplit->setFrameShape(QFrame::Panel);
 	MainSplit->setFrameShadow(QFrame::Plain);
@@ -311,6 +313,9 @@ void LoanAssumptionsEditor::CreateScenarioEditor() {
 	mainLay->addWidget(SaveCurrentButton, 2, 4);
 	BaseTab->addTab(TempTab, tr("Scenarios Editor"));
 
+    connect(m_ScenariosModel, &QStandardItemModel::rowsInserted, [&]() {m_ScenarioEditorRightSection->setEnabled(m_ScenariosModel->rowCount() > 0); });
+    connect(m_ScenariosModel, &QStandardItemModel::rowsRemoved, [&]() {m_ScenarioEditorRightSection->setEnabled(m_ScenariosModel->rowCount() > 0); });
+    connect(m_ScenariosModel, &QStandardItemModel::modelReset, [&]() {m_ScenarioEditorRightSection->setEnabled(m_ScenariosModel->rowCount() > 0); });
 	connect(m_ScenariosModel, &QStandardItemModel::dataChanged, [&](const QModelIndex& index, const QModelIndex&) {
 		m_SortScenarios->sort(0);
 	});
@@ -410,16 +415,17 @@ void LoanAssumptionsEditor::CreateScenarioEditor() {
 		}
 		RemoveMezzAssumptionButton->setEnabled(m_MezzAsumptionsModel->rowCount() > 0);
 	});
-	connect(AddScenarioButton, &QPushButton::clicked, [&](bool) {
-		QString NewScenName = "Scenario %1";
-		{quint64 i = 1; for (; ScenExist(NewScenName.arg(i)); ++i); NewScenName = NewScenName.arg(i); }
-		m_Assumptions.insert(NewScenName, QSharedPointer<LoanAssumption>(nullptr));
-		m_DirtyAssumptions.insert(NewScenName, QSharedPointer<LoanAssumption>(new LoanAssumption(NewScenName)));
-		m_ScenariosModel->insertRow(m_ScenariosModel->rowCount());
-		m_ScenariosModel->setData(m_ScenariosModel->index(m_ScenariosModel->rowCount() - 1, 0), NewScenName, Qt::EditRole);
-		m_ScenariosModel->setData(m_ScenariosModel->index(m_ScenariosModel->rowCount() - 1, 0), RichTextDelegate::Added, Qt::UserRole);
-		m_ScenarioList->selectionModel()->setCurrentIndex(m_SortScenarios->mapFromSource(m_ScenariosModel->index(m_ScenariosModel->rowCount() - 1, 0)), QItemSelectionModel::ClearAndSelect);
-	});
+    connect(AddScenarioButton, &QPushButton::clicked, [&]() {
+        QString NewScenName = "Scenario %1";
+        {quint64 i = 1; for (; ScenExist(NewScenName.arg(i)); ++i); NewScenName = NewScenName.arg(i); }
+        m_Assumptions.insert(NewScenName, QSharedPointer<LoanAssumption>(nullptr));
+        m_DirtyAssumptions.insert(NewScenName, QSharedPointer<LoanAssumption>(new LoanAssumption(NewScenName)));
+        m_ScenariosModel->insertRow(m_ScenariosModel->rowCount());
+        m_ScenariosModel->setData(m_ScenariosModel->index(m_ScenariosModel->rowCount() - 1, 0), NewScenName, Qt::EditRole);
+        m_ScenariosModel->setData(m_ScenariosModel->index(m_ScenariosModel->rowCount() - 1, 0), RichTextDelegate::Added, Qt::UserRole);
+        m_ScenarioList->selectionModel()->setCurrentIndex(QModelIndex(), QItemSelectionModel::ClearAndSelect);
+        m_ScenarioList->selectionModel()->setCurrentIndex(m_SortScenarios->mapFromSource(m_ScenariosModel->index(m_ScenariosModel->rowCount() - 1, 0)), QItemSelectionModel::ClearAndSelect);
+    });
 	connect(RemoveScenarioButton, SIGNAL(clicked()), this, SLOT(RemoveScenario()));
 	connect(m_ScenariosModel, &QStandardItemModel::rowsInserted, [&](const QModelIndex &, int, int) {
 		RemoveScenarioButton->setEnabled(m_ScenariosModel->rowCount() > 0);
@@ -1136,6 +1142,7 @@ void LoanAssumptionsEditor::ChangeScenario(const QModelIndex& curr, const QModel
 	RemoveMezzAssumptionButton->setEnabled(ActiveAssumption && m_MezzAsumptionsModel->rowCount()>0);
 	RemoveAliasButton->setEnabled(ActiveAssumption && m_AliasesModel->rowCount()>0);
 	ReplaceAliasButton->setEnabled(ActiveAssumption && m_AliasesModel->rowCount()>0);
+    RemoveScenarioButton->setEnabled(m_ScenariosModel->rowCount() > 0 && ActiveAssumption);
 }
 
 void LoanAssumptionsEditor::SeniorScenarioChanged(const QModelIndex& index) {
@@ -1395,10 +1402,10 @@ void LoanAssumptionsEditor::SaveScenario(const QString& key) {
 		RemoveAssQuery.setForwardOnly(true);
 		RemoveAssQuery.prepare("{CALL " + GetFromConfig("Database", "RemoveLoanAssumptionStoredProc") + "}");
 		RemoveAssQuery.bindValue(":scenarioName", key);
-		if (!RemoveAssQuery.exec()) {
+		/*if (!RemoveAssQuery.exec()) {
 			QMessageBox::critical(this, "Error", "Failed to commit changes to the database, try again later.");
 			return;
-		}
+		}*/
 #endif // !NO_DATABASE
 		m_Assumptions[key] = QSharedPointer<LoanAssumption>(nullptr);
 		return DiscardScenario(key);
@@ -1531,11 +1538,10 @@ void LoanAssumptionsEditor::DiscardScenario(const QString& key) {
 				m_PoolModel->setData(m_PoolModel->index(j, 3), QVariant(), Qt::UserRole);
 			}
 		}
-		m_DirtyAssumptions.remove(key);
+        m_Assumptions.remove(key);
 		m_ScenariosModel->removeRow(ScenIdx.row());
-		m_Assumptions.remove(key); 
 	}
-	if (KeyIsCurrent) {
+	else if (KeyIsCurrent) {
 		ChangeScenario(m_SortScenarios->mapFromSource(CurrentIdx), m_SortScenarios->mapFromSource(CurrentIdx));
 		CheckCurrentDirty();
 		m_AliasesList->selectionModel()->setCurrentIndex(m_AliasesModel->index(m_AliasesModel->rowCount() - 1, 0), QItemSelectionModel::ClearAndSelect);
@@ -1736,7 +1742,7 @@ void LoanAssumptionsEditor::RemoveScenario() {
 		m_MezzDateCheck->setEnabled(ActiveAssumption);
 		m_MezzDateEdit->setEnabled(ActiveAssumption);
 	}
-	RemoveScenarioButton->setEnabled(m_ScenariosModel->rowCount() > 0);
+    RemoveScenarioButton->setEnabled(m_ScenariosModel->rowCount() > 0 && ActiveAssumption);
 }
 
 void LoanAssumptionsEditor::SetPoolModelChecks(const QModelIndex& index, const QModelIndex&) {

@@ -63,6 +63,7 @@ private:
 	QSortFilterProxyModel* m_ScannedPoolsProxy;
 	ReadOnlyColProxy* m_ScannedModelProxy;
 	int m_LastScannedColSorted;
+    QWidget* m_ScenarioEditorRightSection;
 	QListView* m_ScenarioList;
 	QListView* m_AliasesList;
 	QTableView* m_SeniorTable;

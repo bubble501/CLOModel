@@ -2213,91 +2213,100 @@ void LoanAssumptionsEditor::AdjustNewGenTableHeight() {
 	}
 }
 
-void LoanAssumptionsEditor::CreateModelScanner() {
-	m_PoolMatcher = new LoanAssMatcher(this);
+void LoanAssumptionsEditor::CreateModelScanner()
+{
+    m_PoolMatcher = new LoanAssMatcher(this);
 
-	m_ScanPoolsModel = new QStandardItemModel(this);
-	m_ScanPoolsModel->setRowCount(0);
-	m_ScanPoolsModel->setColumnCount(1);
-	m_ScannedPoolsProxy = new QSortFilterProxyModel(this);
-	m_ScannedPoolsProxy->setSourceModel(m_ScanPoolsModel);
-	m_ScannedPoolsProxy->setFilterRole(Qt::UserRole);
-	m_ScannedPoolsProxy->setFilterKeyColumn(0);
-	m_ScannedModel = new QStandardItemModel(this);
-	m_ScannedModel->setColumnCount(4);
-	m_ScannedModel->setRowCount(0);
-	m_ScannedModel->setHorizontalHeaderLabels(QStringList() << tr("Issuer") << tr("Facility") << tr("Current Scenario") << tr("Detected Scenario"));
-	m_ScannedModelProxy = new ReadOnlyColProxy(this);
-	m_ScannedModelProxy->setSourceModel(m_ScannedModel);
-	m_ScannedModelProxy->SetReadOnlyCol(QList<qint32>() << 0 << 1 << 2);
-	m_ScannedModelProxy->setFilterKeyColumn(0);
-	m_ScannedModelProxy->setFilterRole(Qt::UserRole);
+    m_ScanPoolsModel = new QStandardItemModel(this);
+    m_ScanPoolsModel->setRowCount(0);
+    m_ScanPoolsModel->setColumnCount(1);
+    m_ScannedPoolsProxy = new QSortFilterProxyModel(this);
+    m_ScannedPoolsProxy->setSourceModel(m_ScanPoolsModel);
+    m_ScannedPoolsProxy->setFilterRole(Qt::UserRole);
+    m_ScannedPoolsProxy->setFilterKeyColumn(0);
+    m_ScannedModel = new QStandardItemModel(this);
+    m_ScannedModel->setColumnCount(4);
+    m_ScannedModel->setRowCount(0);
+    m_ScannedModel->setHorizontalHeaderLabels(QStringList() << tr("Issuer") << tr("Facility") << tr("Current Scenario") << tr("Detected Scenario"));
+    m_ScannedModelProxy = new ReadOnlyColProxy(this);
+    m_ScannedModelProxy->setSourceModel(m_ScannedModel);
+    m_ScannedModelProxy->SetReadOnlyCol(QList<qint32>() << 0 << 1 << 2);
+    m_ScannedModelProxy->setFilterKeyColumn(0);
+    m_ScannedModelProxy->setFilterRole(Qt::UserRole);
 
-	m_PoolScanFilterView = new QListView(this);
-	SafeSetModel(m_PoolScanFilterView, m_SortScenarios);
-	m_PoolScanFilterView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-	m_PoolScanFilterView->setSelectionMode(QAbstractItemView::ExtendedSelection);
-	m_PoolScanFilterView->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    m_PoolScanFilterView = new QListView(this);
+    SafeSetModel(m_PoolScanFilterView, m_SortScenarios);
+    m_PoolScanFilterView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    m_PoolScanFilterView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    m_PoolScanFilterView->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
-	m_PoolScanDealsView = new QListView(this);
-	m_PoolScanDealsView->setModel(m_ScannedPoolsProxy);
-	m_PoolScanDealsView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-	m_PoolScanDealsView->setSelectionMode(QAbstractItemView::SingleSelection);
-	m_PoolScanDealsView->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+    m_PoolScanDealsView = new QListView(this);
+    m_PoolScanDealsView->setModel(m_ScannedPoolsProxy);
+    m_PoolScanDealsView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    m_PoolScanDealsView->setSelectionMode(QAbstractItemView::SingleSelection);
+    m_PoolScanDealsView->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 
-	m_PoolScanPoolView = new QTableView(this);
-	m_PoolScanPoolView->setEditTriggers(QAbstractItemView::CurrentChanged | QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
-	m_PoolScanPoolView->setSelectionMode(QAbstractItemView::SingleSelection);
-	m_PoolScanPoolView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-	m_PoolScanPoolView->horizontalHeader()->setMinimumSectionSize(70);
-	m_PoolScanPoolView->horizontalHeader()->setStretchLastSection(true);
-	m_PoolScanPoolView->verticalHeader()->hide();
-	SafeSetModel(m_PoolScanPoolView, m_ScannedModelProxy);
-
-
-	QLabel* PoolScanFilterLaber = new QLabel(this);
-	PoolScanFilterLaber->setText(tr("Filter by Scenario"));
-	QLabel* ScannedPoolLaber = new QLabel(this);
-	ScannedPoolLaber->setText(tr("Loan Pools"));
-
-	QGroupBox* LeftGroup = new QGroupBox(this);
-	LeftGroup->setTitle(tr("Models"));
-	QVBoxLayout* LeftLay = new QVBoxLayout(LeftGroup);
-	LeftLay->addWidget(PoolScanFilterLaber);
-	LeftLay->addWidget(m_PoolScanFilterView);
-	LeftLay->addWidget(ScannedPoolLaber);
-	LeftLay->addWidget(m_PoolScanDealsView);
-
-	m_ScanPoolsButton = new QPushButton(this);
-	m_ScanPoolsButton->setText(tr("Start Scan"));
-	m_ModelsDirEdit = new QLineEdit(this);
-	m_ModelsDirEdit->setText(GetFromConfig("Folders", "UnifiedResultsFolder"));
-	QLabel* ModelFolderlabel = new QLabel(this);
-	ModelFolderlabel->setText(tr("Models Folder"));
-	QPushButton *ModelsDirBrowseButton = new QPushButton(this);
-	ModelsDirBrowseButton->setText("Browse"); //Ellipsis (...)
-	ModelsDirBrowseButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
-	m_ScanProgress = new QProgressBar(this);
-	m_ScanProgress->setTextVisible(true);
-	m_ScanProgress->setRange(0, 100);
-	m_ScanProgress->hide();
-	m_ScanProgress->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    m_PoolScanPoolView = new QTableView(this);
+    m_PoolScanPoolView->setEditTriggers(QAbstractItemView::CurrentChanged | QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
+    m_PoolScanPoolView->setSelectionMode(QAbstractItemView::SingleSelection);
+    m_PoolScanPoolView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    m_PoolScanPoolView->horizontalHeader()->setMinimumSectionSize(70);
+    m_PoolScanPoolView->horizontalHeader()->setStretchLastSection(true);
+    m_PoolScanPoolView->verticalHeader()->hide();
+    SafeSetModel(m_PoolScanPoolView, m_ScannedModelProxy);
 
 
-	QHBoxLayout* BottomLay = new QHBoxLayout;
-	BottomLay->addWidget(ModelFolderlabel);
-	BottomLay->addWidget(m_ModelsDirEdit);
-	BottomLay->addWidget(ModelsDirBrowseButton);
-	BottomLay->addWidget(m_ScanPoolsButton);
+    QLabel* PoolScanFilterLaber = new QLabel(this);
+    PoolScanFilterLaber->setText(tr("Filter by Scenario"));
+    m_ClearPoolScanFilterButton = new QPushButton(this);
+    m_ClearPoolScanFilterButton->setText(tr("Clear Selection"));
+    m_ClearPoolScanFilterButton->setEnabled(false);
+    QLabel* ScannedPoolLaber = new QLabel(this);
+    ScannedPoolLaber->setText(tr("Loan Pools"));
 
-	QWidget* TempTab = new QWidget(this);
-	QGridLayout* mainLay = new QGridLayout(TempTab);
-	mainLay->addWidget(LeftGroup, 0, 0);
-	mainLay->addWidget(m_PoolScanPoolView, 0, 1);
-	mainLay->addWidget(m_ScanProgress, 1, 0);
-	mainLay->addLayout(BottomLay, 1, 1);
-	BaseTab->addTab(TempTab, tr("Scan Models"));
+    QGroupBox* LeftGroup = new QGroupBox(this);
+    LeftGroup->setTitle(tr("Models"));
+    QGridLayout* LeftLay = new QGridLayout(LeftGroup);
+    LeftLay->addWidget(PoolScanFilterLaber, 0, 0);
+    LeftLay->addWidget(m_ClearPoolScanFilterButton, 0, 1);
+    LeftLay->addWidget(m_PoolScanFilterView, 1, 0, 1, 2);
+    LeftLay->addWidget(ScannedPoolLaber, 2, 0, 1, 2);
+    LeftLay->addWidget(m_PoolScanDealsView, 3, 0, 1, 2);
 
+    m_ScanPoolsButton = new QPushButton(this);
+    m_ScanPoolsButton->setText(tr("Start Scan"));
+    m_ModelsDirEdit = new QLineEdit(this);
+    m_ModelsDirEdit->setText(GetFromConfig("Folders", "UnifiedResultsFolder"));
+    QLabel* ModelFolderlabel = new QLabel(this);
+    ModelFolderlabel->setText(tr("Models Folder"));
+    QPushButton *ModelsDirBrowseButton = new QPushButton(this);
+    ModelsDirBrowseButton->setText("Browse"); //Ellipsis (...)
+    ModelsDirBrowseButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+    m_ScanProgress = new QProgressBar(this);
+    m_ScanProgress->setTextVisible(true);
+    m_ScanProgress->setRange(0, 100);
+    m_ScanProgress->hide();
+    m_ScanProgress->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+
+
+    QHBoxLayout* BottomLay = new QHBoxLayout;
+    BottomLay->addWidget(ModelFolderlabel);
+    BottomLay->addWidget(m_ModelsDirEdit);
+    BottomLay->addWidget(ModelsDirBrowseButton);
+    BottomLay->addWidget(m_ScanPoolsButton);
+
+    QWidget* TempTab = new QWidget(this);
+    QGridLayout* mainLay = new QGridLayout(TempTab);
+    mainLay->addWidget(LeftGroup, 0, 0);
+    mainLay->addWidget(m_PoolScanPoolView, 0, 1);
+    mainLay->addWidget(m_ScanProgress, 1, 0);
+    mainLay->addLayout(BottomLay, 1, 1);
+    BaseTab->addTab(TempTab, tr("Scan Models"));
+
+    connect(m_ClearPoolScanFilterButton, &QPushButton::clicked, m_PoolScanFilterView->selectionModel(),&QItemSelectionModel::clearSelection);
+    connect(m_PoolScanFilterView->selectionModel(), &QItemSelectionModel::selectionChanged, [&](const QItemSelection& index, const QItemSelection&){
+        m_ClearPoolScanFilterButton->setEnabled(!index.isEmpty()); 
+    });
 	connect(m_PoolScanDealsView->selectionModel(), &QItemSelectionModel::currentChanged, [&](const QModelIndex& index, const QModelIndex&) {
 		if (!index.isValid()) {
 			m_ScannedModel->setRowCount(0);

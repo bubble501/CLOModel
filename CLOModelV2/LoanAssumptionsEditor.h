@@ -116,6 +116,7 @@ private:
 	QListView* m_PoolScanFilterView;
 	QListView* m_PoolScanDealsView;
 	QTableView* m_PoolScanPoolView;
+    QPushButton* m_ClearPoolScanFilterButton;
 	LoanAssMatcher* m_PoolMatcher;
 	QLineEdit* m_ModelsDirEdit;
 	bool m_ScanningPools;

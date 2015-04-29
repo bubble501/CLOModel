@@ -36,11 +36,11 @@ int main(int argc, char *argv[]) {
 	//return a.exec();
 
 
-	QApplication a(argc, argv);
+	/*QApplication a(argc, argv);
 	LoanAssumptionsEditor b;
 	b.FillFromQuery();
 	b.show();
-	return a.exec();
+	return a.exec();*/
 
 	/*QApplication a(argc, argv);
 	StressViewer b;
@@ -79,11 +79,11 @@ int main(int argc, char *argv[]) {
 		, "20", "0.5", "0", "0", "0", "0"
 		).GetTranche("HARVT 10X A"));
 	return a.exec();
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     QApplication a(argc, argv);
 	Waterfall TempWtf, TempCallWaterfall;
 	MtgCalculator TempMtg;
-	QFile file("Z:/24AM/Monitoring/Model Results/AVOCA 10X.clom");
+	QFile file("Z:/24AM/Monitoring/Model Results/OHECP III.clom");
 	file.open(QIODevice::ReadOnly);
 	qint32 VersionChecker;
 	QDataStream out(&file);
@@ -98,12 +98,11 @@ int main(int argc, char *argv[]) {
 	{bool Junk; out >> Junk; }
 	TempWtf.SetLoadProtocolVersion(VersionChecker);
 	out >> TempWtf;
-    const Tranche* Test=TempWtf.GetTranche("BH0W305");
-
-	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
-	out >> TempCallWaterfall;
-	TempMtg.SetLoadProtocolVersion(VersionChecker);
-	out >> TempMtg;
+    TempWtf.GetTranche("rrregg");
+//	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
+// 	out >> TempCallWaterfall;
+// 	TempMtg.SetLoadProtocolVersion(VersionChecker);
+// 	out >> TempMtg;
 	file.close();
 	TempWtf.CalculateTranchesCashFlows();
 	
@@ -113,7 +112,7 @@ int main(int argc, char *argv[]) {
 // 	TempMtg.SetSequentialComputation(true);
 // 	TempMtg.StartCalculation();
 // 	return a.exec();
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	QApplication a(argc, argv);
 	QFile file("C:/Temp/BaseCase.clo");
 	//QFile file("C:/Temp/20#,#8#,#100#,#0#,#0#,#0.csw");

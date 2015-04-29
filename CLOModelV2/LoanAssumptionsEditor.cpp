@@ -1402,10 +1402,10 @@ void LoanAssumptionsEditor::SaveScenario(const QString& key) {
 		RemoveAssQuery.setForwardOnly(true);
 		RemoveAssQuery.prepare("{CALL " + GetFromConfig("Database", "RemoveLoanAssumptionStoredProc") + "}");
 		RemoveAssQuery.bindValue(":scenarioName", key);
-		/*if (!RemoveAssQuery.exec()) {
+		if (!RemoveAssQuery.exec()) {
 			QMessageBox::critical(this, "Error", "Failed to commit changes to the database, try again later.");
 			return;
-		}*/
+		}
 #endif // !NO_DATABASE
 		m_Assumptions[key] = QSharedPointer<LoanAssumption>(nullptr);
 		return DiscardScenario(key);

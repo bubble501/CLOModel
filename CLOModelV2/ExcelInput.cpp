@@ -511,8 +511,8 @@ double __stdcall CLODiscountMargin(LPSAFEARRAY *ArrayData){
 		out >> TempWaterfall;
 	}
 	file.close();
-	const Tranche* TranchPoint=TempWaterfall.GetTranche(TrancheName);
-	if(TranchPoint){
+	const Tranche* const TranchPoint=TempWaterfall.GetTranche(TrancheName);
+	if(Q_LIKELY(TranchPoint)){
 		return TranchPoint->GetDiscountMargin(NewPrice);
 	}
 	return 0.0;
@@ -554,10 +554,10 @@ double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
 		out >> TempWaterfall;
 	}
 	file.close();
-	const Tranche* TranchPoint=TempWaterfall.GetTranche(TrancheName);
-	if(!TranchPoint) return 0.0;
-	Tranche TempTranche(*TranchPoint);
-	return TempTranche.GetWALife(/*StartDate*/);
+	const Tranche* const TranchPoint=TempWaterfall.GetTranche(TrancheName);
+	if(Q_LIKELY(TranchPoint)) 
+        return TranchPoint->GetWALife(/*StartDate*/);
+    return 0.0;
 }
 double __stdcall GetStressLoss(LPSAFEARRAY *ArrayData) {
 	QString FolderPath;

@@ -1367,8 +1367,8 @@ bool Waterfall::CalculateTranchesCashFlows()
                     }
 
                 }
-                                                                         break;
-                                                                         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                break;
+                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 case WatFalPrior::WaterfallStepType::wst_Excess:{
                     SolutionDegree = SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate);
                     TestTarget = SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionShare).value<BloombergVector>().GetValue(CurrentDate);
@@ -1423,8 +1423,8 @@ bool Waterfall::CalculateTranchesCashFlows()
                     if (SolutionDegree & 1) AvailableInterest = 0.0;
                     if (SolutionDegree >= 2) AvailablePrincipal.Erase();
                 }
-                                                                break;
-                                                                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                break;
+                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 case WatFalPrior::WaterfallStepType::wst_PDL:{
                     int CurrSenGrpLvl = SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetValue(CurrentDate);
                     int CurrSenGrp = SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate);
@@ -1473,8 +1473,8 @@ bool Waterfall::CalculateTranchesCashFlows()
                         AvailableInterest += TotalPayable - qMin(AvailableInterest, Solution);
                     }
                 }
-                                                             break;
-                                                             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                break;
+                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 case WatFalPrior::WaterfallStepType::wst_ReinvestmentTest:
                 case WatFalPrior::WaterfallStepType::wst_OCTest:{
                     int CurrSenGrpLvl = SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetValue(CurrentDate);
@@ -1585,8 +1585,8 @@ bool Waterfall::CalculateTranchesCashFlows()
                         }
                     }
                 }
-                                                                break;
-                                                                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                break;
+                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 case WatFalPrior::WaterfallStepType::wst_ICTest:{
                     int CurrSenGrpLvl = SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroupLevel).value<IntegerVector>().GetValue(CurrentDate);
                     int CurrSenGrp = SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate);
@@ -1680,8 +1680,8 @@ bool Waterfall::CalculateTranchesCashFlows()
                         }
                     }
                 }
-                                                                break;
-                                                                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                break;
+                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 case WatFalPrior::WaterfallStepType::wst_ReinvestPrincipal:
                     if (!IsCallPaymentDate && !IsMaturityDate) {
                         if (AvailablePrincipal.Total()>0.0) {
@@ -1756,7 +1756,6 @@ bool Waterfall::CalculateTranchesCashFlows()
             RollingLastIPD = RollingNextIPD;
             RollingNextIPD = RollingNextIPD.addMonths(m_PaymentFrequency.GetValue(RollingNextIPD));
             if (IsCallPaymentDate) {
-                //i++;
                 break;
             }
         }//End Cycle in time

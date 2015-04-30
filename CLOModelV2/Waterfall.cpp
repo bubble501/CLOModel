@@ -961,6 +961,9 @@ bool Waterfall::CalculateTranchesCashFlows()
                 else
                     TotalPayable = m_PoolValueAtCall.GetValue(CurrentDate);
                 AvailablePrincipal += TotalPayable*m_MortgagesPayments.GetAmountOut(CurrentDate);
+                LOGDEBUG(QString("Cash in queue at call:\t%1").arg(m_ReinvestmentTest.GetQueuedCash(CurrentDate), 0, 'f'));                
+                AvailablePrincipal += m_ReinvestmentTest.GetQueuedCash(CurrentDate);
+                m_ReinvestmentTest.ResetReinvestQueueue();
             }
             foreach(WatFalPrior* SingleStep, m_WaterfallStesps)
             {//Cycle through the steps of the waterfall
@@ -1813,7 +1816,6 @@ bool Waterfall::CalculateTranchesCashFlows()
                 }
             }
         }
-        LOGDEBUG(QString("After Call Proceeds:\t%1").arg(CheckResults, 0, 'f'));
         CheckResults -= CheckMtgCashFlow.GetTotalFlow(0);
         LOGDEBUG(QString("After Loans Flows:\t%1").arg(CheckResults, 0, 'f'));
         CheckTranCashFlow.Clear(); CheckTranCashFlow.AddFlow(m_GICflows); CheckResults -= CheckTranCashFlow.GetTotalFlow(0);
@@ -1840,7 +1842,7 @@ bool Waterfall::CalculateTranchesCashFlows()
         }
         LOGDEBUG(QString("Final Test\t%1").arg(CheckResults, 0, 'f'));
         if (qAbs(CheckResults) >= 1.0) {
-            PrintToTempFile("ReturnFalse.txt", QString("Cash Flows don't Match, Diff: %1").arg(CheckResults, 0, 'f'));
+            PrintToTempFile("ReturnFalse.txt", QString("Cash Flows don't Match, Diff: %1; Call %2abled").arg(CheckResults, 0, 'f').arg(m_UseCall ? "En":"Dis"));
 #ifndef DebugLogging
             return false;
 #endif // !DebugLogging

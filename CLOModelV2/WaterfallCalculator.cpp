@@ -32,6 +32,9 @@ bool WaterfallCalculator::StartCalculation() {
 void WaterfallCalculator::BeeReturned(int Ident, const Waterfall& a) {
 	RETURN_WHEN_RUNNING(false, )
 	TemplAsyncCalculator <WaterfallCalcThread, Waterfall > ::BeeReturned(Ident, a);
+    /*
+    TODO avoid duplications, copy the result to the waterfall in cascades and then delete the result
+    */
 	WaterfallCalcThread* CurrentThread;
 	for (auto SingleWaterfall = m_Cascades.begin(); SingleWaterfall != m_Cascades.end(); ++SingleWaterfall) {
 		if (BeesSent.contains(SingleWaterfall.key())) continue;

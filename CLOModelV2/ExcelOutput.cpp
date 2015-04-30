@@ -1841,7 +1841,6 @@ HRESULT ExcelOutput::PlotCPRLS(
 	const QString& DestinationSheet,
 	int DestinationIndex
 	){
-    LOGDEBUG(QString("Reached PlotCPRLS Args:\n%1\n%2").arg(DestinationSheet).arg(DestinationIndex));
 		ExcelCommons::InitExcelOLE();
 		SAFEARRAYBOUND  Bound[1];
 		Bound[0].lLbound   = 1;
@@ -1885,7 +1884,6 @@ HRESULT ExcelOutput::PlotCPRLS(
 			SafeArrayUnaccessData(DatesArray);
 			SafeArrayUnaccessData(CPRArray);
 			SafeArrayUnaccessData(LSArray);
-            LOGDEBUG("Vectors Done PlotCPRLS");
 		}
         
 		static DISPID dispid = 0;
@@ -1907,7 +1905,6 @@ HRESULT ExcelOutput::PlotCPRLS(
 			Command[CurrentCmdIndex--].parray = CPRArray;
 			Command[CurrentCmdIndex].vt = VT_ARRAY | VT_VARIANT;
 			Command[CurrentCmdIndex--].parray = LSArray;
-            LOGDEBUG("Command Prepared PlotCPRLS");
 			Params.rgdispidNamedArgs = NULL;
 			Params.rgvarg=Command;
 			Params.cArgs = 6;
@@ -1933,7 +1930,6 @@ HRESULT ExcelOutput::PlotCPRLS(
 			}
 			hr = ExcelCommons::pExcelDisp->Invoke(dispid,IID_NULL,LOCALE_SYSTEM_DEFAULT,
 				DISPATCH_METHOD, &Params, NULL, NULL, NULL);
-            LOGDEBUG("Invoked PlotCPRLS");
 			if(FAILED(hr))
 			{
                 LOGDEBUG("Invoke Failed PlotCPRLS");
@@ -1956,18 +1952,14 @@ HRESULT ExcelOutput::PlotCPRLS(
 		}
 		SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
 		SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
-        LOGDEBUG("Freed strings PlotCPRLS");
 		SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&DatesIter);
         for (int i = 1; i < source.GetCalculatedMtgPayments().Count(); i++)
 		{
-            LOGDEBUG(QString("Aptemting Date %1 %2").arg(i).arg(QString::fromStdWString(DatesIter->bstrVal)));
 			SysFreeString(DatesIter->bstrVal);
 			DatesIter++;
 		}
         
 		SafeArrayUnaccessData(DatesArray);
-        LOGDEBUG("Freed Dates PlotCPRLS");
-        LOGDEBUG("Reached End " + QString::number(hr, 16));
 		return hr;
 }
 

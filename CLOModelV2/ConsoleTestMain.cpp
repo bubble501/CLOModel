@@ -35,7 +35,6 @@ int main(int argc, char *argv[]) {
 	//ConsoleTestObj b;
 	//return a.exec();
 
-
 	/*QApplication a(argc, argv);
 	LoanAssumptionsEditor b;
 	b.FillFromQuery();
@@ -98,14 +97,14 @@ int main(int argc, char *argv[]) {
 	{bool Junk; out >> Junk; }
 	TempWtf.SetLoadProtocolVersion(VersionChecker);
 	out >> TempWtf;
-    TempWtf.GetTranche("rrregg");
 //	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
 // 	out >> TempCallWaterfall;
 // 	TempMtg.SetLoadProtocolVersion(VersionChecker);
 // 	out >> TempMtg;
 	file.close();
+    TempWtf.SetUseCall(true);
+    TempWtf.SetupReinvBond("4.6", "20", "0 12S 3", "35", "6.5 24S 6.5 24R 4 48R 0", "3", "I", "99.80 12S 100", "0", "6", "EUR003M");
 	TempWtf.CalculateTranchesCashFlows();
-	
 	//PrintToTempFile("Class F Flows", TempWtf.GetTranche("DRYD 15-35X F")->GetCashFlow().ToPlainText(), false);
 // 	QApplication a(argc, argv);
 // 	TempMtg.DownloadScenarios();

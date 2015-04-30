@@ -10,6 +10,11 @@
 #include "ExcelOutput.h"
 #include <QStringList>
 #include <QIcon>
+#include <QLabel>
+#include <QStandardItemModel>
+#include <QListView>
+#include <QGridLayout>
+#include <QPushButton>
 CentralUnit::CentralUnit(QObject* parent)
 	:QObject(parent)
 	,Stresser(nullptr)
@@ -273,12 +278,25 @@ void CentralUnit::CalculationStep1(){
         file.close();
     }
 #endif // SAVE_EXCEL_INPUTS
+
+    //Add Fake cash flows to structure to check inputs
+    {
+        MtgCashFlow FakeFlow;
+        FakeFlow.AddFlow(QDate(2015, 5, 30), 100.0, MtgCashFlow::MtgFlowType::PrincipalFlow);
+        Structure.AddMortgagesFlows(FakeFlow);
+        Structure.SetUseCall(false);
+    }
+
 	QString TmpStr = LoansCalculator.ReadyToCalculate();
-	if (!TmpStr.isEmpty()) {
-		QMessageBox::critical(0, "Invalid Input", "The following Inputs are missing or invalid:\n" + TmpStr);
-		QApplication::quit();
-		return;
-	}
+    if (Q_UNLIKELY(!TmpStr.isEmpty()))
+        TmpStr += '\n';
+    TmpStr += Structure.ReadyToCalculate();
+    if (Q_UNLIKELY(!TmpStr.isEmpty())) {
+        showErrorDialog(TmpStr);
+        //QMessageBox::critical(0, "Invalid Input", "The following Inputs are missing or invalid:\n" + TmpStr);
+        QApplication::quit();
+        return;
+    }
 	if(MtgsProgress) MtgsProgress->deleteLater();
 	MtgsProgress=new QProgressDialog();
 	MtgsProgress->setWindowIcon(QIcon(":/Icons/Logo.png"));
@@ -298,17 +316,47 @@ void CentralUnit::CalculationStep1(){
 		return;
 	}
 }
-void CentralUnit::CalculationStep2(){
+
+void CentralUnit::showErrorDialog(const QString& errList)
+{
+    auto errorList = errList.split('\n');
+    QDialog errorDialog;
+    errorDialog.setWindowTitle(tr("Invalid Input"));
+    errorDialog.setWindowIcon(QIcon(":/Icons/Logo.png"));
+    QGridLayout* mainLay = new QGridLayout(&errorDialog);
+    QLabel* mainLabel = new QLabel(&errorDialog);
+    mainLabel->setText(tr("The following Inputs are missing or invalid:"));
+    mainLay->addWidget(mainLabel, 0, 0, 1, 3);
+    QStandardItemModel* mainModel = new QStandardItemModel(&errorDialog);
+    mainModel->setColumnCount(1);
+    mainModel->setRowCount(errorList.size());
+    for (int i = 0; i < errorList.size(); ++i)
+        mainModel->setData(mainModel->index(i, 0), errorList.at(i));
+    QListView* mainView = new QListView(&errorDialog);
+    mainView->setModel(mainModel);
+    mainLay->addWidget(mainView, 1, 0, 1, 3);
+    QPushButton* okButton = new QPushButton(&errorDialog);
+    okButton->setDefault(true);
+    okButton->setText(tr("Ok"));
+    connect(okButton, &QPushButton::clicked, &errorDialog, &QDialog::accept);
+    mainLay->addWidget(okButton, 2, 1);
+    errorDialog.exec();
+}
+
+void CentralUnit::CalculationStep2()
+{
 	LOGDEBUG("Reached CalculationStep2");
 	MtgsProgress->setLabelText(tr("Calculating Tranches"));
 	MtgsProgress->setAutoClose(true);
 	QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 	Structure.ResetMtgFlows();
-	if (LoansCalculator.GetAggregatedResults()) Structure.AddMortgagesFlows(*LoansCalculator.GetAggregatedResults());
+	if (Q_LIKELY(LoansCalculator.GetAggregatedResults())) 
+        Structure.AddMortgagesFlows(*LoansCalculator.GetAggregatedResults());
 	Structure.SetUseCall(false);
 	QString TmpStr=Structure.ReadyToCalculate();
-	if(!TmpStr.isEmpty()){
-		QMessageBox::critical(0,"Invalid Input","The following Inputs are missing or invalid:\n"+TmpStr);
+    if (Q_UNLIKELY(!TmpStr.isEmpty())) {
+        showErrorDialog(TmpStr);
+		//QMessageBox::critical(0,"Invalid Input","The following Inputs are missing or invalid:\n"+TmpStr);
 		QApplication::quit();
 		return;
 	}

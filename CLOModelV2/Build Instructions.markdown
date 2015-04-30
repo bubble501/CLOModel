@@ -10,7 +10,7 @@ The code is compatible with the subset of the standard implemented by MSVC.<br/>
 *Developed using version 1.57.0*<br/>
 [Download](http://www.boost.org/users/download/) and unpack the library. There is no need to build it.
 ### Qt
-*Developed using version 5.3.2*<br/>
+*Developed using version 5.4.1*<br/>
 [Download](http://www.qt.io/download-open-source/) and install Qt libraries, the open source version is sufficient.<br/>
 If you use versions of the library higher than 5.9, minor changes in the code may be required in order for it to compile successfully.
 ### zlib
@@ -19,6 +19,15 @@ If you use versions of the library higher than 5.9, minor changes in the code ma
 ### Bloomberg
 *Developed using version 3.7.5.1*<br/>
 [Download](http://www.bloomberglabs.com/api/libraries/) the Bloomberg API library for C++.
+### QBbgLib
+*Developed using version 0.0.1*<br/>
+[Download](https://github.com/VSRonin/QBbgLib) the Qt interface for the Bloomberg API.
+Once downloaded, open the solution in visual studio and compile the library in release configuration.
+You may need to set, in the project properties, the path to the Bloomberg API library mentioned above under:<ul>
+<li>C/C++ &#10142; General &#10142; Additional Include Directories</li>
+<li>Linker &#10142; General &#10142; Additional Library Directories</li>
+</ul>
+A makefile version will be available soon to speed up the build and deploy process
 ### Quazip
 *Developed using version 0.7.1*<br/>
 [Download](http://sourceforge.net/projects/quazip/) and build Quazip library using the instructions below
@@ -50,7 +59,7 @@ The following environmental variables are needed in order to be able to compile 
     <ul><li>[How to set environment variables in Windows](http://www.computerhope.com/issues/ch000549.htm)</li>
     <li>[How to set environment variables in Mac OS X](http://www.dowdandassociates.com/blog/content/howto-set-an-environment-variable-in-mac-os-x-launchd-plist/) (Versions 10.10 or higher)</li>
     <li>[How to set environment variables on Linux](https://help.ubuntu.com/community/EnvironmentVariables#Persistent_environment_variables)</li></ul>
-<ul><li>BLPPATH - Path to the include folder of the Bloomberg C++ API. (e.g. C:\blp\API\APIv3\C++API\v3.7.5.1)</li>
+<ul><li>QBBGLIBPATH - Path to the include folder of the Bloomberg C++ API. (e.g. C:\QBbgLib)</li>
 <li>BOOSTPATH - Path to the boost folder of the Boost C++ library. (e.g. C:\Boost\Boost-1.57)</li>
 <li>KDCHARTPATH - Path to the include folder of the KDChart library. (e.g. C:\KDAB\KDChart-2.5.1)</li>
 <li>QUAZIPPATH - Path to the include folder of the Quazip library. (e.g. C:\Quazip)</li>

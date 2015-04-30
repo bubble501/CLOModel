@@ -348,11 +348,11 @@ void MtgCalculator::DownloadScenarios() {
 				QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
 				if (!db.isValid()) {
 					if (!db.isValid()) {
-						db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype", "QODBC"), "TwentyFourDB");
+						db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype"), "TwentyFourDB");
 						db.setDatabaseName(
-							"Driver={" + GetFromConfig("Database", "Driver", "SQL Server")
+							"Driver={" + GetFromConfig("Database", "Driver")
 							+ "}; "
-							+ GetFromConfig("Database", "DataSource", R"(Server=SYNSERVER2\SQLExpress; Initial Catalog = ABSDB; Integrated Security = SSPI; Trusted_Connection = Yes;)")
+							+ GetFromConfig("Database", "DataSource")
 							);
 						
 					}
@@ -362,7 +362,7 @@ void MtgCalculator::DownloadScenarios() {
 				if (DbOpen) {
 					QSqlQuery LoanAssQuerry(db);
 					LoanAssQuerry.setForwardOnly(true);
-					LoanAssQuerry.prepare("{CALL " + GetFromConfig("Database", "GetLoanAssumptionStoredProc", "getLoanAssumption(:scenarioName,:isSenior)") + "}");
+					LoanAssQuerry.prepare("{CALL " + GetFromConfig("Database", "GetLoanAssumptionStoredProc") + "}");
 					LoanAssQuerry.bindValue(":scenarioName", i.value()->GetProperty("Scenario"));
 					LoanAssQuerry.bindValue(":isSenior", true);
 					if (LoanAssQuerry.exec()) {
@@ -493,11 +493,11 @@ void MtgCalculator::GuessLoanScenarios(bool OverrideAss) {
 		QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
 		if (!db.isValid()) {
 			if (!db.isValid()) {
-				db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype", "QODBC"), "TwentyFourDB");
+				db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype"), "TwentyFourDB");
 				db.setDatabaseName(
-					"Driver={" + GetFromConfig("Database", "Driver", "SQL Server")
+					"Driver={" + GetFromConfig("Database", "Driver")
 					+ "}; "
-					+ GetFromConfig("Database", "DataSource", R"(Server=SYNSERVER2\SQLExpress; Initial Catalog = ABSDB; Integrated Security = SSPI; Trusted_Connection = Yes;)")
+					+ GetFromConfig("Database", "DataSource")
 					);
 				
 			}
@@ -507,7 +507,7 @@ void MtgCalculator::GuessLoanScenarios(bool OverrideAss) {
 		if (DbOpen) {
 			QSqlQuery LoanAssQuerry(db);
 			LoanAssQuerry.setForwardOnly(true);
-			LoanAssQuerry.prepare("{CALL " + GetFromConfig("Database", "GetAllLoanAssumptionsStoredProc", "getAllLoanAssumptions") + "}");
+			LoanAssQuerry.prepare("{CALL " + GetFromConfig("Database", "GetAllLoanAssumptionsStoredProc") + "}");
 			if (LoanAssQuerry.exec()) {
 				while (LoanAssQuerry.next()) {
 					auto DbgRecord = LoanAssQuerry.record();

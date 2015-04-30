@@ -38,6 +38,8 @@ public:
 #ifndef NO_DATABASE
 	void FillFromQuery();
 #endif
+protected:
+    void closeEvent(QCloseEvent * ev);
 private:
 	static void SafeSetModel(QAbstractItemView* View, QAbstractItemModel* NewModel);
 	void CreateScenarioEditor();
@@ -61,6 +63,7 @@ private:
 	QSortFilterProxyModel* m_ScannedPoolsProxy;
 	ReadOnlyColProxy* m_ScannedModelProxy;
 	int m_LastScannedColSorted;
+    QWidget* m_ScenarioEditorRightSection;
 	QListView* m_ScenarioList;
 	QListView* m_AliasesList;
 	QTableView* m_SeniorTable;
@@ -114,6 +117,7 @@ private:
 	QListView* m_PoolScanFilterView;
 	QListView* m_PoolScanDealsView;
 	QTableView* m_PoolScanPoolView;
+    QPushButton* m_ClearPoolScanFilterButton;
 	LoanAssMatcher* m_PoolMatcher;
 	QLineEdit* m_ModelsDirEdit;
 	bool m_ScanningPools;

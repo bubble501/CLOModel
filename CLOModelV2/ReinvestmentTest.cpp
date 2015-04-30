@@ -212,13 +212,15 @@ const MtgCashFlow& ReinvestmentTest::ProcessQueue(const QDate& CurrentDate, int 
 }
 
 double ReinvestmentTest::GetQueuedCash(QDate StartDate) const {
-	if (!StartDate.isNull()) StartDate.setDate(StartDate.year(), StartDate.month(), 15);
-	double Result = 0.0;
-	for (auto i = ReinvestQueue.begin(); i != ReinvestQueue.end(); ++i) {
-		if (!StartDate.isNull() && i.key()<StartDate) continue;
-		Result += i.value();
-	}
-	return Result;
+    if (StartDate.isNull())
+        return 0.0;
+    StartDate.setDate(StartDate.year(), StartDate.month(), 15);
+    double Result = 0.0;
+    for (auto i = ReinvestQueue.begin(); i != ReinvestQueue.end(); ++i) {
+        if (i.key() < StartDate) continue;
+        Result += i.value();
+    }
+    return Result;
 }
 
 void ReinvestmentTest::RemoveBondFlow(const QDate& a) {

@@ -2,8 +2,12 @@
 #include <QRegExp>
 #include <QStringList>
 #include "CommonFunctions.h"
-#include "QBbgWorker.h"
-#include "QSingleBbgRequest.h"
+#ifndef NO_BLOOMBERG
+#include <QbbgReferenceDataRequest.h>
+#include <QBbgReferenceDataResponse.h>
+#include <QBbgRequestGroup.h>
+#include <QBbgManager.h>
+#endif // !NO_BLOOMBERG
 #ifndef NO_DATABASE
 #include <QSqlDatabase>
 #include <QSqlError>
@@ -90,7 +94,32 @@ QDataStream& BaseRateVector::LoadOldVersion(QDataStream& stream) {
 	ResetProtocolVersion();
 	return stream;
 }
-BloombergVector BaseRateVector::CompileReferenceRateValue(ForwardBaseRateTable& Values) const {
+
+void BaseRateVector::RepackVector()
+{
+    QString newVector;
+    QString lastUsed;
+    int stepCounter = 1;
+    for (auto i = m_VectVal.constBegin(); i != m_VectVal.constEnd(); ++i) {
+        if (lastUsed.isEmpty()) {
+            lastUsed = *i;
+            newVector.append(lastUsed);
+        }
+        else if (*i==lastUsed) {
+            ++stepCounter;
+        }
+        else {
+            newVector += QString(" %1S %2").arg(stepCounter).arg(*i);
+            lastUsed = *i;
+            stepCounter = 1;
+        }
+    }
+    m_Vector = newVector;
+    Q_ASSERT(IsValid());
+}
+
+BloombergVector BaseRateVector::CompileReferenceRateValue(ForwardBaseRateTable& Values) const
+{
 	BloombergVector Result;
 	if (IsEmpty()) return Result;
 	QStringList StringParts = m_Vector.trimmed().toUpper().split(QRegExp("\\s"), QString::SkipEmptyParts);
@@ -150,41 +179,48 @@ BloombergVector BaseRateVector::GetRefRateValueFromBloomberg(ConstantBaseRateTab
 			) RatesToDownload.append(GetValue(i));
 	}
 	if (!RatesToDownload.isEmpty()) {
-		QBloombergLib::QBbgWorker Bee;
-		QString CurrentResult;
-		QDate MinUpdateDate, CurrentUpdateDate;
-		QBloombergLib::QBbgRequest BbgReq;
-		foreach(const QString& SingleRate, RatesToDownload) {
-			BbgReq.AddRequest(SingleRate, "PX_LAST", QBloombergLib::QBbgRequest::Index);
-			//BbgReq.AddRequest(SingleRate, "PX_SETTLE_LAST_DT", "Index");
-			BbgReq.AddRequest(SingleRate, "LAST_UPDATE", QBloombergLib::QBbgRequest::Index);
-		}
-		Bee.StartRequestSync(BbgReq);
-		if (!Bee.GetRequest().HasErrors()) {
-			for (QBloombergLib::QBbgResultsIterator i = Bee.GetResultIterator(); i.IsValid(); ++i) {
-				if (!i->HasErrors()) {
-					const QBloombergLib::QSingleBbgRequest* Temp = Bee.GetRequest().FindRequest(i.ResultID());
-					if (Temp->GetField() == "PX_LAST") {
-						Values.GetValues().insert(
-							Temp->GetSecurity(),
-							i->GetDouble() / 100.0
-							);
-					}
-					else {
-						CurrentUpdateDate = i->GetDate();
-						if (MinUpdateDate.isNull() || MinUpdateDate > CurrentUpdateDate) MinUpdateDate = CurrentUpdateDate;
-					}
-				}
-				else { if (Bee.GetRequest().FindRequest(i.ResultID())->GetField() == "PX_LAST") return BloombergVector(); }
-			}
-			Values.SetUpdateDate(MinUpdateDate);
-		}
-		else return BloombergVector();
+        QBbgLib::QBbgRequestGroup BbgReq;
+        QHash<qint32, QPair<qint64, qint64> > RequestHash;
+		QDate MinUpdateDate;
+        QBbgLib::QBbgSecurity TempSecurity;
+        TempSecurity.setExtension(QBbgLib::QBbgSecurity::Index);
+        QBbgLib::QBbgReferenceDataRequest TempPriceRq, TempUpdateRq;
+        TempPriceRq.setField("PX_LAST");
+        TempUpdateRq.setField("LAST_UPDATE");
+        QPair<qint64, qint64> TempIndexPair;
+        for (int i = 0; i < RatesToDownload.size(); ++i) {
+            TempSecurity.setName(RatesToDownload.at(i));
+            TempPriceRq.setSecurity(TempSecurity);
+            TempUpdateRq.setSecurity(TempSecurity);
+            TempIndexPair.first = BbgReq.addRequest(TempPriceRq);
+            TempIndexPair.second = BbgReq.addRequest(TempUpdateRq);
+            RequestHash.insert(i, TempIndexPair);
+        }
+        QBbgLib::QBbgManager bbgMan;
+        const auto & bbgResults=bbgMan.processRequest(BbgReq);
+        const QBbgLib::QBbgReferenceDataResponse* PriceResponse;
+        const QBbgLib::QBbgReferenceDataResponse* DateResponse;
+        for (auto i = RequestHash.constBegin(); i != RequestHash.constEnd(); ++i) {
+            PriceResponse = dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(bbgResults.value(i.value().first,nullptr));
+            DateResponse = dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(bbgResults.value(i.value().second, nullptr));
+            if (Q_UNLIKELY(!PriceResponse)) 
+                return BloombergVector();
+            if (!PriceResponse->hasErrors()) {
+                Values.GetValues().insert(RatesToDownload.at(i.key()), PriceResponse->value().toDouble() / 100.0);
+                if (Q_UNLIKELY(!DateResponse))
+                    continue;
+                if (!DateResponse->hasErrors()) {
+                    if (MinUpdateDate.isNull() || MinUpdateDate > DateResponse->value().toDate()) 
+                        MinUpdateDate = DateResponse->value().toDate();
+                }
+            }
+            else {
+                return BloombergVector();
+            }
+        }
+        if(MinUpdateDate.isValid())
+            Values.SetUpdateDate(MinUpdateDate);
 	}
-	/*for (QStringList::const_iterator i = RatesToDownload.constBegin(); i != RatesToDownload.constEnd(); i++) {
-		//Avoid infinite loop if download is unsuccessful
-		if (!Values.Contains(*i)) return BloombergVector();
-	}*/
 	return CompileReferenceRateValue(Values);
 }
 BloombergVector BaseRateVector::GetRefRateValueFromBloomberg(ForwardBaseRateTable& Values)const {
@@ -220,7 +256,7 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ConstantBaseRateTable& Refe
 	if (DbOpen) {
 		QSqlQuery query(db);
 		query.setForwardOnly(true);
-		query.prepare("{CALL " + GetFromConfig("Database", "ConstBaseRatesStoredProc", "getLatestIndexPrices") + "}");
+		query.prepare("{CALL " + GetFromConfig("Database", "ConstBaseRatesStoredProc") + "}");
 		if (query.exec()) {
 			while (query.next()) {
 				if (
@@ -251,11 +287,11 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ForwardBaseRateTable& Refer
 	QMutexLocker DbLocker(&Db_Mutex);
 	QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
 	if (!db.isValid()) {
-		db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype", "QODBC"), "TwentyFourDB");
+		db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype"), "TwentyFourDB");
 		db.setDatabaseName(
-			"Driver={" + GetFromConfig("Database", "Driver", "SQL Server")
+			"Driver={" + GetFromConfig("Database", "Driver")
 			+ "}; "
-			+ GetFromConfig("Database",  "DataSource", R"(Server=SYNSERVER2\SQLExpress;Initial Catalog=ABSDB;Integrated Security=SSPI;Trusted_Connection=Yes;)")
+			+ GetFromConfig("Database",  "DataSource")
 			);
 		
 	}
@@ -264,7 +300,7 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ForwardBaseRateTable& Refer
 	if (DbOpen) {
 		QSqlQuery query(db);
 		query.setForwardOnly(true);
-		query.prepare("{CALL " + GetFromConfig("Database", "ForwardBaseRatesStoredProc", "getForwardCurveMatrix") + "}");
+		query.prepare("{CALL " + GetFromConfig("Database", "ForwardBaseRatesStoredProc") + "}");
 		if (query.exec()) {
 			QHash < QString, QHash<QDate, double> > QueryResults;
 			while (query.next()) {
@@ -295,7 +331,48 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ForwardBaseRateTable& Refer
 }
 #endif
 
-FloorCapVector BaseRateVector::ExtractFloorCapVector() const {
+int BaseRateVector::replaceValue(const QString& oldVal, BaseRateVector newVal, bool replaceFloorCaps /*= true*/)
+{
+    if (!BaseRateVector(oldVal).IsValid() || !newVal.IsValid() || !m_Vector.contains(oldVal))
+        return 0;
+    QRegExp subOld(oldVal.trimmed());
+    if (replaceFloorCaps){
+        subOld.setPattern(oldVal.trimmed()+ R"**((?:\[(?:(?:-?\d*\.?\d+)|(?:(?:-?\d*\.?\d+)?(?:,-?\d*\.?\d+)))\])?)**");
+    }
+    if (m_AnchorDate.isNull()) 
+        newVal.RemoveAnchorDate();
+    else if(newVal.GetAnchorDate().isNull())
+        newVal.SetAnchorDate(m_AnchorDate);
+    QStringList newVector;
+    QString newValue;
+    int countReplaced = 0;
+    for (qint32 i = 0; i < m_VectVal.size(); ++i){
+        if (subOld.indexIn(m_VectVal.at(i))>=0) {
+            ++countReplaced;
+            if (m_AnchorDate.isNull()) {
+                if (replaceFloorCaps)
+                    newValue = newVal.m_VectVal.at(qMin(i, newVal.m_VectVal.size() - 1));
+                else
+                    newValue = newVal.GetValue(i);
+            }
+            else {
+                newValue = newVal.GetValue(m_AnchorDate.addMonths(i));
+                if (replaceFloorCaps) {
+                    QString curCap = newVal.GetCap(m_AnchorDate.addMonths(i));
+                    QString curFloor = newVal.GetFloor(m_AnchorDate.addMonths(i));
+                    if (!(curCap.isEmpty() && curFloor.isEmpty()))
+                        newValue += QString("[%1%2%3]").arg(curFloor).arg(curCap.isEmpty() ? "" : ",").arg(curCap);
+                }
+            }
+            m_VectVal[i].replace(subOld, newValue);
+        }
+    }
+    RepackVector();
+    return countReplaced;
+}
+
+FloorCapVector BaseRateVector::ExtractFloorCapVector() const
+{
 	QString ResultStr=m_Vector;
 	for (int i = 0; i < NumElements(); i++) {
 		ResultStr.replace(

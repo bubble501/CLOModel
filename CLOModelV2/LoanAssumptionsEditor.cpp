@@ -37,6 +37,7 @@
 #include <QScrollBar>
 #include "LoanAssMatcher.h"
 #include <QProgressBar>
+#include <QCloseEvent>
 LoanAssumptionsEditor::LoanAssumptionsEditor(QWidget *parent)
 	: QWidget(parent)
 	, ActiveAssumption(nullptr)
@@ -244,12 +245,14 @@ void LoanAssumptionsEditor::CreateScenarioEditor() {
 	MezzLowerlay->addWidget(RemoveMezzAssumptionButton);
 	MezzLay->addLayout(MezzLowerlay, 2, 0, 1, 3);
 
-	QWidget* RightSection = new QWidget(this);
-	QVBoxLayout* RightLay = new QVBoxLayout(RightSection);
+	m_ScenarioEditorRightSection = new QWidget(this);
+	QVBoxLayout* RightLay = new QVBoxLayout(m_ScenarioEditorRightSection);
 	RightLay->addWidget(NamesGroup);
 	RightLay->addWidget(SeniorGroup);
 	RightLay->addWidget(MezzGroup);
-	RightSection->setMinimumWidth(400);
+	m_ScenarioEditorRightSection->setMinimumWidth(400);
+    m_ScenarioEditorRightSection->setEnabled(false);
+
 
 	QWidget* LeftSection = new QWidget(this);
 	QGridLayout* LeftLay = new QGridLayout(LeftSection);
@@ -263,7 +266,7 @@ void LoanAssumptionsEditor::CreateScenarioEditor() {
 	QSplitter* MainSplit = new QSplitter(this);
 	MainSplit->setOrientation(Qt::Horizontal);
 	MainSplit->addWidget(LeftSection);
-	MainSplit->addWidget(RightSection);
+	MainSplit->addWidget(m_ScenarioEditorRightSection);
 	MainSplit->setChildrenCollapsible(false);
 	MainSplit->setFrameShape(QFrame::Panel);
 	MainSplit->setFrameShadow(QFrame::Plain);
@@ -310,6 +313,9 @@ void LoanAssumptionsEditor::CreateScenarioEditor() {
 	mainLay->addWidget(SaveCurrentButton, 2, 4);
 	BaseTab->addTab(TempTab, tr("Scenarios Editor"));
 
+    connect(m_ScenariosModel, &QStandardItemModel::rowsInserted, [&]() {m_ScenarioEditorRightSection->setEnabled(m_ScenariosModel->rowCount() > 0); });
+    connect(m_ScenariosModel, &QStandardItemModel::rowsRemoved, [&]() {m_ScenarioEditorRightSection->setEnabled(m_ScenariosModel->rowCount() > 0); });
+    connect(m_ScenariosModel, &QStandardItemModel::modelReset, [&]() {m_ScenarioEditorRightSection->setEnabled(m_ScenariosModel->rowCount() > 0); });
 	connect(m_ScenariosModel, &QStandardItemModel::dataChanged, [&](const QModelIndex& index, const QModelIndex&) {
 		m_SortScenarios->sort(0);
 	});
@@ -409,16 +415,17 @@ void LoanAssumptionsEditor::CreateScenarioEditor() {
 		}
 		RemoveMezzAssumptionButton->setEnabled(m_MezzAsumptionsModel->rowCount() > 0);
 	});
-	connect(AddScenarioButton, &QPushButton::clicked, [&](bool) {
-		QString NewScenName = "Scenario %1";
-		{quint64 i = 1; for (; ScenExist(NewScenName.arg(i)); ++i); NewScenName = NewScenName.arg(i); }
-		m_Assumptions.insert(NewScenName, QSharedPointer<LoanAssumption>(nullptr));
-		m_DirtyAssumptions.insert(NewScenName, QSharedPointer<LoanAssumption>(new LoanAssumption(NewScenName)));
-		m_ScenariosModel->insertRow(m_ScenariosModel->rowCount());
-		m_ScenariosModel->setData(m_ScenariosModel->index(m_ScenariosModel->rowCount() - 1, 0), NewScenName, Qt::EditRole);
-		m_ScenariosModel->setData(m_ScenariosModel->index(m_ScenariosModel->rowCount() - 1, 0), RichTextDelegate::Added, Qt::UserRole);
-		m_ScenarioList->selectionModel()->setCurrentIndex(m_SortScenarios->mapFromSource(m_ScenariosModel->index(m_ScenariosModel->rowCount() - 1, 0)), QItemSelectionModel::ClearAndSelect);
-	});
+    connect(AddScenarioButton, &QPushButton::clicked, [&]() {
+        QString NewScenName = "Scenario %1";
+        {quint64 i = 1; for (; ScenExist(NewScenName.arg(i)); ++i); NewScenName = NewScenName.arg(i); }
+        m_Assumptions.insert(NewScenName, QSharedPointer<LoanAssumption>(nullptr));
+        m_DirtyAssumptions.insert(NewScenName, QSharedPointer<LoanAssumption>(new LoanAssumption(NewScenName)));
+        m_ScenariosModel->insertRow(m_ScenariosModel->rowCount());
+        m_ScenariosModel->setData(m_ScenariosModel->index(m_ScenariosModel->rowCount() - 1, 0), NewScenName, Qt::EditRole);
+        m_ScenariosModel->setData(m_ScenariosModel->index(m_ScenariosModel->rowCount() - 1, 0), RichTextDelegate::Added, Qt::UserRole);
+        m_ScenarioList->selectionModel()->setCurrentIndex(QModelIndex(), QItemSelectionModel::ClearAndSelect);
+        m_ScenarioList->selectionModel()->setCurrentIndex(m_SortScenarios->mapFromSource(m_ScenariosModel->index(m_ScenariosModel->rowCount() - 1, 0)), QItemSelectionModel::ClearAndSelect);
+    });
 	connect(RemoveScenarioButton, SIGNAL(clicked()), this, SLOT(RemoveScenario()));
 	connect(m_ScenariosModel, &QStandardItemModel::rowsInserted, [&](const QModelIndex &, int, int) {
 		RemoveScenarioButton->setEnabled(m_ScenariosModel->rowCount() > 0);
@@ -618,11 +625,11 @@ void LoanAssumptionsEditor::FillFromQuery() {
 	Db_Mutex.lock();
 	QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
 	if (!db.isValid()) {
-		db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype", "QODBC"), "TwentyFourDB");
+		db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype"), "TwentyFourDB");
 		db.setDatabaseName(
-			"Driver={" + GetFromConfig("Database", "Driver", "SQL Server")
+			"Driver={" + GetFromConfig("Database", "Driver")
 			+ "}; "
-			+ GetFromConfig("Database", "DataSource", R"(Server=SYNSERVER2\SQLExpress; Initial Catalog = ABSDB; Integrated Security = SSPI; Trusted_Connection = Yes;)")
+			+ GetFromConfig("Database", "DataSource")
 			);
 		
 	}
@@ -631,7 +638,7 @@ void LoanAssumptionsEditor::FillFromQuery() {
 	if (DbOpen) {
 		QSqlQuery LoanAssQuery(db);
 		LoanAssQuery.setForwardOnly(true);
-		LoanAssQuery.prepare("{CALL " + GetFromConfig("Database", "GetAllLoanAssumptionStoredProc", "getAllLoanAssumptions") + "}");
+		LoanAssQuery.prepare("{CALL " + GetFromConfig("Database", "GetAllLoanAssumptionStoredProc") + "}");
 		if (LoanAssQuery.exec()) {
 			bool CurrentSenior;
 			int FieldCount;
@@ -719,9 +726,18 @@ void LoanAssumptionsEditor::FillFromQuery() {
 	Db_Mutex.unlock();
 	FillScenariosModel();
 }
-
 #endif
-
+void LoanAssumptionsEditor::closeEvent(QCloseEvent * ev)
+{
+    if (m_PoolMatcher)
+        m_PoolMatcher->StopCalculation();
+    if(m_NewWatFalls)
+        m_NewWatFalls->StopCalculation();
+    if (m_NewLoans)
+        m_NewLoans->StopCalculation();
+    m_LoanPool.StopCalculation();
+    ev->accept();
+}
 void LoanAssumptionsEditor::FillScenariosModel() {
 	m_ScenariosModel->setRowCount(m_Assumptions.size());
 	int RawIndex = 0;
@@ -1126,6 +1142,7 @@ void LoanAssumptionsEditor::ChangeScenario(const QModelIndex& curr, const QModel
 	RemoveMezzAssumptionButton->setEnabled(ActiveAssumption && m_MezzAsumptionsModel->rowCount()>0);
 	RemoveAliasButton->setEnabled(ActiveAssumption && m_AliasesModel->rowCount()>0);
 	ReplaceAliasButton->setEnabled(ActiveAssumption && m_AliasesModel->rowCount()>0);
+    RemoveScenarioButton->setEnabled(m_ScenariosModel->rowCount() > 0 && ActiveAssumption);
 }
 
 void LoanAssumptionsEditor::SeniorScenarioChanged(const QModelIndex& index) {
@@ -1363,11 +1380,11 @@ void LoanAssumptionsEditor::SaveScenario(const QString& key) {
 	QMutexLocker DbLocker(&Db_Mutex);
 	QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
 	if (!db.isValid()) {
-		db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype", "QODBC"), "TwentyFourDB");
+		db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype"), "TwentyFourDB");
 		db.setDatabaseName(
-			"Driver={" + GetFromConfig("Database", "Driver", "SQL Server")
+			"Driver={" + GetFromConfig("Database", "Driver")
 			+ "}; "
-			+ GetFromConfig("Database", "DataSource", R"(Server=SYNSERVER2\SQLExpress; Initial Catalog = ABSDB; Integrated Security = SSPI; Trusted_Connection = Yes;)")
+			+ GetFromConfig("Database", "DataSource")
 			);
 		
 	}
@@ -1383,7 +1400,7 @@ void LoanAssumptionsEditor::SaveScenario(const QString& key) {
 		}
 		QSqlQuery RemoveAssQuery(db);
 		RemoveAssQuery.setForwardOnly(true);
-		RemoveAssQuery.prepare("{CALL " + GetFromConfig("Database", "RemoveLoanAssumptionStoredProc", "removeLoanAssumption(:scenarioName)") + "}");
+		RemoveAssQuery.prepare("{CALL " + GetFromConfig("Database", "RemoveLoanAssumptionStoredProc") + "}");
 		RemoveAssQuery.bindValue(":scenarioName", key);
 		if (!RemoveAssQuery.exec()) {
 			QMessageBox::critical(this, "Error", "Failed to commit changes to the database, try again later.");
@@ -1402,7 +1419,7 @@ void LoanAssumptionsEditor::SaveScenario(const QString& key) {
 	QSqlQuery SetSeniorAssQuery(db);
 	QString TmpString;
 	SetSeniorAssQuery.setForwardOnly(true);
-	SetSeniorAssQuery.prepare("{CALL " + GetFromConfig("Database", "SetLoanAssumptionStoredProc", "") + "}");
+	SetSeniorAssQuery.prepare("{CALL " + GetFromConfig("Database", "SetLoanAssumptionStoredProc") + "}");
 	SetSeniorAssQuery.bindValue(":OldScenName", key);
 	SetSeniorAssQuery.bindValue(":scenarioName", CurrAss->GetScenarioName());
 	TmpString = CurrAss->GelAliasString(); SetSeniorAssQuery.bindValue(":scanarioAlias", TmpString.isEmpty() ? QVariant(QVariant::String) : TmpString);
@@ -1428,7 +1445,7 @@ void LoanAssumptionsEditor::SaveScenario(const QString& key) {
 	}
 	QSqlQuery SetMezzAssQuery(db);
 	SetMezzAssQuery.setForwardOnly(true);
-	SetMezzAssQuery.prepare("{CALL " + GetFromConfig("Database", "SetLoanAssumptionStoredProc", "") + "}");
+	SetMezzAssQuery.prepare("{CALL " + GetFromConfig("Database", "SetLoanAssumptionStoredProc") + "}");
 	SetMezzAssQuery.bindValue(":OldScenName", key);
 	SetMezzAssQuery.bindValue(":scenarioName", CurrAss->GetScenarioName());
 	TmpString = CurrAss->GelAliasString(); SetMezzAssQuery.bindValue(":scanarioAlias", TmpString.isEmpty() ? QVariant(QVariant::String) : TmpString);
@@ -1521,11 +1538,10 @@ void LoanAssumptionsEditor::DiscardScenario(const QString& key) {
 				m_PoolModel->setData(m_PoolModel->index(j, 3), QVariant(), Qt::UserRole);
 			}
 		}
-		m_DirtyAssumptions.remove(key);
+        m_Assumptions.remove(key);
 		m_ScenariosModel->removeRow(ScenIdx.row());
-		m_Assumptions.remove(key); 
 	}
-	if (KeyIsCurrent) {
+	else if (KeyIsCurrent) {
 		ChangeScenario(m_SortScenarios->mapFromSource(CurrentIdx), m_SortScenarios->mapFromSource(CurrentIdx));
 		CheckCurrentDirty();
 		m_AliasesList->selectionModel()->setCurrentIndex(m_AliasesModel->index(m_AliasesModel->rowCount() - 1, 0), QItemSelectionModel::ClearAndSelect);
@@ -1556,7 +1572,7 @@ void LoanAssumptionsEditor::AddLoanToPool(qint32 index,Mortgage& a) {
 }
 
 void LoanAssumptionsEditor::LoadModel() {
-	QString ModelPath = QFileDialog::getOpenFileName(this, tr("Open Model"), GetFromConfig("Folders", "UnifiedResultsFolder", QString()), tr("CLO Models (*clom)"));
+	QString ModelPath = QFileDialog::getOpenFileName(this, tr("Open Model"), GetFromConfig("Folders", "UnifiedResultsFolder"), tr("CLO Models (*clom)"));
 	if (ModelPath.isNull()) return;
 	m_ModelNameLabel->setText(tr("No Model Loaded"));
 	m_PoolModel->setRowCount(0);
@@ -1709,6 +1725,7 @@ void LoanAssumptionsEditor::RemoveScenario() {
 				}
 			}
 			m_DirtyAssumptions.remove(key);
+            m_Assumptions.remove(key);
 			m_ScenariosModel->removeRow(currIdx.row());
 		}
 		else {
@@ -1725,7 +1742,7 @@ void LoanAssumptionsEditor::RemoveScenario() {
 		m_MezzDateCheck->setEnabled(ActiveAssumption);
 		m_MezzDateEdit->setEnabled(ActiveAssumption);
 	}
-	RemoveScenarioButton->setEnabled(m_ScenariosModel->rowCount() > 0);
+    RemoveScenarioButton->setEnabled(m_ScenariosModel->rowCount() > 0 && ActiveAssumption);
 }
 
 void LoanAssumptionsEditor::SetPoolModelChecks(const QModelIndex& index, const QModelIndex&) {
@@ -2202,91 +2219,100 @@ void LoanAssumptionsEditor::AdjustNewGenTableHeight() {
 	}
 }
 
-void LoanAssumptionsEditor::CreateModelScanner() {
-	m_PoolMatcher = new LoanAssMatcher(this);
+void LoanAssumptionsEditor::CreateModelScanner()
+{
+    m_PoolMatcher = new LoanAssMatcher(this);
 
-	m_ScanPoolsModel = new QStandardItemModel(this);
-	m_ScanPoolsModel->setRowCount(0);
-	m_ScanPoolsModel->setColumnCount(1);
-	m_ScannedPoolsProxy = new QSortFilterProxyModel(this);
-	m_ScannedPoolsProxy->setSourceModel(m_ScanPoolsModel);
-	m_ScannedPoolsProxy->setFilterRole(Qt::UserRole);
-	m_ScannedPoolsProxy->setFilterKeyColumn(0);
-	m_ScannedModel = new QStandardItemModel(this);
-	m_ScannedModel->setColumnCount(4);
-	m_ScannedModel->setRowCount(0);
-	m_ScannedModel->setHorizontalHeaderLabels(QStringList() << tr("Issuer") << tr("Facility") << tr("Current Scenario") << tr("Detected Scenario"));
-	m_ScannedModelProxy = new ReadOnlyColProxy(this);
-	m_ScannedModelProxy->setSourceModel(m_ScannedModel);
-	m_ScannedModelProxy->SetReadOnlyCol(QList<qint32>() << 0 << 1 << 2);
-	m_ScannedModelProxy->setFilterKeyColumn(0);
-	m_ScannedModelProxy->setFilterRole(Qt::UserRole);
+    m_ScanPoolsModel = new QStandardItemModel(this);
+    m_ScanPoolsModel->setRowCount(0);
+    m_ScanPoolsModel->setColumnCount(1);
+    m_ScannedPoolsProxy = new QSortFilterProxyModel(this);
+    m_ScannedPoolsProxy->setSourceModel(m_ScanPoolsModel);
+    m_ScannedPoolsProxy->setFilterRole(Qt::UserRole);
+    m_ScannedPoolsProxy->setFilterKeyColumn(0);
+    m_ScannedModel = new QStandardItemModel(this);
+    m_ScannedModel->setColumnCount(4);
+    m_ScannedModel->setRowCount(0);
+    m_ScannedModel->setHorizontalHeaderLabels(QStringList() << tr("Issuer") << tr("Facility") << tr("Current Scenario") << tr("Detected Scenario"));
+    m_ScannedModelProxy = new ReadOnlyColProxy(this);
+    m_ScannedModelProxy->setSourceModel(m_ScannedModel);
+    m_ScannedModelProxy->SetReadOnlyCol(QList<qint32>() << 0 << 1 << 2);
+    m_ScannedModelProxy->setFilterKeyColumn(0);
+    m_ScannedModelProxy->setFilterRole(Qt::UserRole);
 
-	m_PoolScanFilterView = new QListView(this);
-	SafeSetModel(m_PoolScanFilterView, m_SortScenarios);
-	m_PoolScanFilterView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-	m_PoolScanFilterView->setSelectionMode(QAbstractItemView::ExtendedSelection);
-	m_PoolScanFilterView->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    m_PoolScanFilterView = new QListView(this);
+    SafeSetModel(m_PoolScanFilterView, m_SortScenarios);
+    m_PoolScanFilterView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    m_PoolScanFilterView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    m_PoolScanFilterView->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
-	m_PoolScanDealsView = new QListView(this);
-	m_PoolScanDealsView->setModel(m_ScannedPoolsProxy);
-	m_PoolScanDealsView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-	m_PoolScanDealsView->setSelectionMode(QAbstractItemView::SingleSelection);
-	m_PoolScanDealsView->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+    m_PoolScanDealsView = new QListView(this);
+    m_PoolScanDealsView->setModel(m_ScannedPoolsProxy);
+    m_PoolScanDealsView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    m_PoolScanDealsView->setSelectionMode(QAbstractItemView::SingleSelection);
+    m_PoolScanDealsView->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 
-	m_PoolScanPoolView = new QTableView(this);
-	m_PoolScanPoolView->setEditTriggers(QAbstractItemView::CurrentChanged | QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
-	m_PoolScanPoolView->setSelectionMode(QAbstractItemView::SingleSelection);
-	m_PoolScanPoolView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-	m_PoolScanPoolView->horizontalHeader()->setMinimumSectionSize(70);
-	m_PoolScanPoolView->horizontalHeader()->setStretchLastSection(true);
-	m_PoolScanPoolView->verticalHeader()->hide();
-	SafeSetModel(m_PoolScanPoolView, m_ScannedModelProxy);
-
-
-	QLabel* PoolScanFilterLaber = new QLabel(this);
-	PoolScanFilterLaber->setText(tr("Filter by Scenario"));
-	QLabel* ScannedPoolLaber = new QLabel(this);
-	ScannedPoolLaber->setText(tr("Loan Pools"));
-
-	QGroupBox* LeftGroup = new QGroupBox(this);
-	LeftGroup->setTitle(tr("Models"));
-	QVBoxLayout* LeftLay = new QVBoxLayout(LeftGroup);
-	LeftLay->addWidget(PoolScanFilterLaber);
-	LeftLay->addWidget(m_PoolScanFilterView);
-	LeftLay->addWidget(ScannedPoolLaber);
-	LeftLay->addWidget(m_PoolScanDealsView);
-
-	m_ScanPoolsButton = new QPushButton(this);
-	m_ScanPoolsButton->setText(tr("Start Scan"));
-	m_ModelsDirEdit = new QLineEdit(this);
-	m_ModelsDirEdit->setText(GetFromConfig("Folders", "UnifiedResultsFolder"));
-	QLabel* ModelFolderlabel = new QLabel(this);
-	ModelFolderlabel->setText(tr("Models Folder"));
-	QPushButton *ModelsDirBrowseButton = new QPushButton(this);
-	ModelsDirBrowseButton->setText("Browse"); //Ellipsis (...)
-	ModelsDirBrowseButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
-	m_ScanProgress = new QProgressBar(this);
-	m_ScanProgress->setTextVisible(true);
-	m_ScanProgress->setRange(0, 100);
-	m_ScanProgress->hide();
-	m_ScanProgress->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    m_PoolScanPoolView = new QTableView(this);
+    m_PoolScanPoolView->setEditTriggers(QAbstractItemView::CurrentChanged | QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
+    m_PoolScanPoolView->setSelectionMode(QAbstractItemView::SingleSelection);
+    m_PoolScanPoolView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    m_PoolScanPoolView->horizontalHeader()->setMinimumSectionSize(70);
+    m_PoolScanPoolView->horizontalHeader()->setStretchLastSection(true);
+    m_PoolScanPoolView->verticalHeader()->hide();
+    SafeSetModel(m_PoolScanPoolView, m_ScannedModelProxy);
 
 
-	QHBoxLayout* BottomLay = new QHBoxLayout;
-	BottomLay->addWidget(ModelFolderlabel);
-	BottomLay->addWidget(m_ModelsDirEdit);
-	BottomLay->addWidget(ModelsDirBrowseButton);
-	BottomLay->addWidget(m_ScanPoolsButton);
+    QLabel* PoolScanFilterLaber = new QLabel(this);
+    PoolScanFilterLaber->setText(tr("Filter by Scenario"));
+    m_ClearPoolScanFilterButton = new QPushButton(this);
+    m_ClearPoolScanFilterButton->setText(tr("Clear Selection"));
+    m_ClearPoolScanFilterButton->setEnabled(false);
+    QLabel* ScannedPoolLaber = new QLabel(this);
+    ScannedPoolLaber->setText(tr("Loan Pools"));
 
-	QWidget* TempTab = new QWidget(this);
-	QGridLayout* mainLay = new QGridLayout(TempTab);
-	mainLay->addWidget(LeftGroup, 0, 0);
-	mainLay->addWidget(m_PoolScanPoolView, 0, 1);
-	mainLay->addWidget(m_ScanProgress, 1, 0);
-	mainLay->addLayout(BottomLay, 1, 1);
-	BaseTab->addTab(TempTab, tr("Scan Models"));
+    QGroupBox* LeftGroup = new QGroupBox(this);
+    LeftGroup->setTitle(tr("Models"));
+    QGridLayout* LeftLay = new QGridLayout(LeftGroup);
+    LeftLay->addWidget(PoolScanFilterLaber, 0, 0);
+    LeftLay->addWidget(m_ClearPoolScanFilterButton, 0, 1);
+    LeftLay->addWidget(m_PoolScanFilterView, 1, 0, 1, 2);
+    LeftLay->addWidget(ScannedPoolLaber, 2, 0, 1, 2);
+    LeftLay->addWidget(m_PoolScanDealsView, 3, 0, 1, 2);
 
+    m_ScanPoolsButton = new QPushButton(this);
+    m_ScanPoolsButton->setText(tr("Start Scan"));
+    m_ModelsDirEdit = new QLineEdit(this);
+    m_ModelsDirEdit->setText(GetFromConfig("Folders", "UnifiedResultsFolder"));
+    QLabel* ModelFolderlabel = new QLabel(this);
+    ModelFolderlabel->setText(tr("Models Folder"));
+    QPushButton *ModelsDirBrowseButton = new QPushButton(this);
+    ModelsDirBrowseButton->setText("Browse"); //Ellipsis (...)
+    ModelsDirBrowseButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+    m_ScanProgress = new QProgressBar(this);
+    m_ScanProgress->setTextVisible(true);
+    m_ScanProgress->setRange(0, 100);
+    m_ScanProgress->hide();
+    m_ScanProgress->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+
+
+    QHBoxLayout* BottomLay = new QHBoxLayout;
+    BottomLay->addWidget(ModelFolderlabel);
+    BottomLay->addWidget(m_ModelsDirEdit);
+    BottomLay->addWidget(ModelsDirBrowseButton);
+    BottomLay->addWidget(m_ScanPoolsButton);
+
+    QWidget* TempTab = new QWidget(this);
+    QGridLayout* mainLay = new QGridLayout(TempTab);
+    mainLay->addWidget(LeftGroup, 0, 0);
+    mainLay->addWidget(m_PoolScanPoolView, 0, 1);
+    mainLay->addWidget(m_ScanProgress, 1, 0);
+    mainLay->addLayout(BottomLay, 1, 1);
+    BaseTab->addTab(TempTab, tr("Scan Models"));
+
+    connect(m_ClearPoolScanFilterButton, &QPushButton::clicked, m_PoolScanFilterView->selectionModel(),&QItemSelectionModel::clearSelection);
+    connect(m_PoolScanFilterView->selectionModel(), &QItemSelectionModel::selectionChanged, [&](const QItemSelection& index, const QItemSelection&){
+        m_ClearPoolScanFilterButton->setEnabled(!index.isEmpty()); 
+    });
 	connect(m_PoolScanDealsView->selectionModel(), &QItemSelectionModel::currentChanged, [&](const QModelIndex& index, const QModelIndex&) {
 		if (!index.isValid()) {
 			m_ScannedModel->setRowCount(0);

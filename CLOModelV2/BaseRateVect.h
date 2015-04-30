@@ -16,7 +16,9 @@ protected:
 	virtual void UnpackVector();
 	virtual bool IsValid() const override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
+    virtual void RepackVector();
 public:
+    virtual int replaceValue(const QString& oldVal, BaseRateVector newVal, bool replaceFloorCaps = true);
 	virtual FloorCapVector ExtractFloorCapVector() const;
 	BaseRateVector(){}
 	BaseRateVector(const QString& Vec);

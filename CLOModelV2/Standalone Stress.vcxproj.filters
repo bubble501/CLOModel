@@ -89,21 +89,6 @@
     <ClInclude Include="BaseRateTable.h">
       <Filter>Header Files\Core Files</Filter>
     </ClInclude>
-    <ClInclude Include="QSingleBbgResult.h">
-      <Filter>Header Files\Core Files</Filter>
-    </ClInclude>
-    <ClInclude Include="QSingleBbgRequest.h">
-      <Filter>Header Files\Core Files</Filter>
-    </ClInclude>
-    <ClInclude Include="QProjectGlobals.h">
-      <Filter>Header Files\Core Files</Filter>
-    </ClInclude>
-    <ClInclude Include="QBbgResultsIterator.h">
-      <Filter>Header Files\Core Files</Filter>
-    </ClInclude>
-    <ClInclude Include="QBbgRequest.h">
-      <Filter>Header Files\Core Files</Filter>
-    </ClInclude>
     <ClInclude Include="GenericCashFlow.h">
       <Filter>Header Files\Core Files</Filter>
     </ClInclude>
@@ -206,9 +191,6 @@
       <Filter>Header Files\Core Files</Filter>
     </CustomBuild>
     <CustomBuild Include="WaterfallViewer.h">
-      <Filter>Header Files\Core Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="QBbgWorker.h">
       <Filter>Header Files\Core Files</Filter>
     </CustomBuild>
     <CustomBuild Include="AbstrAsyncCalculator.h">
@@ -376,27 +358,6 @@
       <Filter>Source Files\Core Files</Filter>
     </ClCompile>
     <ClCompile Include="BaseRateTable.cpp">
-      <Filter>Source Files\Core Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_QBbgWorker.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_QBbgWorker.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="QBbgRequest.cpp">
-      <Filter>Source Files\Core Files</Filter>
-    </ClCompile>
-    <ClCompile Include="QBbgResultsIterator.cpp">
-      <Filter>Source Files\Core Files</Filter>
-    </ClCompile>
-    <ClCompile Include="QBbgWorker.cpp">
-      <Filter>Source Files\Core Files</Filter>
-    </ClCompile>
-    <ClCompile Include="QSingleBbgRequest.cpp">
-      <Filter>Source Files\Core Files</Filter>
-    </ClCompile>
-    <ClCompile Include="QSingleBbgResult.cpp">
       <Filter>Source Files\Core Files</Filter>
     </ClCompile>
     <ClCompile Include="GenericCashFlow.cpp">

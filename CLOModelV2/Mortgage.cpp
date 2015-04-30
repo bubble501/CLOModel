@@ -111,11 +111,11 @@ void Mortgage::SetInterest(const QString& a){
 		 QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
 		 if (!db.isValid()) {
 			 if (!db.isValid()) {
-				 db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype", "QODBC"), "TwentyFourDB");
+				 db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype"), "TwentyFourDB");
 				 db.setDatabaseName(
-					 "Driver={" + GetFromConfig("Database", "Driver", "SQL Server")
+					 "Driver={" + GetFromConfig("Database", "Driver")
 					 + "}; "
-					 + GetFromConfig("Database", "DataSource", R"(Server=SYNSERVER2\SQLExpress; Initial Catalog = ABSDB; Integrated Security = SSPI; Trusted_Connection = Yes;)")
+					 + GetFromConfig("Database", "DataSource")
 					 );
 				 
 			 }
@@ -125,7 +125,7 @@ void Mortgage::SetInterest(const QString& a){
 		 if (DbOpen) {
 			 QSqlQuery LoanAssQuerry(db);
 			 LoanAssQuerry.setForwardOnly(true);
-			 LoanAssQuerry.prepare("{CALL " + GetFromConfig("Database", "GetLoanAssumptionStoredProc", "getLoanAssumption(:scenarioName,:isSenior)") + "}");
+			 LoanAssQuerry.prepare("{CALL " + GetFromConfig("Database", "GetLoanAssumptionStoredProc") + "}");
 			 LoanAssQuerry.bindValue(":scenarioName", GetProperty("Scenario"));
 			 LoanAssQuerry.bindValue(":isSenior", static_cast<bool>(GetProperty("Mezzanine").compare("Yes", Qt::CaseInsensitive) != 0));
 			 if (LoanAssQuerry.exec()) {

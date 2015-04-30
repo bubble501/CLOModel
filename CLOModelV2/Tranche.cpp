@@ -1,6 +1,4 @@
 #include "Tranche.h"
-#include "QBbgWorker.h"
-#include "QSingleBbgRequest.h"
 #include <boost/math/tools/roots.hpp>
 #ifndef NO_DATABASE
 #include <QSqlDatabase>
@@ -9,6 +7,13 @@
 #include <QSqlRecord>
 #include <QVariant>
 #endif
+#ifndef NO_BLOOMBERG
+#include <QBbgManager.h>
+#include <QbbgReferenceDataRequest.h>
+#include <QBbgRequestGroup.h>
+#include <QBbgReferenceDataResponse.h>
+#include <QBbgOverride.h>
+#endif // !NO_BLOOMBERG
 Tranche::Tranche()
 	: LastPaymentDate(2000, 1, 1)
 	, Currency("GBP")
@@ -120,13 +125,12 @@ void Tranche::SetExchangeRate(double a){
 }
 #ifndef NO_BLOOMBERG
 void Tranche::GetRefRateValueFromBloomberg()const{
-	ConstantBaseRateTable TempTable;
 	for (QHash<qint32, BaseRateVector*>::const_iterator i = ReferenceRate.constBegin(); i != ReferenceRate.constEnd(); ++i) {
 		if (ReferenceRateValue.contains(i.key())) {
-			(*(ReferenceRateValue[i.key()])) = i.value()->GetRefRateValueFromBloomberg(TempTable);
+            (*(ReferenceRateValue[i.key()])) = i.value()->GetRefRateValueFromBloomberg(m_CnstRateCache);
 		}
 		else {
-			ReferenceRateValue.insert(i.key(), new BloombergVector(i.value()->GetRefRateValueFromBloomberg(TempTable)));
+            ReferenceRateValue.insert(i.key(), new BloombergVector(i.value()->GetRefRateValueFromBloomberg(m_CnstRateCache)));
 		}
 	}
 	m_UseForwardCurve = false;
@@ -154,6 +158,13 @@ void Tranche::CompileReferenceRateValue(ForwardBaseRateTable& Values) const {
 	}
 	m_UseForwardCurve = true;
 }
+
+void Tranche::ClearRefRatesCache() const
+{
+    m_FrwRateCache.Clear();
+    m_CnstRateCache.Clear();
+}
+
 #ifndef NO_DATABASE
 void Tranche::GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll) const {
 	for (QHash<qint32, BaseRateVector*>::const_iterator i = ReferenceRate.constBegin(); i != ReferenceRate.constEnd(); ++i) {
@@ -181,9 +192,9 @@ void Tranche::GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAl
 void Tranche::DownloadBaseRates() const {
 	#ifndef NO_DATABASE
 		if (m_UseForwardCurve)
-			GetBaseRatesDatabase(ForwardBaseRateTable());
+            GetBaseRatesDatabase(m_FrwRateCache);
 		else
-			GetBaseRatesDatabase(ConstantBaseRateTable());
+            GetBaseRatesDatabase(m_CnstRateCache);
 	#else
 		#ifndef NO_BLOOMBERG
 			GetRefRateValueFromBloomberg();
@@ -211,9 +222,9 @@ double Tranche::GetCoupon(const QDate& index, qint32 CoupIndex , int Frequency) 
 		{
 			#ifndef NO_DATABASE
 				if (m_UseForwardCurve)
-					GetBaseRatesDatabase(ForwardBaseRateTable());
+                    GetBaseRatesDatabase(m_FrwRateCache);
 				else
-					GetBaseRatesDatabase(ConstantBaseRateTable());
+                    GetBaseRatesDatabase(m_CnstRateCache);
 			#else
 				#ifndef NO_BLOOMBERG
 					GetRefRateValueFromBloomberg();
@@ -278,82 +289,141 @@ void Tranche::SetBloombergExtension(const QString& a){
 }
 #ifndef NO_BLOOMBERG
 void Tranche::GetDataFromBloomberg() {
+    double currentDefer = 0;
 	{
-		QBloombergLib::QBbgWorker Bee;
-		QBloombergLib::QBbgRequest TempReq;
+		QBbgLib::QBbgManager Bee;
+        QBbgLib::QBbgRequestGroup ReqGr;
+		QBbgLib::QBbgReferenceDataRequest TempReq;
 		QString IdentityCode = (ISINcode.isEmpty() ? TrancheName:ISINcode);
 		if (IdentityCode.isEmpty()) return;
-		auto BdpExt = QBloombergLib::QBbgRequest::String2YellowKey(BloombergExtension);
-		TempReq.AddRequest(1, IdentityCode, "MTG_ORIG_AMT", BdpExt);
-		TempReq.AddRequest(2, IdentityCode, "AMT_OUTSTANDING", BdpExt);
-		TempReq.AddRequest(3, IdentityCode, "CRNCY", BdpExt);
-		TempReq.AddRequest(4, IdentityCode, "START_ACC_DT", BdpExt);
-		TempReq.AddRequest(5, IdentityCode, "MTG_TYP", BdpExt);
-		TempReq.AddRequest(6, IdentityCode, "FLT_SPREAD", BdpExt);
-		TempReq.AddRequest(7, IdentityCode, "RESET_IDX", BdpExt);
-		TempReq.AddRequest(8, IdentityCode, "CPN", BdpExt);
-		TempReq.AddRequest(9, IdentityCode, "CPN_FREQ", BdpExt);
-		TempReq.AddRequest(11, IdentityCode, "SETTLE_DT", BdpExt);
-		TempReq.AddRequest(12, IdentityCode, "NAME", BdpExt);
-		TempReq.AddRequest(13, IdentityCode, "ID_ISIN", BdpExt);
-		TempReq.AddRequest(14, IdentityCode, "DAY_CNT", BdpExt);
+        auto BdpExt = QBbgLib::QBbgSecurity::stringToYellowKey(BloombergExtension);
+        if (BdpExt == QBbgLib::QBbgSecurity::Invalid) return;
+        TempReq.setSecurity(QBbgLib::QBbgSecurity(IdentityCode, BdpExt));
+        TempReq.setField("MTG_ORIG_AMT"); TempReq.setID(1); ReqGr.addRequest(TempReq);
+        TempReq.setField("AMT_OUTSTANDING"); TempReq.setID(2); ReqGr.addRequest(TempReq);
+        TempReq.setField("CRNCY"); TempReq.setID(3); ReqGr.addRequest(TempReq);
+        TempReq.setField("START_ACC_DT"); TempReq.setID(4); ReqGr.addRequest(TempReq);
+        TempReq.setField("MTG_TYP"); TempReq.setID(5); ReqGr.addRequest(TempReq);
+        TempReq.setField("FLT_SPREAD"); TempReq.setID(6); ReqGr.addRequest(TempReq);
+        TempReq.setField("RESET_IDX"); TempReq.setID(7); ReqGr.addRequest(TempReq);
+        TempReq.setField("CPN"); TempReq.setID(8); ReqGr.addRequest(TempReq);
+        TempReq.setField("CPN_FREQ"); TempReq.setID(9); ReqGr.addRequest(TempReq);
+        TempReq.setField("SETTLE_DT"); TempReq.setID(11); ReqGr.addRequest(TempReq);
+        TempReq.setField("NAME"); TempReq.setID(12); ReqGr.addRequest(TempReq);
+        TempReq.setField("ID_ISIN"); TempReq.setID(13); ReqGr.addRequest(TempReq);
+        TempReq.setField("DAY_CNT"); TempReq.setID(14); ReqGr.addRequest(TempReq);
+        TempReq.setField("MTG_INT_DEFERRED"); TempReq.setID(15); ReqGr.addRequest(TempReq);
+        const auto& TmpResponse=Bee.processRequest(ReqGr);
 
-		Bee.StartRequestSync(TempReq);
-		if (Bee.GetRequest().HasErrors()) return;
+        if (TmpResponse.value(1)->hasErrors())
+            OriginalAmt = 0.0;
+        else 
+            OriginalAmt = dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(1))->value().toDouble() / ExchangeRate;
 
-		if (Bee.GetResult(1)->HasErrors()) OriginalAmt = 0.0;
-		else OutstandingAmt = Bee.GetResult(1)->GetDouble() / ExchangeRate;
+        if (TmpResponse.value(2)->hasErrors()) 
+            OutstandingAmt = 0.0;
+        else
+            OutstandingAmt = dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(2))->value().toDouble() / ExchangeRate;
 
-		if (Bee.GetResult(2)->HasErrors()) OutstandingAmt = 0.0;
-		else OutstandingAmt = Bee.GetResult(2)->GetDouble() / ExchangeRate;
+        if (TmpResponse.value(3)->hasErrors())
+            Currency = "EUR";
+        else
+            Currency = dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(3))->value().toString();
 
-		if (Bee.GetResult(3)->HasErrors()) Currency = "EUR";
-		else Currency = Bee.GetResult(3)->GetString();
+        if (TmpResponse.value(4)->hasErrors()) 
+            LastPaymentDate = QDate();
+        else 
+            LastPaymentDate = dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(4))->value().toDate();
 
-		if (Bee.GetResult(4)->HasErrors()) LastPaymentDate = QDate();
-		else LastPaymentDate = Bee.GetResult(4)->GetDate();
+        bool TempCheck = TmpResponse.value(6)->hasErrors();
+        if (!TempCheck)
+            TempCheck = !(dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(5))->value().toString().contains("FLT"));
+        if (!TempCheck) {
+            if (TmpResponse.value(6)->hasErrors()) { 
+                if (Coupon.contains(0)) 
+                    *(Coupon[0]) = ""; 
+                else 
+                    Coupon.insert(0, new BloombergVector()); 
+            }
+			else { 
+                if (Coupon.contains(0)) 
+                    *(Coupon[0]) = dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(6))->value().toString();
+                else 
+                    Coupon.insert(0, new BloombergVector(dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(6))->value().toString()));
+            }
 
-        if (Bee.GetResult(5)->GetString().contains("FLT")) {
-			if (Bee.GetResult(6)->HasErrors()) { if (Coupon.contains(0)) *(Coupon[0]) = ""; else Coupon.insert(0, new BloombergVector()); }
-			else { if (Coupon.contains(0)) *(Coupon[0]) = Bee.GetResult(6)->GetString(); else Coupon.insert(0, new BloombergVector(Bee.GetResult(6)->GetString())); }
-
-			if (Bee.GetResult(7)->HasErrors()) { if (ReferenceRate.contains(0)) *(ReferenceRate[0]) = ""; else ReferenceRate.insert(0, new BaseRateVector()); }
+            if (TmpResponse.value(7)->hasErrors()) { 
+                if (ReferenceRate.contains(0))
+                    *(ReferenceRate[0]) = ""; 
+                else 
+                    ReferenceRate.insert(0, new BaseRateVector());
+            }
 			else {
-				if (ReferenceRate.contains(0)) *(ReferenceRate[0]) = Bee.GetResult(7)->GetString(); else ReferenceRate.insert(0, new BaseRateVector(Bee.GetResult(7)->GetString()));
-				if (ReferenceRate.contains(-1)) *(ReferenceRate[-1]) = Bee.GetResult(7)->GetString(); else ReferenceRate.insert(-1, new BaseRateVector(Bee.GetResult(7)->GetString()));
+                if (ReferenceRate.contains(0)) 
+                    *(ReferenceRate[0]) = dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(7))->value().toString(); 
+                else 
+                    ReferenceRate.insert(0, new BaseRateVector(dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(7))->value().toString()));
+                if (ReferenceRate.contains(-1))
+                    *(ReferenceRate[-1]) = dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(7))->value().toString(); 
+                else
+                    ReferenceRate.insert(-1, new BaseRateVector(dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(7))->value().toString()));
 			}
 		}
 		else {
-			if (Bee.GetResult(8)->HasErrors()) { if (Coupon.contains(0)) *(Coupon[0]) = ""; else Coupon.insert(0, new BloombergVector()); }
-			else { if (Coupon.contains(0)) *(Coupon[0]) = QString("%1").arg(Bee.GetResult(8)->GetDouble()*100.0); else Coupon.insert(0, new BloombergVector(QString("%1").arg(Bee.GetResult(8)->GetDouble()*100.0))); }
+            if (TmpResponse.value(8)->hasErrors()) {
+                if (Coupon.contains(0)) 
+                    *(Coupon[0]) = ""; 
+                else 
+                    Coupon.insert(0, new BloombergVector()); 
+            }
+			else { 
+                if (Coupon.contains(0))
+                    *(Coupon[0]) = QString("%1").arg(dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(8))->value().toDouble()*100.0);
+                else 
+                    Coupon.insert(0, new BloombergVector(QString("%1").arg(dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(8))->value().toDouble()*100.0)));
+            }
 
 
 			QString DeafultRefRateString;
-			if (!Bee.GetResult(9)->HasErrors()) {
-				if (Currency == "EUR")DeafultRefRateString = "EUR";
-				else if (Currency == "GBP")DeafultRefRateString = "BP";
-				else if (Currency == "USD")DeafultRefRateString = "US";
+            if (!TmpResponse.value(9)->hasErrors()) {
+				if (Currency == "EUR")
+                    DeafultRefRateString = "EUR";
+				else if (Currency == "GBP")
+                    DeafultRefRateString = "BP";
+				else if (Currency == "USD")
+                    DeafultRefRateString = "US";
 				if (!DeafultRefRateString.isEmpty())
 					DeafultRefRateString +=
 					QString("%1M")
-					.arg(static_cast<int>(12.0 / Bee.GetResult(9)->GetDouble()), 6 - DeafultRefRateString.size(), 10, QChar('0'));
+                    .arg(static_cast<int>(12.0 / dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(9))->value().toDouble()), 6 - DeafultRefRateString.size(), 10, QChar('0'));
 			}
-			if (ReferenceRate.contains(-1)) *(ReferenceRate[-1]) = DeafultRefRateString; else ReferenceRate.insert(-1, new BaseRateVector(DeafultRefRateString));
+			if (ReferenceRate.contains(-1)) 
+                *(ReferenceRate[-1]) = DeafultRefRateString; 
+            else 
+                ReferenceRate.insert(-1, new BaseRateVector(DeafultRefRateString));
 		}
 
-		if (Bee.GetResult(9)->HasErrors()) PaymentFrequency = "";
-		else PaymentFrequency = QString("%1").arg(static_cast<int>(12.0 / Bee.GetResult(9)->GetDouble()));
+        if (TmpResponse.value(9)->hasErrors()) 
+            PaymentFrequency = "";
+        else 
+            PaymentFrequency = QString("%1").arg(static_cast<int>(12.0 / dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(9))->value().toDouble()));
 
-		if (Bee.GetResult(11)->HasErrors()) SettlementDate = QDate();
-		else SettlementDate = Bee.GetResult(11)->GetDate();
+        if (TmpResponse.value(11)->hasErrors()) 
+            SettlementDate = QDate();
+        else 
+            SettlementDate = dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(11))->value().toDate();
 
-		if (Bee.GetResult(12)->HasErrors()) TrancheName = "";
-		else TrancheName = Bee.GetResult(12)->GetString();
+        if (TmpResponse.value(12)->hasErrors()) 
+            TrancheName = "";
+        else 
+            TrancheName = dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(12))->value().toString();
 
-		if (Bee.GetResult(13)->HasErrors()) ISINcode = "";
-		else ISINcode = Bee.GetResult(13)->GetString();
+        if (TmpResponse.value(13)->hasErrors()) 
+            ISINcode = "";
+        else 
+            ISINcode = dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(13))->value().toString();
 
-        if (Bee.GetResult(14)->HasErrors()) {
+        if (TmpResponse.value(14)->hasErrors()) {
             if (m_DayCount.contains(0))
                 m_DayCount[0]->operator=(QString::number(static_cast<qint16>(DayCountConvention::ACT360)));
             else
@@ -361,32 +431,35 @@ void Tranche::GetDataFromBloomberg() {
         }
         else {
             if (m_DayCount.contains(0))
-                m_DayCount[0]->operator=(Bee.GetResult(14)->GetString());
+                m_DayCount[0]->operator=(dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(14))->value().toString());
             else
-                m_DayCount.insert(0, new DayCountVector(Bee.GetResult(14)->GetString()));
+                m_DayCount.insert(0, new DayCountVector(dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(14))->value().toString()));
+        }
+        if (!TmpResponse.value(15)->hasErrors()) {
+            currentDefer = dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(15))->value().toDouble();
         }
 	}
 	DownloadBaseRates();
 	GetCashFlowsFromBloomberg();
 	CashFlow.SetInitialOutstanding(OutstandingAmt);
+    CashFlow.SetStartingDeferredInterest(currentDefer, 0);
 }
-void Tranche::GetCashFlowsFromBloomberg() {
+void Tranche::GetCashFlowsFromBloomberg(bool useFwdRates)
+{
 	CashFlow.Clear();
-	QBloombergLib::QBbgWorker Bee;
-	QBloombergLib::QBbgRequest TempReq;
-	QString IdentityCode = (ISINcode.isEmpty() ? TrancheName : ISINcode);
-	if (IdentityCode.isEmpty()) return;
-	QBloombergLib::Overrides Ovr;
+    QBbgLib::QBbgSecurity TempSecurity(ISINcode.isEmpty() ? TrancheName : ISINcode, QBbgLib::QBbgSecurity::stringToYellowKey(BloombergExtension));
+    if (TempSecurity.name().isEmpty() || TempSecurity.extension() == QBbgLib::QBbgSecurity::Invalid) return;
+    QBbgLib::QBbgOverride Ovr;
 #ifndef NO_DATABASE
 	Db_Mutex.lock();
 	{
 		QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
 		if (!db.isValid()) {
-			db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype", "QODBC"), "TwentyFourDB");
+			db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype"), "TwentyFourDB");
 			db.setDatabaseName(
-				"Driver={" + GetFromConfig("Database", "Driver", "SQL Server")
+				"Driver={" + GetFromConfig("Database", "Driver")
 				+ "}; "
-				+ GetFromConfig("Database", "DataSource", R"(Server=SYNSERVER2\SQLExpress; Initial Catalog = ABSDB; Integrated Security = SSPI; Trusted_Connection = Yes;)")
+				+ GetFromConfig("Database", "DataSource")
 				);
 			
 		}
@@ -402,7 +475,7 @@ void Tranche::GetCashFlowsFromBloomberg() {
 					auto GetPrepaySpeedRecord = GetPrepaySpeedQuery.record();
 					for (int RecIter = 0; RecIter < GetPrepaySpeedRecord.count(); ++RecIter) {
 						if (GetPrepaySpeedRecord.value(RecIter).toString().isEmpty()) continue;
-						Ovr[GetPrepaySpeedRecord.fieldName(RecIter)] = GetPrepaySpeedRecord.value(RecIter).toString();
+                        Ovr.setOverride(GetPrepaySpeedRecord.fieldName(RecIter), GetPrepaySpeedRecord.value(RecIter).toString());
 					}
 				}
 			}
@@ -410,39 +483,28 @@ void Tranche::GetCashFlowsFromBloomberg() {
 	}
 	Db_Mutex.unlock();
 #endif // !NO_DATABASE
-	QString FieldName;
-	auto BdpExt = QBloombergLib::QBbgRequest::String2YellowKey(BloombergExtension);
-	switch (BdpExt) {
-	case QBloombergLib::QBbgRequest::Invalid: return;
-		break;
-	case QBloombergLib::QBbgRequest::Govt: FieldName = "DES_CASH_FLOW";
-		break;
-	case QBloombergLib::QBbgRequest::Corp: FieldName = "DES_CASH_FLOW";
-		break;
-	case QBloombergLib::QBbgRequest::Mtge: FieldName = "MTG_CASH_FLOW";
-		break;
-	case QBloombergLib::QBbgRequest::MMkt: return;
-		break;
-	case QBloombergLib::QBbgRequest::Muni: FieldName = "DES_CASH_FLOW";
-		break;
-	case QBloombergLib::QBbgRequest::Pfd: FieldName = "DES_CASH_FLOW";
-		break;
-	case QBloombergLib::QBbgRequest::Equity: return;
-		break;
-	case QBloombergLib::QBbgRequest::Comdty: return;
-		break;
-	case QBloombergLib::QBbgRequest::Index: return;
-		break;
-	case QBloombergLib::QBbgRequest::Curncy: return;
-		break;
-	default:
-		break;
-	}
-	TempReq.AddRequest(1, IdentityCode, FieldName, Ovr, BdpExt);
-	Bee.StartRequestSync(TempReq);
-	if (Bee.GetRequest().HasErrors()) return;
-	if (Bee.GetResult(1)->HasErrors()) return;
-	CashFlow.GetCashFlowsBloomberg(*Bee.GetResult(1));
+    Ovr.setOverride("APPLY_FWD_RATE", useFwdRates ? "Y" : "N");
+    QBbgLib::QBbgRequestGroup TempReq;
+    QBbgLib::QBbgReferenceDataRequest SingleRq;
+    SingleRq.setSecurity(TempSecurity);
+    SingleRq.setOverrides(Ovr);
+    SingleRq.setField("MTG_CASH_FLOW");
+    SingleRq.setID(1);
+    TempReq.addRequest(SingleRq);
+    SingleRq.setField("DES_CASH_FLOW");
+    SingleRq.setID(2);
+    TempReq.addRequest(SingleRq);
+    QBbgLib::QBbgManager bbgMan;
+    const auto& Results=bbgMan.processRequest(TempReq);
+    if (Results.value(1, nullptr)) {
+        if (CashFlow.GetCashFlowsBloomberg(Results.value(1)))
+                return;
+        if (Results.value(2, nullptr)){
+            if(CashFlow.GetCashFlowsBloomberg(Results.value(2)))
+                return;
+        }
+        return CashFlow.Clear();
+    }
 }
 #endif
 double Tranche::GetLossRate() const{
@@ -472,19 +534,17 @@ double Tranche::GetDiscountMargin(double NewPrice)const{
 		FlowsDates.append(TempDate);
 		FlowsValues.append(CashFlow.GetTotalFlow(i));
 	}
-	BloombergVector* ApplicableRate = ReferenceRateValue.value(0, ReferenceRateValue.value(-1, nullptr));
-	if (!ApplicableRate) {
-		DownloadBaseRates();
-		ApplicableRate = ReferenceRateValue.value(0, ReferenceRateValue.value(-1, nullptr));
-		if (!ApplicableRate) return 0.0;
-	}
-	if (ApplicableRate->IsEmpty()) {
-		DownloadBaseRates();
-		ApplicableRate = ReferenceRateValue.value(0, ReferenceRateValue.value(-1, nullptr));
-        if (!ApplicableRate) return 0.0;
-		if (ApplicableRate->IsEmpty()) return 0.0;
-	}
-    return qMax(0.0, CalculateDM(FlowsDates, FlowsValues, *ApplicableRate, *(m_DayCount.value(0))));
+    Q_ASSERT(ReferenceRate.contains(-1));
+    BaseRateVector ApplicableRate = *(ReferenceRate.value(0, ReferenceRate.value(-1)));
+    ApplicableRate.replaceValue("ZERO", *ReferenceRate.value(-1));
+    BloombergVector ApplicableRateValue;
+    if(m_UseForwardCurve)
+        ApplicableRateValue = ApplicableRate.GetBaseRatesDatabase(m_FrwRateCache);
+    else
+        ApplicableRateValue = ApplicableRate.GetBaseRatesDatabase(m_CnstRateCache);
+    if (ApplicableRateValue.IsEmpty()) 
+         return 0.0;
+    return qMax(0.0, CalculateDM(FlowsDates, FlowsValues, ApplicableRateValue, *(m_DayCount.value(0))));
 }
 double Tranche::GetIRR() const {return GetIRR(Price);}
 double Tranche::GetIRR(double NewPrice)const{

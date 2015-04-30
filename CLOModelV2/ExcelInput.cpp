@@ -466,11 +466,16 @@ double __stdcall CLOReturnRate(LPSAFEARRAY *ArrayData){
 		out >> TempWaterfall;
 	}
 	file.close();
-	const Tranche* TranchPoint=TempWaterfall.GetTranche(TrancheName);
-	if(!TranchPoint){
-		return 0.0;
-	}
-	return TranchPoint->GetIRR(NewPrice);
+    if (TempWaterfall.GetTranchesCount() == 0)
+        return 0.0;
+    char *argv[] = { "NoArgumnets" };
+    int argc = sizeof(argv) / sizeof(char*) - 1;
+    QApplication ComputationLoop(argc, argv);
+	const Tranche* const TranchPoint=TempWaterfall.GetTranche(TrancheName);
+    ComputationLoop.quit();
+	if(Q_LIKELY(TranchPoint))
+        return TranchPoint->GetIRR(NewPrice);
+	return 0.0;
 }
 double __stdcall CLODiscountMargin(LPSAFEARRAY *ArrayData){
 	VARIANT HUGEP *pdFreq;
@@ -510,11 +515,16 @@ double __stdcall CLODiscountMargin(LPSAFEARRAY *ArrayData){
 		TempWaterfall.SetLoadProtocolVersion(VersionChecker);
 		out >> TempWaterfall;
 	}
-	file.close();
-	const Tranche* TranchPoint=TempWaterfall.GetTranche(TrancheName);
-	if(TranchPoint){
+    file.close();
+    if (TempWaterfall.GetTranchesCount() == 0)
+        return 0.0;
+    char *argv[] = { "NoArgumnets" };
+    int argc = sizeof(argv) / sizeof(char*) - 1;
+    QApplication ComputationLoop(argc, argv);
+	const Tranche* const TranchPoint=TempWaterfall.GetTranche(TrancheName);
+    ComputationLoop.quit();
+	if(Q_LIKELY(TranchPoint))
 		return TranchPoint->GetDiscountMargin(NewPrice);
-	}
 	return 0.0;
 }
 double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
@@ -533,7 +543,7 @@ double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
 	QFile file(Filename);
 	bool UsingClom = false;
 	if (!file.exists()){
-		file.setFileName(GetFromConfig("Folders", "UnifiedResultsFolder", R"(\\synserver2\Company Share\24AM\Monitoring\Model Results)") + '\\' + DealName + ".clom");
+		file.setFileName(GetFromConfig("Folders", "UnifiedResultsFolder") + '\\' + DealName + ".clom");
 		if (!file.exists())return 0.0;
 		UsingClom = true;
 	}
@@ -554,10 +564,16 @@ double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
 		out >> TempWaterfall;
 	}
 	file.close();
-	const Tranche* TranchPoint=TempWaterfall.GetTranche(TrancheName);
-	if(!TranchPoint) return 0.0;
-	Tranche TempTranche(*TranchPoint);
-	return TempTranche.GetWALife(/*StartDate*/);
+    if (TempWaterfall.GetTranchesCount() == 0)
+        return 0.0;
+    char *argv[] = { "NoArgumnets" };
+    int argc = sizeof(argv) / sizeof(char*) - 1;
+    QApplication ComputationLoop(argc, argv);
+	const Tranche* const TranchPoint=TempWaterfall.GetTranche(TrancheName);
+    ComputationLoop.quit();
+	if(Q_LIKELY(TranchPoint)) 
+        return TranchPoint->GetWALife(/*StartDate*/);
+    return 0.0;
 }
 double __stdcall GetStressLoss(LPSAFEARRAY *ArrayData) {
 	QString FolderPath;
@@ -584,7 +600,11 @@ double __stdcall GetStressLoss(LPSAFEARRAY *ArrayData) {
 	FolderPath += "StressResult.fcsr";
 	if (!QFile::exists(FolderPath)) { LOGDEBUG("Returned -1"); return -1.0; }
 	Waterfall TempRes = StressTest::GetScenarioFromFile(FolderPath, CPRscenario, CDRscenario, LSscenario, RecLagScenario, DelinqScenario, DelinqLagScenario);
-	const Tranche* Result = TempRes.GetTranche(TrancheName);
+    char *argv[] = { "NoArgumnets" };
+    int argc = sizeof(argv) / sizeof(char*) - 1;
+    QApplication ComputationLoop(argc, argv);
+	const Tranche* const Result = TempRes.GetTranche(TrancheName);
+    ComputationLoop.quit();
 	if (Result)
 		return Result->GetLossRate();
 	return -1.0;
@@ -616,7 +636,11 @@ double __stdcall GetStressDM(LPSAFEARRAY *ArrayData) {
 	FolderPath += "StressResult.fcsr";
 	if (!QFile::exists(FolderPath)) { return 0.0; }
 	Waterfall TempRes = StressTest::GetScenarioFromFile(FolderPath, CPRscenario, CDRscenario, LSscenario, RecLagScenario, DelinqScenario, DelinqLagScenario);
-	const Tranche* Result = TempRes.GetTranche(TrancheName);
+    char *argv[] = { "NoArgumnets" };
+    int argc = sizeof(argv) / sizeof(char*) - 1;
+    QApplication ComputationLoop(argc, argv);
+    const Tranche* const Result = TempRes.GetTranche(TrancheName);
+    ComputationLoop.quit();
 	if (Result)
 		return Result->GetDiscountMargin(NewPrice);
 	return 0.0;

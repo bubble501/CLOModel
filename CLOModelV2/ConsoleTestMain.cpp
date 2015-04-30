@@ -14,8 +14,6 @@
 #include "BloombergVector.h"
 #include "BaseRateVect.h"
 #include "BaseRateTable.h"
-#include "QBbgRequest.h"
-#include "QBbgWorker.h"
 #include <QTime>
 #include <QTextStream>
 #include "DateTrigger.h"
@@ -32,11 +30,10 @@
 #include <QIcon>
 
 int main(int argc, char *argv[]) {
-
+    
 	//QApplication a(argc, argv);
 	//ConsoleTestObj b;
 	//return a.exec();
-
 
 	/*QApplication a(argc, argv);
 	LoanAssumptionsEditor b;
@@ -82,10 +79,10 @@ int main(int argc, char *argv[]) {
 		).GetTranche("HARVT 10X A"));
 	return a.exec();
 	*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
+    QApplication a(argc, argv);
 	Waterfall TempWtf, TempCallWaterfall;
 	MtgCalculator TempMtg;
-	QFile file("Z:/24AM/Monitoring/Model Results/ALBA 2015-1.clom");
+	QFile file("Z:/24AM/Monitoring/Model Results/OHECP III.clom");
 	file.open(QIODevice::ReadOnly);
 	qint32 VersionChecker;
 	QDataStream out(&file);
@@ -100,13 +97,14 @@ int main(int argc, char *argv[]) {
 	{bool Junk; out >> Junk; }
 	TempWtf.SetLoadProtocolVersion(VersionChecker);
 	out >> TempWtf;
-	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
-	out >> TempCallWaterfall;
-	TempMtg.SetLoadProtocolVersion(VersionChecker);
-	out >> TempMtg;
+//	TempCallWaterfall.SetLoadProtocolVersion(VersionChecker);
+// 	out >> TempCallWaterfall;
+// 	TempMtg.SetLoadProtocolVersion(VersionChecker);
+// 	out >> TempMtg;
 	file.close();
+    TempWtf.SetUseCall(true);
+    TempWtf.SetupReinvBond("4.6", "20", "0 12S 3", "35", "6.5 24S 6.5 24R 4 48R 0", "3", "I", "99.80 12S 100", "0", "6", "EUR003M");
 	TempWtf.CalculateTranchesCashFlows();
-	
 	//PrintToTempFile("Class F Flows", TempWtf.GetTranche("DRYD 15-35X F")->GetCashFlow().ToPlainText(), false);
 // 	QApplication a(argc, argv);
 // 	TempMtg.DownloadScenarios();

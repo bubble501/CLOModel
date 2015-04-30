@@ -94,7 +94,32 @@ QDataStream& BaseRateVector::LoadOldVersion(QDataStream& stream) {
 	ResetProtocolVersion();
 	return stream;
 }
-BloombergVector BaseRateVector::CompileReferenceRateValue(ForwardBaseRateTable& Values) const {
+
+void BaseRateVector::RepackVector()
+{
+    QString newVector;
+    QString lastUsed;
+    int stepCounter = 1;
+    for (auto i = m_VectVal.constBegin(); i != m_VectVal.constEnd(); ++i) {
+        if (lastUsed.isEmpty()) {
+            lastUsed = *i;
+            newVector.append(lastUsed);
+        }
+        else if (*i==lastUsed) {
+            ++stepCounter;
+        }
+        else {
+            newVector += QString(" %1S %2").arg(stepCounter).arg(*i);
+            lastUsed = *i;
+            stepCounter = 1;
+        }
+    }
+    m_Vector = newVector;
+    Q_ASSERT(IsValid());
+}
+
+BloombergVector BaseRateVector::CompileReferenceRateValue(ForwardBaseRateTable& Values) const
+{
 	BloombergVector Result;
 	if (IsEmpty()) return Result;
 	QStringList StringParts = m_Vector.trimmed().toUpper().split(QRegExp("\\s"), QString::SkipEmptyParts);
@@ -306,7 +331,48 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ForwardBaseRateTable& Refer
 }
 #endif
 
-FloorCapVector BaseRateVector::ExtractFloorCapVector() const {
+int BaseRateVector::replaceValue(const QString& oldVal, BaseRateVector newVal, bool replaceFloorCaps /*= true*/)
+{
+    if (!BaseRateVector(oldVal).IsValid() || !newVal.IsValid() || !m_Vector.contains(oldVal))
+        return 0;
+    QRegExp subOld(oldVal.trimmed());
+    if (replaceFloorCaps){
+        subOld.setPattern(oldVal.trimmed()+ R"**((?:\[(?:(?:-?\d*\.?\d+)|(?:(?:-?\d*\.?\d+)?(?:,-?\d*\.?\d+)))\])?)**");
+    }
+    if (m_AnchorDate.isNull()) 
+        newVal.RemoveAnchorDate();
+    else if(newVal.GetAnchorDate().isNull())
+        newVal.SetAnchorDate(m_AnchorDate);
+    QStringList newVector;
+    QString newValue;
+    int countReplaced = 0;
+    for (qint32 i = 0; i < m_VectVal.size(); ++i){
+        if (subOld.indexIn(m_VectVal.at(i))>=0) {
+            ++countReplaced;
+            if (m_AnchorDate.isNull()) {
+                if (replaceFloorCaps)
+                    newValue = newVal.m_VectVal.at(qMin(i, newVal.m_VectVal.size() - 1));
+                else
+                    newValue = newVal.GetValue(i);
+            }
+            else {
+                newValue = newVal.GetValue(m_AnchorDate.addMonths(i));
+                if (replaceFloorCaps) {
+                    QString curCap = newVal.GetCap(m_AnchorDate.addMonths(i));
+                    QString curFloor = newVal.GetFloor(m_AnchorDate.addMonths(i));
+                    if (!(curCap.isEmpty() && curFloor.isEmpty()))
+                        newValue += QString("[%1%2%3]").arg(curFloor).arg(curCap.isEmpty() ? "" : ",").arg(curCap);
+                }
+            }
+            m_VectVal[i].replace(subOld, newValue);
+        }
+    }
+    RepackVector();
+    return countReplaced;
+}
+
+FloorCapVector BaseRateVector::ExtractFloorCapVector() const
+{
 	QString ResultStr=m_Vector;
 	for (int i = 0; i < NumElements(); i++) {
 		ResultStr.replace(

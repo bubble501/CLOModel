@@ -13,6 +13,8 @@
 #include "Seniority.h"
 class  Tranche : public BackwardInterface {
 private:
+    mutable ForwardBaseRateTable m_FrwRateCache;
+    mutable ConstantBaseRateTable m_CnstRateCache;
     QHash<qint32, DayCountVector*> m_DayCount;
 	QString ISINcode;
 	QString TrancheName;
@@ -118,6 +120,7 @@ public:
 	bool GetUseForwardCurve() const { return m_UseForwardCurve; }
 	void CompileReferenceRateValue(ConstantBaseRateTable& Values)const;
 	void CompileReferenceRateValue(ForwardBaseRateTable& Values)const;
+    void ClearRefRatesCache() const;
 	bool HasCoupon(qint32 CoupIdx) const;
 #ifndef NO_DATABASE
 	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll = false)const;

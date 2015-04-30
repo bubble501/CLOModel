@@ -125,13 +125,12 @@ void Tranche::SetExchangeRate(double a){
 }
 #ifndef NO_BLOOMBERG
 void Tranche::GetRefRateValueFromBloomberg()const{
-	ConstantBaseRateTable TempTable;
 	for (QHash<qint32, BaseRateVector*>::const_iterator i = ReferenceRate.constBegin(); i != ReferenceRate.constEnd(); ++i) {
 		if (ReferenceRateValue.contains(i.key())) {
-			(*(ReferenceRateValue[i.key()])) = i.value()->GetRefRateValueFromBloomberg(TempTable);
+            (*(ReferenceRateValue[i.key()])) = i.value()->GetRefRateValueFromBloomberg(m_CnstRateCache);
 		}
 		else {
-			ReferenceRateValue.insert(i.key(), new BloombergVector(i.value()->GetRefRateValueFromBloomberg(TempTable)));
+            ReferenceRateValue.insert(i.key(), new BloombergVector(i.value()->GetRefRateValueFromBloomberg(m_CnstRateCache)));
 		}
 	}
 	m_UseForwardCurve = false;
@@ -159,6 +158,13 @@ void Tranche::CompileReferenceRateValue(ForwardBaseRateTable& Values) const {
 	}
 	m_UseForwardCurve = true;
 }
+
+void Tranche::ClearRefRatesCache() const
+{
+    m_FrwRateCache.Clear();
+    m_CnstRateCache.Clear();
+}
+
 #ifndef NO_DATABASE
 void Tranche::GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll) const {
 	for (QHash<qint32, BaseRateVector*>::const_iterator i = ReferenceRate.constBegin(); i != ReferenceRate.constEnd(); ++i) {
@@ -186,9 +192,9 @@ void Tranche::GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAl
 void Tranche::DownloadBaseRates() const {
 	#ifndef NO_DATABASE
 		if (m_UseForwardCurve)
-			GetBaseRatesDatabase(ForwardBaseRateTable());
+            GetBaseRatesDatabase(m_FrwRateCache);
 		else
-			GetBaseRatesDatabase(ConstantBaseRateTable());
+            GetBaseRatesDatabase(m_CnstRateCache);
 	#else
 		#ifndef NO_BLOOMBERG
 			GetRefRateValueFromBloomberg();
@@ -216,9 +222,9 @@ double Tranche::GetCoupon(const QDate& index, qint32 CoupIndex , int Frequency) 
 		{
 			#ifndef NO_DATABASE
 				if (m_UseForwardCurve)
-					GetBaseRatesDatabase(ForwardBaseRateTable());
+                    GetBaseRatesDatabase(m_FrwRateCache);
 				else
-					GetBaseRatesDatabase(ConstantBaseRateTable());
+                    GetBaseRatesDatabase(m_CnstRateCache);
 			#else
 				#ifndef NO_BLOOMBERG
 					GetRefRateValueFromBloomberg();
@@ -528,19 +534,17 @@ double Tranche::GetDiscountMargin(double NewPrice)const{
 		FlowsDates.append(TempDate);
 		FlowsValues.append(CashFlow.GetTotalFlow(i));
 	}
-	BloombergVector* ApplicableRate = ReferenceRateValue.value(0, ReferenceRateValue.value(-1, nullptr));
-	if (!ApplicableRate) {
-		DownloadBaseRates();
-		ApplicableRate = ReferenceRateValue.value(0, ReferenceRateValue.value(-1, nullptr));
-		if (!ApplicableRate) return 0.0;
-	}
-	if (ApplicableRate->IsEmpty()) {
-		DownloadBaseRates();
-		ApplicableRate = ReferenceRateValue.value(0, ReferenceRateValue.value(-1, nullptr));
-        if (!ApplicableRate) return 0.0;
-		if (ApplicableRate->IsEmpty()) return 0.0;
-	}
-    return qMax(0.0, CalculateDM(FlowsDates, FlowsValues, *ApplicableRate, *(m_DayCount.value(0))));
+    Q_ASSERT(ReferenceRate.contains(-1));
+    BaseRateVector ApplicableRate = *(ReferenceRate.value(0, ReferenceRate.value(-1)));
+    ApplicableRate.replaceValue("ZERO", *ReferenceRate.value(-1));
+    BloombergVector ApplicableRateValue;
+    if(m_UseForwardCurve)
+        ApplicableRateValue = ApplicableRate.GetBaseRatesDatabase(m_FrwRateCache);
+    else
+        ApplicableRateValue = ApplicableRate.GetBaseRatesDatabase(m_CnstRateCache);
+    if (ApplicableRateValue.IsEmpty()) 
+         return 0.0;
+    return qMax(0.0, CalculateDM(FlowsDates, FlowsValues, ApplicableRateValue, *(m_DayCount.value(0))));
 }
 double Tranche::GetIRR() const {return GetIRR(Price);}
 double Tranche::GetIRR(double NewPrice)const{

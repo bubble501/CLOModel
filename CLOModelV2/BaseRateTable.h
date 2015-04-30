@@ -18,6 +18,7 @@ public:
 	virtual void SetUpdateDate(const QDate& val) { UpdateDate = val; }
 	virtual bool Contains(const QString& key) const = 0;
 	virtual QList<QString> GetAvailableKeys() const = 0;
+    virtual void Clear() = 0;
 };
 class ConstantBaseRateTable : public AbstractBaseRateTable {
 public:
@@ -37,6 +38,7 @@ public:
 	virtual double GetValue(const QString& key) const { return Values.value(key, -1.0); }
 	virtual void SetValue(const QString& key, double a) { Values[key] = a; }
 	virtual QList<QString> GetAvailableKeys() const override { return Values.keys(); }
+    virtual void Clear() override { Values.clear(); SetUpdateDate(QDate()); }
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 private:
@@ -64,6 +66,7 @@ public:
 	virtual void SetValue(const QString& key, const BloombergVector& a) { if (!a.IsEmpty()) Values[key] = a; }
 	virtual void SetValue(const QString& key, const QList<QDate>& RefDates, const QList<double>& Refvals) { SetValue(key, BloombergVector(RefDates, Refvals)); }
 	virtual QList<QString> GetAvailableKeys() const override{ return Values.keys(); }
+    virtual void Clear() override { Values.clear(); SetUpdateDate(QDate()); }
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 private:

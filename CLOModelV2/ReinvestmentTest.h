@@ -20,7 +20,7 @@ public:
 	const IntegerVector& GetReinvDelay()const { return m_ReinvestmentDelay; }
 	const BloombergVector& GetReinvPrice()const { return ReinvestmentPrice; }
 	void ClearFlows() { m_Reinvested.Clear(); ReinvestmentBond.ResetFlows(); }
-	double GetQueuedCash(QDate StartDate=QDate()) const;
+	double GetQueuedCash(QDate StartDate) const;
 	bool ReinvestQueueueEmpty() const { return ReinvestQueue.isEmpty(); }
 	void ResetReinvestQueueue() { ReinvestQueue.clear(); }
 	void SetupReinvBond(

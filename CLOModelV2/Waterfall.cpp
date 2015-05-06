@@ -70,15 +70,15 @@ double Waterfall::GetAnnualizedExcess(int index, bool AsShareOfLoans)const
     if (m_PaymentFrequency.GetAnchorDate().isNull()) AdjPaymentFreq.SetAnchorDate(m_MortgagesPayments.GetDate(0));
     if (AsShareOfLoans) {
         if (m_CalculatedMtgPayments.GetAmountOut(m_AnnualizedExcess.GetDate(index))<0.01) return -1.0;
-        return qPow((1.0 + (m_AnnualizedExcess.GetFlow(index, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow)) /
-            m_CalculatedMtgPayments.GetAmountOut(m_AnnualizedExcess.GetDate(index)))), 12.0 / (AdjPaymentFreq.GetValue(m_AnnualizedExcess.GetDate(index)))) - 1.0;
+        return AdjustCoupon(m_CalculatedMtgPayments.GetAmountOut(m_AnnualizedExcess.GetDate(index)) / m_AnnualizedExcess.GetTotalFlow(index), index == 0 ? m_LastIPDdate : m_AnnualizedExcess.GetDate(index - 1), m_AnnualizedExcess.GetDate(index), DayCountConvention::N30360);
     }
     double RunningSum = 0.0;
     for (int i = 0; i<m_Tranches.size(); i++) {
         RunningSum += m_Tranches.at(i)->GetCashFlow().GetAmountOutstanding(index);
     }
     if (RunningSum<0.01) return -1.0;
-    return qPow(1.0 + (m_AnnualizedExcess.GetFlow(index, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow)) / RunningSum), 12.0 / (AdjPaymentFreq.GetValue(m_AnnualizedExcess.GetDate(index)))) - 1.0;
+    return AdjustCoupon(RunningSum / m_AnnualizedExcess.GetTotalFlow(index), index == 0 ? m_LastIPDdate : m_AnnualizedExcess.GetDate(index - 1), m_AnnualizedExcess.GetDate(index), DayCountConvention::N30360);
+
 }
 Waterfall::Waterfall()
     :m_SeniorExpenses("0")
@@ -848,7 +848,7 @@ bool Waterfall::CalculateTranchesCashFlows()
             if (!m_LegalFinal.isNull() && CurrentDate >= m_LegalFinal)  IsMaturityDate = true;
             if (!IsMaturityDate && m_MortgagesPayments.FindDate(CurrentDate) < 0) m_MortgagesPayments.AddFlow(CurrentDate, 0, 0);
             if (IsMaturityDate) {
-                m_PrincipalAvailable.AddPrepay(m_ReinvestmentTest.GetQueuedCash());
+                m_PrincipalAvailable.AddPrepay(m_ReinvestmentTest.GetQueuedCash(CurrentDate));
                 m_ReinvestmentTest.ResetReinvestQueueue();
             }
             else {
@@ -863,12 +863,12 @@ bool Waterfall::CalculateTranchesCashFlows()
                 }
             }
             if (CurrentDate > m_MortgagesPayments.GetDate(0)) {
-                CurrentAssetSum += m_MortgagesPayments.GetAmountOut(CurrentDate.addMonths(-1)) + m_ReinvestmentTest.GetQueuedCash();
+                CurrentAssetSum += m_MortgagesPayments.GetAmountOut(CurrentDate.addMonths(-1)) + m_ReinvestmentTest.GetQueuedCash(CurrentDate);
                 ++CurrentAssetCount;
                 TotalPayable = AdjustCoupon(m_GICinterest.GetValue(CurrentDate) + m_GICBaseRateValue.GetValue(CurrentDate), CurrentDate.addMonths(-1), CurrentDate, m_DealDayCountConvention.GetValue(CurrentDate));
                 m_GICflows.AddFlow(CurrentDate, m_InterestAvailable*TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
                 m_GICflows.AddFlow(CurrentDate, m_PrincipalAvailable.Total()*TotalPayable, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::PrincipalFlow));
-                m_GICflows.AddFlow(CurrentDate, m_ReinvestmentTest.GetQueuedCash()*TotalPayable, 2 | static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
+                m_GICflows.AddFlow(CurrentDate, m_ReinvestmentTest.GetQueuedCash(CurrentDate)*TotalPayable, 2 | static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
                 foreach(const ReserveFund* SingleRes, m_Reserves)
                 {
                     m_GICflows.AddFlow(CurrentDate, SingleRes->GetReserveFundCurrent()*TotalPayable, 1 | static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow));
@@ -1508,7 +1508,7 @@ bool Waterfall::CalculateTranchesCashFlows()
                         Solution = (1.0 - ((m_CCCcurve.GetValue(CurrentDate) - m_CCCTestLimit)*m_CCChaircut))*m_MortgagesPayments.GetOutstandingForOC(CurrentDate);
                     else
                         Solution = m_MortgagesPayments.GetOutstandingForOC(CurrentDate);
-                    Solution += AvailablePrincipal.Total() + m_ReinvestmentTest.GetQueuedCash();
+                    Solution += AvailablePrincipal.Total() + m_ReinvestmentTest.GetQueuedCash(CurrentDate);
                     if (Solution == 0.0) Solution = 1.0;
                     TotalPayable = qMax(TotalPayable, 0.000001);
                     if (SingleStep->GetParameter(WatFalPrior::wstParameters::PayAccrue).toInt() & static_cast<quint8>(WatFalPrior::wstAccrueOrPay::Accrue)) {
@@ -1601,8 +1601,8 @@ bool Waterfall::CalculateTranchesCashFlows()
                     }
                     ProRataBonds.clear();
                     TotalPayable = Solution = 0.0;
-                    adjSeniorExpenses = AdjustCoupon(m_SeniorExpenses.GetValue(CurrentDate), RollingNextIPD, RollingNextIPD.addMonths(m_PaymentFrequency.GetValue(RollingNextIPD)), m_DealDayCountConvention.GetValue(CurrentDate));
-                    adjSeniorFees = AdjustCoupon(m_SeniorFees.GetValue(CurrentDate), RollingNextIPD, RollingNextIPD.addMonths(m_PaymentFrequency.GetValue(RollingNextIPD)), m_DealDayCountConvention.GetValue(CurrentDate));
+                    adjSeniorExpenses = AdjustCoupon(m_SeniorExpenses.GetValue(CurrentDate), RollingLastIPD, RollingNextIPD, m_DealDayCountConvention.GetValue(CurrentDate));
+                    adjSeniorFees = AdjustCoupon(m_SeniorFees.GetValue(CurrentDate), RollingLastIPD, RollingNextIPD, m_DealDayCountConvention.GetValue(CurrentDate));
                     Solution =
                         m_InterestAvailable
                         + m_MortgagesPayments.GetAccruedInterest(CurrentDate)
@@ -1616,7 +1616,7 @@ bool Waterfall::CalculateTranchesCashFlows()
                                 PrintToTempFile("ReturnFalse.txt", m_Tranches.at(h)->GetTrancheName() + " - Coupon not set in tranche");
                                 return false;
                             }
-                            AdjustedCoupon = AdjustCoupon((m_Tranches.at(h)->GetCoupon(CurrentDate, CurrCoupIndx)), RollingNextIPD, RollingNextIPD.addMonths(m_PaymentFrequency.GetValue(RollingNextIPD)), m_Tranches.at(h)->GetDayCount(CurrCoupIndx).GetValue(CurrentDate));
+                            AdjustedCoupon = AdjustCoupon((m_Tranches.at(h)->GetCoupon(CurrentDate, CurrCoupIndx)), RollingLastIPD, RollingNextIPD, m_Tranches.at(h)->GetDayCount(CurrCoupIndx).GetValue(CurrentDate));
                             TotalPayable += AdjustedCoupon*(m_Tranches.at(h)->GetCashFlow().GetAmountOutstanding(CurrentDate) + m_Tranches.at(h)->GetCashFlow().GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | CurrCoupIndx));
                             if (m_Tranches.at(h)->GetProrataGroup(CurrSenGrpLvl) == CurrSenGrp)
                                 ProRataBonds.enqueue(h);
@@ -1661,7 +1661,7 @@ bool Waterfall::CalculateTranchesCashFlows()
                                     Solution = 0.0;
                                     for (int h = 0; h<m_Tranches.size(); h++) {
                                         if (m_Tranches.at(h)->GetProrataGroup(CurrSenGrpLvl) <= CurrSenGrp && m_Tranches.at(h)->GetProrataGroup(CurrSenGrpLvl) >= SolutionDegree) {
-                                            AdjustedCoupon = AdjustCoupon((m_Tranches.at(h)->GetCoupon(CurrentDate, CurrCoupIndx)), RollingNextIPD, RollingNextIPD.addMonths((m_PaymentFrequency.GetValue(RollingNextIPD))), m_Tranches.at(h)->GetDayCount(CurrCoupIndx).GetValue(CurrentDate));
+                                            AdjustedCoupon = AdjustCoupon((m_Tranches.at(h)->GetCoupon(CurrentDate, CurrCoupIndx)), RollingLastIPD, RollingNextIPD, m_Tranches.at(h)->GetDayCount(CurrCoupIndx).GetValue(CurrentDate));
                                             Solution += AdjustedCoupon*(m_Tranches.at(h)->GetCashFlow().GetAmountOutstanding(CurrentDate) + m_Tranches.at(h)->GetCashFlow().GetFlow(CurrentDate, static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | CurrCoupIndx));
                                         }
                                     }

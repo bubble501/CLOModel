@@ -29,10 +29,8 @@ public:
 	explicit RichTextDelegate(QObject *parent = 0);
 	~RichTextDelegate() { label->deleteLater(); }
 
-	void paint(QPainter *painter, const QStyleOptionViewItem &option,
-		const QModelIndex &index) const;
-	QSize sizeHint(const QStyleOptionViewItem &option,
-		const QModelIndex &index) const;
+    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 private:
 	
 	enum {LabelPadding=1};

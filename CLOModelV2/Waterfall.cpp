@@ -66,18 +66,21 @@ QDate Waterfall::GetStructureMaturity()const
 double Waterfall::GetAnnualizedExcess(int index, bool AsShareOfLoans)const
 {
     if (index<0 || index >= m_AnnualizedExcess.Count()) return 0.0;
-    IntegerVector AdjPaymentFreq(m_PaymentFrequency);
-    if (m_PaymentFrequency.GetAnchorDate().isNull()) AdjPaymentFreq.SetAnchorDate(m_MortgagesPayments.GetDate(0));
     if (AsShareOfLoans) {
+        double loanSize = m_CalculatedMtgPayments.GetAmountOut(m_AnnualizedExcess.GetDate(index));
+        loanSize += index == 0 ? m_CalculatedMtgPayments.GetAmountOut(0) : m_CalculatedMtgPayments.GetAmountOut(m_AnnualizedExcess.GetDate(index-1));
+        loanSize *= 0.5;
         if (m_CalculatedMtgPayments.GetAmountOut(m_AnnualizedExcess.GetDate(index))<0.01) return -1.0;
-        return AdjustCoupon(m_CalculatedMtgPayments.GetAmountOut(m_AnnualizedExcess.GetDate(index)) / m_AnnualizedExcess.GetTotalFlow(index), index == 0 ? m_LastIPDdate : m_AnnualizedExcess.GetDate(index - 1), m_AnnualizedExcess.GetDate(index), DayCountConvention::N30360);
+        return 1.0 / AdjustCoupon(loanSize / m_AnnualizedExcess.GetTotalFlow(index), index == 0 ? m_LastIPDdate : m_AnnualizedExcess.GetDate(index - 1), m_AnnualizedExcess.GetDate(index), DayCountConvention::N30360);
     }
     double RunningSum = 0.0;
-    for (int i = 0; i<m_Tranches.size(); i++) {
-        RunningSum += m_Tranches.at(i)->GetCashFlow().GetAmountOutstanding(index);
+    double RunningPrev = 0.0;
+    for (auto i = m_Tranches.constBegin(); i!=m_Tranches.constEnd(); ++i) {
+        RunningSum += (*i)->GetCashFlow().GetAmountOutstanding(index);
+        RunningPrev += index == 0 ? (*i)->GetOutstandingAmt(): (*i)->GetCashFlow().GetAmountOutstanding(index - 1);
     }
     if (RunningSum<0.01) return -1.0;
-    return AdjustCoupon(RunningSum / m_AnnualizedExcess.GetTotalFlow(index), index == 0 ? m_LastIPDdate : m_AnnualizedExcess.GetDate(index - 1), m_AnnualizedExcess.GetDate(index), DayCountConvention::N30360);
+    return 1.0/AdjustCoupon(RunningSum / m_AnnualizedExcess.GetTotalFlow(index), index == 0 ? m_LastIPDdate : m_AnnualizedExcess.GetDate(index - 1), m_AnnualizedExcess.GetDate(index), DayCountConvention::N30360);
 
 }
 Waterfall::Waterfall()

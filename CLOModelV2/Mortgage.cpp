@@ -133,7 +133,7 @@ void Mortgage::SetInterest(const QString& a){
 					 auto DbgRecord = LoanAssQuerry.record();
 					 int FieldCount = 0;
 					 QString VecsAnchor;
-					 if (!DbgRecord.isNull(FieldCount)) VecsAnchor = "A " + DbgRecord.value(FieldCount).toDate().toString("MM/dd/aaaa") + ' ';
+                     if (!DbgRecord.isNull(FieldCount)) VecsAnchor = "A " + DbgRecord.value(FieldCount).toDate().toString("MM/dd/aaaa") + ' '; ++FieldCount;
 					 if (!DbgRecord.isNull(FieldCount)) MaturityExtension = DbgRecord.value(FieldCount).toInt(); ++FieldCount;
 					 if (!DbgRecord.isNull(FieldCount)) StartingHaircut = DbgRecord.value(FieldCount).toDouble(); ++FieldCount;
 					 if (!DbgRecord.isNull(FieldCount)) PrepaymentFee = VecsAnchor + DbgRecord.value(FieldCount).toString(); ++FieldCount;
@@ -160,6 +160,7 @@ void Mortgage::SetInterest(const QString& a){
 #ifdef Assumptions_ExcelOverDB
 	 (*ApplyProperty)();
 #endif
+     StartingHaircut /= 100.0;
 	 if (
 		 CPRVec.IsEmpty(0.0, 1.0)
 		 || CDRVec.IsEmpty(0.0, 1.0)

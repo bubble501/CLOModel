@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;cxx;c;def</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h</Extensions>
+    </Filter>
+    <Filter Include="Form Files">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>moc;h;cpp</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Privates">
+      <UniqueIdentifier>{7a9072bd-4a87-4522-8e6d-f5eef9fc8a5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Vectors">
+      <UniqueIdentifier>{af8f1474-55b8-475b-bf72-af765c59ca59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Vectors">
+      <UniqueIdentifier>{354d7465-fd11-4d01-92eb-3287502798d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Privates\Vectors">
+      <UniqueIdentifier>{3f45989a-6db4-4fb2-8d64-e547b260ff84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Common Items">
+      <UniqueIdentifier>{f57b442f-dfc9-4c9f-ac49-e5a915e565bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Common Items">
+      <UniqueIdentifier>{20e63aa2-57e8-431f-bbe1-452e583c82e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Interfaces">
+      <UniqueIdentifier>{ad9fd37a-87ce-42f4-929d-b5cbacd3df1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Privates\Interfaces">
+      <UniqueIdentifier>{be8b3193-d0a1-4207-a6da-1c3a8668ed0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Interfaces">
+      <UniqueIdentifier>{b7482301-ac8c-43f8-8f1d-10cc0b965233}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Triggers">
+      <UniqueIdentifier>{e2cbeab1-6f35-4b1b-8940-2a1f6da0e7b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Privates\Triggers">
+      <UniqueIdentifier>{e1961720-7c18-4ede-9b63-4bad70cfa982}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Triggers">
+      <UniqueIdentifier>{3a624e86-4a34-4834-8a06-ecffef800392}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BackwardCompatibilityInterface_p.h">
+      <Filter>Privates\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="clomodellib_global.h">
+      <Filter>Header Files\Common Items</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonFunctions.h">
+      <Filter>Header Files\Common Items</Filter>
+    </ClInclude>
+    <ClInclude Include="BackwardCompatibilityInterface.h">
+      <Filter>Header Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="AbstractBbgVect.h">
+      <Filter>Header Files\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="AbstractBbgVect_p.h">
+      <Filter>Privates\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="BloombergVector.h">
+      <Filter>Header Files\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="BloombergVector_p.h">
+      <Filter>Privates\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="FloorCapVector.h">
+      <Filter>Header Files\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="FloorCapVector_p.h">
+      <Filter>Privates\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="DayCountVect.h">
+      <Filter>Header Files\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="DayCountVect_p.h">
+      <Filter>Privates\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="AbstractTrigger.h">
+      <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="AbstractTrigger_p.h">
+      <Filter>Privates\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="InternalItems.h">
+      <Filter>Privates</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="BackwardCompatibilityInterface.cpp">
+      <Filter>Source Files\Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="CommonFunctions.cpp">
+      <Filter>Source Files\Common Items</Filter>
+    </ClCompile>
+    <ClCompile Include="AbstractBbgVect.cpp">
+      <Filter>Source Files\Vectors</Filter>
+    </ClCompile>
+    <ClCompile Include="BloombergVector.cpp">
+      <Filter>Source Files\Vectors</Filter>
+    </ClCompile>
+    <ClCompile Include="FloorCapVector.cpp">
+      <Filter>Source Files\Vectors</Filter>
+    </ClCompile>
+    <ClCompile Include="DayCountVect.cpp">
+      <Filter>Source Files\Vectors</Filter>
+    </ClCompile>
+    <ClCompile Include="AbstractTrigger.cpp">
+      <Filter>Source Files\Triggers</Filter>
+    </ClCompile>
+    <ClCompile Include="InternalItems.cpp">
+      <Filter>Privates</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -4,7 +4,7 @@
 #include <QMetaType>
 #include "AbstractBbgVect.h"
 class BoolVectorPrivate;
-class BoolVector : public AbstractBbgVect
+class CLOMODELLIB_EXPORT BoolVector : public AbstractBbgVect
 {
     Q_DECLARE_PRIVATE(BoolVector)
 protected:

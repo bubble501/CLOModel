@@ -150,12 +150,16 @@
     <ClInclude Include="BackwardCompatibilityInterface_p.h" />
     <ClInclude Include="BloombergVector.h" />
     <ClInclude Include="BloombergVector_p.h" />
+    <ClInclude Include="BoolVector.h" />
+    <ClInclude Include="BoolVector_p.h" />
     <ClInclude Include="clomodellib_global.h" />
     <ClInclude Include="CommonFunctions.h" />
     <ClInclude Include="DayCountVect.h" />
     <ClInclude Include="DayCountVect_p.h" />
     <ClInclude Include="FloorCapVector.h" />
     <ClInclude Include="FloorCapVector_p.h" />
+    <ClInclude Include="IntegerVector.h" />
+    <ClInclude Include="IntegerVector_p.h" />
     <ClInclude Include="InternalItems.h" />
   </ItemGroup>
   <ItemGroup>
@@ -163,9 +167,11 @@
     <ClCompile Include="AbstractTrigger.cpp" />
     <ClCompile Include="BackwardCompatibilityInterface.cpp" />
     <ClCompile Include="BloombergVector.cpp" />
+    <ClCompile Include="BoolVector.cpp" />
     <ClCompile Include="CommonFunctions.cpp" />
     <ClCompile Include="DayCountVect.cpp" />
     <ClCompile Include="FloorCapVector.cpp" />
+    <ClCompile Include="IntegerVector.cpp" />
     <ClCompile Include="InternalItems.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

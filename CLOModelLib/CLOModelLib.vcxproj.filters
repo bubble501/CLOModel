@@ -106,6 +106,18 @@
     <ClInclude Include="InternalItems.h">
       <Filter>Privates</Filter>
     </ClInclude>
+    <ClInclude Include="BoolVector.h">
+      <Filter>Header Files\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="BoolVector_p.h">
+      <Filter>Privates\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="IntegerVector.h">
+      <Filter>Header Files\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="IntegerVector_p.h">
+      <Filter>Privates\Vectors</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BackwardCompatibilityInterface.cpp">
@@ -131,6 +143,12 @@
     </ClCompile>
     <ClCompile Include="InternalItems.cpp">
       <Filter>Privates</Filter>
+    </ClCompile>
+    <ClCompile Include="BoolVector.cpp">
+      <Filter>Source Files\Vectors</Filter>
+    </ClCompile>
+    <ClCompile Include="IntegerVector.cpp">
+      <Filter>Source Files\Vectors</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

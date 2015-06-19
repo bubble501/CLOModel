@@ -12,7 +12,6 @@ public:
     PrincipalRecipPrivate(PrincipalRecip* q);
     PrincipalRecipPrivate(PrincipalRecip* q, const PrincipalRecipPrivate& other);
     virtual PrincipalRecipPrivate& operator=(const PrincipalRecipPrivate& other);
-protected:
     double m_Scheduled;
     double m_Prepay;
     virtual void NormaliseValues();

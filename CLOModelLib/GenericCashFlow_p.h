@@ -11,7 +11,6 @@ public:
     GenericCashFlowPrivate(GenericCashFlow* q);
     GenericCashFlowPrivate(GenericCashFlow* q, const GenericCashFlowPrivate& other);
     virtual GenericCashFlowPrivate& operator=(const GenericCashFlowPrivate& other);
-protected:
     static bool SamePeriod(const QDate& a, const QDate& b, GenericCashFlow::CashFlowAggregation Freq);
     QMap<QDate, QHash<qint32, double>*	> m_CashFlows;
     QHash<qint32, QString> m_CashFlowLabels;

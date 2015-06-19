@@ -6,6 +6,7 @@
 class SeniorityPrivate;
 class CLOMODELLIB_EXPORT Seniority : public BackwardInterface
 {
+protected:
     Q_DECLARE_PRIVATE(Seniority)
 public:
     void Clear();

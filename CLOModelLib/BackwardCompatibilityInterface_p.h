@@ -13,9 +13,9 @@ public:
     BackwardInterfacePrivate(BackwardInterface* q);
     BackwardInterfacePrivate(BackwardInterface* q, const BackwardInterfacePrivate& other);
     virtual BackwardInterfacePrivate& operator=(const BackwardInterfacePrivate& other);
+    qint32 m_LoadProtocolVersion;
 private:
     BackwardInterfacePrivate(const BackwardInterfacePrivate& other);
-	qint32 m_LoadProtocolVersion;
 };
 
 

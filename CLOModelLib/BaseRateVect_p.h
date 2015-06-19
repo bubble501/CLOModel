@@ -13,7 +13,6 @@ public:
     BaseRateVectorPrivate(BaseRateVector* q);
     BaseRateVectorPrivate(BaseRateVector* q, const BaseRateVectorPrivate& other);
     virtual BaseRateVectorPrivate& operator=(const BaseRateVectorPrivate& other);
-protected:
     QStringList m_VectVal;
     template<class T> QString GetValue(const T& index) const
     {

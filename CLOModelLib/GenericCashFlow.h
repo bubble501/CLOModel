@@ -6,6 +6,7 @@
 class GenericCashFlowPrivate;
 class CLOMODELLIB_EXPORT GenericCashFlow : public BackwardInterface
 {
+protected:
     Q_DECLARE_PRIVATE(GenericCashFlow)
 public:
 	enum CashFlowAggregation {

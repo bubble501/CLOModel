@@ -6,6 +6,7 @@
 class RepaymentVectorPrivate;
 class CLOMODELLIB_EXPORT RepaymentVector : public AbstractBbgVect
 {
+protected:
     Q_DECLARE_PRIVATE(RepaymentVector)
 public:
 	enum RepaymentMethods : qint8 {

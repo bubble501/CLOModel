@@ -9,8 +9,8 @@
 class BaseRateVectorPrivate;
 class CLOMODELLIB_EXPORT  BaseRateVector : public AbstractBbgVect
 {
-    Q_DECLARE_PRIVATE(BaseRateVector)
 protected:
+    Q_DECLARE_PRIVATE(BaseRateVector)
 	virtual void UnpackVector() override;
 	virtual bool IsValid() const override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;

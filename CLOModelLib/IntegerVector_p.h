@@ -9,7 +9,6 @@ public:
     IntegerVectorPrivate(IntegerVector* q);
     IntegerVectorPrivate(IntegerVector* q, const IntegerVectorPrivate& other);
     virtual IntegerVectorPrivate& operator=(const IntegerVectorPrivate& other);
-protected:
     QList<int> m_VectVal;
     qint32 m_Shift;
     friend QDataStream& operator<<(QDataStream & stream, const IntegerVector& flows);

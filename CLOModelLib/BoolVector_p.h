@@ -11,7 +11,6 @@ public:
     BoolVectorPrivate(BoolVector* q);
     BoolVectorPrivate(BoolVector* q, const BoolVectorPrivate& other);
     virtual BoolVectorPrivate& operator=(const BoolVectorPrivate& other);
-protected:
     QList<bool> m_VectVal;
     friend QDataStream& operator<<(QDataStream & stream, const BoolVector& flows);
     friend QDataStream& operator>>(QDataStream & stream, BoolVector& flows);

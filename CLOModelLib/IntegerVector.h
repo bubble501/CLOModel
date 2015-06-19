@@ -6,8 +6,8 @@
 class IntegerVectorPrivate;
 class CLOMODELLIB_EXPORT IntegerVector : public AbstractBbgVect
 {
-    Q_DECLARE_PRIVATE(IntegerVector)
 protected:
+    Q_DECLARE_PRIVATE(IntegerVector)
 	virtual void UnpackVector();
 	virtual bool IsValid() const override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;

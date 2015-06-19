@@ -12,7 +12,6 @@ public:
     RepaymentVectorPrivate(RepaymentVector* q);
     RepaymentVectorPrivate(RepaymentVector* q, const RepaymentVectorPrivate& other);
     virtual RepaymentVectorPrivate& operator=(const RepaymentVectorPrivate& other);
-protected:
     QList<RepaymentVector::RepaymentMethods> m_VectVal;
     QString RepaymentMethodsToString(int a) const;
     QString RepaymentMethodsToString(RepaymentVector::RepaymentMethods a) const;

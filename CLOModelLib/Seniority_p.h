@@ -12,7 +12,6 @@ public:
     SeniorityPrivate(Seniority* q);
     SeniorityPrivate(Seniority* q, const SeniorityPrivate& other);
     virtual SeniorityPrivate& operator=(const SeniorityPrivate& other);
-protected:
     QList<quint32> m_SeniorityScale;
     QList<quint32> m_GroupScale;
     QList<quint32> m_RankScale;

@@ -11,7 +11,6 @@ public:
     BloombergVectorPrivate(BloombergVector* q);
     BloombergVectorPrivate(BloombergVector* q, const BloombergVectorPrivate& other);
     virtual BloombergVectorPrivate& operator=(const BloombergVectorPrivate& other);
-protected:
     QList<double> m_VectVal;
     double m_Divisor;
     friend QDataStream& operator<<(QDataStream & stream, const BloombergVector& flows);

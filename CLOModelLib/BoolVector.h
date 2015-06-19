@@ -6,8 +6,8 @@
 class BoolVectorPrivate;
 class CLOMODELLIB_EXPORT BoolVector : public AbstractBbgVect
 {
-    Q_DECLARE_PRIVATE(BoolVector)
 protected:
+    Q_DECLARE_PRIVATE(BoolVector)
 	virtual void UnpackVector();
 	virtual bool IsValid() const override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;

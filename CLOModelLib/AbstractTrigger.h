@@ -5,6 +5,7 @@
 class AbstractTriggerPrivate;
 class CLOMODELLIB_EXPORT AbstractTrigger : public BackwardInterface
 {
+protected:
     Q_DECLARE_PRIVATE(AbstractTrigger)
 public:
 	enum TriggerType : quint8 {

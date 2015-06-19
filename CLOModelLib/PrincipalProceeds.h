@@ -5,8 +5,8 @@
 class PrincipalRecipPrivate;
 class CLOMODELLIB_EXPORT PrincipalRecip :public BackwardInterface
 {
-    Q_DECLARE_PRIVATE(PrincipalRecip)
 protected:
+    Q_DECLARE_PRIVATE(PrincipalRecip)
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
     PrincipalRecip(PrincipalRecipPrivate* d);
 public:

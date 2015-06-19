@@ -20,7 +20,6 @@ public:
         static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetCap can be used only with int or QDate");
         return GetValueTemplate(m_CapVal, index, QSharedPointer<double>(NULL));
     }
-protected:
     QList<QSharedPointer<double> > m_FloorVal;
     QList<QSharedPointer<double> > m_CapVal;
     friend QDataStream& operator<<(QDataStream & stream, const FloorCapVector& flows);

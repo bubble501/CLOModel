@@ -13,6 +13,7 @@ class ForwardBaseRateTablePrivate;
 class AbstractBaseRateTablePrivate;
 class CLOMODELLIB_EXPORT AbstractBaseRateTable : public BackwardInterface
 {
+protected:
     Q_DECLARE_PRIVATE(AbstractBaseRateTable)
 public:
 	AbstractBaseRateTable(const QDate& a);
@@ -27,6 +28,7 @@ protected:
 };
 class CLOMODELLIB_EXPORT ConstantBaseRateTable : public AbstractBaseRateTable
 {
+protected:
     Q_DECLARE_PRIVATE(ConstantBaseRateTable)
 public:
 	ConstantBaseRateTable();
@@ -56,6 +58,7 @@ private:
 };
 class CLOMODELLIB_EXPORT  ForwardBaseRateTable : public AbstractBaseRateTable
 {
+protected:
     Q_DECLARE_PRIVATE(ForwardBaseRateTable)
 public:
 	ForwardBaseRateTable() {}

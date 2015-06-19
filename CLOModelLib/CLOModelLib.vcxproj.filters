@@ -68,6 +68,15 @@
     <Filter Include="Source Files\Deal Structure">
       <UniqueIdentifier>{6e67f7a8-2253-4a1c-8e44-0e579666818f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Loans">
+      <UniqueIdentifier>{d319072d-38a5-4c1f-8dfa-ca02615d7039}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Privates\Loans">
+      <UniqueIdentifier>{b1a296ae-385a-4126-8eea-5f96c6a70bbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Loans">
+      <UniqueIdentifier>{2cb825d3-c2b3-498e-9347-b4865a1b164b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BackwardCompatibilityInterface_p.h">
@@ -163,6 +172,9 @@
     <ClInclude Include="GenericCashFlow_p.h">
       <Filter>Privates\Interfaces</Filter>
     </ClInclude>
+    <ClInclude Include="MtgCashFlow.h">
+      <Filter>Header Files\Loans</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BackwardCompatibilityInterface.cpp">
@@ -212,6 +224,9 @@
     </ClCompile>
     <ClCompile Include="GenericCashFlow.cpp">
       <Filter>Source Files\Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="MtgCashFlow.cpp">
+      <Filter>Source Files\Loans</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -13,7 +13,6 @@ public:
     AbstractBaseRateTablePrivate(AbstractBaseRateTable* q);
     AbstractBaseRateTablePrivate(AbstractBaseRateTable* q, const AbstractBaseRateTablePrivate& other);
     virtual AbstractBaseRateTablePrivate& operator=(const AbstractBaseRateTablePrivate& other);
-protected:
     QDate UpdateDate;
     friend QDataStream& operator<<(QDataStream & stream, const AbstractBaseRateTable& flows);
     friend QDataStream& operator>>(QDataStream & stream, AbstractBaseRateTable& flows);
@@ -27,7 +26,6 @@ public:
     ConstantBaseRateTablePrivate(ConstantBaseRateTable* q);
     ConstantBaseRateTablePrivate(ConstantBaseRateTable* q, const ConstantBaseRateTablePrivate& other);
     virtual ConstantBaseRateTablePrivate& operator=(const ConstantBaseRateTablePrivate& other);
-protected:
     QHash<QString, double> Values;
     friend QDataStream& operator<<(QDataStream & stream, const ConstantBaseRateTable& flows);
     friend QDataStream& operator>>(QDataStream & stream, ConstantBaseRateTable& flows);
@@ -41,7 +39,6 @@ public:
     ForwardBaseRateTablePrivate(ForwardBaseRateTable* q);
     ForwardBaseRateTablePrivate(ForwardBaseRateTable* q, const ForwardBaseRateTablePrivate& other);
     virtual ForwardBaseRateTablePrivate& operator=(const ForwardBaseRateTablePrivate& other);
-protected:
     QHash<QString, BloombergVector> Values;
     friend QDataStream& operator<<(QDataStream & stream, const ForwardBaseRateTable& flows);
     friend QDataStream& operator>>(QDataStream & stream, ForwardBaseRateTable& flows);

@@ -151,6 +151,12 @@
     <ClInclude Include="BaseRateTable_p.h">
       <Filter>Privates\Interfaces</Filter>
     </ClInclude>
+    <ClInclude Include="BaseRateVect.h">
+      <Filter>Header Files\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseRateVect_p.h">
+      <Filter>Privates\Vectors</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BackwardCompatibilityInterface.cpp">
@@ -194,6 +200,9 @@
     </ClCompile>
     <ClCompile Include="BaseRateTable.cpp">
       <Filter>Source Files\Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseRateVect.cpp">
+      <Filter>Source Files\Vectors</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

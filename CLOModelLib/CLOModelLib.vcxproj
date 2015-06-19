@@ -150,6 +150,8 @@
     <ClInclude Include="BackwardCompatibilityInterface_p.h" />
     <ClInclude Include="BaseRateTable.h" />
     <ClInclude Include="BaseRateTable_p.h" />
+    <ClInclude Include="BaseRateVect.h" />
+    <ClInclude Include="BaseRateVect_p.h" />
     <ClInclude Include="BloombergVector.h" />
     <ClInclude Include="BloombergVector_p.h" />
     <ClInclude Include="BoolVector.h" />
@@ -175,6 +177,7 @@
     <ClCompile Include="AbstractTrigger.cpp" />
     <ClCompile Include="BackwardCompatibilityInterface.cpp" />
     <ClCompile Include="BaseRateTable.cpp" />
+    <ClCompile Include="BaseRateVect.cpp" />
     <ClCompile Include="BloombergVector.cpp" />
     <ClCompile Include="BoolVector.cpp" />
     <ClCompile Include="CommonFunctions.cpp" />

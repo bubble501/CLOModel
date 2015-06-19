@@ -161,6 +161,8 @@
     <ClInclude Include="IntegerVector.h" />
     <ClInclude Include="IntegerVector_p.h" />
     <ClInclude Include="InternalItems.h" />
+    <ClInclude Include="PrincipalProceeds.h" />
+    <ClInclude Include="PrincipalProceeds_p.h" />
     <ClInclude Include="RepaymentVector.h" />
     <ClInclude Include="RepaymentVector_p.h" />
     <ClInclude Include="Seniority.h" />
@@ -177,6 +179,7 @@
     <ClCompile Include="FloorCapVector.cpp" />
     <ClCompile Include="IntegerVector.cpp" />
     <ClCompile Include="InternalItems.cpp" />
+    <ClCompile Include="PrincipalProceeds.cpp" />
     <ClCompile Include="RepaymentVector.cpp" />
     <ClCompile Include="Seniority.cpp" />
   </ItemGroup>

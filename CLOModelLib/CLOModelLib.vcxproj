@@ -162,6 +162,8 @@
     <ClInclude Include="DayCountVect_p.h" />
     <ClInclude Include="FloorCapVector.h" />
     <ClInclude Include="FloorCapVector_p.h" />
+    <ClInclude Include="GenericCashFlow.h" />
+    <ClInclude Include="GenericCashFlow_p.h" />
     <ClInclude Include="IntegerVector.h" />
     <ClInclude Include="IntegerVector_p.h" />
     <ClInclude Include="InternalItems.h" />
@@ -183,6 +185,7 @@
     <ClCompile Include="CommonFunctions.cpp" />
     <ClCompile Include="DayCountVect.cpp" />
     <ClCompile Include="FloorCapVector.cpp" />
+    <ClCompile Include="GenericCashFlow.cpp" />
     <ClCompile Include="IntegerVector.cpp" />
     <ClCompile Include="InternalItems.cpp" />
     <ClCompile Include="PrincipalProceeds.cpp" />

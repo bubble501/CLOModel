@@ -157,6 +157,12 @@
     <ClInclude Include="BaseRateVect_p.h">
       <Filter>Privates\Vectors</Filter>
     </ClInclude>
+    <ClInclude Include="GenericCashFlow.h">
+      <Filter>Header Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="GenericCashFlow_p.h">
+      <Filter>Privates\Interfaces</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BackwardCompatibilityInterface.cpp">
@@ -203,6 +209,9 @@
     </ClCompile>
     <ClCompile Include="BaseRateVect.cpp">
       <Filter>Source Files\Vectors</Filter>
+    </ClCompile>
+    <ClCompile Include="GenericCashFlow.cpp">
+      <Filter>Source Files\Interfaces</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

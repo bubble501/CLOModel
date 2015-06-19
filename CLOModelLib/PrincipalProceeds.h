@@ -3,7 +3,8 @@
 #include <QtGlobal>
 #include "BackwardCompatibilityInterface.h"
 class PrincipalRecipPrivate;
-class PrincipalRecip :public BackwardInterface {
+class CLOMODELLIB_EXPORT PrincipalRecip :public BackwardInterface
+{
     Q_DECLARE_PRIVATE(PrincipalRecip)
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;

@@ -145,6 +145,12 @@
     <ClInclude Include="PrincipalProceeds_p.h">
       <Filter>Privates\Deal Structure</Filter>
     </ClInclude>
+    <ClInclude Include="BaseRateTable.h">
+      <Filter>Header Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseRateTable_p.h">
+      <Filter>Privates\Interfaces</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BackwardCompatibilityInterface.cpp">
@@ -185,6 +191,9 @@
     </ClCompile>
     <ClCompile Include="PrincipalProceeds.cpp">
       <Filter>Source Files\Deal Structure</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseRateTable.cpp">
+      <Filter>Source Files\Interfaces</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

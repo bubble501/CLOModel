@@ -6,16 +6,11 @@
 #define MinimumSupportedVersion 188
 #include "BackwardCompatibilityInterface.h"
 class BackwardInterfacePrivate {
-    Q_DECLARE_PUBLIC(BackwardInterface)
+    DECLARE_PRIVATE_COMMONS(BackwardInterface)
 protected:
     BackwardInterface* q_ptr;
 public:
-    BackwardInterfacePrivate(BackwardInterface* q);
-    BackwardInterfacePrivate(BackwardInterface* q, const BackwardInterfacePrivate& other);
-    virtual BackwardInterfacePrivate& operator=(const BackwardInterfacePrivate& other);
     qint32 m_LoadProtocolVersion;
-private:
-    BackwardInterfacePrivate(const BackwardInterfacePrivate& other);
 };
 
 

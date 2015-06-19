@@ -6,14 +6,8 @@
 #include "BackwardCompatibilityInterface_p.h"
 class AbstractBbgVectPrivate : public BackwardInterfacePrivate
 {
-    Q_DECLARE_PUBLIC(AbstractBbgVect)
-private:
-    AbstractBbgVectPrivate(const AbstractBbgVectPrivate& other);
+    DECLARE_PRIVATE_COMMONS(AbstractBbgVect)
 public:
-    AbstractBbgVectPrivate(AbstractBbgVect* q);
-    AbstractBbgVectPrivate(AbstractBbgVect* q, const AbstractBbgVectPrivate& other);
-    virtual AbstractBbgVectPrivate& operator=(const AbstractBbgVectPrivate& other);
-protected:
     QString m_Vector;
     QDate m_AnchorDate;
     template<class T> T GetValueTemplate(const QList<T>& VecVal, const QDate& index, const T& DefaultValue) const

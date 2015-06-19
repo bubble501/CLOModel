@@ -174,6 +174,8 @@
     <ClInclude Include="RepaymentVector_p.h" />
     <ClInclude Include="Seniority.h" />
     <ClInclude Include="Seniority_p.h" />
+    <ClInclude Include="TrancheCashFlow.h" />
+    <ClInclude Include="TrancheCashFlow_p.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AbstractBbgVect.cpp" />
@@ -193,6 +195,7 @@
     <ClCompile Include="PrincipalProceeds.cpp" />
     <ClCompile Include="RepaymentVector.cpp" />
     <ClCompile Include="Seniority.cpp" />
+    <ClCompile Include="TrancheCashFlow.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

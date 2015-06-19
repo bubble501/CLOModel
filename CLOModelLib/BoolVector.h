@@ -6,28 +6,27 @@
 class BoolVectorPrivate;
 class CLOMODELLIB_EXPORT BoolVector : public AbstractBbgVect
 {
+    DECLARE_PUBLIC_COMMONS(BoolVector)
+    DECLARE_PUBLIC_COMMONS_COPY(BoolVector)
 protected:
-    Q_DECLARE_PRIVATE(BoolVector)
 	virtual void UnpackVector();
 	virtual bool IsValid() const override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 public:
 	virtual QRegExpValidator* GetValidator(QObject* parent = 0) const override;
-    BoolVector();
-	BoolVector(const BoolVector& Vec);
 	BoolVector(const QString& Vec);
 	BoolVector(const QString& Vec,const QDate& Anchor);
 	bool GetValue(const QDate& index) const;
 	bool GetValue(int index) const;
 	int NumElements() const;
 	BoolVector& operator=(const QString& a);
+    BoolVector& operator=(const BoolVector& a);
 	friend QDataStream& operator<<(QDataStream & stream, const BoolVector& flows);
 	friend QDataStream& operator>>(QDataStream & stream, BoolVector& flows);
 };
 QDataStream& operator<<(QDataStream & stream, const BoolVector& flows);
 QDataStream& operator>>(QDataStream & stream, BoolVector& flows);
 Q_DECLARE_METATYPE(BoolVector)
-
 #endif // BoolVector_h__
 
 

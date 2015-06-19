@@ -69,6 +69,32 @@ double CLOMODELLIB_EXPORT AdjustCoupon(double AnnualCoupon /*Annualised Coupon*/
 bool CLOMODELLIB_EXPORT IsHoliday(const QDate& a/*,const QString& CountryCode*/);
 bool CLOMODELLIB_EXPORT removeDir(const QString& dirName);
 bool CLOMODELLIB_EXPORT ValidDayCount(qint16 a);
+
+#define DECLARE_PUBLIC_COMMONS(Class) protected: \
+    Q_DECLARE_PRIVATE(Class) \
+    Class(Class ## Private *d); \
+    public: \
+    Class();
+#define DECLARE_PUBLIC_COMMONS_COPY(Class) protected: \
+    Class(Class ## Private *d, const Class& other); \
+    public: \
+    Class(const Class& other);
+#define DEFINE_PUBLIC_COMMONS(Class) Class::Class() \
+    : Class(new Class ## Private(this)) \
+    {} 
+#define DEFINE_PUBLIC_COMMONS_COPY(Class) Class::Class(const Class& other) \
+     : Class(new Class ## Private(this), other) \
+    {} 
+#define DECLARE_PRIVATE_COMMONS(Class) protected: \
+    Q_DECLARE_PUBLIC(Class) \
+    public: \
+    Class ## Private(Class *q); \
+    private: \
+    Class ## Private(const Class ## Private &other);
+#define DECLARE_PRIVATE_COMMONS_DATASTREAM(Class) friend QDataStream& operator<<(QDataStream & stream, const Class& flows); \
+friend QDataStream& operator>>(QDataStream & stream, Class& flows);
+
+
 #endif // CommonFunctions_h__
 
 

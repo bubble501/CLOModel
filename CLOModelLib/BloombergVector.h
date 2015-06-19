@@ -7,13 +7,13 @@ class FloorCapVector;
 class BloombergVectorPrivate;
 class CLOMODELLIB_EXPORT BloombergVector : public AbstractBbgVect
 {
+    DECLARE_PUBLIC_COMMONS(BloombergVector)
+    DECLARE_PUBLIC_COMMONS_COPY(BloombergVector)
 protected:
-    Q_DECLARE_PRIVATE(BloombergVector)
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 	virtual void UnpackVector();
 	virtual bool IsValid() const override;
 	virtual void RepackVector();
-    BloombergVector(BloombergVectorPrivate *d);
 public:
 	virtual QRegExpValidator* GetValidator(QObject* parent = 0) const override;
 	QString BloombergSafeVector(QDate CurrentDate=QDate::currentDate()) const;
@@ -21,9 +21,7 @@ public:
 	virtual bool IsEmpty(double Lbound, double Ubound = std::numeric_limits<double>::max())const;
 	static BloombergVector Combine(const BloombergVector& StartVect, const BloombergVector& SwitchVect, quint32 Periods);
 	void Combine(const BloombergVector& SwitchVect, quint32 Periods);
-	BloombergVector();
 	BloombergVector(const QString& Vec);
-	BloombergVector(const BloombergVector& Vec);
 	BloombergVector(const QString& Vec,const QDate& Anchor);
 	BloombergVector(const QList<double>& Values, const QDate& Anchor = QDate());
 	BloombergVector(const QList<QDate>& Dates, const QList<double>& Values);

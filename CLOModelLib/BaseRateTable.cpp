@@ -1,13 +1,40 @@
 #include "BaseRateTable.h"
 #include "BaseRateTable_p.h"
 #include "BloombergVector.h"
+DEFINE_PUBLIC_COMMONS(AbstractBaseRateTable)
+DEFINE_PUBLIC_COMMONS_COPY(AbstractBaseRateTable)
+DEFINE_PUBLIC_COMMONS(ForwardBaseRateTable)
+DEFINE_PUBLIC_COMMONS_COPY(ForwardBaseRateTable)
+DEFINE_PUBLIC_COMMONS(ConstantBaseRateTable)
+DEFINE_PUBLIC_COMMONS_COPY(ConstantBaseRateTable)
+
+ConstantBaseRateTablePrivate::ConstantBaseRateTablePrivate(ConstantBaseRateTable *q)
+	:AbstractBaseRateTablePrivate(q)
+{}
+ConstantBaseRateTable::ConstantBaseRateTable(ConstantBaseRateTablePrivate *d, const ConstantBaseRateTable& other)
+	:AbstractBaseRateTable(d,other)
+{
+    d->Values = other.d_func()->Values;
+}
+ConstantBaseRateTable::ConstantBaseRateTable(ConstantBaseRateTablePrivate *d)
+	:AbstractBaseRateTable(d)
+{
+	
+}
+
+ConstantBaseRateTable& ConstantBaseRateTable::operator=(const ConstantBaseRateTable& other)
+{
+    AbstractBaseRateTable::operator=(other);
+    Q_D(ConstantBaseRateTable);
+    d->Values = other.d_func()->Values;
+    return *this;
+}
+
 QDataStream& operator<<(QDataStream & stream, const ConstantBaseRateTable& flows) { 
     stream << flows.d_func()->Values << flows.d_func()->UpdateDate; 
     return stream;
 }
-ConstantBaseRateTable::ConstantBaseRateTable(const ConstantBaseRateTable& a) 
-    :AbstractBaseRateTable(new ConstantBaseRateTablePrivate(this,*a.d_func()))
-{}
+
 ConstantBaseRateTable::ConstantBaseRateTable(const ForwardBaseRateTable& a)
 	: AbstractBaseRateTable(a.GetUpdateDate())
 {
@@ -16,10 +43,6 @@ ConstantBaseRateTable::ConstantBaseRateTable(const ForwardBaseRateTable& a)
 		d->Values.insert(i.key(), i.value().GetValue(0));
 	}
 }
-
-ConstantBaseRateTable::ConstantBaseRateTable()
-    :AbstractBaseRateTable(new ConstantBaseRateTablePrivate(this))
-{}
 
 QHash<QString, double>& ConstantBaseRateTable::GetValues()
 {
@@ -64,12 +87,6 @@ void ConstantBaseRateTable::Clear()
     SetUpdateDate(QDate());
 }
 
-ConstantBaseRateTable& ConstantBaseRateTable::operator= (const ConstantBaseRateTable& a)
-{
-    Q_D(ConstantBaseRateTable);
-    d->operator=(*a.d_func());
-    return *this; 
-}
 ConstantBaseRateTable& ConstantBaseRateTable::operator += (const ConstantBaseRateTable& a) {
     Q_D(ConstantBaseRateTable);
     for (QHash<QString, double>::ConstIterator i = a.d_func()->Values.constBegin(); i != a.d_func()->Values.constEnd(); i++) {
@@ -132,25 +149,29 @@ ConstantBaseRateTable& ConstantBaseRateTable::operator = (const QHash<QString, d
 	d->Values = a;
 	return *this;
 }
-ConstantBaseRateTablePrivate::ConstantBaseRateTablePrivate(ConstantBaseRateTable* q)
-    :AbstractBaseRateTablePrivate(q)
-{}
 
-ConstantBaseRateTablePrivate::ConstantBaseRateTablePrivate(ConstantBaseRateTable* q, const ConstantBaseRateTablePrivate& other)
-    : AbstractBaseRateTablePrivate(q, other)
-    , Values(other.Values)
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ForwardBaseRateTablePrivate::ForwardBaseRateTablePrivate(ForwardBaseRateTable *q)
+	:AbstractBaseRateTablePrivate(q)
 {}
-
-ConstantBaseRateTablePrivate& ConstantBaseRateTablePrivate::operator=(const ConstantBaseRateTablePrivate& other)
+ForwardBaseRateTable::ForwardBaseRateTable(ForwardBaseRateTablePrivate *d, const ForwardBaseRateTable& other)
+	:AbstractBaseRateTable(d,other)
 {
-    AbstractBaseRateTablePrivate::operator=(other);
-    Values = other.Values;
+    d->Values = other.d_func()->Values;
+}
+ForwardBaseRateTable::ForwardBaseRateTable(ForwardBaseRateTablePrivate *d)
+	:AbstractBaseRateTable(d)
+{
+	
+}
+
+ForwardBaseRateTable& ForwardBaseRateTable::operator=(const ForwardBaseRateTable& other)
+{
+    AbstractBaseRateTable::operator=(other);
+    Q_D(ForwardBaseRateTable);
+    d->Values = other.d_func()->Values;
     return *this;
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ForwardBaseRateTable::ForwardBaseRateTable(const ForwardBaseRateTable& a) 
-    :AbstractBaseRateTable(new ForwardBaseRateTablePrivate(this,*a.d_func()))
-{}
 
 const QHash<QString, BloombergVector>& ForwardBaseRateTable::GetValues() const
 {
@@ -293,21 +314,7 @@ ForwardBaseRateTable& ForwardBaseRateTable::operator+= (const ConstantBaseRateTa
 	}
 	return *this;
 }
-ForwardBaseRateTablePrivate::ForwardBaseRateTablePrivate(ForwardBaseRateTable* q)
-    :AbstractBaseRateTablePrivate(q)
-{}
 
-ForwardBaseRateTablePrivate::ForwardBaseRateTablePrivate(ForwardBaseRateTable* q, const ForwardBaseRateTablePrivate& other)
-    : AbstractBaseRateTablePrivate(q, other)
-    , Values(other.Values)
-{}
-
-ForwardBaseRateTablePrivate& ForwardBaseRateTablePrivate::operator=(const ForwardBaseRateTablePrivate& other)
-{
-    AbstractBaseRateTablePrivate::operator=(other);
-    Values = other.Values;
-    return *this;
-}
 //////////////////////////////////////////////////////////////////////////
 AbstractBaseRateTable::AbstractBaseRateTable(const QDate& a) 
     : AbstractBaseRateTable()
@@ -315,15 +322,12 @@ AbstractBaseRateTable::AbstractBaseRateTable(const QDate& a)
     SetUpdateDate(a);
 }
 
-AbstractBaseRateTable::AbstractBaseRateTable()
-    :BackwardInterface(new AbstractBaseRateTablePrivate(this))
+AbstractBaseRateTable& AbstractBaseRateTable::operator=(const AbstractBaseRateTable& a)
 {
-
+    BackwardInterface::operator=(a);
+    Q_D(AbstractBaseRateTable);
+    d->UpdateDate = a.d_func()->UpdateDate;
 }
-
-AbstractBaseRateTable::AbstractBaseRateTable(AbstractBaseRateTablePrivate* d)
-    :BackwardInterface(d)
-{}
 
 const QDate& AbstractBaseRateTable::GetUpdateDate() const
 {
@@ -337,18 +341,16 @@ void AbstractBaseRateTable::SetUpdateDate(const QDate& val)
     d->UpdateDate = val;
 }
 
-AbstractBaseRateTablePrivate::AbstractBaseRateTablePrivate(AbstractBaseRateTable* q)
-    :BackwardInterfacePrivate(q)
+AbstractBaseRateTablePrivate::AbstractBaseRateTablePrivate(AbstractBaseRateTable *q)
+	:BackwardInterfacePrivate(q)
 {}
-
-AbstractBaseRateTablePrivate::AbstractBaseRateTablePrivate(AbstractBaseRateTable* q, const AbstractBaseRateTablePrivate& other)
-    : BackwardInterfacePrivate(q, other)
-    , UpdateDate(other.UpdateDate)
-{}
-
-AbstractBaseRateTablePrivate& AbstractBaseRateTablePrivate::operator=(const AbstractBaseRateTablePrivate& other)
+AbstractBaseRateTable::AbstractBaseRateTable(AbstractBaseRateTablePrivate *d, const AbstractBaseRateTable& other)
+	:BackwardInterface(d,other)
 {
-    BackwardInterfacePrivate::operator=(other);
-    UpdateDate = other.UpdateDate;
-    return *this;
+    d->UpdateDate = other.d_func()->UpdateDate;
 }
+AbstractBaseRateTable::AbstractBaseRateTable(AbstractBaseRateTablePrivate *d)
+	:BackwardInterface(d)
+{}
+
+

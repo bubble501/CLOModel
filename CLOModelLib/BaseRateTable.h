@@ -13,26 +13,22 @@ class ForwardBaseRateTablePrivate;
 class AbstractBaseRateTablePrivate;
 class CLOMODELLIB_EXPORT AbstractBaseRateTable : public BackwardInterface
 {
-protected:
-    Q_DECLARE_PRIVATE(AbstractBaseRateTable)
+    DECLARE_PUBLIC_COMMONS(AbstractBaseRateTable)
+    DECLARE_PUBLIC_COMMONS_COPY(AbstractBaseRateTable)
 public:
 	AbstractBaseRateTable(const QDate& a);
-	AbstractBaseRateTable();
+    AbstractBaseRateTable& operator=(const AbstractBaseRateTable& a);
 	virtual const QDate& GetUpdateDate() const;
 	virtual void SetUpdateDate(const QDate& val);
 	virtual bool Contains(const QString& key) const = 0;
 	virtual QList<QString> GetAvailableKeys() const = 0;
     virtual void Clear() = 0;
-protected:
-    AbstractBaseRateTable(AbstractBaseRateTablePrivate* d);
 };
 class CLOMODELLIB_EXPORT ConstantBaseRateTable : public AbstractBaseRateTable
 {
-protected:
-    Q_DECLARE_PRIVATE(ConstantBaseRateTable)
+    DECLARE_PUBLIC_COMMONS(ConstantBaseRateTable)
+    DECLARE_PUBLIC_COMMONS_COPY(ConstantBaseRateTable)
 public:
-	ConstantBaseRateTable();
-	ConstantBaseRateTable(const ConstantBaseRateTable& a);
 	ConstantBaseRateTable(const ForwardBaseRateTable& a);
 	ConstantBaseRateTable(const QHash<QString, double>& a, const QDate& upd=QDate());
 	ConstantBaseRateTable& operator=(const ConstantBaseRateTable& a);
@@ -51,18 +47,15 @@ public:
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 private:
-	
 	friend QDataStream& operator<<(QDataStream & stream, const ConstantBaseRateTable& flows);
 	friend QDataStream& operator>>(QDataStream & stream, ConstantBaseRateTable& flows);
 
 };
 class CLOMODELLIB_EXPORT  ForwardBaseRateTable : public AbstractBaseRateTable
 {
-protected:
-    Q_DECLARE_PRIVATE(ForwardBaseRateTable)
+    DECLARE_PUBLIC_COMMONS(ForwardBaseRateTable)
+    DECLARE_PUBLIC_COMMONS_COPY(ForwardBaseRateTable)
 public:
-	ForwardBaseRateTable() {}
-	ForwardBaseRateTable(const ForwardBaseRateTable& a);
 	ForwardBaseRateTable(const ConstantBaseRateTable& a);
 	ForwardBaseRateTable(const QHash<QString, BloombergVector>& a, const QDate& upd = QDate());
 	ForwardBaseRateTable& operator=(const ForwardBaseRateTable& a);

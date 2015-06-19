@@ -6,8 +6,8 @@
 class GenericCashFlowPrivate;
 class CLOMODELLIB_EXPORT GenericCashFlow : public BackwardInterface
 {
-protected:
-    Q_DECLARE_PRIVATE(GenericCashFlow)
+    DECLARE_PUBLIC_COMMONS(GenericCashFlow)
+    DECLARE_PUBLIC_COMMONS_COPY(GenericCashFlow)
 public:
 	enum CashFlowAggregation {
 		NoAggregation
@@ -19,8 +19,6 @@ public:
 		, TotalAggragate
 	};
 	virtual ~GenericCashFlow();
-	GenericCashFlow();
-	GenericCashFlow(const GenericCashFlow& a);
 	virtual GenericCashFlow& operator=(const GenericCashFlow& a);
 	virtual GenericCashFlow& operator+=(const GenericCashFlow& a);
 	virtual GenericCashFlow operator+(const GenericCashFlow& a) const;
@@ -69,7 +67,6 @@ public:
 	virtual bool IsStock(qint32 a) const;
 	virtual const QSet<qint32>& GetStocks() const;
 protected:
-    GenericCashFlow(GenericCashFlowPrivate* d);
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 	friend QDataStream& operator<<(QDataStream & stream, const GenericCashFlow& flows);
 	friend QDataStream& operator>>(QDataStream & stream, GenericCashFlow& flows);

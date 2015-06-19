@@ -1,7 +1,34 @@
 #include "Seniority.h"
 #include "Seniority_p.h"
 #include <QStringList>
+DEFINE_PUBLIC_COMMONS(Seniority)
+DEFINE_PUBLIC_COMMONS_COPY(Seniority)
 
+SeniorityPrivate::SeniorityPrivate(Seniority *q)
+	:BackwardInterfacePrivate(q)
+{}
+Seniority::Seniority(SeniorityPrivate *d, const Seniority& other)
+	:BackwardInterface(d,other)
+{
+    d->m_SeniorityScale = other.d_func()->m_SeniorityScale;
+    d->m_GroupScale = other.d_func()->m_GroupScale;
+    d->m_RankScale = other.d_func()->m_RankScale;
+}
+Seniority::Seniority(SeniorityPrivate *d)
+	:BackwardInterface(d)
+{
+	
+}
+
+Seniority& Seniority::operator=(const Seniority& other)
+{
+    BackwardInterface::operator=(other);
+    Q_D(Seniority);
+    d->m_SeniorityScale = other.d_func()->m_SeniorityScale;
+    d->m_GroupScale = other.d_func()->m_GroupScale;
+    d->m_RankScale = other.d_func()->m_RankScale;
+    return *this;
+}
 void Seniority::Clear()
 {
     Q_D(Seniority);
@@ -9,8 +36,6 @@ void Seniority::Clear()
     d->m_GroupScale.clear();
     d->m_RankScale.clear();
 }
-
-
 
 quint32 Seniority::GetSeniority(int level) const
 {
@@ -97,29 +122,12 @@ QString Seniority::ToString() const
     return Result;
 }
 
-Seniority::Seniority()
-    :BackwardInterface(new SeniorityPrivate(this))
-{}
+
 
 Seniority::Seniority(const QString& a)
     :Seniority()
 {
     SetSeniorityScale(a);
-}
-
-Seniority::Seniority(SeniorityPrivate* d)
-    :BackwardInterface(d)
-{}
-
-Seniority::Seniority(const Seniority& a)
-    : BackwardInterface(new SeniorityPrivate(this,*a.d_func()))
-{}
-
-Seniority& Seniority::operator=(const Seniority& a)
-{
-    Q_D(Seniority);
-    d->operator=(*a.d_func());
-    return *this;
 }
 
 bool Seniority::isValid() const
@@ -139,22 +147,4 @@ QDataStream& operator>>(QDataStream & stream, Seniority& flows)
 {
     return flows.LoadOldVersion(stream);
 }
-SeniorityPrivate::SeniorityPrivate(Seniority* q)
-    :BackwardInterfacePrivate(q)
-{}
 
-SeniorityPrivate::SeniorityPrivate(Seniority* q, const SeniorityPrivate& other)
-    : BackwardInterfacePrivate(q, other)
-    , m_SeniorityScale(other.m_SeniorityScale)
-    , m_GroupScale(other.m_GroupScale)
-    , m_RankScale(other.m_RankScale)
-{}
-
-SeniorityPrivate& SeniorityPrivate::operator=(const SeniorityPrivate& other)
-{
-    BackwardInterfacePrivate::operator=(other);
-    m_SeniorityScale = other.m_SeniorityScale;
-    m_GroupScale = other.m_GroupScale;
-    m_RankScale = other.m_RankScale;
-    return *this;
-}

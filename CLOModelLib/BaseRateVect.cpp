@@ -16,23 +16,34 @@
 #include <QSqlQuery>
 #include <QVariant>
 #endif
-
-BaseRateVector::BaseRateVector()
-    : AbstractBbgVect(new BaseRateVectorPrivate(this))
+DEFINE_PUBLIC_COMMONS(BaseRateVector)
+DEFINE_PUBLIC_COMMONS_COPY(BaseRateVector)
+BaseRateVectorPrivate::BaseRateVectorPrivate(BaseRateVector *q)
+	:AbstractBbgVectPrivate(q)
 {}
+BaseRateVector::BaseRateVector(BaseRateVectorPrivate *d, const BaseRateVector& other)
+	:AbstractBbgVect(d,other)
+{
+    d->m_VectVal = other.d_func()->m_VectVal;
+}
+BaseRateVector::BaseRateVector(BaseRateVectorPrivate *d)
+	:AbstractBbgVect(d)
+{}
+BaseRateVector& BaseRateVector::operator=(const BaseRateVector& other)
+{
+    AbstractBbgVect::operator=(other);
+    Q_D(BaseRateVector);
+    d->m_VectVal = other.d_func()->m_VectVal;
+    return *this;
+}
+
 BaseRateVector::BaseRateVector(const QString& Vec)
     :BaseRateVector()
 {
     SetVector(Vec);
 }
-BaseRateVector::BaseRateVector(const BaseRateVector& Vec)
-	: AbstractBbgVect(new BaseRateVectorPrivate(this,*Vec.d_func()))
-{}
-BaseRateVector& BaseRateVector::operator=(const BaseRateVector& Vec) {
-    Q_D(BaseRateVector);
-    d->operator=(*Vec.d_func());
-	return *this;
-}
+
+
 BaseRateVector::BaseRateVector(const QString& Vec,const QDate& Anchor)
     :BaseRateVector(Vec)
 {
@@ -451,18 +462,3 @@ FloorCapVector BaseRateVector::ExtractFloorCapVector() const
 
 
 
-BaseRateVectorPrivate::BaseRateVectorPrivate(BaseRateVector* q, const BaseRateVectorPrivate& other)
-    :AbstractBbgVectPrivate(q, other)
-    , m_VectVal(other.m_VectVal)
-{}
-
-BaseRateVectorPrivate::BaseRateVectorPrivate(BaseRateVector* q)
-    : AbstractBbgVectPrivate(q)
-{}
-
-BaseRateVectorPrivate& BaseRateVectorPrivate::operator=(const BaseRateVectorPrivate& other)
-{
-    AbstractBbgVectPrivate::operator=(other);
-    m_VectVal = other.m_VectVal;
-    return *this;
-}

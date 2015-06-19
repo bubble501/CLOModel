@@ -6,8 +6,8 @@
 class RepaymentVectorPrivate;
 class CLOMODELLIB_EXPORT RepaymentVector : public AbstractBbgVect
 {
-protected:
-    Q_DECLARE_PRIVATE(RepaymentVector)
+    DECLARE_PUBLIC_COMMONS(RepaymentVector)
+    DECLARE_PUBLIC_COMMONS_COPY(RepaymentVector)
 public:
 	enum RepaymentMethods : qint8 {
 		Invalid=-1
@@ -22,8 +22,6 @@ protected:
 	virtual bool IsValid() const override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 public:
-    RepaymentVector();
-	RepaymentVector(const RepaymentVector& Vec);
 	RepaymentVector(const QString& Vec);
 	RepaymentVector(const QString& Vec, const QDate& Anchor);
 	RepaymentMethods GetValue(const QDate& index) const;

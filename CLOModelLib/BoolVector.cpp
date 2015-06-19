@@ -3,9 +3,27 @@
 #include "CommonFunctions.h"
 #include <QRegExp>
 #include <QStringList>
-BoolVector::BoolVector()
-    : AbstractBbgVect(new BoolVectorPrivate(this))
+DEFINE_PUBLIC_COMMONS(BoolVector)
+DEFINE_PUBLIC_COMMONS_COPY(BoolVector)
+BoolVectorPrivate::BoolVectorPrivate(BoolVector *q)
+	:AbstractBbgVectPrivate(q)
 {}
+BoolVector::BoolVector(BoolVectorPrivate *d, const BoolVector& other)
+    : AbstractBbgVect(d, other)
+{
+    d->m_VectVal = other.d_func()->m_VectVal;
+}
+BoolVector::BoolVector(BoolVectorPrivate *d)
+	:AbstractBbgVect(d)
+{}
+BoolVector& BoolVector::operator=(const BoolVector& other)
+{
+    AbstractBbgVect::operator=(other);
+    Q_D(BoolVector);
+    d->m_VectVal = other.d_func()->m_VectVal;
+    return *this;
+}
+
 BoolVector::BoolVector(const QString& Vec)
     :BoolVector()
 {
@@ -15,10 +33,6 @@ BoolVector::BoolVector(const QString& Vec,const QDate& Anchor)
     : BoolVector(Vec)
 {
     SetAnchorDate(Anchor);
-}
-BoolVector::BoolVector(const BoolVector& Vec)
-    : AbstractBbgVect(new BoolVectorPrivate(this, *Vec.d_func()))
-{
 }
 void BoolVector::UnpackVector(){
     Q_D(BoolVector);
@@ -87,18 +101,3 @@ QDataStream& BoolVector::LoadOldVersion(QDataStream& stream) {
 }
 
 
-BoolVectorPrivate::BoolVectorPrivate(BoolVector* q, const BoolVectorPrivate& other)
-    :AbstractBbgVectPrivate(q, other)
-    , m_VectVal(other.m_VectVal)
-{}
-
-BoolVectorPrivate::BoolVectorPrivate(BoolVector* q)
-    : AbstractBbgVectPrivate(q)
-{}
-
-BoolVectorPrivate& BoolVectorPrivate::operator=(const BoolVectorPrivate& other)
-{
-    AbstractBbgVectPrivate::operator=(other);
-    m_VectVal = other.m_VectVal;
-    return *this;
-}

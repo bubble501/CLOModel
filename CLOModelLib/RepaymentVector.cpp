@@ -3,6 +3,27 @@
 #include "CommonFunctions.h"
 #include <QRegExp>
 #include <QStringList>
+DEFINE_PUBLIC_COMMONS(RepaymentVector)
+DEFINE_PUBLIC_COMMONS_COPY(RepaymentVector)
+RepaymentVectorPrivate::RepaymentVectorPrivate(RepaymentVector *q)
+	:AbstractBbgVectPrivate(q)
+{}
+RepaymentVector::RepaymentVector(RepaymentVectorPrivate *d, const RepaymentVector& other)
+	:AbstractBbgVect(d,other)
+{
+    d->m_VectVal = other.d_func()->m_VectVal;
+}
+RepaymentVector::RepaymentVector(RepaymentVectorPrivate *d)
+	:AbstractBbgVect(d)
+{}
+RepaymentVector& RepaymentVector::operator=(const RepaymentVector& other)
+{
+    AbstractBbgVect::operator=(other);
+    Q_D(RepaymentVector);
+    d->m_VectVal = other.d_func()->m_VectVal;
+    return *this;
+}
+
 RepaymentVector::RepaymentVector(const QString& Vec)
     :RepaymentVector()
 {
@@ -13,12 +34,6 @@ RepaymentVector::RepaymentVector(const QString& Vec, const QDate& Anchor)
 {
     SetAnchorDate(Anchor);
 }
-RepaymentVector::RepaymentVector()
-    : AbstractBbgVect(new RepaymentVectorPrivate(this))
-{}
-RepaymentVector::RepaymentVector(const RepaymentVector& Vec) 
-    :AbstractBbgVect(new RepaymentVectorPrivate(this,*Vec.d_func()))
-{}
 void RepaymentVector::UnpackVector() {
     Q_D(RepaymentVector);
 	d->m_VectVal.clear();
@@ -88,14 +103,6 @@ int RepaymentVector::NumElements() const
     Q_D(const RepaymentVector);
     return d->m_VectVal.size();
 }
-
-RepaymentVector& RepaymentVector::operator=(const RepaymentVector& a)
-{
-    Q_D(RepaymentVector);
-    d->operator=(*a.d_func());
-    return *this;
-}
-
 RepaymentVector& RepaymentVector::operator=(const QString& a)
 {
     AbstractBbgVect::operator=(a); 
@@ -156,19 +163,4 @@ RepaymentVector::RepaymentMethods RepaymentVectorPrivate::StringToRepaymentMetho
 
 QString RepaymentVectorPrivate::RepaymentMethodsToString(RepaymentVector::RepaymentMethods a) const { 
     return RepaymentMethodsToString(static_cast<int>(a)); 
-}
-RepaymentVectorPrivate::RepaymentVectorPrivate(RepaymentVector* q, const RepaymentVectorPrivate& other)
-    :AbstractBbgVectPrivate(q, other)
-    , m_VectVal(other.m_VectVal)
-{}
-
-RepaymentVectorPrivate::RepaymentVectorPrivate(RepaymentVector* q)
-    : AbstractBbgVectPrivate(q)
-{}
-
-RepaymentVectorPrivate& RepaymentVectorPrivate::operator=(const RepaymentVectorPrivate& other)
-{
-    AbstractBbgVectPrivate::operator=(other);
-    m_VectVal = other.m_VectVal;
-    return *this;
 }

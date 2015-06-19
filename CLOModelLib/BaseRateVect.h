@@ -9,8 +9,9 @@
 class BaseRateVectorPrivate;
 class CLOMODELLIB_EXPORT  BaseRateVector : public AbstractBbgVect
 {
+    DECLARE_PUBLIC_COMMONS(BaseRateVector)
+    DECLARE_PUBLIC_COMMONS_COPY(BaseRateVector)
 protected:
-    Q_DECLARE_PRIVATE(BaseRateVector)
 	virtual void UnpackVector() override;
 	virtual bool IsValid() const override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
@@ -18,9 +19,7 @@ protected:
 public:
     virtual int replaceValue(const QString& oldVal, BaseRateVector newVal, bool replaceFloorCaps = true);
 	virtual FloorCapVector ExtractFloorCapVector() const;
-    BaseRateVector();
 	BaseRateVector(const QString& Vec);
-	BaseRateVector(const BaseRateVector& Vec);
 	BaseRateVector(const QString& Vec,const QDate& Anchor);
 	BaseRateVector& operator=(const BaseRateVector& Vec);
 	virtual bool IsZero()const;

@@ -8,16 +8,15 @@
 class DayCountVectorPrivate;
 class CLOMODELLIB_EXPORT DayCountVector : public AbstractBbgVect
 {
+    DECLARE_PUBLIC_COMMONS(DayCountVector)
+    DECLARE_PUBLIC_COMMONS_COPY(DayCountVector)
 protected:
-    Q_DECLARE_PRIVATE(DayCountVector)
 	virtual void UnpackVector() override;
 	virtual bool IsValid() const override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 public:
 	virtual QRegExpValidator* GetValidator(QObject* parent = 0) const override;
 	using AbstractBbgVect::IsEmpty;
-	DayCountVector();
-	DayCountVector(const DayCountVector& Vec);
 	DayCountVector(const QString& Vec);
 	DayCountVector(const QString& Vec, const QDate& Anchor);
 	DayCountVector(DayCountConvention a,const QDate& index=QDate());

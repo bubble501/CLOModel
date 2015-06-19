@@ -1,6 +1,32 @@
 #include "PrincipalProceeds.h"
 #include "PrincipalProceeds_p.h"
 #include <QDataStream>
+DEFINE_PUBLIC_COMMONS(PrincipalRecip)
+DEFINE_PUBLIC_COMMONS_COPY(PrincipalRecip)
+PrincipalRecipPrivate::PrincipalRecipPrivate(PrincipalRecip *q)
+	:BackwardInterfacePrivate(q)
+{}
+PrincipalRecip::PrincipalRecip(PrincipalRecipPrivate *d, const PrincipalRecip& other)
+	:BackwardInterface(d,other)
+{
+    d->m_Scheduled = other.d_func()->m_Scheduled;
+    d->m_Prepay = other.d_func()->m_Prepay;
+}
+PrincipalRecip::PrincipalRecip(PrincipalRecipPrivate *d)
+	:BackwardInterface(d)
+{
+    d->m_Scheduled = 0.0;
+    d->m_Prepay = 0.0;
+}
+
+PrincipalRecip& PrincipalRecip::operator=(const PrincipalRecip& other)
+{
+    BackwardInterface::operator=(other);
+    Q_D(PrincipalRecip);
+    d->m_Scheduled = other.d_func()->m_Scheduled;
+    d->m_Prepay = other.d_func()->m_Prepay;
+    return *this;
+}
 QDataStream& PrincipalRecip::LoadOldVersion(QDataStream& stream) {
     Q_D(PrincipalRecip);
     stream >> d->m_Scheduled >> d->m_Prepay;
@@ -14,13 +40,6 @@ void PrincipalRecipPrivate::NormaliseValues()
         m_Scheduled = 0.0;
     if (qAbs(m_Prepay) < 0.01)
         m_Prepay = 0.0;
-}
-
-PrincipalRecip& PrincipalRecip::operator=(const PrincipalRecip& a)
-{
-    Q_D(PrincipalRecip);
-    d->operator=(*a.d_func());
-    return *this;
 }
 
 const double& PrincipalRecip::GetPrepay() const
@@ -65,13 +84,6 @@ void PrincipalRecip::AddScheduled(const double& val)
     d->NormaliseValues();
 }
 
-PrincipalRecip::PrincipalRecip(const PrincipalRecip& a)
-    :BackwardInterface(new PrincipalRecipPrivate(this,*a.d_func()))
-{}
-
-PrincipalRecip::PrincipalRecip()
-    :BackwardInterface(new PrincipalRecipPrivate(this))
-{}
 
 PrincipalRecip& PrincipalRecip::operator-=(double a)
 {
@@ -136,23 +148,4 @@ QDataStream& operator<<(QDataStream & stream, const PrincipalRecip& flows)
 }
 QDataStream& operator>>(QDataStream & stream, PrincipalRecip& flows) {
 	return flows.LoadOldVersion(stream);
-}
-PrincipalRecipPrivate::PrincipalRecipPrivate(PrincipalRecip* q)
-    :BackwardInterfacePrivate(q)
-    , m_Scheduled(0.0)
-    , m_Prepay(0.0)
-{}
-
-PrincipalRecipPrivate::PrincipalRecipPrivate(PrincipalRecip* q, const PrincipalRecipPrivate& other)
-    : BackwardInterfacePrivate(q, other)
-    , m_Scheduled(other.m_Scheduled)
-    , m_Prepay(other.m_Prepay)
-{}
-
-PrincipalRecipPrivate& PrincipalRecipPrivate::operator=(const PrincipalRecipPrivate& other)
-{
-    BackwardInterfacePrivate::operator=(other);
-    m_Scheduled = other.m_Scheduled;
-    m_Prepay = other.m_Prepay;
-    return *this;
 }

@@ -4,15 +4,9 @@
 #include "BoolVector.h"
 class BoolVectorPrivate : public AbstractBbgVectPrivate
 {
-    Q_DECLARE_PUBLIC(BoolVector)
-private:
-    BoolVectorPrivate(const BoolVectorPrivate& other);
+    DECLARE_PRIVATE_COMMONS(BoolVector)
+    DECLARE_PRIVATE_COMMONS_DATASTREAM(BoolVector)
 public:
-    BoolVectorPrivate(BoolVector* q);
-    BoolVectorPrivate(BoolVector* q, const BoolVectorPrivate& other);
-    virtual BoolVectorPrivate& operator=(const BoolVectorPrivate& other);
     QList<bool> m_VectVal;
-    friend QDataStream& operator<<(QDataStream & stream, const BoolVector& flows);
-    friend QDataStream& operator>>(QDataStream & stream, BoolVector& flows);
 };
 #endif // BoolVector_p_h__

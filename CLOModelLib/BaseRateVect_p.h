@@ -6,13 +6,9 @@
 #include <QStringList>
 class BaseRateVectorPrivate : public AbstractBbgVectPrivate
 {
-    Q_DECLARE_PUBLIC(BaseRateVector)
-private:
-    BaseRateVectorPrivate(const BaseRateVectorPrivate& other);
+    DECLARE_PRIVATE_COMMONS(BaseRateVector)
+    DECLARE_PRIVATE_COMMONS_DATASTREAM(BaseRateVector)
 public:
-    BaseRateVectorPrivate(BaseRateVector* q);
-    BaseRateVectorPrivate(BaseRateVector* q, const BaseRateVectorPrivate& other);
-    virtual BaseRateVectorPrivate& operator=(const BaseRateVectorPrivate& other);
     QStringList m_VectVal;
     template<class T> QString GetValue(const T& index) const
     {
@@ -37,7 +33,5 @@ public:
         if (CaptureFloor.indexIn(RawVal) < 0) return QString();
         return CaptureFloor.cap(1);
     }
-    friend QDataStream& operator<<(QDataStream & stream, const BaseRateVector& flows);
-    friend QDataStream& operator>>(QDataStream & stream, BaseRateVector& flows);
 };
 #endif // BaseRateVect_p_h__

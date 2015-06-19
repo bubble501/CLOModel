@@ -5,17 +5,11 @@
 #include "BackwardCompatibilityInterface_p.h"
 class PrincipalRecipPrivate : public BackwardInterfacePrivate
 {
-    Q_DECLARE_PUBLIC(PrincipalRecip)
-private:
-    PrincipalRecipPrivate(const PrincipalRecipPrivate& other);
+    DECLARE_PRIVATE_COMMONS(PrincipalRecip)
+    DECLARE_PRIVATE_COMMONS_DATASTREAM(PrincipalRecip)
 public:
-    PrincipalRecipPrivate(PrincipalRecip* q);
-    PrincipalRecipPrivate(PrincipalRecip* q, const PrincipalRecipPrivate& other);
-    virtual PrincipalRecipPrivate& operator=(const PrincipalRecipPrivate& other);
     double m_Scheduled;
     double m_Prepay;
     virtual void NormaliseValues();
-    friend QDataStream& operator<<(QDataStream & stream, const PrincipalRecip& flows);
-    friend QDataStream& operator>>(QDataStream & stream, PrincipalRecip& flows);
 };
 #endif // PrincipalProceeds_p_h__

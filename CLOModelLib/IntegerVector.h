@@ -6,8 +6,9 @@
 class IntegerVectorPrivate;
 class CLOMODELLIB_EXPORT IntegerVector : public AbstractBbgVect
 {
+    DECLARE_PUBLIC_COMMONS(IntegerVector)
+    DECLARE_PUBLIC_COMMONS_COPY(IntegerVector)
 protected:
-    Q_DECLARE_PRIVATE(IntegerVector)
 	virtual void UnpackVector();
 	virtual bool IsValid() const override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
@@ -15,8 +16,6 @@ public:
 	virtual QRegExpValidator* GetValidator(QObject* parent = 0) const override;
 	using AbstractBbgVect::IsEmpty;
 	virtual bool IsEmpty(int Lbound, int Ubound=INT_MAX, bool IgnoreShift=false)const;
-	IntegerVector();
-	IntegerVector(const IntegerVector& Vec);
 	IntegerVector(const QString& Vec);
 	IntegerVector(const QString& Vec, const QDate& Anchor);
 	int GetValue(const QDate& index) const;

@@ -1,16 +1,14 @@
+#ifndef IntegerVector_p_h__
+#define IntegerVector_p_h__
+
 #include "AbstractBbgVect_p.h"
 #include "IntegerVector.h"
 class IntegerVectorPrivate : public AbstractBbgVectPrivate
 {
-    Q_DECLARE_PUBLIC(IntegerVector)
-private:
-    IntegerVectorPrivate(const IntegerVectorPrivate& other);
+    DECLARE_PRIVATE_COMMONS(IntegerVector)
+    DECLARE_PRIVATE_COMMONS_DATASTREAM(IntegerVector)
 public:
-    IntegerVectorPrivate(IntegerVector* q);
-    IntegerVectorPrivate(IntegerVector* q, const IntegerVectorPrivate& other);
-    virtual IntegerVectorPrivate& operator=(const IntegerVectorPrivate& other);
     QList<int> m_VectVal;
     qint32 m_Shift;
-    friend QDataStream& operator<<(QDataStream & stream, const IntegerVector& flows);
-    friend QDataStream& operator>>(QDataStream & stream, IntegerVector& flows);
 };
+#endif // IntegerVector_p_h__

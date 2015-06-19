@@ -5,6 +5,32 @@
 #include <qmath.h>
 #include "IntegerVector_p.h"
 #include "InternalItems.h"
+DEFINE_PUBLIC_COMMONS(IntegerVector)
+DEFINE_PUBLIC_COMMONS_COPY(IntegerVector)
+IntegerVectorPrivate::IntegerVectorPrivate(IntegerVector *q)
+	:AbstractBbgVectPrivate(q)
+{}
+IntegerVector::IntegerVector(IntegerVectorPrivate *d, const IntegerVector& other)
+	:AbstractBbgVect(d,other)
+{
+    d->m_VectVal=other.d_func()->m_VectVal;
+    d->m_Shift=other.d_func()->m_Shift;
+}
+IntegerVector::IntegerVector(IntegerVectorPrivate *d)
+	:AbstractBbgVect(d)
+{
+    d->m_Shift=0;
+}
+
+
+IntegerVector& IntegerVector::operator=(const IntegerVector& other)
+{
+    Q_D(IntegerVector);
+    AbstractBbgVect::operator=(other);
+    d->m_VectVal = other.d_func()->m_VectVal;
+    d->m_Shift = other.d_func()->m_Shift;
+    return *this;
+}
 IntegerVector::IntegerVector(const QString& Vec)
     :IntegerVector()
 {
@@ -134,22 +160,4 @@ bool IntegerVector::IsEmpty(int Lbound, int Ubound, bool IgnoreShift) const {
 		) return true;
 	}
 	return false;
-}
-IntegerVectorPrivate::IntegerVectorPrivate(IntegerVector* q, const IntegerVectorPrivate& other)
-    :AbstractBbgVectPrivate(q, other)
-    , m_VectVal(other.m_VectVal)
-    ,m_Shift(other.m_Shift)
-{}
-
-IntegerVectorPrivate::IntegerVectorPrivate(IntegerVector* q)
-    : AbstractBbgVectPrivate(q)
-    , m_Shift(0)
-{}
-
-IntegerVectorPrivate& IntegerVectorPrivate::operator=(const IntegerVectorPrivate& other)
-{
-    AbstractBbgVectPrivate::operator=(other);
-    m_VectVal = other.m_VectVal;
-    m_Shift = other.m_Shift;
-    return *this;
 }

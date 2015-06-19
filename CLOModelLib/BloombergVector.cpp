@@ -9,6 +9,35 @@
 #include <QStringList>
 #include <boost/math/tools/toms748_solve.hpp>
 #include <qmath.h>
+DEFINE_PUBLIC_COMMONS(BloombergVector)
+DEFINE_PUBLIC_COMMONS_COPY(BloombergVector)
+BloombergVectorPrivate::BloombergVectorPrivate(BloombergVector *q)
+	:AbstractBbgVectPrivate(q)
+{}
+BloombergVector::BloombergVector(BloombergVectorPrivate *d, const BloombergVector& other)
+	:AbstractBbgVect(d)
+{
+	Q_D(BloombergVector);
+    d->m_VectVal = other.d_func()->m_VectVal;
+    d->m_Divisor = other.d_func()->m_Divisor;
+    RegisterAsMetaType<BloombergVector>();
+}
+BloombergVector::BloombergVector(BloombergVectorPrivate *d)
+	:AbstractBbgVect(d)
+{
+	Q_D(BloombergVector);
+    d->m_Divisor = 100.0;
+    RegisterAsMetaType<BloombergVector>();
+}
+BloombergVector& BloombergVector::operator=(const BloombergVector& Vec)
+{
+    AbstractBbgVect::operator=(Vec);
+    Q_D(BloombergVector);
+    d->m_VectVal = Vec.d_func()->m_VectVal;
+    d->m_Divisor = Vec.d_func()->m_Divisor;
+    return *this;
+}
+
 BloombergVector::BloombergVector(const QString& Vec)
     :BloombergVector()
 {
@@ -27,10 +56,6 @@ BloombergVector::BloombergVector(const QList<double>& Values, const QDate& Ancho
     d->m_AnchorDate = Anchor;
 	RepackVector(); 
 }
-
-BloombergVector::BloombergVector(BloombergVectorPrivate *d)
-    :AbstractBbgVect(d)
-{}
 
 bool BloombergVector::SetVector(const QList<double>& Values, const QDate& Anchor)
 {
@@ -78,17 +103,6 @@ bool BloombergVector::SetVector(const QList<QDate>& Dates, const QList<double>& 
 
 	RepackVector();
 	return true;
-}
-
-BloombergVector::BloombergVector(const BloombergVector& Vec)
-	:AbstractBbgVect(new BloombergVectorPrivate(this,*Vec.d_func()))
-{}
-	
-BloombergVector& BloombergVector::operator=(const BloombergVector& Vec)
-{
-    Q_D(BloombergVector);
-    d->operator=(*Vec.d_func());
-	return *this;
 }
 
 BloombergVector& BloombergVector::operator=(const QString& a)
@@ -147,12 +161,6 @@ BloombergVector::BloombergVector(const QString& Vec,const QDate& Anchor)
 {
     SetVector(Vec);
     SetAnchorDate(Anchor);
-}
-
-BloombergVector::BloombergVector()
-    :AbstractBbgVect(new BloombergVectorPrivate(this))
-{
-    RegisterAsMetaType<BloombergVector>();
 }
 
 void BloombergVector::RepackVector(){
@@ -459,25 +467,3 @@ double BloombergVector::GetDivisor() const
     return d->m_Divisor;
 }
 
-BloombergVectorPrivate::BloombergVectorPrivate(BloombergVector* q, const BloombergVectorPrivate& other)
-    :AbstractBbgVectPrivate(q, other)
-    , m_VectVal(other.m_VectVal)
-    , m_Divisor(other.m_Divisor)
-{
-
-}
-
-BloombergVectorPrivate::BloombergVectorPrivate(BloombergVector* q)
-    :AbstractBbgVectPrivate(q)
-    , m_Divisor(100.0)
-{
-
-}
-
-BloombergVectorPrivate& BloombergVectorPrivate::operator=(const BloombergVectorPrivate& other)
-{
-    AbstractBbgVectPrivate::operator=(other);
-    m_VectVal = other.m_VectVal;
-    m_Divisor = other.m_Divisor;
-    return *this;
-}

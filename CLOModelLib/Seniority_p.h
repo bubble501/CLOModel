@@ -5,13 +5,9 @@
 #include "BackwardCompatibilityInterface_p.h"
 class SeniorityPrivate : public BackwardInterfacePrivate
 {
-    Q_DECLARE_PUBLIC(Seniority)
-private:
-    SeniorityPrivate(const SeniorityPrivate& other);
+    DECLARE_PRIVATE_COMMONS(Seniority)
+    DECLARE_PRIVATE_COMMONS_DATASTREAM(Seniority)
 public:
-    SeniorityPrivate(Seniority* q);
-    SeniorityPrivate(Seniority* q, const SeniorityPrivate& other);
-    virtual SeniorityPrivate& operator=(const SeniorityPrivate& other);
     QList<quint32> m_SeniorityScale;
     QList<quint32> m_GroupScale;
     QList<quint32> m_RankScale;

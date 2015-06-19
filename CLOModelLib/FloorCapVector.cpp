@@ -3,12 +3,39 @@
 #include <QRegExp>
 #include <QStringList>
 #include "CommonFunctions.h"
-FloorCapVector::FloorCapVector()
-    :AbstractBbgVect(new FloorCapVectorPrivate(this))
+DEFINE_PUBLIC_COMMONS(FloorCapVector)
+DEFINE_PUBLIC_COMMONS_COPY(FloorCapVector)
+FloorCapVectorPrivate::FloorCapVectorPrivate(FloorCapVector *q)
+	:AbstractBbgVectPrivate(q)
 {}
-FloorCapVector::FloorCapVector(const FloorCapVector& other)
-    : AbstractBbgVect(new FloorCapVectorPrivate(this,*other.d_func()))
+FloorCapVector::FloorCapVector(FloorCapVectorPrivate *d, const FloorCapVector& other)
+	:AbstractBbgVect(d,other)
+{
+    this->operator=(other);
+}
+FloorCapVector::FloorCapVector(FloorCapVectorPrivate *d)
+	:AbstractBbgVect(d)
 {}
+
+FloorCapVector& FloorCapVector::operator=(const FloorCapVector& other)
+{
+    Q_D(FloorCapVector);
+    AbstractBbgVect::operator=(other);
+    d->m_FloorVal.clear();
+    d->m_CapVal.clear();
+    foreach(const QSharedPointer<double>& SingleFloor, other.d_func()->m_FloorVal)
+    {
+        if (SingleFloor) d->m_FloorVal.append(QSharedPointer<double>(new double(*SingleFloor)));
+        else d->m_FloorVal.append(QSharedPointer<double>(NULL));
+    }
+    foreach(const QSharedPointer<double>& SingleCap, other.d_func()->m_CapVal)
+    {
+        if (SingleCap) d->m_CapVal.append(QSharedPointer<double>(new double(*SingleCap)));
+        else  d->m_CapVal.append(QSharedPointer<double>(NULL));
+    }
+    return *this;
+}
+
 FloorCapVector::FloorCapVector(const QString& Vec)
     :FloorCapVector()
 {
@@ -47,13 +74,6 @@ FloorCapVector& FloorCapVector::operator=(const QString& a)
     AbstractBbgVect::operator=(a); return *this;
 }
 
-FloorCapVector& FloorCapVector::operator=(const FloorCapVector& Vec)
-{
-    Q_D(FloorCapVector);
-    d->operator=(*Vec.d_func());
-    return *this;
-
-}
 FloorCapVector::FloorCapVector(const QString& Vec, const QDate& Anchor)
     :FloorCapVector()
 {
@@ -146,42 +166,4 @@ QDataStream& FloorCapVector::LoadOldVersion(QDataStream& stream)
 }
 
 
-FloorCapVectorPrivate::FloorCapVectorPrivate(FloorCapVector* q, const FloorCapVectorPrivate& other)
-    :AbstractBbgVectPrivate(q, other)
-{
-    m_FloorVal.clear();
-    m_CapVal.clear();
-    foreach(const QSharedPointer<double>& SingleFloor, other.m_FloorVal)
-    {
-        if (SingleFloor) m_FloorVal.append(QSharedPointer<double>(new double(*SingleFloor)));
-        else m_FloorVal.append(QSharedPointer<double>(NULL));
-    }
-    foreach(const QSharedPointer<double>& SingleCap, other.m_CapVal)
-    {
-        if (SingleCap) m_CapVal.append(QSharedPointer<double>(new double(*SingleCap)));
-        else  m_CapVal.append(QSharedPointer<double>(NULL));
-    }
-}
-
-FloorCapVectorPrivate::FloorCapVectorPrivate(FloorCapVector* q)
-    :AbstractBbgVectPrivate(q)
-{}
-
-FloorCapVectorPrivate& FloorCapVectorPrivate::operator=(const FloorCapVectorPrivate& other)
-{
-    AbstractBbgVectPrivate::operator=(other);
-    m_FloorVal.clear();
-    m_CapVal.clear();
-    foreach(const QSharedPointer<double>& SingleFloor, other.m_FloorVal)
-    {
-        if (SingleFloor) m_FloorVal.append(QSharedPointer<double>(new double(*SingleFloor)));
-        else m_FloorVal.append(QSharedPointer<double>(NULL));
-    }
-    foreach(const QSharedPointer<double>& SingleCap, other.m_CapVal)
-    {
-        if (SingleCap) m_CapVal.append(QSharedPointer<double>(new double(*SingleCap)));
-        else  m_CapVal.append(QSharedPointer<double>(NULL));
-    }
-    return *this;
-}
 

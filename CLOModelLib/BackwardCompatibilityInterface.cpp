@@ -1,5 +1,8 @@
 #include "BackwardCompatibilityInterface.h"
 #include "BackwardCompatibilityInterface_p.h"
+DEFINE_PUBLIC_COMMONS(BackwardInterface)
+DEFINE_PUBLIC_COMMONS_COPY(BackwardInterface)
+
 BackwardInterfacePrivate::BackwardInterfacePrivate(BackwardInterface* q)
     : q_ptr(q)
     , m_LoadProtocolVersion(ModelVersionNumber)
@@ -7,24 +10,23 @@ BackwardInterfacePrivate::BackwardInterfacePrivate(BackwardInterface* q)
     static_assert(ModelVersionNumber >= MinimumSupportedVersion, "ModelVersionNumber must be greater or equal to MinimumSupportedVersion");
 }
 
-BackwardInterface::BackwardInterface()
-    : d_ptr(new BackwardInterfacePrivate(this))
-{}
+
 
 BackwardInterface::BackwardInterface(BackwardInterfacePrivate *d)
     : d_ptr(d)
+{}
+BackwardInterface::BackwardInterface(BackwardInterfacePrivate *d, const BackwardInterface& other) 
+    : d_ptr(d)
 {
-
+    Q_D(BackwardInterface);
+    d->m_LoadProtocolVersion = other.d_func()->m_LoadProtocolVersion;
 }
 
-BackwardInterface::BackwardInterface(const BackwardInterface& other)
-    : d_ptr(new BackwardInterfacePrivate(this,*other.d_func()))
-{}
 
 BackwardInterface& BackwardInterface::operator=(const BackwardInterface& other)
 {
     Q_D(BackwardInterface);
-    d->operator=(*(other.d_func()));
+    d->m_LoadProtocolVersion = other.d_func()->m_LoadProtocolVersion;
     return *this;
 }
 
@@ -55,15 +57,4 @@ void BackwardInterface::ResetProtocolVersion()
 {
     Q_D(BackwardInterface);
     d->m_LoadProtocolVersion = ModelVersionNumber;
-}
-
-BackwardInterfacePrivate::BackwardInterfacePrivate(BackwardInterface* q, const BackwardInterfacePrivate& other)
-    :q_ptr(q)
-    , m_LoadProtocolVersion(other.m_LoadProtocolVersion)
-{}
-
-BackwardInterfacePrivate& BackwardInterfacePrivate::operator=(const BackwardInterfacePrivate& other)
-{
-    m_LoadProtocolVersion = other.m_LoadProtocolVersion;
-    return *this;
 }

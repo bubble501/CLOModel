@@ -3,25 +3,34 @@
 #include <QRegExp>
 #include <QStringList>
 #include "CommonFunctions.h"
+DEFINE_PUBLIC_COMMONS(DayCountVector)
+DEFINE_PUBLIC_COMMONS_COPY(DayCountVector)
+DayCountVectorPrivate::DayCountVectorPrivate(DayCountVector *q)
+	:AbstractBbgVectPrivate(q)
+{}
+DayCountVector::DayCountVector(DayCountVectorPrivate *d, const DayCountVector& other)
+	:AbstractBbgVect(d,other)
+{
+    d->m_VectVal = other.d_func()->m_VectVal;
+}
+DayCountVector::DayCountVector(DayCountVectorPrivate *d)
+	:AbstractBbgVect(d)
+{}
+
+DayCountVector& DayCountVector::operator=(const DayCountVector& other)
+{
+    AbstractBbgVect::operator=(other);
+    Q_D(DayCountVector);
+    d->m_VectVal = other.d_func()->m_VectVal;
+    return *this;
+}
+
 DayCountVector::DayCountVector(const QString& Vec)
     :DayCountVector()
 {
     SetVector(Vec);
 }
-DayCountVector::DayCountVector(const DayCountVector& Vec)
-    : AbstractBbgVect(new DayCountVectorPrivate(this, *Vec.d_func()))
-{}
 
-DayCountVector::DayCountVector()
-    : AbstractBbgVect(new DayCountVectorPrivate(this))
-{}
-
-DayCountVector& DayCountVector::operator=(const DayCountVector& Vec)
-{
-    Q_D(DayCountVector);
-    d->operator=(*Vec.d_func());
-	return *this;
-}
 DayCountVector::DayCountVector(const QString& Vec, const QDate& Anchor)
     :DayCountVector()
 {
@@ -136,18 +145,4 @@ QDataStream& DayCountVector::LoadOldVersion(QDataStream& stream) {
 	return stream;
 }
 
-DayCountVectorPrivate::DayCountVectorPrivate(DayCountVector* q, const DayCountVectorPrivate& other)
-    :AbstractBbgVectPrivate(q, other)
-    , m_VectVal(other.m_VectVal)
-{}
 
-DayCountVectorPrivate::DayCountVectorPrivate(DayCountVector* q)
-    : AbstractBbgVectPrivate(q)
-{}
-
-DayCountVectorPrivate& DayCountVectorPrivate::operator=(const DayCountVectorPrivate& other)
-{
-    AbstractBbgVectPrivate::operator=(other);
-    m_VectVal = other.m_VectVal;
-    return *this;
-}

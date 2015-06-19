@@ -5,15 +5,9 @@
 #include "DayCountVect.h"
 class DayCountVectorPrivate : public AbstractBbgVectPrivate
 {
-    Q_DECLARE_PUBLIC(DayCountVector)
-private:
-    DayCountVectorPrivate(const DayCountVectorPrivate& other);
+    DECLARE_PRIVATE_COMMONS(DayCountVector)
+    DECLARE_PRIVATE_COMMONS_DATASTREAM(DayCountVector)
 public:
-    DayCountVectorPrivate(DayCountVector* q);
-    DayCountVectorPrivate(DayCountVector* q, const DayCountVectorPrivate& other);
-    virtual DayCountVectorPrivate& operator=(const DayCountVectorPrivate& other);
     QList<DayCountConvention> m_VectVal;
-    friend QDataStream& operator<<(QDataStream & stream, const DayCountVector& flows);
-    friend QDataStream& operator>>(QDataStream & stream, DayCountVector& flows);
 };
 #endif // DayCountVect_p_h__

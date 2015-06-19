@@ -8,40 +8,34 @@
 #include <algorithm>
 #include <functional>  
 #include "CommonFunctions.h"
-GenericCashFlowPrivate::GenericCashFlowPrivate(GenericCashFlow* q)
-    :BackwardInterfacePrivate(q)
-    , m_AggregationLevel(GenericCashFlow::NoAggregation)
-    , m_AdjustHolidays(false)
-{}
+DEFINE_PUBLIC_COMMONS(GenericCashFlow)
+DEFINE_PUBLIC_COMMONS_COPY(GenericCashFlow)
 
-GenericCashFlowPrivate::GenericCashFlowPrivate(GenericCashFlow* q, const GenericCashFlowPrivate& other)
-    : BackwardInterfacePrivate(q, other)
-    , m_AggregationLevel(other.m_AggregationLevel)
-    , m_AdjustHolidays(other.m_AdjustHolidays)
-    , m_CashFlowLabels(other.m_CashFlowLabels)
-    , m_Stocks(other.m_Stocks)
+GenericCashFlowPrivate::GenericCashFlowPrivate(GenericCashFlow *q)
+	:BackwardInterfacePrivate(q)
 {}
-
-GenericCashFlowPrivate& GenericCashFlowPrivate::operator=(const GenericCashFlowPrivate& other)
+GenericCashFlow::GenericCashFlow(GenericCashFlowPrivate *d, const GenericCashFlow& other)
+	:BackwardInterface(d,other)
 {
-    Q_Q(GenericCashFlow);
-    BackwardInterfacePrivate::operator=(other);
-    return *this;
+    Q_D(GenericCashFlow);
+    d->m_AggregationLevel = other.d_func()->m_AggregationLevel;
+    d->m_AdjustHolidays=other.d_func()->m_AdjustHolidays;
+    d->m_CashFlowLabels=other.d_func()->m_CashFlowLabels;
+    d->m_Stocks=other.d_func()->m_Stocks;
+    SetFlow(other);
+}
+GenericCashFlow::GenericCashFlow(GenericCashFlowPrivate *d)
+	:BackwardInterface(d)
+{
+    Q_D(GenericCashFlow);
+    d->m_AdjustHolidays = false;
+    d->m_AggregationLevel = GenericCashFlow::NoAggregation;
 }
 
-GenericCashFlow::GenericCashFlow(const GenericCashFlow& a)
-    :BackwardInterface(new GenericCashFlowPrivate(this, *a.d_func()))
-{
-    SetFlow(a);
-}
-
-GenericCashFlow::GenericCashFlow()
-    : BackwardInterface(new GenericCashFlowPrivate(this))
-{}
 GenericCashFlow& GenericCashFlow::operator=(const GenericCashFlow& other)
 {
     Q_D(GenericCashFlow);
-    d->operator=(*other.d_func());
+    BackwardInterface::operator=(other);
     Aggregate(other.d_func()->m_AggregationLevel);
     SetFlow(other);
     return *this;

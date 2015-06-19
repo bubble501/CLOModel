@@ -4,6 +4,30 @@
 #include <QStringList>
 #include <QRegExpValidator>
 #include <QDate>
+DEFINE_PUBLIC_COMMONS(AbstractBbgVect)
+DEFINE_PUBLIC_COMMONS_COPY(AbstractBbgVect)
+
+AbstractBbgVectPrivate::AbstractBbgVectPrivate(AbstractBbgVect *q)
+	:BackwardInterfacePrivate(q)
+{}
+AbstractBbgVect::AbstractBbgVect(AbstractBbgVectPrivate *d, const AbstractBbgVect& other)
+	:BackwardInterface(d,other)
+{
+    d->m_Vector = other.d_func()->m_Vector;
+    d->m_AnchorDate = other.d_func()->m_AnchorDate;
+}
+AbstractBbgVect::AbstractBbgVect(AbstractBbgVectPrivate *d)
+	:BackwardInterface(d)
+{}
+AbstractBbgVect& AbstractBbgVect::operator=(const AbstractBbgVect& other)
+{
+    BackwardInterface::operator=(other);
+    Q_D(AbstractBbgVect);
+    d->m_Vector = other.d_func()->m_Vector;
+    d->m_AnchorDate = other.d_func()->m_AnchorDate;
+    return *this;
+}
+
 void AbstractBbgVect::SetVector(const QString& Vec){
     Q_D(AbstractBbgVect);
 	d->m_Vector = Vec;
@@ -17,17 +41,7 @@ AbstractBbgVect::AbstractBbgVect(const QString& Vec)
     SetVector(Vec);
 }
 
-AbstractBbgVect::AbstractBbgVect()
-    :BackwardInterface(new AbstractBbgVectPrivate(this))
-{}
 
-AbstractBbgVect::AbstractBbgVect(const AbstractBbgVect& other)
-    : BackwardInterface(new AbstractBbgVectPrivate(this, *other.d_func()))
-{}
-
-AbstractBbgVect::AbstractBbgVect(AbstractBbgVectPrivate *d)
-    : BackwardInterface(d)
-{}
 
 void AbstractBbgVect::SetAnchorDate(const QDate& Anchor)
 {
@@ -53,13 +67,6 @@ const QDate& AbstractBbgVect::GetAnchorDate() const
 {
     Q_D(const AbstractBbgVect);
     return d->m_AnchorDate;
-}
-
-AbstractBbgVect& AbstractBbgVect::operator=(const AbstractBbgVect& other)
-{
-    Q_D(AbstractBbgVect);
-    d->operator=(*(other.d_func()));
-    return *this;
 }
 
 bool AbstractBbgVect::IsEmpty() const
@@ -122,21 +129,7 @@ void AbstractBbgVect::Clear() {
     d->m_Vector = "";
 	UnpackVector();
 }
-AbstractBbgVectPrivate::AbstractBbgVectPrivate(AbstractBbgVect* q)
-    :BackwardInterfacePrivate(q)
-{}
 
-AbstractBbgVectPrivate::AbstractBbgVectPrivate(AbstractBbgVect* q, const AbstractBbgVectPrivate& other)
-    :BackwardInterfacePrivate(q, other)
-    , m_Vector(other.m_Vector)
-    , m_AnchorDate(other.m_AnchorDate)
-{}
 
-AbstractBbgVectPrivate& AbstractBbgVectPrivate::operator=(const AbstractBbgVectPrivate& other)
-{
-    BackwardInterfacePrivate::operator=(other);
-    m_Vector = other.m_Vector;
-    m_AnchorDate = other.m_AnchorDate;
-    return *this;
-}
+
 

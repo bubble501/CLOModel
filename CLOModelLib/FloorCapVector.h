@@ -7,16 +7,15 @@
 class FloorCapVectorPrivate;
 class CLOMODELLIB_EXPORT FloorCapVector : public AbstractBbgVect
 {
+    DECLARE_PUBLIC_COMMONS(FloorCapVector)
+    DECLARE_PUBLIC_COMMONS_COPY(FloorCapVector)
 protected:
-    Q_DECLARE_PRIVATE(FloorCapVector)
 	virtual void UnpackVector() override;
 	virtual bool IsValid() const override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 public:
 	virtual QRegExpValidator* GetValidator(QObject* parent = 0) const override;
 	using AbstractBbgVect::IsEmpty;
-    FloorCapVector();
-	FloorCapVector(const FloorCapVector& Vec);
 	FloorCapVector(const QString& Vec);
 	FloorCapVector(const QString& Vec, const QDate& Anchor);
 	QSharedPointer<double> GetFloor(const QDate& index) const;

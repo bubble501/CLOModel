@@ -59,6 +59,15 @@
     <Filter Include="Source Files\Triggers">
       <UniqueIdentifier>{3a624e86-4a34-4834-8a06-ecffef800392}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Deal Structure">
+      <UniqueIdentifier>{7eac6702-adc5-4e5a-b6c5-144d61980b8c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Privates\Deal Structure">
+      <UniqueIdentifier>{c90efa11-0141-402a-be97-05b6d9ff07ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Deal Structure">
+      <UniqueIdentifier>{6e67f7a8-2253-4a1c-8e44-0e579666818f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BackwardCompatibilityInterface_p.h">
@@ -118,6 +127,18 @@
     <ClInclude Include="IntegerVector_p.h">
       <Filter>Privates\Vectors</Filter>
     </ClInclude>
+    <ClInclude Include="Seniority.h">
+      <Filter>Header Files\Deal Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="Seniority_p.h">
+      <Filter>Privates\Deal Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="RepaymentVector.h">
+      <Filter>Header Files\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="RepaymentVector_p.h">
+      <Filter>Privates\Vectors</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BackwardCompatibilityInterface.cpp">
@@ -148,6 +169,12 @@
       <Filter>Source Files\Vectors</Filter>
     </ClCompile>
     <ClCompile Include="IntegerVector.cpp">
+      <Filter>Source Files\Vectors</Filter>
+    </ClCompile>
+    <ClCompile Include="Seniority.cpp">
+      <Filter>Source Files\Deal Structure</Filter>
+    </ClCompile>
+    <ClCompile Include="RepaymentVector.cpp">
       <Filter>Source Files\Vectors</Filter>
     </ClCompile>
   </ItemGroup>

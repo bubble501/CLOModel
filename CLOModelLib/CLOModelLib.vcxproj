@@ -161,6 +161,10 @@
     <ClInclude Include="IntegerVector.h" />
     <ClInclude Include="IntegerVector_p.h" />
     <ClInclude Include="InternalItems.h" />
+    <ClInclude Include="RepaymentVector.h" />
+    <ClInclude Include="RepaymentVector_p.h" />
+    <ClInclude Include="Seniority.h" />
+    <ClInclude Include="Seniority_p.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AbstractBbgVect.cpp" />
@@ -173,6 +177,8 @@
     <ClCompile Include="FloorCapVector.cpp" />
     <ClCompile Include="IntegerVector.cpp" />
     <ClCompile Include="InternalItems.cpp" />
+    <ClCompile Include="RepaymentVector.cpp" />
+    <ClCompile Include="Seniority.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -146,6 +146,10 @@
     <ClInclude Include="AbstractBbgVect_p.h" />
     <ClInclude Include="AbstractTrigger.h" />
     <ClInclude Include="AbstractTrigger_p.h" />
+    <ClInclude Include="Tranche.h" />
+    <ClInclude Include="Tranche_p.h" />
+    <ClInclude Include="TriggersResults.h" />
+    <ClInclude Include="TriggersResults_p.h" />
     <CustomBuild Include="AbstrAsyncThread.h">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing AbstrAsyncThread.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
@@ -227,7 +231,9 @@
     <ClCompile Include="PrincipalProceeds.cpp" />
     <ClCompile Include="RepaymentVector.cpp" />
     <ClCompile Include="Seniority.cpp" />
+    <ClCompile Include="Tranche.cpp" />
     <ClCompile Include="TrancheCashFlow.cpp" />
+    <ClCompile Include="TriggersResults.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -200,6 +200,18 @@
     <ClInclude Include="AbstrAsyncThread_p.h">
       <Filter>Privates\Interfaces</Filter>
     </ClInclude>
+    <ClInclude Include="TriggersResults.h">
+      <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="TriggersResults_p.h">
+      <Filter>Privates\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="Tranche.h">
+      <Filter>Header Files\Deal Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="Tranche_p.h">
+      <Filter>Privates\Deal Structure</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BackwardCompatibilityInterface.cpp">
@@ -267,6 +279,12 @@
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_AbstrAsyncThread.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="TriggersResults.cpp">
+      <Filter>Source Files\Triggers</Filter>
+    </ClCompile>
+    <ClCompile Include="Tranche.cpp">
+      <Filter>Source Files\Deal Structure</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

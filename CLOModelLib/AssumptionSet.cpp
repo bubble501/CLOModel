@@ -1,5 +1,5 @@
 #include "AssumptionSet.h"
-#include "AssumptionSet_p.h"
+#include "Private/AssumptionSet_p.h"
 #include <QHash>
 #include <QStringList>
 #include "BloombergVector.h"

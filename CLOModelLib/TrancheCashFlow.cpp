@@ -1,6 +1,6 @@
 #include "TrancheCashFlow.h"
-#include "TrancheCashFlow_p.h"
-#include "InternalItems.h"
+#include "Private/TrancheCashFlow_p.h"
+#include "Private/InternalItems.h"
 #include <QMap>
 #include <QDataStream>
 #include "MtgCashFlow.h"

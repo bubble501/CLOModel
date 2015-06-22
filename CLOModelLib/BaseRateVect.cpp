@@ -1,9 +1,9 @@
 #include "BaseRateVect.h"
-#include "BaseRateVect_p.h"
+#include "Private/BaseRateVect_p.h"
 #include <QRegExp>
 #include <QStringList>
 #include "CommonFunctions.h"
-#include "InternalItems.h"
+#include "Private/InternalItems.h"
 #ifndef NO_BLOOMBERG
 #include <QbbgReferenceDataRequest.h>
 #include <QBbgReferenceDataResponse.h>
@@ -301,7 +301,8 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ConstantBaseRateTable& Refe
 	for (int i = 0; i < NumElements() && AllRefFound; i++) {
 		if (!ReferencesValues.GetValues().contains(GetValue(i))) AllRefFound = false;
 	}
-	if (AllRefFound) return CompileReferenceRateValue(ReferencesValues);
+	if (AllRefFound) 
+        return CompileReferenceRateValue(ReferencesValues);
 	QDate MinUpdateDate;;
 	QMutexLocker DbLocker(&Db_Mutex);
 	QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);

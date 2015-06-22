@@ -1,5 +1,5 @@
 #include "RepaymentVector.h"
-#include "RepaymentVector_p.h"
+#include "Private/RepaymentVector_p.h"
 #include "CommonFunctions.h"
 #include <QRegExp>
 #include <QStringList>

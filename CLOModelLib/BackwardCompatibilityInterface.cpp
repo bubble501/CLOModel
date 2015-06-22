@@ -1,5 +1,5 @@
 #include "BackwardCompatibilityInterface.h"
-#include "BackwardCompatibilityInterface_p.h"
+#include "Private/BackwardCompatibilityInterface_p.h"
 DEFINE_PUBLIC_COMMONS(BackwardInterface)
 DEFINE_PUBLIC_COMMONS_COPY(BackwardInterface)
 

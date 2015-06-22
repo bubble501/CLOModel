@@ -1,8 +1,8 @@
 #include "BloombergVector.h"
-#include "BloombergVector_p.h"
+#include "Private/BloombergVector_p.h"
 #include "CommonFunctions.h"
 #include "FloorCapVector.h"
-#include "InternalItems.h"
+#include "Private/InternalItems.h"
 #include <QMap>
 #include <QRegExp>
 #include <QSet>
@@ -15,7 +15,7 @@ BloombergVectorPrivate::BloombergVectorPrivate(BloombergVector *q)
 	:AbstractBbgVectPrivate(q)
 {}
 BloombergVector::BloombergVector(BloombergVectorPrivate *d, const BloombergVector& other)
-	:AbstractBbgVect(d)
+    : AbstractBbgVect(d, other)
 {
     d->m_VectVal = other.d_func()->m_VectVal;
     d->m_Divisor = other.d_func()->m_Divisor;
@@ -147,6 +147,7 @@ BloombergVector BloombergVector::operator+(const BloombergVector& Vec) const
 BloombergVector BloombergVector::operator+(double a) const{
     Q_D(const BloombergVector);
 	BloombergVector ResultVector(*this);
+    Q_ASSERT(!IsEmpty() == !ResultVector.IsEmpty());
     for (int i = 0; i<d->m_VectVal.size(); i++) {
         ResultVector.d_func()->m_VectVal[i] += a;
 	}

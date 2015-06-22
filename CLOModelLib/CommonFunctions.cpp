@@ -15,7 +15,7 @@
 #include <QXmlStreamReader>
 #include <QFile>
 #include "simstring.h"
-#include "InternalItems.h"
+#include "Private/InternalItems.h"
 int MonthDiff(const QDate& FutureDte,const QDate& PresentDte){
 	int Result;
 	Result=(FutureDte.year()-PresentDte.year())*12;

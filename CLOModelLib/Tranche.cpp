@@ -1,6 +1,6 @@
 #include "Tranche.h"
-#include "Tranche_p.h"
-#include "InternalItems.h"
+#include "Private/Tranche_p.h"
+#include "Private/InternalItems.h"
 #include <boost/math/tools/roots.hpp>
 #ifndef NO_DATABASE
 #include <QSqlDatabase>
@@ -739,7 +739,7 @@ double Tranche::GetDiscountMargin(double NewPrice)const{
         ApplicableRateValue = ApplicableRate.GetBaseRatesDatabase(d->m_FrwRateCache);
     else
         ApplicableRateValue = ApplicableRate.GetBaseRatesDatabase(d->m_CnstRateCache);
-    if (ApplicableRateValue.IsEmpty()) 
+    if (ApplicableRateValue.IsEmpty() || d->m_DayCount.value(0)->IsEmpty())
          return 0.0;
     return qMax(0.0, CalculateDM(FlowsDates, FlowsValues, ApplicableRateValue, *(d->m_DayCount.value(0))));
 }

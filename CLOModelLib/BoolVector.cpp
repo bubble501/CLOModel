@@ -1,5 +1,5 @@
 #include "BoolVector.h"
-#include "BoolVector_p.h"
+#include "Private/BoolVector_p.h"
 #include "CommonFunctions.h"
 #include <QRegExp>
 #include <QStringList>

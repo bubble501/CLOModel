@@ -1,5 +1,5 @@
 #include "PrincipalProceeds.h"
-#include "PrincipalProceeds_p.h"
+#include "Private/PrincipalProceeds_p.h"
 #include <QDataStream>
 DEFINE_PUBLIC_COMMONS(PrincipalRecip)
 DEFINE_PUBLIC_COMMONS_COPY(PrincipalRecip)

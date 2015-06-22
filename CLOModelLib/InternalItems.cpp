@@ -1,4 +1,4 @@
-#include "InternalItems.h"
+#include "Private/InternalItems.h"
 #include <QRegExp>
 #include <QStringList>
 #include <QStack>

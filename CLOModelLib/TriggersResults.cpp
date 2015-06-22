@@ -1,5 +1,5 @@
 #include "TriggersResults.h"
-#include "TriggersResults_p.h"
+#include "Private/TriggersResults_p.h"
 #include <QDataStream>
 DEFINE_PUBLIC_COMMONS(TriggersResults)
 DEFINE_PUBLIC_COMMONS_COPY(TriggersResults)

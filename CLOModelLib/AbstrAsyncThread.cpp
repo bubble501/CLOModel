@@ -1,5 +1,5 @@
 #include "AbstrAsyncThread.h"
-#include "AbstrAsyncThread_p.h"
+#include "Private/AbstrAsyncThread_p.h"
 AbstrAsyncThreadPrivate::AbstrAsyncThreadPrivate(AbstrAsyncThread *q)
     :q_ptr(q)
     , m_Result(nullptr)

@@ -1,5 +1,5 @@
 #include "DayCountVect.h"
-#include "DayCountVect_p.h"
+#include "Private/DayCountVect_p.h"
 #include <QRegExp>
 #include <QStringList>
 #include "CommonFunctions.h"

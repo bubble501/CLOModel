@@ -1,5 +1,5 @@
 #include "Seniority.h"
-#include "Seniority_p.h"
+#include "Private/Seniority_p.h"
 #include <QStringList>
 DEFINE_PUBLIC_COMMONS(Seniority)
 DEFINE_PUBLIC_COMMONS_COPY(Seniority)

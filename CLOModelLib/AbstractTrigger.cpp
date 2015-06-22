@@ -1,5 +1,5 @@
 #include "AbstractTrigger.h"
-#include "AbstractTrigger_p.h"
+#include "Private/AbstractTrigger_p.h"
 #include <QDataStream>
 QDataStream& operator>>(QDataStream & stream, AbstractTrigger& flows) {
 	return flows.LoadOldVersion(stream);

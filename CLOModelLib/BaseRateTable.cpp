@@ -1,5 +1,5 @@
 #include "BaseRateTable.h"
-#include "BaseRateTable_p.h"
+#include "Private/BaseRateTable_p.h"
 #include "BloombergVector.h"
 DEFINE_PUBLIC_COMMONS(AbstractBaseRateTable)
 DEFINE_PUBLIC_COMMONS_COPY(AbstractBaseRateTable)

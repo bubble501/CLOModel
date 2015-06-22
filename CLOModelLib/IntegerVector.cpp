@@ -3,8 +3,8 @@
 #include <QStringList>
 #include "CommonFunctions.h"
 #include <qmath.h>
-#include "IntegerVector_p.h"
-#include "InternalItems.h"
+#include "Private/IntegerVector_p.h"
+#include "Private/InternalItems.h"
 DEFINE_PUBLIC_COMMONS(IntegerVector)
 DEFINE_PUBLIC_COMMONS_COPY(IntegerVector)
 IntegerVectorPrivate::IntegerVectorPrivate(IntegerVector *q)

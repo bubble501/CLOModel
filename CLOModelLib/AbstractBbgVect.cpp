@@ -1,5 +1,5 @@
 #include "AbstractBbgVect.h"
-#include "AbstractBbgVect_p.h"
+#include "Private/AbstractBbgVect_p.h"
 #include <QRegExp>
 #include <QStringList>
 #include <QRegExpValidator>

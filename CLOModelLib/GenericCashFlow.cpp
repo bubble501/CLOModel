@@ -1,5 +1,5 @@
 #include "GenericCashFlow.h"
-#include "GenericCashFlow_p.h"
+#include "Private/GenericCashFlow_p.h"
 #include <QDataStream>
 #include <QSet>
 #include <QXmlStreamWriter>

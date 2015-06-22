@@ -146,6 +146,25 @@
     <ClInclude Include="AbstractBbgVect_p.h" />
     <ClInclude Include="AbstractTrigger.h" />
     <ClInclude Include="AbstractTrigger_p.h" />
+    <CustomBuild Include="AbstrAsyncThread.h">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing AbstrAsyncThread.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DCLOMODELLIB_LIB -D_WINDLL "-I$(QBBGLIBPATH)\QBbgLib" "-I$(SIMSTRINGPATH)\include\simstring" "-I$(QUAZIPPATH)\include" "-I$(ZLIBPATH)\include" "-I$(BOOSTPATH)\." "-I$(KDCHARTPATH)\include\KDChart" "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtSql" "-I$(QTDIR)\include\QtWidgets"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing AbstrAsyncThread.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DCLOMODELLIB_LIB -DQT_CORE_LIB -DQT_DLL -DQT_GUI_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_WINDLL "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtSql" "-I$(QTDIR)\include\QtWidgets"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing AbstrAsyncThread.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_SQL_LIB -DQT_WIDGETS_LIB -DCLOMODELLIB_LIB -D_WINDLL "-I$(QBBGLIBPATH)\QBbgLib" "-I$(SIMSTRINGPATH)\include\simstring" "-I$(QUAZIPPATH)\include" "-I$(ZLIBPATH)\include" "-I$(BOOSTPATH)\." "-I$(KDCHARTPATH)\include\KDChart" "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtSql" "-I$(QTDIR)\include\QtWidgets"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing AbstrAsyncThread.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DCLOMODELLIB_LIB -DNDEBUG -DQT_CORE_LIB -DQT_DLL -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_WINDLL "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtSql" "-I$(QTDIR)\include\QtWidgets"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="AbstrAsyncThread_p.h" />
     <ClInclude Include="AssumptionSet.h" />
     <ClInclude Include="AssumptionSet_p.h" />
     <ClInclude Include="BackwardCompatibilityInterface.h" />
@@ -159,7 +178,7 @@
     <ClInclude Include="BoolVector.h" />
     <ClInclude Include="BoolVector_p.h" />
     <ClInclude Include="clomodellib_global.h" />
-    <ClInclude Include="CommonFunctions.h" />
+    <CustomBuild Include="CommonFunctions.h" />
     <ClInclude Include="DayCountVect.h" />
     <ClInclude Include="DayCountVect_p.h" />
     <ClInclude Include="FloorCapVector.h" />
@@ -176,12 +195,14 @@
     <ClInclude Include="RepaymentVector_p.h" />
     <ClInclude Include="Seniority.h" />
     <ClInclude Include="Seniority_p.h" />
+    <ClInclude Include="TemplAsyncThread.h" />
     <ClInclude Include="TrancheCashFlow.h" />
     <ClInclude Include="TrancheCashFlow_p.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AbstractBbgVect.cpp" />
     <ClCompile Include="AbstractTrigger.cpp" />
+    <ClCompile Include="AbstrAsyncThread.cpp" />
     <ClCompile Include="AssumptionSet.cpp" />
     <ClCompile Include="BackwardCompatibilityInterface.cpp" />
     <ClCompile Include="BaseRateTable.cpp" />
@@ -191,6 +212,14 @@
     <ClCompile Include="CommonFunctions.cpp" />
     <ClCompile Include="DayCountVect.cpp" />
     <ClCompile Include="FloorCapVector.cpp" />
+    <ClCompile Include="GeneratedFiles\Debug\moc_AbstrAsyncThread.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_AbstrAsyncThread.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="GenericCashFlow.cpp" />
     <ClCompile Include="IntegerVector.cpp" />
     <ClCompile Include="InternalItems.cpp" />

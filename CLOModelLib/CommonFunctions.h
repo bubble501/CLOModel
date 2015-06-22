@@ -70,6 +70,11 @@ bool CLOMODELLIB_EXPORT IsHoliday(const QDate& a/*,const QString& CountryCode*/)
 bool CLOMODELLIB_EXPORT removeDir(const QString& dirName);
 bool CLOMODELLIB_EXPORT ValidDayCount(qint16 a);
 
+#define DECLARE_PUBLIC_QOBJECT_COMMONS(Class) protected: \
+    Q_DECLARE_PRIVATE(Class) \
+    Class(Class ## Private *d, QObject* parent =nullptr); \
+    public: \
+    Class(QObject* parent =nullptr);
 #define DECLARE_PUBLIC_COMMONS(Class) protected: \
     Q_DECLARE_PRIVATE(Class) \
     Class(Class ## Private *d); \
@@ -80,7 +85,9 @@ bool CLOMODELLIB_EXPORT ValidDayCount(qint16 a);
     public: \
     Class(const Class& other); \
     Class& operator=(const Class& other);
-
+#define DEFINE_PUBLIC_QOBJECT_COMMONS(Class) Class::Class(QObject* parent) \
+    : Class(new Class ## Private(this),parent) \
+    {}
 #define DEFINE_PUBLIC_COMMONS(Class) Class::Class() \
     : Class(new Class ## Private(this)) \
     {} 

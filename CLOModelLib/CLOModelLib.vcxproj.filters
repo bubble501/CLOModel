@@ -77,15 +77,22 @@
     <Filter Include="Source Files\Loans">
       <UniqueIdentifier>{2cb825d3-c2b3-498e-9347-b4865a1b164b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Generated Files\Debug">
+      <UniqueIdentifier>{245e351d-bc67-4e12-96be-df05a1d8986d}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\Release">
+      <UniqueIdentifier>{435c840a-eaf0-4112-afad-d3f16bcbdd71}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BackwardCompatibilityInterface_p.h">
       <Filter>Privates\Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="clomodellib_global.h">
-      <Filter>Header Files\Common Items</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonFunctions.h">
       <Filter>Header Files\Common Items</Filter>
     </ClInclude>
     <ClInclude Include="BackwardCompatibilityInterface.h">
@@ -187,6 +194,12 @@
     <ClInclude Include="AssumptionSet_p.h">
       <Filter>Privates\Loans</Filter>
     </ClInclude>
+    <ClInclude Include="TemplAsyncThread.h">
+      <Filter>Header Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="AbstrAsyncThread_p.h">
+      <Filter>Privates\Interfaces</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BackwardCompatibilityInterface.cpp">
@@ -246,5 +259,22 @@
     <ClCompile Include="AssumptionSet.cpp">
       <Filter>Source Files\Loans</Filter>
     </ClCompile>
+    <ClCompile Include="AbstrAsyncThread.cpp">
+      <Filter>Source Files\Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_AbstrAsyncThread.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_AbstrAsyncThread.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="AbstrAsyncThread.h">
+      <Filter>Header Files\Interfaces</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CommonFunctions.h">
+      <Filter>Header Files\Common Items</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

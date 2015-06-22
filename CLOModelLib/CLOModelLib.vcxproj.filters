@@ -181,6 +181,12 @@
     <ClInclude Include="TrancheCashFlow.h">
       <Filter>Header Files\Deal Structure</Filter>
     </ClInclude>
+    <ClInclude Include="AssumptionSet.h">
+      <Filter>Header Files\Loans</Filter>
+    </ClInclude>
+    <ClInclude Include="AssumptionSet_p.h">
+      <Filter>Privates\Loans</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BackwardCompatibilityInterface.cpp">
@@ -236,6 +242,9 @@
     </ClCompile>
     <ClCompile Include="TrancheCashFlow.cpp">
       <Filter>Source Files\Deal Structure</Filter>
+    </ClCompile>
+    <ClCompile Include="AssumptionSet.cpp">
+      <Filter>Source Files\Loans</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

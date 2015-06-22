@@ -75,9 +75,8 @@ FloorCapVector& FloorCapVector::operator=(const QString& a)
 }
 
 FloorCapVector::FloorCapVector(const QString& Vec, const QDate& Anchor)
-    :FloorCapVector()
+    :FloorCapVector(Vec)
 {
-    SetVector(Vec);
     SetAnchorDate(Anchor);
 }
 void FloorCapVector::UnpackVector()

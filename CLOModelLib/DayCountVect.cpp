@@ -32,9 +32,8 @@ DayCountVector::DayCountVector(const QString& Vec)
 }
 
 DayCountVector::DayCountVector(const QString& Vec, const QDate& Anchor)
-    :DayCountVector()
+    : DayCountVector(Vec)
 {
-    SetVector(Vec);
     SetAnchorDate(Anchor);
 }
 DayCountVector::DayCountVector(DayCountConvention a, const QDate& index)

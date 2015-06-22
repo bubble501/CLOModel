@@ -1,3 +1,6 @@
+#ifndef AbstractTrigger_p_h__
+#define AbstractTrigger_p_h__
+
 #include "BackwardCompatibilityInterface_p.h"
 #include "AbstractTrigger.h"
 class AbstractTriggerPrivate : public BackwardInterfacePrivate
@@ -9,3 +12,4 @@ public:
     QString m_TriggerLabel;
 
 };
+#endif // AbstractTrigger_p_h__

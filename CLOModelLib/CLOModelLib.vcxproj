@@ -146,6 +146,8 @@
     <ClInclude Include="AbstractBbgVect_p.h" />
     <ClInclude Include="AbstractTrigger.h" />
     <ClInclude Include="AbstractTrigger_p.h" />
+    <ClInclude Include="AssumptionSet.h" />
+    <ClInclude Include="AssumptionSet_p.h" />
     <ClInclude Include="BackwardCompatibilityInterface.h" />
     <ClInclude Include="BackwardCompatibilityInterface_p.h" />
     <ClInclude Include="BaseRateTable.h" />
@@ -180,6 +182,7 @@
   <ItemGroup>
     <ClCompile Include="AbstractBbgVect.cpp" />
     <ClCompile Include="AbstractTrigger.cpp" />
+    <ClCompile Include="AssumptionSet.cpp" />
     <ClCompile Include="BackwardCompatibilityInterface.cpp" />
     <ClCompile Include="BaseRateTable.cpp" />
     <ClCompile Include="BaseRateVect.cpp" />

@@ -36,9 +36,10 @@ QDataStream& operator<<(QDataStream & stream, const ConstantBaseRateTable& flows
 }
 
 ConstantBaseRateTable::ConstantBaseRateTable(const ForwardBaseRateTable& a)
-	: AbstractBaseRateTable(a.GetUpdateDate())
+    : ConstantBaseRateTable()
 {
     Q_D(ConstantBaseRateTable);
+    d->UpdateDate = a.GetUpdateDate();
 	for (QHash<QString, BloombergVector>::ConstIterator i = a.GetValues().constBegin(); i != a.GetValues().constEnd(); i++) {
 		d->Values.insert(i.key(), i.value().GetValue(0));
 	}
@@ -139,9 +140,10 @@ QDataStream& operator>>(QDataStream & stream, ConstantBaseRateTable& flows) {
 	return flows.LoadOldVersion(stream); 
 }
 ConstantBaseRateTable::ConstantBaseRateTable(const QHash<QString, double>& a, const QDate& upd) 
-	:AbstractBaseRateTable(upd)
+    :ConstantBaseRateTable()
 {
     Q_D(ConstantBaseRateTable);
+    d->UpdateDate=upd;
     d->Values = a;
 }
 ConstantBaseRateTable& ConstantBaseRateTable::operator = (const QHash<QString, double>& a) {
@@ -224,9 +226,10 @@ void ForwardBaseRateTable::Clear()
 }
 
 ForwardBaseRateTable::ForwardBaseRateTable(const QHash<QString, BloombergVector>& a, const QDate& upd)
-	: AbstractBaseRateTable(upd) 
+    : ForwardBaseRateTable()
 {
     Q_D(ForwardBaseRateTable);
+    d->UpdateDate = upd;
     d->Values=a;
 }
 ForwardBaseRateTable& ForwardBaseRateTable::operator= (const QHash<QString, BloombergVector>& a) {
@@ -243,9 +246,10 @@ ForwardBaseRateTable& ForwardBaseRateTable::operator= (const ConstantBaseRateTab
 	return *this;
 }
 ForwardBaseRateTable::ForwardBaseRateTable(const ConstantBaseRateTable& a)
-	: AbstractBaseRateTable(a.GetUpdateDate())
+    : ForwardBaseRateTable()
 {
     Q_D(ForwardBaseRateTable);
+    d->UpdateDate = a.GetUpdateDate();
 	for (QHash<QString, double>::ConstIterator i = a.GetValues().constBegin(); i != a.GetValues().constEnd(); i++) {
         d->Values.insert(i.key(), QString("%1").arg(i.value()));
 	}

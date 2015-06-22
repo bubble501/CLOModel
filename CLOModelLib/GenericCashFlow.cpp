@@ -17,7 +17,6 @@ GenericCashFlowPrivate::GenericCashFlowPrivate(GenericCashFlow *q)
 GenericCashFlow::GenericCashFlow(GenericCashFlowPrivate *d, const GenericCashFlow& other)
 	:BackwardInterface(d,other)
 {
-    Q_D(GenericCashFlow);
     d->m_AggregationLevel = other.d_func()->m_AggregationLevel;
     d->m_AdjustHolidays=other.d_func()->m_AdjustHolidays;
     d->m_CashFlowLabels=other.d_func()->m_CashFlowLabels;
@@ -27,7 +26,6 @@ GenericCashFlow::GenericCashFlow(GenericCashFlowPrivate *d, const GenericCashFlo
 GenericCashFlow::GenericCashFlow(GenericCashFlowPrivate *d)
 	:BackwardInterface(d)
 {
-    Q_D(GenericCashFlow);
     d->m_AdjustHolidays = false;
     d->m_AggregationLevel = GenericCashFlow::NoAggregation;
 }

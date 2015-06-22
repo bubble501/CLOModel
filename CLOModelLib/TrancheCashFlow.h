@@ -117,7 +117,6 @@ public:
 	virtual void SetFlow(const QDate& Dte, double Amt, TrancheFlowType FlwTpe);
 	using GenericCashFlow::AddFlow;
 	using GenericCashFlow::SetFlow;
-	virtual TrancheCashFlow& operator=(const TrancheCashFlow& a);
 	QDate GetLastFlowDate(bool IncludeDeferred = false) const;
 	int GetLastFlowIndex(bool IncludeDeferred = false) const;
 	double GetStartingDeferredInterest(qint32 CoupIdx/*=0*/) const;

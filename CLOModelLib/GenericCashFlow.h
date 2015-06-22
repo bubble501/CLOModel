@@ -19,7 +19,6 @@ public:
 		, TotalAggragate
 	};
 	virtual ~GenericCashFlow();
-	virtual GenericCashFlow& operator=(const GenericCashFlow& a);
 	virtual GenericCashFlow& operator+=(const GenericCashFlow& a);
 	virtual GenericCashFlow operator+(const GenericCashFlow& a) const;
 	virtual bool operator==(const GenericCashFlow& a) const;

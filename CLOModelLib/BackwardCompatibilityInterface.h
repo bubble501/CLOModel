@@ -12,7 +12,6 @@ protected:
     virtual QDataStream& LoadOldVersion(QDataStream& stream) = 0;
     virtual void ResetProtocolVersion() final;
 public:
-    virtual BackwardInterface& operator=(const BackwardInterface& other);
     virtual  ~BackwardInterface();
 	virtual void SetLoadProtocolVersion(qint32 VersionNum) final;
     virtual void SetLoadProtocolVersion() final;

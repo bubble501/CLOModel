@@ -22,7 +22,6 @@ public:
 	int GetValue(int index) const;
 	int NumElements() const;
 	IntegerVector& operator=(const QString& a);
-	IntegerVector& operator=(const IntegerVector& Vec);
 	friend QDataStream& operator<<(QDataStream & stream, const IntegerVector& flows);
 	friend QDataStream& operator>>(QDataStream & stream, IntegerVector& flows);
 	int GetShift() const;

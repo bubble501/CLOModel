@@ -17,7 +17,6 @@ BloombergVectorPrivate::BloombergVectorPrivate(BloombergVector *q)
 BloombergVector::BloombergVector(BloombergVectorPrivate *d, const BloombergVector& other)
 	:AbstractBbgVect(d)
 {
-	Q_D(BloombergVector);
     d->m_VectVal = other.d_func()->m_VectVal;
     d->m_Divisor = other.d_func()->m_Divisor;
     RegisterAsMetaType<BloombergVector>();
@@ -25,7 +24,6 @@ BloombergVector::BloombergVector(BloombergVectorPrivate *d, const BloombergVecto
 BloombergVector::BloombergVector(BloombergVectorPrivate *d)
 	:AbstractBbgVect(d)
 {
-	Q_D(BloombergVector);
     d->m_Divisor = 100.0;
     RegisterAsMetaType<BloombergVector>();
 }

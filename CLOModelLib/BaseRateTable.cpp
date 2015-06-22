@@ -223,12 +223,6 @@ void ForwardBaseRateTable::Clear()
     SetUpdateDate(QDate());
 }
 
-ForwardBaseRateTable& ForwardBaseRateTable::operator = (const ForwardBaseRateTable& a)
-{
-    Q_D(ForwardBaseRateTable);
-    d->operator=(*a.d_func());
-    return *this;
-}
 ForwardBaseRateTable::ForwardBaseRateTable(const QHash<QString, BloombergVector>& a, const QDate& upd)
 	: AbstractBaseRateTable(upd) 
 {
@@ -327,6 +321,7 @@ AbstractBaseRateTable& AbstractBaseRateTable::operator=(const AbstractBaseRateTa
     BackwardInterface::operator=(a);
     Q_D(AbstractBaseRateTable);
     d->UpdateDate = a.d_func()->UpdateDate;
+    return *this;
 }
 
 const QDate& AbstractBaseRateTable::GetUpdateDate() const

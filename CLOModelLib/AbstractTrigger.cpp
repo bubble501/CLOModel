@@ -32,17 +32,24 @@ QString AbstractTrigger::TriggerTypeToString(TriggerType a)const {
 	default: return QString();
 	}
 }
-
-AbstractTrigger::AbstractTrigger(const AbstractTrigger& a) 
-    : BackwardInterface(new AbstractTriggerPrivate(this,*a.d_func()))
+DEFINE_PUBLIC_COMMONS_COPY(AbstractTrigger);
+AbstractTriggerPrivate::AbstractTriggerPrivate(AbstractTrigger *q)
+    :BackwardInterfacePrivate(q)
 {}
-
 AbstractTrigger::AbstractTrigger(TriggerType TTP, const QString& lab /*= QString()*/) 
-    : BackwardInterface(new AbstractTriggerPrivate(this))
+    : AbstractTrigger(new AbstractTriggerPrivate(this),TTP,lab)
+{}
+AbstractTrigger::AbstractTrigger(AbstractTriggerPrivate* d, TriggerType TTP, const QString& lab /*= QString()*/)
+    : BackwardInterface(d)
 {
-    Q_D(AbstractTrigger);
     d->m_TriggerType = TTP;
     d->m_TriggerLabel = lab;
+}
+AbstractTrigger::AbstractTrigger(AbstractTriggerPrivate* d, const AbstractTrigger& other)
+    : BackwardInterface(d,other)
+{
+    d->m_TriggerType = other.d_func()->m_TriggerType;
+    d->m_TriggerLabel = other.d_func()->m_TriggerLabel;
 }
 
 AbstractTrigger::TriggerType AbstractTrigger::GetTriggerType() const
@@ -69,20 +76,11 @@ QString AbstractTrigger::ToString() const
     return "Label: " + d->m_TriggerLabel + "\nTrigger type: " + TriggerTypeToString(d->m_TriggerType);
 }
 
-AbstractTriggerPrivate::AbstractTriggerPrivate(AbstractTrigger* q, const AbstractTriggerPrivate& other)
-    :BackwardInterfacePrivate(q, other)
-    , m_TriggerType(other.m_TriggerType)
-    , m_TriggerLabel(other.m_TriggerLabel)
-{}
-
-AbstractTriggerPrivate::AbstractTriggerPrivate(AbstractTrigger* q)
-    : BackwardInterfacePrivate(q)
-{}
-
-AbstractTriggerPrivate& AbstractTriggerPrivate::operator=(const AbstractTriggerPrivate& other)
+AbstractTrigger& AbstractTrigger::operator=(const AbstractTrigger& other)
 {
-    BackwardInterfacePrivate::operator=(other);
-    m_TriggerType = other.m_TriggerType;
-    m_TriggerLabel = other.m_TriggerLabel;
+    BackwardInterface::operator=(other);
+    Q_D(AbstractTrigger);
+    d->m_TriggerType = other.d_func()->m_TriggerType;
+    d->m_TriggerLabel = other.d_func()->m_TriggerLabel;
     return *this;
 }

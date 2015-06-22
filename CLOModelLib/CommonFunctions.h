@@ -78,7 +78,9 @@ bool CLOMODELLIB_EXPORT ValidDayCount(qint16 a);
 #define DECLARE_PUBLIC_COMMONS_COPY(Class) protected: \
     Class(Class ## Private *d, const Class& other); \
     public: \
-    Class(const Class& other);
+    Class(const Class& other); \
+    Class& operator=(const Class& other);
+
 #define DEFINE_PUBLIC_COMMONS(Class) Class::Class() \
     : Class(new Class ## Private(this)) \
     {} 
@@ -90,7 +92,8 @@ bool CLOMODELLIB_EXPORT ValidDayCount(qint16 a);
     public: \
     Class ## Private(Class *q); \
     private: \
-    Class ## Private(const Class ## Private &other);
+    Class ## Private(const Class ## Private &other) =delete; \
+    Class ## Private& operator=(const Class ## Private &other) = delete;
 #define DECLARE_PRIVATE_COMMONS_DATASTREAM(Class) friend QDataStream& operator<<(QDataStream & stream, const Class& flows); \
 friend QDataStream& operator>>(QDataStream & stream, Class& flows);
 

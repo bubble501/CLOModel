@@ -17,7 +17,6 @@ class CLOMODELLIB_EXPORT AbstractBaseRateTable : public BackwardInterface
     DECLARE_PUBLIC_COMMONS_COPY(AbstractBaseRateTable)
 public:
 	AbstractBaseRateTable(const QDate& a);
-    AbstractBaseRateTable& operator=(const AbstractBaseRateTable& a);
 	virtual const QDate& GetUpdateDate() const;
 	virtual void SetUpdateDate(const QDate& val);
 	virtual bool Contains(const QString& key) const = 0;
@@ -31,7 +30,6 @@ class CLOMODELLIB_EXPORT ConstantBaseRateTable : public AbstractBaseRateTable
 public:
 	ConstantBaseRateTable(const ForwardBaseRateTable& a);
 	ConstantBaseRateTable(const QHash<QString, double>& a, const QDate& upd=QDate());
-	ConstantBaseRateTable& operator=(const ConstantBaseRateTable& a);
 	ConstantBaseRateTable& operator=(const ForwardBaseRateTable& a);
 	ConstantBaseRateTable& operator=(const QHash<QString, double>& a);
 	ConstantBaseRateTable& operator+=(const ConstantBaseRateTable& a);
@@ -58,7 +56,6 @@ class CLOMODELLIB_EXPORT  ForwardBaseRateTable : public AbstractBaseRateTable
 public:
 	ForwardBaseRateTable(const ConstantBaseRateTable& a);
 	ForwardBaseRateTable(const QHash<QString, BloombergVector>& a, const QDate& upd = QDate());
-	ForwardBaseRateTable& operator=(const ForwardBaseRateTable& a);
 	ForwardBaseRateTable& operator=(const ConstantBaseRateTable& a);
 	ForwardBaseRateTable& operator=(const QHash<QString, BloombergVector>& a);
 	ForwardBaseRateTable& operator+=(const ForwardBaseRateTable& a);

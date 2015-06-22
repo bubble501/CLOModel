@@ -17,7 +17,6 @@ public:
     bool SetSeniorityScale(const QString& a);
     QString ToString() const;
     Seniority(const QString& a);
-    Seniority& operator=(const Seniority& a);
     bool isValid() const;
 protected:
     virtual QDataStream& LoadOldVersion(QDataStream& stream) override;

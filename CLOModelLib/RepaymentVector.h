@@ -29,7 +29,6 @@ public:
 	QString GetValueString(const QDate& index) const;
 	QString GetValueString(int index) const;
 	int NumElements() const;
-    RepaymentVector& operator=(const RepaymentVector& a);
 	RepaymentVector& operator=(const QString& a);
 	friend QDataStream& operator<<(QDataStream & stream, const RepaymentVector& flows);
 	friend QDataStream& operator>>(QDataStream & stream, RepaymentVector& flows);

@@ -38,7 +38,6 @@ public:
 	void SetDivisor(double a);
 	double GetDivisor() const;
 	BloombergVector& operator=(const QString& a);
-	BloombergVector& operator=(const BloombergVector& Vec);
 	BloombergVector operator+(const BloombergVector& Vec) const;
 	BloombergVector operator+(double a) const;
 	BloombergVector operator*(double a) const;

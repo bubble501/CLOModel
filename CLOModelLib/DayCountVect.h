@@ -24,7 +24,6 @@ public:
 	DayCountConvention GetValue(int index) const;
 	int NumElements() const;
 	DayCountVector& operator=(const QString& a);
-	DayCountVector& operator=(const DayCountVector& Vec);
 	friend QDataStream& operator<<(QDataStream & stream, const DayCountVector& flows);
 	friend QDataStream& operator>>(QDataStream & stream, DayCountVector& flows);
 };

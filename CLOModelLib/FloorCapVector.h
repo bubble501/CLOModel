@@ -24,7 +24,6 @@ public:
     QSharedPointer<double> GetCap(int index) const;
 	int NumElements() const;
 	FloorCapVector& operator=(const QString& a);
-	FloorCapVector& operator=(const FloorCapVector& Vec);
 	friend QDataStream& operator<<(QDataStream & stream, const FloorCapVector& flows);
 	friend QDataStream& operator>>(QDataStream & stream, FloorCapVector& flows);
 };

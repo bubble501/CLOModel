@@ -18,7 +18,6 @@ BackwardInterface::BackwardInterface(BackwardInterfacePrivate *d)
 BackwardInterface::BackwardInterface(BackwardInterfacePrivate *d, const BackwardInterface& other) 
     : d_ptr(d)
 {
-    Q_D(BackwardInterface);
     d->m_LoadProtocolVersion = other.d_func()->m_LoadProtocolVersion;
 }
 

@@ -16,7 +16,6 @@ public:
     virtual const double& GetScheduled() const;
     virtual void SetScheduled(const double& val);
     virtual void AddScheduled(const double& val);
-    virtual PrincipalRecip& operator=(const PrincipalRecip& a);
     virtual PrincipalRecip operator-(double a);
     virtual PrincipalRecip& operator-=(double a);
     virtual PrincipalRecip& operator+=(double a);

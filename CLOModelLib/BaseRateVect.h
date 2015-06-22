@@ -21,7 +21,6 @@ public:
 	virtual FloorCapVector ExtractFloorCapVector() const;
 	BaseRateVector(const QString& Vec);
 	BaseRateVector(const QString& Vec,const QDate& Anchor);
-	BaseRateVector& operator=(const BaseRateVector& Vec);
 	virtual bool IsZero()const;
 	virtual QRegExpValidator* GetValidator(QObject* parent = 0) const override;
 	int NumElements() const;

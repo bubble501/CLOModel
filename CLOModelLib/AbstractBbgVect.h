@@ -21,7 +21,6 @@ public:
 	virtual QRegExpValidator* GetValidator(QObject* parent = 0) const =0;
 	virtual void Clear();
 	virtual void SetVector(const QString& Vec);
-    virtual AbstractBbgVect& operator=(const AbstractBbgVect& other);
 	AbstractBbgVect(const QString& Vec);
 	virtual void SetAnchorDate(const QDate& Anchor);
 	virtual void RemoveAnchorDate();

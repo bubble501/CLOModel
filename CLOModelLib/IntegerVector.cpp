@@ -13,12 +13,14 @@ IntegerVectorPrivate::IntegerVectorPrivate(IntegerVector *q)
 IntegerVector::IntegerVector(IntegerVectorPrivate *d, const IntegerVector& other)
 	:AbstractBbgVect(d,other)
 {
+    RegisterAsMetaType<IntegerVector>();
     d->m_VectVal=other.d_func()->m_VectVal;
     d->m_Shift=other.d_func()->m_Shift;
 }
 IntegerVector::IntegerVector(IntegerVectorPrivate *d)
 	:AbstractBbgVect(d)
 {
+    RegisterAsMetaType<IntegerVector>();
     d->m_Shift=0;
 }
 
@@ -36,22 +38,8 @@ IntegerVector::IntegerVector(const QString& Vec)
 {
     SetVector(Vec);
 }
-IntegerVector::IntegerVector(const IntegerVector& Vec)
-    :AbstractBbgVect(new IntegerVectorPrivate(this,*Vec.d_func()))
-{}
 
-IntegerVector::IntegerVector() 
-    : AbstractBbgVect(new IntegerVectorPrivate(this))
-{
-    RegisterAsMetaType<IntegerVector>();
-}
 
-IntegerVector& IntegerVector::operator=(const IntegerVector& Vec)
-{
-    Q_D(IntegerVector);
-    d->operator=(*Vec.d_func());
-	return *this;
-}
 IntegerVector::IntegerVector(const QString& Vec, const QDate& Anchor)
     :IntegerVector(Vec)
 {

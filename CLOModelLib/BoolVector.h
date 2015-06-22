@@ -20,7 +20,6 @@ public:
 	bool GetValue(int index) const;
 	int NumElements() const;
 	BoolVector& operator=(const QString& a);
-    BoolVector& operator=(const BoolVector& a);
 	friend QDataStream& operator<<(QDataStream & stream, const BoolVector& flows);
 	friend QDataStream& operator>>(QDataStream & stream, BoolVector& flows);
 };

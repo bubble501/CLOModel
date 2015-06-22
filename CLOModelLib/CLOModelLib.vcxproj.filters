@@ -230,6 +230,9 @@
     <ClInclude Include="Private\LoanAssumption_p.h">
       <Filter>Privates\Loans</Filter>
     </ClInclude>
+    <ClInclude Include="Private\ApplyFlowThread_p.h">
+      <Filter>Privates\Loans</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BackwardCompatibilityInterface.cpp">
@@ -322,6 +325,15 @@
     <ClCompile Include="LoanAssumption.cpp">
       <Filter>Source Files\Loans</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ApplyFlowThread.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ApplyFlowThread.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="ApplyFlowThread.cpp">
+      <Filter>Source Files\Loans</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="AbstrAsyncThread.h">
@@ -335,6 +347,9 @@
     </CustomBuild>
     <CustomBuild Include="Resources.qrc">
       <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ApplyFlowThread.h">
+      <Filter>Header Files\Loans</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

@@ -33,14 +33,6 @@ extern QMutex Db_Mutex;
 #endif
 extern const QString LoansPropertiesToSearch[2]; //Properties in which scenarios will be searched
 QString InfixToPostfix(const QString& a);
-template<class T> void RegisterAsMetaType()
-{
-    if (!QMetaType::isRegistered(qMetaTypeId<T>())) {
-        int TypeID = qRegisterMetaType<T>(typeid(T).name());
-        qRegisterMetaTypeStreamOperators<T>(typeid(T).name());
-        LOGDEBUG(QString("Meta type registered: %1, ID: %2").arg(typeid(T).name()).arg(TypeID));
-    }
-}
 void PrintToTempFile(const QString& TempFileName, const QString& Message, bool PrintTime = true);
 int NumberOfSetBits(quint32 i);
 QString NormaliseTriggerStructure(QString a);

@@ -1,7 +1,8 @@
 #ifndef TemplAsyncThread_h__
 #define TemplAsyncThread_h__
 #include "AbstrAsyncThread.h"
-#include "AbstrAsyncThread_p.h"
+#include "CommonFunctions.h"
+#include "Private/AbstrAsyncThread_p.h"
 template <typename ResultType>
 class  CLOMODELLIB_EXPORT TemplAsyncThread : public AbstrAsyncThread
 {
@@ -11,7 +12,7 @@ protected:
     }
 public:
 	TemplAsyncThread(int ID, QObject* parent = 0) 
-        , AbstrAsyncThread(ID,parent)
+        : AbstrAsyncThread(ID,parent)
     {   
 		static_assert(std::is_default_constructible<ResultType>::value, "ResultType must implement a default constructor"); 
 		static_assert(std::is_assignable<ResultType, const ResultType&>::value, "ResultType must implement an assignment operator");

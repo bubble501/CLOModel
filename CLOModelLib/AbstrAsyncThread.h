@@ -6,8 +6,8 @@ class AbstrAsyncThreadPrivate;
 class  CLOMODELLIB_EXPORT AbstrAsyncThread : public QThread
 {
     Q_OBJECT
-    Q_DECLARE_PRIVATE(AbstrAsyncThread)
 protected:
+    Q_DECLARE_PRIVATE(AbstrAsyncThread)
     AbstrAsyncThreadPrivate* d_ptr;
     AbstrAsyncThread(AbstrAsyncThreadPrivate* d, int ID, QObject* parent = nullptr);
 public:

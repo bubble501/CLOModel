@@ -3,6 +3,7 @@
 #include <QtGlobal>
 #include <QMetaType>
 #include <QString>
+#include <QDataStream>
 #include "clomodellib_global.h"
 #define CompoundShift 10
 #define MaximumInterestsTypes 8
@@ -69,6 +70,13 @@ double CLOMODELLIB_EXPORT AdjustCoupon(double AnnualCoupon /*Annualised Coupon*/
 bool CLOMODELLIB_EXPORT IsHoliday(const QDate& a/*,const QString& CountryCode*/);
 bool CLOMODELLIB_EXPORT removeDir(const QString& dirName);
 bool CLOMODELLIB_EXPORT ValidDayCount(qint16 a);
+template<class T> void RegisterAsMetaType()
+{
+    if (!QMetaType::isRegistered(qMetaTypeId<T>())) {
+        int TypeID = qRegisterMetaType<T>(typeid(T).name());
+        qRegisterMetaTypeStreamOperators<T>(typeid(T).name());
+    }
+}
 
 #define DECLARE_PUBLIC_QOBJECT_COMMONS(Class) protected: \
     Q_DECLARE_PRIVATE(Class) \

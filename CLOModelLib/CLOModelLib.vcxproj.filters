@@ -248,6 +248,12 @@
     <ClInclude Include="Private\CumulativeLossTrigger_p.h">
       <Filter>Privates\Triggers</Filter>
     </ClInclude>
+    <ClInclude Include="DeferredInterestTrigger.h">
+      <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\DeferredInterestTrigger_p.h">
+      <Filter>Privates\Triggers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BackwardCompatibilityInterface.cpp">
@@ -353,6 +359,9 @@
       <Filter>Source Files\Triggers</Filter>
     </ClCompile>
     <ClCompile Include="CumulativeLossTrigger.cpp">
+      <Filter>Source Files\Triggers</Filter>
+    </ClCompile>
+    <ClCompile Include="DeferredInterestTrigger.cpp">
       <Filter>Source Files\Triggers</Filter>
     </ClCompile>
   </ItemGroup>

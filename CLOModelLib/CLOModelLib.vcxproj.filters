@@ -272,6 +272,9 @@
     <ClInclude Include="Private\LoanAssMatcherResult_p.h">
       <Filter>Privates\Loans</Filter>
     </ClInclude>
+    <ClInclude Include="Private\MtgCalculatorThread_p.h">
+      <Filter>Privates</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BackwardCompatibilityInterface.cpp">
@@ -400,6 +403,15 @@
     <ClCompile Include="LoanAssMatcherResult.cpp">
       <Filter>Source Files\Loans</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_MtgCalculatorThread.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_MtgCalculatorThread.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="MtgCalculatorThread.cpp">
+      <Filter>Source Files\Loans</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="AbstrAsyncThread.h">
@@ -418,6 +430,9 @@
       <Filter>Header Files\Loans</Filter>
     </CustomBuild>
     <CustomBuild Include="LoanAssMatcherThread.h">
+      <Filter>Header Files\Loans</Filter>
+    </CustomBuild>
+    <CustomBuild Include="MtgCalculatorThread.h">
       <Filter>Header Files\Loans</Filter>
     </CustomBuild>
   </ItemGroup>

@@ -23,17 +23,11 @@
       <Extensions>moc;h;cpp</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
-    <Filter Include="Privates">
-      <UniqueIdentifier>{7a9072bd-4a87-4522-8e6d-f5eef9fc8a5d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Vectors">
       <UniqueIdentifier>{af8f1474-55b8-475b-bf72-af765c59ca59}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Vectors">
       <UniqueIdentifier>{354d7465-fd11-4d01-92eb-3287502798d1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Privates\Vectors">
-      <UniqueIdentifier>{3f45989a-6db4-4fb2-8d64-e547b260ff84}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Common Items">
       <UniqueIdentifier>{f57b442f-dfc9-4c9f-ac49-e5a915e565bb}</UniqueIdentifier>
@@ -44,17 +38,11 @@
     <Filter Include="Header Files\Interfaces">
       <UniqueIdentifier>{ad9fd37a-87ce-42f4-929d-b5cbacd3df1c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Privates\Interfaces">
-      <UniqueIdentifier>{be8b3193-d0a1-4207-a6da-1c3a8668ed0a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Interfaces">
       <UniqueIdentifier>{b7482301-ac8c-43f8-8f1d-10cc0b965233}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Triggers">
       <UniqueIdentifier>{e2cbeab1-6f35-4b1b-8940-2a1f6da0e7b8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Privates\Triggers">
-      <UniqueIdentifier>{e1961720-7c18-4ede-9b63-4bad70cfa982}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Triggers">
       <UniqueIdentifier>{3a624e86-4a34-4834-8a06-ecffef800392}</UniqueIdentifier>
@@ -62,17 +50,11 @@
     <Filter Include="Header Files\Deal Structure">
       <UniqueIdentifier>{7eac6702-adc5-4e5a-b6c5-144d61980b8c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Privates\Deal Structure">
-      <UniqueIdentifier>{c90efa11-0141-402a-be97-05b6d9ff07ef}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Deal Structure">
       <UniqueIdentifier>{6e67f7a8-2253-4a1c-8e44-0e579666818f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Loans">
       <UniqueIdentifier>{d319072d-38a5-4c1f-8dfa-ca02615d7039}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Privates\Loans">
-      <UniqueIdentifier>{b1a296ae-385a-4126-8eea-5f96c6a70bbf}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Loans">
       <UniqueIdentifier>{2cb825d3-c2b3-498e-9347-b4865a1b164b}</UniqueIdentifier>
@@ -86,6 +68,24 @@
       <UniqueIdentifier>{435c840a-eaf0-4112-afad-d3f16bcbdd71}</UniqueIdentifier>
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Privates">
+      <UniqueIdentifier>{7a9072bd-4a87-4522-8e6d-f5eef9fc8a5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Privates\Vectors">
+      <UniqueIdentifier>{3f45989a-6db4-4fb2-8d64-e547b260ff84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Privates\Interfaces">
+      <UniqueIdentifier>{be8b3193-d0a1-4207-a6da-1c3a8668ed0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Privates\Triggers">
+      <UniqueIdentifier>{e1961720-7c18-4ede-9b63-4bad70cfa982}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Privates\Deal Structure">
+      <UniqueIdentifier>{c90efa11-0141-402a-be97-05b6d9ff07ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Privates\Loans">
+      <UniqueIdentifier>{b1a296ae-385a-4126-8eea-5f96c6a70bbf}</UniqueIdentifier>
     </Filter>
     <Filter Include="Privates\Widgets">
       <UniqueIdentifier>{9b1fd83e-7dea-4fdf-95cb-60073a231b5e}</UniqueIdentifier>
@@ -284,6 +284,12 @@
     <ClInclude Include="Private\PDLtrigger_p.h">
       <Filter>Privates\Triggers</Filter>
     </ClInclude>
+    <ClInclude Include="PoolSizeTrigger.h">
+      <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\PoolSizeTrigger_p.h">
+      <Filter>Privates\Triggers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BackwardCompatibilityInterface.cpp">
@@ -431,6 +437,9 @@
       <Filter>Source Files\Loans</Filter>
     </ClCompile>
     <ClCompile Include="PDLtrigger.cpp">
+      <Filter>Source Files\Triggers</Filter>
+    </ClCompile>
+    <ClCompile Include="PoolSizeTrigger.cpp">
       <Filter>Source Files\Triggers</Filter>
     </ClCompile>
   </ItemGroup>

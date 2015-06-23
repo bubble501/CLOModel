@@ -243,6 +243,7 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DCLOMODELLIB_LIB -DNDEBUG -DQT_CORE_LIB -DQT_DLL -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_WINDLL "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtSql" "-I$(QTDIR)\include\QtWidgets"</Command>
     </CustomBuild>
     <ClInclude Include="PDLtrigger.h" />
+    <ClInclude Include="PoolSizeTrigger.h" />
     <ClInclude Include="Private\AbstractBbgVect_p.h" />
     <ClInclude Include="Private\AbstractTrigger_p.h" />
     <ClInclude Include="Private\AbstrAsyncCalculator_p.h" />
@@ -270,6 +271,7 @@
     <ClInclude Include="Private\MtgCalculatorThread_p.h" />
     <ClInclude Include="Private\MtgCalculator_p.h" />
     <ClInclude Include="Private\PDLtrigger_p.h" />
+    <ClInclude Include="Private\PoolSizeTrigger_p.h" />
     <ClInclude Include="Private\PrincipalProceeds_p.h" />
     <ClInclude Include="Private\RepaymentVector_p.h" />
     <ClInclude Include="Private\Seniority_p.h" />
@@ -405,6 +407,7 @@
     <ClCompile Include="MtgCalculatorThread.cpp" />
     <ClCompile Include="MtgCashFlow.cpp" />
     <ClCompile Include="PDLtrigger.cpp" />
+    <ClCompile Include="PoolSizeTrigger.cpp" />
     <ClCompile Include="PrincipalProceeds.cpp" />
     <ClCompile Include="RepaymentVector.cpp" />
     <ClCompile Include="Seniority.cpp" />

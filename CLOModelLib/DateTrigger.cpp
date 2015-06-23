@@ -1,5 +1,5 @@
 #include "DateTrigger.h"
-#include "DateTrigger_p.h"
+#include "Private/DateTrigger_p.h"
 #include <QDataStream>
 DEFINE_PUBLIC_COMMONS(DateTrigger)
 DEFINE_PUBLIC_COMMONS_COPY(DateTrigger)
@@ -23,7 +23,7 @@ DateTrigger& DateTrigger::operator=(const DateTrigger& other){
 DateTrigger::DateTrigger(DateTriggerPrivate *d)
     :AbstractTrigger(d, TriggerType::DateTrigger)
 {
-	
+    d->m_Side = TriggerSide::Invalid;
 }
 
 DateTrigger::DateTrigger(const QDate& dte, TriggerSide sd, const QString& lab)

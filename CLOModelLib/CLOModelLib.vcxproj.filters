@@ -239,7 +239,13 @@
     <ClInclude Include="DateTrigger.h">
       <Filter>Header Files\Triggers</Filter>
     </ClInclude>
-    <ClInclude Include="DateTrigger_p.h">
+    <ClInclude Include="Private\DateTrigger_p.h">
+      <Filter>Privates\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="CumulativeLossTrigger.h">
+      <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\CumulativeLossTrigger_p.h">
       <Filter>Privates\Triggers</Filter>
     </ClInclude>
   </ItemGroup>
@@ -344,6 +350,9 @@
       <Filter>Source Files\Loans</Filter>
     </ClCompile>
     <ClCompile Include="DateTrigger.cpp">
+      <Filter>Source Files\Triggers</Filter>
+    </ClCompile>
+    <ClCompile Include="CumulativeLossTrigger.cpp">
       <Filter>Source Files\Triggers</Filter>
     </ClCompile>
   </ItemGroup>

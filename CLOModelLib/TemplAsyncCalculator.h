@@ -11,7 +11,7 @@ template <typename ThreadType, typename ResultType>
 class CLOMODELLIB_EXPORT TemplAsyncCalculator : public AbstrAsyncCalculator
 {
 public:
-	TemplAsyncCalculator(QObject* parent = 0);
+	TemplAsyncCalculator(QObject* parent = nullptr);
 	virtual ~TemplAsyncCalculator();
 	virtual void SetSequentialComputation(bool a) { 
         d_func()->m_SequentialComputation = a;
@@ -24,6 +24,7 @@ public:
     virtual const ResultType* GetResult(qint32 key)const { return static_cast<ResultType>(m_Result.value(key, nullptr)); }
 	virtual const QHash<qint32, ResultType*>& GetResults() const { return m_Result; }
 protected:	
+    TemplAsyncCalculator(AbstrAsyncCalculatorPrivate* d,QObject* parent = nullptr);
 	virtual ThreadType* AddThread(qint32 Key);
 	virtual void BeeReturned(int Ident, const ResultType& a);
 	virtual void HandleErrorInCalculation(int a) { BeeReturned(a, ResultType()); }
@@ -31,6 +32,31 @@ protected:
 	virtual QDataStream& SaveToStream(QDataStream& stream) const final;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 };
+
+template <typename ThreadType, typename ResultType>
+TemplAsyncCalculator<ThreadType, ResultType>::TemplAsyncCalculator(QObject* parent)
+    :AbstrAsyncCalculator(parent)
+{
+    static_assert(std::is_base_of<QThread, TemplAsyncThread<ResultType> >::value, "ThreadType must inherit from TemplAsyncThread");
+    static_assert(std::is_object<ThreadType>::value, "ThreadType can't be a reference or pointer");
+    static_assert(std::is_default_constructible<ResultType>::value, "ResultType must implement a default constructor");
+    static_assert(std::is_base_of<BackwardInterface, ResultType >::value, "ResultType must inherit from BackwardInterface");
+    RegisterAsMetaType<ResultType>();
+    d->m_SequentialComputation = false;
+    d->BeesReturned = 0;
+}
+template <typename ThreadType, typename ResultType>
+TemplAsyncCalculator<ThreadType, ResultType>::TemplAsyncCalculator(AbstrAsyncCalculatorPrivate* d, QObject* parent)
+    :AbstrAsyncCalculator(d,parent)
+{
+    static_assert(std::is_base_of<QThread, TemplAsyncThread<ResultType> >::value, "ThreadType must inherit from TemplAsyncThread");
+    static_assert(std::is_object<ThreadType>::value, "ThreadType can't be a reference or pointer");
+    static_assert(std::is_default_constructible<ResultType>::value, "ResultType must implement a default constructor");
+    static_assert(std::is_base_of<BackwardInterface, ResultType >::value, "ResultType must inherit from BackwardInterface");
+    RegisterAsMetaType<ResultType>();
+    d->m_SequentialComputation = false;
+    d->BeesReturned = 0;
+}
 
 template <typename ThreadType, typename ResultType>
 void TemplAsyncCalculator<ThreadType, ResultType>::RemoveResult(qint32 Key)
@@ -81,25 +107,12 @@ void TemplAsyncCalculator<ThreadType, ResultType>::ClearResults() {
 	m_Result.clear();
 }
 
-
-template <typename ThreadType, typename ResultType>
-TemplAsyncCalculator<ThreadType, ResultType>::TemplAsyncCalculator(QObject* parent)
-	:AbstrAsyncCalculator(parent)
-	, m_SequentialComputation(false)	
-	, BeesReturned(0) {
-	static_assert(std::is_base_of<QThread, TemplAsyncThread<ResultType> >::value, "ThreadType must inherit from TemplAsyncThread");
-	static_assert(std::is_object<ThreadType>::value, "ThreadType can't be a reference or pointer");
-	static_assert(std::is_default_constructible<ResultType>::value, "ResultType must implement a default constructor");
-	static_assert(std::is_base_of<BackwardInterface, ResultType >::value, "ResultType must inherit from BackwardInterface");
-	RegisterAsMetaType<ResultType>();
-}
 template <typename ThreadType, typename ResultType>
 TemplAsyncCalculator<ThreadType, ResultType>::~TemplAsyncCalculator() {
 	Reset();
 }
 template <typename ThreadType, typename ResultType>
 void TemplAsyncCalculator<ThreadType, ResultType>::Reset() {
-	RETURN_WHEN_RUNNING(true, )
 	m_ContinueCalculation = false;
 	ThreadType* CurrentRunning;
 	for (auto j = m_ThreadPool.begin(); j != m_ThreadPool.end(); j++) {

@@ -263,6 +263,15 @@
     <ClInclude Include="Private\DelinquencyTrigger_p.h">
       <Filter>Privates\Triggers</Filter>
     </ClInclude>
+    <ClInclude Include="LoanAssMatcherResult.h">
+      <Filter>Header Files\Loans</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\LoanAssMatcherThread_p.h">
+      <Filter>Privates\Loans</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\LoanAssMatcherResult_p.h">
+      <Filter>Privates\Loans</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BackwardCompatibilityInterface.cpp">
@@ -379,6 +388,18 @@
     <ClCompile Include="DuringStressTestTrigger.cpp">
       <Filter>Source Files\Triggers</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_LoanAssMatcherThread.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_LoanAssMatcherThread.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="LoanAssMatcherThread.cpp">
+      <Filter>Source Files\Loans</Filter>
+    </ClCompile>
+    <ClCompile Include="LoanAssMatcherResult.cpp">
+      <Filter>Source Files\Loans</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="AbstrAsyncThread.h">
@@ -394,6 +415,9 @@
       <Filter>Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="ApplyFlowThread.h">
+      <Filter>Header Files\Loans</Filter>
+    </CustomBuild>
+    <CustomBuild Include="LoanAssMatcherThread.h">
       <Filter>Header Files\Loans</Filter>
     </CustomBuild>
   </ItemGroup>

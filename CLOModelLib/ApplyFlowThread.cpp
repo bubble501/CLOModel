@@ -1,7 +1,14 @@
 #include "ApplyFlowThread.h"
 #include "Private/ApplyFlowThread_p.h"
+ApplyFlowThreadPrivate::ApplyFlowThreadPrivate(ApplyFlowThread *q)
+    :AbstrAsyncThreadPrivate(q)
+    , BaseFlow(nullptr)
+{}
+ApplyFlowThread::ApplyFlowThread(ApplyFlowThreadPrivate* d, int ID, QObject* parent)
+    :TemplAsyncThread<MtgCashFlow>(d,ID,parent)
+{}
 ApplyFlowThread::ApplyFlowThread(int ID, QObject* parent)
-	:TemplAsyncThread<MtgCashFlow>(ID,parent)
+    : ApplyFlowThread(new ApplyFlowThreadPrivate(this), ID, parent)
 {}
 
 void ApplyFlowThread::SetBaseFlow(const MtgCashFlow& a)
@@ -19,6 +26,10 @@ void ApplyFlowThread::SetAssumption(const AssumptionSet& a)
 void ApplyFlowThread::run()
 {
     Q_D(ApplyFlowThread);
+    if (!d->BaseFlow) {
+        emit ErrorCalculation(d->Identifier);
+        return;
+    }
     *castResult() = d->BaseFlow->ApplyScenario(
         d->AssumptionsToApply.GetCPRscenario()
         , d->AssumptionsToApply.GetCDRscenario()

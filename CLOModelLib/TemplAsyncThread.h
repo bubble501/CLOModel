@@ -10,6 +10,14 @@ protected:
 	ResultType* castResult(){
         return static_cast<ResultType*>(d_func()->m_Result);
     }
+    TemplAsyncThread(AbstrAsyncThreadPrivate* d, int ID, QObject* parent = nullptr)
+        :AbstrAsyncThread(d,ID, parent)
+    {
+        static_assert(std::is_default_constructible<ResultType>::value, "ResultType must implement a default constructor");
+        static_assert(std::is_assignable<ResultType, const ResultType&>::value, "ResultType must implement an assignment operator");
+        d_func()->m_Result = new ResultType();
+        RegisterAsMetaType<ResultType>();
+    }
 public:
 	TemplAsyncThread(int ID, QObject* parent = 0) 
         : AbstrAsyncThread(ID,parent)

@@ -8,7 +8,7 @@ class ApplyFlowThread : public TemplAsyncThread<MtgCashFlow>{
 	Q_OBJECT
 protected:
     Q_DECLARE_PRIVATE(ApplyFlowThread)
-    AbstrAsyncThreadPrivate* d_ptr;
+    //AbstrAsyncThreadPrivate* d_ptr;
     ApplyFlowThread(ApplyFlowThreadPrivate* d, int ID, QObject* parent = nullptr);
 public:
 	ApplyFlowThread(int ID, QObject* parent = nullptr);

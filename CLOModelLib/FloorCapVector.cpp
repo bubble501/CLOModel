@@ -23,15 +23,19 @@ FloorCapVector& FloorCapVector::operator=(const FloorCapVector& other)
     AbstractBbgVect::operator=(other);
     d->m_FloorVal.clear();
     d->m_CapVal.clear();
-    foreach(const QSharedPointer<double>& SingleFloor, other.d_func()->m_FloorVal)
+    for (auto SingleFloor = other.d_func()->m_FloorVal.constBegin(); SingleFloor != other.d_func()->m_FloorVal.constEnd(); ++SingleFloor)
     {
-        if (SingleFloor) d->m_FloorVal.append(QSharedPointer<double>(new double(*SingleFloor)));
-        else d->m_FloorVal.append(QSharedPointer<double>(NULL));
+        if (*SingleFloor)
+            d->m_FloorVal.append(QSharedPointer<double>(new double(**SingleFloor)));
+        else 
+            d->m_FloorVal.append(QSharedPointer<double>(NULL));
     }
-    foreach(const QSharedPointer<double>& SingleCap, other.d_func()->m_CapVal)
+    for (auto SingleCap = other.d_func()->m_CapVal.constBegin(); SingleCap != other.d_func()->m_CapVal.constEnd(); ++SingleCap)
     {
-        if (SingleCap) d->m_CapVal.append(QSharedPointer<double>(new double(*SingleCap)));
-        else  d->m_CapVal.append(QSharedPointer<double>(NULL));
+        if (*SingleCap) 
+            d->m_CapVal.append(QSharedPointer<double>(new double(**SingleCap)));
+        else  
+            d->m_CapVal.append(QSharedPointer<double>(NULL));
     }
     return *this;
 }

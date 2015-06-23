@@ -4,7 +4,7 @@
 #include "BackwardCompatibilityInterface.h"
 #include <QObject>
 #ifndef RETURN_WHEN_RUNNING
-#define RETURN_WHEN_RUNNING(rvr,retval) if(m_ContinueCalculation == rvr) return retval;
+#define RETURN_WHEN_RUNNING(rvr,retval) if( ContinueCalculation() == rvr) return retval;
 #endif
 class AbstrAsyncCalculatorPrivate;
 class CLOMODELLIB_EXPORT AbstrAsyncCalculator : public QObject, public BackwardInterface
@@ -15,9 +15,25 @@ protected:
     inline const AbstrAsyncCalculatorPrivate* d_func() const { return reinterpret_cast<const AbstrAsyncCalculatorPrivate *>(qGetPtrHelper(BackwardInterface::d_ptr)); }
     friend class AbstrAsyncCalculatorPrivate;
     AbstrAsyncCalculator(AbstrAsyncCalculatorPrivate *d, QObject* parent = nullptr);
+    virtual QHash<qint32, void*>& getResultVoid();
+    virtual const QHash<qint32, void*>& getResultVoid() const;
+    virtual QHash<qint32, QPointer<QObject> >& getThreadPool();
+    virtual const QHash<qint32, QPointer<QObject> >& getThreadPool() const;
+    virtual const QSet<qint32>& getBeeSent() const;
+    virtual QSet<qint32>& getBeeSent();
+    virtual qint32& getBeesReturned();
+    virtual const qint32& getBeesReturned() const;
+    virtual const void* getResultVoid(qint32 key)const;
+    virtual void insertResult(qint32 Key, void* val);
+    virtual bool ContinueCalculation() const;
+    virtual void ContinueCalculation(bool val);
 public:
     AbstrAsyncCalculator(QObject* parent =nullptr);
     virtual QString ReadyToCalculate() const = 0;
+    virtual void SetSequentialComputation(bool a);
+    virtual bool GetSequentialComputation()const;
+    virtual QList<qint32> GetResultsKeys() const;
+    virtual int NumBees() const = 0;
 signals :
 	void Calculated();
 	void BeeCalculated(int);

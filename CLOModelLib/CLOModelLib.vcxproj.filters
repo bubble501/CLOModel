@@ -275,6 +275,9 @@
     <ClInclude Include="Private\MtgCalculatorThread_p.h">
       <Filter>Privates</Filter>
     </ClInclude>
+    <ClInclude Include="Private\MtgCalculator_p.h">
+      <Filter>Privates\Loans</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BackwardCompatibilityInterface.cpp">
@@ -412,6 +415,15 @@
     <ClCompile Include="MtgCalculatorThread.cpp">
       <Filter>Source Files\Loans</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_MtgCalculator.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_MtgCalculator.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="MtgCalculator.cpp">
+      <Filter>Source Files\Loans</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="AbstrAsyncThread.h">
@@ -433,6 +445,9 @@
       <Filter>Header Files\Loans</Filter>
     </CustomBuild>
     <CustomBuild Include="MtgCalculatorThread.h">
+      <Filter>Header Files\Loans</Filter>
+    </CustomBuild>
+    <CustomBuild Include="MtgCalculator.h">
       <Filter>Header Files\Loans</Filter>
     </CustomBuild>
   </ItemGroup>

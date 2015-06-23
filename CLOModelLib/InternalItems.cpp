@@ -50,11 +50,11 @@ QString InfixToPostfix(const QString& a)
     }
     QStack<qint32> s;
     QString sb("");
-    QStringList parts = Spaced.split(QRegExp("\\s"));
-    foreach(const QString& token, parts)
+    const QStringList parts = Spaced.split(QRegExp("\\s"));
+    for (auto token = parts.constBegin(); token != parts.constEnd();++token)
     {
-        int idx = ops.indexOf(token.at(0));
-        if (idx != -1 && token.size() == 1) {
+        int idx = ops.indexOf(token->at(0));
+        if (idx != -1 && token->size() == 1) {
             if (s.isEmpty())
                 s.push(idx);
             else {
@@ -68,18 +68,18 @@ QString InfixToPostfix(const QString& a)
                 s.push(idx);
             }
         }
-        else if (token.at(0) == '(') {
+        else if (token->at(0) == '(') {
             s.push(-2);
         }
-        else if (token.at(0) == ')') {
+        else if (token->at(0) == ')') {
             while (s.top() != -2)
                 sb.append(ops.at(s.pop())).append(' ');
             s.pop();
         }
         else {
-            if (!CheckValidNumber.exactMatch(token))
+            if (!CheckValidNumber.exactMatch(*token))
                 return QString();
-            sb.append(token).append(' ');
+            sb.append(*token).append(' ');
         }
     }
     while (!s.isEmpty()) {

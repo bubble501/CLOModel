@@ -153,11 +153,11 @@ void GenericCashFlow::AddFlow(const GenericCashFlow& a) {
 		}
 	}
 	//Aggregate Stocks
-	foreach(qint32 SingleStock, StocksToCalculate) {
-		auto CurrDates = DatesOfStockChange.value(SingleStock, QSet<QDate>()).toList();
+    for (auto SingleStock = StocksToCalculate.constBegin(); SingleStock != StocksToCalculate.constEnd(); ++SingleStock) {
+		auto CurrDates = DatesOfStockChange.value(*SingleStock, QSet<QDate>()).toList();
 		std::sort(CurrDates.begin(), CurrDates.end(), std::greater<QDate>());
 		for (auto i = CurrDates.constBegin(); i != CurrDates.constEnd(); ++i) {
-			SetFlow(*i, GetFlow(*i, SingleStock) + a.GetFlow(*i, SingleStock), SingleStock);
+			SetFlow(*i, GetFlow(*i, *SingleStock) + a.GetFlow(*i, *SingleStock), *SingleStock);
 		}
 	}
 	//Aggregate Labels
@@ -457,10 +457,10 @@ QList<qint32> GenericCashFlow::AvailableFlows(const QDate& a) const {
 		Result.unite(TempIter.value()->keys().toSet());
     for (TempIter = d->m_CashFlows.constBegin(); TempIter != d->m_CashFlows.constEnd(); ++TempIter) {
 		if (TempIter.key() > a) break;
-        foreach(qint32 SingleStock, d->m_Stocks)
+        for (auto SingleStock = d->m_Stocks.constBegin(); SingleStock != d->m_Stocks.constEnd(); ++SingleStock)
         {
-			if (TempIter.value()->contains(SingleStock))
-                Result.insert(SingleStock);
+			if (TempIter.value()->contains(*SingleStock))
+                Result.insert(*SingleStock);
 		}
 	}
 	return Result.toList();

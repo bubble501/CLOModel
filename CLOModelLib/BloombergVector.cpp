@@ -68,9 +68,11 @@ bool BloombergVector::SetVector(const QList<double>& Values, const QDate& Anchor
 bool BloombergVector::SetVector(const QList<double>& Values) {
     Q_D(BloombergVector);
 	if (Values.isEmpty()) return false;
-	foreach(double SingleVal, Values) {
-		if (SingleVal < 0.0) return false;
-	}
+    /*
+    Negative values are allowed
+    if(std::any_of(Values.constBegin(), Values.constEnd(), [](double SingleVal)->bool {return SingleVal < 0.0; }))
+        return false;
+    */
     d->m_VectVal = Values;
 	RepackVector();
 	return true;

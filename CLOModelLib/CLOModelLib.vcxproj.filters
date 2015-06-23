@@ -278,6 +278,12 @@
     <ClInclude Include="Private\MtgCalculator_p.h">
       <Filter>Privates\Loans</Filter>
     </ClInclude>
+    <ClInclude Include="PDLtrigger.h">
+      <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\PDLtrigger_p.h">
+      <Filter>Privates\Triggers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BackwardCompatibilityInterface.cpp">
@@ -423,6 +429,9 @@
     </ClCompile>
     <ClCompile Include="MtgCalculator.cpp">
       <Filter>Source Files\Loans</Filter>
+    </ClCompile>
+    <ClCompile Include="PDLtrigger.cpp">
+      <Filter>Source Files\Triggers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -2,7 +2,8 @@
 #define DelinquencyTrigger_h__
 #include "AbstractTrigger.h"
 class DelinquencyTriggerPrivate;
-class DelinquencyTrigger : public AbstractTrigger {
+class CLOMODELLIB_EXPORT DelinquencyTrigger : public AbstractTrigger
+{
     DECLARE_PUBLIC_COMMONS(DelinquencyTrigger)
     DECLARE_PUBLIC_COMMONS_COPY(DelinquencyTrigger)
 public:

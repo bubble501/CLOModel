@@ -4,7 +4,8 @@
 class Tranche;
 class IntegerVector;
 class DeferredInterestTriggerPrivate;
-class DeferredInterestTrigger : public AbstractTrigger {
+class CLOMODELLIB_EXPORT DeferredInterestTrigger : public AbstractTrigger
+{
     DECLARE_PUBLIC_COMMONS(DeferredInterestTrigger)
     DECLARE_PUBLIC_COMMONS_COPY(DeferredInterestTrigger)
 public:

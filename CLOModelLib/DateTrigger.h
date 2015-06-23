@@ -2,7 +2,8 @@
 #define DateTrigger_h__
 #include "AbstractTrigger.h"
 class DateTriggerPrivate;
-class DateTrigger : public AbstractTrigger {
+class CLOMODELLIB_EXPORT DateTrigger : public AbstractTrigger
+{
     DECLARE_PUBLIC_COMMONS(DateTrigger)
     DECLARE_PUBLIC_COMMONS_COPY(DateTrigger)
 public:

@@ -1,7 +1,6 @@
 #ifndef TriggersResults_h__
 #define TriggersResults_h__
 #include "BackwardCompatibilityInterface.h"
-#include <QHash>
 class QDate;
 class TriggersResultsPrivate;
 class QDataStream;

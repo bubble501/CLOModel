@@ -1,7 +1,8 @@
 #ifndef DuringStressTestTrigger_h__
 #define DuringStressTestTrigger_h__
 #include "AbstractTrigger.h"
-class DuringStressTestTrigger : public AbstractTrigger { 
+class CLOMODELLIB_EXPORT DuringStressTestTrigger : public AbstractTrigger
+{
 public:
     DuringStressTestTrigger(const QString& lab=QString());
     DuringStressTestTrigger(const DuringStressTestTrigger& other);

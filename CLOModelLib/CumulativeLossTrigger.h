@@ -2,7 +2,8 @@
 #define CumulativeLossTrigger_h__
 #include "AbstractTrigger.h"
 class CumulativeLossTriggerPrivate;
-class CumulativeLossTrigger : public AbstractTrigger {
+class CLOMODELLIB_EXPORT CumulativeLossTrigger : public AbstractTrigger
+{
     DECLARE_PUBLIC_COMMONS(CumulativeLossTrigger)
     DECLARE_PUBLIC_COMMONS_COPY(CumulativeLossTrigger)
 public:

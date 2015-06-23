@@ -87,6 +87,9 @@
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
+    <Filter Include="Privates\Widgets">
+      <UniqueIdentifier>{9b1fd83e-7dea-4fdf-95cb-60073a231b5e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="clomodellib_global.h">
@@ -233,6 +236,12 @@
     <ClInclude Include="Private\ApplyFlowThread_p.h">
       <Filter>Privates\Loans</Filter>
     </ClInclude>
+    <ClInclude Include="DateTrigger.h">
+      <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="DateTrigger_p.h">
+      <Filter>Privates\Triggers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BackwardCompatibilityInterface.cpp">
@@ -333,6 +342,9 @@
     </ClCompile>
     <ClCompile Include="ApplyFlowThread.cpp">
       <Filter>Source Files\Loans</Filter>
+    </ClCompile>
+    <ClCompile Include="DateTrigger.cpp">
+      <Filter>Source Files\Triggers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

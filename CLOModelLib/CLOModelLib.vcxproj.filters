@@ -254,6 +254,15 @@
     <ClInclude Include="Private\DeferredInterestTrigger_p.h">
       <Filter>Privates\Triggers</Filter>
     </ClInclude>
+    <ClInclude Include="DuringStressTestTrigger.h">
+      <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="DelinquencyTrigger.h">
+      <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\DelinquencyTrigger_p.h">
+      <Filter>Privates\Triggers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BackwardCompatibilityInterface.cpp">
@@ -362,6 +371,12 @@
       <Filter>Source Files\Triggers</Filter>
     </ClCompile>
     <ClCompile Include="DeferredInterestTrigger.cpp">
+      <Filter>Source Files\Triggers</Filter>
+    </ClCompile>
+    <ClCompile Include="DelinquencyTrigger.cpp">
+      <Filter>Source Files\Triggers</Filter>
+    </ClCompile>
+    <ClCompile Include="DuringStressTestTrigger.cpp">
       <Filter>Source Files\Triggers</Filter>
     </ClCompile>
   </ItemGroup>

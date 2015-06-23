@@ -183,6 +183,8 @@
     <ClInclude Include="CumulativeLossTrigger.h" />
     <ClInclude Include="DateTrigger.h" />
     <ClInclude Include="DeferredInterestTrigger.h" />
+    <ClInclude Include="DelinquencyTrigger.h" />
+    <ClInclude Include="DuringStressTestTrigger.h" />
     <ClInclude Include="LoanAssumption.h" />
     <ClInclude Include="Mortgage.h" />
     <ClInclude Include="Private\AbstractBbgVect_p.h" />
@@ -200,6 +202,7 @@
     <ClInclude Include="Private\DateTrigger_p.h" />
     <ClInclude Include="Private\DayCountVect_p.h" />
     <ClInclude Include="Private\DeferredInterestTrigger_p.h" />
+    <ClInclude Include="Private\DelinquencyTrigger_p.h" />
     <ClInclude Include="Private\FloorCapVector_p.h" />
     <ClInclude Include="Private\GenericCashFlow_p.h" />
     <ClInclude Include="Private\IntegerVector_p.h" />
@@ -269,6 +272,8 @@
     <ClCompile Include="DateTrigger.cpp" />
     <ClCompile Include="DayCountVect.cpp" />
     <ClCompile Include="DeferredInterestTrigger.cpp" />
+    <ClCompile Include="DelinquencyTrigger.cpp" />
+    <ClCompile Include="DuringStressTestTrigger.cpp" />
     <ClCompile Include="FloorCapVector.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_AbstrAsyncCalculator.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>

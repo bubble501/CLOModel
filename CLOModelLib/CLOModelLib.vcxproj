@@ -146,11 +146,13 @@
     <ClInclude Include="AbstractTrigger.h" />
     <ClInclude Include="Private\ReinvestmentTest_p.h" />
     <ClInclude Include="Private\ReserveFund_p.h" />
+    <ClInclude Include="Private\TrancheTrigger_p.h" />
     <ClInclude Include="Private\VectorTrigger_p.h" />
     <ClInclude Include="Private\Waterfall_p.h" />
     <ClInclude Include="Private\WatFalPrior_p.h" />
     <ClInclude Include="ReinvestmentTest.h" />
     <ClInclude Include="ReserveFund.h" />
+    <ClInclude Include="TrancheTrigger.h" />
     <ClInclude Include="VectorTrigger.h" />
     <ClInclude Include="Waterfall.h" />
     <ClInclude Include="WatFalPrior.h" />
@@ -425,6 +427,7 @@
     <ClCompile Include="Seniority.cpp" />
     <ClCompile Include="Tranche.cpp" />
     <ClCompile Include="TrancheCashFlow.cpp" />
+    <ClCompile Include="TrancheTrigger.cpp" />
     <ClCompile Include="TriggersResults.cpp" />
     <ClCompile Include="VectorTrigger.cpp" />
     <ClCompile Include="Waterfall.cpp" />

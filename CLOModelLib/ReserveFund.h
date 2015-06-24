@@ -2,7 +2,7 @@
 #define ReserveFund_h__
 
 #include "BackwardCompatibilityInterface.h"
-class ReserveFund;
+class ReserveFundPrivate;
 class BloombergVector;
 class GenericCashFlow;
 class ReserveFund :public BackwardInterface {

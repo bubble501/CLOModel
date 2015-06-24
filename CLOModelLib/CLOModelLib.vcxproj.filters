@@ -320,6 +320,12 @@
     <ClInclude Include="Private\Waterfall_p.h">
       <Filter>Privates\Deal Structure</Filter>
     </ClInclude>
+    <ClInclude Include="TrancheTrigger.h">
+      <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\TrancheTrigger_p.h">
+      <Filter>Privates\Triggers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BackwardCompatibilityInterface.cpp">
@@ -486,6 +492,9 @@
     </ClCompile>
     <ClCompile Include="Waterfall.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TrancheTrigger.cpp">
+      <Filter>Source Files\Triggers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -254,12 +254,6 @@ Waterfall::Waterfall(WaterfallPrivate *d)
 }
 
 
-Waterfall& Waterfall::operator=(const Waterfall& a)
-{
-   
-    return *this;
-}
-
 const WatFalPrior* Waterfall::GetStep(int Index)const
 {
     Q_D(const Waterfall);
@@ -3078,7 +3072,7 @@ const QSharedPointer<AbstractTrigger> Waterfall::GetTrigger(quint32 key) const
 QSharedPointer<AbstractTrigger> Waterfall::GetTrigger(quint32 key)
 {
     Q_D(Waterfall);
-    d->m_Triggers.value(key, QSharedPointer<AbstractTrigger>());
+    return d->m_Triggers.value(key, QSharedPointer<AbstractTrigger>());
 }
 
 GenericCashFlow Waterfall::GetAggregatedReinvestment() const

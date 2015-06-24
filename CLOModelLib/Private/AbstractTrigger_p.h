@@ -1,7 +1,7 @@
 #ifndef AbstractTrigger_p_h__
 #define AbstractTrigger_p_h__
 
-#include "BackwardCompatibilityInterface_p.h"
+#include "Private/BackwardCompatibilityInterface_p.h"
 #include "AbstractTrigger.h"
 class AbstractTriggerPrivate : public BackwardInterfacePrivate
 {

@@ -2,7 +2,7 @@
 #define LoanAssumption_p_h__
 
 #include "LoanAssumption.h"
-#include "BackwardCompatibilityInterface_p.h"
+#include "Private/BackwardCompatibilityInterface_p.h"
 class LoanAssumptionPrivate : public BackwardInterfacePrivate
 {
     DECLARE_PRIVATE_COMMONS(LoanAssumption)

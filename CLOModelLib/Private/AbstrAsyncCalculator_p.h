@@ -2,7 +2,7 @@
 #define AbstrAsyncCalculator_p_h__
 
 #include "AbstrAsyncCalculator.h"
-#include "BackwardCompatibilityInterface_p.h"
+#include "Private/BackwardCompatibilityInterface_p.h"
 #include <QSet>
 #include <QHash>
 #include <QPointer>

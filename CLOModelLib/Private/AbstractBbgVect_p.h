@@ -3,7 +3,7 @@
 
 #define VectorAnchorDateFormat "(\\d{1,2})/(\\d{1,2})/(\\d{4})"
 #include "AbstractBbgVect.h"
-#include "BackwardCompatibilityInterface_p.h"
+#include "Private/BackwardCompatibilityInterface_p.h"
 class AbstractBbgVectPrivate : public BackwardInterfacePrivate
 {
     DECLARE_PRIVATE_COMMONS(AbstractBbgVect)

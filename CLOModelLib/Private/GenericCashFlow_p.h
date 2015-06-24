@@ -2,7 +2,7 @@
 #define GenericCashFlow_p_h__
 
 #include "GenericCashFlow.h"
-#include "BackwardCompatibilityInterface_p.h"
+#include "Private/BackwardCompatibilityInterface_p.h"
 #include <QMap>
 #include <QSet>
 class GenericCashFlowPrivate : public BackwardInterfacePrivate

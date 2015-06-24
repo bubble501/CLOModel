@@ -1,7 +1,7 @@
 #ifndef AssumptionSet_p_h__
 #define AssumptionSet_p_h__
 
-#include "BackwardCompatibilityInterface_p.h"
+#include "Private/BackwardCompatibilityInterface_p.h"
 #include "AssumptionSet.h"
 class AssumptionSetPrivate : public BackwardInterfacePrivate
 {

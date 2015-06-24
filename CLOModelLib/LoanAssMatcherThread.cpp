@@ -5,7 +5,7 @@
 #include "BackwardCompatibilityInterface.h"
 #include "Private/BackwardCompatibilityInterface_p.h"
 //#include "Waterfall.h"
-//#include "MtgCalculator.h"
+#include "MtgCalculator.h"
 #include "CommonFunctions.h"
 #include "Private/InternalItems.h"
 #include "Mortgage.h"
@@ -69,9 +69,9 @@ void LoanAssMatcherThread::run()
 	//{Waterfall Junk; Junk.SetLoadProtocolVersion(VersionChecker); out >> Junk; NewModelName = Junk.GetDealName(); }
 	//{Waterfall Junk; Junk.SetLoadProtocolVersion(VersionChecker); out >> Junk; }
 	QHash<qint32, Mortgage*> LoanPool;
-	//MtgCalculator Junk; Junk.SetLoadProtocolVersion(VersionChecker);out >> Junk;
+	MtgCalculator Junk; Junk.SetLoadProtocolVersion(VersionChecker);out >> Junk;
 	ModelFile.close();
-	//LoanPool = Junk.GetLoans();
+	LoanPool = Junk.GetLoans();
 
 	for (auto i = LoanPool.constBegin(); i != LoanPool.constEnd(); ++i) {
         for (auto j = d->m_AvailableAssumptions->constBegin(); j != d->m_AvailableAssumptions->constEnd(); ++j) {

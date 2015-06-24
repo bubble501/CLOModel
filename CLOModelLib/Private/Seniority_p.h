@@ -2,7 +2,7 @@
 #define Seniority_p_h__
 
 #include "Seniority.h"
-#include "BackwardCompatibilityInterface_p.h"
+#include "Private/BackwardCompatibilityInterface_p.h"
 class SeniorityPrivate : public BackwardInterfacePrivate
 {
     DECLARE_PRIVATE_COMMONS(Seniority)

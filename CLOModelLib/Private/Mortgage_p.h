@@ -1,5 +1,5 @@
 #include "Mortgage.h"
-#include "BackwardCompatibilityInterface_p.h"
+#include "Private/BackwardCompatibilityInterface_p.h"
 class MortgagePrivate : public BackwardInterfacePrivate
 {
     DECLARE_PRIVATE_COMMONS(Mortgage)

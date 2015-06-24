@@ -2,7 +2,7 @@
 #define TriggersResults_p_h__
 
 #include "TriggersResults.h"
-#include "BackwardCompatibilityInterface_p.h"
+#include "Private/BackwardCompatibilityInterface_p.h"
 #include <QHash>
 #include <QMap>
 #include <QDate>

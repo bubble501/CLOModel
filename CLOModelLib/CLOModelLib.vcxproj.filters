@@ -272,9 +272,6 @@
     <ClInclude Include="Private\LoanAssMatcherResult_p.h">
       <Filter>Privates\Loans</Filter>
     </ClInclude>
-    <ClInclude Include="Private\MtgCalculatorThread_p.h">
-      <Filter>Privates</Filter>
-    </ClInclude>
     <ClInclude Include="Private\MtgCalculator_p.h">
       <Filter>Privates\Loans</Filter>
     </ClInclude>
@@ -301,6 +298,15 @@
     </ClInclude>
     <ClInclude Include="VectorTrigger.h">
       <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\MtgCalculatorThread_p.h">
+      <Filter>Privates\Loans</Filter>
+    </ClInclude>
+    <ClInclude Include="ReinvestmentTest.h">
+      <Filter>Header Files\Deal Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\ReinvestmentTest_p.h">
+      <Filter>Privates\Deal Structure</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -459,6 +465,9 @@
     </ClCompile>
     <ClCompile Include="VectorTrigger.cpp">
       <Filter>Source Files\Triggers</Filter>
+    </ClCompile>
+    <ClCompile Include="ReinvestmentTest.cpp">
+      <Filter>Source Files\Deal Structure</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

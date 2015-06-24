@@ -2,7 +2,7 @@
 #define PrincipalProceeds_p_h__
 
 #include "PrincipalProceeds.h"
-#include "BackwardCompatibilityInterface_p.h"
+#include "Private/BackwardCompatibilityInterface_p.h"
 class PrincipalRecipPrivate : public BackwardInterfacePrivate
 {
     DECLARE_PRIVATE_COMMONS(PrincipalRecip)

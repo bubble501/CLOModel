@@ -1,5 +1,5 @@
 #include "Tranche.h"
-#include "BackwardCompatibilityInterface_p.h"
+#include "Private/BackwardCompatibilityInterface_p.h"
 class TranchePrivate : public BackwardInterfacePrivate
 {
     DECLARE_PRIVATE_COMMONS(Tranche)

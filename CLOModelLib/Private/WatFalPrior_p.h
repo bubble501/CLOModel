@@ -2,7 +2,7 @@
 #define WatFalPrior_p_h__
 #include <QHash>
 #include "WatFalPrior.h"
-#include "BackwardCompatibilityInterface_p.h"
+#include "Private/BackwardCompatibilityInterface_p.h"
 #include <QSet>
 class WatFalPriorPrivate : public BackwardInterfacePrivate
 {

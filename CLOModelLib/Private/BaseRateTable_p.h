@@ -3,7 +3,7 @@
 #define BaseRateTable_p_h__
 
 #include "BaseRateTable.h"
-#include "BackwardCompatibilityInterface_p.h"
+#include "Private/BackwardCompatibilityInterface_p.h"
 class AbstractBaseRateTablePrivate : public BackwardInterfacePrivate
 {
     DECLARE_PRIVATE_COMMONS(AbstractBaseRateTable)

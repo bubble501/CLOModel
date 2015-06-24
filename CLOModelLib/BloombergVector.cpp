@@ -87,14 +87,16 @@ bool BloombergVector::SetVector(const QList<QDate>& Dates, const QList<double>& 
 	) return false;
 	QMap<QDate, double> SortedValues;
 	for (int i = 0; i <Dates.size(); i++) {
-		if (Dates.at(i).isNull()) return false;
-		if (Values.at(i)<0.0) return false;
+		if (Dates.at(i).isNull())
+            return false;
+		if (Values.at(i)<0.0)
+            return false;
 		SortedValues.insert(Dates.at(i), Values.at(i));
 	}
 	d->m_AnchorDate = SortedValues.firstKey();
     d->m_VectVal.clear();
 	int NumMonths;
-	for (QMap<QDate, double>::const_iterator i = SortedValues.constBegin()+1; i != SortedValues.constEnd(); i++) {
+	for (auto i = SortedValues.constBegin()+1; i != SortedValues.constEnd(); i++) {
 		NumMonths = MonthDiff(i.key(), (i - 1).key());
 		for (int j = 0; j < NumMonths; j++)
             d->m_VectVal.append((i - 1).value());
@@ -149,7 +151,6 @@ BloombergVector BloombergVector::operator+(const BloombergVector& Vec) const
 BloombergVector BloombergVector::operator+(double a) const{
     Q_D(const BloombergVector);
 	BloombergVector ResultVector(*this);
-    Q_ASSERT(!IsEmpty() == !ResultVector.IsEmpty());
     for (int i = 0; i<d->m_VectVal.size(); i++) {
         ResultVector.d_func()->m_VectVal[i] += a;
 	}
@@ -179,7 +180,9 @@ void BloombergVector::RepackVector(){
     PrevVal = d->m_VectVal.at(0);
     NewVector += QString("%1").arg(PrevVal*d->m_Divisor);
     for (int i = 1; i<d->m_VectVal.size(); i++) {
-        if (ToleranceMonitor(d->m_VectVal.at(i), PrevVal) && RampSize == 0) StepSize++;
+        if (ToleranceMonitor(d->m_VectVal.at(i), PrevVal) && RampSize == 0) {
+            StepSize++;
+        }
 		else {
 			if (StepSize == 1) {
 				if (RampSize == 0) {
@@ -204,14 +207,16 @@ void BloombergVector::RepackVector(){
 			}
 		}
 	}
-    if (RampSize>0) NewVector += QString(" %1%2 %3").arg(RampSize).arg(RampSize>1 ? 'R' : 'S').arg(d->m_VectVal.last()*d->m_Divisor);
+    if (RampSize>0) 
+        NewVector += QString(" %1%2 %3").arg(RampSize).arg(RampSize>1 ? 'R' : 'S').arg(d->m_VectVal.last()*d->m_Divisor);
     d->m_Vector = NewVector;
 }
 
 void BloombergVector::UnpackVector(){
     Q_D(BloombergVector);
 	d->m_VectVal.clear();
-    if (d->m_Vector.isEmpty()) return;
+    if (d->m_Vector.isEmpty()) 
+        return;
 	ExtractAnchorDate();
     QString TempVec(d->m_Vector.trimmed().toUpper());
 	QStringList StringParts=TempVec.trimmed().toUpper().split(QRegExp("\\s"),QString::SkipEmptyParts);
@@ -246,7 +251,8 @@ QRegExpValidator* BloombergVector::GetValidator(QObject* parent) const {
 }
 double BloombergVector::GetValue(const QDate& index,int Frequency)const{
     Q_D(const BloombergVector);
-	if (Frequency<1) return 0.0;
+	if (Frequency<1) 
+        return 0.0;
     double Result = d->GetValueTemplate(d->m_VectVal, index, 0.0);
 	if (Frequency != 12)
 		return qPow(1.0 + Result, static_cast<double>(Frequency) / 12.0) - 1.0;
@@ -255,7 +261,8 @@ double BloombergVector::GetValue(const QDate& index,int Frequency)const{
 
 double BloombergVector::GetValue(int index,int Frequency)const{
     Q_D(const BloombergVector);
-	if (Frequency<1) return 0.0;
+	if (Frequency<1)
+        return 0.0;
     double Result = d->GetValueTemplate(d->m_VectVal, index, 0.0);
 	if(Frequency!=12) 
 		return qPow(1.0 + Result, static_cast<double>(Frequency) / 12.0) - 1.0;
@@ -263,7 +270,8 @@ double BloombergVector::GetValue(int index,int Frequency)const{
 }
 double BloombergVector::GetSMM(const QDate& index, int Frequency)const {
     Q_D(const BloombergVector);
-	if (Frequency < 1) return 0.0;
+	if (Frequency < 1)
+        return 0.0;
     double Result = d->GetValueTemplate(d->m_VectVal, index, 0.0);
 	if (Frequency != 12)
 		return 1.0 - qPow(1.0 - Result, static_cast<double>(Frequency) / 12.0);
@@ -271,7 +279,8 @@ double BloombergVector::GetSMM(const QDate& index, int Frequency)const {
 }
 double BloombergVector::GetSMM(int index, int Frequency)const {
     Q_D(const BloombergVector);
-	if (Frequency < 1) return 0.0;
+	if (Frequency < 1)
+        return 0.0;
     double Result = d->GetValueTemplate(d->m_VectVal, index, 0.0);
 	if (Frequency != 12) 
 		return 1.0 - qPow(1.0 - Result, static_cast<double>(Frequency) / 12.0);
@@ -299,7 +308,8 @@ QDataStream& BloombergVector::LoadOldVersion(QDataStream& stream) {
 }
 BloombergVector BloombergVector::Combine(const BloombergVector& StartVect, const BloombergVector& SwitchVect,quint32 Periods) {
 	BloombergVector Result;
-	if (Periods == 0) return SwitchVect;
+	if (Periods == 0) 
+        return SwitchVect;
 	QDate CurrDate;
 	Result.SetAnchorDate(StartVect.GetAnchorDate());
     if (StartVect.d_func()->m_Divisor == SwitchVect.d_func()->m_Divisor) Result.d_func()->m_Divisor = StartVect.d_func()->m_Divisor;
@@ -337,22 +347,23 @@ void BloombergVector::Combine(const BloombergVector& SwitchVect, quint32 Periods
 bool BloombergVector::IsEmpty(double Lbound, double Ubound) const
 {
     Q_D(const BloombergVector);
-	if (AbstractBbgVect::IsEmpty()) return true;
-	if (Ubound < Lbound) {
-		double TempV = Ubound;
-		Ubound = Lbound;
-		Lbound = TempV;
-	}
-	for (QList<double>::const_iterator i = d->m_VectVal.begin(); i != d->m_VectVal.end(); i++) {
+	if (AbstractBbgVect::IsEmpty()) 
+        return true;
+	if (Ubound < Lbound)
+        std::swap(Lbound, Ubound);
+    return std::any_of(d->m_VectVal.constBegin(), d->m_VectVal.constEnd(), [&Lbound, &Ubound](double val)-> bool {return val<Lbound || val>Ubound; });
+	/*for (QList<double>::const_iterator i = d->m_VectVal.begin(); i != d->m_VectVal.end(); i++) {
 		if ((*i)>Ubound || (*i) < Lbound) return true;
 	}
-	return false;
+	return false;*/
 }
 
 QString BloombergVector::BloombergSafeVector(QDate CurrentDate) const {
     Q_D(const BloombergVector);
-    if (d->m_AnchorDate.isNull()) return d->m_Vector;
-    if (d->m_AnchorDate > CurrentDate) return "";
+    if (d->m_AnchorDate.isNull())
+        return d->m_Vector;
+    if (d->m_AnchorDate > CurrentDate) 
+        return "";
 	BloombergVector Shorter(*this);
     Shorter.d_func()->m_VectVal.erase(Shorter.d_func()->m_VectVal.begin(), Shorter.d_func()->m_VectVal.begin() + MonthDiff(CurrentDate, d->m_AnchorDate));
 	Shorter.RepackVector();
@@ -423,7 +434,8 @@ void BloombergVector::ApplyFloorCap(const FloorCapVector& fc) {
 	QDate NewAnchor;
 	if (!GetAnchorDate().isNull() && !fc.GetAnchorDate().isNull()) {
 		NewAnchor = GetAnchorDate();
-        for (QDate i = GetAnchorDate(); i<qMax(GetAnchorDate(), fc.GetAnchorDate()); i = i.addMonths(1))  NewVec.append(d->GetValueTemplate(d->m_VectVal, i, 0.0));
+        for (QDate i = GetAnchorDate(); i<qMax(GetAnchorDate(), fc.GetAnchorDate()); i = i.addMonths(1)) 
+            NewVec.append(d->GetValueTemplate(d->m_VectVal, i, 0.0));
 		for (
 			QDate i = qMax(GetAnchorDate(), fc.GetAnchorDate());
 			i <= qMax(GetAnchorDate().addMonths(NumElements()), fc.GetAnchorDate().addMonths(fc.NumElements()));
@@ -459,7 +471,9 @@ int BloombergVector::NumElements() const
 void BloombergVector::SetDivisor(double a)
 {
     Q_D(BloombergVector);
-    if (a != 0.0) d->m_Divisor = a; UnpackVector();
+    if (a != 0.0) 
+        d->m_Divisor = a;
+    UnpackVector();
 }
 
 double BloombergVector::GetDivisor() const

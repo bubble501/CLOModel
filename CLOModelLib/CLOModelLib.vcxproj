@@ -144,6 +144,10 @@
   <ItemGroup>
     <ClInclude Include="AbstractBbgVect.h" />
     <ClInclude Include="AbstractTrigger.h" />
+    <ClInclude Include="Private\VectorTrigger_p.h" />
+    <ClInclude Include="Private\WatFalPrior_p.h" />
+    <ClInclude Include="VectorTrigger.h" />
+    <ClInclude Include="WatFalPrior.h" />
     <CustomBuild Include="AbstrAsyncCalculator.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing AbstrAsyncCalculator.h...</Message>
@@ -414,6 +418,8 @@
     <ClCompile Include="Tranche.cpp" />
     <ClCompile Include="TrancheCashFlow.cpp" />
     <ClCompile Include="TriggersResults.cpp" />
+    <ClCompile Include="VectorTrigger.cpp" />
+    <ClCompile Include="WatFalPrior.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Resources.qrc">

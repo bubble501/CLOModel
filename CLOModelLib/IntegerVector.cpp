@@ -110,7 +110,8 @@ void IntegerVector::SetShift(int val)
 
 IntegerVector& IntegerVector::operator=(const QString& a)
 {
-    AbstractBbgVect::operator=(a); return *this;
+    AbstractBbgVect::operator=(a); 
+    return *this;
 }
 
 QDataStream& operator<<(QDataStream & stream, const IntegerVector& flows)
@@ -136,16 +137,19 @@ QDataStream& IntegerVector::LoadOldVersion(QDataStream& stream) {
 bool IntegerVector::IsEmpty(int Lbound, int Ubound, bool IgnoreShift) const {
     Q_D(const IntegerVector);
 	if (AbstractBbgVect::IsEmpty()) return true;
-	if (Ubound < Lbound) {
-		int TempV = Ubound;
-		Ubound = Lbound;
-		Lbound = TempV;
-	}
+	if (Ubound < Lbound) 
+        std::swap(Lbound, Ubound);
+    return std::any_of(
+        d->m_VectVal.constBegin(),
+        d->m_VectVal.constEnd(),
+        [&Lbound, &Ubound, IgnoreShift, d](double val) ->bool {return (val + (IgnoreShift ? 0 : d->m_Shift) > Ubound) || (val + (IgnoreShift ? 0 : d->m_Shift) < Lbound); }
+    );
+/*
     for (QList<int>::const_iterator i = d->m_VectVal.begin(); i != d->m_VectVal.end(); i++) {
 		if (
             (*i) + (IgnoreShift ? 0 : d->m_Shift)> Ubound
             || (*i) + (IgnoreShift ? 0 : d->m_Shift) < Lbound
 		) return true;
 	}
-	return false;
+	return false;*/
 }

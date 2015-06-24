@@ -290,6 +290,18 @@
     <ClInclude Include="Private\PoolSizeTrigger_p.h">
       <Filter>Privates\Triggers</Filter>
     </ClInclude>
+    <ClInclude Include="WatFalPrior.h">
+      <Filter>Header Files\Deal Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\WatFalPrior_p.h">
+      <Filter>Privates\Deal Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\VectorTrigger_p.h">
+      <Filter>Privates\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="VectorTrigger.h">
+      <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BackwardCompatibilityInterface.cpp">
@@ -440,6 +452,12 @@
       <Filter>Source Files\Triggers</Filter>
     </ClCompile>
     <ClCompile Include="PoolSizeTrigger.cpp">
+      <Filter>Source Files\Triggers</Filter>
+    </ClCompile>
+    <ClCompile Include="WatFalPrior.cpp">
+      <Filter>Source Files\Deal Structure</Filter>
+    </ClCompile>
+    <ClCompile Include="VectorTrigger.cpp">
       <Filter>Source Files\Triggers</Filter>
     </ClCompile>
   </ItemGroup>

@@ -308,6 +308,12 @@
     <ClInclude Include="Private\ReinvestmentTest_p.h">
       <Filter>Privates\Deal Structure</Filter>
     </ClInclude>
+    <ClInclude Include="ReserveFund.h">
+      <Filter>Header Files\Deal Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\ReserveFund_p.h">
+      <Filter>Privates\Deal Structure</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BackwardCompatibilityInterface.cpp">
@@ -467,6 +473,9 @@
       <Filter>Source Files\Triggers</Filter>
     </ClCompile>
     <ClCompile Include="ReinvestmentTest.cpp">
+      <Filter>Source Files\Deal Structure</Filter>
+    </ClCompile>
+    <ClCompile Include="ReserveFund.cpp">
       <Filter>Source Files\Deal Structure</Filter>
     </ClCompile>
   </ItemGroup>

@@ -145,9 +145,11 @@
     <ClInclude Include="AbstractBbgVect.h" />
     <ClInclude Include="AbstractTrigger.h" />
     <ClInclude Include="Private\ReinvestmentTest_p.h" />
+    <ClInclude Include="Private\ReserveFund_p.h" />
     <ClInclude Include="Private\VectorTrigger_p.h" />
     <ClInclude Include="Private\WatFalPrior_p.h" />
     <ClInclude Include="ReinvestmentTest.h" />
+    <ClInclude Include="ReserveFund.h" />
     <ClInclude Include="VectorTrigger.h" />
     <ClInclude Include="WatFalPrior.h" />
     <CustomBuild Include="AbstrAsyncCalculator.h">
@@ -417,6 +419,7 @@
     <ClCompile Include="PrincipalProceeds.cpp" />
     <ClCompile Include="ReinvestmentTest.cpp" />
     <ClCompile Include="RepaymentVector.cpp" />
+    <ClCompile Include="ReserveFund.cpp" />
     <ClCompile Include="Seniority.cpp" />
     <ClCompile Include="Tranche.cpp" />
     <ClCompile Include="TrancheCashFlow.cpp" />

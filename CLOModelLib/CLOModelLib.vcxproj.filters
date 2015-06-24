@@ -314,6 +314,12 @@
     <ClInclude Include="Private\ReserveFund_p.h">
       <Filter>Privates\Deal Structure</Filter>
     </ClInclude>
+    <ClInclude Include="Waterfall.h">
+      <Filter>Header Files\Deal Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\Waterfall_p.h">
+      <Filter>Privates\Deal Structure</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BackwardCompatibilityInterface.cpp">
@@ -477,6 +483,9 @@
     </ClCompile>
     <ClCompile Include="ReserveFund.cpp">
       <Filter>Source Files\Deal Structure</Filter>
+    </ClCompile>
+    <ClCompile Include="Waterfall.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

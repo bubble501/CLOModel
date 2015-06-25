@@ -69,7 +69,6 @@ public:
 	void SetDownloadScenario(bool val);
     bool SaveIndividualFlows() const;
     void SaveIndividualFlows(bool val);
-protected:
 	friend QDataStream& operator<<(QDataStream & stream, const MtgCalculator& flows);
 	friend QDataStream& operator>>(QDataStream & stream, MtgCalculator& flows);
 };

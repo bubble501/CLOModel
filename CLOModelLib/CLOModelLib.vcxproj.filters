@@ -329,6 +329,9 @@
     <ClInclude Include="Private\WaterfallCalcThread_p.h">
       <Filter>Privates\Deal Structure</Filter>
     </ClInclude>
+    <ClInclude Include="Private\WaterfallCalculator_p.h">
+      <Filter>Privates\Deal Structure</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BackwardCompatibilityInterface.cpp">
@@ -493,9 +496,6 @@
     <ClCompile Include="ReserveFund.cpp">
       <Filter>Source Files\Deal Structure</Filter>
     </ClCompile>
-    <ClCompile Include="Waterfall.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TrancheTrigger.cpp">
       <Filter>Source Files\Triggers</Filter>
     </ClCompile>
@@ -506,6 +506,18 @@
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="WaterfallCalcThread.cpp">
+      <Filter>Source Files\Deal Structure</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_WaterfallCalculator.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_WaterfallCalculator.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="WaterfallCalculator.cpp">
+      <Filter>Source Files\Deal Structure</Filter>
+    </ClCompile>
+    <ClCompile Include="Waterfall.cpp">
       <Filter>Source Files\Deal Structure</Filter>
     </ClCompile>
   </ItemGroup>
@@ -535,6 +547,9 @@
       <Filter>Header Files\Loans</Filter>
     </CustomBuild>
     <CustomBuild Include="WaterfallCalcThread.h">
+      <Filter>Header Files\Deal Structure</Filter>
+    </CustomBuild>
+    <CustomBuild Include="WaterfallCalculator.h">
       <Filter>Header Files\Deal Structure</Filter>
     </CustomBuild>
   </ItemGroup>

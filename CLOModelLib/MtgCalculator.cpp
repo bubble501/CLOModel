@@ -278,7 +278,7 @@ QDataStream& operator<<(QDataStream & stream, const MtgCalculator& flows) {
         << flows.d_func()->m_DelinquencyLag
         << flows.d_func()->StartDate
 		;
-    for (auto i = flows.d_func()->Loans.begin(); i != flows.d_func()->Loans.end(); i++) {
+    for (auto i = flows.d_func()->Loans.constBegin(); i != flows.d_func()->Loans.constEnd(); i++) {
 		stream << i.key() << *(i.value());
 	}
 	return flows.SaveToStream(stream);
@@ -298,7 +298,7 @@ QDataStream& MtgCalculator::LoadOldVersion(QDataStream& stream) {
     stream >> d->m_DelinquencyLag;
     stream >> d->StartDate;
 	Mortgage TmpMtg;
-	for (qint32 i = 0; i < tempInt; i++) {
+    while (tempInt--) {
 		stream >> TempKey;
 		TmpMtg.SetLoadProtocolVersion(loadProtocolVersion());
 		stream >> TmpMtg;

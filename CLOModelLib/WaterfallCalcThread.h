@@ -1,7 +1,7 @@
 #ifndef WaterfallCalcThread_h__
 #define WaterfallCalcThread_h__
 #include "TemplAsyncThread.h"
-class Waterfall;
+#include "Waterfall.h"
 class WaterfallCalcThreadPrivate;
 class WaterfallCalcThread : public TemplAsyncThread<Waterfall> {
 	Q_OBJECT

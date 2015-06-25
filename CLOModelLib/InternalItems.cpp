@@ -10,6 +10,25 @@
 QMutex Db_Mutex;
 #endif
 const QString LoansPropertiesToSearch[] = { "Issuer", "Facility" };
+QString Commarize(double num, unsigned int precision)
+{
+    return QLocale().toString(num, 'f', precision);
+    /*QString Result=QString::number(num,'f',precision);
+    QString Commarized;
+    bool HasDecimal=Result.contains('.');
+    int currnecounter=0;
+    for(int j=Result.size()-1;j>=0;j--){
+    if(HasDecimal){
+    Commarized.prepend(Result.at(j));
+    HasDecimal=Result.at(j)!='.';
+    continue;
+    }
+    if(currnecounter%3==0 && currnecounter>0) Commarized.prepend(',');
+    currnecounter++;
+    Commarized.prepend(Result.at(j));
+    }
+    return Commarized;*/
+}
 QString InfixToPostfix(const QString& a)
 {
     if (a.isEmpty()) return QString();

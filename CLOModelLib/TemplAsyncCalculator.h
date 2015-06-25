@@ -46,8 +46,10 @@ TemplAsyncCalculator<ThreadType, ResultType>::TemplAsyncCalculator(QObject* pare
     static_assert(std::is_object<ThreadType>::value, "ThreadType can't be a reference or pointer");
     static_assert(std::is_default_constructible<ResultType>::value, "ResultType must implement a default constructor");
     static_assert(std::is_base_of<BackwardInterface, ResultType >::value, "ResultType must inherit from BackwardInterface");
-    RegisterAsMetaType<ResultType>();
-    
+    if (!QMetaType::isRegistered(qMetaTypeId<ResultType>())) {
+        int TypeID = qRegisterMetaType<ResultType>(typeid(ResultType).name());
+        qRegisterMetaTypeStreamOperators<ResultType>(typeid(ResultType).name());
+    }   
 }
 template <typename ThreadType, typename ResultType>
 TemplAsyncCalculator<ThreadType, ResultType>::TemplAsyncCalculator(AbstrAsyncCalculatorPrivate* d, QObject* parent)
@@ -57,7 +59,10 @@ TemplAsyncCalculator<ThreadType, ResultType>::TemplAsyncCalculator(AbstrAsyncCal
     static_assert(std::is_object<ThreadType>::value, "ThreadType can't be a reference or pointer");
     static_assert(std::is_default_constructible<ResultType>::value, "ResultType must implement a default constructor");
     static_assert(std::is_base_of<BackwardInterface, ResultType >::value, "ResultType must inherit from BackwardInterface");
-    RegisterAsMetaType<ResultType>();
+    if (!QMetaType::isRegistered(qMetaTypeId<ResultType>())) {
+        int TypeID = qRegisterMetaType<ResultType>(typeid(ResultType).name());
+        qRegisterMetaTypeStreamOperators<ResultType>(typeid(ResultType).name());
+    }
 }
 
 template <typename ThreadType, typename ResultType>

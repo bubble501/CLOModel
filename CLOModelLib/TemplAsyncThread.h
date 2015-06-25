@@ -16,7 +16,10 @@ protected:
         static_assert(std::is_default_constructible<ResultType>::value, "ResultType must implement a default constructor");
         static_assert(std::is_assignable<ResultType, const ResultType&>::value, "ResultType must implement an assignment operator");
         d_func()->m_Result = new ResultType();
-        RegisterAsMetaType<ResultType>();
+        if (!QMetaType::isRegistered(qMetaTypeId<ResultType>())) {
+            int TypeID = qRegisterMetaType<ResultType>(typeid(ResultType).name());
+            qRegisterMetaTypeStreamOperators<ResultType>(typeid(ResultType).name());
+        }
     }
 public:
 	TemplAsyncThread(int ID, QObject* parent = 0) 
@@ -25,7 +28,10 @@ public:
 		static_assert(std::is_default_constructible<ResultType>::value, "ResultType must implement a default constructor"); 
 		static_assert(std::is_assignable<ResultType, const ResultType&>::value, "ResultType must implement an assignment operator");
         d_func()->m_Result = new ResultType();
-		RegisterAsMetaType<ResultType>();
+        if (!QMetaType::isRegistered(qMetaTypeId<ResultType>())) {
+            int TypeID = qRegisterMetaType<ResultType>(typeid(ResultType).name());
+            qRegisterMetaTypeStreamOperators<ResultType>(typeid(ResultType).name());
+        }
 	}
 };
 

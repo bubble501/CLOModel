@@ -2,14 +2,13 @@
 #define CommonFunctions_h__
 #include <QtGlobal>
 #include <QMetaType>
-#include <QString>
 #include <QDataStream>
 #include "clomodellib_global.h"
 #define CompoundShift 10
 #define MaximumInterestsTypes 8
-//#define PrintStressTestExecutionTime
 #define NumStressDimentsions 6
 class QDate;
+class QString;
 class DayCountVector;
 class BloombergVector;
 template<typename T> class QList;
@@ -60,7 +59,6 @@ enum DayCountConvention : qint16
 
 };
 double CLOMODELLIB_EXPORT RoundUp(double a);
-QString CLOMODELLIB_EXPORT Commarize(double num, unsigned int precision = 0);
 double CLOMODELLIB_EXPORT CalculateIRR(const QList<QDate>& Dte, const QList<double>& Flws, const DayCountVector& Daycount, double Guess = 0.05);
 double CLOMODELLIB_EXPORT CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, double Interest, const DayCountVector& Daycount);
 double CLOMODELLIB_EXPORT CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, const BloombergVector& Interest, const DayCountVector& Daycount);
@@ -68,17 +66,10 @@ double CLOMODELLIB_EXPORT CalculateNPV(const QList<QDate>& Dte, const QList<doub
 double CLOMODELLIB_EXPORT CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, double BaseRate, const DayCountVector& Daycount, double Guess = 0.05);
 double CLOMODELLIB_EXPORT CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const BloombergVector& BaseRate, const DayCountVector& Daycount, double Guess = 0.05);
 double CLOMODELLIB_EXPORT CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const QString& BaseRate, const DayCountVector& Daycount, double Guess = 0.05);
-double CLOMODELLIB_EXPORT AdjustCoupon(double AnnualCoupon /*Annualised Coupon*/, QDate PrevIPD, QDate CurrIPD, DayCountConvention DayCount);
+double CLOMODELLIB_EXPORT AdjustCoupon(double AnnualCoupon, QDate PrevIPD, QDate CurrIPD, DayCountConvention DayCount);
 bool CLOMODELLIB_EXPORT IsHoliday(const QDate& a/*,const QString& CountryCode*/);
 bool CLOMODELLIB_EXPORT removeDir(const QString& dirName);
 bool CLOMODELLIB_EXPORT ValidDayCount(qint16 a);
-template<class T> void RegisterAsMetaType()
-{
-    if (!QMetaType::isRegistered(qMetaTypeId<T>())) {
-        int TypeID = qRegisterMetaType<T>(typeid(T).name());
-        qRegisterMetaTypeStreamOperators<T>(typeid(T).name());
-    }
-}
 
 #define DECLARE_PUBLIC_QOBJECT_COMMONS(Class) protected: \
     Q_DECLARE_PRIVATE(Class) \
@@ -111,6 +102,9 @@ template<class T> void RegisterAsMetaType()
     private: \
     Class ## Private(const Class ## Private &other) =delete; \
     Class ## Private& operator=(const Class ## Private &other) = delete;
+// #TODO Use this instead of assignment operators in public class as copy constructor
+#define DECLARE_PRIVATE_COMMONS_COPY(Class) public: \
+    Class ## Private(Class *q,const Class ## Private &other);
 #define DECLARE_PRIVATE_COMMONS_DATASTREAM(Class) friend QDataStream& operator<<(QDataStream & stream, const Class& flows); \
 friend QDataStream& operator>>(QDataStream & stream, Class& flows);
 

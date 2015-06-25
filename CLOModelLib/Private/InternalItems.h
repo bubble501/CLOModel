@@ -17,6 +17,7 @@ extern QMutex Db_Mutex;
 //#define SaveLoanTape
 //#define DebugLogging
 //#define PrintAggregatedMtgFlows
+//#define PrintStressTestExecutionTime
 #ifdef DebugLogging
 #include <QDebug>
 #define LOGASSERT(CheckExp,LogMsg) ((CheckExp) ? qt_noop() : PrintToTempFile("DebugLog.log",LogMsg)); Q_ASSERT_X(CheckExp,"LOGASSERT",LogMsg)
@@ -37,4 +38,12 @@ void PrintToTempFile(const QString& TempFileName, const QString& Message, bool P
 int NumberOfSetBits(quint32 i);
 QString NormaliseTriggerStructure(QString a);
 QString GetFromConfig(const QString& Domain, const QString& Field, const QString& DefaultValue = QString());
+QString Commarize(double num, unsigned int precision = 0);
+template<class T> void RegisterAsMetaType()
+{
+    if (!QMetaType::isRegistered(qMetaTypeId<T>())) {
+        int TypeID = qRegisterMetaType<T>(typeid(T).name());
+        qRegisterMetaTypeStreamOperators<T>(typeid(T).name());
+    }
+}
 #endif // InternalItems_h__

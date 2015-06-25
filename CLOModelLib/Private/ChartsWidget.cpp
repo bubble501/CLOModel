@@ -12,6 +12,7 @@
 #include "MtgCashFlow.h"
 #include "Tranche.h"
 #include "ReserveFund.h"
+#include "Private/InternalItems.h"
 ChartsWidget::ChartsWidget(QWidget* parent)
 	:QWidget(parent)
 {

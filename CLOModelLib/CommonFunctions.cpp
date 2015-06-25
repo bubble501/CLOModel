@@ -16,6 +16,7 @@
 #include <QFile>
 #include "simstring.h"
 #include "Private/InternalItems.h"
+#include <QLocale>
 int MonthDiff(const QDate& FutureDte,const QDate& PresentDte){
 	int Result;
 	Result=(FutureDte.year()-PresentDte.year())*12;
@@ -27,23 +28,7 @@ double RoundUp(double a){
 	if(a>Result) Result+=1.0;
 	return Result;
 }
-QString Commarize(double num,unsigned int precision){
-	QString Result=QString::number(num,'f',precision);
-	QString Commarized;
-	bool HasDecimal=Result.contains('.');
-	int currnecounter=0;
-	for(int j=Result.size()-1;j>=0;j--){
-		if(HasDecimal){
-			Commarized.prepend(Result.at(j));
-			HasDecimal=Result.at(j)!='.';
-			continue;
-		}
-		if(currnecounter%3==0 && currnecounter>0) Commarized.prepend(',');
-		currnecounter++;
-		Commarized.prepend(Result.at(j));
-	}
-	return Commarized;
-}
+
 
 double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, double Interest, const DayCountVector& Daycount) {
 	if (Dte.size() != Flws.size() || Dte.isEmpty() || Daycount.IsEmpty()) return 0.0;
@@ -101,25 +86,24 @@ double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const QSt
 }
 bool removeDir(const QString & dirName)
 {
-	bool result = true;
 	QDir dir(dirName);
-
 	if (dir.exists(dirName)) {
-		Q_FOREACH(QFileInfo info, dir.entryInfoList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst)) {
-			if (info.isDir()) {
-				result = removeDir(info.absoluteFilePath());
+        const auto allInfos = dir.entryInfoList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden | QDir::AllDirs | QDir::Files, QDir::DirsFirst);
+        for (auto info = allInfos.constBegin(); info != allInfos.constEnd(); ++info)
+        {
+			if (info->isDir()) {
+                if (!removeDir(info->absoluteFilePath()))
+                    return false;
 			}
 			else {
-				result = QFile::remove(info.absoluteFilePath());
-			}
-
-			if (!result) {
-				return result;
+                if (!QFile::remove(info->absoluteFilePath()))
+                    return false;
 			}
 		}
-		result = dir.rmdir(dirName);
+        if (!dir.rmdir(dirName));
+            return false;
 	}
-	return result;
+	return true;
 }
 
 double AdjustCoupon(double AnnualCoupon /*Annualised Coupon*/, QDate PrevIPD /*Interesty start accrual date*/, QDate CurrIPD /*Interesty end accrual date*/, DayCountConvention DayCount) {

@@ -7,6 +7,8 @@
 #include "clomodellib_global.h"
 #define CompoundShift 10
 #define MaximumInterestsTypes 8
+//#define PrintStressTestExecutionTime
+#define NumStressDimentsions 6
 class QDate;
 class DayCountVector;
 class BloombergVector;

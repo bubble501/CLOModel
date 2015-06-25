@@ -90,6 +90,15 @@
     <Filter Include="Privates\Widgets">
       <UniqueIdentifier>{9b1fd83e-7dea-4fdf-95cb-60073a231b5e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Stress Test">
+      <UniqueIdentifier>{f519b278-f896-45bb-a996-94c6c309c156}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Stress Test">
+      <UniqueIdentifier>{69c7e9a5-fbc2-44d0-97b8-8cdec8ec2fcf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Privates\Stress Test">
+      <UniqueIdentifier>{da357504-ee64-48b1-8735-4df0ac314c2b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="clomodellib_global.h">
@@ -143,9 +152,6 @@
     <ClInclude Include="TrancheCashFlow.h">
       <Filter>Header Files\Deal Structure</Filter>
     </ClInclude>
-    <ClInclude Include="AssumptionSet.h">
-      <Filter>Header Files\Loans</Filter>
-    </ClInclude>
     <ClInclude Include="TemplAsyncThread.h">
       <Filter>Header Files\Interfaces</Filter>
     </ClInclude>
@@ -172,9 +178,6 @@
     </ClInclude>
     <ClInclude Include="Private\AbstrAsyncThread_p.h">
       <Filter>Privates\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="Private\AssumptionSet_p.h">
-      <Filter>Privates\Loans</Filter>
     </ClInclude>
     <ClInclude Include="Private\BackwardCompatibilityInterface_p.h">
       <Filter>Privates\Interfaces</Filter>
@@ -332,6 +335,21 @@
     <ClInclude Include="Private\WaterfallCalculator_p.h">
       <Filter>Privates\Deal Structure</Filter>
     </ClInclude>
+    <ClInclude Include="AssumptionSet.h">
+      <Filter>Header Files\Stress Test</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\AssumptionSet_p.h">
+      <Filter>Privates\Stress Test</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\StressTest_p.h">
+      <Filter>Privates\Stress Test</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\ReadOnlyColProxy.h">
+      <Filter>Privates\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\ScenarioApplier_p.h">
+      <Filter>Privates\Loans</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BackwardCompatibilityInterface.cpp">
@@ -387,9 +405,6 @@
     </ClCompile>
     <ClCompile Include="TrancheCashFlow.cpp">
       <Filter>Source Files\Deal Structure</Filter>
-    </ClCompile>
-    <ClCompile Include="AssumptionSet.cpp">
-      <Filter>Source Files\Loans</Filter>
     </ClCompile>
     <ClCompile Include="AbstrAsyncThread.cpp">
       <Filter>Source Files\Interfaces</Filter>
@@ -520,6 +535,90 @@
     <ClCompile Include="Waterfall.cpp">
       <Filter>Source Files\Deal Structure</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_StressTest.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_StressTest.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="StressTest.cpp">
+      <Filter>Source Files\Stress Test</Filter>
+    </ClCompile>
+    <ClCompile Include="AssumptionSet.cpp">
+      <Filter>Source Files\Stress Test</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_RichTextDelegate.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_RichTextDelegate.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\RichTextDelegate.cpp">
+      <Filter>Privates\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_PhasedProgressWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_PhasedProgressWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\PhasedProgressWidget.cpp">
+      <Filter>Privates\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_LoanAssumptionDelegate.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_LoanAssumptionDelegate.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\LoanAssumptionDelegate.cpp">
+      <Filter>Privates\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_CheckAndEditDelegate.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_CheckAndEditDelegate.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\CheckAndEditDelegate.cpp">
+      <Filter>Privates\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_CheckAndEdit.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_CheckAndEdit.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\CheckAndEdit.cpp">
+      <Filter>Privates\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ChartsWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ChartsWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\ChartsWidget.cpp">
+      <Filter>Privates\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_AssumptionsComboDelegate.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_AssumptionsComboDelegate.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\AssumptionsComboDelegate.cpp">
+      <Filter>Privates\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ScenarioApplier.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ScenarioApplier.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="ScenarioApplier.cpp">
+      <Filter>Source Files\Loans</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="AbstrAsyncThread.h">
@@ -551,6 +650,33 @@
     </CustomBuild>
     <CustomBuild Include="WaterfallCalculator.h">
       <Filter>Header Files\Deal Structure</Filter>
+    </CustomBuild>
+    <CustomBuild Include="StressTest.h">
+      <Filter>Header Files\Stress Test</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\RichTextDelegate.h">
+      <Filter>Privates\Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\PhasedProgressWidget.h">
+      <Filter>Privates\Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\LoanAssumptionDelegate.h">
+      <Filter>Privates\Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\CheckAndEditDelegate.h">
+      <Filter>Privates\Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\CheckAndEdit.h">
+      <Filter>Privates\Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\ChartsWidget.h">
+      <Filter>Privates\Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\AssumptionsComboDelegate.h">
+      <Filter>Privates\Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ScenarioApplier.h">
+      <Filter>Header Files\Loans</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

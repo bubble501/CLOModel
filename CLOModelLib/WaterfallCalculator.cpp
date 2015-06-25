@@ -122,3 +122,7 @@ QDataStream& WaterfallCalculator::LoadOldVersion(QDataStream& stream)
     }
     return TemplAsyncCalculator<WaterfallCalcThread, Waterfall>::LoadOldVersion(stream);
 }
+QDataStream& operator>>(QDataStream & stream, WaterfallCalculator& flows)
+{
+    return flows.LoadOldVersion(stream);
+}

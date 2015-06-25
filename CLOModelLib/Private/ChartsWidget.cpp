@@ -9,6 +9,9 @@
 #include <KDChartBarDiagram>
 #include <KDChartCartesianAxis>
 #include <qmath.h>
+#include "MtgCashFlow.h"
+#include "Tranche.h"
+#include "ReserveFund.h"
 ChartsWidget::ChartsWidget(QWidget* parent)
 	:QWidget(parent)
 {

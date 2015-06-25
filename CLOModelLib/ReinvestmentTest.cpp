@@ -125,8 +125,8 @@ void ReinvestmentTest::CalculateBondCashFlows(double Size, QDate StartDate, int 
     d->ReinvestmentBond.SetProperty("Price", QString("%1").arg(CurrentPrice*100.0));
     d->ReinvestmentBond.SetProperty("PurchasePrice", QString("%1").arg(CurrentPrice*100.0));
     d->ReinvestmentBond.SetSize(Size / qMax(CurrentPrice, 0.01));
-    if (d->WALAssumption.GetAnchorDate().isNull()) d->ReinvestmentBond.SetMaturityDate(StartDate.addDays(RoundUp(365.25*d->WALAssumption.GetValue(Period))));
-    else d->ReinvestmentBond.SetMaturityDate(StartDate.addDays(RoundUp(365.25*d->WALAssumption.GetValue(StartDate))));
+    if (d->WALAssumption.GetAnchorDate().isNull()) d->ReinvestmentBond.SetMaturityDate(StartDate.addDays(std::ceil(365.25*d->WALAssumption.GetValue(Period))));
+    else d->ReinvestmentBond.SetMaturityDate(StartDate.addDays(std::ceil(365.25*d->WALAssumption.GetValue(StartDate))));
     if (!MaxMaturity.isNull() && d->ReinvestmentBond.GetMaturityDate() > MaxMaturity) d->ReinvestmentBond.SetMaturityDate(MaxMaturity);
     d->ReinvestmentBond.CalculateCashFlows(
 		StartDate

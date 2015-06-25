@@ -58,7 +58,6 @@ enum DayCountConvention : qint16
     , ContCompNAFBACTACT = (1 << (1 + CompoundShift)) | 204
 
 };
-double CLOMODELLIB_EXPORT RoundUp(double a);
 double CLOMODELLIB_EXPORT CalculateIRR(const QList<QDate>& Dte, const QList<double>& Flws, const DayCountVector& Daycount, double Guess = 0.05);
 double CLOMODELLIB_EXPORT CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, double Interest, const DayCountVector& Daycount);
 double CLOMODELLIB_EXPORT CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, const BloombergVector& Interest, const DayCountVector& Daycount);

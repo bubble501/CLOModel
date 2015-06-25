@@ -23,12 +23,6 @@ int MonthDiff(const QDate& FutureDte,const QDate& PresentDte){
 	Result+=FutureDte.month()-PresentDte.month();
 	return Result;
 }
-double RoundUp(double a){
-	double Result=static_cast<double>(static_cast<int>(a));
-	if(a>Result) Result+=1.0;
-	return Result;
-}
-
 
 double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, double Interest, const DayCountVector& Daycount) {
 	if (Dte.size() != Flws.size() || Dte.isEmpty() || Daycount.IsEmpty()) return 0.0;

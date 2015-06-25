@@ -18,7 +18,7 @@ MtgCashFlow MtgCashFlow::ApplyScenario(BloombergVector CPRv, BloombergVector CDR
 	if (LSv.GetAnchorDate().isNull()) LSv.SetAnchorDate(GetDate(0));
 	Result.AddFlow(SingleDate(GetDate(0)));
 	double CurrentOut,ShareOfPrinc, ShareOfIntr, ShareOfAccrIntr, ShareOfLoss, ShareOfLossOnInterest, SumDeltaOut, TempF, ApplicablePrincipal, ApplicableMultiplier;
-	bool HasOCoutstanding = HasFlowType(static_cast<qint32>(MtgFlowType::OutstandingForOC));
+	bool HasOCoutstanding = HasFlowType(MtgFlowType::OutstandingForOC);
 	if (Count() <= 1) return Result;
     for (auto i = (d->m_CashFlows.constBegin() + 1); i != d->m_CashFlows.constEnd(); ++i) {
 		CurrentOut = GetFlow((i - 1).key(), MtgFlowType::AmountOutstandingFlow);
@@ -122,79 +122,81 @@ MtgCashFlow MtgCashFlow::ApplyScenario(const QString& CPRv, const QString& CDRv,
 
 MtgCashFlow::MtgCashFlow()
 {
-	SetLabel(static_cast<qint32>(MtgFlowType::InterestFlow), "Interest");
-	SetLabel(static_cast<qint32>(MtgFlowType::PrincipalFlow), "Scheduled");
-	SetLabel(static_cast<qint32>(MtgFlowType::PrepaymentFlow), "Prepayment");
-	SetLabel(static_cast<qint32>(MtgFlowType::AmountOutstandingFlow), "Amount Outstanding");
-	SetLabel(static_cast<qint32>(MtgFlowType::WACouponFlow), "WA Coupon");
-	SetLabel(static_cast<qint32>(MtgFlowType::AccruedInterestFlow), "Accrued Interest");
-	SetLabel(static_cast<qint32>(MtgFlowType::LossOnInterestFlow), "Loss on Interest");
-	SetLabel(static_cast<qint32>(MtgFlowType::PrincipalDefault), "Principal Default");
-	SetLabel(static_cast<qint32>(MtgFlowType::PrincipalRecovered), "Principal Recovered");
-	SetLabel(static_cast<qint32>(MtgFlowType::InterestRecovered), "Interest Recovered");
-	SetLabel(static_cast<qint32>(MtgFlowType::LossFlow), "Loss");
-	SetLabel(static_cast<qint32>(MtgFlowType::WAPrepayMult), "WA Prepay Multiplier");
-	SetLabel(static_cast<qint32>(MtgFlowType::WALossMult), "WA Loss Multiplier");
-	SetLabel(static_cast<qint32>(MtgFlowType::WAPrice), "WA Price");
-	SetLabel(static_cast<qint32>(MtgFlowType::WALlevel), "WAL");
-	SetLabel(static_cast<qint32>(MtgFlowType::DelinquentOutstanding), "Delinquent");
-	SetLabel(static_cast<qint32>(MtgFlowType::WAPrepayFees), "WA Prepayment Fees");
-	SetLabel(static_cast<qint32>(MtgFlowType::PrepaymentFees), "Prepayment Fees");
-	SetLabel(static_cast<qint32>(MtgFlowType::OutstandingForOC), "Outstanding for OC Test");
-	Aggregate(Monthly); 
-	SetStock(static_cast<qint32>(MtgFlowType::AmountOutstandingFlow));
-	SetStock(static_cast<qint32>(MtgFlowType::WACouponFlow));
-	SetStock(static_cast<qint32>(MtgFlowType::AccruedInterestFlow));
-	SetStock(static_cast<qint32>(MtgFlowType::WAPrepayMult));
-	SetStock(static_cast<qint32>(MtgFlowType::WALossMult));
-	SetStock(static_cast<qint32>(MtgFlowType::WAPrice));
-	SetStock(static_cast<qint32>(MtgFlowType::WALlevel));
-	SetStock(static_cast<qint32>(MtgFlowType::DelinquentOutstanding));
-	SetStock(static_cast<qint32>(MtgFlowType::WAPrepayFees));
-	SetStock(static_cast<qint32>(MtgFlowType::OutstandingForOC));
+    SetLabel(MtgFlowType::InterestFlow, "Interest");
+    SetLabel(MtgFlowType::PrincipalFlow, "Scheduled");
+    SetLabel(MtgFlowType::PrepaymentFlow, "Prepayment");
+    SetLabel(MtgFlowType::AmountOutstandingFlow, "Amount Outstanding");
+    SetLabel(MtgFlowType::WACouponFlow, "WA Coupon");
+    SetLabel(MtgFlowType::AccruedInterestFlow, "Accrued Interest");
+    SetLabel(MtgFlowType::LossOnInterestFlow, "Loss on Interest");
+    SetLabel(MtgFlowType::PrincipalDefault, "Principal Default");
+    SetLabel(MtgFlowType::PrincipalRecovered, "Principal Recovered");
+    SetLabel(MtgFlowType::InterestRecovered, "Interest Recovered");
+    SetLabel(MtgFlowType::LossFlow, "Loss");
+    SetLabel(MtgFlowType::WAPrepayMult, "WA Prepay Multiplier");
+    SetLabel(MtgFlowType::WALossMult, "WA Loss Multiplier");
+    SetLabel(MtgFlowType::WAPrice, "WA Price");
+    SetLabel(MtgFlowType::WALlevel, "WAL");
+    SetLabel(MtgFlowType::DelinquentOutstanding, "Delinquent");
+    SetLabel(MtgFlowType::WAPrepayFees, "WA Prepayment Fees");
+    SetLabel(MtgFlowType::PrepaymentFees, "Prepayment Fees");
+    SetLabel(MtgFlowType::OutstandingForOC, "Outstanding for OC Test");
+    Aggregate(Monthly);
+    SetStock(MtgFlowType::AmountOutstandingFlow);
+    SetStock(MtgFlowType::WACouponFlow);
+    SetStock(MtgFlowType::AccruedInterestFlow);
+    SetStock(MtgFlowType::WAPrepayMult);
+    SetStock(MtgFlowType::WALossMult);
+    SetStock(MtgFlowType::WAPrice);
+    SetStock(MtgFlowType::WALlevel);
+    SetStock(MtgFlowType::DelinquentOutstanding);
+    SetStock(MtgFlowType::WAPrepayFees);
+    SetStock(MtgFlowType::OutstandingForOC);
 }
 
 MtgCashFlow::MtgCashFlow(const MtgCashFlow& a) 
 	:GenericCashFlow(a)
+{}
+double MtgCashFlow::GetTotalFlow(int index) const
 {
+    return GenericCashFlow::GetTotalFlow(index, QList<qint32>()
+        << MtgFlowType::InterestFlow
+        << MtgFlowType::PrincipalFlow
+        << MtgFlowType::PrepaymentFlow
+        );
 }
-double MtgCashFlow::GetTotalFlow(int index) const {
-	return GenericCashFlow::GetTotalFlow(index, QList<qint32>() 
-		<< static_cast<qint32>(MtgFlowType::InterestFlow)
-		<< static_cast<qint32>(MtgFlowType::PrincipalFlow)
-		<< static_cast<qint32>(MtgFlowType::PrepaymentFlow)
-	);
-}
-double MtgCashFlow::GetTotalFlow(const QDate& a) const {
-	return GenericCashFlow::GetTotalFlow(a, QList<qint32>()
-		<< static_cast<qint32>(MtgFlowType::InterestFlow)
-		<< static_cast<qint32>(MtgFlowType::PrincipalFlow)
-		<< static_cast<qint32>(MtgFlowType::PrepaymentFlow)
-	);
+double MtgCashFlow::GetTotalFlow(const QDate& a) const
+{
+    return GenericCashFlow::GetTotalFlow(a, QList<qint32>()
+        << MtgFlowType::InterestFlow
+        << MtgFlowType::PrincipalFlow
+        << MtgFlowType::PrepaymentFlow
+        );
 }
 
-MtgCashFlow MtgCashFlow::ScaledCashFlows(double OriginalRefSize, double ResultSize) const {
-	MtgCashFlow Result(*this);
-	Result.SetFlow(GenericCashFlow::ScaledCashFlows(OriginalRefSize, ResultSize, QList<qint32>(), QList<qint32>()
-		<< static_cast<qint32>(MtgFlowType::WACouponFlow)
-		<< static_cast<qint32>(MtgFlowType::WAPrepayMult)
-		<< static_cast<qint32>(MtgFlowType::WALossMult)
-		<< static_cast<qint32>(MtgFlowType::WAPrice)
-		<< static_cast<qint32>(MtgFlowType::WALlevel)
-		<< static_cast<qint32>(MtgFlowType::WAPrepayFees)
-		));
-	double CurrentOut;
+MtgCashFlow MtgCashFlow::ScaledCashFlows(double OriginalRefSize, double ResultSize) const
+{
+    MtgCashFlow Result(*this);
+    Result.SetFlow(GenericCashFlow::ScaledCashFlows(OriginalRefSize, ResultSize, QList<qint32>(), QList<qint32>()
+        << MtgFlowType::WACouponFlow
+        << MtgFlowType::WAPrepayMult
+        << MtgFlowType::WALossMult
+        << MtgFlowType::WAPrice
+        << MtgFlowType::WALlevel
+        << MtgFlowType::WAPrepayFees
+        ));
+    double CurrentOut;
     for (auto i = Result.d_func()->m_CashFlows.begin(); i != Result.d_func()->m_CashFlows.end(); ++i) {
-		CurrentOut = GetAmountOut(i.key());
-		if (CurrentOut != 0) {
-			i.value()->operator[](static_cast<qint32>(MtgFlowType::WACouponFlow)) *= i.value()->value(static_cast<qint32>(MtgFlowType::AmountOutstandingFlow), 0.0) / CurrentOut;
-			i.value()->operator[](static_cast<qint32>(MtgFlowType::WAPrepayMult)) *= i.value()->value(static_cast<qint32>(MtgFlowType::AmountOutstandingFlow), 0.0) / CurrentOut;
-			i.value()->operator[](static_cast<qint32>(MtgFlowType::WALossMult)) *= i.value()->value(static_cast<qint32>(MtgFlowType::AmountOutstandingFlow), 0.0) / CurrentOut;
-			i.value()->operator[](static_cast<qint32>(MtgFlowType::WAPrice)) *= i.value()->value(static_cast<qint32>(MtgFlowType::AmountOutstandingFlow), 0.0) / CurrentOut;
-			i.value()->operator[](static_cast<qint32>(MtgFlowType::WALlevel)) *= i.value()->value(static_cast<qint32>(MtgFlowType::AmountOutstandingFlow), 0.0) / CurrentOut;
-			i.value()->operator[](static_cast<qint32>(MtgFlowType::WAPrepayFees)) *= i.value()->value(static_cast<qint32>(MtgFlowType::AmountOutstandingFlow), 0.0) / CurrentOut;
-		}
-			
-	}
-	return Result;
+        CurrentOut = GetAmountOut(i.key());
+        if (CurrentOut != 0) {
+            i.value()->operator[](MtgFlowType::WACouponFlow) *= i.value()->value(MtgFlowType::AmountOutstandingFlow, 0.0) / CurrentOut;
+            i.value()->operator[](MtgFlowType::WAPrepayMult) *= i.value()->value(MtgFlowType::AmountOutstandingFlow, 0.0) / CurrentOut;
+            i.value()->operator[](MtgFlowType::WALossMult) *= i.value()->value(MtgFlowType::AmountOutstandingFlow, 0.0) / CurrentOut;
+            i.value()->operator[](MtgFlowType::WAPrice) *= i.value()->value(MtgFlowType::AmountOutstandingFlow, 0.0) / CurrentOut;
+            i.value()->operator[](MtgFlowType::WALlevel) *= i.value()->value(MtgFlowType::AmountOutstandingFlow, 0.0) / CurrentOut;
+            i.value()->operator[](MtgFlowType::WAPrepayFees) *= i.value()->value(MtgFlowType::AmountOutstandingFlow, 0.0) / CurrentOut;
+        }
+
+    }
+    return Result;
 }

@@ -45,7 +45,7 @@ public:
             }
             for (
                 qint32 CoupIter = CurrentCoupon + 1
-                ; ApplicableTranche && CoupIter < static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow) && (static_cast<quint8>(m_CouponSide)& static_cast<quint8>(DeferredInterestTrigger::TriggerCouponSide::Bigger))
+                ; ApplicableTranche && CoupIter < TrancheCashFlow::TrancheFlowType::InterestFlow && (static_cast<quint8>(m_CouponSide)& static_cast<quint8>(DeferredInterestTrigger::TriggerCouponSide::Bigger))
                 ; ++CoupIter
                 ) {
                 SumDeferred += (*TranIter)->GetCashFlow().GetDeferred(CurrentPeriod, CoupIter);

@@ -10,7 +10,7 @@ class CLOMODELLIB_EXPORT ReserveFund :public BackwardInterface
     DECLARE_PUBLIC_COMMONS(ReserveFund)
     DECLARE_PUBLIC_COMMONS_COPY(ReserveFund)
 public:
-	enum class ReserveFlowsType : qint32{
+	enum ReserveFlowsType : qint32{
 		ReplenishFromInterest = 1 << MaximumInterestsTypes
 		, ReplenishFromPrincipal =1
 		, ShortFall = 1 << (MaximumInterestsTypes + 1)

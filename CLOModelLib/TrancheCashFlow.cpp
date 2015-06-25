@@ -30,19 +30,19 @@ TrancheCashFlow::TrancheCashFlow(TrancheCashFlowPrivate *d)
 {
     d->OutstandingAmt = 0.0;
     for (qint32 i = 0; i < (1 << MaximumInterestsTypes); ++i) {
-        SetStock(static_cast<qint32>(TrancheFlowType::DeferredFlow) | i);
+        SetStock(TrancheFlowType::DeferredFlow | i);
     }
-    SetLabel(static_cast<qint32>(TrancheFlowType::PrincipalFlow), "Principal");
-    SetLabel(static_cast<qint32>(TrancheFlowType::AmountOutstandingFlow), "Amount Outstanding");
-    SetLabel(static_cast<qint32>(TrancheFlowType::OCFlow), "OC Test");
-    SetLabel(static_cast<qint32>(TrancheFlowType::ICFlow), "IC Test");
-    SetLabel(static_cast<qint32>(TrancheFlowType::OCTarget), "OC Target");
-    SetLabel(static_cast<qint32>(TrancheFlowType::ICTarget), "IC Target");
-    SetLabel(static_cast<qint32>(TrancheFlowType::PDLOutstanding), "PDL Outstanding");
-    SetLabel(static_cast<qint32>(TrancheFlowType::PDLCured), "PDL Cured");
+    SetLabel(TrancheFlowType::PrincipalFlow, "Principal");
+    SetLabel(TrancheFlowType::AmountOutstandingFlow, "Amount Outstanding");
+    SetLabel(TrancheFlowType::OCFlow, "OC Test");
+    SetLabel(TrancheFlowType::ICFlow, "IC Test");
+    SetLabel(TrancheFlowType::OCTarget, "OC Target");
+    SetLabel(TrancheFlowType::ICTarget, "IC Target");
+    SetLabel(TrancheFlowType::PDLOutstanding, "PDL Outstanding");
+    SetLabel(TrancheFlowType::PDLCured, "PDL Cured");
 
-    SetStock(static_cast<qint32>(TrancheFlowType::AmountOutstandingFlow));
-    SetStock(static_cast<qint32>(TrancheFlowType::PDLOutstanding));
+    SetStock(TrancheFlowType::AmountOutstandingFlow);
+    SetStock(TrancheFlowType::PDLOutstanding);
     Aggregate(Monthly);
 }
 
@@ -66,12 +66,12 @@ QString TrancheCashFlow::GetLabel(qint32 FlowTpe, const QString& DefaultLab /*= 
     Q_D(const TrancheCashFlow);
 	if (d->m_CashFlowLabels.contains(FlowTpe)) 
         return GenericCashFlow::GetLabel(FlowTpe, DefaultLab);
-	if (FlowTpe >= static_cast<qint32>(TrancheFlowType::InterestFlow) && FlowTpe < (static_cast<qint32>(TrancheFlowType::InterestFlow) << 1))
-		return QString("Interest %1").arg((FlowTpe & ~static_cast<qint32>(TrancheFlowType::InterestFlow)) + 1);
-	if (FlowTpe >= static_cast<qint32>(TrancheFlowType::DeferredFlow) && FlowTpe <( static_cast<qint32>(TrancheFlowType::DeferredFlow) | static_cast<qint32>(TrancheFlowType::InterestFlow)))
-		return QString("Deferred Interest %1").arg((FlowTpe & ~static_cast<qint32>(TrancheFlowType::DeferredFlow)) + 1);
-	if (FlowTpe >= static_cast<qint32>(TrancheFlowType::AccruedFlow) && FlowTpe < (static_cast<qint32>(TrancheFlowType::AccruedFlow) | static_cast<qint32>(TrancheFlowType::InterestFlow)))
-		return QString("Accrued Interest %1").arg((FlowTpe & ~static_cast<qint32>(TrancheFlowType::AccruedFlow)) + 1);
+	if (FlowTpe >= TrancheFlowType::InterestFlow && FlowTpe < (TrancheFlowType::InterestFlow << 1))
+		return QString("Interest %1").arg((FlowTpe & ~TrancheFlowType::InterestFlow) + 1);
+	if (FlowTpe >= TrancheFlowType::DeferredFlow && FlowTpe <( TrancheFlowType::DeferredFlow | TrancheFlowType::InterestFlow))
+		return QString("Deferred Interest %1").arg((FlowTpe & ~TrancheFlowType::DeferredFlow) + 1);
+	if (FlowTpe >= TrancheFlowType::AccruedFlow && FlowTpe < (TrancheFlowType::AccruedFlow | TrancheFlowType::InterestFlow))
+		return QString("Accrued Interest %1").arg((FlowTpe & ~TrancheFlowType::AccruedFlow) + 1);
 	return DefaultLab;
 }
 
@@ -113,9 +113,9 @@ QDate TrancheCashFlow::GetLastFlowDate(bool IncludeDeferred) const
     for (auto i = d->m_CashFlows.constEnd() - 1; true; --i) {
 		for (auto j = i.value()->constBegin(); j != i.value()->constEnd(); ++j) {
 			if ((
-				(j.key() & static_cast<qint32>(TrancheFlowType::InterestFlow)) 
-				|| (j.key() == static_cast<qint32>(TrancheFlowType::PrincipalFlow))
-				|| ((j.key() & static_cast<qint32>(TrancheFlowType::DeferredFlow)) && IncludeDeferred)
+				(j.key() & TrancheFlowType::InterestFlow) 
+				|| (j.key() == TrancheFlowType::PrincipalFlow)
+				|| ((j.key() & TrancheFlowType::DeferredFlow) && IncludeDeferred)
 			) && j.value() >= 0.01) return i.key();
 
 		}
@@ -146,15 +146,15 @@ double TrancheCashFlow::GetStartingDeferredInterest(qint32 CoupIdx/*=0*/) const
 
 double TrancheCashFlow::GetTotalFlow(int index) const {
 	QList<qint32> FlowsType;
-	FlowsType.append(static_cast<qint32>(TrancheFlowType::PrincipalFlow));
-	for (qint32 i = static_cast<qint32>(TrancheFlowType::InterestFlow); i < (static_cast<qint32>(TrancheFlowType::InterestFlow) << 1); ++i)
+	FlowsType.append(TrancheFlowType::PrincipalFlow);
+	for (qint32 i = TrancheFlowType::InterestFlow; i < (TrancheFlowType::InterestFlow << 1); ++i)
 		FlowsType.append(i);
 	return GenericCashFlow::GetTotalFlow(index,FlowsType);
 }
 double TrancheCashFlow::GetTotalFlow(const QDate& a) const {
 	QList<qint32> FlowsType;
-	FlowsType.append(static_cast<qint32>(TrancheFlowType::PrincipalFlow));
-	for (qint32 i = static_cast<qint32>(TrancheFlowType::InterestFlow); i < (static_cast<qint32>(TrancheFlowType::InterestFlow) << 1); ++i)
+	FlowsType.append(TrancheFlowType::PrincipalFlow);
+	for (qint32 i = TrancheFlowType::InterestFlow; i < (TrancheFlowType::InterestFlow << 1); ++i)
 		FlowsType.append(i);
 	return GenericCashFlow::GetTotalFlow(a, FlowsType);
 }
@@ -255,10 +255,10 @@ TrancheCashFlow TrancheCashFlow::ScaledCashFlows(double OldSize,double NewSize) 
 		i.value() *= NewSize / OldSize;
 	}
 	Result.AddFlow(GenericCashFlow::ScaledCashFlows(OldSize, NewSize, QList<qint32>(), QList<qint32>()
-		 << static_cast<qint32>(TrancheFlowType::OCFlow)
-		 << static_cast<qint32>(TrancheFlowType::ICFlow)
-		 << static_cast<qint32>(TrancheFlowType::OCTarget)
-		 << static_cast<qint32>(TrancheFlowType::ICTarget)
+		 << TrancheFlowType::OCFlow
+		 << TrancheFlowType::ICFlow
+		 << TrancheFlowType::OCTarget
+		 << TrancheFlowType::ICTarget
 		));
 	return Result;
 }
@@ -279,8 +279,8 @@ void TrancheCashFlow::LoadFromXML(const QString& Source)
 		return;
 	}
     d->OutstandingAmt =
-        d->m_CashFlows.constBegin().value()->value(static_cast<qint32>(TrancheFlowType::AmountOutstandingFlow), 0.0)
-        + d->m_CashFlows.constBegin().value()->value(static_cast<qint32>(TrancheFlowType::PrincipalFlow), 0.0);
+        d->m_CashFlows.constBegin().value()->value(TrancheFlowType::AmountOutstandingFlow, 0.0)
+        + d->m_CashFlows.constBegin().value()->value(TrancheFlowType::PrincipalFlow, 0.0);
 }
 
 void TrancheCashFlow::AddFlow(const QDate& Dte, double Amt, TrancheFlowType FlwTpe) {
@@ -292,7 +292,7 @@ void TrancheCashFlow::SetFlow(const QDate& Dte, double Amt, TrancheFlowType FlwT
 void TrancheCashFlow::AddFlow(QDate Dte, double Amt, qint32 FlwTpe) {
     Q_D(TrancheCashFlow);
     if (d->m_CashFlows.isEmpty()) {
-        if (d->OutstandingAmt>0.0) GenericCashFlow::SetFlow(Dte, d->OutstandingAmt, static_cast<qint32>(TrancheFlowType::AmountOutstandingFlow));
+        if (d->OutstandingAmt>0.0) GenericCashFlow::SetFlow(Dte, d->OutstandingAmt, TrancheFlowType::AmountOutstandingFlow);
         for (auto i = d->StartingDeferredInterest.constBegin(); i != d->StartingDeferredInterest.constEnd(); ++i) {
 			if (i.value()>0.0) GenericCashFlow::SetFlow(Dte, i.value(), i.key());
 		}
@@ -303,7 +303,7 @@ void TrancheCashFlow::AddFlow(QDate Dte, double Amt, qint32 FlwTpe) {
 void TrancheCashFlow::SetFlow(QDate Dte, double Amt, qint32 FlwTpe) {
     Q_D(TrancheCashFlow);
     if (d->m_CashFlows.isEmpty()) {
-        if (d->OutstandingAmt > 0.0) GenericCashFlow::SetFlow(Dte, d->OutstandingAmt, static_cast<qint32>(TrancheFlowType::AmountOutstandingFlow));
+        if (d->OutstandingAmt > 0.0) GenericCashFlow::SetFlow(Dte, d->OutstandingAmt, TrancheFlowType::AmountOutstandingFlow);
         for (auto i = d->StartingDeferredInterest.constBegin(); i != d->StartingDeferredInterest.constEnd(); ++i) {
 			if (i.value() > 0.0) GenericCashFlow::SetFlow(Dte, i.value(), i.key());
 		}
@@ -356,13 +356,13 @@ void TrancheCashFlow::SetInitialOutstanding(double a)
 {
     Q_D(TrancheCashFlow);
     if (a == d->OutstandingAmt) return;
-	/*auto OldOut = SingleFlow(static_cast<qint32>(TrancheFlowType::AmountOutstandingFlow)).ScaledCashFlows(OutstandingAmt,a);
-	RemoveFlow(static_cast<qint32>(TrancheFlowType::AmountOutstandingFlow));
+	/*auto OldOut = SingleFlow(TrancheFlowType::AmountOutstandingFlow)).ScaledCashFlows(OutstandingAmt,a;
+	RemoveFlow(TrancheFlowType::AmountOutstandingFlow);
 	for (int i = 0; i < OldOut.Count(); ++i) {
 		GenericCashFlow::SetFlow(
 			OldOut.GetDate(i)
-			, OldOut.GetFlow(i, static_cast<qint32>(TrancheFlowType::AmountOutstandingFlow))
-			, static_cast<qint32>(TrancheFlowType::AmountOutstandingFlow)
+			, OldOut.GetFlow(i, TrancheFlowType::AmountOutstandingFlow)
+			, TrancheFlowType::AmountOutstandingFlow
 		);
 	}*/
 	TrancheCashFlow Tempfl;

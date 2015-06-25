@@ -9,7 +9,7 @@ class CLOMODELLIB_EXPORT TrancheCashFlow : public GenericCashFlow
     DECLARE_PUBLIC_COMMONS(TrancheCashFlow)
     DECLARE_PUBLIC_COMMONS_COPY(TrancheCashFlow)
 public:
-	enum class TrancheFlowType : qint32{
+	enum TrancheFlowType : qint32{
 		InterestFlow = 1 << MaximumInterestsTypes,
 		PrincipalFlow = 1,
 		AmountOutstandingFlow = 3,
@@ -30,7 +30,7 @@ public:
 		static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetInterest can be used only with int or QDate");
 		double Result = 0;
         for (qint32 i = 0; i < (1 << MaximumInterestsTypes); ++i) {
-            Result += GetFlow(index, static_cast<qint32>(TrancheFlowType::InterestFlow) | i);
+            Result += GetFlow(index, TrancheFlowType::InterestFlow | i);
 		}
 		return Result;
 	}
@@ -38,7 +38,7 @@ public:
 		static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetDeferred can be used only with int or QDate");
 		double Result = 0;
 		for (qint32 i = 0; i < (1 << MaximumInterestsTypes) ; ++i) {
-            Result += GetFlow(index, static_cast<qint32>(TrancheFlowType::DeferredFlow) | i);
+            Result += GetFlow(index, TrancheFlowType::DeferredFlow | i);
 		}
 		return Result;
 	}
@@ -46,65 +46,65 @@ public:
 		static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetAccrued can be used only with int or QDate");
 		double Result = 0;
         for (qint32 i = 0; i < (1 << MaximumInterestsTypes); ++i) {
-            Result += GetFlow(index, static_cast<qint32>(TrancheFlowType::AccruedFlow) | i);
+            Result += GetFlow(index, TrancheFlowType::AccruedFlow | i);
 		}
 		return Result;
 	}
 	template<class T> double GetPrincipal(const T& a)const {
         static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetPrincipal can be used only with int or QDate"); 
-        return GetFlow(a, static_cast<qint32>(TrancheFlowType::PrincipalFlow)); 
+        return GetFlow(a, TrancheFlowType::PrincipalFlow); 
     }
 	template<class T> double GetOCTest(const T& a)const { 
         static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetOCTest can be used only with int or QDate"); 
-        return GetFlow(a, static_cast<qint32>(TrancheFlowType::OCFlow)); 
+        return GetFlow(a, TrancheFlowType::OCFlow); 
     }
 	template<class T> double GetICTest(const T& a)const {
         static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetICTest can be used only with int or QDate");
-        return GetFlow(a, static_cast<qint32>(TrancheFlowType::ICFlow)); 
+        return GetFlow(a, TrancheFlowType::ICFlow); 
     }
 	template<class T> double GetOCTarget(const T& a)const {
         static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetOCTarget can be used only with int or QDate");
-        return GetFlow(a, static_cast<qint32>(TrancheFlowType::OCTarget)); 
+        return GetFlow(a, TrancheFlowType::OCTarget); 
     }
 	template<class T> double GetICTarget(const T& a)const {
         static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetICTarget can be used only with int or QDate"); 
-        return GetFlow(a, static_cast<qint32>(TrancheFlowType::ICTarget));
+        return GetFlow(a, TrancheFlowType::ICTarget);
     }
 	template<class T> double GetOCNumerator(const T& a)const {
         static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetOCNumerator can be used only with int or QDate"); 
-        return GetFlow(a, static_cast<qint32>(TrancheFlowType::OCNumerator)); 
+        return GetFlow(a, TrancheFlowType::OCNumerator); 
     }
 	template<class T> double GetPDLOutstanding(const T& a)const {
         static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetPDLOutstanding can be used only with int or QDate");
-        return GetFlow(a, static_cast<qint32>(TrancheFlowType::PDLOutstanding)); 
+        return GetFlow(a, TrancheFlowType::PDLOutstanding); 
     }
 	template<class T> double GetPDLCured(const T& a)const { 
         static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetPDLCured can be used only with int or QDate"); 
-        return GetFlow(a, static_cast<qint32>(TrancheFlowType::PDLCured)); 
+        return GetFlow(a, TrancheFlowType::PDLCured); 
     }
 	template<class T> double GetAmountOutstanding(const T& a)const { 
 		static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetAmountOutstanding can be used only with int or QDate"); 
-		if (HasFlowType(static_cast<qint32>(TrancheFlowType::AmountOutstandingFlow)))
-			return GetFlow(a, static_cast<qint32>(TrancheFlowType::AmountOutstandingFlow));
+		if (HasFlowType(TrancheFlowType::AmountOutstandingFlow))
+			return GetFlow(a, TrancheFlowType::AmountOutstandingFlow);
 		else
 			return GetInitialOutstanding();
 	}
 	template<class T> double GetDeferred(const T& a, qint32 CouponIdx/*=0*/)const {
 		static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetDeferred can be used only with int or QDate");
 		if (CouponIdx < 0 || CouponIdx >= (1 << MaximumInterestsTypes)) return 0.0;
-		if (HasFlowType(static_cast<qint32>(TrancheFlowType::DeferredFlow) | CouponIdx))
-			return GetFlow(a, static_cast<qint32>(TrancheFlowType::DeferredFlow) | CouponIdx);
+		if (HasFlowType(TrancheFlowType::DeferredFlow | CouponIdx))
+			return GetFlow(a, TrancheFlowType::DeferredFlow | CouponIdx);
 		return GetStartingDeferredInterest(CouponIdx);
 	}
 	template<class T> double GetAccrued(const T& a, qint32 CouponIdx/*=0*/)const {
 		static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetAccrued can be used only with int or QDate");
 		if (CouponIdx < 0 || CouponIdx >= (1 << MaximumInterestsTypes)) return 0.0;
-		return GetFlow(a, static_cast<qint32>(TrancheFlowType::AccruedFlow) | CouponIdx);
+		return GetFlow(a, TrancheFlowType::AccruedFlow | CouponIdx);
 	}
 	template<class T> double GetInterest(const T& a, qint32 CouponIdx/*=0*/)const {
 		static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetInterest can be used only with int or QDate");
 		if (CouponIdx < 0 || CouponIdx >= (1 << MaximumInterestsTypes)) return 0.0;
-		return GetFlow(a, static_cast<qint32>(TrancheFlowType::InterestFlow) | CouponIdx);
+		return GetFlow(a, TrancheFlowType::InterestFlow | CouponIdx);
 	}
 	double GetInitialOutstanding()const;
 	void SetInitialOutstanding(double a);

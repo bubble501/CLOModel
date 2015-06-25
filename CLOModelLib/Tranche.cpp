@@ -312,13 +312,13 @@ double Tranche::GetCoupon(int index, qint32 CoupIndex, int Frequency) const {
 	return GetCoupon(CoupDate, CoupIndex, Frequency);
 }
 
-double Tranche::GetStartingDeferredInterest(qint32 CoupIdx /*= static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow)*/) const
+double Tranche::GetStartingDeferredInterest(qint32 CoupIdx) const
 {
     Q_D(const Tranche);
     return  d->CashFlow.GetStartingDeferredInterest(CoupIdx);
 }
 
-void Tranche::SetStartingDeferredInterest(const double& val, qint32 CoupIdx /*= static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow)*/)
+void Tranche::SetStartingDeferredInterest(const double& val, qint32 CoupIdx )
 {
     Q_D(Tranche);
     d->CashFlow.SetStartingDeferredInterest(val, CoupIdx);

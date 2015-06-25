@@ -9,13 +9,13 @@ class CLOMODELLIB_EXPORT MtgCashFlow : public GenericCashFlow
 public:
 #ifdef _DEBUG
 	double GetCoupTimeOut(int index)const { 
-        return GetFlow(index, static_cast<qint32>(MtgFlowType::WACouponFlow)); 
+        return GenericCashFlow::GetFlow(index, MtgFlowType::WACouponFlow);
     }
 	double GetCoupTimeOut(const QDate& index) const { 
-        return GetFlow(index, static_cast<qint32>(MtgFlowType::WACouponFlow)); 
+        return GenericCashFlow::GetFlow(index, MtgFlowType::WACouponFlow);
     }
 #endif
-	enum class MtgFlowType : qint32 {
+	enum MtgFlowType : qint32 {
 		InterestFlow = 1 << MaximumInterestsTypes,
 		PrincipalFlow = 1,
 		PrepaymentFlow = 2,
@@ -51,15 +51,15 @@ public:
 	}
 	template<class T> double GetInterest(const T& index) const {
         static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetInterest can be used only with int or QDate"); 
-        return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::InterestFlow)); 
+        return GenericCashFlow::GetFlow(index, MtgFlowType::InterestFlow); 
     }
 	template<class T> double GetScheduled(const T& index) const { 
         static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetScheduled can be used only with int or QDate");
-        return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::PrincipalFlow)); 
+        return GenericCashFlow::GetFlow(index, MtgFlowType::PrincipalFlow); 
     }
 	template<class T> double GetPrepay(const T& index) const {
         static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetPrepay can be used only with int or QDate");
-        return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::PrepaymentFlow));
+        return GenericCashFlow::GetFlow(index, MtgFlowType::PrepaymentFlow);
     }
 	template<class T> double GetPrincipal(const T& index) const {
         static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetPrincipal can be used only with int or QDate"); 
@@ -67,27 +67,27 @@ public:
     }
 	template<class T> double GetLoss(const T& index) const {
         static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetLoss can be used only with int or QDate");	
-        return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::LossFlow)); 
+        return GenericCashFlow::GetFlow(index, MtgFlowType::LossFlow); 
     }
 	template<class T> double GetAmountOut(const T& index) const { 
         static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetAmountOut can be used only with int or QDate"); 
-        return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::AmountOutstandingFlow)); 
+        return GenericCashFlow::GetFlow(index, MtgFlowType::AmountOutstandingFlow); 
     }
 	template<class T> double GetAccruedInterest(const T& index) const { 
         static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetAccruedInterest can be used only with int or QDate");
-        return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::AccruedInterestFlow));
+        return GenericCashFlow::GetFlow(index, MtgFlowType::AccruedInterestFlow);
     }
 	template<class T> double GetLossOnInterest(const T& index) const {
         static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetLossOnInterest can be used only with int or QDate"); 
-        return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::LossOnInterestFlow)); 
+        return GenericCashFlow::GetFlow(index, MtgFlowType::LossOnInterestFlow); 
     }
 	template<class T> double GetDelinquent(const T& index) const { 
         static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetDelinquent can be used only with int or QDate"); 
-        return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::DelinquentOutstanding)); 
+        return GenericCashFlow::GetFlow(index, MtgFlowType::DelinquentOutstanding); 
     }
 	template<class T> double GetPrepayFees(const T& index) const { 
         static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetPrepayFees can be used only with int or QDate"); 
-        return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::PrepaymentFees)); 
+        return GenericCashFlow::GetFlow(index, MtgFlowType::PrepaymentFees); 
     }
 	template<class T> double GetWAcoupon(const T& index) const {
 		static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetWAcoupon can be used only with int or QDate");
@@ -116,20 +116,20 @@ public:
 	}
 	template<class T> double GetDefaults(const T& index) const { 
         static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetDefaults can be used only with int or QDate");
-        return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::PrincipalDefault));
+        return GenericCashFlow::GetFlow(index, MtgFlowType::PrincipalDefault);
     }
 	template<class T> double GetRecoveries(const T& index) const { 
         static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetRecoveries can be used only with int or QDate"); 
-        return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::PrincipalRecovered)); 
+        return GenericCashFlow::GetFlow(index, MtgFlowType::PrincipalRecovered); 
     }
 	template<class T> double GetInterestRecoveries(const T& index) const { 
         static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetInterestRecoveries can be used only with int or QDate"); 
-        return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::InterestRecovered)); 
+        return GenericCashFlow::GetFlow(index, MtgFlowType::InterestRecovered); 
     }
 	template<class T> double GetOutstandingForOC(const T& index) const {
 		static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetOutstandingForOC can be used only with int or QDate");
-		if (HasFlowType(static_cast<qint32>(MtgFlowType::OutstandingForOC)))
-			return GenericCashFlow::GetFlow(index, static_cast<qint32>(MtgFlowType::OutstandingForOC));
+		if (HasFlowType(MtgFlowType::OutstandingForOC))
+			return GenericCashFlow::GetFlow(index, MtgFlowType::OutstandingForOC);
 		return GetAmountOut(index);
 	}
 	

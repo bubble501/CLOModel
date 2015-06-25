@@ -326,6 +326,9 @@
     <ClInclude Include="Private\TrancheTrigger_p.h">
       <Filter>Privates\Triggers</Filter>
     </ClInclude>
+    <ClInclude Include="Private\WaterfallCalcThread_p.h">
+      <Filter>Privates\Deal Structure</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BackwardCompatibilityInterface.cpp">
@@ -496,6 +499,15 @@
     <ClCompile Include="TrancheTrigger.cpp">
       <Filter>Source Files\Triggers</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_WaterfallCalcThread.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_WaterfallCalcThread.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="WaterfallCalcThread.cpp">
+      <Filter>Source Files\Deal Structure</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="AbstrAsyncThread.h">
@@ -521,6 +533,9 @@
     </CustomBuild>
     <CustomBuild Include="MtgCalculator.h">
       <Filter>Header Files\Loans</Filter>
+    </CustomBuild>
+    <CustomBuild Include="WaterfallCalcThread.h">
+      <Filter>Header Files\Deal Structure</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

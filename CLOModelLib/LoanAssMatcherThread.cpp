@@ -4,7 +4,7 @@
 #include <QFileInfo>
 #include "BackwardCompatibilityInterface.h"
 #include "Private/BackwardCompatibilityInterface_p.h"
-//#include "Waterfall.h"
+#include "Waterfall.h"
 #include "MtgCalculator.h"
 #include "CommonFunctions.h"
 #include "Private/InternalItems.h"
@@ -65,9 +65,8 @@ void LoanAssMatcherThread::run()
 	{bool Junk; out >> Junk; }
 	{bool Junk; out >> Junk; }
 	QString NewModelName;
-    // #TODO uncomment lines once classes are refactored
-	//{Waterfall Junk; Junk.SetLoadProtocolVersion(VersionChecker); out >> Junk; NewModelName = Junk.GetDealName(); }
-	//{Waterfall Junk; Junk.SetLoadProtocolVersion(VersionChecker); out >> Junk; }
+	{Waterfall Junk; Junk.SetLoadProtocolVersion(VersionChecker); out >> Junk; NewModelName = Junk.GetDealName(); }
+	{Waterfall Junk; Junk.SetLoadProtocolVersion(VersionChecker); out >> Junk; }
 	QHash<qint32, Mortgage*> LoanPool;
 	MtgCalculator Junk; Junk.SetLoadProtocolVersion(VersionChecker);out >> Junk;
 	ModelFile.close();

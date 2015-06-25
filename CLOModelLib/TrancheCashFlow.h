@@ -1,9 +1,6 @@
 #ifndef TrancheCashFlow_h__
 #define TrancheCashFlow_h__
 #include "GenericCashFlow.h"
-#include "CommonFunctions.h"
-#include <QList>
-#include <QHash>
 #include <QDate>
 namespace QBbgLib { class QBbgAbstractResponse; }
 class TrancheCashFlowPrivate;

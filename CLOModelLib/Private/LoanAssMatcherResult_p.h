@@ -1,6 +1,5 @@
 #include "LoanAssMatcherResult.h"
 #include "Private/BackwardCompatibilityInterface_p.h"
-#include <QString>
 #include <QList>
 class LoanAssMatcherResultPrivate : public BackwardInterfacePrivate
 {

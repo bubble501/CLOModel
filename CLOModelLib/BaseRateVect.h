@@ -2,11 +2,11 @@
 #define BaseRateVect_h__
 #include "AbstractBbgVect.h"
 #include <QString>
-#include <QDataStream>
 #include "BloombergVector.h"
-#include "BaseRateTable.h"
 #include "FloorCapVector.h"
 class BaseRateVectorPrivate;
+class ConstantBaseRateTable;
+class ForwardBaseRateTable;
 class CLOMODELLIB_EXPORT  BaseRateVector : public AbstractBbgVect
 {
     DECLARE_PUBLIC_COMMONS(BaseRateVector)

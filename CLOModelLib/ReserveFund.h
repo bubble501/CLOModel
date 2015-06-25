@@ -5,7 +5,8 @@
 class ReserveFundPrivate;
 class BloombergVector;
 class GenericCashFlow;
-class ReserveFund :public BackwardInterface {
+class CLOMODELLIB_EXPORT ReserveFund :public BackwardInterface
+{
     DECLARE_PUBLIC_COMMONS(ReserveFund)
     DECLARE_PUBLIC_COMMONS_COPY(ReserveFund)
 public:

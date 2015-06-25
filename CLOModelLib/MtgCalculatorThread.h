@@ -4,7 +4,8 @@
 class MtgCashFlow;
 class Mortgage;
 class MtgCalculatorThreadPrivate;
-class MtgCalculatorThread : public TemplAsyncThread <MtgCashFlow>{
+class CLOMODELLIB_EXPORT MtgCalculatorThread : public TemplAsyncThread <MtgCashFlow>
+{
 	Q_OBJECT
 protected:
     Q_DECLARE_PRIVATE(MtgCalculatorThread)

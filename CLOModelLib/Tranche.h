@@ -1,16 +1,12 @@
 #ifndef Tranche_h__
 #define Tranche_h__
-#include <QString>
-#include <QObject>
+#include <QHash>
 #include "TrancheCashFlow.h"
 #include "BloombergVector.h"
 #include "BackwardCompatibilityInterface.h"
 #include "BaseRateVect.h"
-#include "IntegerVector.h"
-#include <QHash>
-#include "BaseRateTable.h"
-#include "DayCountVect.h"
-#include "Seniority.h"
+class IntegerVector;
+class Seniority;
 class TranchePrivate;
 class CLOMODELLIB_EXPORT  Tranche : public BackwardInterface
 {

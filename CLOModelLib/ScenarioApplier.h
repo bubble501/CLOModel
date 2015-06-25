@@ -6,7 +6,8 @@
 #include "TemplAsyncCalculator.h"
 class ScenarioApplierPrivate;
 class AssumptionSet;
-class ScenarioApplier : public TemplAsyncCalculator<ApplyFlowThread, MtgCashFlow> {
+class CLOMODELLIB_EXPORT ScenarioApplier : public TemplAsyncCalculator<ApplyFlowThread, MtgCashFlow>
+{
 	Q_OBJECT
 protected:
     inline ScenarioApplierPrivate* d_func() { return reinterpret_cast<ScenarioApplierPrivate *>(qGetPtrHelper(BackwardInterface::d_ptr)); }

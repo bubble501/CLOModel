@@ -1,6 +1,5 @@
 #ifndef IntegerVector_h__
 #define IntegerVector_h__
-#include <QList>
 #include <QMetaType>
 #include "AbstractBbgVect.h"
 class IntegerVectorPrivate;

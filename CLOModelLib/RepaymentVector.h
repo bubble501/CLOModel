@@ -1,6 +1,5 @@
 #ifndef RepaymentVector_h__
 #define RepaymentVector_h__
-#include <QList>
 #include <QMetaType>
 #include "AbstractBbgVect.h"
 class RepaymentVectorPrivate;

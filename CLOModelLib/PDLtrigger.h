@@ -5,7 +5,7 @@ class IntegerVector;
 class Tranche;
 class PDLTriggerPrivate;
 class BloombergVector;
-class PDLTrigger : public AbstractTrigger
+class CLOMODELLIB_EXPORT PDLTrigger : public AbstractTrigger
 {
     DECLARE_PUBLIC_COMMONS(PDLTrigger)
     DECLARE_PUBLIC_COMMONS_COPY(PDLTrigger)

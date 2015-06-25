@@ -10,7 +10,8 @@ class ForwardBaseRateTable;
 class ConstantBaseRateTable;
 class MtgCalculatorPrivate;
 namespace simstring { class reader; }
-class MtgCalculator : public TemplAsyncCalculator <MtgCalculatorThread,MtgCashFlow>{
+class CLOMODELLIB_EXPORT MtgCalculator : public TemplAsyncCalculator <MtgCalculatorThread, MtgCashFlow>
+{
 	Q_OBJECT
 protected:
     inline MtgCalculatorPrivate* d_func() { return reinterpret_cast<MtgCalculatorPrivate *>(qGetPtrHelper(BackwardInterface::d_ptr)); }

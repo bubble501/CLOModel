@@ -4,7 +4,6 @@
 #include <QMetaType>
 #include <QDate>
 #include "AbstractBbgVect.h"
-#include "CommonFunctions.h"
 class DayCountVectorPrivate;
 class CLOMODELLIB_EXPORT DayCountVector : public AbstractBbgVect
 {

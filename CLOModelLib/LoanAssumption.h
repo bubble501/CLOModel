@@ -1,8 +1,6 @@
 #ifndef LoanAssumption_h__
 #define LoanAssumption_h__
 #include <QString>
-#include <QStringList>
-#include <QDate>
 #include "BackwardCompatibilityInterface.h"
 class LoanAssumptionPrivate;
 class CLOMODELLIB_EXPORT LoanAssumption :public BackwardInterface

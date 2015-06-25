@@ -3,7 +3,7 @@
 #include <QString>
 #include "BackwardCompatibilityInterface.h"
 class AssumptionSetPrivate;
-class AssumptionSet : public BackwardInterface{
+class CLOMODELLIB_EXPORT  AssumptionSet : public BackwardInterface{
     DECLARE_PUBLIC_COMMONS(AssumptionSet)
     DECLARE_PUBLIC_COMMONS_COPY(AssumptionSet)
 protected:

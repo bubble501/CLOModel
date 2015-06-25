@@ -2,6 +2,7 @@
 #define ReinvestmentTest_h__
 #include "BackwardCompatibilityInterface.h"
 #include "IntegerVector.h"
+#include <QDate>
 class ReinvestmentTestPrivate;
 class GenericCashFlow;
 class QDate;
@@ -10,7 +11,8 @@ class Mortgage;
 class MtgCashFlow;
 class ConstantBaseRateTable;
 class ForwardBaseRateTable;
-class ReinvestmentTest : public BackwardInterface{
+class CLOMODELLIB_EXPORT ReinvestmentTest : public BackwardInterface
+{
     DECLARE_PUBLIC_COMMONS(ReinvestmentTest)
     DECLARE_PUBLIC_COMMONS_COPY(ReinvestmentTest)
 public:

@@ -1,16 +1,14 @@
 #ifndef Mortgage_h__
 #define Mortgage_h__
 #include "MtgCashFlow.h"
-#include <QDate>
-#include <QString>
-#include "BloombergVector.h"
-#include "RepaymentVector.h"
 #include "IntegerVector.h"
-#include "BaseRateVect.h"
-#include "BaseRateTable.h"
-#include "DayCountVect.h"
+#include "BloombergVector.h"
 class LoanAssumption;
 class MortgagePrivate;
+class MtgCashFlow;
+class BaseRateVector;
+class ForwardBaseRateTable;
+class ConstantBaseRateTable;
 class CLOMODELLIB_EXPORT Mortgage : public BackwardInterface
 {
     DECLARE_PUBLIC_COMMONS(Mortgage)

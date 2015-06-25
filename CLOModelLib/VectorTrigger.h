@@ -3,7 +3,8 @@
 #include "AbstractTrigger.h"
 class BoolVector;
 class VectorTriggerPrivate;
-class VectorTrigger : public AbstractTrigger {
+class CLOMODELLIB_EXPORT VectorTrigger : public AbstractTrigger
+{
     DECLARE_PUBLIC_COMMONS(VectorTrigger)
     DECLARE_PUBLIC_COMMONS_COPY(VectorTrigger)
 public:

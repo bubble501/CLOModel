@@ -2,6 +2,7 @@
 #define Seniority_p_h__
 
 #include "Seniority.h"
+#include <QList>
 #include "Private/BackwardCompatibilityInterface_p.h"
 class SeniorityPrivate : public BackwardInterfacePrivate
 {

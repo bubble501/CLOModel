@@ -11,6 +11,8 @@
 #include <QSqlRecord>
 #endif
 #include "LoanAssumption.h"
+#include "DayCountVect.h"
+#include "BaseRateTable.h"
 DEFINE_PUBLIC_COMMONS(Mortgage)
 DEFINE_PUBLIC_COMMONS_COPY(Mortgage)
 

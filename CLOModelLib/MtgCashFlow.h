@@ -1,11 +1,9 @@
 #ifndef MtgCashFlow_h__
 #define MtgCashFlow_h__
-#include <QList>
 #include <QDate>
 #include <QMetaType>
 #include "GenericCashFlow.h"
 #include "BloombergVector.h"
-#include "IntegerVector.h"
 class CLOMODELLIB_EXPORT MtgCashFlow : public GenericCashFlow
 {
 public:

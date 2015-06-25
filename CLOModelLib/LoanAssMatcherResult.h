@@ -1,11 +1,11 @@
 #ifndef LoanAssMatcherResult_h__
 #define LoanAssMatcherResult_h__
 #include <QString>
-#include <QList>
 #include "BackwardCompatibilityInterface.h"
 class QDataStream;
 class LoanAssMatcherResultPrivate;
-class LoanAssMatcherResult : public BackwardInterface {
+class CLOMODELLIB_EXPORT LoanAssMatcherResult : public BackwardInterface
+{
     DECLARE_PUBLIC_COMMONS(LoanAssMatcherResult)
     DECLARE_PUBLIC_COMMONS_COPY(LoanAssMatcherResult)
 public:

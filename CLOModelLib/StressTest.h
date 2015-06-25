@@ -10,7 +10,7 @@ class ScenarioApplier;
 class QProgressDialog;
 class StressTestPrivate;
 class Mortgage;
-class StressTest : public QObject , public BackwardInterface{
+class CLOMODELLIB_EXPORT StressTest : public QObject, public BackwardInterface{
 	Q_OBJECT
 protected:
     inline StressTestPrivate* d_func() { return reinterpret_cast<StressTestPrivate *>(qGetPtrHelper(BackwardInterface::d_ptr)); }

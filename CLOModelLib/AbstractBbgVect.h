@@ -1,8 +1,8 @@
 #ifndef AbstarctBbgVect_h__
 #define AbstarctBbgVect_h__
 #include <QString>
-#include <QDate>
 #include "BackwardCompatibilityInterface.h"
+class QDate;
 class QObject;
 class QRegExpValidator;
 class AbstractBbgVectPrivate;

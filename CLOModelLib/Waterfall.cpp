@@ -18,6 +18,8 @@
 #include "PDLtrigger.h"
 #include "Private/InternalItems.h"
 #include "Mortgage.h"
+#include "Seniority.h"
+#include "BaseRateTable.h"
 #ifndef NO_BLOOMBERG
 #include <QBbgManager.h>
 #include <QBbgRequestGroup.h>

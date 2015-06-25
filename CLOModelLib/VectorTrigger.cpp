@@ -1,6 +1,7 @@
 #include "VectorTrigger.h"
 #include "Private/VectorTrigger_p.h"
 #include <QDataStream>
+#include <QDate>
 DEFINE_PUBLIC_COMMONS(VectorTrigger)
 DEFINE_PUBLIC_COMMONS_COPY(VectorTrigger)
 

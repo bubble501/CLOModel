@@ -17,7 +17,7 @@ class WaterfallPrivate;
 class TriggersResults;
 class AbstractTrigger;
 class Tranche;
-class Waterfall : public BackwardInterface
+class CLOMODELLIB_EXPORT Waterfall : public BackwardInterface
 {
     DECLARE_PUBLIC_COMMONS(Waterfall)
     DECLARE_PUBLIC_COMMONS_COPY(Waterfall)

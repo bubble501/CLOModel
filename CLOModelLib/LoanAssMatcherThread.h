@@ -4,7 +4,7 @@
 #include "LoanAssMatcherResult.h"
 class LoanAssumption;
 class LoanAssMatcherThreadPrivate;
-class LoanAssMatcherThread : public TemplAsyncThread<LoanAssMatcherResult>
+class CLOMODELLIB_EXPORT LoanAssMatcherThread : public TemplAsyncThread<LoanAssMatcherResult>
 {
 	Q_OBJECT
 protected:

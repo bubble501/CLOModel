@@ -4,6 +4,7 @@
 #define VectorAnchorDateFormat "(\\d{1,2})/(\\d{1,2})/(\\d{4})"
 #include "AbstractBbgVect.h"
 #include "Private/BackwardCompatibilityInterface_p.h"
+#include <QDate>
 class AbstractBbgVectPrivate : public BackwardInterfacePrivate
 {
     DECLARE_PRIVATE_COMMONS(AbstractBbgVect)

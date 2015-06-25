@@ -1,5 +1,9 @@
 #include "Mortgage.h"
 #include "Private/BackwardCompatibilityInterface_p.h"
+#include <QDate>
+#include <QString>
+#include "RepaymentVector.h"
+#include "BaseRateVect.h"
 class MortgagePrivate : public BackwardInterfacePrivate
 {
     DECLARE_PRIVATE_COMMONS(Mortgage)

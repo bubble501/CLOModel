@@ -1,7 +1,6 @@
 #include "TrancheCashFlow.h"
 #include "GenericCashFlow_p.h"
-#include <QMap>
-#include <QSet>
+#include <QHash>
 class TrancheCashFlowPrivate : public GenericCashFlowPrivate
 {
     DECLARE_PRIVATE_COMMONS(TrancheCashFlow)

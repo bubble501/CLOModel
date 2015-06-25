@@ -4,7 +4,8 @@
 #include "AbstractTrigger.h"
 class PoolSizeTriggerPrivate;
 class BloombergVector;
-class PoolSizeTrigger : public AbstractTrigger {
+class CLOMODELLIB_EXPORT PoolSizeTrigger : public AbstractTrigger
+{
     DECLARE_PUBLIC_COMMONS(PoolSizeTrigger)
     DECLARE_PUBLIC_COMMONS_COPY(PoolSizeTrigger)
 public:

@@ -1,6 +1,5 @@
 #ifndef PrincipalProceeds_h__
 #define PrincipalProceeds_h__
-#include <QtGlobal>
 #include "BackwardCompatibilityInterface.h"
 class PrincipalRecipPrivate;
 class CLOMODELLIB_EXPORT PrincipalRecip :public BackwardInterface

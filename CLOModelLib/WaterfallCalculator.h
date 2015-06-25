@@ -3,7 +3,8 @@
 #include "TemplAsyncCalculator.h"
 #include "WaterfallCalcThread.h"
 class WaterfallCalculatorPrivate;
-class WaterfallCalculator : public TemplAsyncCalculator <WaterfallCalcThread, Waterfall>{
+class CLOMODELLIB_EXPORT WaterfallCalculator : public TemplAsyncCalculator <WaterfallCalcThread, Waterfall>
+{
 	Q_OBJECT
 protected:
     inline WaterfallCalculatorPrivate* d_func() { return reinterpret_cast<WaterfallCalculatorPrivate *>(qGetPtrHelper(BackwardInterface::d_ptr)); }

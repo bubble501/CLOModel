@@ -16,6 +16,7 @@
 #include <QCache>
 #include "simstring.h"
 #include <QXmlStreamReader>
+#include "BaseRateTable.h"
 DEFINE_PUBLIC_QOBJECT_COMMONS(MtgCalculator)
 MtgCalculatorPrivate::MtgCalculatorPrivate(MtgCalculator *q)
     :AbstrAsyncCalculatorPrivate(q)

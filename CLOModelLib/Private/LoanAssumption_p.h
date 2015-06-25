@@ -1,6 +1,7 @@
 #ifndef LoanAssumption_p_h__
 #define LoanAssumption_p_h__
-
+#include <QStringList>
+#include <QDate>
 #include "LoanAssumption.h"
 #include "Private/BackwardCompatibilityInterface_p.h"
 class LoanAssumptionPrivate : public BackwardInterfacePrivate

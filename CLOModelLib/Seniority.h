@@ -2,7 +2,6 @@
 #define Seniority_h__
 
 #include "BackwardCompatibilityInterface.h"
-#include <QList>
 class SeniorityPrivate;
 class CLOMODELLIB_EXPORT Seniority : public BackwardInterface
 {

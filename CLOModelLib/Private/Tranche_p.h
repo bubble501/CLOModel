@@ -1,4 +1,7 @@
 #include "Tranche.h"
+#include "Seniority.h"
+#include "IntegerVector.h"
+#include "BaseRateTable.h"
 #include "Private/BackwardCompatibilityInterface_p.h"
 class TranchePrivate : public BackwardInterfacePrivate
 {

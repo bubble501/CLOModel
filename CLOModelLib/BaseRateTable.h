@@ -1,11 +1,9 @@
 #ifndef BaseRateTable_h__
 #define BaseRateTable_h__
 #include <QHash>
-#include <QDate>
-#include <QString>
-#include <QDataStream>
 #include "BackwardCompatibilityInterface.h"
 #include "BloombergVector.h"
+class QDate;
 class ConstantBaseRateTable;
 class ForwardBaseRateTable;
 class ConstantBaseRateTablePrivate;

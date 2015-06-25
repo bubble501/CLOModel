@@ -1,6 +1,5 @@
 #ifndef BoolVector_h__
 #define BoolVector_h__
-#include <QList>
 #include <QMetaType>
 #include "AbstractBbgVect.h"
 class BoolVectorPrivate;

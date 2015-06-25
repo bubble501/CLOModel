@@ -1,10 +1,11 @@
 #ifndef ApplyFlowThread_h__
 #define ApplyFlowThread_h__
 #include "MtgCashFlow.h"
-#include "AssumptionSet.h"
 #include "TemplAsyncThread.h"
 class ApplyFlowThreadPrivate;
-class ApplyFlowThread : public TemplAsyncThread<MtgCashFlow>{
+class AssumptionSet;
+class CLOMODELLIB_EXPORT ApplyFlowThread : public TemplAsyncThread<MtgCashFlow>
+{
 	Q_OBJECT
 protected:
     Q_DECLARE_PRIVATE(ApplyFlowThread)

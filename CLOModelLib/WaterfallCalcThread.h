@@ -3,7 +3,8 @@
 #include "TemplAsyncThread.h"
 #include "Waterfall.h"
 class WaterfallCalcThreadPrivate;
-class WaterfallCalcThread : public TemplAsyncThread<Waterfall> {
+class CLOMODELLIB_EXPORT WaterfallCalcThread : public TemplAsyncThread<Waterfall>
+{
 	Q_OBJECT
 protected:
     Q_DECLARE_PRIVATE(WaterfallCalcThread)

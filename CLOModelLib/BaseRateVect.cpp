@@ -4,6 +4,7 @@
 #include <QStringList>
 #include "CommonFunctions.h"
 #include "Private/InternalItems.h"
+#include "BaseRateTable.h"
 #ifndef NO_BLOOMBERG
 #include <QbbgReferenceDataRequest.h>
 #include <QBbgReferenceDataResponse.h>

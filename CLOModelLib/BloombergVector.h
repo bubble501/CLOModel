@@ -2,6 +2,7 @@
 #define BloombergVector_h__
 #include <QList>
 #include <QMetaType>
+#include <QDate>
 #include "AbstractBbgVect.h"
 class FloorCapVector;
 class BloombergVectorPrivate;

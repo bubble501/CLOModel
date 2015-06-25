@@ -2,6 +2,7 @@
 #define ApplyFlowThread_p_h__
 
 #include "ApplyFlowThread.h"
+#include "AssumptionSet.h"
 #include "Private/AbstrAsyncThread_p.h"
 class ApplyFlowThreadPrivate : public AbstrAsyncThreadPrivate
 {

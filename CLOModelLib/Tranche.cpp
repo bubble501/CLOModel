@@ -2,6 +2,7 @@
 #include "Private/Tranche_p.h"
 #include "Private/InternalItems.h"
 #include <boost/math/tools/roots.hpp>
+#include "DayCountVect.h"
 #ifndef NO_DATABASE
 #include <QSqlDatabase>
 #include <QSqlError>

@@ -7,7 +7,8 @@
 class IntegerVector;
 class BloombergVector;
 class WatFalPriorPrivate;
-class WatFalPrior : public BackwardInterface {
+class CLOMODELLIB_EXPORT WatFalPrior : public BackwardInterface
+{
     DECLARE_PUBLIC_COMMONS(WatFalPrior)
     DECLARE_PUBLIC_COMMONS_COPY(WatFalPrior)
 public:

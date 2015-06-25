@@ -6,7 +6,8 @@ class TrancheTriggerPrivate;
 class Tranche;
 class QDate;
 class IntegerVector;
-class TrancheTrigger : public AbstractTrigger {
+class CLOMODELLIB_EXPORT TrancheTrigger : public AbstractTrigger
+{
     DECLARE_PUBLIC_COMMONS(TrancheTrigger)
     DECLARE_PUBLIC_COMMONS_COPY(TrancheTrigger)
 public:

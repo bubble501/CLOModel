@@ -1,6 +1,5 @@
 #ifndef FloorCapVector_h__
 #define FloorCapVector_h__
-#include <QList>
 #include "AbstractBbgVect.h"
 #include <QSharedPointer>
 #include <QMetaType>

@@ -350,6 +350,9 @@
     <ClInclude Include="Private\ScenarioApplier_p.h">
       <Filter>Privates\Loans</Filter>
     </ClInclude>
+    <ClInclude Include="Private\LoanAssMatcher_p.h">
+      <Filter>Privates\Loans</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BackwardCompatibilityInterface.cpp">
@@ -619,6 +622,15 @@
     <ClCompile Include="ScenarioApplier.cpp">
       <Filter>Source Files\Loans</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_LoanAssMatcher.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_LoanAssMatcher.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="LoanAssMatcher.cpp">
+      <Filter>Source Files\Loans</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="AbstrAsyncThread.h">
@@ -676,6 +688,9 @@
       <Filter>Privates\Widgets</Filter>
     </CustomBuild>
     <CustomBuild Include="ScenarioApplier.h">
+      <Filter>Header Files\Loans</Filter>
+    </CustomBuild>
+    <CustomBuild Include="LoanAssMatcher.h">
       <Filter>Header Files\Loans</Filter>
     </CustomBuild>
   </ItemGroup>

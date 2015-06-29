@@ -19,10 +19,10 @@ public:
     bool isValid() const;
 protected:
     virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
-    friend QDataStream& operator<<(QDataStream & stream, const Seniority& flows);
-    friend QDataStream& operator>>(QDataStream & stream, Seniority& flows);
+    friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const Seniority& flows);
+    friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, Seniority& flows);
 };
-QDataStream& operator<<(QDataStream & stream, const Seniority& flows);
-QDataStream& operator>>(QDataStream & stream, Seniority& flows);
+CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const Seniority& flows);
+CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, Seniority& flows);
 
 #endif // Seniority_h__

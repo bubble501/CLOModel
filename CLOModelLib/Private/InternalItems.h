@@ -34,10 +34,8 @@ extern QMutex Db_Mutex;
 #endif
 extern const QString LoansPropertiesToSearch[2]; //Properties in which scenarios will be searched
 QString InfixToPostfix(const QString& a);
-void PrintToTempFile(const QString& TempFileName, const QString& Message, bool PrintTime = true);
 int NumberOfSetBits(quint32 i);
 QString NormaliseTriggerStructure(QString a);
-QString GetFromConfig(const QString& Domain, const QString& Field, const QString& DefaultValue = QString());
 QString Commarize(double num, unsigned int precision = 0);
 template<class T> void RegisterAsMetaType()
 {

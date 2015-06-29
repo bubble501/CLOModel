@@ -2,8 +2,8 @@
 #include <QMetaType>
 #include <QApplication>
 #include <QFile>
-#include "WaterfallCalculator.h"
-#include "CommonFunctions.h"
+#include <WaterfallCalculator.h>
+#include <CommonFunctions.h>
 #include <QMessageBox>
 #include <QDir>
 #include "ExcelCommons.h"
@@ -15,6 +15,10 @@
 #include <QListView>
 #include <QGridLayout>
 #include <QPushButton>
+#include <Mortgage.h>
+#include <Tranche.h>
+#include <ReinvestmentTest.h>
+#include <ReserveFund.h>
 CentralUnit::CentralUnit(QObject* parent)
 	:QObject(parent)
 	,Stresser(nullptr)
@@ -27,8 +31,14 @@ CentralUnit::CentralUnit(QObject* parent)
 	, LastRateTable(nullptr)
 {
 	for(int i=0;i<NumberOfPlots;i++) PlotIndexes[i]=0;
-	RegisterAsMetaType<Waterfall>();
-	RegisterAsMetaType<MtgCashFlow>();
+    if (!QMetaType::isRegistered(qMetaTypeId<Waterfall>())) {
+        int TypeID = qRegisterMetaType<Waterfall>(typeid(Waterfall).name());
+        qRegisterMetaTypeStreamOperators<Waterfall>(typeid(Waterfall).name());
+    }
+    if (!QMetaType::isRegistered(qMetaTypeId<MtgCashFlow>())) {
+        int TypeID = qRegisterMetaType<MtgCashFlow>(typeid(MtgCashFlow).name());
+        qRegisterMetaTypeStreamOperators<MtgCashFlow>(typeid(MtgCashFlow).name());
+    }
 	connect(&LoansCalculator,SIGNAL(Calculated()),this,SLOT(CalculationStep2()));
 	connect(this,SIGNAL(LoopStarted()),this,SLOT(CalculationStep1()),Qt::QueuedConnection);
 	ParallWatFalls=new WaterfallCalculator(this);

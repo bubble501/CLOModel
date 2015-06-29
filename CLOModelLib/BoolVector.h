@@ -3,6 +3,9 @@
 #include <QMetaType>
 #include "AbstractBbgVect.h"
 class BoolVectorPrivate;
+class BoolVector;
+CLOMODELLIB_EXPORT QDataStream&  operator<<(QDataStream & stream, const BoolVector& flows);
+CLOMODELLIB_EXPORT QDataStream&  operator>>(QDataStream & stream, BoolVector& flows);
 class CLOMODELLIB_EXPORT BoolVector : public AbstractBbgVect
 {
     DECLARE_PUBLIC_COMMONS(BoolVector)
@@ -19,11 +22,10 @@ public:
 	bool GetValue(int index) const;
 	int NumElements() const;
 	BoolVector& operator=(const QString& a);
-	friend QDataStream& operator<<(QDataStream & stream, const BoolVector& flows);
-	friend QDataStream& operator>>(QDataStream & stream, BoolVector& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const BoolVector& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, BoolVector& flows);
 };
-QDataStream& operator<<(QDataStream & stream, const BoolVector& flows);
-QDataStream& operator>>(QDataStream & stream, BoolVector& flows);
+
 Q_DECLARE_METATYPE(BoolVector)
 #endif // BoolVector_h__
 

@@ -5,6 +5,9 @@
 #include <QDate>
 #include "AbstractBbgVect.h"
 class DayCountVectorPrivate;
+class DayCountVector;
+CLOMODELLIB_EXPORT QDataStream&  operator<<(QDataStream & stream, const DayCountVector& flows);
+CLOMODELLIB_EXPORT QDataStream&  operator>>(QDataStream & stream, DayCountVector& flows);
 class CLOMODELLIB_EXPORT DayCountVector : public AbstractBbgVect
 {
     DECLARE_PUBLIC_COMMONS(DayCountVector)
@@ -23,11 +26,10 @@ public:
 	DayCountConvention GetValue(int index) const;
 	int NumElements() const;
 	DayCountVector& operator=(const QString& a);
-	friend QDataStream& operator<<(QDataStream & stream, const DayCountVector& flows);
-	friend QDataStream& operator>>(QDataStream & stream, DayCountVector& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const DayCountVector& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, DayCountVector& flows);
 };
-QDataStream& operator<<(QDataStream & stream, const DayCountVector& flows);
-QDataStream& operator>>(QDataStream & stream, DayCountVector& flows);
+
 Q_DECLARE_METATYPE(DayCountVector)
 #endif // DayCountVect_h__
 

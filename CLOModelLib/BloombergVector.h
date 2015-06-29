@@ -6,6 +6,9 @@
 #include "AbstractBbgVect.h"
 class FloorCapVector;
 class BloombergVectorPrivate;
+class BloombergVector;
+CLOMODELLIB_EXPORT QDataStream&  operator<<(QDataStream & stream, const BloombergVector& flows);
+CLOMODELLIB_EXPORT QDataStream&  operator>>(QDataStream & stream, BloombergVector& flows);
 class CLOMODELLIB_EXPORT BloombergVector : public AbstractBbgVect
 {
     DECLARE_PUBLIC_COMMONS(BloombergVector)
@@ -49,11 +52,10 @@ public:
 	BloombergVector& operator-=(double a);
 	BloombergVector& operator*=(double a);
 	BloombergVector& operator/=(double a);
-	friend QDataStream& operator<<(QDataStream & stream, const BloombergVector& flows);
-	friend QDataStream& operator>>(QDataStream & stream, BloombergVector& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const BloombergVector& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, BloombergVector& flows);
 };
-QDataStream& operator<<(QDataStream & stream, const BloombergVector& flows);
-QDataStream& operator>>(QDataStream & stream, BloombergVector& flows);
+
 Q_DECLARE_METATYPE(BloombergVector)
 #endif // BloombergVector_h__
 

@@ -9,6 +9,10 @@ class ForwardBaseRateTable;
 class ConstantBaseRateTablePrivate;
 class ForwardBaseRateTablePrivate;
 class AbstractBaseRateTablePrivate;
+CLOMODELLIB_EXPORT QDataStream&  operator<<(QDataStream & stream, const ForwardBaseRateTable& flows);
+CLOMODELLIB_EXPORT QDataStream&  operator>>(QDataStream & stream, ForwardBaseRateTable& flows);
+CLOMODELLIB_EXPORT QDataStream&  operator<<(QDataStream & stream, const ConstantBaseRateTable& flows);
+CLOMODELLIB_EXPORT QDataStream&  operator>>(QDataStream & stream, ConstantBaseRateTable& flows);
 class CLOMODELLIB_EXPORT AbstractBaseRateTable : public BackwardInterface
 {
     DECLARE_PUBLIC_COMMONS(AbstractBaseRateTable)
@@ -43,8 +47,8 @@ public:
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 private:
-	friend QDataStream& operator<<(QDataStream & stream, const ConstantBaseRateTable& flows);
-	friend QDataStream& operator>>(QDataStream & stream, ConstantBaseRateTable& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const ConstantBaseRateTable& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, ConstantBaseRateTable& flows);
 
 };
 class CLOMODELLIB_EXPORT  ForwardBaseRateTable : public AbstractBaseRateTable
@@ -70,11 +74,8 @@ public:
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 private:
-	friend QDataStream& operator<<(QDataStream & stream, const ForwardBaseRateTable& flows);
-	friend QDataStream& operator>>(QDataStream & stream, ForwardBaseRateTable& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const ForwardBaseRateTable& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, ForwardBaseRateTable& flows);
 };
-QDataStream& operator<<(QDataStream & stream, const ForwardBaseRateTable& flows);
-QDataStream& operator>>(QDataStream & stream, ForwardBaseRateTable& flows);
-QDataStream& operator<<(QDataStream & stream, const ConstantBaseRateTable& flows);
-QDataStream& operator>>(QDataStream & stream, ConstantBaseRateTable& flows);
+
 #endif // BaseRateTable_h__

@@ -131,9 +131,9 @@ public:
 protected:
     virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
     bool HasAnyInterest(TrancheFlowType base) const;
-	friend QDataStream& operator<<(QDataStream & stream, const TrancheCashFlow& flows);
-	friend QDataStream& operator>>(QDataStream & stream, TrancheCashFlow& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const TrancheCashFlow& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, TrancheCashFlow& flows);
 };
-QDataStream& operator<<(QDataStream & stream, const TrancheCashFlow& flows);
-QDataStream& operator>>(QDataStream & stream, TrancheCashFlow& flows);
+CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const TrancheCashFlow& flows);
+CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, TrancheCashFlow& flows);
 #endif // TrancheCashFlow_h__

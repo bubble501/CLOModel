@@ -4,6 +4,9 @@
 #include <QSharedPointer>
 #include <QMetaType>
 class FloorCapVectorPrivate;
+class FloorCapVector;
+CLOMODELLIB_EXPORT QDataStream&  operator<<(QDataStream & stream, const FloorCapVector& flows);
+CLOMODELLIB_EXPORT QDataStream&  operator>>(QDataStream & stream, FloorCapVector& flows);
 class CLOMODELLIB_EXPORT FloorCapVector : public AbstractBbgVect
 {
     DECLARE_PUBLIC_COMMONS(FloorCapVector)
@@ -23,11 +26,10 @@ public:
     QSharedPointer<double> GetCap(int index) const;
 	int NumElements() const;
 	FloorCapVector& operator=(const QString& a);
-	friend QDataStream& operator<<(QDataStream & stream, const FloorCapVector& flows);
-	friend QDataStream& operator>>(QDataStream & stream, FloorCapVector& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const FloorCapVector& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, FloorCapVector& flows);
 };
-QDataStream& operator<<(QDataStream & stream, const FloorCapVector& flows);
-QDataStream& operator>>(QDataStream & stream, FloorCapVector& flows);
+
 Q_DECLARE_METATYPE(FloorCapVector)
 #endif // FloorCapVector_h__
 

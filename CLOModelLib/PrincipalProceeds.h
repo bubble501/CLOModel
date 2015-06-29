@@ -22,9 +22,9 @@ public:
     virtual bool operator<(double a) const;
     virtual double Total() const;
     virtual void Erase();
-	friend QDataStream& operator<<(QDataStream & stream, const PrincipalRecip& flows);
-	friend QDataStream& operator>>(QDataStream & stream, PrincipalRecip& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const PrincipalRecip& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, PrincipalRecip& flows);
 };
-QDataStream& operator<<(QDataStream & stream, const PrincipalRecip& flows);
-QDataStream& operator>>(QDataStream & stream, PrincipalRecip& flows);
+CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const PrincipalRecip& flows);
+CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, PrincipalRecip& flows);
 #endif // PrincipalProceeds_h__

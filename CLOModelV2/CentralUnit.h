@@ -2,12 +2,13 @@
 #define CentralUnit_h__
 #include <QObject>
 #include <QHash>
-#include "MtgCalculator.h"
-#include "Waterfall.h"
-#include "StressTest.h"
-#include "BaseRateTable.h"
+#include <MtgCalculator.h>
+#include <Waterfall.h>
+#include <StressTest.h>
+#include <BaseRateTable.h>
 #include <QPointer>
 #include <QProgressDialog>
+#include <WatFalPrior.h>
 #define NumberOfPlots 9
 class WaterfallCalculator;
 class CentralUnit : public QObject{

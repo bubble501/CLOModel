@@ -374,6 +374,9 @@
     <ClInclude Include="Private\SummaryView_p.h">
       <Filter>Privates\Widgets</Filter>
     </ClInclude>
+    <ClInclude Include="Private\WaterfallStepHelperDialog_p.h">
+      <Filter>Privates\Widgets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BackwardCompatibilityInterface.cpp">
@@ -715,6 +718,15 @@
     <ClCompile Include="TriggerStructHelperWidget.cpp">
       <Filter>Source Files\Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_WaterfallStepHelperDialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_WaterfallStepHelperDialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="WaterfallStepHelperDialog.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="AbstrAsyncThread.h">
@@ -796,6 +808,9 @@
       <Filter>Header Files\Widget</Filter>
     </CustomBuild>
     <CustomBuild Include="TriggerStructHelperWidget.h">
+      <Filter>Header Files\Widget</Filter>
+    </CustomBuild>
+    <CustomBuild Include="WaterfallStepHelperDialog.h">
       <Filter>Header Files\Widget</Filter>
     </CustomBuild>
   </ItemGroup>

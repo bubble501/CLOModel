@@ -20,8 +20,8 @@ public:
 	void SetResult(quint32 TrigType, const QDate& RefDate, bool Res);
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
-	friend QDataStream& operator<<(QDataStream & stream, const TriggersResults& flows);
-	friend QDataStream& operator>>(QDataStream & stream, TriggersResults& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const TriggersResults& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, TriggersResults& flows);
 };
 QDataStream& operator<<(QDataStream & stream, const TriggersResults& flows);
 QDataStream& operator>>(QDataStream & stream, TriggersResults& flows);

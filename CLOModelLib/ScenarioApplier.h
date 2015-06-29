@@ -6,6 +6,9 @@
 #include "TemplAsyncCalculator.h"
 class ScenarioApplierPrivate;
 class AssumptionSet;
+class ScenarioApplier;
+CLOMODELLIB_EXPORT QDataStream&  operator<<(QDataStream & stream, const ScenarioApplier& flows);
+CLOMODELLIB_EXPORT QDataStream&  operator>>(QDataStream & stream, ScenarioApplier& flows);
 class CLOMODELLIB_EXPORT ScenarioApplier : public TemplAsyncCalculator<ApplyFlowThread, MtgCashFlow>
 {
 	Q_OBJECT
@@ -33,9 +36,8 @@ public:
 	virtual QString ReadyToCalculate() const override;
 	virtual void Reset() override;
 	virtual int NumBees() const override;
-	friend QDataStream& operator<<(QDataStream & stream, const ScenarioApplier& flows);
-	friend QDataStream& operator>>(QDataStream & stream, ScenarioApplier& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const ScenarioApplier& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, ScenarioApplier& flows);
 };
-QDataStream& operator<<(QDataStream & stream, const ScenarioApplier& flows);
-QDataStream& operator>>(QDataStream & stream, ScenarioApplier& flows);
+
 #endif // ScenarioApplier_h__

@@ -3,6 +3,9 @@
 #include "BackwardCompatibilityInterface.h"
 #include <QString>
 class AbstractTriggerPrivate;
+class AbstractTrigger;
+CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const AbstractTrigger& flows);
+CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, AbstractTrigger& flows);
 class CLOMODELLIB_EXPORT AbstractTrigger : public BackwardInterface
 {
     DECLARE_PUBLIC_COMMONS_COPY(AbstractTrigger)
@@ -31,9 +34,7 @@ public:
 	void SetTriggerLabel(const QString& lab);
 	virtual QString ReadyToCalculate() const = 0;
 	virtual QString ToString() const;
-	friend QDataStream& operator<<(QDataStream & stream, const AbstractTrigger& flows);
-	friend QDataStream& operator>>(QDataStream & stream, AbstractTrigger& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const AbstractTrigger& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, AbstractTrigger& flows);
 };
-QDataStream& operator<<(QDataStream & stream, const AbstractTrigger& flows);
-QDataStream& operator>>(QDataStream & stream, AbstractTrigger& flows);
 #endif // AbstractTrigger_h__

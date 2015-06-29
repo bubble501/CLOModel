@@ -322,5 +322,47 @@ void BuildDBCountries(const QString& path) {
 	dbw.close();
 	return;
 }
-
+void PrintToTempFile(const QString& TempFileName, const QString& Message, bool PrintTime)
+{
+    QFile TempFile("C:/Temp/" + TempFileName + ".log");
+    if (!TempFile.open(QIODevice::Append | QIODevice::Text)) return;
+    QTextStream  TempWrite(&TempFile);
+    TempWrite << (PrintTime ? QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm ") : QString()) + Message + '\n';
+    TempFile.close();
+}
+QString GetFromConfig(const QString& Domain, const QString& Field, const QString& DefaultValue)
+{
+    QFile Source(":/Configs/GlobalConfigs.xml");
+    Source.open(QIODevice::ReadOnly);
+    QXmlStreamReader xml(&Source);
+    bool DomainFound = false;
+    bool FieldFound = false;
+    while (!xml.atEnd() && !xml.hasError()) {
+        xml.readNext();
+        if (xml.isStartElement()) {
+            if (xml.name() == Domain) {
+                if (DomainFound) return DefaultValue;
+                DomainFound = true;
+            }
+            else if (DomainFound && xml.name() == Field) {
+                if (FieldFound) return DefaultValue;
+                FieldFound = true;
+            }
+        }
+        else if (xml.isEndElement()) {
+            if (xml.name() == Domain) {
+                if (!DomainFound) return DefaultValue;
+                DomainFound = false;
+            }
+            else if (xml.name() == Field) {
+                if (!FieldFound) return DefaultValue;
+                FieldFound = false;
+            }
+        }
+        else if (xml.isCharacters() && FieldFound) {
+            return xml.text().toString();
+        }
+    }
+    return DefaultValue;
+}
 

@@ -3,6 +3,9 @@
 #include <QString>
 #include "BackwardCompatibilityInterface.h"
 class AssumptionSetPrivate;
+class AssumptionSet;
+CLOMODELLIB_EXPORT QDataStream&  operator<<(QDataStream & stream, const AssumptionSet& flows);
+CLOMODELLIB_EXPORT QDataStream&  operator>>(QDataStream & stream, AssumptionSet& flows);
 class CLOMODELLIB_EXPORT  AssumptionSet : public BackwardInterface{
     DECLARE_PUBLIC_COMMONS(AssumptionSet)
     DECLARE_PUBLIC_COMMONS_COPY(AssumptionSet)
@@ -35,11 +38,10 @@ public:
 	bool IsValid() const;
 	friend uint qHash(const AssumptionSet& key, uint seed);
 	friend bool operator==(const AssumptionSet &e1, const AssumptionSet &e2);
-	friend QDataStream& operator<<(QDataStream & stream, const AssumptionSet& flows);
-	friend QDataStream& operator>>(QDataStream & stream, AssumptionSet& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const AssumptionSet& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, AssumptionSet& flows);
 };
 bool operator==(const AssumptionSet &e1, const AssumptionSet &e2);
 uint qHash(const AssumptionSet& key, uint seed);
-QDataStream& operator<<(QDataStream & stream, const AssumptionSet& flows);
-QDataStream& operator>>(QDataStream & stream, AssumptionSet& flows);
+
 #endif // AssumptionSet_h__

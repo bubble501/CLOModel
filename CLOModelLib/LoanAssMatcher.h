@@ -4,6 +4,9 @@
 #include "LoanAssMatcherThread.h"
 #include "LoanAssMatcherResult.h"
 class LoanAssMatcherPrivate;
+class LoanAssMatcher;
+CLOMODELLIB_EXPORT QDataStream&  operator<<(QDataStream & stream, const LoanAssMatcher& flows);
+CLOMODELLIB_EXPORT QDataStream&  operator>>(QDataStream & stream, LoanAssMatcher& flows);
 class CLOMODELLIB_EXPORT LoanAssMatcher : public TemplAsyncCalculator<LoanAssMatcherThread, LoanAssMatcherResult>
 {
 	Q_OBJECT
@@ -28,10 +31,9 @@ public:
     void RemoveAssumption(const QString& key);
     const QString& GetFolderToScan() const;
     void SetFolderToScan(const QString& val);
-	friend QDataStream& operator<<(QDataStream & stream, const LoanAssMatcher& flows);
-	friend QDataStream& operator>>(QDataStream & stream, LoanAssMatcher& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const LoanAssMatcher& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, LoanAssMatcher& flows);
 };
-QDataStream& operator<<(QDataStream & stream, const LoanAssMatcher& flows);
-QDataStream& operator>>(QDataStream & stream, LoanAssMatcher& flows);
+
 
 #endif // LOANASSMATCHER_H

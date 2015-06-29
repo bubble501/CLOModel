@@ -126,9 +126,9 @@ public:
 	double GetWALife() const;
 	const QDate& GetSettlementDate() const;
 	void SetSettlementDate(const QDate& a);
-	friend QDataStream& operator<<(QDataStream & stream, const Tranche& flows);
-	friend QDataStream& operator>>(QDataStream & stream, Tranche& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const Tranche& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, Tranche& flows);
 };
-QDataStream& operator<<(QDataStream & stream, const Tranche& flows);
-QDataStream& operator>>(QDataStream & stream, Tranche& flows);
+CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const Tranche& flows);
+CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, Tranche& flows);
 #endif // Tranche_h__

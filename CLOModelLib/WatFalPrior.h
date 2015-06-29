@@ -75,9 +75,9 @@ protected:
     virtual bool HasParameter(qint32 ParameterType) const;
     virtual void SetParameter(qint32 ParameterType, const QString& val);
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
-	friend QDataStream& operator<<(QDataStream & stream, const WatFalPrior& flows);
-	friend QDataStream& operator>>(QDataStream & stream, WatFalPrior& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const WatFalPrior& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, WatFalPrior& flows);
 };
-QDataStream& operator<<(QDataStream & stream, const WatFalPrior& flows);
-QDataStream& operator>>(QDataStream & stream, WatFalPrior& flows);
+CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const WatFalPrior& flows);
+CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, WatFalPrior& flows);
 #endif // WatFalPrior_h__

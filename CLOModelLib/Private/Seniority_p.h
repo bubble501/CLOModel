@@ -14,7 +14,7 @@ public:
     QList<quint32> m_RankScale;
     enum { SeniorityStringSeparator = '-' };
     quint32 genericGet(int level, const QList<quint32>& cont) const;
-    friend QDataStream& operator<<(QDataStream & stream, const Seniority& flows);
-    friend QDataStream& operator>>(QDataStream & stream, Seniority& flows);
+    friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const Seniority& flows);
+    friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, Seniority& flows);
 };
 #endif // Seniority_p_h__

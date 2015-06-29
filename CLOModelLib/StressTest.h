@@ -10,6 +10,9 @@ class ScenarioApplier;
 class QProgressDialog;
 class StressTestPrivate;
 class Mortgage;
+class StressTest;
+CLOMODELLIB_EXPORT QDataStream&  operator<<(QDataStream & stream, const StressTest& flows);
+CLOMODELLIB_EXPORT QDataStream&  operator>>(QDataStream & stream, StressTest& flows);
 class CLOMODELLIB_EXPORT StressTest : public QObject, public BackwardInterface{
 	Q_OBJECT
 protected:
@@ -106,9 +109,8 @@ signals:
 	void FinishedWithErrors();
 	void ErrorsOccured();
 	
-    friend QDataStream& operator<<(QDataStream & stream, const StressTest& flows);
-    friend QDataStream& operator>>(QDataStream & stream, StressTest& flows);
+    friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const StressTest& flows);
+    friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, StressTest& flows);
 };
-QDataStream& operator<<(QDataStream & stream, const StressTest& flows);
-QDataStream& operator>>(QDataStream & stream, StressTest& flows);
+
 #endif // StressTest_h__

@@ -23,9 +23,9 @@ public:
 	virtual void ClearWaterfalls();
 public slots:
 	virtual bool StartCalculation() override;
-    friend QDataStream& operator<<(QDataStream & stream, const WaterfallCalculator& flows);
-    friend QDataStream& operator>>(QDataStream & stream, WaterfallCalculator& flows);
+    friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const WaterfallCalculator& flows);
+    friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, WaterfallCalculator& flows);
 };
-QDataStream& operator<<(QDataStream & stream, const WaterfallCalculator& flows);
-QDataStream& operator>>(QDataStream & stream, WaterfallCalculator& flows);
+CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const WaterfallCalculator& flows);
+CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, WaterfallCalculator& flows);
 #endif // WaterfallCalculator_h__

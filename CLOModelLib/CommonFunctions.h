@@ -58,6 +58,8 @@ enum DayCountConvention : qint16
     , ContCompNAFBACTACT = (1 << (1 + CompoundShift)) | 204
 
 };
+QString CLOMODELLIB_EXPORT GetFromConfig(const QString& Domain, const QString& Field, const QString& DefaultValue = QString());
+void CLOMODELLIB_EXPORT PrintToTempFile(const QString& TempFileName, const QString& Message, bool PrintTime = true);
 double CLOMODELLIB_EXPORT CalculateIRR(const QList<QDate>& Dte, const QList<double>& Flws, const DayCountVector& Daycount, double Guess = 0.05);
 double CLOMODELLIB_EXPORT CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, double Interest, const DayCountVector& Daycount);
 double CLOMODELLIB_EXPORT CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, const BloombergVector& Interest, const DayCountVector& Daycount);
@@ -104,8 +106,8 @@ bool CLOMODELLIB_EXPORT ValidDayCount(qint16 a);
 // #TODO Use this instead of assignment operators in public class as copy constructor
 #define DECLARE_PRIVATE_COMMONS_COPY(Class) public: \
     Class ## Private(Class *q,const Class ## Private &other);
-#define DECLARE_PRIVATE_COMMONS_DATASTREAM(Class) friend QDataStream& operator<<(QDataStream & stream, const Class& flows); \
-friend QDataStream& operator>>(QDataStream & stream, Class& flows);
+#define DECLARE_PRIVATE_COMMONS_DATASTREAM(Class) friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const Class& flows); \
+friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, Class& flows);
 
 
 #endif // CommonFunctions_h__

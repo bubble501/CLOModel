@@ -9,6 +9,9 @@ class MtgCashFlow;
 class BaseRateVector;
 class ForwardBaseRateTable;
 class ConstantBaseRateTable;
+class Mortgage;
+CLOMODELLIB_EXPORT QDataStream&  operator<<(QDataStream & stream, const Mortgage& flows);
+CLOMODELLIB_EXPORT QDataStream&  operator>>(QDataStream & stream, Mortgage& flows);
 class CLOMODELLIB_EXPORT Mortgage : public BackwardInterface
 {
     DECLARE_PUBLIC_COMMONS(Mortgage)
@@ -67,9 +70,8 @@ public:
 	QString GetPropertyName(qint32 PropIndex) const;
 	bool HasProperty(const QString& PropName) const;
 	qint32 GetNumProperties()const;
-	friend QDataStream& operator<<(QDataStream & stream, const Mortgage& flows);
-	friend QDataStream& operator>>(QDataStream & stream, Mortgage& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const Mortgage& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, Mortgage& flows);
 };
-QDataStream& operator<<(QDataStream & stream, const Mortgage& flows);
-QDataStream& operator>>(QDataStream & stream, Mortgage& flows);
+
 #endif // Mortgage_h__

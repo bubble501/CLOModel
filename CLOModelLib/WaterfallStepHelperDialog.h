@@ -1,30 +1,30 @@
 #ifndef WATERFALLSTEPHELPERDIALOG_H
 #define WATERFALLSTEPHELPERDIALOG_H
-
 #include <QDialog>
-#include <QMap>
+#include <QHash>
 #include <QSharedPointer>
 #include "AbstractTrigger.h"
-class QComboBox;
-class QStackedWidget;
-class TriggerStructHelperWidget;
-class QSortFilterProxyModel;
-class QStandardItemModel;
-class WaterfallStepHelperDialog : public QDialog
+#include "clomodellib_global.h"
+class WaterfallStepHelperDialogPrivate;
+class CLOMODELLIB_EXPORT WaterfallStepHelperDialog : public QDialog
 {
 	Q_OBJECT
-
+protected:
+    Q_DECLARE_PRIVATE(WaterfallStepHelperDialog)
+    WaterfallStepHelperDialog(WaterfallStepHelperDialogPrivate* d, QWidget *parent = nullptr);
+    WaterfallStepHelperDialogPrivate* d_ptr;
 public:
-	WaterfallStepHelperDialog(QWidget *parent=0);
+	WaterfallStepHelperDialog(QWidget *parent=nullptr);
+    virtual ~WaterfallStepHelperDialog();
 	QString GetParameters();
 	void SetAvailableTriggers(const QHash<quint32, QSharedPointer<AbstractTrigger> >& AvailableTriggers);
 	void SetCurrentPars(const QString& a);
-	const bool& GetInterestWF() const { return m_InterestWF; }
+	const bool& GetInterestWF() const;
 	void SetInterestWF(const bool& val);
-private slots:
+protected slots:
 	void CheckOkEnabled(int index);
-	void ClearParameters() { ResultingParameters.clear(); }
-	void SetParameter(int PrmIndex, QString value) { ResultingParameters[PrmIndex] = value; }
+	void ClearParameters();
+	void SetParameter(int PrmIndex, QString value);
 	void SetSeniorityGroup(QString value);
 	void SetSeniorityGroupLevel(QString value);
 	void SetRedemptionGroup(QString value);
@@ -52,7 +52,6 @@ signals:
 	void SetTo0(QString);
 	void SetSoFCombo(int);
 	void SetPayAccrueCombo(int);
-
 	void ImportSeniorityGroup(QString value);
 	void ImportSeniorityGroupLevel(QString value);
 	void ImportRedemptionGroup(QString value);
@@ -65,36 +64,6 @@ signals:
 	void ImportIRRtoEquityTarget(QString value);
 	void ImportReserveIndex(QString value);
 	void ImportPayAccrue(QString value);
-private:
-	enum {
-		AllWaterfalls=0
-		, InterestWFonly=1
-		, PrincipalWFonly = 2
-	};
-	enum {NumberOfStepTypes=16};
-	QStandardItemModel* StepSelectorModel;
-	QSortFilterProxyModel* StepsFilter;
-	QWidget* CreateInterestWidget();
-	QWidget* CreatePrincipalWidget();
-	QWidget* CreateICWidget();
-	QWidget* CreateOCWidget();
-	QWidget* CreateDeferredInterestWidget();
-	QWidget* CreateExcessWidget();
-	QWidget* CreateReinvestPrincipalWidget();
-	QWidget* CreateReserveReplenishWidget();
-	QWidget* CreateTurboWidget();
-	QWidget* CreateCurePDLWidget();
-	QWidget* CreateFeesFromXSWidget();
-	QWidget* CreateAllocPrepayWidget();
-	QWidget* CreateJuniorFeesWidget();
-	bool FirstCombodeleted;
-	bool Cleared;
-	QMap<qint32,QString> ResultingParameters;
-	QPushButton* AcceptButton;
-	QComboBox* StepSelectorCombo;
-	QStackedWidget* StepBuilderBase;
-	bool m_InterestWF;
-	TriggerStructHelperWidget* TriggerBuilder;
 };
 
 #endif // WATERFALLSTEPHELPERDIALOG_H

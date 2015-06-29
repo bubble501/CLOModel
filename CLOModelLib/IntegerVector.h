@@ -3,6 +3,9 @@
 #include <QMetaType>
 #include "AbstractBbgVect.h"
 class IntegerVectorPrivate;
+class IntegerVector;
+CLOMODELLIB_EXPORT QDataStream&  operator<<(QDataStream & stream, const IntegerVector& flows);
+CLOMODELLIB_EXPORT QDataStream&  operator>>(QDataStream & stream, IntegerVector& flows);
 class CLOMODELLIB_EXPORT IntegerVector : public AbstractBbgVect
 {
     DECLARE_PUBLIC_COMMONS(IntegerVector)
@@ -21,12 +24,11 @@ public:
 	int GetValue(int index) const;
 	int NumElements() const;
 	IntegerVector& operator=(const QString& a);
-	friend QDataStream& operator<<(QDataStream & stream, const IntegerVector& flows);
-	friend QDataStream& operator>>(QDataStream & stream, IntegerVector& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const IntegerVector& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, IntegerVector& flows);
 	int GetShift() const;
 	void SetShift(int val);
 };
-QDataStream& operator<<(QDataStream & stream, const IntegerVector& flows);
-QDataStream& operator>>(QDataStream & stream, IntegerVector& flows);
+
 Q_DECLARE_METATYPE(IntegerVector)
 #endif // IntegerVector_h__

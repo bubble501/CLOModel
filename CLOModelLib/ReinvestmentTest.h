@@ -68,12 +68,12 @@ public:
 	void RemoveBondFlow(const QDate& a);
 	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll = false);
 	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll = false);
-	friend QDataStream& operator<<(QDataStream & stream, const ReinvestmentTest& flows);
-	friend QDataStream& operator>>(QDataStream & stream, ReinvestmentTest& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const ReinvestmentTest& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, ReinvestmentTest& flows);
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 
 };
-QDataStream& operator<<(QDataStream & stream, const ReinvestmentTest& flows);
-QDataStream& operator>>(QDataStream & stream, ReinvestmentTest& flows);
+CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const ReinvestmentTest& flows);
+CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, ReinvestmentTest& flows);
 #endif // ReinvestmentTest_h__

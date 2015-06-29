@@ -7,6 +7,9 @@
 class BaseRateVectorPrivate;
 class ConstantBaseRateTable;
 class ForwardBaseRateTable;
+class BaseRateVector;
+CLOMODELLIB_EXPORT QDataStream&  operator<<(QDataStream & stream, const BaseRateVector& flows);
+CLOMODELLIB_EXPORT QDataStream&  operator>>(QDataStream & stream, BaseRateVector& flows);
 class CLOMODELLIB_EXPORT  BaseRateVector : public AbstractBbgVect
 {
     DECLARE_PUBLIC_COMMONS(BaseRateVector)
@@ -37,10 +40,9 @@ public:
 	BloombergVector GetBaseRatesDatabase(ConstantBaseRateTable& ReferencesValues, bool DownloadAll=false) const;
 	BloombergVector GetBaseRatesDatabase(ForwardBaseRateTable& ReferencesValues, bool DownloadAll=false) const;
 	BaseRateVector& operator=(const QString& a);
-	friend QDataStream& operator<<(QDataStream & stream, const BaseRateVector& flows);
-	friend QDataStream& operator>>(QDataStream & stream, BaseRateVector& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const BaseRateVector& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, BaseRateVector& flows);
 };
-QDataStream& operator<<(QDataStream & stream, const BaseRateVector& flows);
-QDataStream& operator>>(QDataStream & stream, BaseRateVector& flows);
+
 Q_DECLARE_METATYPE(BaseRateVector)
 #endif // BaseRateVect_h__

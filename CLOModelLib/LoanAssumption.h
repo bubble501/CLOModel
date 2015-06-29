@@ -3,6 +3,9 @@
 #include <QString>
 #include "BackwardCompatibilityInterface.h"
 class LoanAssumptionPrivate;
+class LoanAssumption;
+CLOMODELLIB_EXPORT QDataStream&  operator<<(QDataStream & stream, const LoanAssumption& flows);
+CLOMODELLIB_EXPORT QDataStream&  operator>>(QDataStream & stream, LoanAssumption& flows);
 class CLOMODELLIB_EXPORT LoanAssumption :public BackwardInterface
 {
     DECLARE_PUBLIC_COMMONS(LoanAssumption)
@@ -135,9 +138,8 @@ public:
 	QString GetRawMezzLossMultiplier()const;
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
-	friend QDataStream& operator<<(QDataStream & stream, const LoanAssumption& flows);
-	friend QDataStream& operator>>(QDataStream & stream, LoanAssumption& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const LoanAssumption& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, LoanAssumption& flows);
 };
-QDataStream& operator<<(QDataStream & stream, const LoanAssumption& flows);
-QDataStream& operator>>(QDataStream & stream, LoanAssumption& flows);
+
 #endif // LoanAssumption_h__

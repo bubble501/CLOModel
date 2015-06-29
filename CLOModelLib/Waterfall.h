@@ -181,10 +181,10 @@ public:
     void CompileReferenceRateValue(ConstantBaseRateTable& Values);
     void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll = false);
     void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll = false);
-    friend QDataStream& operator<<(QDataStream & stream, const Waterfall& flows);
-    friend QDataStream& operator>>(QDataStream & stream, Waterfall& flows);
+    friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const Waterfall& flows);
+    friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, Waterfall& flows);
 };
 Q_DECLARE_METATYPE(Waterfall)
-QDataStream& operator<<(QDataStream & stream, const Waterfall& flows);
-QDataStream& operator>>(QDataStream & stream, Waterfall& flows);
+CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const Waterfall& flows);
+CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, Waterfall& flows);
 #endif // Waterfall_h__

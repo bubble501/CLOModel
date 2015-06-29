@@ -1,7 +1,7 @@
 #include "ExcelOutput.h"
-#include "Tranche.h"
-#include "MtgCashFlow.h"
-#include "StressTest.h"
+#include <Tranche.h>
+#include <MtgCashFlow.h>
+#include <StressTest.h>
 #include <qmath.h>
 #include <QString>
 HRESULT ExcelOutput::PrintMortgagesRepLines(

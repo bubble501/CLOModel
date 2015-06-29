@@ -10,6 +10,9 @@ class ForwardBaseRateTable;
 class ConstantBaseRateTable;
 class MtgCalculatorPrivate;
 namespace simstring { class reader; }
+class MtgCalculator;
+CLOMODELLIB_EXPORT QDataStream&  operator<<(QDataStream & stream, const MtgCalculator& flows);
+CLOMODELLIB_EXPORT QDataStream&  operator>>(QDataStream & stream, MtgCalculator& flows);
 class CLOMODELLIB_EXPORT MtgCalculator : public TemplAsyncCalculator <MtgCalculatorThread, MtgCashFlow>
 {
 	Q_OBJECT
@@ -70,9 +73,8 @@ public:
 	void SetDownloadScenario(bool val);
     bool SaveIndividualFlows() const;
     void SaveIndividualFlows(bool val);
-	friend QDataStream& operator<<(QDataStream & stream, const MtgCalculator& flows);
-	friend QDataStream& operator>>(QDataStream & stream, MtgCalculator& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const MtgCalculator& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, MtgCalculator& flows);
 };
-QDataStream& operator<<(QDataStream & stream, const MtgCalculator& flows);
-QDataStream& operator>>(QDataStream & stream, MtgCalculator& flows);
+
 #endif // MtgCalculator_h__

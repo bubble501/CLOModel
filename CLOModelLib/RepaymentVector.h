@@ -3,6 +3,9 @@
 #include <QMetaType>
 #include "AbstractBbgVect.h"
 class RepaymentVectorPrivate;
+class RepaymentVector;
+CLOMODELLIB_EXPORT QDataStream&  operator<<(QDataStream & stream, const RepaymentVector& flows);
+CLOMODELLIB_EXPORT QDataStream&  operator>>(QDataStream & stream, RepaymentVector& flows);
 class CLOMODELLIB_EXPORT RepaymentVector : public AbstractBbgVect
 {
     DECLARE_PUBLIC_COMMONS(RepaymentVector)
@@ -29,10 +32,9 @@ public:
 	QString GetValueString(int index) const;
 	int NumElements() const;
 	RepaymentVector& operator=(const QString& a);
-	friend QDataStream& operator<<(QDataStream & stream, const RepaymentVector& flows);
-	friend QDataStream& operator>>(QDataStream & stream, RepaymentVector& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const RepaymentVector& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, RepaymentVector& flows);
 };
-QDataStream& operator<<(QDataStream & stream, const RepaymentVector& flows);
-QDataStream& operator>>(QDataStream & stream, RepaymentVector& flows);
+
 Q_DECLARE_METATYPE(RepaymentVector)
 #endif // RepaymentVector_h__

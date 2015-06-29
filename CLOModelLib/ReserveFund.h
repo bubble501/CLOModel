@@ -78,9 +78,9 @@ protected:
         , EnumEnd
     };
 private:
-	friend QDataStream& operator<<(QDataStream & stream, const ReserveFund& flows);
-	friend QDataStream& operator>>(QDataStream & stream, ReserveFund& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const ReserveFund& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, ReserveFund& flows);
 };
-QDataStream& operator<<(QDataStream & stream, const ReserveFund& flows);
-QDataStream& operator>>(QDataStream & stream, ReserveFund& flows);
+CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const ReserveFund& flows);
+CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, ReserveFund& flows);
 #endif // ReserveFund_h__

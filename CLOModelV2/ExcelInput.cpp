@@ -1,29 +1,30 @@
-#include "ExcelCommons.h"
 #include "CentralUnit.h"
-#include "WatFalPrior.h"
+#include "ExcelCommons.h"
 #include "ExcelOutput.h"
-#include "SummaryView.h"
-#include "WaterfallViewer.h"
-#include "CommonFunctions.h"
-#include <QDate>
-#include <QString>
-#include <QHBoxLayout>
-#include <QFile>
-#include <QIcon>
+#include <CommonFunctions.h>
+#include <CumulativeLossTrigger.h>
+#include <DateTrigger.h>
+#include <DeferredInterestTrigger.h>
+#include <DelinquencyTrigger.h>
+#include <DuringStressTestTrigger.h>
+#include <LoanAssumptionsEditor.h>
+#include <Mortgage.h>
+#include <PDLtrigger.h>
+#include <PoolSizeTrigger.h>
 #include <QApplication>
+#include <QDate>
+#include <QFile>
+#include <QHBoxLayout>
+#include <QIcon>
+#include <QString>
 #include <QTextStream>
-#include "DateTrigger.h"
-#include "VectorTrigger.h"
-#include "PoolSizeTrigger.h"
-#include "TrancheTrigger.h"
-#include "PDLtrigger.h"
-#include "DelinquencyTrigger.h"
-#include "WaterfallStepHelperDialog.h"
-#include "TriggerHelperDialog.h"
-#include "DuringStressTestTrigger.h"
-#include "CumulativeLossTrigger.h"
-#include "LoanAssumptionsEditor.h"
-#include "DeferredInterestTrigger.h"
+#include <SummaryView.h>
+#include <Tranche.h>
+#include <TrancheTrigger.h>
+#include <TriggerHelperDialog.h>
+#include <VectorTrigger.h>
+#include <WatFalPrior.h>
+#include <WaterfallStepHelperDialog.h>
 void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	bool RunStress;
 	CentralUnit TempUnit;
@@ -65,14 +66,19 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			Curr=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			currOut=pdFreq->dblVal;pdFreq++;
 			TempSize = pdFreq->intVal; pdFreq++;
+            LOGDEBUG(QString("Reached Coupons %1").arg(TempSize));
 			for (int i = 0; i < TempSize; ++i)
 				{coup.append(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;}
+            LOGDEBUG("Finished Coupons");
 			TempSize = pdFreq->intVal; pdFreq++;
+            LOGDEBUG(QString("Reached Ref Rate %1").arg(TempSize));
 			for (int i = 0; i < TempSize; ++i)
 				{RefRt.append(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;}
+            LOGDEBUG("Reached IPD");
 			PrevIPD=QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd");pdFreq++;
 			BasRt=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			IPDfrq=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
+            LOGDEBUG("Reached Tests");
 			OClim=pdFreq->dblVal;pdFreq++;
 			IClim=pdFreq->dblVal;pdFreq++;
 			Price=pdFreq->dblVal;pdFreq++;

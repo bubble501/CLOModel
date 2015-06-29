@@ -4,6 +4,9 @@
 #include "BackwardCompatibilityInterface.h"
 class QDataStream;
 class LoanAssMatcherResultPrivate;
+class LoanAssMatcherResult;
+CLOMODELLIB_EXPORT QDataStream&  operator<<(QDataStream & stream, const LoanAssMatcherResult& flows);
+CLOMODELLIB_EXPORT QDataStream&  operator>>(QDataStream & stream, LoanAssMatcherResult& flows);
 class CLOMODELLIB_EXPORT LoanAssMatcherResult : public BackwardInterface
 {
     DECLARE_PUBLIC_COMMONS(LoanAssMatcherResult)
@@ -26,10 +29,9 @@ public:
 	void Clear();
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream & stream) override;
-	friend QDataStream& operator<<(QDataStream & stream, const LoanAssMatcherResult& flows);
-	friend QDataStream& operator>>(QDataStream & stream, LoanAssMatcherResult& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const LoanAssMatcherResult& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, LoanAssMatcherResult& flows);
 };
 Q_DECLARE_METATYPE(LoanAssMatcherResult)
-QDataStream& operator<<(QDataStream & stream, const LoanAssMatcherResult& flows);
-QDataStream& operator>>(QDataStream & stream, LoanAssMatcherResult& flows);
+
 #endif // LoanAssMatcherResult_h__

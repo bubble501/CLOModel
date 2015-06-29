@@ -4,6 +4,9 @@
 #include <QDate>
 #include <QList>
 class GenericCashFlowPrivate;
+class GenericCashFlow;
+CLOMODELLIB_EXPORT QDataStream&  operator<<(QDataStream & stream, const GenericCashFlow& flows);
+CLOMODELLIB_EXPORT QDataStream&  operator>>(QDataStream & stream, GenericCashFlow& flows);
 class CLOMODELLIB_EXPORT GenericCashFlow : public BackwardInterface
 {
     DECLARE_PUBLIC_COMMONS(GenericCashFlow)
@@ -67,10 +70,9 @@ public:
 	virtual const QSet<qint32>& GetStocks() const;
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
-	friend QDataStream& operator<<(QDataStream & stream, const GenericCashFlow& flows);
-	friend QDataStream& operator>>(QDataStream & stream, GenericCashFlow& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const GenericCashFlow& flows);
+	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, GenericCashFlow& flows);
 };
-QDataStream& operator<<(QDataStream & stream, const GenericCashFlow& flows);
-QDataStream& operator>>(QDataStream & stream, GenericCashFlow& flows);
+
 #endif // AbstractCashFlow_h__
 

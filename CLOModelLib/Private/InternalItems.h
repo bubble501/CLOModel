@@ -37,11 +37,10 @@ QString InfixToPostfix(const QString& a);
 int NumberOfSetBits(quint32 i);
 QString NormaliseTriggerStructure(QString a);
 QString Commarize(double num, unsigned int precision = 0);
-template<class T> void RegisterAsMetaType()
-{
-    if (!QMetaType::isRegistered(qMetaTypeId<T>())) {
-        int TypeID = qRegisterMetaType<T>(typeid(T).name());
-        qRegisterMetaTypeStreamOperators<T>(typeid(T).name());
-    }
+#define RegisterAsMetaType(T) { \
+    if (QMetaType::type(#T)==QMetaType::UnknownType) { \
+        qRegisterMetaType<T>(typeid(T).name()); \
+        qRegisterMetaTypeStreamOperators<T>(typeid(T).name()); \
+    } \
 }
 #endif // InternalItems_h__

@@ -16,8 +16,8 @@ protected:
         static_assert(std::is_default_constructible<ResultType>::value, "ResultType must implement a default constructor");
         static_assert(std::is_assignable<ResultType, const ResultType&>::value, "ResultType must implement an assignment operator");
         d_func()->m_Result = new ResultType();
-        if (!QMetaType::isRegistered(qMetaTypeId<ResultType>())) {
-            int TypeID = qRegisterMetaType<ResultType>(typeid(ResultType).name());
+        if (QMetaType::type(typeid(ResultType).name()) == QMetaType::UnknownType) {
+            qRegisterMetaType<ResultType>(typeid(ResultType).name());
             qRegisterMetaTypeStreamOperators<ResultType>(typeid(ResultType).name());
         }
     }
@@ -28,8 +28,8 @@ public:
 		static_assert(std::is_default_constructible<ResultType>::value, "ResultType must implement a default constructor"); 
 		static_assert(std::is_assignable<ResultType, const ResultType&>::value, "ResultType must implement an assignment operator");
         d_func()->m_Result = new ResultType();
-        if (!QMetaType::isRegistered(qMetaTypeId<ResultType>())) {
-            int TypeID = qRegisterMetaType<ResultType>(typeid(ResultType).name());
+        if (QMetaType::type(typeid(ResultType).name()) == QMetaType::UnknownType) {
+            qRegisterMetaType<ResultType>(typeid(ResultType).name());
             qRegisterMetaTypeStreamOperators<ResultType>(typeid(ResultType).name());
         }
 	}

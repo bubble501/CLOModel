@@ -13,14 +13,14 @@ IntegerVectorPrivate::IntegerVectorPrivate(IntegerVector *q)
 IntegerVector::IntegerVector(IntegerVectorPrivate *d, const IntegerVector& other)
 	:AbstractBbgVect(d,other)
 {
-    RegisterAsMetaType<IntegerVector>();
+    RegisterAsMetaType(IntegerVector);
     d->m_VectVal=other.d_func()->m_VectVal;
     d->m_Shift=other.d_func()->m_Shift;
 }
 IntegerVector::IntegerVector(IntegerVectorPrivate *d)
 	:AbstractBbgVect(d)
 {
-    RegisterAsMetaType<IntegerVector>();
+    RegisterAsMetaType(IntegerVector);
     d->m_Shift=0;
 }
 

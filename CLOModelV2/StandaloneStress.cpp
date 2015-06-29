@@ -17,10 +17,11 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QCheckBox>
-#include "CommonFunctions.h"
-#include "BloombergVector.h"
-#include "MtgCalculator.h"
+#include <CommonFunctions.h>
+#include <BloombergVector.h>
+#include <MtgCalculator.h>
 #include <QGroupBox>
+#include <IntegerVector.h>
 StandaloneStress::StandaloneStress(QWidget *parent)
 	: QWidget(parent)
 {
@@ -28,8 +29,14 @@ StandaloneStress::StandaloneStress(QWidget *parent)
 
 	setWindowTitle(tr("Standalone Stress Test"));
 	setWindowIcon(QIcon(":/Icons/Logo.png"));
-	RegisterAsMetaType<Waterfall>();
-	RegisterAsMetaType<MtgCashFlow>();
+    if (QMetaType::type("Waterfall") == QMetaType::UnknownType) {
+        qRegisterMetaType<Waterfall>("Waterfall");
+        qRegisterMetaTypeStreamOperators<Waterfall>("Waterfall");
+    }
+    if (QMetaType::type("MtgCashFlow") == QMetaType::UnknownType) {
+        qRegisterMetaType<MtgCashFlow>("MtgCashFlow");
+        qRegisterMetaTypeStreamOperators<MtgCashFlow>("MtgCashFlow");
+    }
 	Stresser=new StressTest(this);
 	
 

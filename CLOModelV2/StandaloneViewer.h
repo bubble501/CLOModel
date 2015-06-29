@@ -2,7 +2,7 @@
 #define StandaloneViewer_h__
 #include <QMainWindow>
 #include <QStringList>
-#include "Waterfall.h"
+#include <Waterfall.h>
 #define MaxRecentFiles 10
 class QMenu;
 class QAction;

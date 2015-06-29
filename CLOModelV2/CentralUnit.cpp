@@ -31,11 +31,11 @@ CentralUnit::CentralUnit(QObject* parent)
 	, LastRateTable(nullptr)
 {
 	for(int i=0;i<NumberOfPlots;i++) PlotIndexes[i]=0;
-    if (!QMetaType::isRegistered(qMetaTypeId<Waterfall>())) {
+    if (QMetaType::type("Waterfall")==QMetaType::UnknownType) {
         int TypeID = qRegisterMetaType<Waterfall>(typeid(Waterfall).name());
         qRegisterMetaTypeStreamOperators<Waterfall>(typeid(Waterfall).name());
     }
-    if (!QMetaType::isRegistered(qMetaTypeId<MtgCashFlow>())) {
+    if (QMetaType::type("MtgCashFlow")==QMetaType::UnknownType) {
         int TypeID = qRegisterMetaType<MtgCashFlow>(typeid(MtgCashFlow).name());
         qRegisterMetaTypeStreamOperators<MtgCashFlow>(typeid(MtgCashFlow).name());
     }

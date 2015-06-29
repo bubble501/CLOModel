@@ -33,7 +33,7 @@ SummaryView::SummaryView(SummaryViewPrivate* d, QWidget* parent)
     , d_ptr(d)
 {
 	setWindowIcon(QIcon(":/Icons/Logo.png"));
-	if(!QMetaType::isRegistered(qMetaTypeId<Waterfall>()))
+	if(QMetaType::type("Waterfall")==QMetaType::UnknownType)
 		qRegisterMetaType<Waterfall>("Waterfall");
 	setWindowTitle("Stress Scenario");
 	setMinimumSize(1024,768);

@@ -18,8 +18,8 @@ public:
         static_assert(std::is_object<ThreadType>::value, "ThreadType can't be a reference or pointer");
         static_assert(std::is_default_constructible<ResultType>::value, "ResultType must implement a default constructor");
         static_assert(std::is_base_of<BackwardInterface, ResultType >::value, "ResultType must inherit from BackwardInterface");
-        if (!QMetaType::isRegistered(qMetaTypeId<ResultType>())) {
-            int TypeID = qRegisterMetaType<ResultType>(typeid(ResultType).name());
+        if (QMetaType::type(typeid(ResultType).name()) == QMetaType::UnknownType) {
+            qRegisterMetaType<ResultType>(typeid(ResultType).name());
             qRegisterMetaTypeStreamOperators<ResultType>(typeid(ResultType).name());
         }
     }
@@ -75,8 +75,8 @@ protected:
         static_assert(std::is_object<ThreadType>::value, "ThreadType can't be a reference or pointer");
         static_assert(std::is_default_constructible<ResultType>::value, "ResultType must implement a default constructor");
         static_assert(std::is_base_of<BackwardInterface, ResultType >::value, "ResultType must inherit from BackwardInterface");
-        if (!QMetaType::isRegistered(qMetaTypeId<ResultType>())) {
-            int TypeID = qRegisterMetaType<ResultType>(typeid(ResultType).name());
+        if (QMetaType::type(typeid(ResultType).name()) == QMetaType::UnknownType) {
+            qRegisterMetaType<ResultType>(typeid(ResultType).name());
             qRegisterMetaTypeStreamOperators<ResultType>(typeid(ResultType).name());
         }
     }

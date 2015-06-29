@@ -53,7 +53,7 @@ StressViewer::StressViewer(StressViewerPrivate* d, QWidget* parent)
 	setWindowIcon(QIcon(":/Icons/Logo.png"));
 	setWindowTitle("CLO Stress Test Viewer");
 	setMinimumSize(1024, 768);
-	RegisterAsMetaType<Waterfall>();
+    RegisterAsMetaType(Waterfall);
     d->StressTarget = new StressTest(this);
 
 	QVBoxLayout* MainLay = new QVBoxLayout(this);

@@ -19,13 +19,13 @@ BloombergVector::BloombergVector(BloombergVectorPrivate *d, const BloombergVecto
 {
     d->m_VectVal = other.d_func()->m_VectVal;
     d->m_Divisor = other.d_func()->m_Divisor;
-    RegisterAsMetaType<BloombergVector>();
+    RegisterAsMetaType(BloombergVector);
 }
 BloombergVector::BloombergVector(BloombergVectorPrivate *d)
 	:AbstractBbgVect(d)
 {
     d->m_Divisor = 100.0;
-    RegisterAsMetaType<BloombergVector>();
+    RegisterAsMetaType(BloombergVector);
 }
 BloombergVector& BloombergVector::operator=(const BloombergVector& Vec)
 {

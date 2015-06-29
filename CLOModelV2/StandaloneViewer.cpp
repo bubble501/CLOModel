@@ -9,18 +9,19 @@
 #include <QFile>
 #include <QCloseEvent>
 #include <QSettings>
-#include "CommonFunctions.h"
-#include "StressViewer.h"
+#include <CommonFunctions.h>
+#include <StressViewer.h>
 #include <algorithm>
 #include <functional>
+#include <MtgCashFlow.h>
 StandaloneViewer::StandaloneViewer(QWidget *parent)
 	:QMainWindow(parent)
 {
 	setWindowIcon(QIcon(":/Icons/Logo.png"));
 	setWindowTitle("CLO Model Viewer");
-	if(!QMetaType::isRegistered(qMetaTypeId<Waterfall>()))
+	if(QMetaType::type("Waterfall")==QMetaType::UnknownType)
 		qRegisterMetaType<Waterfall>("Waterfall");
-	if(!QMetaType::isRegistered(qMetaTypeId<MtgCashFlow>()))
+	if(QMetaType::type("MtgCashFlow")==QMetaType::UnknownType)
 		qRegisterMetaType<MtgCashFlow>("MtgCashFlow");
 	TheViewer=new SummaryView(this);
 	setCentralWidget(TheViewer);

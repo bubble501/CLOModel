@@ -6,7 +6,7 @@
 class LoanAssumptionDelegate : public QItemDelegate {
 	Q_OBJECT
 public:
-	enum class AssumptionType : qint8 { 
+	enum AssumptionType : qint8 { 
 		IntegerAssumption
 		, DoubleAssumption 
 		, DayCountVectorAssumption

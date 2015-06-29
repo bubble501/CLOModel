@@ -8,7 +8,9 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QScrollBar>
-WaterfallViewer::WaterfallViewer(QWidget* parent/* =0 */)
+#include "IntegerVector.h"
+#include "BloombergVector.h"
+WaterfallViewer::WaterfallViewer(QWidget* parent)
 	:QWidget(parent)
 {
 	setWindowIcon(QIcon(":/Icons/Logo.png"));

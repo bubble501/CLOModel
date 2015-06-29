@@ -99,6 +99,12 @@
     <Filter Include="Privates\Stress Test">
       <UniqueIdentifier>{da357504-ee64-48b1-8735-4df0ac314c2b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Widget">
+      <UniqueIdentifier>{44062ff7-d060-4bec-9278-bedf70703c8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Widgets">
+      <UniqueIdentifier>{a957199a-dee4-4ce5-b004-4b3588e5a0a6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="clomodellib_global.h">
@@ -352,6 +358,21 @@
     </ClInclude>
     <ClInclude Include="Private\LoanAssMatcher_p.h">
       <Filter>Privates\Loans</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\LoanAssumptionsEditor_p.h">
+      <Filter>Privates\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\TriggerHelperDialog_p.h">
+      <Filter>Privates\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\TriggerStructHelperWidget_p.h">
+      <Filter>Privates\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\StressViewer_p.h">
+      <Filter>Privates\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\SummaryView_p.h">
+      <Filter>Privates\Widgets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -631,6 +652,69 @@
     <ClCompile Include="LoanAssMatcher.cpp">
       <Filter>Source Files\Loans</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_LoanAssumptionsEditor.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_LoanAssumptionsEditor.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="LoanAssumptionsEditor.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_TrancheViewer.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_TrancheViewer.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\TrancheViewer.cpp">
+      <Filter>Privates\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_WaterfallViewer.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_WaterfallViewer.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\WaterfallViewer.cpp">
+      <Filter>Privates\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_StressViewer.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_StressViewer.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_SummaryView.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_SummaryView.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_TriggerHelperDialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_TriggerHelperDialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_TriggerStructHelperWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_TriggerStructHelperWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="StressViewer.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="SummaryView.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="TriggerHelperDialog.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="TriggerStructHelperWidget.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="AbstrAsyncThread.h">
@@ -692,6 +776,27 @@
     </CustomBuild>
     <CustomBuild Include="LoanAssMatcher.h">
       <Filter>Header Files\Loans</Filter>
+    </CustomBuild>
+    <CustomBuild Include="LoanAssumptionsEditor.h">
+      <Filter>Header Files\Widget</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\TrancheViewer.h">
+      <Filter>Privates\Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\WaterfallViewer.h">
+      <Filter>Privates\Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="StressViewer.h">
+      <Filter>Header Files\Widget</Filter>
+    </CustomBuild>
+    <CustomBuild Include="SummaryView.h">
+      <Filter>Header Files\Widget</Filter>
+    </CustomBuild>
+    <CustomBuild Include="TriggerHelperDialog.h">
+      <Filter>Header Files\Widget</Filter>
+    </CustomBuild>
+    <CustomBuild Include="TriggerStructHelperWidget.h">
+      <Filter>Header Files\Widget</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

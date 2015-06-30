@@ -9,10 +9,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h</Extensions>
     </Filter>
-    <Filter Include="Form Files">
-      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
-      <Extensions>ui</Extensions>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
       <Extensions>qrc;*</Extensions>
@@ -24,32 +20,34 @@
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
     <Filter Include="Generated Files\Debug">
-      <UniqueIdentifier>{2c21f092-5733-46f2-8c71-20b24bf4ed1e}</UniqueIdentifier>
+      <UniqueIdentifier>{0b6a02b1-f4bd-4d31-a89a-8a32f854a214}</UniqueIdentifier>
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
     <Filter Include="Generated Files\Release">
-      <UniqueIdentifier>{97110555-020a-4d8e-96e7-1c67f889095f}</UniqueIdentifier>
+      <UniqueIdentifier>{c54498ae-f5d4-40b8-813a-27eddf21b622}</UniqueIdentifier>
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GeneratedFiles\Debug\moc_StandaloneViewer.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_StandaloneViewer.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\qrc_Resources.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
     <ClCompile Include="StandaloneViewer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="StandaloneViewMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_StandaloneViewer.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_StandaloneViewer.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="StandaloneViewer.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -57,23 +55,9 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="StandaloneViewer.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="Resources.qrc">
-      <Filter>Resource Files</Filter>
-    </CustomBuild>
+    <ResourceCompile Include="CLOViewer.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Resources\Logo.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Resources\Loading2.gif">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="Resources\Logo.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="CLO Viewer.rc" />
   </ItemGroup>
 </Project>

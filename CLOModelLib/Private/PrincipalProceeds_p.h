@@ -6,6 +6,7 @@
 class PrincipalRecipPrivate : public BackwardInterfacePrivate
 {
     DECLARE_PRIVATE_COMMONS(PrincipalRecip)
+    DECLARE_PRIVATE_COMMONS_COPY(PrincipalRecip)
     DECLARE_PRIVATE_COMMONS_DATASTREAM(PrincipalRecip)
 public:
     double m_Scheduled;

@@ -19,14 +19,16 @@
 #endif
 DEFINE_PUBLIC_COMMONS(BaseRateVector)
 DEFINE_PUBLIC_COMMONS_COPY(BaseRateVector)
+BaseRateVectorPrivate::BaseRateVectorPrivate(BaseRateVector *q,const BaseRateVectorPrivate& other)
+	:AbstractBbgVectPrivate(q,other)
+    , m_VectVal(other.m_VectVal)
+{}
 BaseRateVectorPrivate::BaseRateVectorPrivate(BaseRateVector *q)
 	:AbstractBbgVectPrivate(q)
 {}
 BaseRateVector::BaseRateVector(BaseRateVectorPrivate *d, const BaseRateVector& other)
 	:AbstractBbgVect(d,other)
-{
-    d->m_VectVal = other.d_func()->m_VectVal;
-}
+{}
 BaseRateVector::BaseRateVector(BaseRateVectorPrivate *d)
 	:AbstractBbgVect(d)
 {}

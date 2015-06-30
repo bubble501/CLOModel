@@ -5,13 +5,16 @@
 #include "CommonFunctions.h"
 DEFINE_PUBLIC_COMMONS(FloorCapVector)
 DEFINE_PUBLIC_COMMONS_COPY(FloorCapVector)
+FloorCapVectorPrivate::FloorCapVectorPrivate(FloorCapVector *q,const FloorCapVectorPrivate& other)
+	:AbstractBbgVectPrivate(q,other)
+{}
 FloorCapVectorPrivate::FloorCapVectorPrivate(FloorCapVector *q)
 	:AbstractBbgVectPrivate(q)
 {}
 FloorCapVector::FloorCapVector(FloorCapVectorPrivate *d, const FloorCapVector& other)
 	:AbstractBbgVect(d,other)
 {
-    this->operator=(other);
+    operator=(other);
 }
 FloorCapVector::FloorCapVector(FloorCapVectorPrivate *d)
 	:AbstractBbgVect(d)

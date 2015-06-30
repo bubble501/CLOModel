@@ -7,6 +7,7 @@
 class MortgagePrivate : public BackwardInterfacePrivate
 {
     DECLARE_PRIVATE_COMMONS(Mortgage)
+    DECLARE_PRIVATE_COMMONS_COPY(Mortgage)
     DECLARE_PRIVATE_COMMONS_DATASTREAM(Mortgage)
 public:
     BaseRateVector m_FloatRateBase;

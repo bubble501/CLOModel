@@ -6,20 +6,21 @@
 #include "IntegerVector.h"
 DEFINE_PUBLIC_COMMONS(AssumptionSet)
 DEFINE_PUBLIC_COMMONS_COPY(AssumptionSet)
-
+AssumptionSetPrivate::AssumptionSetPrivate(AssumptionSet *q,const AssumptionSetPrivate& other)
+	:BackwardInterfacePrivate(q,other)
+    , m_CDRscenario(other.m_CDRscenario)
+    , m_CPRscenario(other.m_CPRscenario)
+    , m_LSscenario(other.m_LSscenario)
+    , m_RecLagScenario(other.m_RecLagScenario)
+    , m_DelinqScenario(other.m_DelinqScenario)
+    , m_DelinqLagScenario(other.m_DelinqLagScenario)
+{}
 AssumptionSetPrivate::AssumptionSetPrivate(AssumptionSet *q)
 	:BackwardInterfacePrivate(q)
 {}
 AssumptionSet::AssumptionSet(AssumptionSetPrivate *d, const AssumptionSet& other)
 	:BackwardInterface(d,other)
-{
-    d->m_CDRscenario = other.d_func()->m_CDRscenario;
-    d->m_CPRscenario = other.d_func()->m_CPRscenario;
-    d->m_LSscenario = other.d_func()->m_LSscenario;
-    d->m_RecLagScenario = other.d_func()->m_RecLagScenario;
-    d->m_DelinqScenario = other.d_func()->m_DelinqScenario;
-    d->m_DelinqLagScenario = other.d_func()->m_DelinqLagScenario;
-}
+{}
 AssumptionSet& AssumptionSet::operator=(const AssumptionSet& a)
 {
     Q_D(AssumptionSet);

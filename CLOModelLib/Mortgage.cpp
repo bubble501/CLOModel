@@ -15,24 +15,32 @@
 #include "BaseRateTable.h"
 DEFINE_PUBLIC_COMMONS(Mortgage)
 DEFINE_PUBLIC_COMMONS_COPY(Mortgage)
-
+MortgagePrivate::MortgagePrivate(Mortgage *q,const MortgagePrivate& other)
+	:BackwardInterfacePrivate(q,other)
+    , m_FloatRateBase(other.m_FloatRateBase)
+    , m_FloatingRateBaseValue(other.m_FloatingRateBaseValue)
+    , m_PaymentFreq(other.m_PaymentFreq)
+    , m_AnnuityVect(other.m_AnnuityVect)
+    , m_InterestVect(other.m_InterestVect)
+    , m_Size(other.m_Size)
+    , m_MaturityDate(other.m_MaturityDate)
+    , m_CashFlows(other.m_CashFlows)
+    , m_UseForwardCurve(other.m_UseForwardCurve)
+    , m_Properties(other.m_Properties)
+{}
 MortgagePrivate::MortgagePrivate(Mortgage *q)
 	:BackwardInterfacePrivate(q)
+    , m_PaymentFreq("1")
+    , m_AnnuityVect("N")
+    , m_InterestVect("0")
+    , m_FloatRateBase("ZERO")
+    , m_FloatingRateBaseValue("0")
+    , m_Size(0.0)
+    , m_UseForwardCurve(false)
 {}
 Mortgage::Mortgage(MortgagePrivate *d, const Mortgage& other)
 	:BackwardInterface(d,other)
-{
-    d->m_FloatRateBase = other.d_func()->m_FloatRateBase;
-    d->m_FloatingRateBaseValue = other.d_func()->m_FloatingRateBaseValue;
-    d->m_PaymentFreq = other.d_func()->m_PaymentFreq;
-    d->m_AnnuityVect = other.d_func()->m_AnnuityVect;
-    d->m_InterestVect = other.d_func()->m_InterestVect;
-    d->m_Size = other.d_func()->m_Size;
-    d->m_MaturityDate = other.d_func()->m_MaturityDate;
-    d->m_CashFlows = other.d_func()->m_CashFlows;
-    d->m_UseForwardCurve = other.d_func()->m_UseForwardCurve;
-    d->m_Properties = other.d_func()->m_Properties;
-}
+{}
 Mortgage& Mortgage::operator=(const Mortgage& other){
 	Q_D(Mortgage);
 	BackwardInterface::operator=(other);
@@ -50,16 +58,7 @@ Mortgage& Mortgage::operator=(const Mortgage& other){
 }
 Mortgage::Mortgage(MortgagePrivate *d)
 	:BackwardInterface(d)
-{
-     d->m_PaymentFreq="1";
-     d->m_AnnuityVect = "N";
-     d->m_InterestVect = "0";
-     d->m_FloatRateBase = "ZERO";
-     d->m_FloatingRateBaseValue = "0";
-     d->m_Size = 0.0;
-     d->m_UseForwardCurve = false;
-     d->m_Properties = "";
-}
+{}
 
 void Mortgage::SetAnnuity(const QString& a){
     Q_D(Mortgage);

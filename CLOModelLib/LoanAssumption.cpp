@@ -4,22 +4,24 @@
 #include "Private/AbstractBbgVect_p.h"
 DEFINE_PUBLIC_COMMONS(LoanAssumption)
 DEFINE_PUBLIC_COMMONS_COPY(LoanAssumption)
-
+LoanAssumptionPrivate::LoanAssumptionPrivate(LoanAssumption *q,const LoanAssumptionPrivate& other)
+	:BackwardInterfacePrivate(q,other)
+    ,m_ScenarioName(other.m_ScenarioName)
+    , m_Aliases(other.m_Aliases)
+{
+    for (int j = 0; j < LoanAssumptionPrivate::SenioritySize; j++) {
+        for (int i = 0; i < LoanAssumptionPrivate::AssumptionTypeSize; i++) {
+            m_Assumptions[i][j] = other.m_Assumptions[i][j];
+        }
+        m_LastUpdate[j] = other.m_LastUpdate[j];
+    }
+}
 LoanAssumptionPrivate::LoanAssumptionPrivate(LoanAssumption *q)
 	:BackwardInterfacePrivate(q)
 {}
 LoanAssumption::LoanAssumption(LoanAssumptionPrivate *d, const LoanAssumption& other)
 	:BackwardInterface(d,other)
-{
-    d->m_ScenarioName = other.d_func()->m_ScenarioName;
-    d->m_Aliases = other.d_func()->m_Aliases;
-    for (int j = 0; j < LoanAssumptionPrivate::SenioritySize; j++) {
-        for (int i = 0; i < LoanAssumptionPrivate::AssumptionTypeSize; i++) {
-            d->m_Assumptions[i][j] = other.d_func()->m_Assumptions[i][j];
-        }
-        d->m_LastUpdate[j] = other.d_func()->m_LastUpdate[j];
-    }
-}
+{}
 LoanAssumption& LoanAssumption::operator=(const LoanAssumption& other){
 	Q_D(LoanAssumption);
 	BackwardInterface::operator=(other);

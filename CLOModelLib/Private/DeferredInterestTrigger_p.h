@@ -9,6 +9,7 @@
 class DeferredInterestTriggerPrivate : public AbstractTriggerPrivate
 {
     DECLARE_PRIVATE_COMMONS(DeferredInterestTrigger)
+    DECLARE_PRIVATE_COMMONS_COPY(DeferredInterestTrigger)
 public:
     IntegerVector m_TargetSeniorityLevel;
     IntegerVector m_TargetSeniority;

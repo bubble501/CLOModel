@@ -5,19 +5,20 @@ DEFINE_PUBLIC_COMMONS(PrincipalRecip)
 DEFINE_PUBLIC_COMMONS_COPY(PrincipalRecip)
 PrincipalRecipPrivate::PrincipalRecipPrivate(PrincipalRecip *q)
 	:BackwardInterfacePrivate(q)
+    , m_Scheduled(0.0)
+    , m_Prepay(0.0)
+{}
+PrincipalRecipPrivate::PrincipalRecipPrivate(PrincipalRecip *q,const PrincipalRecipPrivate& other)
+	:BackwardInterfacePrivate(q,other)
+    , m_Scheduled(other.m_Scheduled)
+    , m_Prepay(other.m_Prepay)
 {}
 PrincipalRecip::PrincipalRecip(PrincipalRecipPrivate *d, const PrincipalRecip& other)
 	:BackwardInterface(d,other)
-{
-    d->m_Scheduled = other.d_func()->m_Scheduled;
-    d->m_Prepay = other.d_func()->m_Prepay;
-}
+{}
 PrincipalRecip::PrincipalRecip(PrincipalRecipPrivate *d)
 	:BackwardInterface(d)
-{
-    d->m_Scheduled = 0.0;
-    d->m_Prepay = 0.0;
-}
+{}
 
 PrincipalRecip& PrincipalRecip::operator=(const PrincipalRecip& other)
 {

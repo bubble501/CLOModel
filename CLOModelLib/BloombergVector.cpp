@@ -11,20 +11,23 @@
 #include <qmath.h>
 DEFINE_PUBLIC_COMMONS(BloombergVector)
 DEFINE_PUBLIC_COMMONS_COPY(BloombergVector)
+BloombergVectorPrivate::BloombergVectorPrivate(BloombergVector *q,const BloombergVectorPrivate& other)
+	:AbstractBbgVectPrivate(q,other)
+    , m_Divisor(other.m_Divisor)
+    , m_VectVal(other.m_VectVal)
+{}
 BloombergVectorPrivate::BloombergVectorPrivate(BloombergVector *q)
 	:AbstractBbgVectPrivate(q)
+    , m_Divisor(100.0)
 {}
 BloombergVector::BloombergVector(BloombergVectorPrivate *d, const BloombergVector& other)
     : AbstractBbgVect(d, other)
 {
-    d->m_VectVal = other.d_func()->m_VectVal;
-    d->m_Divisor = other.d_func()->m_Divisor;
     RegisterAsMetaType(BloombergVector);
 }
 BloombergVector::BloombergVector(BloombergVectorPrivate *d)
 	:AbstractBbgVect(d)
 {
-    d->m_Divisor = 100.0;
     RegisterAsMetaType(BloombergVector);
 }
 BloombergVector& BloombergVector::operator=(const BloombergVector& Vec)

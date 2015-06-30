@@ -7,6 +7,7 @@
 class DateTriggerPrivate : public AbstractTriggerPrivate
 {
     DECLARE_PRIVATE_COMMONS(DateTrigger)
+    DECLARE_PRIVATE_COMMONS_COPY(DateTrigger)
 public:
     QDate m_LimitDate;
     DateTrigger::TriggerSide m_Side;

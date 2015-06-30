@@ -4,7 +4,6 @@
 #include <QWidget>
 #include <CommonFunctions.h>
 #include <Waterfall.h>
-#include <ExcelOutput.h>
 #include <StressTest.h>
 class QLineEdit;
 class QTableWidget;

@@ -5,6 +5,7 @@
 #include "BackwardCompatibilityInterface.h"
 class BackwardInterfacePrivate {
     DECLARE_PRIVATE_COMMONS(BackwardInterface)
+    DECLARE_PRIVATE_COMMONS_COPY(BackwardInterface)
 protected:
     BackwardInterface* q_ptr;
 public:

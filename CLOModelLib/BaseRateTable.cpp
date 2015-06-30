@@ -7,20 +7,19 @@ DEFINE_PUBLIC_COMMONS(ForwardBaseRateTable)
 DEFINE_PUBLIC_COMMONS_COPY(ForwardBaseRateTable)
 DEFINE_PUBLIC_COMMONS(ConstantBaseRateTable)
 DEFINE_PUBLIC_COMMONS_COPY(ConstantBaseRateTable)
-
+ConstantBaseRateTablePrivate::ConstantBaseRateTablePrivate(ConstantBaseRateTable *q,const ConstantBaseRateTablePrivate& other)
+	:AbstractBaseRateTablePrivate(q,other)
+    , Values(other.Values)
+{}
 ConstantBaseRateTablePrivate::ConstantBaseRateTablePrivate(ConstantBaseRateTable *q)
 	:AbstractBaseRateTablePrivate(q)
 {}
 ConstantBaseRateTable::ConstantBaseRateTable(ConstantBaseRateTablePrivate *d, const ConstantBaseRateTable& other)
 	:AbstractBaseRateTable(d,other)
-{
-    d->Values = other.d_func()->Values;
-}
+{}
 ConstantBaseRateTable::ConstantBaseRateTable(ConstantBaseRateTablePrivate *d)
 	:AbstractBaseRateTable(d)
-{
-	
-}
+{}
 
 ConstantBaseRateTable& ConstantBaseRateTable::operator=(const ConstantBaseRateTable& other)
 {
@@ -153,14 +152,16 @@ ConstantBaseRateTable& ConstantBaseRateTable::operator = (const QHash<QString, d
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ForwardBaseRateTablePrivate::ForwardBaseRateTablePrivate(ForwardBaseRateTable *q,const ForwardBaseRateTablePrivate& other)
+	:AbstractBaseRateTablePrivate(q,other)
+    , Values(other.Values)
+{}
 ForwardBaseRateTablePrivate::ForwardBaseRateTablePrivate(ForwardBaseRateTable *q)
 	:AbstractBaseRateTablePrivate(q)
 {}
 ForwardBaseRateTable::ForwardBaseRateTable(ForwardBaseRateTablePrivate *d, const ForwardBaseRateTable& other)
 	:AbstractBaseRateTable(d,other)
-{
-    d->Values = other.d_func()->Values;
-}
+{}
 ForwardBaseRateTable::ForwardBaseRateTable(ForwardBaseRateTablePrivate *d)
 	:AbstractBaseRateTable(d)
 {
@@ -339,15 +340,16 @@ void AbstractBaseRateTable::SetUpdateDate(const QDate& val)
     Q_D(AbstractBaseRateTable);
     d->UpdateDate = val;
 }
-
+AbstractBaseRateTablePrivate::AbstractBaseRateTablePrivate(AbstractBaseRateTable *q,const AbstractBaseRateTablePrivate& other)
+	:BackwardInterfacePrivate(q,other)
+    , UpdateDate(other.UpdateDate)
+{}
 AbstractBaseRateTablePrivate::AbstractBaseRateTablePrivate(AbstractBaseRateTable *q)
 	:BackwardInterfacePrivate(q)
 {}
 AbstractBaseRateTable::AbstractBaseRateTable(AbstractBaseRateTablePrivate *d, const AbstractBaseRateTable& other)
 	:BackwardInterface(d,other)
-{
-    d->UpdateDate = other.d_func()->UpdateDate;
-}
+{}
 AbstractBaseRateTable::AbstractBaseRateTable(AbstractBaseRateTablePrivate *d)
 	:BackwardInterface(d)
 {}

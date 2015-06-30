@@ -6,6 +6,7 @@
 class AssumptionSetPrivate : public BackwardInterfacePrivate
 {
     DECLARE_PRIVATE_COMMONS(AssumptionSet)
+    DECLARE_PRIVATE_COMMONS_COPY(AssumptionSet)
     DECLARE_PRIVATE_COMMONS_DATASTREAM(AssumptionSet)
 public:
     QString m_CDRscenario;

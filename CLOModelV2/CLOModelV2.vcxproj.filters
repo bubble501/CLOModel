@@ -55,9 +55,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="Resources.qrc">
-      <Filter>Resource Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="CentralUnit.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
@@ -65,9 +62,6 @@
   <ItemGroup>
     <ClCompile Include="CentralUnit.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\qrc_Resources.cpp">
-      <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include="ExcelCommons.cpp">
       <Filter>Source Files\Excel</Filter>
@@ -86,28 +80,12 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Resources\Logo.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Resources\Loading2.gif">
-      <Filter>Resource Files</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="ExcelFunctionExport.def">
       <Filter>Definition Files</Filter>
     </None>
     <None Include="..\README.markdown">
       <Filter>Documentation</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Xml Include="Resources\GlobalConfigs.xml">
-      <Filter>Resource Files</Filter>
-    </Xml>
-    <Xml Include="Resources\ISO3166-1.xml">
-      <Filter>Resource Files</Filter>
-    </Xml>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Build Instructions.markdown">

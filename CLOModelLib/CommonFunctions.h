@@ -94,7 +94,7 @@ bool CLOMODELLIB_EXPORT ValidDayCount(qint16 a);
     : Class(new Class ## Private(this)) \
     {} 
 #define DEFINE_PUBLIC_COMMONS_COPY(Class) Class::Class(const Class& other) \
-     : Class(new Class ## Private(this), other) \
+     : Class(new Class ## Private(this,*(other.d_func())), other) \
     {} 
 #define DECLARE_PRIVATE_COMMONS(Class) protected: \
     Q_DECLARE_PUBLIC(Class) \
@@ -111,5 +111,3 @@ friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, Class& f
 
 
 #endif // CommonFunctions_h__
-
-

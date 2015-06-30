@@ -5,14 +5,16 @@
 #include <QStringList>
 DEFINE_PUBLIC_COMMONS(BoolVector)
 DEFINE_PUBLIC_COMMONS_COPY(BoolVector)
+BoolVectorPrivate::BoolVectorPrivate(BoolVector *q,const BoolVectorPrivate& other)
+	:AbstractBbgVectPrivate(q,other)
+    , m_VectVal(other.m_VectVal)
+{}
 BoolVectorPrivate::BoolVectorPrivate(BoolVector *q)
 	:AbstractBbgVectPrivate(q)
 {}
 BoolVector::BoolVector(BoolVectorPrivate *d, const BoolVector& other)
     : AbstractBbgVect(d, other)
-{
-    d->m_VectVal = other.d_func()->m_VectVal;
-}
+{}
 BoolVector::BoolVector(BoolVectorPrivate *d)
 	:AbstractBbgVect(d)
 {}

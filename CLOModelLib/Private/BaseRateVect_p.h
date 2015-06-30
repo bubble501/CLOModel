@@ -7,6 +7,7 @@
 class BaseRateVectorPrivate : public AbstractBbgVectPrivate
 {
     DECLARE_PRIVATE_COMMONS(BaseRateVector)
+    DECLARE_PRIVATE_COMMONS_COPY(BaseRateVector)
     DECLARE_PRIVATE_COMMONS_DATASTREAM(BaseRateVector)
 public:
     QStringList m_VectVal;

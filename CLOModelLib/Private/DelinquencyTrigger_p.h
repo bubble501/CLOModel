@@ -6,6 +6,7 @@
 class DelinquencyTriggerPrivate : public AbstractTriggerPrivate
 {
     DECLARE_PRIVATE_COMMONS(DelinquencyTrigger)
+    DECLARE_PRIVATE_COMMONS_COPY(DelinquencyTrigger)
 public:
     BloombergVector m_Target;
 };

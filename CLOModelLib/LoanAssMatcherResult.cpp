@@ -6,17 +6,19 @@ DEFINE_PUBLIC_COMMONS_COPY(LoanAssMatcherResult)
 LoanAssMatcherResultPrivate::LoanAssMatcherResultPrivate(LoanAssMatcherResult *q)
 	:BackwardInterfacePrivate(q)
 {}
+LoanAssMatcherResultPrivate::LoanAssMatcherResultPrivate(LoanAssMatcherResult *q,const LoanAssMatcherResultPrivate& other)
+	:BackwardInterfacePrivate(q,other)
+    , m_DealName(other.m_DealName)
+    , m_FilePath(other.m_FilePath)
+    , m_LoanID(other.m_LoanID)
+    , m_Issuer(other.m_Issuer)
+    , m_Facility(other.m_Facility)
+    , m_CurrScen(other.m_CurrScen)
+    , m_DetectedScen(other.m_DetectedScen)
+{}
 LoanAssMatcherResult::LoanAssMatcherResult(LoanAssMatcherResultPrivate *d, const LoanAssMatcherResult& other)
 	:BackwardInterface(d,other)
-{
-    d->m_DealName = other.d_func()->m_DealName;
-    d->m_LoanID = other.d_func()->m_LoanID;
-    d->m_Issuer = other.d_func()->m_Issuer;
-    d->m_Facility = other.d_func()->m_Facility;
-    d->m_CurrScen = other.d_func()->m_CurrScen;
-    d->m_DetectedScen = other.d_func()->m_DetectedScen;
-    d->m_FilePath = other.d_func()->m_FilePath;
-}
+{}
 LoanAssMatcherResult& LoanAssMatcherResult::operator=(const LoanAssMatcherResult& other){
 	Q_D(LoanAssMatcherResult);
 	BackwardInterface::operator=(other);

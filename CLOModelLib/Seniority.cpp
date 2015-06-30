@@ -3,23 +3,21 @@
 #include <QStringList>
 DEFINE_PUBLIC_COMMONS(Seniority)
 DEFINE_PUBLIC_COMMONS_COPY(Seniority)
-
+SeniorityPrivate::SeniorityPrivate(Seniority *q,const SeniorityPrivate& other)
+	:BackwardInterfacePrivate(q,other)
+    , m_SeniorityScale(other.m_SeniorityScale)
+    , m_GroupScale(other.m_GroupScale)
+    , m_RankScale(other.m_RankScale)
+{}
 SeniorityPrivate::SeniorityPrivate(Seniority *q)
 	:BackwardInterfacePrivate(q)
 {}
 Seniority::Seniority(SeniorityPrivate *d, const Seniority& other)
 	:BackwardInterface(d,other)
-{
-    d->m_SeniorityScale = other.d_func()->m_SeniorityScale;
-    d->m_GroupScale = other.d_func()->m_GroupScale;
-    d->m_RankScale = other.d_func()->m_RankScale;
-}
+{}
 Seniority::Seniority(SeniorityPrivate *d)
 	:BackwardInterface(d)
-{
-	
-}
-
+{}
 Seniority& Seniority::operator=(const Seniority& other)
 {
     BackwardInterface::operator=(other);

@@ -15,20 +15,21 @@
 #endif // !NO_BLOOMBERG
 DEFINE_PUBLIC_COMMONS(TrancheCashFlow)
 DEFINE_PUBLIC_COMMONS_COPY(TrancheCashFlow)
-
+TrancheCashFlowPrivate::TrancheCashFlowPrivate(TrancheCashFlow *q,const TrancheCashFlowPrivate& other)
+	:GenericCashFlowPrivate(q,other)
+    , OutstandingAmt(other.OutstandingAmt)
+    , StartingDeferredInterest(other.StartingDeferredInterest)
+{}
 TrancheCashFlowPrivate::TrancheCashFlowPrivate(TrancheCashFlow *q)
 	:GenericCashFlowPrivate(q)
+    , OutstandingAmt(0.0)
 {}
 TrancheCashFlow::TrancheCashFlow(TrancheCashFlowPrivate *d, const TrancheCashFlow& other)
 	:GenericCashFlow(d,other)
-{
-    d->OutstandingAmt = other.d_func()->OutstandingAmt;
-    d->StartingDeferredInterest = other.d_func()->StartingDeferredInterest;
-}
+{}
 TrancheCashFlow::TrancheCashFlow(TrancheCashFlowPrivate *d)
 	:GenericCashFlow(d)
 {
-    d->OutstandingAmt = 0.0;
     for (qint32 i = 0; i < (1 << MaximumInterestsTypes); ++i) {
         SetStock(TrancheFlowType::DeferredFlow | i);
     }

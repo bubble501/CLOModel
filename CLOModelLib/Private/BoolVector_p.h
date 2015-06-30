@@ -5,6 +5,7 @@
 class BoolVectorPrivate : public AbstractBbgVectPrivate
 {
     DECLARE_PRIVATE_COMMONS(BoolVector)
+    DECLARE_PRIVATE_COMMONS_COPY(BoolVector)
     DECLARE_PRIVATE_COMMONS_DATASTREAM(BoolVector)
 public:
     QList<bool> m_VectVal;

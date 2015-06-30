@@ -7,6 +7,7 @@
 class SeniorityPrivate : public BackwardInterfacePrivate
 {
     DECLARE_PRIVATE_COMMONS(Seniority)
+    DECLARE_PRIVATE_COMMONS_COPY(Seniority)
     DECLARE_PRIVATE_COMMONS_DATASTREAM(Seniority)
 public:
     QList<quint32> m_SeniorityScale;

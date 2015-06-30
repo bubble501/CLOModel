@@ -2,29 +2,41 @@
 #include "Private/ReserveFund_p.h"
 DEFINE_PUBLIC_COMMONS(ReserveFund)
 DEFINE_PUBLIC_COMMONS_COPY(ReserveFund)
-
+ReserveFundPrivate::ReserveFundPrivate(ReserveFund *q,const ReserveFundPrivate& other)
+	:BackwardInterfacePrivate(q,other)
+    , m_ReserveFundCurrent(other.m_ReserveFundCurrent)
+    , m_ReserveFundFreed(other.m_ReserveFundFreed)
+    , m_ReserveToInterest(other.m_ReserveToInterest)
+    , m_ReserveFundFlows(other.m_ReserveFundFlows)
+    , m_StartingReserve(other.m_StartingReserve)
+{
+    for (auto j = std::begin(m_ReserveVects); j != std::end(m_ReserveVects); ++j)
+        j->operator=(other.m_ReserveVects[std::distance(std::begin(m_ReserveVects),j)]);
+}
 ReserveFundPrivate::ReserveFundPrivate(ReserveFund *q)
 	:BackwardInterfacePrivate(q)
-{}
+    , m_ReserveFundCurrent(0.0)
+    , m_ReserveFundFreed(0)
+    , m_StartingReserve(0.0)
+    , m_ReserveToInterest(true)
+{
+    m_ReserveFundFlows.Aggregate(GenericCashFlow::Monthly);
+    for (auto i = std::begin(m_ReserveVects); i != std::end(m_ReserveVects); ++i) {
+        i->SetVector("0");
+        i->SetDivisor(1.0);
+    }
+    m_ReserveFundFlows.SetLabel(ReserveFund::ReserveFlowsType::ReplenishFromInterest, "Replenish from Interest");
+    m_ReserveFundFlows.SetLabel(ReserveFund::ReserveFlowsType::ReplenishFromPrincipal, "Replenish from Principal");
+    m_ReserveFundFlows.SetLabel(ReserveFund::ReserveFlowsType::ShortFall, "ShortFall");
+}
 ReserveFund::ReserveFund(ReserveFundPrivate *d, const ReserveFund& other)
 	:BackwardInterface(d,other)
-{
-    {
-        int i = 0;
-        for (auto j = std::begin(d->m_ReserveVects); j != std::end(d->m_ReserveVects); ++i, ++j)
-            d->m_ReserveVects[i] = other.d_func()->m_ReserveVects[i];
-    }
-    d->m_ReserveFundCurrent = other.d_func()->m_ReserveFundCurrent;
-    d->m_ReserveFundFreed = other.d_func()->m_ReserveFundFreed;
-    d->m_ReserveToInterest = other.d_func()->m_ReserveToInterest;
-    d->m_ReserveFundFlows = other.d_func()->m_ReserveFundFlows;
-    d->m_StartingReserve = other.d_func()->m_StartingReserve;
-}
+{}
 ReserveFund& ReserveFund::operator=(const ReserveFund& other){
 	Q_D(ReserveFund);
     BackwardInterface::operator=(other);
     for (auto j = std::begin(d->m_ReserveVects); j != std::end(d->m_ReserveVects); ++j)
-        *j = other.d_func()->m_ReserveVects[std::distance(std::begin(d->m_ReserveVects), j)];
+        j->operator=(other.d_func()->m_ReserveVects[std::distance(std::begin(d->m_ReserveVects), j)]);
     d->m_ReserveFundCurrent = other.d_func()->m_ReserveFundCurrent;
     d->m_ReserveFundFreed = other.d_func()->m_ReserveFundFreed;
     d->m_ReserveToInterest = other.d_func()->m_ReserveToInterest;
@@ -34,24 +46,7 @@ ReserveFund& ReserveFund::operator=(const ReserveFund& other){
 }
 ReserveFund::ReserveFund(ReserveFundPrivate *d)
 	:BackwardInterface(d)
-{
-    d->m_ReserveFundCurrent = 0.0;
-    d->m_ReserveFundFreed=0;
-    d->m_StartingReserve=0.0;
-    d->m_ReserveToInterest=true;
-    d->m_ReserveFundFlows.Aggregate(GenericCashFlow::Monthly);
-    for (auto i = std::begin(d->m_ReserveVects); i != std::end(d->m_ReserveVects);++i){
-        i->SetVector("0");
-        i->SetDivisor(1.0);
-    }
-   /* for (int i = 0; i < ReserveFund::EnumEnd; i++) {
-        m_ReserveVects[i].SetVector("0");
-        m_ReserveVects[i].SetDivisor(1.0);
-    }*/
-    d->m_ReserveFundFlows.SetLabel(static_cast<qint32>(ReserveFlowsType::ReplenishFromInterest), "Replenish from Interest");
-    d->m_ReserveFundFlows.SetLabel(static_cast<qint32>(ReserveFlowsType::ReplenishFromPrincipal), "Replenish from Principal");
-    d->m_ReserveFundFlows.SetLabel(static_cast<qint32>(ReserveFlowsType::ShortFall), "ShortFall");
-}
+{}
 
 
 QDataStream& operator<<(QDataStream & stream, const ReserveFund& flows) 

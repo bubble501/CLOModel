@@ -29,99 +29,135 @@
 
 DEFINE_PUBLIC_COMMONS(Waterfall)
 DEFINE_PUBLIC_COMMONS_COPY(Waterfall)
-
-WaterfallPrivate::WaterfallPrivate(Waterfall *q)
-	:BackwardInterfacePrivate(q)
-{}
-Waterfall::Waterfall(WaterfallPrivate *d, const Waterfall& other)
-	:BackwardInterface(d,other)
+WaterfallPrivate::WaterfallPrivate(Waterfall *q,const WaterfallPrivate& other)
+	:BackwardInterfacePrivate(q,other)
+    , m_SeniorExpenses(other.m_SeniorExpenses)
+    , m_SeniorFees(other.m_SeniorFees)
+    , m_JuniorFees(other.m_JuniorFees)
+    , m_MortgagesPayments(other.m_MortgagesPayments)
+    , m_PaymentFrequency(other.m_PaymentFrequency)
+    , m_ExcessCashFlow(other.m_ExcessCashFlow)
+    , m_TotalSeniorExpenses(other.m_TotalSeniorExpenses)
+    , m_TotalSeniorFees(other.m_TotalSeniorFees)
+    , m_TotalJuniorFees(other.m_TotalJuniorFees)
+    , m_ReinvestmentTest(other.m_ReinvestmentTest)
+    , m_CCCTestLimit(other.m_CCCTestLimit)
+    , m_CCCcurve(other.m_CCCcurve)
+    , m_CCChaircut(other.m_CCChaircut)
+    , m_PrincipalAvailable(other.m_PrincipalAvailable)
+    , m_InterestAvailable(other.m_InterestAvailable)
+    , m_JuniorFeesCoupon(other.m_JuniorFeesCoupon)
+    , m_AnnualizedExcess(other.m_AnnualizedExcess)
+    , m_FirstIPDdate(other.m_FirstIPDdate)
+    , m_LastIPDdate(other.m_LastIPDdate)
+    , m_CallDate(other.m_CallDate)
+    , m_PoolValueAtCall(other.m_PoolValueAtCall)
+    , m_UseCall(other.m_UseCall)
+    , m_CallMultiple(other.m_CallMultiple)
+    , m_CallReserve(other.m_CallReserve)
+    , m_CalculatedMtgPayments(other.m_CalculatedMtgPayments)
+    , m_EquityIncome(other.m_EquityIncome)
+    , m_CumulativeReserves(other.m_CumulativeReserves)
+    , m_DealName(other.m_DealName)
+    , m_SeniorExpensesFixed(other.m_SeniorExpensesFixed)
+    , m_SeniorFeesFixed(other.m_SeniorFeesFixed)
+    , m_JuniorFeesFixed(other.m_JuniorFeesFixed)
+    , m_GICinterest(other.m_GICinterest)
+    , m_StartingDeferredJunFees(other.m_StartingDeferredJunFees)
+    , m_GICflows(other.m_GICflows)
+    , m_GICBaseRate(other.m_GICBaseRate)
+    , m_GICBaseRateValue(other.m_GICBaseRateValue)
+    , m_DealDayCountConvention(other.m_DealDayCountConvention)
+    , m_CalledPeriod(other.m_CalledPeriod)
+    , m_TriggersResults(other.m_TriggersResults)
+    , m_IsStressTest(other.m_IsStressTest)
+    , m_LegalFinal(other.m_LegalFinal)
 {
-    d->m_SeniorExpenses = other.d_func()->m_SeniorExpenses;
-    d->m_SeniorFees = other.d_func()->m_SeniorFees;
-    d->m_JuniorFees = other.d_func()->m_JuniorFees;
-    d->m_MortgagesPayments = other.d_func()->m_MortgagesPayments;
-    d->m_PaymentFrequency = other.d_func()->m_PaymentFrequency;
-    d->m_ExcessCashFlow = other.d_func()->m_ExcessCashFlow;
-    d->m_TotalSeniorExpenses = other.d_func()->m_TotalSeniorExpenses;
-    d->m_TotalSeniorFees = other.d_func()->m_TotalSeniorFees;
-    d->m_TotalJuniorFees = other.d_func()->m_TotalJuniorFees;
-    d->m_ReinvestmentTest = other.d_func()->m_ReinvestmentTest;
-    d->m_CCCTestLimit = other.d_func()->m_CCCTestLimit;
-    d->m_CCCcurve = other.d_func()->m_CCCcurve;
-    d->m_CCChaircut = other.d_func()->m_CCChaircut;
-    d->m_PrincipalAvailable = other.d_func()->m_PrincipalAvailable;
-    d->m_InterestAvailable = other.d_func()->m_InterestAvailable;
-    d->m_JuniorFeesCoupon = other.d_func()->m_JuniorFeesCoupon;
-    d->m_AnnualizedExcess = other.d_func()->m_AnnualizedExcess;
-    d->m_FirstIPDdate = other.d_func()->m_FirstIPDdate;
-    d->m_LastIPDdate = other.d_func()->m_LastIPDdate;
-    d->m_CallDate = other.d_func()->m_CallDate;
-    d->m_PoolValueAtCall = other.d_func()->m_PoolValueAtCall;
-    d->m_UseCall = other.d_func()->m_UseCall;
-    d->m_CallMultiple = other.d_func()->m_CallMultiple;
-    d->m_CallReserve = other.d_func()->m_CallReserve;
-    d->m_CalculatedMtgPayments = other.d_func()->m_CalculatedMtgPayments;
-    d->m_EquityIncome = other.d_func()->m_EquityIncome;
-    d->m_CumulativeReserves = other.d_func()->m_CumulativeReserves;
-    d->m_DealName = other.d_func()->m_DealName;
-    d->m_SeniorExpensesFixed = other.d_func()->m_SeniorExpensesFixed;
-    d->m_SeniorFeesFixed = other.d_func()->m_SeniorFeesFixed;
-    d->m_JuniorFeesFixed = other.d_func()->m_JuniorFeesFixed;
-    d->m_GICinterest = other.d_func()->m_GICinterest;
-    d->m_StartingDeferredJunFees = other.d_func()->m_StartingDeferredJunFees;
-    d->m_GICflows = other.d_func()->m_GICflows;
-    d->m_GICBaseRate = other.d_func()->m_GICBaseRate;
-    d->m_GICBaseRateValue = other.d_func()->m_GICBaseRateValue;
-    d->m_DealDayCountConvention = other.d_func()->m_DealDayCountConvention;
-    d->m_CalledPeriod = other.d_func()->m_CalledPeriod;
-    d->m_TriggersResults = other.d_func()->m_TriggersResults;
-    d->m_IsStressTest = other.d_func()->m_IsStressTest;
-    d->m_LegalFinal = other.d_func()->m_LegalFinal;
-    for (auto i = other.d_func()->m_Tranches.constBegin(); i != other.d_func()->m_Tranches.constEnd(); i++) {
-        d->m_Tranches.append(new Tranche(**i));
+    for (auto i = other.m_Tranches.constBegin(); i != other.m_Tranches.constEnd(); i++) {
+        m_Tranches.append(new Tranche(**i));
     }
-    for (auto i = other.d_func()->m_WaterfallStesps.constBegin(); i != other.d_func()->m_WaterfallStesps.constEnd(); i++) {
-        d->m_WaterfallStesps.append(new WatFalPrior(**i));
+    for (auto i = other.m_WaterfallStesps.constBegin(); i != other.m_WaterfallStesps.constEnd(); i++) {
+        m_WaterfallStesps.append(new WatFalPrior(**i));
     }
-    for (auto i = other.d_func()->m_Reserves.constBegin(); i != other.d_func()->m_Reserves.constEnd(); i++) {
-        d->m_Reserves.append(new ReserveFund(**i));
+    for (auto i = other.m_Reserves.constBegin(); i != other.m_Reserves.constEnd(); i++) {
+        m_Reserves.append(new ReserveFund(**i));
     }
-    for (auto i = other.d_func()->m_Triggers.constBegin(); i != other.d_func()->m_Triggers.constEnd(); ++i) {
+    for (auto i = other.m_Triggers.constBegin(); i != other.m_Triggers.constEnd(); ++i) {
         switch (i.value()->GetTriggerType()) {
         case AbstractTrigger::TriggerType::DateTrigger:
-            d->m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DateTrigger(*(i.value().dynamicCast<DateTrigger>()))));
+            m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DateTrigger(*(i.value().dynamicCast<DateTrigger>()))));
             break;
         case AbstractTrigger::TriggerType::VectorTrigger:
-            d->m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new VectorTrigger(*(i.value().dynamicCast<VectorTrigger>()))));
+            m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new VectorTrigger(*(i.value().dynamicCast<VectorTrigger>()))));
             break;
         case AbstractTrigger::TriggerType::PoolSizeTrigger:
-            d->m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new PoolSizeTrigger(*(i.value().dynamicCast<PoolSizeTrigger>()))));
+            m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new PoolSizeTrigger(*(i.value().dynamicCast<PoolSizeTrigger>()))));
             break;
         case AbstractTrigger::TriggerType::TrancheTrigger:
-            d->m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new TrancheTrigger(*(i.value().dynamicCast<TrancheTrigger>()))));
+            m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new TrancheTrigger(*(i.value().dynamicCast<TrancheTrigger>()))));
             break;
         case AbstractTrigger::TriggerType::DelinquencyTrigger:
-            d->m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DelinquencyTrigger(*(i.value().dynamicCast<DelinquencyTrigger>()))));
+            m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DelinquencyTrigger(*(i.value().dynamicCast<DelinquencyTrigger>()))));
             break;
         case AbstractTrigger::TriggerType::DuringStressTestTrigger:
-            d->m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DuringStressTestTrigger(*(i.value().dynamicCast<DuringStressTestTrigger>()))));
+            m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DuringStressTestTrigger(*(i.value().dynamicCast<DuringStressTestTrigger>()))));
             break;
         case AbstractTrigger::TriggerType::CumulativeLossTrigger:
-            d->m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new CumulativeLossTrigger(*(i.value().dynamicCast<CumulativeLossTrigger>()))));
+            m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new CumulativeLossTrigger(*(i.value().dynamicCast<CumulativeLossTrigger>()))));
             break;
         case AbstractTrigger::TriggerType::DeferredInterestTrigger:
-            d->m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DeferredInterestTrigger(*(i.value().dynamicCast<DeferredInterestTrigger>()))));
+            m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DeferredInterestTrigger(*(i.value().dynamicCast<DeferredInterestTrigger>()))));
             break;
         case AbstractTrigger::TriggerType::PDLTrigger:
-            d->m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new PDLTrigger(*(i.value().dynamicCast<PDLTrigger>()))));
+            m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new PDLTrigger(*(i.value().dynamicCast<PDLTrigger>()))));
             break;
         default:
-            Q_ASSERT_X(false, "Waterfall::CopyConstructor", "Unhandled Trigger Type");
+            Q_UNREACHABLE(); //Unhandled Trigger Type
             break;
         }
     }
-
 }
+WaterfallPrivate::WaterfallPrivate(Waterfall *q)
+	:BackwardInterfacePrivate(q)
+    , m_SeniorExpenses("0")
+    , m_SeniorFees("0")
+    , m_JuniorFees("0")
+    , m_SeniorExpensesFixed("0")
+    , m_SeniorFeesFixed("0")
+    , m_JuniorFeesFixed("0")
+    , m_PaymentFrequency("1")
+    , m_CCCTestLimit(1.0)
+    , m_CCCcurve("0")
+    , m_CCChaircut(0.0)
+    , m_InterestAvailable(0.0)
+    , m_JuniorFeesCoupon(0.0)
+    , m_PoolValueAtCall("100")
+    , m_UseCall(false)
+    , m_CallMultiple(0.0)
+    , m_CallReserve(0.0)
+    , m_CumulativeReserves(false)
+    , m_StartingDeferredJunFees(0.0)
+    , m_GICBaseRate("ZERO")
+    , m_DealDayCountConvention(DayCountConvention::ACT360)
+    , m_IsStressTest(false)
+{
+    m_GICflows.Aggregate(GenericCashFlow::Monthly);
+    m_ExcessCashFlow.Aggregate(GenericCashFlow::Monthly);
+    m_TotalSeniorExpenses.Aggregate(GenericCashFlow::Monthly);
+    m_TotalSeniorFees.Aggregate(GenericCashFlow::Monthly);
+    m_TotalJuniorFees.Aggregate(GenericCashFlow::Monthly);
+    m_AnnualizedExcess.Aggregate(GenericCashFlow::Monthly);
+    m_EquityIncome.Aggregate(GenericCashFlow::Monthly);
+
+    m_SeniorExpensesFixed.SetDivisor(1.0);
+    m_SeniorFeesFixed.SetDivisor(1.0);
+    m_JuniorFeesFixed.SetDivisor(1.0);
+
+    m_TotalJuniorFees.SetStock(TrancheCashFlow::TrancheFlowType::DeferredFlow);
+}
+Waterfall::Waterfall(WaterfallPrivate *d, const Waterfall& other)
+	:BackwardInterface(d,other)
+{}
 Waterfall& Waterfall::operator=(const Waterfall& other){
 	Q_D(Waterfall);
 	BackwardInterface::operator=(other);
@@ -210,7 +246,7 @@ Waterfall& Waterfall::operator=(const Waterfall& other){
             d->m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new PDLTrigger(*(i.value().dynamicCast<PDLTrigger>()))));
             break;
         default:
-            Q_ASSERT_X(false, "Waterfall::operator=", "Unhandled Trigger Type");
+            Q_UNREACHABLE(); //Unhandled Trigger Type
             break;
         }
     }
@@ -218,42 +254,7 @@ Waterfall& Waterfall::operator=(const Waterfall& other){
 }
 Waterfall::Waterfall(WaterfallPrivate *d)
 	:BackwardInterface(d)
-{
-    d->m_SeniorExpenses = "0";
-    d->m_SeniorFees = "0";
-    d->m_JuniorFees = "0";
-    d->m_SeniorExpensesFixed = "0";
-    d->m_SeniorFeesFixed = "0";
-    d->m_JuniorFeesFixed = "0";
-    d->m_PaymentFrequency = "1";
-    d->m_CCCTestLimit = 1.0;
-    d->m_CCCcurve = "0";
-    d->m_CCChaircut = 0.0;
-    d->m_InterestAvailable = 0.0;
-    d->m_JuniorFeesCoupon = 0.0;
-    d->m_PoolValueAtCall = "100";
-    d->m_UseCall = false;
-    d->m_CallMultiple = 0.0;
-    d->m_CallReserve = 0.0;
-    d->m_CumulativeReserves = false;
-    d->m_StartingDeferredJunFees = 0.0;
-    d->m_GICBaseRate = "ZERO";
-    d->m_DealDayCountConvention = DayCountConvention::ACT360;
-    d->m_IsStressTest = false;
-    d->m_GICflows.Aggregate(GenericCashFlow::Monthly);
-    d->m_ExcessCashFlow.Aggregate(GenericCashFlow::Monthly);
-    d->m_TotalSeniorExpenses.Aggregate(GenericCashFlow::Monthly);
-    d->m_TotalSeniorFees.Aggregate(GenericCashFlow::Monthly);
-    d->m_TotalJuniorFees.Aggregate(GenericCashFlow::Monthly);
-    d->m_AnnualizedExcess.Aggregate(GenericCashFlow::Monthly);
-    d->m_EquityIncome.Aggregate(GenericCashFlow::Monthly);
-
-    d->m_SeniorExpensesFixed.SetDivisor(1.0);
-    d->m_SeniorFeesFixed.SetDivisor(1.0);
-    d->m_JuniorFeesFixed.SetDivisor(1.0);
-
-    d->m_TotalJuniorFees.SetStock(TrancheCashFlow::TrancheFlowType::DeferredFlow);
-}
+{}
 
 
 const WatFalPrior* Waterfall::GetStep(int Index)const

@@ -3,6 +3,7 @@
 class FloorCapVectorPrivate : public AbstractBbgVectPrivate
 {
     DECLARE_PRIVATE_COMMONS(FloorCapVector)
+    DECLARE_PRIVATE_COMMONS_COPY(FloorCapVector)
     DECLARE_PRIVATE_COMMONS_DATASTREAM(FloorCapVector)
 public:
     template<class T> QSharedPointer<double> GetFloor(const T& index) const

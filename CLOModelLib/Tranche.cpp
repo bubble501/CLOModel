@@ -19,39 +19,58 @@
 #endif // !NO_BLOOMBERG
 DEFINE_PUBLIC_COMMONS(Tranche)
 DEFINE_PUBLIC_COMMONS_COPY(Tranche)
-
+TranchePrivate::TranchePrivate(Tranche *q,const TranchePrivate& other)
+    :BackwardInterfacePrivate(q, other)
+    , LastPaymentDate(other.LastPaymentDate)
+    , Currency(other.Currency)
+    , Price(other.Price)
+    , BloombergExtension(other.BloombergExtension)
+    , ProrataGroup(other.ProrataGroup)
+    , MinIClevel(other.MinIClevel)
+    , MinOClevel(other.MinOClevel)
+    , ExchangeRate(other.ExchangeRate)
+    , OriginalAmt(other.OriginalAmt)
+    , OutstandingAmt(other.OutstandingAmt)
+    , PaymentFrequency(other.PaymentFrequency)
+    , TrancheName(other.TrancheName)
+    , CashFlow(other.CashFlow)
+    , SettlementDate(other.SettlementDate)
+    , ISINcode(other.ISINcode)
+    , m_UseForwardCurve(other.m_UseForwardCurve)
+{
+    for (QHash<qint32, BloombergVector*>::const_iterator i = other.Coupon.constBegin(); i != other.Coupon.constEnd(); ++i)
+        Coupon.insert(i.key(), new BloombergVector(*(i.value())));
+    for (QHash<qint32, BloombergVector*>::const_iterator i = other.ReferenceRateValue.constBegin(); i != other.ReferenceRateValue.constEnd(); ++i)
+        ReferenceRateValue.insert(i.key(), new BloombergVector(*(i.value())));
+    for (QHash<qint32, BaseRateVector*>::const_iterator i = other.ReferenceRate.constBegin(); i != other.ReferenceRate.constEnd(); ++i)
+        ReferenceRate.insert(i.key(), new BaseRateVector(*(i.value())));
+    for (auto i = other.m_DayCount.constBegin(); i != other.m_DayCount.constEnd(); ++i)
+        m_DayCount.insert(i.key(), new DayCountVector(*(i.value())));
+}
 TranchePrivate::TranchePrivate(Tranche *q)
 	:BackwardInterfacePrivate(q)
-{}
+    , LastPaymentDate(2000, 1, 1)
+    , Currency("GBP")
+    , Price(100)
+    , BloombergExtension("Mtge")
+    , ProrataGroup("1")
+    , MinIClevel(-1.0)
+    , MinOClevel(-1.0)
+    , ExchangeRate(1.0)
+    , OriginalAmt(0.0)
+    , OutstandingAmt(0.0)
+    , PaymentFrequency("3")
+    , m_UseForwardCurve(false)
+{
+    BloombergVector* TempCoup = new BloombergVector("0");
+    TempCoup->SetDivisor(10000.0);
+    Coupon.insert(0, TempCoup);
+    m_DayCount.insert(0, new DayCountVector(DayCountConvention::ACT360));
+    ReferenceRate.insert(-1, new BaseRateVector("BP0003M"));
+}
 Tranche::Tranche(TranchePrivate *d, const Tranche& other)
 	:BackwardInterface(d,other)
-{
-    d->LastPaymentDate = other.d_func()->LastPaymentDate;
-    d->Currency = other.d_func()->Currency;
-    d->Price = other.d_func()->Price;
-    d->BloombergExtension = other.d_func()->BloombergExtension;
-    d->ProrataGroup = other.d_func()->ProrataGroup;
-    d->MinIClevel = other.d_func()->MinIClevel;
-    d->MinOClevel = other.d_func()->MinOClevel;
-    d->ExchangeRate = other.d_func()->ExchangeRate;
-    d->OriginalAmt = other.d_func()->OriginalAmt;
-    d->OutstandingAmt = other.d_func()->OutstandingAmt;
-    d->PaymentFrequency = other.d_func()->PaymentFrequency;
-    d->TrancheName = other.d_func()->TrancheName;
-    d->CashFlow = other.d_func()->CashFlow;
-    d->SettlementDate = other.d_func()->SettlementDate;
-    d->ISINcode = other.d_func()->ISINcode;
-    d->m_UseForwardCurve = other.d_func()->m_UseForwardCurve;
-    d->m_LoadProtocolVersion = other.d_func()->m_LoadProtocolVersion;
-    for (auto i = other.d_func()->Coupon.constBegin(); i != other.d_func()->Coupon.constEnd(); ++i)
-        d->Coupon.insert(i.key(), new BloombergVector(*(i.value())));
-    for (auto i = other.d_func()->ReferenceRateValue.constBegin(); i != other.d_func()->ReferenceRateValue.constEnd(); ++i)
-        d->ReferenceRateValue.insert(i.key(), new BloombergVector(*(i.value())));
-    for (auto i = other.d_func()->ReferenceRate.constBegin(); i != other.d_func()->ReferenceRate.constEnd(); ++i)
-        d->ReferenceRate.insert(i.key(), new BaseRateVector(*(i.value())));
-    for (auto i = other.d_func()->m_DayCount.constBegin(); i != other.d_func()->m_DayCount.constEnd(); ++i)
-        d->m_DayCount.insert(i.key(), new DayCountVector(*(i.value())));
-}
+{}
 Tranche& Tranche::operator=(const Tranche& other){
 	Q_D(Tranche);
 	BackwardInterface::operator=(other);
@@ -85,25 +104,7 @@ Tranche& Tranche::operator=(const Tranche& other){
 }
 Tranche::Tranche(TranchePrivate *d)
 	:BackwardInterface(d)
-{
-    d->LastPaymentDate = QDate(2000, 1, 1);
-    d->Currency = "GBP";
-    d->Price = 100;
-    d->BloombergExtension = "Mtge";
-    d->ProrataGroup = Seniority("1");
-    d->MinIClevel = -1.0;
-    d->MinOClevel = -1.0;
-    d->ExchangeRate = 1.0;
-    d->OriginalAmt = 0.0;
-    d->OutstandingAmt = 0.0;
-    d->PaymentFrequency = "3";
-    d->m_UseForwardCurve = false;
-    BloombergVector* TempCoup = new BloombergVector("0");
-    TempCoup->SetDivisor(10000.0);
-    d->Coupon.insert(0, TempCoup);
-    d->m_DayCount.insert(0, new DayCountVector(DayCountConvention::ACT360));
-    d->ReferenceRate.insert(-1, new BaseRateVector("BP0003M"));
-}
+{}
 
 Tranche::~Tranche() {
 	ClearInterest();

@@ -3,15 +3,16 @@
 #include <QDataStream>
 DEFINE_PUBLIC_COMMONS(DelinquencyTrigger)
 DEFINE_PUBLIC_COMMONS_COPY(DelinquencyTrigger)
-
+DelinquencyTriggerPrivate::DelinquencyTriggerPrivate(DelinquencyTrigger *q,const DelinquencyTriggerPrivate& other)
+	:AbstractTriggerPrivate(q,other)
+    , m_Target(other.m_Target)
+{}
 DelinquencyTriggerPrivate::DelinquencyTriggerPrivate(DelinquencyTrigger *q)
 	:AbstractTriggerPrivate(q)
 {}
 DelinquencyTrigger::DelinquencyTrigger(DelinquencyTriggerPrivate *d, const DelinquencyTrigger& other)
 	:AbstractTrigger(d,other)
-{
-    d->m_Target = other.d_func()->m_Target;
-}
+{}
 DelinquencyTrigger& DelinquencyTrigger::operator=(const DelinquencyTrigger& other){
 	Q_D(DelinquencyTrigger);
 	AbstractTrigger::operator=(other);

@@ -7,6 +7,7 @@
 class LoanAssumptionPrivate : public BackwardInterfacePrivate
 {
     DECLARE_PRIVATE_COMMONS(LoanAssumption)
+    DECLARE_PRIVATE_COMMONS_COPY(LoanAssumption)
     DECLARE_PRIVATE_COMMONS_DATASTREAM(LoanAssumption)
 public:
     enum { SenioritySize = 2 };

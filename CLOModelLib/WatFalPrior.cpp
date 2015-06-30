@@ -6,23 +6,26 @@
 #include "Private/InternalItems.h"
 DEFINE_PUBLIC_COMMONS(WatFalPrior)
 DEFINE_PUBLIC_COMMONS_COPY(WatFalPrior)
-
+WatFalPriorPrivate::WatFalPriorPrivate(WatFalPrior *q,const WatFalPriorPrivate& other)
+	:BackwardInterfacePrivate(q,other)
+    , PriorityType(other.PriorityType)
+    , FilledNullAnchors(other.FilledNullAnchors)
+    , TriggerStruc(other.TriggerStruc)
+    , m_AccrueOrPay(other.m_AccrueOrPay)
+{
+    for (auto i = other.IntParameters.constBegin(); i != other.IntParameters.constEnd(); ++i)
+        IntParameters.insert(i.key(), new IntegerVector(*(i.value())));
+    for (auto i = other.DoubleParameters.constBegin(); i != other.DoubleParameters.constEnd(); ++i)
+        DoubleParameters.insert(i.key(), new BloombergVector(*(i.value())));
+}
 WatFalPriorPrivate::WatFalPriorPrivate(WatFalPrior *q)
 	:BackwardInterfacePrivate(q)
+    , PriorityType(WatFalPrior::WaterfallStepType::wst_Excess)
+    , m_AccrueOrPay(WatFalPrior::wstAccrueOrPay::Invalid)
 {}
 WatFalPrior::WatFalPrior(WatFalPriorPrivate *d, const WatFalPrior& other)
 	:BackwardInterface(d,other)
-{
-    d->PriorityType = other.d_func()->PriorityType;
-    d->FilledNullAnchors = other.d_func()->FilledNullAnchors;
-    d->TriggerStruc = other.d_func()->TriggerStruc;
-    d->m_AccrueOrPay = other.d_func()->m_AccrueOrPay;
-
-    for (auto i = other.d_func()->IntParameters.constBegin(); i != other.d_func()->IntParameters.constEnd(); ++i)
-        d->IntParameters.insert(i.key(), new IntegerVector(*(i.value())));
-    for (auto i = other.d_func()->DoubleParameters.constBegin(); i != other.d_func()->DoubleParameters.constEnd(); ++i)
-        d->DoubleParameters.insert(i.key(), new BloombergVector(*(i.value())));
-}
+{}
 WatFalPrior& WatFalPrior::operator=(const WatFalPrior& other){
 	Q_D(WatFalPrior);
 	BackwardInterface::operator=(other);
@@ -39,10 +42,7 @@ WatFalPrior& WatFalPrior::operator=(const WatFalPrior& other){
 }
 WatFalPrior::WatFalPrior(WatFalPriorPrivate *d)
 	:BackwardInterface(d)
-{
-    d->PriorityType=WaterfallStepType::wst_Excess;
-    d->m_AccrueOrPay = wstAccrueOrPay::Invalid;
-}
+{}
 
 void WatFalPrior::SetPriorityType(WaterfallStepType a)
 {

@@ -6,6 +6,7 @@
 class RepaymentVectorPrivate : public AbstractBbgVectPrivate
 {
     DECLARE_PRIVATE_COMMONS(RepaymentVector)
+    DECLARE_PRIVATE_COMMONS_COPY(RepaymentVector)
     DECLARE_PRIVATE_COMMONS_DATASTREAM(RepaymentVector)
 public:
     QList<RepaymentVector::RepaymentMethods> m_VectVal;

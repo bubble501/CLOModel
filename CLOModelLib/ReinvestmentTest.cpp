@@ -3,27 +3,43 @@
 #include "CommonFunctions.h"
 DEFINE_PUBLIC_COMMONS(ReinvestmentTest)
 DEFINE_PUBLIC_COMMONS_COPY(ReinvestmentTest)
+ReinvestmentTestPrivate::ReinvestmentTestPrivate(ReinvestmentTest *q,const ReinvestmentTestPrivate& other)
+	:BackwardInterfacePrivate(q,other)
+    , CDRAssumption(other.CDRAssumption)
+    , CPRAssumption(other.CPRAssumption)
+    , LSAssumption(other.LSAssumption)
+    , WALAssumption(other.WALAssumption)
+    , ReinvestmentBond(other.ReinvestmentBond)
+    , ReinvestmentPeriod(other.ReinvestmentPeriod)
+    , m_ReinvestmentDelay(other.m_ReinvestmentDelay)
+    , ReinvestmentPrice(other.ReinvestmentPrice)
+    , m_RecoveryLag(other.m_RecoveryLag)
+    , m_Delinquency(other.m_Delinquency)
+    , m_DelinquencyLag(other.m_DelinquencyLag)
+    , m_ReinvestmentSpreadOverTime(other.m_ReinvestmentSpreadOverTime)
+    , m_Reinvested(other.m_Reinvested)
+    , ReinvestQueue(other.ReinvestQueue)
+{}
 ReinvestmentTestPrivate::ReinvestmentTestPrivate(ReinvestmentTest *q)
 	:BackwardInterfacePrivate(q)
-{}
+    , CDRAssumption("0")
+    , CPRAssumption("0")
+    , LSAssumption("100")
+    , WALAssumption("1")
+    , m_ReinvestmentDelay("0")
+    , ReinvestmentPrice("100")
+    , m_RecoveryLag("0")
+    , m_Delinquency("0")
+    , m_DelinquencyLag("0")
+    , m_ReinvestmentSpreadOverTime("0")
+{
+    WALAssumption.SetDivisor(1.0);
+    m_Reinvested.Aggregate(GenericCashFlow::Monthly);
+    m_Reinvested.SetLabel(static_cast<qint32>(MtgCashFlow::MtgFlowType::PrincipalFlow), "Reinvested Funds");
+}
 ReinvestmentTest::ReinvestmentTest(ReinvestmentTestPrivate *d, const ReinvestmentTest& other)
 	:BackwardInterface(d,other)
-{
-    d->CDRAssumption = other.d_func()->CDRAssumption;
-    d->CPRAssumption = other.d_func()->CPRAssumption;
-    d->LSAssumption = other.d_func()->LSAssumption;
-    d->WALAssumption = other.d_func()->WALAssumption;
-    d->ReinvestmentBond = other.d_func()->ReinvestmentBond;
-    d->ReinvestmentPeriod = other.d_func()->ReinvestmentPeriod;
-    d->m_ReinvestmentDelay = other.d_func()->m_ReinvestmentDelay;
-    d->ReinvestmentPrice = other.d_func()->ReinvestmentPrice;
-    d->m_RecoveryLag = other.d_func()->m_RecoveryLag;
-    d->m_Delinquency = other.d_func()->m_Delinquency;
-    d->m_DelinquencyLag = other.d_func()->m_DelinquencyLag;
-    d->m_ReinvestmentSpreadOverTime = other.d_func()->m_ReinvestmentSpreadOverTime;
-    d->m_Reinvested = other.d_func()->m_Reinvested;
-    d->ReinvestQueue = other.d_func()->ReinvestQueue;
-}
+{}
 ReinvestmentTest& ReinvestmentTest::operator=(const ReinvestmentTest& other){
 	Q_D(ReinvestmentTest);
 	BackwardInterface::operator=(other);
@@ -45,21 +61,7 @@ ReinvestmentTest& ReinvestmentTest::operator=(const ReinvestmentTest& other){
 }
 ReinvestmentTest::ReinvestmentTest(ReinvestmentTestPrivate *d)
 	:BackwardInterface(d)
-{
-    d->CDRAssumption = "0";
-    d->CPRAssumption = "0";
-    d->LSAssumption = "100";
-    d->WALAssumption = "1";
-    d->m_ReinvestmentDelay = "0";
-    d->ReinvestmentPrice = "100";
-    d->m_RecoveryLag = "0";
-    d->m_Delinquency = "0";
-    d->m_DelinquencyLag = "0";
-    d->m_ReinvestmentSpreadOverTime = "0";
-    d->WALAssumption.SetDivisor(1.0);
-    d->m_Reinvested.Aggregate(GenericCashFlow::Monthly);
-    d->m_Reinvested.SetLabel(static_cast<qint32>(MtgCashFlow::MtgFlowType::PrincipalFlow), "Reinvested Funds");
-}
+{}
 
 void ReinvestmentTest::SetupReinvBond(
     const QString& IntrVec,

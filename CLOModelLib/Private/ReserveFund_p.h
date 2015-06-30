@@ -8,6 +8,7 @@
 class ReserveFundPrivate : public BackwardInterfacePrivate
 {
     DECLARE_PRIVATE_COMMONS(ReserveFund)
+    DECLARE_PRIVATE_COMMONS_COPY(ReserveFund)
     DECLARE_PRIVATE_COMMONS_DATASTREAM(ReserveFund)
 public:
     

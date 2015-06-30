@@ -3,16 +3,17 @@
 #include <QDataStream>
 DEFINE_PUBLIC_COMMONS(CumulativeLossTrigger)
 DEFINE_PUBLIC_COMMONS_COPY(CumulativeLossTrigger)
-
+CumulativeLossTriggerPrivate::CumulativeLossTriggerPrivate(CumulativeLossTrigger *q,const CumulativeLossTriggerPrivate& other)
+	:AbstractTriggerPrivate(q,other)
+    , m_Side(other.m_Side)
+    , m_TargetSize(other.m_TargetSize)
+{}
 CumulativeLossTriggerPrivate::CumulativeLossTriggerPrivate(CumulativeLossTrigger *q)
 	:AbstractTriggerPrivate(q)
 {}
 CumulativeLossTrigger::CumulativeLossTrigger(CumulativeLossTriggerPrivate *d, const CumulativeLossTrigger& other)
 	:AbstractTrigger(d,other)
-{
-    d->m_Side = other.d_func()->m_Side;
-    d->m_TargetSize = other.d_func()->m_TargetSize;
-}
+{}
 CumulativeLossTrigger& CumulativeLossTrigger::operator=(const CumulativeLossTrigger& other){
 	Q_D(CumulativeLossTrigger);
 	AbstractTrigger::operator=(other);

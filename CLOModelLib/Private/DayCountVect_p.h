@@ -6,6 +6,7 @@
 class DayCountVectorPrivate : public AbstractBbgVectPrivate
 {
     DECLARE_PRIVATE_COMMONS(DayCountVector)
+    DECLARE_PRIVATE_COMMONS_COPY(DayCountVector)
     DECLARE_PRIVATE_COMMONS_DATASTREAM(DayCountVector)
 public:
     QList<DayCountConvention> m_VectVal;

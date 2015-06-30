@@ -3,22 +3,33 @@
 #include <QDataStream>
 DEFINE_PUBLIC_COMMONS(DeferredInterestTrigger)
 DEFINE_PUBLIC_COMMONS_COPY(DeferredInterestTrigger)
-
+DeferredInterestTriggerPrivate::DeferredInterestTriggerPrivate(DeferredInterestTrigger *q,const DeferredInterestTriggerPrivate& other)
+	:AbstractTriggerPrivate(q,other)
+    , m_TargetSeniorityLevel(other.m_TargetSeniorityLevel)
+    , m_TargetSeniority(other.m_TargetSeniority)
+    , m_SizeSide(other.m_SizeSide)
+    , m_SenioritySide(other.m_SenioritySide)
+    , m_CouponSide(other.m_CouponSide)
+    , m_TargetSize(other.m_TargetSize)
+    , m_TargetCoupon(other.m_TargetCoupon)
+{}
 DeferredInterestTriggerPrivate::DeferredInterestTriggerPrivate(DeferredInterestTrigger *q)
 	:AbstractTriggerPrivate(q)
-{}
+    , m_TargetSeniority("0")
+    , m_TargetSeniorityLevel("1")
+    , m_TargetSize("0")
+    , m_TargetCoupon("1")
+    , m_SenioritySide(DeferredInterestTrigger::TriggerSenioritySide::Invalid)
+    , m_SizeSide(DeferredInterestTrigger::TriggerSizeSide::Invalid)
+    , m_CouponSide(DeferredInterestTrigger::TriggerCouponSide::Invalid)
+{
+    m_TargetSeniorityLevel.SetShift(-1);
+    m_TargetCoupon.SetShift(-1);
+}
 
 DeferredInterestTrigger::DeferredInterestTrigger(DeferredInterestTriggerPrivate *d, const DeferredInterestTrigger& other)
 	:AbstractTrigger(d,other)
-{
-    d->m_TargetSeniority = other.d_func()->m_TargetSeniority;
-    d->m_TargetSeniorityLevel = other.d_func()->m_TargetSeniorityLevel;
-    d->m_TargetSize = other.d_func()->m_TargetSize;
-    d->m_TargetCoupon = other.d_func()->m_TargetCoupon;
-    d->m_SenioritySide = other.d_func()->m_SenioritySide;
-    d->m_SizeSide = other.d_func()->m_SizeSide;
-    d->m_CouponSide = other.d_func()->m_CouponSide;
-}
+{}
 DeferredInterestTrigger& DeferredInterestTrigger::operator=(const DeferredInterestTrigger& other){
 	Q_D(DeferredInterestTrigger);
 	AbstractTrigger::operator=(other);
@@ -33,17 +44,7 @@ DeferredInterestTrigger& DeferredInterestTrigger::operator=(const DeferredIntere
 }
 DeferredInterestTrigger::DeferredInterestTrigger(DeferredInterestTriggerPrivate *d)
     :AbstractTrigger(d, AbstractTrigger::DeferredInterestTrigger)
-{
-    d->m_TargetSeniority = "0";
-    d->m_TargetSeniorityLevel = "1";
-    d->m_TargetSize = "0";
-    d->m_TargetCoupon = "1";
-    d->m_SenioritySide = TriggerSenioritySide::Invalid;
-    d->m_SizeSide = TriggerSizeSide::Invalid;
-    d->m_CouponSide = TriggerCouponSide::Invalid;
-    d->m_TargetSeniorityLevel.SetShift(-1);
-    d->m_TargetCoupon.SetShift(-1);
-}
+{}
 
 DeferredInterestTrigger::DeferredInterestTrigger(
     QString TargetSenior

@@ -8,6 +8,7 @@
 class AbstractBbgVectPrivate : public BackwardInterfacePrivate
 {
     DECLARE_PRIVATE_COMMONS(AbstractBbgVect)
+    DECLARE_PRIVATE_COMMONS_COPY(AbstractBbgVect)
 public:
     QString m_Vector;
     QDate m_AnchorDate;

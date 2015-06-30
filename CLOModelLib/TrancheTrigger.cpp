@@ -4,19 +4,27 @@
 #include "Tranche.h"
 DEFINE_PUBLIC_COMMONS(TrancheTrigger)
 DEFINE_PUBLIC_COMMONS_COPY(TrancheTrigger)
-
+TrancheTriggerPrivate::TrancheTriggerPrivate(TrancheTrigger *q,const TrancheTriggerPrivate& other)
+	:AbstractTriggerPrivate(q,other)
+    , m_TargetSeniorityLevel(other.m_TargetSeniorityLevel)
+    , m_TargetSeniority(other.m_TargetSeniority)
+    , m_SizeSide(other.m_SizeSide)
+    , m_SenioritySide(other.m_SenioritySide)
+    , m_TargetSize(other.m_TargetSize)
+{}
 TrancheTriggerPrivate::TrancheTriggerPrivate(TrancheTrigger *q)
 	:AbstractTriggerPrivate(q)
-{}
+    , m_TargetSeniority("0")
+    , m_TargetSeniorityLevel("1")
+    , m_TargetSize("0")
+    , m_SenioritySide(TrancheTrigger::TriggerSenioritySide::Invalid)
+    , m_SizeSide(TrancheTrigger::TriggerSizeSide::Invalid)
+{
+    m_TargetSeniorityLevel.SetShift(-1);
+}
 TrancheTrigger::TrancheTrigger(TrancheTriggerPrivate *d, const TrancheTrigger& other)
 	:AbstractTrigger(d,other)
-{
-    d->m_TargetSeniorityLevel = other.d_func()->m_TargetSeniorityLevel;
-    d->m_TargetSeniority = other.d_func()->m_TargetSeniority;
-    d->m_SizeSide = other.d_func()->m_SizeSide;
-    d->m_SenioritySide = other.d_func()->m_SenioritySide;
-    d->m_TargetSize = other.d_func()->m_TargetSize;
-}
+{}
 TrancheTrigger& TrancheTrigger::operator=(const TrancheTrigger& other){
 	Q_D(TrancheTrigger);
 	AbstractTrigger::operator=(other);
@@ -29,14 +37,7 @@ TrancheTrigger& TrancheTrigger::operator=(const TrancheTrigger& other){
 }
 TrancheTrigger::TrancheTrigger(TrancheTriggerPrivate *d)
     :AbstractTrigger(d, AbstractTrigger::TriggerType::TrancheTrigger)
-{
-    d->m_TargetSeniority = "0";
-    d->m_TargetSeniorityLevel = "1";
-    d->m_SenioritySide = TriggerSenioritySide::Invalid;
-    d->m_SizeSide = TriggerSizeSide::Invalid;
-    d->m_TargetSize = "0";
-    d->m_TargetSeniorityLevel.SetShift(-1);
-}
+{}
 
 TrancheTrigger::TrancheTrigger(QString TargetSenior, QString TargetSeniorLevel, QString TargetSize, TriggerSizeSide szd, TriggerSenioritySide ssd, const QString& lab)
     :TrancheTrigger(lab)

@@ -7,6 +7,7 @@
 class WatFalPriorPrivate : public BackwardInterfacePrivate
 {
     DECLARE_PRIVATE_COMMONS(WatFalPrior)
+    DECLARE_PRIVATE_COMMONS_COPY(WatFalPrior)
     DECLARE_PRIVATE_COMMONS_DATASTREAM(WatFalPrior)
 public:
     QHash<qint32, IntegerVector*> IntParameters;

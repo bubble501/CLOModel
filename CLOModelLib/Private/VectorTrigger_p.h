@@ -7,6 +7,7 @@
 class VectorTriggerPrivate : public AbstractTriggerPrivate
 {
     DECLARE_PRIVATE_COMMONS(VectorTrigger)
+    DECLARE_PRIVATE_COMMONS_COPY(VectorTrigger)
 public:
     BoolVector m_TrigVector;
 };

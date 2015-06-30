@@ -7,6 +7,7 @@
 class PoolSizeTriggerPrivate : public AbstractTriggerPrivate
 {
     DECLARE_PRIVATE_COMMONS(PoolSizeTrigger)
+    DECLARE_PRIVATE_COMMONS_COPY(PoolSizeTrigger)
 public:
     BloombergVector m_TargetSize;
     PoolSizeTrigger::TriggerSide m_Side;

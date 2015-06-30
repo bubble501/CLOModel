@@ -6,6 +6,7 @@
 class TranchePrivate : public BackwardInterfacePrivate
 {
     DECLARE_PRIVATE_COMMONS(Tranche)
+    DECLARE_PRIVATE_COMMONS_COPY(Tranche)
     DECLARE_PRIVATE_COMMONS_DATASTREAM(Tranche)
 public:
     IntegerVector PaymentFrequency;

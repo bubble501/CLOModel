@@ -7,6 +7,7 @@
 class CumulativeLossTriggerPrivate : public AbstractTriggerPrivate
 {
     DECLARE_PRIVATE_COMMONS(CumulativeLossTrigger)
+    DECLARE_PRIVATE_COMMONS_COPY(CumulativeLossTrigger)
 public:
     BloombergVector m_TargetSize;
     CumulativeLossTrigger::TriggerSide m_Side;

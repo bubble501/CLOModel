@@ -4,6 +4,7 @@
 class LoanAssMatcherResultPrivate : public BackwardInterfacePrivate
 {
     DECLARE_PRIVATE_COMMONS(LoanAssMatcherResult)
+    DECLARE_PRIVATE_COMMONS_COPY(LoanAssMatcherResult)
     DECLARE_PRIVATE_COMMONS_DATASTREAM(LoanAssMatcherResult)
 public:
     QString m_FilePath;

@@ -5,6 +5,7 @@
 class BloombergVectorPrivate : public AbstractBbgVectPrivate
 {
     DECLARE_PRIVATE_COMMONS(BloombergVector)
+    DECLARE_PRIVATE_COMMONS_COPY(BloombergVector)
     DECLARE_PRIVATE_COMMONS_DATASTREAM(BloombergVector)
 public:
     QList<double> m_VectVal;

@@ -10,6 +10,7 @@
 class ReinvestmentTestPrivate : public BackwardInterfacePrivate
 {
     DECLARE_PRIVATE_COMMONS(ReinvestmentTest)
+    DECLARE_PRIVATE_COMMONS_COPY(ReinvestmentTest)
     DECLARE_PRIVATE_COMMONS_DATASTREAM(ReinvestmentTest)
 public:
     GenericCashFlow m_Reinvested;

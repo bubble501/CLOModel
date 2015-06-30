@@ -33,6 +33,11 @@ QString AbstractTrigger::TriggerTypeToString(TriggerType a)const {
 	}
 }
 DEFINE_PUBLIC_COMMONS_COPY(AbstractTrigger);
+AbstractTriggerPrivate::AbstractTriggerPrivate(AbstractTrigger *q,const AbstractTriggerPrivate& other)
+	:BackwardInterfacePrivate(q,other)
+    , m_TriggerType(other.m_TriggerType)
+    , m_TriggerLabel(other.m_TriggerLabel)
+{}
 AbstractTriggerPrivate::AbstractTriggerPrivate(AbstractTrigger *q)
     :BackwardInterfacePrivate(q)
 {}
@@ -47,10 +52,7 @@ AbstractTrigger::AbstractTrigger(AbstractTriggerPrivate* d, TriggerType TTP, con
 }
 AbstractTrigger::AbstractTrigger(AbstractTriggerPrivate* d, const AbstractTrigger& other)
     : BackwardInterface(d,other)
-{
-    d->m_TriggerType = other.d_func()->m_TriggerType;
-    d->m_TriggerLabel = other.d_func()->m_TriggerLabel;
-}
+{}
 
 AbstractTrigger::TriggerType AbstractTrigger::GetTriggerType() const
 {

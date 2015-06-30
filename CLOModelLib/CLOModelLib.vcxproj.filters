@@ -188,9 +188,6 @@
     <ClInclude Include="Private\BackwardCompatibilityInterface_p.h">
       <Filter>Privates\Interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="Private\BaseRateTable_p.h">
-      <Filter>Privates\Vectors</Filter>
-    </ClInclude>
     <ClInclude Include="Private\BaseRateVect_p.h">
       <Filter>Privates\Vectors</Filter>
     </ClInclude>
@@ -376,6 +373,9 @@
     </ClInclude>
     <ClInclude Include="Private\WaterfallStepHelperDialog_p.h">
       <Filter>Privates\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\BaseRateTable_p.h">
+      <Filter>Privates\Interfaces</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

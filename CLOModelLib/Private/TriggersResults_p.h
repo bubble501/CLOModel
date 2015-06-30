@@ -9,6 +9,7 @@
 class TriggersResultsPrivate : public BackwardInterfacePrivate
 {
     DECLARE_PRIVATE_COMMONS(TriggersResults)
+    DECLARE_PRIVATE_COMMONS_COPY(TriggersResults)
     DECLARE_PRIVATE_COMMONS_DATASTREAM(TriggersResults)
 public:
     QHash<quint32, QMap<QDate, bool>* > m_Results;

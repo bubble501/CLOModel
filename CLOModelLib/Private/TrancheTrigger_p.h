@@ -8,6 +8,7 @@
 class TrancheTriggerPrivate : public AbstractTriggerPrivate
 {
     DECLARE_PRIVATE_COMMONS(TrancheTrigger)
+    DECLARE_PRIVATE_COMMONS_COPY(TrancheTrigger)
 public:
     IntegerVector m_TargetSeniorityLevel;
     IntegerVector m_TargetSeniority;

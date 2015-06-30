@@ -18,6 +18,7 @@
 class WaterfallPrivate : public BackwardInterfacePrivate
 {
     DECLARE_PRIVATE_COMMONS(Waterfall)
+    DECLARE_PRIVATE_COMMONS_COPY(Waterfall)
     DECLARE_PRIVATE_COMMONS_DATASTREAM(Waterfall)
 public:
     QList<ReserveFund*> m_Reserves;

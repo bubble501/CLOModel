@@ -3,19 +3,27 @@
 #include <QDataStream>
 DEFINE_PUBLIC_COMMONS(PDLTrigger)
 DEFINE_PUBLIC_COMMONS_COPY(PDLTrigger)
-
+PDLTriggerPrivate::PDLTriggerPrivate(PDLTrigger *q,const PDLTriggerPrivate& other)
+	:AbstractTriggerPrivate(q,other)
+    , m_TargetSeniorityLevel(other.m_TargetSeniorityLevel)
+    , m_TargetSeniority(other.m_TargetSeniority)
+    , m_SizeSide(other.m_SizeSide)
+    , m_SenioritySide(other.m_SenioritySide)
+    , m_TargetSize(other.m_TargetSize)
+{}
 PDLTriggerPrivate::PDLTriggerPrivate(PDLTrigger *q)
     :AbstractTriggerPrivate(q)
-{}
+    , m_TargetSeniorityLevel("1")
+    , m_TargetSeniority("0")
+    , m_SizeSide(PDLTrigger::TriggerSizeSide::Invalid)
+    , m_SenioritySide(PDLTrigger::TriggerSenioritySide::Invalid)
+    , m_TargetSize("0")
+{
+    m_TargetSeniorityLevel.SetShift(-1);
+}
 PDLTrigger::PDLTrigger(PDLTriggerPrivate *d, const PDLTrigger& other)
     : AbstractTrigger(d, other)
-{
-    d->m_TargetSeniorityLevel = other.d_func()->m_TargetSeniorityLevel;
-    d->m_TargetSeniority = other.d_func()->m_TargetSeniority;
-    d->m_SizeSide = other.d_func()->m_SizeSide;
-    d->m_SenioritySide = other.d_func()->m_SenioritySide;
-    d->m_TargetSize = other.d_func()->m_TargetSize;
-}
+{}
 PDLTrigger& PDLTrigger::operator=(const PDLTrigger& other)
 {
     Q_D(PDLTrigger);
@@ -29,14 +37,7 @@ PDLTrigger& PDLTrigger::operator=(const PDLTrigger& other)
 }
 PDLTrigger::PDLTrigger(PDLTriggerPrivate *d)
     :AbstractTrigger(d, TriggerType::PDLTrigger)
-{
-    d->m_TargetSeniority = "0";
-    d->m_TargetSeniorityLevel = "1";
-    d->m_SenioritySide = TriggerSenioritySide::Invalid;
-    d->m_SizeSide = TriggerSizeSide::Invalid;
-    d->m_TargetSize = "0";
-    d->m_TargetSeniorityLevel.SetShift(-1);
-}
+{}
 
 
 

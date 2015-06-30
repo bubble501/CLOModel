@@ -10,16 +10,17 @@ BackwardInterfacePrivate::BackwardInterfacePrivate(BackwardInterface* q)
     static_assert(ModelVersionNumber >= MinimumSupportedVersion, "ModelVersionNumber must be greater or equal to MinimumSupportedVersion");
 }
 
-
+BackwardInterfacePrivate::BackwardInterfacePrivate(BackwardInterface* q, const BackwardInterfacePrivate& other)
+    :q_ptr(q)
+    , m_LoadProtocolVersion(other.m_LoadProtocolVersion)
+{}
 
 BackwardInterface::BackwardInterface(BackwardInterfacePrivate *d)
     : d_ptr(d)
 {}
-BackwardInterface::BackwardInterface(BackwardInterfacePrivate *d, const BackwardInterface& other) 
+BackwardInterface::BackwardInterface(BackwardInterfacePrivate *d, const BackwardInterface& ) 
     : d_ptr(d)
-{
-    d->m_LoadProtocolVersion = other.d_func()->m_LoadProtocolVersion;
-}
+{}
 
 
 BackwardInterface& BackwardInterface::operator=(const BackwardInterface& other)

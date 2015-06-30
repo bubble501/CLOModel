@@ -3,17 +3,19 @@
 #include <QDataStream>
 DEFINE_PUBLIC_COMMONS(TriggersResults)
 DEFINE_PUBLIC_COMMONS_COPY(TriggersResults)
-
+TriggersResultsPrivate::TriggersResultsPrivate(TriggersResults *q,const TriggersResultsPrivate& other)
+	:BackwardInterfacePrivate(q,other)
+{
+    for (auto i = other.m_Results.constBegin(); i != other.m_Results.constEnd(); ++i) {
+        m_Results.insert(i.key(), new QMap<QDate, bool>(*(i.value())));
+    }
+}
 TriggersResultsPrivate::TriggersResultsPrivate(TriggersResults *q)
 	:BackwardInterfacePrivate(q)
 {}
 TriggersResults::TriggersResults(TriggersResultsPrivate *d, const TriggersResults& other)
 	:BackwardInterface(d,other)
-{
-    for (auto i = other.d_func()->m_Results.constBegin(); i != other.d_func()->m_Results.constEnd(); ++i) {
-        d->m_Results.insert(i.key(), new QMap<QDate, bool>(*(i.value())));
-    }
-}
+{}
 TriggersResults& TriggersResults::operator=(const TriggersResults& other){
     Q_D(TriggersResults);
 	BackwardInterface::operator=(other);

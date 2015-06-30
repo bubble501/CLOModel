@@ -3,16 +3,17 @@
 #include <QDataStream>
 DEFINE_PUBLIC_COMMONS(DateTrigger)
 DEFINE_PUBLIC_COMMONS_COPY(DateTrigger)
-
+DateTriggerPrivate::DateTriggerPrivate(DateTrigger *q,const DateTriggerPrivate& other)
+	:AbstractTriggerPrivate(q,other)
+    , m_LimitDate(other.m_LimitDate)
+    , m_Side(other.m_Side)
+{}
 DateTriggerPrivate::DateTriggerPrivate(DateTrigger *q)
 	:AbstractTriggerPrivate(q)
 {}
 DateTrigger::DateTrigger(DateTriggerPrivate *d, const DateTrigger& other)
 	:AbstractTrigger(d,other)
-{
-    d->m_LimitDate = other.d_func()->m_LimitDate;
-    d->m_Side = other.d_func()->m_Side;
-}
+{}
 DateTrigger& DateTrigger::operator=(const DateTrigger& other){
 	Q_D(DateTrigger);
 	AbstractTrigger::operator=(other);

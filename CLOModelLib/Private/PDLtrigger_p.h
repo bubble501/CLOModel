@@ -10,6 +10,7 @@
 class PDLTriggerPrivate : public AbstractTriggerPrivate
 {
     DECLARE_PRIVATE_COMMONS(PDLTrigger)
+    DECLARE_PRIVATE_COMMONS_COPY(PDLTrigger)
 public:
     IntegerVector m_TargetSeniorityLevel;
     IntegerVector m_TargetSeniority;

@@ -6,6 +6,7 @@
 class IntegerVectorPrivate : public AbstractBbgVectPrivate
 {
     DECLARE_PRIVATE_COMMONS(IntegerVector)
+    DECLARE_PRIVATE_COMMONS_COPY(IntegerVector)
     DECLARE_PRIVATE_COMMONS_DATASTREAM(IntegerVector)
 public:
     QList<int> m_VectVal;

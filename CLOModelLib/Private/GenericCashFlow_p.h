@@ -8,6 +8,7 @@
 class GenericCashFlowPrivate : public BackwardInterfacePrivate
 {
     DECLARE_PRIVATE_COMMONS(GenericCashFlow)
+    DECLARE_PRIVATE_COMMONS_COPY(GenericCashFlow)
     DECLARE_PRIVATE_COMMONS_DATASTREAM(GenericCashFlow)
 public:
     static bool SamePeriod(const QDate& a, const QDate& b, GenericCashFlow::CashFlowAggregation Freq);

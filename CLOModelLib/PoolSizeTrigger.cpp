@@ -3,16 +3,21 @@
 #include <QDataStream>
 DEFINE_PUBLIC_COMMONS(PoolSizeTrigger)
 DEFINE_PUBLIC_COMMONS_COPY(PoolSizeTrigger)
-
+PoolSizeTriggerPrivate::PoolSizeTriggerPrivate(PoolSizeTrigger *q,const PoolSizeTriggerPrivate& other)
+	:AbstractTriggerPrivate(q,other)
+    , m_TargetSize(other.m_TargetSize)
+    , m_Side(other.m_Side)
+{}
 PoolSizeTriggerPrivate::PoolSizeTriggerPrivate(PoolSizeTrigger *q)
     :AbstractTriggerPrivate(q)
-{}
+    , m_Side(PoolSizeTrigger::TriggerSide::Invalid)
+    , m_TargetSize("0")
+{
+    m_TargetSize.SetDivisor(1.0);
+}
 PoolSizeTrigger::PoolSizeTrigger(PoolSizeTriggerPrivate *d, const PoolSizeTrigger& other)
     : AbstractTrigger(d, other)
-{
-    d->m_TargetSize=other.d_func()->m_TargetSize;
-    d->m_Side=other.d_func()->m_Side;
-}
+{}
 PoolSizeTrigger& PoolSizeTrigger::operator=(const PoolSizeTrigger& other)
 {
     Q_D(PoolSizeTrigger);
@@ -23,10 +28,7 @@ PoolSizeTrigger& PoolSizeTrigger::operator=(const PoolSizeTrigger& other)
 }
 PoolSizeTrigger::PoolSizeTrigger(PoolSizeTriggerPrivate *d)
     :AbstractTrigger(d, TriggerType::PoolSizeTrigger)
-{
-    d->m_Side = TriggerSide::Invalid;
-    d->m_TargetSize.SetDivisor(1.0);
-}
+{}
 
 
 QDataStream& PoolSizeTrigger::WriteToStream(QDataStream& stream) const {

@@ -8,7 +8,9 @@
 extern QMutex Db_Mutex;
 #endif // !NO_DATABASE
 #ifdef _DEBUG
-#define DEBUG_ITEM auto
+#define DEBUG_CHECK(item,val) const auto item=val;
+#else
+#define DEBUG_CHECK(item,val)
 #endif // _DEBUG
 #define MaximumIRRIterations 10000 //INT_MAX-1
 #define USE_SOFT_COLOUR //Uses softer color in stress test table rather than pure RGB(255,0,0) style ones

@@ -192,7 +192,6 @@ Waterfall& Waterfall::operator=(const Waterfall& other){
     d->m_SeniorExpensesFixed = other.d_func()->m_SeniorExpensesFixed;
     d->m_SeniorFeesFixed = other.d_func()->m_SeniorFeesFixed;
     d->m_JuniorFeesFixed = other.d_func()->m_JuniorFeesFixed;
-    d->m_LoadProtocolVersion = other.d_func()->m_LoadProtocolVersion;
     d->m_GICinterest = other.d_func()->m_GICinterest;
     d->m_StartingDeferredJunFees = other.d_func()->m_StartingDeferredJunFees;
     d->m_GICflows = other.d_func()->m_GICflows;
@@ -204,15 +203,15 @@ Waterfall& Waterfall::operator=(const Waterfall& other){
     d->m_IsStressTest = other.d_func()->m_IsStressTest;
     d->m_LegalFinal = other.d_func()->m_LegalFinal;
     ResetTranches();
-    for (QList<Tranche*>::const_iterator i = other.d_func()->m_Tranches.constBegin(); i != other.d_func()->m_Tranches.constEnd(); i++) {
+    for (auto i = other.d_func()->m_Tranches.constBegin(); i != other.d_func()->m_Tranches.constEnd(); i++) {
         d->m_Tranches.append(new Tranche(**i));
     }
     ResetSteps();
-    for (QList<WatFalPrior*>::const_iterator i = other.d_func()->m_WaterfallStesps.constBegin(); i != other.d_func()->m_WaterfallStesps.constEnd(); i++) {
+    for (auto i = other.d_func()->m_WaterfallStesps.constBegin(); i != other.d_func()->m_WaterfallStesps.constEnd(); i++) {
         d->m_WaterfallStesps.append(new WatFalPrior(**i));
     }
     RemoveReserve();
-    for (QList<ReserveFund*>::const_iterator i = other.d_func()->m_Reserves.constBegin(); i != other.d_func()->m_Reserves.constEnd(); i++) {
+    for (auto i = other.d_func()->m_Reserves.constBegin(); i != other.d_func()->m_Reserves.constEnd(); i++) {
         d->m_Reserves.append(new ReserveFund(**i));
     }
     d->m_Triggers.clear();
@@ -2402,7 +2401,7 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream)
                 TempTrig.reset(new PDLTrigger());
                 break;
             default:
-                Q_ASSERT_X(false, "Waterfall::LoadOldVersion", "Unhadled Trigger Type");
+                Q_UNREACHABLE(); // Unhadled Trigger Type"
             }
             TempTrig->SetLoadProtocolVersion(loadProtocolVersion());
             stream >> (*TempTrig);

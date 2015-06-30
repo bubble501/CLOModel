@@ -3,14 +3,15 @@
 DuringStressTestTrigger::DuringStressTestTrigger(AbstractTriggerPrivate* d)
     :AbstractTrigger(d, TriggerType::DuringStressTestTrigger)
 {}
+
 DuringStressTestTrigger::DuringStressTestTrigger(const QString& lab) 
     : DuringStressTestTrigger(new AbstractTriggerPrivate(this))
 {
    d_func()->m_TriggerLabel=lab;
 }
-
+// If you change this change #PublicCopies
 DuringStressTestTrigger::DuringStressTestTrigger(const DuringStressTestTrigger& other) 
-    : DuringStressTestTrigger(new AbstractTriggerPrivate(this),other)
+    : DuringStressTestTrigger(new AbstractTriggerPrivate(this,*other.d_func()),other)
 {}
 
 DuringStressTestTrigger::DuringStressTestTrigger(AbstractTriggerPrivate* d, const DuringStressTestTrigger& other)

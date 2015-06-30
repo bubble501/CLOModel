@@ -93,6 +93,7 @@ bool CLOMODELLIB_EXPORT ValidDayCount(qint16 a);
 #define DEFINE_PUBLIC_COMMONS(Class) Class::Class() \
     : Class(new Class ## Private(this)) \
     {} 
+// If you change this change #PublicCopies
 #define DEFINE_PUBLIC_COMMONS_COPY(Class) Class::Class(const Class& other) \
      : Class(new Class ## Private(this,*(other.d_func())), other) \
     {} 

@@ -11,6 +11,5 @@ class PrincipalRecipPrivate : public BackwardInterfacePrivate
 public:
     double m_Scheduled;
     double m_Prepay;
-    virtual void NormaliseValues();
 };
 #endif // PrincipalProceeds_p_h__

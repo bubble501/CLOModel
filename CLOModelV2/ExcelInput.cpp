@@ -300,9 +300,13 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 				.arg(Timespread)
 			);
 			TempUnit.SetupReinvBond(Intr, CPR, CDR, LS, WAL, Frq, ReinvBondAnnuit, Pric, Delay, Timespread, BaseVal, RecLag, Dlq, DlqLag);
+            LOGDEBUG("reinvestment bond set up");
 		}
+        LOGDEBUG(QString("Available Princ %1").arg(pdFreq->dblVal));
 		TempUnit.SetSchedPrincAvailable(pdFreq->dblVal);pdFreq++; //TODO starting Prepay
+        LOGDEBUG("Available principal set up");
 		TempUnit.SetInterestAvailable(pdFreq->dblVal);pdFreq++;
+        LOGDEBUG("Available interest set up");
 		TempUnit.SetPoolCutOff(QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd"));pdFreq++;
 		TempUnit.SetRunCall(pdFreq->boolVal);pdFreq++;
 		LOGDEBUG(QString("Use Call: %1").arg(TempUnit.GetRunCall()));

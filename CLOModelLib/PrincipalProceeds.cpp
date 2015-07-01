@@ -35,12 +35,13 @@ QDataStream& PrincipalRecip::LoadOldVersion(QDataStream& stream) {
 	return stream;
 }
 
-void PrincipalRecipPrivate::NormaliseValues()
+void PrincipalRecip::NormaliseValues()
 {
-    if (qAbs(m_Scheduled) < 0.01)
-        m_Scheduled = 0.0;
-    if (qAbs(m_Prepay) < 0.01)
-        m_Prepay = 0.0;
+    Q_D(PrincipalRecip);
+    if (qAbs(d->m_Scheduled) < 0.01)
+        d->m_Scheduled = 0.0;
+    if (qAbs(d->m_Prepay) < 0.01)
+        d->m_Prepay = 0.0;
 }
 
 const double& PrincipalRecip::GetPrepay() const
@@ -53,7 +54,7 @@ void PrincipalRecip::SetPrepay(const double& val)
 {
     Q_D(PrincipalRecip);
     d->m_Prepay = qMax(val, 0.0);
-    d->NormaliseValues();
+    NormaliseValues();
 }
 
 void PrincipalRecip::AddPrepay(const double& val)
@@ -61,7 +62,7 @@ void PrincipalRecip::AddPrepay(const double& val)
     Q_D(PrincipalRecip);
     if (qAbs(val) >= 0.01) 
         d->m_Prepay += val; 
-    d->NormaliseValues();
+    NormaliseValues();
 }
 
 const double& PrincipalRecip::GetScheduled() const
@@ -74,7 +75,7 @@ void PrincipalRecip::SetScheduled(const double& val)
 {
     Q_D(PrincipalRecip);
     d->m_Scheduled = qMax(val, 0.0);
-    d->NormaliseValues();
+    NormaliseValues();
 }
 
 void PrincipalRecip::AddScheduled(const double& val)
@@ -82,7 +83,7 @@ void PrincipalRecip::AddScheduled(const double& val)
     Q_D(PrincipalRecip);
     if (qAbs(val) >= 0.01) 
         d->m_Scheduled += val;
-    d->NormaliseValues();
+    NormaliseValues();
 }
 
 
@@ -96,7 +97,7 @@ PrincipalRecip& PrincipalRecip::operator-=(double a)
     double Temp = qMin(a, d->m_Scheduled);
     d->m_Scheduled -= Temp;
     d->m_Prepay -= a - Temp;
-    d->NormaliseValues();
+    NormaliseValues();
     return *this;
 }
 
@@ -115,7 +116,7 @@ PrincipalRecip& PrincipalRecip::operator+=(double a)
     if (a < 0.0) 
         return operator-=(-a);
     d->m_Scheduled += a;
-    d->NormaliseValues();
+    NormaliseValues();
     return *this;
 }
 

@@ -8,6 +8,7 @@ class CLOMODELLIB_EXPORT PrincipalRecip :public BackwardInterface
     DECLARE_PUBLIC_COMMONS_COPY(PrincipalRecip)
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
+    virtual void NormaliseValues();
 public:
 	virtual const double& GetPrepay() const;
     virtual void SetPrepay(const double& val);

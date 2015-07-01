@@ -85,7 +85,7 @@ WaterfallStepHelperDialog::WaterfallStepHelperDialog(WaterfallStepHelperDialogPr
     d->StepBuilderBase->addWidget(d->CreateFeesFromXSWidget()); //Fees From Excess
     d->StepBuilderBase->addWidget(d->CreateAllocPrepayWidget()); //Allocate Prepay Fees
 
-	connect(d->StepSelectorCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [&](int index) {d->StepBuilderBase->setCurrentIndex(d->StepSelectorCombo->itemData(index, Qt::UserRole + 1).toInt()); });
+    connect(d->StepSelectorCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [&](int index) {d_func()->StepBuilderBase->setCurrentIndex(d_func()->StepSelectorCombo->itemData(index, Qt::UserRole + 1).toInt()); });
 	connect(d->StepSelectorCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(ClearParameters()));
 	connect(d->StepSelectorCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(SetDefaults1())/*, Qt::QueuedConnection*/);
 	connect(d->StepSelectorCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(SetDefaults100())/*, Qt::QueuedConnection*/);

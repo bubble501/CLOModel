@@ -660,12 +660,15 @@ BSTR __stdcall WatFallStepEdit(LPSAFEARRAY *ArrayData) {
 	//QString DestinationAddress = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 	bool IsInterestWF = pdFreq->boolVal; pdFreq++;
 	QString CurrentStep = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+    LOGDEBUG("Step Parameters: " + CurrentStep);
 	{ //Triggers
 		int TriggerTpe;
 		const int TriggerCount = pdFreq->intVal; pdFreq++;
+        LOGDEBUG(QString("Num Triggers: %1").arg(TriggerCount));
 		QHash<quint32, QSharedPointer<AbstractTrigger> >::iterator TempIter;
 		for (int i = 0; i < TriggerCount; i++) {
 			TriggerTpe = pdFreq->intVal; pdFreq++;
+            LOGDEBUG(QString("Loading Trigger Type: %1").arg(TriggerTpe));
 			switch (TriggerTpe) {
 			case static_cast<int>(AbstractTrigger::TriggerType::DateTrigger) :
 				TempIter = AvailableTriggers.insert(i, QSharedPointer<AbstractTrigger>(new DateTrigger(QString::fromWCharArray(pdFreq->bstrVal)))); pdFreq++;
@@ -723,9 +726,10 @@ BSTR __stdcall WatFallStepEdit(LPSAFEARRAY *ArrayData) {
                 TempIter->dynamicCast<PDLTrigger>()->SetSizeMultiplier(pdFreq->dblVal); pdFreq++;
                 break;
 			default:
-                Q_ASSERT_X(false, "ExcelInput::WatFallStepEdit", "Unhandled trigger type");
+                Q_UNREACHABLE(); // "Unhandled trigger type"
 				return NULL;
 			}
+            LOGDEBUG("Trigger Loaded");
 		}
 	}
 	SafeArrayUnaccessData(*ArrayData);
@@ -735,8 +739,11 @@ BSTR __stdcall WatFallStepEdit(LPSAFEARRAY *ArrayData) {
 		QApplication a(argc, argv);
 		WaterfallStepHelperDialog WatfDialog;
 		WatfDialog.SetInterestWF(IsInterestWF);
+        LOGDEBUG("InterestWF loaded");
 		WatfDialog.SetAvailableTriggers(AvailableTriggers);
+        LOGDEBUG("Available triggers loaded");
 		WatfDialog.SetCurrentPars(CurrentStep);
+        LOGDEBUG("Pars Loaded");
 		if (WatfDialog.exec() == QDialog::Accepted) {
 			QString Result = WatfDialog.GetParameters();
 			a.quit();
@@ -752,6 +759,7 @@ BSTR __stdcall TriggerEdit(LPSAFEARRAY *ArrayData) {
 	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
 	if (!SUCCEEDED(hr))return NULL;
 	QString CurrentTrig = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+    LOGDEBUG(CurrentTrig);
 	SafeArrayUnaccessData(*ArrayData);
 	{
 		char *argv[] = { "NoArgumnets" };

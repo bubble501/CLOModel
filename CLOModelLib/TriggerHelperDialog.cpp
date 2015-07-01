@@ -85,7 +85,7 @@ TriggerHelperDialog::TriggerHelperDialog(TriggerHelperDialogPrivate* d, QWidget 
 	QPushButton* ClearAcceptButton = new QPushButton(this);
 	ClearAcceptButton->setText(tr("Clear"));
 	ClearAcceptButton->setDefault(false);
-    connect(ClearAcceptButton, &QPushButton::clicked, this, [&]() { d->Cleared = true; accept(); });
+    connect(ClearAcceptButton, &QPushButton::clicked, this, [&]() { d_func()->Cleared = true; accept(); });
 
 	QGroupBox *TopGroup = new QGroupBox(this);
 	TopGroup->setTitle("Trigger");
@@ -335,7 +335,8 @@ QWidget* TriggerHelperDialogPrivate::CreateTrancheTriggerWidget()
                 q_func()->SetParameter(0, NewVec);
 		});
         q->connect(q, &TriggerHelperDialog::ImportParam, [&](int parIdx, const QString& parVal) {
-			if (parIdx == 0) TrancheTrigger_SenEditor->setText(parVal);
+			if (parIdx == 0)
+                TrancheTrigger_SenEditor->setText(parVal);
 		});
 		ResLay->addWidget(VecLabel, CountRow, 0);
 		ResLay->addWidget(TrancheTrigger_SenEditor, CountRow, 1);
@@ -357,7 +358,8 @@ QWidget* TriggerHelperDialogPrivate::CreateTrancheTriggerWidget()
                 q_func()->SetParameter(1, NewVec);
 		});
         q->connect(q, &TriggerHelperDialog::ImportParam, [&](int parIdx, const QString& parVal) {
-			if (parIdx == 1) TrancheTrigger_SenLvlEditor->setText(parVal);
+			if (parIdx == 1)
+                TrancheTrigger_SenLvlEditor->setText(parVal);
 		});
 		ResLay->addWidget(VecLabel, CountRow, 0);
 		ResLay->addWidget(TrancheTrigger_SenLvlEditor, CountRow, 1);
@@ -378,7 +380,8 @@ QWidget* TriggerHelperDialogPrivate::CreateTrancheTriggerWidget()
                 q_func()->SetParameter(2, NewVec);
 		});
         q->connect(q, &TriggerHelperDialog::ImportParam, [&](int parIdx, const QString& parVal) {
-			if (parIdx == 2) TrancheTrigger_SizeEditor->setText(parVal);
+			if (parIdx == 2)
+                TrancheTrigger_SizeEditor->setText(parVal);
 		});
 		ResLay->addWidget(VecLabel, CountRow, 0);
 		ResLay->addWidget(TrancheTrigger_SizeEditor, CountRow, 1);
@@ -399,7 +402,8 @@ QWidget* TriggerHelperDialogPrivate::CreateTrancheTriggerWidget()
                 q_func()->SetParameter(5, QString::number(NewVal, 'f'));
 		});
         q->connect(q, &TriggerHelperDialog::ImportParam, [&](int parIdx, const QString& parVal) {
-			if (parIdx == 5) TrancheTrigger_SizeMultEditor->setValue(parVal.toDouble());
+			if (parIdx == 5) 
+                TrancheTrigger_SizeMultEditor->setValue(parVal.toDouble());
 		});
 
 		ResLay->addWidget(VecLabel, CountRow, 0);
@@ -425,7 +429,8 @@ QWidget* TriggerHelperDialogPrivate::CreateTrancheTriggerWidget()
                 q_func()->SetParameter(3, QString::number(TrancheTrigger_SeniorSideCombo->itemData(NewIndex).toInt()));
 		});
         q->connect(q, &TriggerHelperDialog::ImportParam, [&](int parIdx, const QString& parVal) {
-			if (parIdx == 3) TrancheTrigger_SeniorSideCombo->setCurrentIndex(TrancheTrigger_SeniorSideCombo->findData(parVal.toInt()));
+			if (parIdx == 3) 
+                TrancheTrigger_SeniorSideCombo->setCurrentIndex(TrancheTrigger_SeniorSideCombo->findData(parVal.toInt()));
 		});
 		ResLay->addWidget(SideLabel, CountRow, 0);
 		ResLay->addWidget(TrancheTrigger_SeniorSideCombo, CountRow, 1);
@@ -450,7 +455,8 @@ QWidget* TriggerHelperDialogPrivate::CreateTrancheTriggerWidget()
                 q_func()->SetParameter(4, QString::number(TrancheTrigger_SizeSideCombo->itemData(NewIndex).toInt()));
 		});
         q->connect(q, &TriggerHelperDialog::ImportParam, [&](int parIdx, const QString& parVal) {
-			if (parIdx == 4) TrancheTrigger_SizeSideCombo->setCurrentIndex(TrancheTrigger_SizeSideCombo->findData(parVal.toInt()));
+			if (parIdx == 4) 
+                TrancheTrigger_SizeSideCombo->setCurrentIndex(TrancheTrigger_SizeSideCombo->findData(parVal.toInt()));
 		});
 		ResLay->addWidget(SideLabel, CountRow, 0);
 		ResLay->addWidget(TrancheTrigger_SizeSideCombo, CountRow, 1);
@@ -488,7 +494,8 @@ QWidget* TriggerHelperDialogPrivate::CreatePDLWidget()
         });
         q->connect(q, &TriggerHelperDialog::ImportParam, [&](int parIdx, const QString& parVal)
         {
-            if (parIdx == 0) TrancheTrigger_SenEditor->setText(parVal);
+            if (parIdx == 0)
+                TrancheTrigger_SenEditor->setText(parVal);
         });
         ResLay->addWidget(VecLabel, CountRow, 0);
         ResLay->addWidget(TrancheTrigger_SenEditor, CountRow, 1);

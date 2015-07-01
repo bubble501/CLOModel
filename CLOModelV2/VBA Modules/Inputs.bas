@@ -1,16 +1,14 @@
 Attribute VB_Name = "Inputs"
 Option Explicit
-Declare Sub RunModel Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant)
-'Declare Sub RunModel Lib "Z:\24AM\Analytics\CLO Model\ExcelDllCLOModelLoanTape.dll" (ArrayData() As Variant) 'This will also save the loan pool file
-Declare Function CLODiscountMargin Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As Double
-Declare Function CLOWALife Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As Double
-Declare Function CLOReturnRate Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As Double
-Declare Function GetStressLoss Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As Double
-Declare Function GetStressDM Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As Double
-'Declare Sub InspectWaterfall Lib "C:\Visual Studio Projects\CLOModelV2\Win32\Release\CLOModel2.dll" (ArrayData() As Variant)
-Declare Function WatFallStepEdit Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As String
-Declare Function TriggerEdit Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As String
-Declare Function LoadLoanScenario Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModel2.dll" (ArrayData() As Variant) As String
+Declare Sub RunModel Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModelExcel.dll" (ArrayData() As Variant)
+Declare Function CLODiscountMargin Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModelExcel.dll" (ArrayData() As Variant) As Double
+Declare Function CLOWALife Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModelExcel.dll" (ArrayData() As Variant) As Double
+Declare Function CLOReturnRate Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModelExcel.dll" (ArrayData() As Variant) As Double
+Declare Function GetStressLoss Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModelExcel.dll" (ArrayData() As Variant) As Double
+Declare Function GetStressDM Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModelExcel.dll" (ArrayData() As Variant) As Double
+Declare Function WatFallStepEdit Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModelExcel.dll" (ArrayData() As Variant) As String
+Declare Function TriggerEdit Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModelExcel.dll" (ArrayData() As Variant) As String
+Declare Function LoadLoanScenario Lib "Z:\24AM\Analytics\Development\CLOModel2\CLOModelExcel.dll" (ArrayData() As Variant) As String
 
 Public Sub GetInputFromStructure( _
     MortgagesSheet As String, _

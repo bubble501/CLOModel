@@ -4,6 +4,8 @@
 class Tranche;
 class IntegerVector;
 class DeferredInterestTriggerPrivate;
+class DeferredInterestTriggerSettingWidget;
+class QWidget;
 class CLOMODELLIB_EXPORT DeferredInterestTrigger : public AbstractTrigger
 {
     DECLARE_PUBLIC_COMMONS(DeferredInterestTrigger)
@@ -74,6 +76,7 @@ public:
 	void FillMissingAnchorDate(const QDate& a);
 	void SetAnchorDate(const QDate& a);
 	void RemoveAnchorDate();
+    static DeferredInterestTriggerSettingWidget* createSettingsWidget(QWidget* parent = nullptr);
 protected:
     virtual QDataStream& WriteToStream(QDataStream& stream) const override;
     virtual QDataStream& LoadOldVersion(QDataStream& stream) override;

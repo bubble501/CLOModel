@@ -16,12 +16,10 @@ public:
     virtual ~TriggerHelperDialog();
 	QString GetParameters() const;
 	void SetCurrentPars(const QString& pars);
-private slots:
+public slots:
 	void ClearParameters();
-	void CheckOkEnabled(int index);
-	void SetParameter(int parIdx, const QString& parVal);
-signals:
-	void ImportParam(int parIdx, const QString& parVal);
+protected slots:
+	void CheckOkEnabled();
 };
 
 #endif // TRIGGERHELPERDIALOG_H

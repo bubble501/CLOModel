@@ -1,5 +1,6 @@
 #include "CumulativeLossTrigger.h"
 #include "Private/CumulativeLossTrigger_p.h"
+#include "Private/CumulativeLossTriggerSettingWidget.h"
 #include <QDataStream>
 DEFINE_PUBLIC_COMMONS(CumulativeLossTrigger)
 DEFINE_PUBLIC_COMMONS_COPY(CumulativeLossTrigger)
@@ -96,6 +97,11 @@ QString CumulativeLossTrigger::ToString() const
 {
     Q_D(const CumulativeLossTrigger);
     return AbstractTrigger::ToString() + "\nLoss Limit: " + d->m_TargetSize.GetVector() + "\nSide: " + TriggerSideToString(d->m_Side);
+}
+
+CumulativeLossTriggerSettingWidget* CumulativeLossTrigger::createSettingsWidget(QWidget* parent /*= nullptr*/)
+{
+    return new CumulativeLossTriggerSettingWidget(parent);
 }
 
 bool CumulativeLossTrigger::Passing(double CurrentSize, const QDate& CurrentPeriod) const

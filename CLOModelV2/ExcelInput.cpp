@@ -139,6 +139,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		for (int i = 0; i < TriggerCount; i++) {
 			TriggerTpe = pdFreq->intVal; pdFreq++;
 			switch (TriggerTpe) {
+                // Keep this in sync with the relevant override of AbstractTriggerSettingWidget::parameters()
 			case static_cast<int>(AbstractTrigger::TriggerType::DateTrigger) :
 				TempTrigger.reset(new DateTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
 				TempTrigger.dynamicCast<DateTrigger>()->SetLimitDate(QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal), "yyyy-MM-dd")); pdFreq++;
@@ -771,12 +772,18 @@ BSTR __stdcall TriggerEdit(LPSAFEARRAY *ArrayData) {
 		QApplication a(argc, argv);
 		TriggerHelperDialog TrigDialog;
 		TrigDialog.SetCurrentPars(CurrentTrig);
-		if (TrigDialog.exec() == QDialog::Accepted) {
-			QString Result = TrigDialog.GetParameters();
+        const auto DialogRes = TrigDialog.exec();
+        if (DialogRes == QDialog::Accepted) {
+			const QString Result = TrigDialog.GetParameters();
 			a.quit();
 			return SysAllocStringByteLen(Result.toStdString().c_str(), Result.size());
 		}
-		a.quit();
+        else if (DialogRes == QDialog::Rejected)
+		    a.quit();
+        else{ //Clear
+            a.quit();
+            return SysAllocStringByteLen("#", 1);
+        }
 	}
 	return NULL;
 }

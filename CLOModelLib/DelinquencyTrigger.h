@@ -2,6 +2,8 @@
 #define DelinquencyTrigger_h__
 #include "AbstractTrigger.h"
 class DelinquencyTriggerPrivate;
+class DelinquencyTriggerSettingWidget;
+class QWidget;
 class CLOMODELLIB_EXPORT DelinquencyTrigger : public AbstractTrigger
 {
     DECLARE_PUBLIC_COMMONS(DelinquencyTrigger)
@@ -22,6 +24,7 @@ public:
 	void RemoveAnchorDate();
 	bool HasAnchor()const;
 	virtual QString ToString() const override;
+    static DelinquencyTriggerSettingWidget* createSettingsWidget(QWidget* parent = nullptr);
 protected:
 	virtual QDataStream& WriteToStream(QDataStream& stream) const override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;

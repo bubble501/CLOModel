@@ -2,6 +2,8 @@
 #define CumulativeLossTrigger_h__
 #include "AbstractTrigger.h"
 class CumulativeLossTriggerPrivate;
+class CumulativeLossTriggerSettingWidget;
+class QWidget;
 class CLOMODELLIB_EXPORT CumulativeLossTrigger : public AbstractTrigger
 {
     DECLARE_PUBLIC_COMMONS(CumulativeLossTrigger)
@@ -31,6 +33,7 @@ public:
 	const CumulativeLossTrigger::TriggerSide& GetSide() const;
 	void SetSide(const CumulativeLossTrigger::TriggerSide& val);
 	virtual QString ToString() const override;
+    static CumulativeLossTriggerSettingWidget* createSettingsWidget(QWidget* parent = nullptr);
 protected:
 	virtual QDataStream& WriteToStream(QDataStream& stream) const override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;

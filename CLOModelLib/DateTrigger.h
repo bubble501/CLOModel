@@ -2,6 +2,8 @@
 #define DateTrigger_h__
 #include "AbstractTrigger.h"
 class DateTriggerPrivate;
+class DateTriggerSettingWidget;
+class QWidget;
 class CLOMODELLIB_EXPORT DateTrigger : public AbstractTrigger
 {
     DECLARE_PUBLIC_COMMONS(DateTrigger)
@@ -26,6 +28,7 @@ public:
 	void SetSide(const DateTrigger::TriggerSide& val);
 	virtual QString ReadyToCalculate() const override;
 	virtual QString ToString() const override;
+    static DateTriggerSettingWidget* createSettingsWidget(QWidget* parent = nullptr);
 protected:
 	virtual QDataStream& WriteToStream(QDataStream& stream) const override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;

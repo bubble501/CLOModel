@@ -4,6 +4,8 @@
 #include "AbstractTrigger.h"
 class PoolSizeTriggerPrivate;
 class BloombergVector;
+class PoolSizeTriggerSettingWidget;
+class QWidget;
 class CLOMODELLIB_EXPORT PoolSizeTrigger : public AbstractTrigger
 {
     DECLARE_PUBLIC_COMMONS(PoolSizeTrigger)
@@ -33,6 +35,7 @@ public:
 	const PoolSizeTrigger::TriggerSide& GetSide() const;
 	void SetSide(const PoolSizeTrigger::TriggerSide& val);
 	virtual QString ToString() const override;
+    static PoolSizeTriggerSettingWidget* createSettingsWidget(QWidget* parent = nullptr);
 protected:
 	virtual QDataStream& WriteToStream(QDataStream& stream) const override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;

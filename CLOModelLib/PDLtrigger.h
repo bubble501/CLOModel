@@ -4,6 +4,8 @@
 class IntegerVector;
 class Tranche;
 class PDLTriggerPrivate;
+class PDLTriggerSettingWidget;
+class QWidget;
 class BloombergVector;
 class CLOMODELLIB_EXPORT PDLTrigger : public AbstractTrigger
 {
@@ -54,6 +56,7 @@ public:
     void FillMissingAnchorDate(const QDate& a);
     void SetAnchorDate(const QDate& a);
     void RemoveAnchorDate();
+    static PDLTriggerSettingWidget* createSettingsWidget(QWidget* parent = nullptr);
 protected:
     virtual QDataStream& WriteToStream(QDataStream& stream) const override;
     virtual QDataStream& LoadOldVersion(QDataStream& stream) override;

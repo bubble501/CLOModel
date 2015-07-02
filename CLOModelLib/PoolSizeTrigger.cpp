@@ -1,5 +1,6 @@
 #include "PoolSizeTrigger.h"
 #include "Private/PoolSizeTrigger_p.h"
+#include "Private/PoolSizeTriggerSettingWidget.h"
 #include <QDataStream>
 DEFINE_PUBLIC_COMMONS(PoolSizeTrigger)
 DEFINE_PUBLIC_COMMONS_COPY(PoolSizeTrigger)
@@ -128,6 +129,11 @@ QString PoolSizeTrigger::ToString() const
 {
     Q_D(const PoolSizeTrigger);
     return AbstractTrigger::ToString() + "\nSize Limit: " + d->m_TargetSize.GetVector() + "\nSide: " + TriggerSideToString(d->m_Side);
+}
+
+PoolSizeTriggerSettingWidget* PoolSizeTrigger::createSettingsWidget(QWidget* parent /*= nullptr*/)
+{
+    return new PoolSizeTriggerSettingWidget(parent);
 }
 
 bool PoolSizeTrigger::Passing(double CurrentSize, const QDate& CurrentPeriod) const

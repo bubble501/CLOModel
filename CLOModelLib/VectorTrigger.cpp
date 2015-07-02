@@ -1,5 +1,6 @@
 #include "VectorTrigger.h"
 #include "Private/VectorTrigger_p.h"
+#include "Private/VectorTriggerSettingWidget.h"
 #include <QDataStream>
 #include <QDate>
 DEFINE_PUBLIC_COMMONS(VectorTrigger)
@@ -136,4 +137,9 @@ QString VectorTrigger::ToString() const
 {
     Q_D(const VectorTrigger);
     return AbstractTrigger::ToString() + "\nVector: " + d->m_TrigVector.GetVector();
+}
+
+VectorTriggerSettingWidget* VectorTrigger::createSettingsWidget(QWidget* parent /*= nullptr*/)
+{
+    return new VectorTriggerSettingWidget(parent);
 }

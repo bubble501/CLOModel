@@ -1,5 +1,6 @@
 #include "DateTrigger.h"
 #include "Private/DateTrigger_p.h"
+#include "Private/DateTriggerSettingWidget.h"
 #include <QDataStream>
 DEFINE_PUBLIC_COMMONS(DateTrigger)
 DEFINE_PUBLIC_COMMONS_COPY(DateTrigger)
@@ -122,6 +123,11 @@ QString DateTrigger::ToString() const
 {
     Q_D(const DateTrigger);
     return AbstractTrigger::ToString() + "\nLimit Date: " + d->m_LimitDate.toString("yyyy-MM-dd") + "\nSide: " + TriggerSideToString(d->m_Side);
+}
+
+DateTriggerSettingWidget* DateTrigger::createSettingsWidget(QWidget* parent /*= nullptr*/)
+{
+    return new DateTriggerSettingWidget(parent);
 }
 
 QString DateTrigger::TriggerSideToString(TriggerSide a) const

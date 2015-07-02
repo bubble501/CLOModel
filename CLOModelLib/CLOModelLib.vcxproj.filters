@@ -105,6 +105,9 @@
     <Filter Include="Source Files\Widgets">
       <UniqueIdentifier>{a957199a-dee4-4ce5-b004-4b3588e5a0a6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Privates\Triggers\Trigger Settings Widgets">
+      <UniqueIdentifier>{167f3f47-ceb8-4e44-a61f-84bc5723d5b6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="clomodellib_global.h">
@@ -727,6 +730,87 @@
     <ClCompile Include="WaterfallStepHelperDialog.cpp">
       <Filter>Source Files\Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="Private\DateTriggerSettingWidget.cpp">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_DateTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_DateTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\AbstractTriggerSettingWidget.cpp">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_AbstractTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_AbstractTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_VectorTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_VectorTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\VectorTriggerSettingWidget.cpp">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\CumulativeLossTriggerSettingWidget.cpp">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_CumulativeLossTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_CumulativeLossTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DelinquencyTriggerSettingWidget.cpp">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_DelinquencyTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_DelinquencyTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\PoolSizeTriggerSettingWidget.cpp">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_PoolSizeTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_PoolSizeTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DeferredInterestTriggerSettingWidget.cpp">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_DeferredInterestTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_DeferredInterestTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\PDLTriggerSettingWidget.cpp">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_PDLTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_PDLTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_TrancheTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_TrancheTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\TrancheTriggerSettingWidget.cpp">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="AbstrAsyncThread.h">
@@ -812,6 +896,33 @@
     </CustomBuild>
     <CustomBuild Include="WaterfallStepHelperDialog.h">
       <Filter>Header Files\Widget</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\DateTriggerSettingWidget.h">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\AbstractTriggerSettingWidget.h">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\VectorTriggerSettingWidget.h">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\CumulativeLossTriggerSettingWidget.h">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\DelinquencyTriggerSettingWidget.h">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\PoolSizeTriggerSettingWidget.h">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\DeferredInterestTriggerSettingWidget.h">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\PDLTriggerSettingWidget.h">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\TrancheTriggerSettingWidget.h">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

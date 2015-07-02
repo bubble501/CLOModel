@@ -1,5 +1,6 @@
 #include "DuringStressTestTrigger.h"
 #include "Private/AbstractTrigger_p.h"
+#include "Private/AbstractTriggerSettingWidget.h"
 DuringStressTestTrigger::DuringStressTestTrigger(AbstractTriggerPrivate* d)
     :AbstractTrigger(d, TriggerType::DuringStressTestTrigger)
 {}
@@ -31,6 +32,11 @@ bool DuringStressTestTrigger::Failing(bool IsStressTest) const
 QString DuringStressTestTrigger::ReadyToCalculate() const
 {
     return QString();
+}
+
+AbstractTriggerSettingWidget* DuringStressTestTrigger::createSettingsWidget(QWidget* parent /*= nullptr*/)
+{
+    return new AbstractTriggerSettingWidget(parent);
 }
 
 QDataStream& DuringStressTestTrigger::WriteToStream(QDataStream& stream) const

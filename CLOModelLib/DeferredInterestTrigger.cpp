@@ -1,6 +1,7 @@
 #include "DeferredInterestTrigger.h"
 #include "Private/DeferredInterestTrigger_p.h"
 #include <QDataStream>
+#include "Private/DeferredInterestTriggerSettingWidget.h"
 DEFINE_PUBLIC_COMMONS(DeferredInterestTrigger)
 DEFINE_PUBLIC_COMMONS_COPY(DeferredInterestTrigger)
 DeferredInterestTriggerPrivate::DeferredInterestTriggerPrivate(DeferredInterestTrigger *q,const DeferredInterestTriggerPrivate& other)
@@ -306,6 +307,11 @@ void DeferredInterestTrigger::RemoveAnchorDate()
     d->m_TargetSize.RemoveAnchorDate(); 
     d->m_TargetSeniorityLevel.RemoveAnchorDate();
     d->m_TargetSeniority.RemoveAnchorDate();
+}
+
+DeferredInterestTriggerSettingWidget* DeferredInterestTrigger::createSettingsWidget(QWidget* parent /*= nullptr*/)
+{
+    return new DeferredInterestTriggerSettingWidget(parent);
 }
 
 void DeferredInterestTrigger::SetSizeMultiplier(double mult)

@@ -3,6 +3,8 @@
 #include "AbstractTrigger.h"
 class BoolVector;
 class VectorTriggerPrivate;
+class VectorTriggerSettingWidget;
+class QWidget;
 class CLOMODELLIB_EXPORT VectorTrigger : public AbstractTrigger
 {
     DECLARE_PUBLIC_COMMONS(VectorTrigger)
@@ -24,6 +26,7 @@ public:
 	void SetAnchor(const QDate& a);
 	virtual QString ReadyToCalculate() const override;
 	virtual QString ToString() const override;
+    static VectorTriggerSettingWidget* createSettingsWidget(QWidget* parent = nullptr);
 protected:
 	virtual QDataStream& WriteToStream(QDataStream& stream) const override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;

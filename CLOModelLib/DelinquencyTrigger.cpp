@@ -1,5 +1,6 @@
 #include "DelinquencyTrigger.h"
 #include "Private/DelinquencyTrigger_p.h"
+#include "Private/DelinquencyTriggerSettingWidget.h"
 #include <QDataStream>
 DEFINE_PUBLIC_COMMONS(DelinquencyTrigger)
 DEFINE_PUBLIC_COMMONS_COPY(DelinquencyTrigger)
@@ -122,4 +123,9 @@ QString DelinquencyTrigger::ToString() const
 {
     Q_D(const DelinquencyTrigger);
     return AbstractTrigger::ToString() + "\nDelinquency Limit: " + d->m_Target.GetVector();
+}
+
+DelinquencyTriggerSettingWidget* DelinquencyTrigger::createSettingsWidget(QWidget* parent /*= nullptr*/)
+{
+    return new DelinquencyTriggerSettingWidget(parent);
 }

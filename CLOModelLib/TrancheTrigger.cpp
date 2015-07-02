@@ -1,5 +1,6 @@
 #include "TrancheTrigger.h"
 #include "Private/TrancheTrigger_p.h"
+#include "Private/TrancheTriggerSettingWidget.h"
 #include <QDataStream>
 #include "Tranche.h"
 DEFINE_PUBLIC_COMMONS(TrancheTrigger)
@@ -286,6 +287,11 @@ void TrancheTrigger::RemoveAnchorDate()
     d->m_TargetSize.RemoveAnchorDate(); 
     d->m_TargetSeniorityLevel.RemoveAnchorDate();
     d->m_TargetSeniority.RemoveAnchorDate();
+}
+
+TrancheTriggerSettingWidget* TrancheTrigger::createSettingsWidget(QWidget* parent /*= nullptr*/)
+{
+    return new TrancheTriggerSettingWidget(parent);
 }
 
 void TrancheTrigger::SetSizeMultiplier(double mult)

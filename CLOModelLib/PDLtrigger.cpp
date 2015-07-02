@@ -1,5 +1,6 @@
 #include "PDLTrigger.h"
 #include "Private/PDLTrigger_p.h"
+#include "Private/PDLTriggerSettingWidget.h"
 #include <QDataStream>
 DEFINE_PUBLIC_COMMONS(PDLTrigger)
 DEFINE_PUBLIC_COMMONS_COPY(PDLTrigger)
@@ -224,6 +225,11 @@ void PDLTrigger::RemoveAnchorDate()
     d->m_TargetSize.RemoveAnchorDate();
     d->m_TargetSeniorityLevel.RemoveAnchorDate(); 
     d->m_TargetSeniority.RemoveAnchorDate();
+}
+
+PDLTriggerSettingWidget* PDLTrigger::createSettingsWidget(QWidget* parent /*= nullptr*/)
+{
+    return new PDLTriggerSettingWidget(parent);
 }
 
 void PDLTrigger::SetTargetSeniorityLevel(const QString& val)

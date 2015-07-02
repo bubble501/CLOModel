@@ -6,6 +6,8 @@ class TrancheTriggerPrivate;
 class Tranche;
 class QDate;
 class IntegerVector;
+class TrancheTriggerSettingWidget;
+class QWidget;
 class CLOMODELLIB_EXPORT TrancheTrigger : public AbstractTrigger
 {
     DECLARE_PUBLIC_COMMONS(TrancheTrigger)
@@ -53,6 +55,7 @@ public:
 	void FillMissingAnchorDate(const QDate& a);
 	void SetAnchorDate(const QDate& a);
 	void RemoveAnchorDate();
+    static TrancheTriggerSettingWidget* createSettingsWidget(QWidget* parent = nullptr);
 protected:
 	virtual QDataStream& WriteToStream(QDataStream& stream) const override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;

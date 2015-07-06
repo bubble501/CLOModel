@@ -304,7 +304,7 @@ ForwardBaseRateTable& ForwardBaseRateTable::operator+= (const ConstantBaseRateTa
     Q_D(ForwardBaseRateTable);
 	for (QHash<QString, double>::ConstIterator i = a.GetValues().constBegin(); i != a.GetValues().constEnd(); i++) {
         if (!d->Values.contains(i.key()))
-            d->Values.insert(i.key(), QString("%1").arg(i.value()));
+            d->Values.insert(i.key(), QString::number(i.value(),'f'));
 	}
 	if (!a.GetUpdateDate().isNull()) {
         if (!d->UpdateDate.isNull())

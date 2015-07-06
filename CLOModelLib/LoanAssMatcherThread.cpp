@@ -55,7 +55,7 @@ void LoanAssMatcherThread::run()
 	if (!ModelFile.open(QIODevice::ReadOnly)) return ReturnError();
 	qint32 VersionChecker;
 	QDataStream out(&ModelFile);
-	out.setVersion(QDataStream::Qt_5_3);
+	out.setVersion(StreamVersionUsed);
 	out >> VersionChecker;
 	if (VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) {
 		ModelFile.close();

@@ -283,7 +283,7 @@ void CentralUnit::CalculationStep1(){
     QFile file(Filename);
     if (file.open(QIODevice::WriteOnly)) {
         QDataStream out(&file);
-        out.setVersion(QDataStream::Qt_5_3);
+        out.setVersion(StreamVersionUsed);
         out << qint32(ModelVersionNumber) << LoansCalculator << Structure;
         file.close();
     }
@@ -375,7 +375,7 @@ void CentralUnit::CalculationStep2()
 	QFile file(Filename);
 	if (file.open(QIODevice::WriteOnly)) {
 		QDataStream out(&file);
-		out.setVersion(QDataStream::Qt_5_3);
+		out.setVersion(StreamVersionUsed);
 		out << qint32(ModelVersionNumber) << m_BaseCaseToCall << Structure << Waterfall();
 		file.close();
 	}
@@ -432,7 +432,7 @@ void CentralUnit::CheckCalculationDone()
 		QFile file(FolderPath+"\\.Loans.clp");
 		if (file.open(QIODevice::WriteOnly)) {
 			QDataStream out(&file);
-			out.setVersion(QDataStream::Qt_5_3);
+			out.setVersion(StreamVersionUsed);
 			out << qint32(ModelVersionNumber) << LoansCalculator;
 			file.close();
 			#ifdef Q_WS_WIN
@@ -445,7 +445,7 @@ void CentralUnit::CheckCalculationDone()
 	QFile file(Filename);
 	if (file.open(QIODevice::WriteOnly)) {
 		QDataStream out(&file);
-		out.setVersion(QDataStream::Qt_5_3);
+		out.setVersion(StreamVersionUsed);
 		out << qint32(ModelVersionNumber) << m_BaseCaseToCall << Structure << CallStructure;
 		file.close();
 	}
@@ -460,7 +460,7 @@ void CentralUnit::CheckCalculationDone()
 			QFile UnifiedFile(UnifiedDir.absoluteFilePath(AdjDealName + ".clom"));
 			if (UnifiedFile.open(QIODevice::WriteOnly)) {
 				QDataStream out(&UnifiedFile);
-				out.setVersion(QDataStream::Qt_5_3);
+				out.setVersion(StreamVersionUsed);
 				out 
 					<< qint32(ModelVersionNumber) 
 					<< LiborUpdateDate 

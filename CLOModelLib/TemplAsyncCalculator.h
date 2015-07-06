@@ -50,7 +50,7 @@ public:
     virtual void ClearResults()
     {
         RETURN_WHEN_RUNNING(true, )
-            auto& tempRes = getResultVoid();
+        auto& tempRes = getResultVoid();
         for (auto j = tempRes.begin(); j != tempRes.end();) {
             delete j.value();
             j = tempRes.erase(j);

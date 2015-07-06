@@ -668,7 +668,7 @@ void StressTest::SaveResults(const QString& DestPath)const
 	if (TargetFile.open(QIODevice::WriteOnly, ZipFileInfo))
 	{
 		QDataStream out(&TargetFile);
-		out.setVersion(QDataStream::Qt_5_3);
+		out.setVersion(StreamVersionUsed);
         out << qint32(ModelVersionNumber) << d->StartDate << d->SequentialComputation << d->ShowProgress << d->UseFastVersion << *(d->BaseCalculator) << d->Structure;
 		TargetFile.close();
         if (d->ShowProgress) UpdateSaveProgress(SaveProgress.data(), SaveProgress->value() + 1);
@@ -679,7 +679,7 @@ void StressTest::SaveResults(const QString& DestPath)const
 		UsedFileNames << ZipFileInfo.name;
 		if (TargetFile.open(QIODevice::WriteOnly, ZipFileInfo)) {
 			QDataStream out(&TargetFile);
-			out.setVersion(QDataStream::Qt_5_3);
+			out.setVersion(StreamVersionUsed);
 			out << qint32(ModelVersionNumber) << *(i.value());
 			TargetFile.close();
             if (d->ShowProgress)
@@ -733,7 +733,7 @@ Waterfall StressTest::GetScenarioFromFile(const QString& DestPath, const QString
 	if (!zip.setCurrentFile(CurrentKey.ToString()+ ".csw")) return Result;
 	TargetFile.open(QIODevice::ReadOnly);
 	QDataStream out(&TargetFile);
-	out.setVersion(QDataStream::Qt_5_3);
+	out.setVersion(StreamVersionUsed);
 	out >> VesionCheck;
 	if (VesionCheck<qint32(MinimumSupportedVersion) || VesionCheck>qint32(ModelVersionNumber)) return Result;
 	Result.SetLoadProtocolVersion(VesionCheck);
@@ -754,7 +754,7 @@ bool StressTest::LoadResultsFromFile(const QString& DestPath)
 		if(!zip.setCurrentFile("StressTestInputs")) throw 1;
 		TargetFile.open(QIODevice::ReadOnly);
 		QDataStream out(&TargetFile);
-		out.setVersion(QDataStream::Qt_5_3);
+		out.setVersion(StreamVersionUsed);
 		out >> VesionCheck;
 		if(VesionCheck<qint32(MinimumSupportedVersion) || VesionCheck>qint32(ModelVersionNumber)){
 			TargetFile.close();
@@ -794,7 +794,7 @@ bool StressTest::LoadResultsFromFile(const QString& DestPath)
             d->m_AssumptionsRef[i]->insert(Spanns.at(i));
 		}
 		QDataStream out(&TargetFile);
-		out.setVersion(QDataStream::Qt_5_3);
+		out.setVersion(StreamVersionUsed);
 		Waterfall* TempWF = new Waterfall();
 		out >> VesionCheck;
 		if (VesionCheck<qint32(MinimumSupportedVersion) || VesionCheck>qint32(ModelVersionNumber)) {

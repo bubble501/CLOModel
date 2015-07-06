@@ -7,6 +7,7 @@
 #define CompoundShift 10
 #define MaximumInterestsTypes 8
 #define NumStressDimentsions 6
+#define StreamVersionUsed QDataStream::Qt_5_3
 class QDate;
 class QString;
 class DayCountVector;

@@ -1,9 +1,24 @@
 #include "AbstrAsyncCalculator.h"
 #include "Private/AbstrAsyncCalculator_p.h"
+#include <QThread>
 DEFINE_PUBLIC_QOBJECT_COMMONS(AbstrAsyncCalculator)
 AbstrAsyncCalculatorPrivate::AbstrAsyncCalculatorPrivate(AbstrAsyncCalculator *q)
 	:BackwardInterfacePrivate(q)
 {}
+
+quint8 AbstrAsyncCalculator::operativity() const
+{
+    Q_D(const AbstrAsyncCalculator);
+    return d->m_operativity;
+}
+
+void AbstrAsyncCalculator::setOperativity(quint8 val)
+{
+    Q_ASSERT(val <= 100);
+    RETURN_WHEN_RUNNING(true,)
+    Q_D(AbstrAsyncCalculator);
+    d->m_operativity = val;
+}
 
 AbstrAsyncCalculator::AbstrAsyncCalculator(AbstrAsyncCalculatorPrivate *d, QObject* parent)
 	:QObject(parent)
@@ -87,6 +102,16 @@ void AbstrAsyncCalculator::ContinueCalculation(bool val)
 {
     Q_D(AbstrAsyncCalculator);
     d->m_ContinueCalculation = val;
+}
+
+int AbstrAsyncCalculator::availableThreads() const
+{
+    Q_D(const AbstrAsyncCalculator);
+    return static_cast<int>(
+        static_cast<double>(QThread::idealThreadCount()) 
+        * static_cast<double>(d->m_operativity) 
+        / 100.0
+        );
 }
 
 void AbstrAsyncCalculator::SetSequentialComputation(bool a)

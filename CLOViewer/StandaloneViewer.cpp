@@ -140,7 +140,7 @@ void StandaloneViewer::LoadFile(const QString& fileName){
 		file.open(QIODevice::ReadOnly);
 		qint32 VersionChecker;
 		QDataStream out(&file);
-		out.setVersion(QDataStream::Qt_5_3);
+		out.setVersion(StreamVersionUsed);
 		out >> VersionChecker;
 		if(VersionChecker<qint32(MinimumSupportedVersion)){
 			QMessageBox::critical(this,"Invalid File Format","The selected file version is not compatible with this viewer");

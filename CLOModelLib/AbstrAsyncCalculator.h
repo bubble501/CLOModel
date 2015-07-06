@@ -27,7 +27,10 @@ protected:
     virtual void insertResult(qint32 Key, void* val);
     virtual bool ContinueCalculation() const;
     virtual void ContinueCalculation(bool val);
+    virtual int availableThreads() const;
 public:
+    virtual quint8 operativity() const;
+    virtual void setOperativity(quint8 val);
     AbstrAsyncCalculator(QObject* parent =nullptr);
     virtual QString ReadyToCalculate() const = 0;
     virtual void SetSequentialComputation(bool a);

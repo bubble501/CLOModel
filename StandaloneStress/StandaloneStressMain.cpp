@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
     file.open(QIODevice::ReadOnly);
     qint32 VersionChecker;
     QDataStream out(&file);
-    out.setVersion(QDataStream::Qt_5_3);
+    out.setVersion(StreamVersionUsed);
     out >> VersionChecker;
     if (VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) {
         file.close();
@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
                 QFile UnifiedFile(UnifiedDir.absoluteFilePath(AdjDealName + ".clom"));
                 if (UnifiedFile.open(QIODevice::WriteOnly)) {
                     QDataStream out(&UnifiedFile);
-                    out.setVersion(QDataStream::Qt_5_3);
+                    out.setVersion(StreamVersionUsed);
                     out
                         << qint32(ModelVersionNumber)
                         << QDate()

@@ -97,7 +97,7 @@ bool MtgCalculator::StartCalculation() {
 					if (SingleClom.open(QIODevice::ReadOnly)) {
 						QDataStream out(&SingleClom);
 						qint32 TempInt;
-						out.setVersion(QDataStream::Qt_5_3);
+						out.setVersion(StreamVersionUsed);
 						out >> TempInt;
 						if (TempInt >= MinimumSupportedVersion && TempInt <= ModelVersionNumber) {
 								{QDate Junk;  out >> Junk; } //drop LiborUpdateDate
@@ -171,7 +171,7 @@ bool MtgCalculator::StartCalculation() {
     d->BeesReturned = 0;
     d->BeesSent.clear();
     d->m_ContinueCalculation = true;
-	int NumberOfThreads = QThread::idealThreadCount();
+	int NumberOfThreads = availableThreads();
     if (d->m_SequentialComputation || NumberOfThreads < 1) NumberOfThreads = 1;
 	int NumofSent = 0;
 	MtgCalculatorThread* CurrentThread;

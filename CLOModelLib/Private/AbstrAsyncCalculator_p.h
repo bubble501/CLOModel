@@ -18,5 +18,7 @@ public:
     QSet<qint32> BeesSent;
     qint32 BeesReturned;
     bool m_SequentialComputation;
+    quint8 m_operativity;
+    
 };
 #endif // AbstrAsyncCalculator_p_h__

@@ -426,7 +426,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	QFile file(Filename);
 	if (file.open(QIODevice::WriteOnly)) {
 		QDataStream out(&file);
-		out.setVersion(QDataStream::Qt_5_3);
+		out.setVersion(StreamVersionUsed);
 		out << qint32(ModelVersionNumber) << TempUnit.GetBaseCaseToCall() << TempUnit.GetStructure() << Waterfall();
 		file.close();
 	}
@@ -461,7 +461,7 @@ double __stdcall CLOReturnRate(LPSAFEARRAY *ArrayData){
 	}
 	qint32 VersionChecker;
 	QDataStream out(&file);
-	out.setVersion(QDataStream::Qt_5_3);
+	out.setVersion(StreamVersionUsed);
 	out >> VersionChecker;
 	//if(VersionChecker!=qint32(ModelVersionNumber)) return 0.0;
 	if(VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) return 0.0;
@@ -512,7 +512,7 @@ double __stdcall CLODiscountMargin(LPSAFEARRAY *ArrayData){
 	}
 	qint32 VersionChecker;
 	QDataStream out(&file);
-	out.setVersion(QDataStream::Qt_5_3);
+	out.setVersion(StreamVersionUsed);
 	out >> VersionChecker;
 	if(VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) return 0.0;
 	if (UsingClom) {
@@ -560,7 +560,7 @@ double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
 	}
 	if (!file.open(QIODevice::ReadOnly))return 0.0;
 	QDataStream out(&file);
-	out.setVersion(QDataStream::Qt_5_3);
+	out.setVersion(StreamVersionUsed);
 	out >> VersionChecker;
 	if(VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) return 0.0;
 	if (UsingClom) {

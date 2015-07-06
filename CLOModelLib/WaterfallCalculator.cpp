@@ -31,7 +31,7 @@ bool WaterfallCalculator::StartCalculation()
     d->BeesSent.clear();
 	if (!ReadyToCalculate().isEmpty()) return false;
     d->m_ContinueCalculation = true;
-	int NumberOfThreads = QThread::idealThreadCount();
+	int NumberOfThreads = availableThreads();
     if (d->m_SequentialComputation || NumberOfThreads < 1) NumberOfThreads = 1;
 	int NumofSent = 0;
 	WaterfallCalcThread* CurrentThread;

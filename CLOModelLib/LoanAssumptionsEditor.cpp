@@ -1645,7 +1645,7 @@ void LoanAssumptionsEditor::LoadModel()
 	file.open(QIODevice::ReadOnly);
 	qint32 VersionChecker;
 	QDataStream out(&file);
-	out.setVersion(QDataStream::Qt_5_3);
+	out.setVersion(StreamVersionUsed);
 	out >> VersionChecker;
 	if (VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) {
 		file.close();
@@ -1855,7 +1855,7 @@ void LoanAssumptionsEditor::SavePool()
 	file.open(QIODevice::ReadOnly);
 	qint32 VersionChecker;
 	QDataStream out(&file);
-	out.setVersion(QDataStream::Qt_5_3);
+	out.setVersion(StreamVersionUsed);
 	out >> VersionChecker;
 	if (VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) {
 		file.close();
@@ -1885,7 +1885,7 @@ void LoanAssumptionsEditor::SavePool()
 	file.close();
 	file.open(QIODevice::WriteOnly);
 	QDataStream In(&file);
-	In.setVersion(QDataStream::Qt_5_3);
+	In.setVersion(StreamVersionUsed);
 	In 
 		<< qint32(ModelVersionNumber)
 		<< OldLiborUpdateDate

@@ -126,6 +126,11 @@ public:
 	double GetWALife() const;
 	const QDate& GetSettlementDate() const;
 	void SetSettlementDate(const QDate& a);
+    double getActualCoupon(const QDate& index,qint32 CouponIdx) const;
+    double getTotalActualCoupon(const QDate& index) const;
+    double getTotalActualCoupon(int index) const;
+    double getActualCoupon(int index, qint32 CouponIdx) const;
+
 	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const Tranche& flows);
 	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, Tranche& flows);
 };

@@ -747,6 +747,28 @@ const QSet<qint32>& GenericCashFlow::GetStocks() const
     return d->m_Stocks;
 }
 
+QDate GenericCashFlow::nextFlowDate(const QDate& currDt) const
+{
+    Q_D(const GenericCashFlow);
+    for (auto i = d->m_CashFlows.constBegin(); i != d->m_CashFlows.constEnd();++i){
+        if (i.key() > currDt)
+            return i.key();
+    }
+    return QDate();
+}
+
+QDate GenericCashFlow::prevFlowDate(const QDate& currDt) const
+{
+    Q_D(const GenericCashFlow);
+    for (auto i = d->m_CashFlows.constEnd()-1; true; --i) {
+        if (i.key() < currDt)
+            return i.key();
+        if (i == d->m_CashFlows.constBegin())
+            break;
+    }
+    return QDate();
+}
+
 void GenericCashFlow::SetLabel(qint32 FlowTpe, const QString& Lab)
 {
     Q_D(GenericCashFlow);

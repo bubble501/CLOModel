@@ -31,4 +31,14 @@ public:
     mutable ForwardBaseRateTable m_FrwRateCache;
     mutable QHash<qint32, BloombergVector*> ReferenceRateValue;
     mutable bool m_UseForwardCurve;
+
+    template <class T> double getTotalActualCoupon(const T& index) const
+    {
+        Q_Q(const Tranche);
+        static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "getTotalActualCoupon can be used only with int or QDate");
+        double result = 0.0;
+        for (qint32 i = 0; i < (1 << MaximumInterestsTypes); ++i)
+            result += q->getActualCoupon(index, i);
+        return result;
+    }
 };

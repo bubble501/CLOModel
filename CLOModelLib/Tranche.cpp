@@ -736,11 +736,13 @@ double Tranche::GetDiscountMargin(double NewPrice)const{
     Q_ASSERT(d->ReferenceRate.contains(-1));
     BaseRateVector ApplicableRate = *(d->ReferenceRate.value(0, d->ReferenceRate.value(-1)));
     ApplicableRate.replaceValue("ZERO", *d->ReferenceRate.value(-1));
+    DEBUG_CHECK(check1, ApplicableRate.GetVector());
     BloombergVector ApplicableRateValue;
     if (d->m_UseForwardCurve)
         ApplicableRateValue = ApplicableRate.GetBaseRatesDatabase(d->m_FrwRateCache);
     else
         ApplicableRateValue = ApplicableRate.GetBaseRatesDatabase(d->m_CnstRateCache);
+    DEBUG_CHECK(check2, ApplicableRateValue.GetVector());
     if (ApplicableRateValue.IsEmpty() || d->m_DayCount.value(0)->IsEmpty())
          return 0.0;
     return qMax(0.0, CalculateDM(FlowsDates, FlowsValues, ApplicableRateValue, *(d->m_DayCount.value(0))));
@@ -797,6 +799,47 @@ void Tranche::SetSettlementDate(const QDate& a)
 {
     Q_D(Tranche);
     d->SettlementDate = a;
+}
+
+
+
+double Tranche::getActualCoupon(const QDate& index, qint32 CouponIdx) const
+{
+    if (CouponIdx<0 || CouponIdx>(1 << MaximumInterestsTypes))
+        return 0.0;
+    Q_D(const Tranche);
+    if(!d->CashFlow.HasFlowType(TrancheCashFlow::InterestFlow | CouponIdx))
+        return 0.0;
+    const QDate prevIPD = d->CashFlow.prevFlowDate(index);
+    Q_ASSERT(d->m_DayCount.value(CouponIdx, nullptr));
+    DayCountVector currDayCount(*(d->m_DayCount.value(CouponIdx)));
+    if (currDayCount.GetAnchorDate().isNull())
+        currDayCount.SetAnchorDate(d->SettlementDate);
+    return d->CashFlow.GetInterest(index, CouponIdx) 
+        / (
+            (prevIPD.isNull() ? d->CashFlow.GetAmountOutstanding(prevIPD) : GetOutstandingAmt())
+            * AdjustCoupon(1.0, prevIPD.isNull() ? d->LastPaymentDate : prevIPD, index, currDayCount.GetValue(index))
+        );
+}
+
+double Tranche::getActualCoupon(int index, qint32 CouponIdx) const
+{
+    Q_D(const Tranche);
+    return getActualCoupon(d->CashFlow.GetDate(index), CouponIdx);
+}
+
+
+
+double Tranche::getTotalActualCoupon(const QDate& index) const
+{
+    Q_D(const Tranche);
+    d->getTotalActualCoupon(index);
+}
+
+double Tranche::getTotalActualCoupon(int index) const
+{
+    Q_D(const Tranche);
+    d->getTotalActualCoupon(index);
 }
 
 void Tranche::SetPaymentFrequency(const QString& a)

@@ -4,7 +4,7 @@
 		<DBtype>QODBC</DBtype>
 		<Driver>SQL Server</Driver>
 		<DataSource>Server=twe-sql02;Initial Catalog=ABSDB;Integrated Security=SSPI;Trusted_Connection=Yes;</DataSource>
-		<ConstBaseRatesStoredProc>getLatestIndexPrices</ConstBaseRatesStoredProc>
+		<ConstBaseRatesStoredProc>getLatestIndexPrices(0)</ConstBaseRatesStoredProc>
 		<ForwardBaseRatesStoredProc>getForwardCurveMatrix</ForwardBaseRatesStoredProc>
 		<CashFlowsStoredProc>getCashFlows</CashFlowsStoredProc>
 		<GetLoanAssumptionStoredProc>getLoanAssumption(:scenarioName,:isSenior)</GetLoanAssumptionStoredProc>

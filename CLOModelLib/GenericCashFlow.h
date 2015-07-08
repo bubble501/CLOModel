@@ -68,6 +68,8 @@ public:
 	virtual void ClearStocks();
 	virtual bool IsStock(qint32 a) const;
 	virtual const QSet<qint32>& GetStocks() const;
+    virtual QDate nextFlowDate(const QDate& currDt) const;
+    virtual QDate prevFlowDate(const QDate& currDt) const;
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const GenericCashFlow& flows);

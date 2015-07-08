@@ -1,4 +1,4 @@
-LIBRARY CLOmodel2
+LIBRARY CLOModelExcel
 EXPORTS
 	RunModel
 	CLODiscountMargin

@@ -1,0 +1,12 @@
+#ifndef CLOMODELLIB_GLOBAL_H
+#define CLOMODELLIB_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#ifdef CLOMODELLIB_LIB
+# define CLOMODELLIB_EXPORT Q_DECL_EXPORT
+#else
+# define CLOMODELLIB_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // CLOMODELLIB_GLOBAL_H

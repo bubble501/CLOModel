@@ -21,7 +21,8 @@
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
     <LinkerAdditionalOptions>-ext WixUIExtension</LinkerAdditionalOptions>
-    <DefineConstants>CountriesDBDir=$(SolutionDir)CLOModelV2\Resources\CountriesDB</DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Product.wxs" />

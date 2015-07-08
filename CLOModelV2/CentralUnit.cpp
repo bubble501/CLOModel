@@ -2,8 +2,8 @@
 #include <QMetaType>
 #include <QApplication>
 #include <QFile>
-#include "WaterfallCalculator.h"
-#include "CommonFunctions.h"
+#include <WaterfallCalculator.h>
+#include <CommonFunctions.h>
 #include <QMessageBox>
 #include <QDir>
 #include "ExcelCommons.h"
@@ -15,6 +15,10 @@
 #include <QListView>
 #include <QGridLayout>
 #include <QPushButton>
+#include <Mortgage.h>
+#include <Tranche.h>
+#include <ReinvestmentTest.h>
+#include <ReserveFund.h>
 CentralUnit::CentralUnit(QObject* parent)
 	:QObject(parent)
 	,Stresser(nullptr)
@@ -27,8 +31,14 @@ CentralUnit::CentralUnit(QObject* parent)
 	, LastRateTable(nullptr)
 {
 	for(int i=0;i<NumberOfPlots;i++) PlotIndexes[i]=0;
-	RegisterAsMetaType<Waterfall>();
-	RegisterAsMetaType<MtgCashFlow>();
+    if (QMetaType::type("Waterfall")==QMetaType::UnknownType) {
+        int TypeID = qRegisterMetaType<Waterfall>(typeid(Waterfall).name());
+        qRegisterMetaTypeStreamOperators<Waterfall>(typeid(Waterfall).name());
+    }
+    if (QMetaType::type("MtgCashFlow")==QMetaType::UnknownType) {
+        int TypeID = qRegisterMetaType<MtgCashFlow>(typeid(MtgCashFlow).name());
+        qRegisterMetaTypeStreamOperators<MtgCashFlow>(typeid(MtgCashFlow).name());
+    }
 	connect(&LoansCalculator,SIGNAL(Calculated()),this,SLOT(CalculationStep2()));
 	connect(this,SIGNAL(LoopStarted()),this,SLOT(CalculationStep1()),Qt::QueuedConnection);
 	ParallWatFalls=new WaterfallCalculator(this);
@@ -273,7 +283,7 @@ void CentralUnit::CalculationStep1(){
     QFile file(Filename);
     if (file.open(QIODevice::WriteOnly)) {
         QDataStream out(&file);
-        out.setVersion(QDataStream::Qt_5_3);
+        out.setVersion(StreamVersionUsed);
         out << qint32(ModelVersionNumber) << LoansCalculator << Structure;
         file.close();
     }
@@ -365,7 +375,7 @@ void CentralUnit::CalculationStep2()
 	QFile file(Filename);
 	if (file.open(QIODevice::WriteOnly)) {
 		QDataStream out(&file);
-		out.setVersion(QDataStream::Qt_5_3);
+		out.setVersion(StreamVersionUsed);
 		out << qint32(ModelVersionNumber) << m_BaseCaseToCall << Structure << Waterfall();
 		file.close();
 	}
@@ -422,7 +432,7 @@ void CentralUnit::CheckCalculationDone()
 		QFile file(FolderPath+"\\.Loans.clp");
 		if (file.open(QIODevice::WriteOnly)) {
 			QDataStream out(&file);
-			out.setVersion(QDataStream::Qt_5_3);
+			out.setVersion(StreamVersionUsed);
 			out << qint32(ModelVersionNumber) << LoansCalculator;
 			file.close();
 			#ifdef Q_WS_WIN
@@ -435,12 +445,17 @@ void CentralUnit::CheckCalculationDone()
 	QFile file(Filename);
 	if (file.open(QIODevice::WriteOnly)) {
 		QDataStream out(&file);
-		out.setVersion(QDataStream::Qt_5_3);
+		out.setVersion(StreamVersionUsed);
 		out << qint32(ModelVersionNumber) << m_BaseCaseToCall << Structure << CallStructure;
 		file.close();
 	}
 	emit CalculationFinished();
 	if (m_SaveBaseCase) {
+        // Save it to database
+        const Waterfall& applicableStructure = (m_BaseCaseToCall && RunCall) ? CallStructure : Structure;
+        for (int tranIter = 0; tranIter < applicableStructure.GetTranchesCount(); ++tranIter)
+            applicableStructure.GetTranche(tranIter)->saveCashflowsDatabase();
+        // Save it to File
 		QDir UnifiedDir(GetFromConfig("Folders", "UnifiedResultsFolder"));
 		if (UnifiedDir.exists()) {
 			QString AdjDealName = Structure.GetDealName();
@@ -450,7 +465,7 @@ void CentralUnit::CheckCalculationDone()
 			QFile UnifiedFile(UnifiedDir.absoluteFilePath(AdjDealName + ".clom"));
 			if (UnifiedFile.open(QIODevice::WriteOnly)) {
 				QDataStream out(&UnifiedFile);
-				out.setVersion(QDataStream::Qt_5_3);
+				out.setVersion(StreamVersionUsed);
 				out 
 					<< qint32(ModelVersionNumber) 
 					<< LiborUpdateDate 

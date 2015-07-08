@@ -1,0 +1,947 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;cxx;c;def</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h</Extensions>
+    </Filter>
+    <Filter Include="Form Files">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>moc;h;cpp</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Header Files\Vectors">
+      <UniqueIdentifier>{af8f1474-55b8-475b-bf72-af765c59ca59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Vectors">
+      <UniqueIdentifier>{354d7465-fd11-4d01-92eb-3287502798d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Common Items">
+      <UniqueIdentifier>{f57b442f-dfc9-4c9f-ac49-e5a915e565bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Common Items">
+      <UniqueIdentifier>{20e63aa2-57e8-431f-bbe1-452e583c82e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Interfaces">
+      <UniqueIdentifier>{ad9fd37a-87ce-42f4-929d-b5cbacd3df1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Interfaces">
+      <UniqueIdentifier>{b7482301-ac8c-43f8-8f1d-10cc0b965233}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Triggers">
+      <UniqueIdentifier>{e2cbeab1-6f35-4b1b-8940-2a1f6da0e7b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Triggers">
+      <UniqueIdentifier>{3a624e86-4a34-4834-8a06-ecffef800392}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Deal Structure">
+      <UniqueIdentifier>{7eac6702-adc5-4e5a-b6c5-144d61980b8c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Deal Structure">
+      <UniqueIdentifier>{6e67f7a8-2253-4a1c-8e44-0e579666818f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Loans">
+      <UniqueIdentifier>{d319072d-38a5-4c1f-8dfa-ca02615d7039}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Loans">
+      <UniqueIdentifier>{2cb825d3-c2b3-498e-9347-b4865a1b164b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Generated Files\Debug">
+      <UniqueIdentifier>{245e351d-bc67-4e12-96be-df05a1d8986d}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\Release">
+      <UniqueIdentifier>{435c840a-eaf0-4112-afad-d3f16bcbdd71}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Privates">
+      <UniqueIdentifier>{7a9072bd-4a87-4522-8e6d-f5eef9fc8a5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Privates\Vectors">
+      <UniqueIdentifier>{3f45989a-6db4-4fb2-8d64-e547b260ff84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Privates\Interfaces">
+      <UniqueIdentifier>{be8b3193-d0a1-4207-a6da-1c3a8668ed0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Privates\Triggers">
+      <UniqueIdentifier>{e1961720-7c18-4ede-9b63-4bad70cfa982}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Privates\Deal Structure">
+      <UniqueIdentifier>{c90efa11-0141-402a-be97-05b6d9ff07ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Privates\Loans">
+      <UniqueIdentifier>{b1a296ae-385a-4126-8eea-5f96c6a70bbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Privates\Widgets">
+      <UniqueIdentifier>{9b1fd83e-7dea-4fdf-95cb-60073a231b5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Stress Test">
+      <UniqueIdentifier>{f519b278-f896-45bb-a996-94c6c309c156}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Stress Test">
+      <UniqueIdentifier>{69c7e9a5-fbc2-44d0-97b8-8cdec8ec2fcf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Privates\Stress Test">
+      <UniqueIdentifier>{da357504-ee64-48b1-8735-4df0ac314c2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Widget">
+      <UniqueIdentifier>{44062ff7-d060-4bec-9278-bedf70703c8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Widgets">
+      <UniqueIdentifier>{a957199a-dee4-4ce5-b004-4b3588e5a0a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Privates\Triggers\Trigger Settings Widgets">
+      <UniqueIdentifier>{167f3f47-ceb8-4e44-a61f-84bc5723d5b6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="clomodellib_global.h">
+      <Filter>Header Files\Common Items</Filter>
+    </ClInclude>
+    <ClInclude Include="BackwardCompatibilityInterface.h">
+      <Filter>Header Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="AbstractBbgVect.h">
+      <Filter>Header Files\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="BloombergVector.h">
+      <Filter>Header Files\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="FloorCapVector.h">
+      <Filter>Header Files\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="DayCountVect.h">
+      <Filter>Header Files\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="AbstractTrigger.h">
+      <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="BoolVector.h">
+      <Filter>Header Files\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="IntegerVector.h">
+      <Filter>Header Files\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="Seniority.h">
+      <Filter>Header Files\Deal Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="RepaymentVector.h">
+      <Filter>Header Files\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="PrincipalProceeds.h">
+      <Filter>Header Files\Deal Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseRateTable.h">
+      <Filter>Header Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseRateVect.h">
+      <Filter>Header Files\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="GenericCashFlow.h">
+      <Filter>Header Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="MtgCashFlow.h">
+      <Filter>Header Files\Loans</Filter>
+    </ClInclude>
+    <ClInclude Include="TrancheCashFlow.h">
+      <Filter>Header Files\Deal Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="TemplAsyncThread.h">
+      <Filter>Header Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="TriggersResults.h">
+      <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="Tranche.h">
+      <Filter>Header Files\Deal Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="TemplAsyncCalculator.h">
+      <Filter>Header Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\InternalItems.h">
+      <Filter>Privates</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\AbstractBbgVect_p.h">
+      <Filter>Privates\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\AbstractTrigger_p.h">
+      <Filter>Privates\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\AbstrAsyncCalculator_p.h">
+      <Filter>Privates\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\AbstrAsyncThread_p.h">
+      <Filter>Privates\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\BackwardCompatibilityInterface_p.h">
+      <Filter>Privates\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\BaseRateVect_p.h">
+      <Filter>Privates\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\BloombergVector_p.h">
+      <Filter>Privates\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\BoolVector_p.h">
+      <Filter>Privates\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\DayCountVect_p.h">
+      <Filter>Privates\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\FloorCapVector_p.h">
+      <Filter>Privates\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\GenericCashFlow_p.h">
+      <Filter>Privates\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\IntegerVector_p.h">
+      <Filter>Privates\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\PrincipalProceeds_p.h">
+      <Filter>Privates\Deal Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\RepaymentVector_p.h">
+      <Filter>Privates\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\Seniority_p.h">
+      <Filter>Privates\Deal Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\Tranche_p.h">
+      <Filter>Privates\Deal Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\TrancheCashFlow_p.h">
+      <Filter>Privates\Deal Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\TriggersResults_p.h">
+      <Filter>Privates\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="Mortgage.h">
+      <Filter>Header Files\Loans</Filter>
+    </ClInclude>
+    <ClInclude Include="LoanAssumption.h">
+      <Filter>Header Files\Loans</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\Mortgage_p.h">
+      <Filter>Privates\Loans</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\LoanAssumption_p.h">
+      <Filter>Privates\Loans</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\ApplyFlowThread_p.h">
+      <Filter>Privates\Loans</Filter>
+    </ClInclude>
+    <ClInclude Include="DateTrigger.h">
+      <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\DateTrigger_p.h">
+      <Filter>Privates\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="CumulativeLossTrigger.h">
+      <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\CumulativeLossTrigger_p.h">
+      <Filter>Privates\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="DeferredInterestTrigger.h">
+      <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\DeferredInterestTrigger_p.h">
+      <Filter>Privates\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="DuringStressTestTrigger.h">
+      <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="DelinquencyTrigger.h">
+      <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\DelinquencyTrigger_p.h">
+      <Filter>Privates\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="LoanAssMatcherResult.h">
+      <Filter>Header Files\Loans</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\LoanAssMatcherThread_p.h">
+      <Filter>Privates\Loans</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\LoanAssMatcherResult_p.h">
+      <Filter>Privates\Loans</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\MtgCalculator_p.h">
+      <Filter>Privates\Loans</Filter>
+    </ClInclude>
+    <ClInclude Include="PDLtrigger.h">
+      <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\PDLtrigger_p.h">
+      <Filter>Privates\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="PoolSizeTrigger.h">
+      <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\PoolSizeTrigger_p.h">
+      <Filter>Privates\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="WatFalPrior.h">
+      <Filter>Header Files\Deal Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\WatFalPrior_p.h">
+      <Filter>Privates\Deal Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\VectorTrigger_p.h">
+      <Filter>Privates\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="VectorTrigger.h">
+      <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\MtgCalculatorThread_p.h">
+      <Filter>Privates\Loans</Filter>
+    </ClInclude>
+    <ClInclude Include="ReinvestmentTest.h">
+      <Filter>Header Files\Deal Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\ReinvestmentTest_p.h">
+      <Filter>Privates\Deal Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="ReserveFund.h">
+      <Filter>Header Files\Deal Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\ReserveFund_p.h">
+      <Filter>Privates\Deal Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="Waterfall.h">
+      <Filter>Header Files\Deal Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\Waterfall_p.h">
+      <Filter>Privates\Deal Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="TrancheTrigger.h">
+      <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\TrancheTrigger_p.h">
+      <Filter>Privates\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\WaterfallCalcThread_p.h">
+      <Filter>Privates\Deal Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\WaterfallCalculator_p.h">
+      <Filter>Privates\Deal Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="AssumptionSet.h">
+      <Filter>Header Files\Stress Test</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\AssumptionSet_p.h">
+      <Filter>Privates\Stress Test</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\StressTest_p.h">
+      <Filter>Privates\Stress Test</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\ReadOnlyColProxy.h">
+      <Filter>Privates\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\ScenarioApplier_p.h">
+      <Filter>Privates\Loans</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\LoanAssMatcher_p.h">
+      <Filter>Privates\Loans</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\LoanAssumptionsEditor_p.h">
+      <Filter>Privates\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\TriggerHelperDialog_p.h">
+      <Filter>Privates\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\TriggerStructHelperWidget_p.h">
+      <Filter>Privates\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\StressViewer_p.h">
+      <Filter>Privates\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\SummaryView_p.h">
+      <Filter>Privates\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\WaterfallStepHelperDialog_p.h">
+      <Filter>Privates\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\BaseRateTable_p.h">
+      <Filter>Privates\Interfaces</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="BackwardCompatibilityInterface.cpp">
+      <Filter>Source Files\Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="CommonFunctions.cpp">
+      <Filter>Source Files\Common Items</Filter>
+    </ClCompile>
+    <ClCompile Include="AbstractBbgVect.cpp">
+      <Filter>Source Files\Vectors</Filter>
+    </ClCompile>
+    <ClCompile Include="BloombergVector.cpp">
+      <Filter>Source Files\Vectors</Filter>
+    </ClCompile>
+    <ClCompile Include="FloorCapVector.cpp">
+      <Filter>Source Files\Vectors</Filter>
+    </ClCompile>
+    <ClCompile Include="DayCountVect.cpp">
+      <Filter>Source Files\Vectors</Filter>
+    </ClCompile>
+    <ClCompile Include="AbstractTrigger.cpp">
+      <Filter>Source Files\Triggers</Filter>
+    </ClCompile>
+    <ClCompile Include="InternalItems.cpp">
+      <Filter>Privates</Filter>
+    </ClCompile>
+    <ClCompile Include="BoolVector.cpp">
+      <Filter>Source Files\Vectors</Filter>
+    </ClCompile>
+    <ClCompile Include="IntegerVector.cpp">
+      <Filter>Source Files\Vectors</Filter>
+    </ClCompile>
+    <ClCompile Include="Seniority.cpp">
+      <Filter>Source Files\Deal Structure</Filter>
+    </ClCompile>
+    <ClCompile Include="RepaymentVector.cpp">
+      <Filter>Source Files\Vectors</Filter>
+    </ClCompile>
+    <ClCompile Include="PrincipalProceeds.cpp">
+      <Filter>Source Files\Deal Structure</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseRateTable.cpp">
+      <Filter>Source Files\Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseRateVect.cpp">
+      <Filter>Source Files\Vectors</Filter>
+    </ClCompile>
+    <ClCompile Include="GenericCashFlow.cpp">
+      <Filter>Source Files\Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="MtgCashFlow.cpp">
+      <Filter>Source Files\Loans</Filter>
+    </ClCompile>
+    <ClCompile Include="TrancheCashFlow.cpp">
+      <Filter>Source Files\Deal Structure</Filter>
+    </ClCompile>
+    <ClCompile Include="AbstrAsyncThread.cpp">
+      <Filter>Source Files\Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_AbstrAsyncThread.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_AbstrAsyncThread.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="TriggersResults.cpp">
+      <Filter>Source Files\Triggers</Filter>
+    </ClCompile>
+    <ClCompile Include="Tranche.cpp">
+      <Filter>Source Files\Deal Structure</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_AbstrAsyncCalculator.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_AbstrAsyncCalculator.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="AbstrAsyncCalculator.cpp">
+      <Filter>Source Files\Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\qrc_Resources.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Mortgage.cpp">
+      <Filter>Source Files\Loans</Filter>
+    </ClCompile>
+    <ClCompile Include="LoanAssumption.cpp">
+      <Filter>Source Files\Loans</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ApplyFlowThread.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ApplyFlowThread.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="ApplyFlowThread.cpp">
+      <Filter>Source Files\Loans</Filter>
+    </ClCompile>
+    <ClCompile Include="DateTrigger.cpp">
+      <Filter>Source Files\Triggers</Filter>
+    </ClCompile>
+    <ClCompile Include="CumulativeLossTrigger.cpp">
+      <Filter>Source Files\Triggers</Filter>
+    </ClCompile>
+    <ClCompile Include="DeferredInterestTrigger.cpp">
+      <Filter>Source Files\Triggers</Filter>
+    </ClCompile>
+    <ClCompile Include="DelinquencyTrigger.cpp">
+      <Filter>Source Files\Triggers</Filter>
+    </ClCompile>
+    <ClCompile Include="DuringStressTestTrigger.cpp">
+      <Filter>Source Files\Triggers</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_LoanAssMatcherThread.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_LoanAssMatcherThread.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="LoanAssMatcherThread.cpp">
+      <Filter>Source Files\Loans</Filter>
+    </ClCompile>
+    <ClCompile Include="LoanAssMatcherResult.cpp">
+      <Filter>Source Files\Loans</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_MtgCalculatorThread.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_MtgCalculatorThread.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="MtgCalculatorThread.cpp">
+      <Filter>Source Files\Loans</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_MtgCalculator.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_MtgCalculator.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="MtgCalculator.cpp">
+      <Filter>Source Files\Loans</Filter>
+    </ClCompile>
+    <ClCompile Include="PDLtrigger.cpp">
+      <Filter>Source Files\Triggers</Filter>
+    </ClCompile>
+    <ClCompile Include="PoolSizeTrigger.cpp">
+      <Filter>Source Files\Triggers</Filter>
+    </ClCompile>
+    <ClCompile Include="WatFalPrior.cpp">
+      <Filter>Source Files\Deal Structure</Filter>
+    </ClCompile>
+    <ClCompile Include="VectorTrigger.cpp">
+      <Filter>Source Files\Triggers</Filter>
+    </ClCompile>
+    <ClCompile Include="ReinvestmentTest.cpp">
+      <Filter>Source Files\Deal Structure</Filter>
+    </ClCompile>
+    <ClCompile Include="ReserveFund.cpp">
+      <Filter>Source Files\Deal Structure</Filter>
+    </ClCompile>
+    <ClCompile Include="TrancheTrigger.cpp">
+      <Filter>Source Files\Triggers</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_WaterfallCalcThread.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_WaterfallCalcThread.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="WaterfallCalcThread.cpp">
+      <Filter>Source Files\Deal Structure</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_WaterfallCalculator.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_WaterfallCalculator.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="WaterfallCalculator.cpp">
+      <Filter>Source Files\Deal Structure</Filter>
+    </ClCompile>
+    <ClCompile Include="Waterfall.cpp">
+      <Filter>Source Files\Deal Structure</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_StressTest.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_StressTest.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="StressTest.cpp">
+      <Filter>Source Files\Stress Test</Filter>
+    </ClCompile>
+    <ClCompile Include="AssumptionSet.cpp">
+      <Filter>Source Files\Stress Test</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_RichTextDelegate.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_RichTextDelegate.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\RichTextDelegate.cpp">
+      <Filter>Privates\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_PhasedProgressWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_PhasedProgressWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\PhasedProgressWidget.cpp">
+      <Filter>Privates\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_LoanAssumptionDelegate.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_LoanAssumptionDelegate.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\LoanAssumptionDelegate.cpp">
+      <Filter>Privates\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_CheckAndEditDelegate.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_CheckAndEditDelegate.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\CheckAndEditDelegate.cpp">
+      <Filter>Privates\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_CheckAndEdit.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_CheckAndEdit.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\CheckAndEdit.cpp">
+      <Filter>Privates\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ChartsWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ChartsWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\ChartsWidget.cpp">
+      <Filter>Privates\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_AssumptionsComboDelegate.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_AssumptionsComboDelegate.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\AssumptionsComboDelegate.cpp">
+      <Filter>Privates\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ScenarioApplier.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ScenarioApplier.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="ScenarioApplier.cpp">
+      <Filter>Source Files\Loans</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_LoanAssMatcher.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_LoanAssMatcher.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="LoanAssMatcher.cpp">
+      <Filter>Source Files\Loans</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_LoanAssumptionsEditor.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_LoanAssumptionsEditor.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="LoanAssumptionsEditor.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_TrancheViewer.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_TrancheViewer.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\TrancheViewer.cpp">
+      <Filter>Privates\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_WaterfallViewer.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_WaterfallViewer.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\WaterfallViewer.cpp">
+      <Filter>Privates\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_StressViewer.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_StressViewer.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_SummaryView.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_SummaryView.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_TriggerHelperDialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_TriggerHelperDialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_TriggerStructHelperWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_TriggerStructHelperWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="StressViewer.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="SummaryView.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="TriggerHelperDialog.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="TriggerStructHelperWidget.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_WaterfallStepHelperDialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_WaterfallStepHelperDialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="WaterfallStepHelperDialog.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DateTriggerSettingWidget.cpp">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_DateTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_DateTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\AbstractTriggerSettingWidget.cpp">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_AbstractTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_AbstractTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_VectorTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_VectorTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\VectorTriggerSettingWidget.cpp">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\CumulativeLossTriggerSettingWidget.cpp">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_CumulativeLossTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_CumulativeLossTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DelinquencyTriggerSettingWidget.cpp">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_DelinquencyTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_DelinquencyTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\PoolSizeTriggerSettingWidget.cpp">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_PoolSizeTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_PoolSizeTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DeferredInterestTriggerSettingWidget.cpp">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_DeferredInterestTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_DeferredInterestTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\PDLTriggerSettingWidget.cpp">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_PDLTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_PDLTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_TrancheTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_TrancheTriggerSettingWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\TrancheTriggerSettingWidget.cpp">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="AbstrAsyncThread.h">
+      <Filter>Header Files\Interfaces</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CommonFunctions.h">
+      <Filter>Header Files\Common Items</Filter>
+    </CustomBuild>
+    <CustomBuild Include="AbstrAsyncCalculator.h">
+      <Filter>Header Files\Interfaces</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Resources.qrc">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ApplyFlowThread.h">
+      <Filter>Header Files\Loans</Filter>
+    </CustomBuild>
+    <CustomBuild Include="LoanAssMatcherThread.h">
+      <Filter>Header Files\Loans</Filter>
+    </CustomBuild>
+    <CustomBuild Include="MtgCalculatorThread.h">
+      <Filter>Header Files\Loans</Filter>
+    </CustomBuild>
+    <CustomBuild Include="MtgCalculator.h">
+      <Filter>Header Files\Loans</Filter>
+    </CustomBuild>
+    <CustomBuild Include="WaterfallCalcThread.h">
+      <Filter>Header Files\Deal Structure</Filter>
+    </CustomBuild>
+    <CustomBuild Include="WaterfallCalculator.h">
+      <Filter>Header Files\Deal Structure</Filter>
+    </CustomBuild>
+    <CustomBuild Include="StressTest.h">
+      <Filter>Header Files\Stress Test</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\RichTextDelegate.h">
+      <Filter>Privates\Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\PhasedProgressWidget.h">
+      <Filter>Privates\Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\LoanAssumptionDelegate.h">
+      <Filter>Privates\Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\CheckAndEditDelegate.h">
+      <Filter>Privates\Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\CheckAndEdit.h">
+      <Filter>Privates\Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\ChartsWidget.h">
+      <Filter>Privates\Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\AssumptionsComboDelegate.h">
+      <Filter>Privates\Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ScenarioApplier.h">
+      <Filter>Header Files\Loans</Filter>
+    </CustomBuild>
+    <CustomBuild Include="LoanAssMatcher.h">
+      <Filter>Header Files\Loans</Filter>
+    </CustomBuild>
+    <CustomBuild Include="LoanAssumptionsEditor.h">
+      <Filter>Header Files\Widget</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\TrancheViewer.h">
+      <Filter>Privates\Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\WaterfallViewer.h">
+      <Filter>Privates\Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="StressViewer.h">
+      <Filter>Header Files\Widget</Filter>
+    </CustomBuild>
+    <CustomBuild Include="SummaryView.h">
+      <Filter>Header Files\Widget</Filter>
+    </CustomBuild>
+    <CustomBuild Include="TriggerHelperDialog.h">
+      <Filter>Header Files\Widget</Filter>
+    </CustomBuild>
+    <CustomBuild Include="TriggerStructHelperWidget.h">
+      <Filter>Header Files\Widget</Filter>
+    </CustomBuild>
+    <CustomBuild Include="WaterfallStepHelperDialog.h">
+      <Filter>Header Files\Widget</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\DateTriggerSettingWidget.h">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\AbstractTriggerSettingWidget.h">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\VectorTriggerSettingWidget.h">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\CumulativeLossTriggerSettingWidget.h">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\DelinquencyTriggerSettingWidget.h">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\PoolSizeTriggerSettingWidget.h">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\DeferredInterestTriggerSettingWidget.h">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\PDLTriggerSettingWidget.h">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\TrancheTriggerSettingWidget.h">
+      <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\Logo.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\Loading2.gif">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\SplitterHandle.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="Resources\GlobalConfigs.xml">
+      <Filter>Resource Files</Filter>
+    </Xml>
+    <Xml Include="Resources\ISO3166-1.xml">
+      <Filter>Resource Files</Filter>
+    </Xml>
+  </ItemGroup>
+</Project>

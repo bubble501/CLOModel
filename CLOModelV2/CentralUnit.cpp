@@ -451,6 +451,11 @@ void CentralUnit::CheckCalculationDone()
 	}
 	emit CalculationFinished();
 	if (m_SaveBaseCase) {
+        // Save it to database
+        const Waterfall& applicableStructure = (m_BaseCaseToCall && RunCall) ? CallStructure : Structure;
+        for (int tranIter = 0; tranIter < applicableStructure.GetTranchesCount(); ++tranIter)
+            applicableStructure.GetTranche(tranIter)->saveCashflowsDatabase();
+        // Save it to File
 		QDir UnifiedDir(GetFromConfig("Folders", "UnifiedResultsFolder"));
 		if (UnifiedDir.exists()) {
 			QString AdjDealName = Structure.GetDealName();

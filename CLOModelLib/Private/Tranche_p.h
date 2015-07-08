@@ -31,7 +31,7 @@ public:
     mutable ForwardBaseRateTable m_FrwRateCache;
     mutable QHash<qint32, BloombergVector*> ReferenceRateValue;
     mutable bool m_UseForwardCurve;
-
+    QString downloadISIN() const;
     template <class T> double getTotalActualCoupon(const T& index) const
     {
         Q_Q(const Tranche);
@@ -42,3 +42,4 @@ public:
         return result;
     }
 };
+

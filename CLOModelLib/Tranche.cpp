@@ -815,11 +815,11 @@ double Tranche::getActualCoupon(const QDate& index, qint32 CouponIdx) const
     DayCountVector currDayCount(*(d->m_DayCount.value(CouponIdx)));
     if (currDayCount.GetAnchorDate().isNull())
         currDayCount.SetAnchorDate(d->SettlementDate);
-    return d->CashFlow.GetInterest(index, CouponIdx) 
-        / (
-            (prevIPD.isNull() ? d->CashFlow.GetAmountOutstanding(prevIPD) : GetOutstandingAmt())
-            * AdjustCoupon(1.0, prevIPD.isNull() ? d->LastPaymentDate : prevIPD, index, currDayCount.GetValue(index))
-        );
+    const double outstanding = prevIPD.isValid() ? (d->CashFlow.GetAmountOutstanding(prevIPD)) : GetOutstandingAmt();
+    const double accrueFactor = AdjustCoupon(1.0, prevIPD.isNull() ? d->LastPaymentDate : prevIPD, index, currDayCount.GetValue(index));
+    if (accrueFactor*outstanding == 0.0)
+        return 0.0;
+    return d->CashFlow.GetInterest(index, CouponIdx) / (outstanding*accrueFactor);
 }
 
 double Tranche::getActualCoupon(int index, qint32 CouponIdx) const
@@ -829,17 +829,124 @@ double Tranche::getActualCoupon(int index, qint32 CouponIdx) const
 }
 
 
+QString TranchePrivate::downloadISIN() const
+{
+    QString applicableIsin = ISINcode;
+#ifndef NO_BLOOMBERG
+    if (applicableIsin.isEmpty()) {
+        QBbgLib::QBbgReferenceDataRequest isinReq;
+        isinReq.setSecurity(QBbgLib::QBbgSecurity(TrancheName, QBbgLib::QBbgSecurity::stringToYellowKey(BloombergExtension)));
+        isinReq.setField("ID_ISIN");
+        if (!isinReq.isValidReq())
+            return QString();
+        QBbgLib::QBbgRequestGroup allReq;
+        allReq.addRequest(isinReq);
+        QBbgLib::QBbgManager bbgMan;
+        const QBbgLib::QBbgReferenceDataResponse* const isinRes = dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(bbgMan.processRequest(allReq).begin().value());
+        if (isinRes->hasErrors())
+            return QString();
+        applicableIsin = isinRes->value().toString();
+    }
+#endif // !NO_BLOOMBERG
+    return applicableIsin;
+}
+
+bool Tranche::saveCashflowsDatabase() const
+{
+#ifndef NO_DATABASE
+    Q_D(const Tranche);
+    const QString applicableIsin = d->downloadISIN();
+    if (applicableIsin.isEmpty())
+        return false;
+    {
+        QMutexLocker dbLocker(&Db_Mutex);
+        QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
+        if (!db.isValid()) {
+            db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype"), "TwentyFourDB");
+            db.setDatabaseName(
+                "Driver={" + GetFromConfig("Database", "Driver")
+                + "}; "
+                + GetFromConfig("Database", "DataSource")
+                );
+            
+        }
+        bool DbOpen = db.isOpen();
+        if (!DbOpen) DbOpen = db.open();
+        if (DbOpen) {
+            {
+                //Check bond exist in the database
+                QSqlQuery CheckBondExistQuery(db);
+                CheckBondExistQuery.setForwardOnly(true);
+                CheckBondExistQuery.prepare("{CALL " + GetFromConfig("Database", "GetBondDetailsStoredProc") + "}");
+                CheckBondExistQuery.bindValue(":isin", applicableIsin);
+                if (!CheckBondExistQuery.exec())
+                    return false;
+                if (!CheckBondExistQuery.next())
+                    return false;
+            }
+            bool dbError;
+            QVariantList isinPar, datePar, deferredPar, interestPar, principalPar, balancePar, couponPar;
+            isinPar.reserve(d->CashFlow.Count());
+            datePar.reserve(d->CashFlow.Count());
+            deferredPar.reserve(d->CashFlow.Count());
+            interestPar.reserve(d->CashFlow.Count());
+            principalPar.reserve(d->CashFlow.Count());
+            balancePar.reserve(d->CashFlow.Count());
+            couponPar.reserve(d->CashFlow.Count());
+            for (int CashFlowIter = 0; CashFlowIter < d->CashFlow.Count(); ++CashFlowIter) {
+                isinPar.append(applicableIsin);
+                datePar.append(d->CashFlow.GetDate(CashFlowIter).toString(Qt::ISODate));
+                deferredPar.append(d->CashFlow.GetTotalDeferred(CashFlowIter));
+                interestPar.append(d->CashFlow.GetTotalInterest(CashFlowIter));
+                principalPar.append(d->CashFlow.GetPrincipal(CashFlowIter));
+                balancePar.append(d->CashFlow.GetAmountOutstanding(CashFlowIter));
+                couponPar.append(100.0*getTotalActualCoupon(CashFlowIter));
+            }
+            db.transaction();
+            {
+                QSqlQuery EraseCashflowQuery(db);
+                EraseCashflowQuery.setForwardOnly(true);
+                EraseCashflowQuery.prepare("{CALL " + GetFromConfig("Database", "DeleteCashflowsStoredProc") + "}");
+                EraseCashflowQuery.bindValue(":ISIN", applicableIsin);
+                dbError = !EraseCashflowQuery.exec();
+            }
+            if (!dbError) {
+                QSqlQuery InsertCashflowQuery(db);
+                InsertCashflowQuery.setForwardOnly(true);
+                InsertCashflowQuery.prepare(GetFromConfig("Database", "InsertCashFlowsQuery"));
+                InsertCashflowQuery.bindValue(":isin", isinPar);
+                InsertCashflowQuery.bindValue(":date", datePar);
+                InsertCashflowQuery.bindValue(":deferred", deferredPar);
+                InsertCashflowQuery.bindValue(":interest", interestPar);
+                InsertCashflowQuery.bindValue(":principal", principalPar);
+                InsertCashflowQuery.bindValue(":balance", balancePar);
+                InsertCashflowQuery.bindValue(":coupon", couponPar);
+                dbError = !InsertCashflowQuery.execBatch();
+            }
+            if (dbError) {
+                db.rollback();
+                return false;
+            }
+            else {
+                db.commit();
+                return true;
+            }
+        }
+    }
+#endif // !NO_DATABASE
+    return false;
+}
 
 double Tranche::getTotalActualCoupon(const QDate& index) const
 {
     Q_D(const Tranche);
-    d->getTotalActualCoupon(index);
+    return d->getTotalActualCoupon(index);
 }
 
 double Tranche::getTotalActualCoupon(int index) const
 {
     Q_D(const Tranche);
-    d->getTotalActualCoupon(index);
+    return  d->getTotalActualCoupon(index);
 }
 
 void Tranche::SetPaymentFrequency(const QString& a)

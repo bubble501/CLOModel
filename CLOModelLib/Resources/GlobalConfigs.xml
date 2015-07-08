@@ -3,7 +3,7 @@
 	<Database>
 		<DBtype>QODBC</DBtype>
 		<Driver>SQL Server</Driver>
-		<DataSource>Server=twe-sql02;Initial Catalog=ABSDB;Integrated Security=SSPI;Trusted_Connection=Yes;</DataSource>
+		<DataSource xml:space="preserve">Server=twe-sql02;Initial Catalog=ABSDB;Integrated Security=SSPI;Trusted_Connection=Yes;</DataSource>
 		<ConstBaseRatesStoredProc>getLatestIndexPrices(0)</ConstBaseRatesStoredProc>
 		<ForwardBaseRatesStoredProc>getForwardCurveMatrix</ForwardBaseRatesStoredProc>
 		<CashFlowsStoredProc>getCashFlows</CashFlowsStoredProc>
@@ -12,9 +12,11 @@
 		<RemoveLoanAssumptionStoredProc>removeLoanAssumption(:scenarioName)</RemoveLoanAssumptionStoredProc>
 		<GetPrepaySpeedStoredProc>getPrepaySpeedOverrides(:TrancheID)</GetPrepaySpeedStoredProc>
 		<SetLoanAssumptionStoredProc>setLoanAssumption(:OldScenName,:scenarioName,:scanarioAlias,:seniorScenario,:scenarioMaturityExtension,:scenarioInitialHaircut,:scenarioPrepaymentFee,:scenarioDayCount,:scenarioCPR,:scenarioCDR,:scenarioLS,:scenarioRecoveryLag,:scenarioDelinquency,:scenarioDelinquencyLag,:scenarioPrice,:scenarioHaircut,:scenarioPrepayMultiplier,:scenarioLossMultiplier,:scenarioUpdateDate)</SetLoanAssumptionStoredProc>
-	</Database>
+        <GetBondDetailsStoredProc>getBondDetails(:isin)</GetBondDetailsStoredProc>
+        <DeleteCashflowsStoredProc>deleteCashflows(:ISIN)</DeleteCashflowsStoredProc>
+        <InsertCashFlowsQuery xml:space="preserve">INSERT INTO  Cashflows (ISIN,Date,Deferred,Interest,Principal,Balance,Coupon) VALUES (:isin,:date,:deferred,:interest,:principal,:balance,:coupon)</InsertCashFlowsQuery>
+    </Database>
 	<Folders>
-		<UnifiedResultsFolder>Z:/24AM/Monitoring/Model Results</UnifiedResultsFolder>
-		<AssumptionsFile>Loans Assumptions</AssumptionsFile>
+		<UnifiedResultsFolder xml:space="preserve">Z:/24AM/Monitoring/Model Results</UnifiedResultsFolder>
 	</Folders>
 </GlobalConfigs>

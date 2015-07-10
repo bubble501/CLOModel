@@ -4,7 +4,7 @@ DESTDIR = ../Win32/Release
 QT += core widgets gui
 CONFIG += release
 DEFINES += WIN64 QT_DLL QT_WIDGETS_LIB CLOMODELV2_LIB NOMINMAX
-INCLUDEPATH += "$(SolutionDir)/CLOModelLib" \
+INCLUDEPATH += "../CLOModelLib" \
     ./GeneratedFiles \
     . \
     ./GeneratedFiles/Release

@@ -35,28 +35,29 @@ void Seniority::Clear()
     d->m_RankScale.clear();
 }
 
-quint32 Seniority::GetSeniority(int level) const
+qint32 Seniority::GetSeniority(int level) const
 {
     Q_D(const Seniority);
     return d->genericGet(level, d->m_SeniorityScale);
 }
 
-quint32 Seniority::GetGroup(int level) const
+qint32 Seniority::GetGroup(int level) const
 {
     Q_D(const Seniority);
     return d->genericGet(level, d->m_GroupScale);
 }
 
-quint32 Seniority::GetRank(int level) const
+qint32 Seniority::GetRank(int level) const
 {
     Q_D(const Seniority);
     return d->genericGet(level, d->m_RankScale);
 }
 
-bool Seniority::AddSeniorityLevel(quint32 sen, quint32 gr, quint32 rnk)
+bool Seniority::AddSeniorityLevel(qint32 sen, qint32 gr, qint32 rnk)
 {
     Q_D(Seniority);
-    if (sen == 0 || gr == 0 || rnk == 0) return false;
+    if (sen <= 0 || gr <= 0 || rnk <= 0)
+        return false;
     d->m_SeniorityScale.append(sen);
     d->m_GroupScale.append(gr);
     d->m_RankScale.append(rnk);
@@ -134,7 +135,7 @@ bool Seniority::isValid() const
     return !d->m_SeniorityScale.isEmpty();
 }
 
-quint32 SeniorityPrivate::genericGet(int level, const QList<quint32>& cont) const
+qint32 SeniorityPrivate::genericGet(int level, const QList<qint32>& cont) const
 {
     if (level < 0) return 0;
     if (level >= cont.size()) return cont.last();

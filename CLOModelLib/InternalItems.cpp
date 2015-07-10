@@ -138,7 +138,7 @@ double getTimeFactor(QDate PrevIPD, QDate CurrIPD, DayCountConvention DayCount)
         PrevIPD = CurrIPD;
         CurrIPD = Temp;
     }
-    double TimeFactor; //This is the factor by which the coupon must be adjusted
+    double TimeFactor=1.0; //This is the factor by which the coupon must be adjusted
     int Offset = 0;
     /*
     DayCount is a 16 bit integer;

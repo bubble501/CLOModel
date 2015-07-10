@@ -10,11 +10,11 @@ class SeniorityPrivate : public BackwardInterfacePrivate
     DECLARE_PRIVATE_COMMONS_COPY(Seniority)
     DECLARE_PRIVATE_COMMONS_DATASTREAM(Seniority)
 public:
-    QList<quint32> m_SeniorityScale;
-    QList<quint32> m_GroupScale;
-    QList<quint32> m_RankScale;
+    QList<qint32> m_SeniorityScale;
+    QList<qint32> m_GroupScale;
+    QList<qint32> m_RankScale;
     enum { SeniorityStringSeparator = '-' };
-    quint32 genericGet(int level, const QList<quint32>& cont) const;
+    qint32 genericGet(int level, const QList<qint32>& cont) const;
     friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const Seniority& flows);
     friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, Seniority& flows);
 };

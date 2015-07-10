@@ -626,7 +626,7 @@ void StressTest::SaveResults(const QString& DestPath)const
 	QString NewName;
 	if (QFile::exists(OldName)) {
 		NewName = DestinationPath + QString("StressResult%1.fcsr");
-		for (quint64 i = 0; true; ++i) {
+		for (quint64 i = 0; ; ++i) {
 			if (!QFile::exists(NewName.arg(i))) {
 				NewName=NewName.arg(i);
 				break;
@@ -765,7 +765,7 @@ bool StressTest::LoadResultsFromFile(const QString& DestPath)
         d->Structure.SetLoadProtocolVersion(VesionCheck); out >> d->Structure;
 		TargetFile.close();
 	}
-	catch(int ExcCode){
+	catch(int){
 		if(!QApplication::instance()){
 			char *argv[] = {"NoArgumnets"};
 			int argc = sizeof(argv) / sizeof(char*) - 1;
@@ -949,7 +949,6 @@ void StressTest::ResetScenarios()
 
 void StressTest::FastLoansCalculated() {
     Q_D( StressTest);
-	uint CurrentHash;
     QList<qint32> AllKeys = d->BaseApplier->GetAssumptionKeys();
 	const AssumptionSet* CurrentAss;
 	foreach(qint32 SingleKey, AllKeys) {

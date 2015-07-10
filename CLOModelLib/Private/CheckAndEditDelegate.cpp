@@ -30,7 +30,6 @@ void CheckAndEditDelegate::paint(QPainter *painter,const QStyleOptionViewItem &o
 
 
 QSize CheckAndEditDelegate::sizeHint(const QStyleOptionViewItem &option,const QModelIndex &index) const {
-	bool selected = option.state & QStyle::State_Selected;
 	Styler->SetText(index.model()->data(index, Qt::DisplayRole).toString());
 	Styler->setPalette(option.palette);
 	Styler->SetChecked(index.model()->data(index, Qt::UserRole + Qt::CheckStateRole).toInt() == Qt::Checked);

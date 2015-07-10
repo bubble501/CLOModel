@@ -307,12 +307,10 @@ Tranche* Waterfall::GetTranche(int Index)
 }
 const Tranche* Waterfall::GetTranche(const QString& TrancheName) const
 {
-    Q_D(const Waterfall);
     return GetTranche(FindTrancheIndex(TrancheName));
 }
 Tranche* Waterfall::GetTranche(const QString& TrancheName)
 {
-    Q_D( Waterfall);
     return GetTranche(FindTrancheIndex(TrancheName));
 }
 void Waterfall::SortByProRataGroup()
@@ -995,13 +993,13 @@ double Waterfall::RedeemNotes(double AvailableFunds, int GroupTarget, int Selior
         }
         return ((AvailableFunds - TotalPayable) >= 0.01 ? (AvailableFunds - TotalPayable) : 0.0);
     }
-    QMap<quint32, double> groupAccrue;
-    QHash < quint32, QList<quint32> * > groupRanks;
+    QMap<qint32, double> groupAccrue;
+    QHash < qint32, QList<qint32> * > groupRanks;
     auto groupKeys = groups.keys();
     for (auto i = groupKeys.constBegin(); i != groupKeys.constEnd(); ++i) {
         auto currVals = groups.values(*i);
         groupAccrue.insert(*i, 0.0);
-        groupRanks.insert(*i, new QList<quint32>());
+        groupRanks.insert(*i, new QList<qint32>());
         for (auto j = currVals.constBegin(); j != currVals.constEnd(); ++j) {
             groupAccrue[*i] += (**j)->GetCashFlow().GetAmountOutstanding(TargetDate);
             if (!groupRanks.value(*i)->contains((**j)->GetProrataGroup().GetRank(SeliorityScaleLevel)))
@@ -1045,7 +1043,6 @@ double Waterfall::RedeemNotes(double AvailableFunds, int GroupTarget, int Selior
 }
 double Waterfall::RedeemSequential(double AvailableFunds, const QDate& TargetDate, int SeliorityScaleLevel, int MaxGroup)
 {
-    Q_D( Waterfall);
     if (AvailableFunds<0.01) return 0.0;
     if (MaxGroup <= 0) MaxGroup = FindMostJuniorLevel(SeliorityScaleLevel);
     for (int CurrentSeniority = 1; CurrentSeniority <= MaxGroup && AvailableFunds >= 0.01; CurrentSeniority++) {
@@ -2306,10 +2303,8 @@ QDataStream& operator>>(QDataStream & stream, Waterfall& flows)
 QDataStream& Waterfall::LoadOldVersion(QDataStream& stream)
 {
     Q_D(Waterfall);
-    double TempDouble;
     QString TempString;
     qint32 TempInt;
-    qint16 TemShort;
     Tranche TempTranche;
     ReserveFund TempReserve;
     WatFalPrior TempStep;
@@ -2508,7 +2503,7 @@ double Waterfall::GetEquityReturn(int index)const
     IntegerVector AdjPaymentFreq(d->m_PaymentFrequency);
     if (d->m_PaymentFrequency.GetAnchorDate().isNull()) AdjPaymentFreq.SetAnchorDate(d->m_MortgagesPayments.GetDate(0));
     if (index<0 || index >= d->m_EquityIncome.Count()) return 0.0;
-    int EquityTranche;
+    int EquityTranche=0.0;
     foreach(WatFalPrior* SingleStep, d->m_WaterfallStesps)
     {
         if (SingleStep->GetPriorityType() == WatFalPrior::WaterfallStepType::wst_Excess) {
@@ -2541,7 +2536,7 @@ double Waterfall::GetCumulativeEquityReturn(int index)const
     if (index<0 || index >= d->m_EquityIncome.Count()) return 0.0;
     double numerator = 0.0;
     for (int i = 0; i <= index; i++) numerator += (d->m_EquityIncome.GetFlow(i, TrancheCashFlow::TrancheFlowType::InterestFlow) + d->m_EquityIncome.GetFlow(i, TrancheCashFlow::TrancheFlowType::PrincipalFlow));
-    int EquityTranche;
+    int EquityTranche=0.0;
     foreach(WatFalPrior* SingleStep, d->m_WaterfallStesps)
     {
         if (SingleStep->GetPriorityType() == WatFalPrior::WaterfallStepType::wst_Excess) {
@@ -2580,7 +2575,7 @@ double Waterfall::GetCallEquityRatio(int index)const
         }
     }
     if (MtgIndex<0) return 0.0;
-    int EquityTranche;
+    int EquityTranche=0.0;
     foreach(WatFalPrior* SingleStep, d->m_WaterfallStesps)
     {
         if (SingleStep->GetPriorityType() == WatFalPrior::WaterfallStepType::wst_Excess) {
@@ -2913,7 +2908,7 @@ bool Waterfall::TriggerPassing(const QString& TriggerStructure, int PeriodIndex,
     return PolishStack.pop();
 }
 
-bool Waterfall::EvaluateTrigger(quint32 TrigID, int PeriodIndex, const QDate& CurrentIPD, bool IsCallDate) const
+bool Waterfall::EvaluateTrigger(quint32 TrigID, int PeriodIndex, const QDate& CurrentIPD, bool /*IsCallDate*/) const
 {
     Q_D(const Waterfall);
     const QSharedPointer<AbstractTrigger> CurrentTrigger = d->m_Triggers.value(TrigID, QSharedPointer<AbstractTrigger>());

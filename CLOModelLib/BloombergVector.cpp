@@ -317,7 +317,7 @@ BloombergVector BloombergVector::Combine(const BloombergVector& StartVect, const
 	Result.SetAnchorDate(StartVect.GetAnchorDate());
     if (StartVect.d_func()->m_Divisor == SwitchVect.d_func()->m_Divisor) Result.d_func()->m_Divisor = StartVect.d_func()->m_Divisor;
 	if (!StartVect.GetAnchorDate().isNull() && !SwitchVect.GetAnchorDate().isNull()) {
-		for (int i = 0; i < Periods; i++)
+		for (decltype(Periods) i = 0; i < Periods; i++)
             Result.d_func()->m_VectVal.append(StartVect.GetValue(i));
 		for (CurrDate = StartVect.GetAnchorDate().addMonths(Periods); CurrDate < SwitchVect.GetAnchorDate(); CurrDate = CurrDate.addMonths(1))
             Result.d_func()->m_VectVal.append(SwitchVect.GetValue(0));
@@ -327,9 +327,9 @@ BloombergVector BloombergVector::Combine(const BloombergVector& StartVect, const
 	else {
 		if (!SwitchVect.GetAnchorDate().isNull())
 			Result.SetAnchorDate(SwitchVect.GetAnchorDate());
-		for (int i = 0; i < Periods; i++) 
+        for (decltype(Periods) i = 0; i < Periods; i++)
             Result.d_func()->m_VectVal.append(StartVect.GetValue(i));
-		if (Periods >= SwitchVect.NumElements())
+        if (Periods >= static_cast<decltype(Periods)>(SwitchVect.NumElements()))
             Result.d_func()->m_VectVal.append(SwitchVect.GetValue(Periods));
 		else {
 			for (int i = Periods; i < SwitchVect.NumElements(); i++) 

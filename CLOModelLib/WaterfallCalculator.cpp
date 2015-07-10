@@ -81,7 +81,6 @@ int WaterfallCalculator::NumBees() const
 
 void WaterfallCalculator::Reset()
 {
-    Q_D(WaterfallCalculator);
 	RETURN_WHEN_RUNNING(true, )
 	ClearWaterfalls();
 	TemplAsyncCalculator<WaterfallCalcThread, Waterfall>::Reset();
@@ -108,7 +107,6 @@ QDataStream& operator<<(QDataStream & stream, const WaterfallCalculator& flows)
 }
 QDataStream& WaterfallCalculator::LoadOldVersion(QDataStream& stream)
 {
-    Q_D(WaterfallCalculator);
     RETURN_WHEN_RUNNING(true, stream)
     Reset();
     qint32 tempInt, TempKey;

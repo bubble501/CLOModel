@@ -42,7 +42,6 @@ void ScenarioApplier::AddAssumption(const AssumptionSet& a, qint32 idx)
 
 const MtgCashFlow* ScenarioApplier::GetResult(const AssumptionSet& a) const
 {
-    Q_D(const ScenarioApplier);
     return GetResult(FindAssumption(a));
 }
 
@@ -87,7 +86,6 @@ void ScenarioApplier::BeeReturned(int Ident, const MtgCashFlow& a)
 }
 void ScenarioApplier::Reset()
 {
-    Q_D( ScenarioApplier);
 	RETURN_WHEN_RUNNING(true, )
 	ClearScenarios();
 	TemplAsyncCalculator<ApplyFlowThread, MtgCashFlow>::Reset();

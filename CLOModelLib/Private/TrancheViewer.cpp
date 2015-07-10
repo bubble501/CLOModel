@@ -30,7 +30,6 @@ TrancheViewer::TrancheViewer(QWidget* parent)
 }
 void TrancheViewer::SetTranche(const Tranche& a){
 	MainTable->setRowCount(0);
-	const auto& Temp = a.GetCashFlow();
 	MainTable->setRowCount(a.GetCashFlow().Count());
 	int EmptyDeferred=0;
 	for (qint32 i = static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow); i < (static_cast<qint32>(TrancheCashFlow::TrancheFlowType::DeferredFlow) | static_cast<qint32>(TrancheCashFlow::TrancheFlowType::InterestFlow)); ++i) {

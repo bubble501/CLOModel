@@ -59,7 +59,7 @@ bool RepaymentVector::IsValid() const {
     Q_D(const RepaymentVector);
 	QString PossibleRatesPattern = "[YNP";
 	QString TempPart;
-	for (int i = 1; true; i<<=1) {
+	for (int i = 1; ; i<<=1) {
         TempPart = d->RepaymentMethodsToString(i);
 		if (TempPart.isEmpty()) break;
 		PossibleRatesPattern += TempPart;
@@ -71,7 +71,7 @@ QRegExpValidator* RepaymentVector::GetValidator(QObject* parent) const {
     Q_D(const RepaymentVector);
 	QString PossibleRatesPattern = "[YNP";
 	QString TempPart;
-	for (int i = 1; true; i <<= 1) {
+	for (int i = 1; ; i <<= 1) {
         TempPart = d->RepaymentMethodsToString(i);
 		if (TempPart.isEmpty()) break;
 		PossibleRatesPattern += TempPart;

@@ -115,11 +115,15 @@ void Mortgage::SetSize(double a)
 	 BloombergVector LossMultiplier("100");
 	 DayCountVector CurrentDayCountConvention(QString("%1").arg(static_cast<qint16>(DayCountConvention::CompN30360)));
 
-	 auto ApplyProperty = &([&]() {
+     auto ApplyProperty = [this, &MaturityExtension, &StartingHaircut, &PrepaymentFee, &CurrentDayCountConvention, &HaircutVector, &PrepayMultiplier, &LossMultiplier, OverrideProperties, &CPRVec, &CDRVec, &LossVec, &RecoveryLag, &Delinquency, &DelinquencyLag]() {
 		 if (HasProperty("MaturityExtension")) MaturityExtension = GetProperty("MaturityExtension").toInt();
 		 if (HasProperty("StartingHaircut")) StartingHaircut = GetProperty("StartingHaircut").toDouble();
 		 if (HasProperty("PrepaymentFee")) PrepaymentFee = GetProperty("PrepaymentFee");
-		 if (HasProperty("DayCount")) { const DayCountVector TempDCV(GetProperty("DayCount")); if (!TempDCV.IsEmpty()) CurrentDayCountConvention = TempDCV; }
+		 if (HasProperty("DayCount")) {
+             const DayCountVector TempDCV(GetProperty("DayCount"));
+             if (!TempDCV.IsEmpty())
+                 CurrentDayCountConvention = TempDCV; 
+         }
 		 if (HasProperty("Haircut")) HaircutVector = GetProperty("Haircut");
 		 if (HasProperty("PrepayMultiplier")) PrepayMultiplier = GetProperty("PrepayMultiplier");
 		 if (HasProperty("LossMultiplier")) LossMultiplier = GetProperty("LossMultiplier");
@@ -131,10 +135,10 @@ void Mortgage::SetSize(double a)
 			 if (HasProperty("Delinquency")) Delinquency = GetProperty("Delinquency");
 			 if (HasProperty("DelinquencyLag")) DelinquencyLag = GetProperty("DelinquencyLag");
 		 }
-	 });
+	 };
 
 #ifndef Assumptions_ExcelOverDB
-	 (*ApplyProperty)();
+	 ApplyProperty();
 #endif
 
 #ifndef NO_DATABASE
@@ -191,7 +195,7 @@ void Mortgage::SetSize(double a)
 	 }
 #endif
 #ifdef Assumptions_ExcelOverDB
-	 (*ApplyProperty)();
+	 ApplyProperty();
 #endif
      StartingHaircut /= 100.0;
 	 if (
@@ -243,7 +247,7 @@ void Mortgage::SetSize(double a)
 
 
 	 
-	 double CurrentInterest, TempFlow1, TempFlow2;
+	 double CurrentInterest, TempFlow1, TempFlow2=0.0;
 	 int TempStep;
      double CurrentAmtOut = d->m_Size*qMax(0.0, 1.0 - StartingHaircut - HaircutVector.GetValue(AdjStartDate));
      d->m_CashFlows.SetFlow(AdjStartDate, d->m_Size*qMin(1.0, StartingHaircut + HaircutVector.GetValue(AdjStartDate)), MtgCashFlow::MtgFlowType::LossFlow);
@@ -297,7 +301,7 @@ void Mortgage::SetSize(double a)
                  (d->m_AnnuityVect.GetValue(CurrentMonth) & (RepaymentVector::InterestOnly | RepaymentVector::Capitalization))
 			){
 				 if (CurrentMonth == AdjMaturityDate) TempFlow2 = CurrentAmtOut;
-				 else TempFlow2 = 0;
+				 else TempFlow2 = 0.0;
 			 }
              else if (d->m_AnnuityVect.GetValue(CurrentMonth) & (RepaymentVector::Linear | RepaymentVector::Annuity)) {
 				 //Count the payments left
@@ -314,6 +318,9 @@ void Mortgage::SetSize(double a)
                      TempFlow2 = qAbs(pmt(GetInterest(CurrentMonth, CurrentMonth.addMonths(-d->m_PaymentFreq.GetValue(CurrentMonth)), CurrentMonth, CurrentDayCountConvention.GetValue(CurrentMonth)), CountPeriods, CurrentAmtOut)) - TempFlow1;
 				 }
 			 }
+             else {
+                 TempFlow2 = 0.0;
+             }
              d->m_CashFlows.AddFlow(CurrentMonth, TempFlow2, MtgCashFlow::MtgFlowType::PrincipalFlow);
 			 CurrentAmtOut = CurrentAmtOut - TempFlow2;
              NextPaymentDate = NextPaymentDate.addMonths(d->m_PaymentFreq.GetValue(CurrentMonth));
@@ -543,7 +550,8 @@ void Mortgage::SetSize(double a)
 #ifdef NO_BLOOMBERG
 			 m_FloatingRateBaseValue="0";
 #else
-         d->m_FloatingRateBaseValue = d->m_FloatRateBase.GetRefRateValueFromBloomberg(ConstantBaseRateTable());
+         ConstantBaseRateTable junk;
+         d->m_FloatingRateBaseValue = d->m_FloatRateBase.GetRefRateValueFromBloomberg(junk);
          d->m_UseForwardCurve = false;
 #endif
 		 }
@@ -555,7 +563,8 @@ void Mortgage::SetSize(double a)
 #ifdef NO_BLOOMBERG
          d->m_FloatingRateBaseValue = "0";
 #else
-         d->m_FloatingRateBaseValue = d->m_FloatRateBase.GetRefRateValueFromBloomberg(ConstantBaseRateTable());
+         ConstantBaseRateTable junk;
+         d->m_FloatingRateBaseValue = d->m_FloatRateBase.GetRefRateValueFromBloomberg(junk);
          d->m_UseForwardCurve = false;
 #endif
 		 }
@@ -567,7 +576,8 @@ void Mortgage::SetSize(double a)
 #ifdef NO_BLOOMBERG
 			 m_FloatingRateBaseValue = "0";
 #else
-         d->m_FloatingRateBaseValue = d->m_FloatRateBase.GetRefRateValueFromBloomberg(ConstantBaseRateTable());
+         ConstantBaseRateTable junk;
+         d->m_FloatingRateBaseValue = d->m_FloatRateBase.GetRefRateValueFromBloomberg(junk);
              d->m_UseForwardCurve = false;
 #endif
 		 }
@@ -579,7 +589,8 @@ void Mortgage::SetSize(double a)
 #ifdef NO_BLOOMBERG
          d->m_FloatingRateBaseValue = "0";
 #else
-         d->m_FloatingRateBaseValue = d->m_FloatRateBase.GetRefRateValueFromBloomberg(ConstantBaseRateTable());
+         ConstantBaseRateTable junk;
+         d->m_FloatingRateBaseValue = d->m_FloatRateBase.GetRefRateValueFromBloomberg(junk);
              d->m_UseForwardCurve = false;
 #endif
 		 }
@@ -642,7 +653,7 @@ QString Mortgage::GetPropertyName(qint32 PropIndex) const
 bool Mortgage::HasProperty(const QString& PropName) const
 {
     Q_D(const Mortgage);
-	QRegExp TempReg('#<#' + PropName.trimmed() + "#=#(.+)#>#", Qt::CaseInsensitive);
+	QRegExp TempReg("#<#" + PropName.trimmed() + "#=#(.+)#>#", Qt::CaseInsensitive);
 	TempReg.setMinimal(true);
 	return  TempReg.indexIn(d->m_Properties) != -1;
 }

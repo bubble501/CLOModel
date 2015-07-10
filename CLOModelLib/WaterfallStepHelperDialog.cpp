@@ -347,7 +347,7 @@ void WaterfallStepHelperDialog::ResetSoFCombo(int index)
 		emit SetSoFCombo(0);
 	}
 }
-void WaterfallStepHelperDialog::ResetPayAccrueCombo(int index) {
+void WaterfallStepHelperDialog::ResetPayAccrueCombo(int) {
 	emit SetPayAccrueCombo(1); 
 	emit SetPayAccrueCombo(0); //Ensures it defaults to Accrue and Pay
 }

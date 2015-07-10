@@ -265,7 +265,7 @@ void PDLTrigger::SetTargetSize(const QString& val)
 void PDLTrigger::SetSizeMultiplier(double mult)
 {
     Q_D( PDLTrigger);
-    return ResetSizeMultiplier();
+    ResetSizeMultiplier();
     if (mult != 0.0) 
         d->m_TargetSize *= mult;
 }

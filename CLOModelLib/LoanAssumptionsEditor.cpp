@@ -340,7 +340,7 @@ void LoanAssumptionsEditorPrivate::CreateScenarioEditor()
     q->connect(m_ScenariosModel, &QStandardItemModel::rowsInserted, [&]() {m_ScenarioEditorRightSection->setEnabled(m_ScenariosModel->rowCount() > 0); });
     q->connect(m_ScenariosModel, &QStandardItemModel::rowsRemoved, [&]() {m_ScenarioEditorRightSection->setEnabled(m_ScenariosModel->rowCount() > 0); });
     q->connect(m_ScenariosModel, &QStandardItemModel::modelReset, [&]() {m_ScenarioEditorRightSection->setEnabled(m_ScenariosModel->rowCount() > 0); });
-    q->connect(m_ScenariosModel, &QStandardItemModel::dataChanged, [&](const QModelIndex& index, const QModelIndex&) {
+    q->connect(m_ScenariosModel, &QStandardItemModel::dataChanged, [&](const QModelIndex& , const QModelIndex&) {
 		m_SortScenarios->sort(0);
 	});
     q->connect(m_ScenarioList->selectionModel(), &QItemSelectionModel::currentChanged, q, &LoanAssumptionsEditor::ChangeScenario);
@@ -781,7 +781,7 @@ void LoanAssumptionsEditorPrivate::FillScenariosModel()
 	m_ScenariosCombo->setCurrentIndex(-1);
 }
 
-void LoanAssumptionsEditor::ChangeScenario(const QModelIndex& curr, const QModelIndex& prev)
+void LoanAssumptionsEditor::ChangeScenario(const QModelIndex& curr, const QModelIndex& )
 {
     Q_D(LoanAssumptionsEditor);
 	if (!curr.isValid()) return;
@@ -1272,7 +1272,7 @@ void LoanAssumptionsEditor::MezzScenarioChanged(const QModelIndex& index) {
 
 }
 bool LoanAssumptionsEditorPrivate::CheckAliasInput() {
-    Q_Q(LoanAssumptionsEditor);
+    Q_Q(const LoanAssumptionsEditor);
 	if (m_AliasLineEdit->text().isEmpty() || QRegExp(m_AliasLineEdit->text()).isValid()) {
 		m_AliasLineEdit->setStyleSheet(QString());
 	}

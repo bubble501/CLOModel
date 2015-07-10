@@ -94,7 +94,7 @@ bool removeDir(const QString & dirName)
                     return false;
 			}
 		}
-        if (!dir.rmdir(dirName));
+        if (!dir.rmdir(dirName))
             return false;
 	}
 	return true;
@@ -136,7 +136,6 @@ bool IsHoliday(const QDate& a/*, const QString& CountryCode*/) {
 	return a.dayOfWeek() >= 6;
 }
 bool ValidDayCount(qint16 a) {
-	DayCountConvention b;
 	switch (a & (((1 << CompoundShift) - 1))) {
 	case static_cast<qint16>(DayCountConvention::ACTACT) :
 	case static_cast<qint16>(DayCountConvention::ACT360) :

@@ -3,7 +3,7 @@ AbstractTriggerSettingWidget::AbstractTriggerSettingWidget(QWidget* parent)
     :QWidget(parent)
 {}
 
-void AbstractTriggerSettingWidget::setParameters(const QString& pars)
+void AbstractTriggerSettingWidget::setParameters(const QString&)
 {}
 
 QString AbstractTriggerSettingWidget::parameters() const

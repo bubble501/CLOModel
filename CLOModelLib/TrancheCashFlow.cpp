@@ -111,7 +111,7 @@ bool TrancheCashFlow::HasAnyInterest(TrancheFlowType base) const
 QDate TrancheCashFlow::GetLastFlowDate(bool IncludeDeferred) const
 {
     Q_D(const TrancheCashFlow);
-    for (auto i = d->m_CashFlows.constEnd() - 1; true; --i) {
+    for (auto i = d->m_CashFlows.constEnd() - 1; ; --i) {
 		for (auto j = i.value()->constBegin(); j != i.value()->constEnd(); ++j) {
 			if ((
 				(j.key() & TrancheFlowType::InterestFlow) 

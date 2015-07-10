@@ -993,8 +993,7 @@ QDataStream& operator>>(QDataStream & stream, Tranche& flows){
 }
 QDataStream& Tranche::LoadOldVersion(QDataStream& stream){
     Q_D(Tranche);
-	qint32 TempSize, TempInt, TempKey;
-	qint16 TempShort;
+	qint32 TempSize, TempKey;
 	BloombergVector* TempBV;
 	BaseRateVector* TempBRV;
     DayCountVector* TempDCV;
@@ -1093,7 +1092,7 @@ double Tranche::GetReferenceRateValue(const QDate& index, qint32 CoupIndex) cons
 	return 0.0;
 }
 
-quint32 Tranche::GetProrataGroup(int SeliorityScaleLevel) const
+qint32 Tranche::GetProrataGroup(int SeliorityScaleLevel) const
 {
     Q_D(const Tranche);
     return d->ProrataGroup.GetSeniority(SeliorityScaleLevel);

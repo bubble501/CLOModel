@@ -33,7 +33,6 @@ GenericCashFlow::GenericCashFlow(GenericCashFlowPrivate *d)
 
 GenericCashFlow& GenericCashFlow::operator=(const GenericCashFlow& other)
 {
-    Q_D(GenericCashFlow);
     BackwardInterface::operator=(other);
     Aggregate(other.d_func()->m_AggregationLevel);
     SetFlow(other);
@@ -173,7 +172,7 @@ void GenericCashFlow::SetFlow(const GenericCashFlow& a) {
     d->m_Stocks = a.d_func()->m_Stocks;
     d->m_CashFlowLabels = a.d_func()->m_CashFlowLabels;
     if (!a.d_func()->m_CashFlows.isEmpty()) {
-        for (auto i = a.d_func()->m_CashFlows.constEnd() - 1; true; --i) {
+        for (auto i = a.d_func()->m_CashFlows.constEnd() - 1; ; --i) {
 			if (i.value()->isEmpty()) SetFlow(i.key(), 0.0, 0);
 			for (auto j = i.value()->constBegin(); j != i.value()->constEnd(); ++j) {
 				SetFlow(i.key(), j.value(), j.key());
@@ -210,7 +209,7 @@ double GenericCashFlow::GetFlow(const QDate& index, qint32 FlowTpe) const {
                 return 0.0;
 			--FoundIt;
 		}
-		for (; true; --FoundIt) {
+		for (; ; --FoundIt) {
 			if (FoundIt.value()->contains(FlowTpe))
 				return FoundIt.value()->value(FlowTpe);
             if (FoundIt == d->m_CashFlows.constBegin()) 
@@ -272,7 +271,7 @@ void GenericCashFlow::Aggregate(CashFlowAggregation Freq) {
 
 bool GenericCashFlowPrivate::SamePeriod(const QDate& a, const QDate& b, GenericCashFlow::CashFlowAggregation Freq)
 {
-	int YearA, YearB;
+	int YearA=0, YearB=0;
 	bool Result;
 	switch (Freq) {
     case GenericCashFlow::TotalAggragate:
@@ -286,7 +285,7 @@ bool GenericCashFlowPrivate::SamePeriod(const QDate& a, const QDate& b, GenericC
     case GenericCashFlow::Monthly:
 		return a.year() == b.year() && a.month() == b.month();
     case GenericCashFlow::Weekly:
-		Result = a.weekNumber(&YearA) && b.weekNumber(&YearB);
+		Result = a.weekNumber(&YearA) == b.weekNumber(&YearB);
 		return Result && YearA == YearB;
     case GenericCashFlow::NoAggregation:
 	default:
@@ -332,7 +331,7 @@ QDataStream& GenericCashFlow::LoadOldVersion(QDataStream& stream) {
 QDate GenericCashFlow::MaturityDate() const {
     Q_D(const GenericCashFlow);
     if (d->m_CashFlows.isEmpty()) return QDate();
-    for (auto i = d->m_CashFlows.constEnd() - 1; true; --i) {
+    for (auto i = d->m_CashFlows.constEnd() - 1; ; --i) {
 		if (!i.value()->isEmpty()) return i.key();
         if (i == d->m_CashFlows.constBegin()) return QDate();
 	}
@@ -760,7 +759,7 @@ QDate GenericCashFlow::nextFlowDate(const QDate& currDt) const
 QDate GenericCashFlow::prevFlowDate(const QDate& currDt) const
 {
     Q_D(const GenericCashFlow);
-    for (auto i = d->m_CashFlows.constEnd()-1; true; --i) {
+    for (auto i = d->m_CashFlows.constEnd()-1; ; --i) {
         if (i.key() < currDt)
             return i.key();
         if (i == d->m_CashFlows.constBegin())

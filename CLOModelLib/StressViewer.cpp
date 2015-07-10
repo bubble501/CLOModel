@@ -264,7 +264,7 @@ void StressViewer::UpdateTable()
     Q_D(StressViewer);
 	QTableWidgetItem* CurrentItem=nullptr;
 	double CurrentData;
-	double MaxDisc, MinDisc;
+	double MaxDisc=0.0, MinDisc=0.0;
 	bool Minset = false;
     for (int i = 0; i < d->StressTable->rowCount(); ++i) {
         for (int j = 0; j <d->StressTable->columnCount(); ++j) {

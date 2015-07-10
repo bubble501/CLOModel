@@ -32,11 +32,9 @@ CentralUnit::CentralUnit(QObject* parent)
 {
 	for(int i=0;i<NumberOfPlots;i++) PlotIndexes[i]=0;
     if (QMetaType::type("Waterfall")==QMetaType::UnknownType) {
-        int TypeID = qRegisterMetaType<Waterfall>(typeid(Waterfall).name());
         qRegisterMetaTypeStreamOperators<Waterfall>(typeid(Waterfall).name());
     }
     if (QMetaType::type("MtgCashFlow")==QMetaType::UnknownType) {
-        int TypeID = qRegisterMetaType<MtgCashFlow>(typeid(MtgCashFlow).name());
         qRegisterMetaTypeStreamOperators<MtgCashFlow>(typeid(MtgCashFlow).name());
     }
 	connect(&LoansCalculator,SIGNAL(Calculated()),this,SLOT(CalculationStep2()));

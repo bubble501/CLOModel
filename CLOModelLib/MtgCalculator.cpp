@@ -812,7 +812,6 @@ QHash<QString, double> MtgCalculator::GetGeographicBreakdown() const
 
 QString MtgCalculator::GetGeography(const QString& guess, simstring::reader& dbr) const
 {
-    Q_D(const MtgCalculator);
 	double simThreshold=0.6;
 	std::vector<std::wstring> simMatches;
     QString Result;
@@ -827,7 +826,6 @@ QString MtgCalculator::GetGeography(const QString& guess, simstring::reader& dbr
 
 QString MtgCalculator::GetCountryISOCode(QString name) const
 {
-    Q_D(const MtgCalculator);
 	name = name.trimmed().toLower();
     if (name.isEmpty()) return QString();
 	QFile InputFile(":/DataSources/ISO3166-1.xml");

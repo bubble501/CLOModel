@@ -71,7 +71,7 @@ public:
 	double GetPrice() const;
 	const QString& GetBloombergExtension() const;
 	const Seniority& GetProrataGroup() const;
-	quint32 GetProrataGroup(int SeliorityScaleLevel) const;
+	qint32 GetProrataGroup(int SeliorityScaleLevel) const;
 	const TrancheCashFlow& GetCashFlow() const;
 	TrancheCashFlow& GetCashFlow();
 	double GetMinOClevel() const;

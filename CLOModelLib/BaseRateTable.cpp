@@ -202,7 +202,6 @@ BloombergVector ForwardBaseRateTable::GetValue(const QString& key) const
 
 void ForwardBaseRateTable::SetValue(const QString& key, const QList<QDate>& RefDates, const QList<double>& Refvals)
 {
-    Q_D(ForwardBaseRateTable);
     SetValue(key, BloombergVector(RefDates, Refvals));
 }
 

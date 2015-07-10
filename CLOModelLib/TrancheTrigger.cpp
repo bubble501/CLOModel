@@ -297,9 +297,10 @@ TrancheTriggerSettingWidget* TrancheTrigger::createSettingsWidget(QWidget* paren
 void TrancheTrigger::SetSizeMultiplier(double mult)
 {
     Q_D( TrancheTrigger);
-	 return ResetSizeMultiplier();  
+    ResetSizeMultiplier();
      if (mult != 0.0)
          d->m_TargetSize *= mult;
+
 }
 
 void TrancheTrigger::ResetSizeMultiplier()

@@ -272,7 +272,7 @@ void StandaloneStress::PasteClipboard(){
 		TableCell.setMinimal(true);
 		int CurrIndex=-1;
 		QStringList SingleValues;
-		while(true){
+        for (;;) {
 			CurrIndex=TableCell.indexIn(Test,CurrIndex+1);
 			if(CurrIndex<0) break;
 			SingleValues.append(TableCell.capturedTexts().last());

@@ -15,7 +15,6 @@ bool ExcelCommons::InitExcelOLE()
 	OleInitialize(NULL);
 	CLSID clsid;
 	HRESULT hr;
-	char cErr[64];
 	IUnknown *pUnk;
 	hr = CLSIDFromProgID(L"Excel.Application", &clsid);
 	if(FAILED(hr))

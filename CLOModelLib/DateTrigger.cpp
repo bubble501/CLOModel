@@ -63,7 +63,6 @@ bool DateTrigger::Passing(const QDate& CurrentDate) const {
 
 bool DateTrigger::Failing(const QDate& CurrentDate) const
 {
-    Q_D(const DateTrigger);
     return !Passing(CurrentDate);
 }
 

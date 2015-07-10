@@ -744,6 +744,8 @@ Waterfall StressTest::GetScenarioFromFile(const QString& DestPath, const QString
 bool StressTest::LoadResultsFromFile(const QString& DestPath)
 {
     Q_D( StressTest);
+    char *argv[] = { "NoArgumnets" };
+    int argc = 1;
 	ResetStressTest();
 	qint32 VesionCheck;
 	if(!QFile::exists(DestPath)) return false;
@@ -767,9 +769,7 @@ bool StressTest::LoadResultsFromFile(const QString& DestPath)
 	}
 	catch(int){
 		if(!QApplication::instance()){
-			char *argv[] = {"NoArgumnets"};
-			int argc = sizeof(argv) / sizeof(char*) - 1;
-			QApplication ComputationLoop(argc,argv);
+            QApplication ComputationLoop(argc, argv);
 			QMessageBox::critical(0,"Incompatible Version","The stress test data is not compatible with the current model version\nPlease run ALL the stress tests again");
 			QApplication::quit();
 		}

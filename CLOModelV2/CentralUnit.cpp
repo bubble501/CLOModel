@@ -253,14 +253,14 @@ void CentralUnit::SetupStress(const QString& ConstPar,QList<QString> XSpann,QLis
 }
 void CentralUnit::Calculate(){
 	char *argv[] = {"NoArgumnets"};
-	int argc = sizeof(argv) / sizeof(char*) - 1;
+	int argc = 1;
 	QApplication ComputationLoop(argc,argv);
 	emit LoopStarted();
 	ComputationLoop.exec();
 }
 void CentralUnit::CalculateStress(){
 	char *argv[] = {"NoArgumnets"};
-	int argc = sizeof(argv) / sizeof(char*) - 1;
+	int argc =  1;
 	QApplication ComputationLoop(argc,argv);
 	if(Stresser) Stresser->SetUseFastVersion(UseFastStress);
 	emit StressLoopStarted();

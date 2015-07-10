@@ -739,7 +739,7 @@ BSTR __stdcall WatFallStepEdit(LPSAFEARRAY *ArrayData) {
 	}
 	SafeArrayUnaccessData(*ArrayData);
 	char *argv[] = { "NoArgumnets" };
-	int argc = sizeof(argv) / sizeof(char*) - 1;
+	int argc = 1;
 	{
 		QApplication a(argc, argv);
 		WaterfallStepHelperDialog WatfDialog;
@@ -766,9 +766,9 @@ BSTR __stdcall TriggerEdit(LPSAFEARRAY *ArrayData) {
 	QString CurrentTrig = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
     LOGDEBUG(CurrentTrig);
 	SafeArrayUnaccessData(*ArrayData);
+    char *argv[] = { "NoArgumnets" };
+    int argc = 1;
 	{
-		char *argv[] = { "NoArgumnets" };
-		int argc = sizeof(argv) / sizeof(char*) - 1;
 		QApplication a(argc, argv);
 		TriggerHelperDialog TrigDialog;
 		TrigDialog.SetCurrentPars(CurrentTrig);
@@ -795,7 +795,7 @@ BSTR __stdcall LoadLoanScenario(LPSAFEARRAY *ArrayData) {
 	const int NumOfLoans = pdFreq->intVal; pdFreq++;
 	Mortgage TempMtg;
 	char *argv[] = { "NoArgumnets" };
-	int argc = sizeof(argv) / sizeof(char*) - 1;
+	int argc = 1;
 	QApplication a(argc, argv);
     QDialog TempDialog;
 	TempDialog.setWindowIcon(QIcon(":/Icons/Logo.png"));

@@ -60,4 +60,8 @@
   <ItemGroup>
     <Image Include="Resources\Logo.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="CLOViewer.pri" />
+    <None Include="CLOViewer.pro" />
+  </ItemGroup>
 </Project>

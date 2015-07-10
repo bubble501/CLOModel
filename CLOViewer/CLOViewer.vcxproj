@@ -64,6 +64,10 @@
   <ItemGroup>
     <Image Include="Resources\Logo.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="CLOViewer.pri" />
+    <None Include="CLOViewer.pro" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F397EA01-C3E5-4A06-B42C-C1941E3407F4}</ProjectGuid>
     <Keyword>Qt4VSv1.0</Keyword>

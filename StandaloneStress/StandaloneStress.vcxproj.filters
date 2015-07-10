@@ -60,4 +60,8 @@
   <ItemGroup>
     <Image Include="Resources\Logo.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="StandaloneStress.pri" />
+    <None Include="StandaloneStress.pro" />
+  </ItemGroup>
 </Project>

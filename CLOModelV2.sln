@@ -15,6 +15,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ConsoleDebugger", "ConsoleD
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CLONetAPI2", "CLONetAPI2\CLONetAPI2.vcxproj", "{368CFBE1-0D79-43A1-93C1-BDAB32793789}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7BEF8B67-F9E1-46D7-9BE4-B0F56AB2B02A}"
+	ProjectSection(SolutionItems) = preProject
+		CLOModelV2.pro = CLOModelV2.pro
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms

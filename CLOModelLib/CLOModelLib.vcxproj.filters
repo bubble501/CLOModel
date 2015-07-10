@@ -944,4 +944,8 @@
       <Filter>Resource Files</Filter>
     </Xml>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="CLOModelLib.pri" />
+    <None Include="CLOModelLib.pro" />
+  </ItemGroup>
 </Project>

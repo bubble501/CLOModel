@@ -64,6 +64,10 @@
   <ItemGroup>
     <Image Include="Resources\Logo.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="StandaloneStress.pri" />
+    <None Include="StandaloneStress.pro" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8BE9DE9F-3DC9-4287-BD71-3B6B0F90DFBD}</ProjectGuid>
     <Keyword>Qt4VSv1.0</Keyword>

@@ -1,6 +1,6 @@
 TEMPLATE = subdirs
 SUBDIRS += CLOModelLib/CLOModelLib.pro \
-    CLOModelV2/CLOModelV2.pro \
+    CLOModelV2/CLOModelExcel.pro \
     CLOViewer/CLOViewer.pro \
     StandaloneStress/StandaloneStress.pro \
     ConsoleDebugger/ConsoleDebugger.pro \

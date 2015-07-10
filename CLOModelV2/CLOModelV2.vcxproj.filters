@@ -86,6 +86,8 @@
     <None Include="..\README.markdown">
       <Filter>Documentation</Filter>
     </None>
+    <None Include="CLOModelExcel.pri" />
+    <None Include="CLOModelExcel.pro" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Build Instructions.markdown">

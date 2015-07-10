@@ -479,9 +479,8 @@ double __stdcall CLOReturnRate(LPSAFEARRAY *ArrayData){
 	file.close();
     if (TempWaterfall.GetTranchesCount() == 0)
         return 0.0;
-    char *argv[] = { "NoArgumnets" };
-    int argc = sizeof(argv) / sizeof(char*) - 1;
-    QApplication ComputationLoop(argc, argv);
+    int argc =  1;
+    QApplication ComputationLoop(argc, NULL);
 	const Tranche* const TranchPoint=TempWaterfall.GetTranche(TrancheName);
     ComputationLoop.quit();
 	if(Q_LIKELY(TranchPoint))
@@ -529,9 +528,8 @@ double __stdcall CLODiscountMargin(LPSAFEARRAY *ArrayData){
     file.close();
     if (TempWaterfall.GetTranchesCount() == 0)
         return 0.0;
-    char *argv[] = { "NoArgumnets" };
-    int argc = sizeof(argv) / sizeof(char*) - 1;
-    QApplication ComputationLoop(argc, argv);
+    int argc =  1;
+    QApplication ComputationLoop(argc, NULL);
 	const Tranche* const TranchPoint=TempWaterfall.GetTranche(TrancheName);
     ComputationLoop.quit();
 	if(Q_LIKELY(TranchPoint))
@@ -577,9 +575,9 @@ double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
 	file.close();
     if (TempWaterfall.GetTranchesCount() == 0)
         return 0.0;
-    char *argv[] = { "NoArgumnets" };
-    int argc = sizeof(argv) / sizeof(char*) - 1;
-    QApplication ComputationLoop(argc, argv);
+
+    int argc =  1;
+    QApplication ComputationLoop(argc, NULL);
 	const Tranche* const TranchPoint=TempWaterfall.GetTranche(TrancheName);
     ComputationLoop.quit();
 	if(Q_LIKELY(TranchPoint)) 
@@ -611,9 +609,8 @@ double __stdcall GetStressLoss(LPSAFEARRAY *ArrayData) {
 	FolderPath += "StressResult.fcsr";
 	if (!QFile::exists(FolderPath)) { LOGDEBUG("Returned -1"); return -1.0; }
 	Waterfall TempRes = StressTest::GetScenarioFromFile(FolderPath, CPRscenario, CDRscenario, LSscenario, RecLagScenario, DelinqScenario, DelinqLagScenario);
-    char *argv[] = { "NoArgumnets" };
-    int argc = sizeof(argv) / sizeof(char*) - 1;
-    QApplication ComputationLoop(argc, argv);
+    int argc =1;
+    QApplication ComputationLoop(argc, NULL);
 	const Tranche* const Result = TempRes.GetTranche(TrancheName);
     ComputationLoop.quit();
 	if (Result)
@@ -647,9 +644,8 @@ double __stdcall GetStressDM(LPSAFEARRAY *ArrayData) {
 	FolderPath += "StressResult.fcsr";
 	if (!QFile::exists(FolderPath)) { return 0.0; }
 	Waterfall TempRes = StressTest::GetScenarioFromFile(FolderPath, CPRscenario, CDRscenario, LSscenario, RecLagScenario, DelinqScenario, DelinqLagScenario);
-    char *argv[] = { "NoArgumnets" };
-    int argc = sizeof(argv) / sizeof(char*) - 1;
-    QApplication ComputationLoop(argc, argv);
+    int argc =  1;
+    QApplication ComputationLoop(argc, NULL);
     const Tranche* const Result = TempRes.GetTranche(TrancheName);
     ComputationLoop.quit();
 	if (Result)
@@ -738,10 +734,9 @@ BSTR __stdcall WatFallStepEdit(LPSAFEARRAY *ArrayData) {
 		}
 	}
 	SafeArrayUnaccessData(*ArrayData);
-	char *argv[] = { "NoArgumnets" };
 	int argc = 1;
 	{
-		QApplication a(argc, argv);
+		QApplication a(argc, NULL);
 		WaterfallStepHelperDialog WatfDialog;
 		WatfDialog.SetInterestWF(IsInterestWF);
         LOGDEBUG("InterestWF loaded");
@@ -766,10 +761,9 @@ BSTR __stdcall TriggerEdit(LPSAFEARRAY *ArrayData) {
 	QString CurrentTrig = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
     LOGDEBUG(CurrentTrig);
 	SafeArrayUnaccessData(*ArrayData);
-    char *argv[] = { "NoArgumnets" };
     int argc = 1;
 	{
-		QApplication a(argc, argv);
+		QApplication a(argc, NULL);
 		TriggerHelperDialog TrigDialog;
 		TrigDialog.SetCurrentPars(CurrentTrig);
         const auto DialogRes = TrigDialog.exec();
@@ -794,9 +788,8 @@ BSTR __stdcall LoadLoanScenario(LPSAFEARRAY *ArrayData) {
 	if (!SUCCEEDED(hr))return NULL;
 	const int NumOfLoans = pdFreq->intVal; pdFreq++;
 	Mortgage TempMtg;
-	char *argv[] = { "NoArgumnets" };
 	int argc = 1;
-	QApplication a(argc, argv);
+	QApplication a(argc, 0);
     QDialog TempDialog;
 	TempDialog.setWindowIcon(QIcon(":/Icons/Logo.png"));
 	TempDialog.setWindowTitle(QObject::tr("Loan Scenarios Editor"));

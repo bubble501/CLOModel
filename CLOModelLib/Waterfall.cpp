@@ -353,7 +353,7 @@ double Waterfall::GetAnnualizedExcess(int index, bool AsShareOfLoans)const
         loanSize *= 0.5;
         if (d->m_CalculatedMtgPayments.GetAmountOut(d->m_AnnualizedExcess.GetDate(index))<0.01) 
             return -1.0;
-        return 1.0 / AdjustCoupon(loanSize / d->m_AnnualizedExcess.GetTotalFlow(index), index == 0 ? d->m_LastIPDdate : d->m_AnnualizedExcess.GetDate(index - 1), d->m_AnnualizedExcess.GetDate(index), DayCountConvention::N30360);
+        return 1.0 / deannualiseCoupon(loanSize / d->m_AnnualizedExcess.GetTotalFlow(index), index == 0 ? d->m_LastIPDdate : d->m_AnnualizedExcess.GetDate(index - 1), d->m_AnnualizedExcess.GetDate(index), DayCountConvention::N30360);
     }
     double RunningSum = 0.0;
     double RunningPrev = 0.0;
@@ -363,7 +363,7 @@ double Waterfall::GetAnnualizedExcess(int index, bool AsShareOfLoans)const
     }
     if (RunningSum<0.01)
         return -1.0;
-    return 1.0 / AdjustCoupon(RunningSum / d->m_AnnualizedExcess.GetTotalFlow(index), index == 0 ? d->m_LastIPDdate : d->m_AnnualizedExcess.GetDate(index - 1), d->m_AnnualizedExcess.GetDate(index), DayCountConvention::N30360);
+    return 1.0 / deannualiseCoupon(RunningSum / d->m_AnnualizedExcess.GetTotalFlow(index), index == 0 ? d->m_LastIPDdate : d->m_AnnualizedExcess.GetDate(index - 1), d->m_AnnualizedExcess.GetDate(index), DayCountConvention::N30360);
 
 }
 
@@ -1248,7 +1248,7 @@ bool Waterfall::CalculateTranchesCashFlows()
             if (CurrentDate > d->m_MortgagesPayments.GetDate(0)) {
                 CurrentAssetSum += d->m_MortgagesPayments.GetAmountOut(CurrentDate.addMonths(-1)) + d->m_ReinvestmentTest.GetQueuedCash(CurrentDate);
                 ++CurrentAssetCount;
-                TotalPayable = AdjustCoupon(d->m_GICinterest.GetValue(CurrentDate) + d->m_GICBaseRateValue.GetValue(CurrentDate), CurrentDate.addMonths(-1), CurrentDate, d->m_DealDayCountConvention.GetValue(CurrentDate));
+                TotalPayable = deannualiseCoupon(d->m_GICinterest.GetValue(CurrentDate) + d->m_GICBaseRateValue.GetValue(CurrentDate), CurrentDate.addMonths(-1), CurrentDate, d->m_DealDayCountConvention.GetValue(CurrentDate));
                 d->m_GICflows.AddFlow(CurrentDate, d->m_InterestAvailable*TotalPayable, TrancheCashFlow::TrancheFlowType::InterestFlow);
                 d->m_GICflows.AddFlow(CurrentDate, d->m_PrincipalAvailable.Total()*TotalPayable, TrancheCashFlow::TrancheFlowType::PrincipalFlow);
                 d->m_GICflows.AddFlow(CurrentDate, d->m_ReinvestmentTest.GetQueuedCash(CurrentDate)*TotalPayable, 2 | TrancheCashFlow::TrancheFlowType::InterestFlow);
@@ -1358,7 +1358,7 @@ bool Waterfall::CalculateTranchesCashFlows()
                 switch (SingleStep->GetPriorityType()) {
                     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 case WatFalPrior::WaterfallStepType::wst_SeniorExpenses:
-                    adjSeniorExpenses = AdjustCoupon(d->m_SeniorExpenses.GetValue(CurrentDate), RollingLastIPD, RollingNextIPD, d->m_DealDayCountConvention.GetValue(CurrentDate));
+                    adjSeniorExpenses = deannualiseCoupon(d->m_SeniorExpenses.GetValue(CurrentDate), RollingLastIPD, RollingNextIPD, d->m_DealDayCountConvention.GetValue(CurrentDate));
                     TotalPayable = adjSeniorExpenses*(CurrentAssetSum / static_cast<double>(CurrentAssetCount))
                         - d->m_TotalSeniorExpenses.GetFlow(CurrentDate, TrancheCashFlow::TrancheFlowType::InterestFlow)
                         - d->m_TotalSeniorExpenses.GetFlow(CurrentDate, TrancheCashFlow::TrancheFlowType::PrincipalFlow)
@@ -1378,7 +1378,7 @@ bool Waterfall::CalculateTranchesCashFlows()
                     break;
                     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 case WatFalPrior::WaterfallStepType::wst_SeniorFees:
-                    adjSeniorFees = AdjustCoupon(d->m_SeniorFees.GetValue(CurrentDate), RollingLastIPD, RollingNextIPD, d->m_DealDayCountConvention.GetValue(CurrentDate));
+                    adjSeniorFees = deannualiseCoupon(d->m_SeniorFees.GetValue(CurrentDate), RollingLastIPD, RollingNextIPD, d->m_DealDayCountConvention.GetValue(CurrentDate));
                     TotalPayable = adjSeniorFees*(CurrentAssetSum / static_cast<double>(CurrentAssetCount))
                         - d->m_TotalSeniorFees.GetFlow(CurrentDate, TrancheCashFlow::TrancheFlowType::InterestFlow)
                         - d->m_TotalSeniorFees.GetFlow(CurrentDate, TrancheCashFlow::TrancheFlowType::PrincipalFlow)
@@ -1399,10 +1399,10 @@ bool Waterfall::CalculateTranchesCashFlows()
                     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 case WatFalPrior::WaterfallStepType::wst_juniorFees:
                     if (SingleStep->GetParameter(WatFalPrior::wstParameters::PayAccrue).toInt() & WatFalPrior::wstAccrueOrPay::Accrue) {
-                        adjJuniorFees = AdjustCoupon(d->m_JuniorFees.GetValue(CurrentDate), RollingLastIPD, RollingNextIPD, d->m_DealDayCountConvention.GetValue(CurrentDate));
+                        adjJuniorFees = deannualiseCoupon(d->m_JuniorFees.GetValue(CurrentDate), RollingLastIPD, RollingNextIPD, d->m_DealDayCountConvention.GetValue(CurrentDate));
                         TotalPayable = (adjJuniorFees*(CurrentAssetSum / static_cast<double>(CurrentAssetCount)))
                             - d->m_TotalJuniorFees.GetFlow(CurrentDate, TrancheCashFlow::TrancheFlowType::AccruedFlow)
-                            + (AdjustCoupon(d->m_JuniorFeesCoupon, RollingLastIPD, RollingNextIPD, d->m_DealDayCountConvention.GetValue(CurrentDate))*(d->m_TotalJuniorFees.GetFlow(CurrentDate, TrancheCashFlow::TrancheFlowType::DeferredFlow) + d->m_StartingDeferredJunFees))
+                            + (deannualiseCoupon(d->m_JuniorFeesCoupon, RollingLastIPD, RollingNextIPD, d->m_DealDayCountConvention.GetValue(CurrentDate))*(d->m_TotalJuniorFees.GetFlow(CurrentDate, TrancheCashFlow::TrancheFlowType::DeferredFlow) + d->m_StartingDeferredJunFees))
                             ;
                         d->m_StartingDeferredJunFees = 0.0;
                         TotalPayable += d->m_JuniorFeesFixed.GetValue(CurrentDate)*static_cast<double>(d->m_PaymentFrequency.GetValue(CurrentDate)) / 12.0;;
@@ -1524,7 +1524,7 @@ bool Waterfall::CalculateTranchesCashFlows()
                                     PrintToTempFile("ReturnFalse.txt", SingleTranche->GetTrancheName() + " - Coupon not set in tranche");
                                     return false;
                                 }
-                                AdjustedCoupon = AdjustCoupon(SingleTranche->GetCoupon(CurrentDate, CurrCoupIndx), RollingLastIPD, RollingNextIPD, SingleTranche->GetDayCount(CurrCoupIndx).GetValue(CurrentDate));
+                                AdjustedCoupon = deannualiseCoupon(SingleTranche->GetCoupon(CurrentDate, CurrCoupIndx), RollingLastIPD, RollingNextIPD, SingleTranche->GetDayCount(CurrCoupIndx).GetValue(CurrentDate));
                                 Solution = SingleTranche->GetCashFlow().GetDeferred(CurrentDate, CurrCoupIndx);
                                 Solution += SingleTranche->GetCashFlow().GetAmountOutstanding(CurrentDate);
                                 Solution *= AdjustedCoupon;
@@ -1988,8 +1988,8 @@ bool Waterfall::CalculateTranchesCashFlows()
                     }
                     ProRataBonds.clear();
                     TotalPayable = Solution = 0.0;
-                    adjSeniorExpenses = AdjustCoupon(d->m_SeniorExpenses.GetValue(CurrentDate), RollingLastIPD, RollingNextIPD, d->m_DealDayCountConvention.GetValue(CurrentDate));
-                    adjSeniorFees = AdjustCoupon(d->m_SeniorFees.GetValue(CurrentDate), RollingLastIPD, RollingNextIPD, d->m_DealDayCountConvention.GetValue(CurrentDate));
+                    adjSeniorExpenses = deannualiseCoupon(d->m_SeniorExpenses.GetValue(CurrentDate), RollingLastIPD, RollingNextIPD, d->m_DealDayCountConvention.GetValue(CurrentDate));
+                    adjSeniorFees = deannualiseCoupon(d->m_SeniorFees.GetValue(CurrentDate), RollingLastIPD, RollingNextIPD, d->m_DealDayCountConvention.GetValue(CurrentDate));
                     Solution =
                         d->m_InterestAvailable
                         + d->m_MortgagesPayments.GetAccruedInterest(CurrentDate)
@@ -2003,7 +2003,7 @@ bool Waterfall::CalculateTranchesCashFlows()
                                 PrintToTempFile("ReturnFalse.txt", d->m_Tranches.at(h)->GetTrancheName() + " - Coupon not set in tranche");
                                 return false;
                             }
-                            AdjustedCoupon = AdjustCoupon((d->m_Tranches.at(h)->GetCoupon(CurrentDate, CurrCoupIndx)), RollingLastIPD, RollingNextIPD, d->m_Tranches.at(h)->GetDayCount(CurrCoupIndx).GetValue(CurrentDate));
+                            AdjustedCoupon = deannualiseCoupon((d->m_Tranches.at(h)->GetCoupon(CurrentDate, CurrCoupIndx)), RollingLastIPD, RollingNextIPD, d->m_Tranches.at(h)->GetDayCount(CurrCoupIndx).GetValue(CurrentDate));
                             TotalPayable += AdjustedCoupon*(d->m_Tranches.at(h)->GetCashFlow().GetAmountOutstanding(CurrentDate) + d->m_Tranches.at(h)->GetCashFlow().GetFlow(CurrentDate, TrancheCashFlow::TrancheFlowType::DeferredFlow | CurrCoupIndx));
                             if (d->m_Tranches.at(h)->GetProrataGroup(CurrSenGrpLvl) == CurrSenGrp)
                                 ProRataBonds.enqueue(h);
@@ -2048,7 +2048,7 @@ bool Waterfall::CalculateTranchesCashFlows()
                                     Solution = 0.0;
                                     for (int h = 0; h<d->m_Tranches.size(); h++) {
                                         if (d->m_Tranches.at(h)->GetProrataGroup(CurrSenGrpLvl) <= CurrSenGrp && d->m_Tranches.at(h)->GetProrataGroup(CurrSenGrpLvl) >= SolutionDegree) {
-                                            AdjustedCoupon = AdjustCoupon((d->m_Tranches.at(h)->GetCoupon(CurrentDate, CurrCoupIndx)), RollingLastIPD, RollingNextIPD, d->m_Tranches.at(h)->GetDayCount(CurrCoupIndx).GetValue(CurrentDate));
+                                            AdjustedCoupon = deannualiseCoupon((d->m_Tranches.at(h)->GetCoupon(CurrentDate, CurrCoupIndx)), RollingLastIPD, RollingNextIPD, d->m_Tranches.at(h)->GetDayCount(CurrCoupIndx).GetValue(CurrentDate));
                                             Solution += AdjustedCoupon*(d->m_Tranches.at(h)->GetCashFlow().GetAmountOutstanding(CurrentDate) + d->m_Tranches.at(h)->GetCashFlow().GetFlow(CurrentDate, TrancheCashFlow::TrancheFlowType::DeferredFlow | CurrCoupIndx));
                                         }
                                     }

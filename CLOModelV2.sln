@@ -3,11 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "CLO Model 2.0 Setup", "CLOModelV2Setup\CLO Model 2.0 Setup.wixproj", "{EEF4AC1D-90D9-4C48-B142-9B07E197DC36}"
-	ProjectSection(ProjectDependencies) = postProject
-		{B12702AD-ABFB-343A-A199-8E24837244A3} = {B12702AD-ABFB-343A-A199-8E24837244A3}
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CLOModelLib", "CLOModelLib\CLOModelLib.vcxproj", "{99CB2547-BDC2-43BB-9E41-9D1A959002F4}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CLOModelExcel", "CLOModelV2\CLOModelV2.vcxproj", "{B12702AD-ABFB-343A-A199-8E24837244A3}"
@@ -32,19 +27,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{EEF4AC1D-90D9-4C48-B142-9B07E197DC36}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{EEF4AC1D-90D9-4C48-B142-9B07E197DC36}.Debug|Win32.ActiveCfg = Debug|x86
-		{EEF4AC1D-90D9-4C48-B142-9B07E197DC36}.Debug|Win32.Build.0 = Debug|x86
-		{EEF4AC1D-90D9-4C48-B142-9B07E197DC36}.Debug|x64.ActiveCfg = Debug|x86
-		{EEF4AC1D-90D9-4C48-B142-9B07E197DC36}.Debug|x86.ActiveCfg = Debug|x86
-		{EEF4AC1D-90D9-4C48-B142-9B07E197DC36}.Debug|x86.Build.0 = Debug|x86
-		{EEF4AC1D-90D9-4C48-B142-9B07E197DC36}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{EEF4AC1D-90D9-4C48-B142-9B07E197DC36}.Release|Mixed Platforms.Build.0 = Release|x86
-		{EEF4AC1D-90D9-4C48-B142-9B07E197DC36}.Release|Win32.ActiveCfg = Release|x86
-		{EEF4AC1D-90D9-4C48-B142-9B07E197DC36}.Release|Win32.Build.0 = Release|x86
-		{EEF4AC1D-90D9-4C48-B142-9B07E197DC36}.Release|x64.ActiveCfg = Release|x86
-		{EEF4AC1D-90D9-4C48-B142-9B07E197DC36}.Release|x86.ActiveCfg = Release|x86
-		{EEF4AC1D-90D9-4C48-B142-9B07E197DC36}.Release|x86.Build.0 = Release|x86
 		{99CB2547-BDC2-43BB-9E41-9D1A959002F4}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
 		{99CB2547-BDC2-43BB-9E41-9D1A959002F4}.Debug|Mixed Platforms.Build.0 = Debug|Win32
 		{99CB2547-BDC2-43BB-9E41-9D1A959002F4}.Debug|Win32.ActiveCfg = Debug|Win32

@@ -68,7 +68,8 @@ double CLOMODELLIB_EXPORT CalculateNPV(const QList<QDate>& Dte, const QList<doub
 double CLOMODELLIB_EXPORT CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, double BaseRate, const DayCountVector& Daycount, double Guess = 0.05);
 double CLOMODELLIB_EXPORT CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const BloombergVector& BaseRate, const DayCountVector& Daycount, double Guess = 0.05);
 double CLOMODELLIB_EXPORT CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const QString& BaseRate, const DayCountVector& Daycount, double Guess = 0.05);
-double CLOMODELLIB_EXPORT AdjustCoupon(double AnnualCoupon, QDate PrevIPD, QDate CurrIPD, DayCountConvention DayCount);
+double CLOMODELLIB_EXPORT deannualiseCoupon(double AnnualCoupon, QDate PrevIPD, QDate CurrIPD, DayCountConvention DayCount);
+double CLOMODELLIB_EXPORT annualiseCoupon(double periodicCoupon, QDate PrevIPD, QDate CurrIPD, DayCountConvention DayCount);
 bool CLOMODELLIB_EXPORT IsHoliday(const QDate& a/*,const QString& CountryCode*/);
 bool CLOMODELLIB_EXPORT removeDir(const QString& dirName);
 bool CLOMODELLIB_EXPORT ValidDayCount(qint16 a);

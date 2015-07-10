@@ -34,7 +34,9 @@ extern QMutex Db_Mutex;
 #define LOGCONDITIONALLY(Condition,LogMsg)
 #define LOGCONSOLE(LogMsg)
 #endif
+enum DayCountConvention : qint16;
 extern const QString LoansPropertiesToSearch[2]; //Properties in which scenarios will be searched
+double getTimeFactor(QDate PrevIPD /*Interesty start accrual date*/, QDate CurrIPD /*Interest end accrual date*/, DayCountConvention DayCount);
 QString InfixToPostfix(const QString& a);
 int NumberOfSetBits(quint32 i);
 QString NormaliseTriggerStructure(QString a);

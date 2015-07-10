@@ -720,7 +720,7 @@ double Tranche::GetDiscountMargin(double NewPrice)const{
     Q_D(const Tranche);
     if (/*GetLossRate()>0.0000 ||*/ d->OutstandingAmt<0.01) return 0.0;
 	
-    double AccruedInterest = AdjustCoupon(GetTotalCoupon(0), d->LastPaymentDate, d->SettlementDate, d->m_DayCount.value(0)->GetValue(d->SettlementDate));
+    double AccruedInterest = deannualiseCoupon(GetTotalCoupon(0), d->LastPaymentDate, d->SettlementDate, d->m_DayCount.value(0)->GetValue(d->SettlementDate));
 	QDate TempDate;
 	QList<QDate> FlowsDates;
 	QList<double> FlowsValues;
@@ -754,7 +754,7 @@ double Tranche::GetIRR() const {
 double Tranche::GetIRR(double NewPrice)const{
     Q_D(const Tranche);
     if (/*GetLossRate()>0.0000 ||*/ d->OutstandingAmt<0.01) return 0.0;
-    double AccruedInterest = AdjustCoupon(GetTotalCoupon(0), d->LastPaymentDate, d->SettlementDate, d->m_DayCount.value(0)->GetValue(d->SettlementDate));
+    double AccruedInterest = deannualiseCoupon(GetTotalCoupon(0), d->LastPaymentDate, d->SettlementDate, d->m_DayCount.value(0)->GetValue(d->SettlementDate));
 	QList<QDate> FlowsDates;
 	QList<double> FlowsValues;
 	QDate TempDate;
@@ -816,10 +816,10 @@ double Tranche::getActualCoupon(const QDate& index, qint32 CouponIdx) const
     if (currDayCount.GetAnchorDate().isNull())
         currDayCount.SetAnchorDate(d->SettlementDate);
     const double outstanding = prevIPD.isValid() ? (d->CashFlow.GetAmountOutstanding(prevIPD)) : GetOutstandingAmt();
-    const double accrueFactor = AdjustCoupon(1.0, prevIPD.isNull() ? d->LastPaymentDate : prevIPD, index, currDayCount.GetValue(index));
-    if (accrueFactor*outstanding == 0.0)
+    if (outstanding == 0.0)
         return 0.0;
-    return d->CashFlow.GetInterest(index, CouponIdx) / (outstanding*accrueFactor);
+    return annualiseCoupon(d->CashFlow.GetInterest(index, CouponIdx) / outstanding, prevIPD.isNull() ? d->LastPaymentDate : prevIPD, index, currDayCount.GetValue(index));
+
 }
 
 double Tranche::getActualCoupon(int index, qint32 CouponIdx) const

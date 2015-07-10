@@ -453,8 +453,16 @@ void CentralUnit::CheckCalculationDone()
 	if (m_SaveBaseCase) {
         // Save it to database
         const Waterfall& applicableStructure = (m_BaseCaseToCall && RunCall) ? CallStructure : Structure;
-        for (int tranIter = 0; tranIter < applicableStructure.GetTranchesCount(); ++tranIter)
-            applicableStructure.GetTranche(tranIter)->saveCashflowsDatabase();
+        QString notLoadedString(tr("Could not update cashflows in the database for the following bonds:"));
+        bool loadFailed = false;
+        for (int tranIter = 0; tranIter < applicableStructure.GetTranchesCount(); ++tranIter) {
+            if (!applicableStructure.GetTranche(tranIter)->saveCashflowsDatabase()) {
+                loadFailed = true;
+                notLoadedString += "\n" + applicableStructure.GetTranche(tranIter)->GetTrancheName();
+            }
+        }
+        if (loadFailed)
+            QMessageBox::warning(nullptr, tr("Database Upload Failed"), notLoadedString);
         // Save it to File
 		QDir UnifiedDir(GetFromConfig("Folders", "UnifiedResultsFolder"));
 		if (UnifiedDir.exists()) {

@@ -547,7 +547,7 @@ void Mortgage::SetSize(double a)
          d->m_UseForwardCurve = false;
 #endif
 		 }
-     return  AdjustCoupon((d->m_InterestVect + d->m_FloatingRateBaseValue).GetValue(a), StartAccrue, EndAccrue, DayCnt);
+     return  deannualiseCoupon((d->m_InterestVect + d->m_FloatingRateBaseValue).GetValue(a), StartAccrue, EndAccrue, DayCnt);
  }
  double Mortgage::GetInterest(int a, const QDate& StartAccrue, const QDate& EndAccrue, DayCountConvention DayCnt) {
      Q_D(Mortgage);
@@ -559,7 +559,7 @@ void Mortgage::SetSize(double a)
          d->m_UseForwardCurve = false;
 #endif
 		 }
-     return  AdjustCoupon((d->m_InterestVect + d->m_FloatingRateBaseValue).GetValue(a), StartAccrue, EndAccrue, DayCnt);
+     return  deannualiseCoupon((d->m_InterestVect + d->m_FloatingRateBaseValue).GetValue(a), StartAccrue, EndAccrue, DayCnt);
  }
  double Mortgage::GetInterest(const QDate& a) {
      Q_D(Mortgage);

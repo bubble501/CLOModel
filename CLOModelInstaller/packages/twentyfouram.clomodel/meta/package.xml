@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+  <DisplayName>Register CLO models files</DisplayName>
+  <Description>Registers .clo and .fcsr files with the CLO Model Viewer</Description>
+  <Version>0.8.8</Version>
+  <ReleaseDate>2015-07-15</ReleaseDate>
+  <Name>twentyfouram.clomodel</Name>
+  <ForcedInstallation>true</ForcedInstallation>
+  <RequiresAdminRights>true</RequiresAdminRights>
+  <Default>true</Default>
+  <Script>installscript.qs</Script>
+</Package>

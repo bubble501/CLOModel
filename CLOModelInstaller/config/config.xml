@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Installer>
+  <Name>CLO Model Installer</Name>
+  <Version>0.8.8</Version>
+  <Title>CLO Model</Title>
+  <Publisher>Twentyfour Asset Management</Publisher>
+  <InstallerApplicationIcon>Logo</InstallerApplicationIcon>
+  <InstallerWindowIcon>Logo</InstallerWindowIcon>
+</Installer>

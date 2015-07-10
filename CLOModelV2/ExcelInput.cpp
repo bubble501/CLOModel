@@ -1,29 +1,30 @@
-#include "ExcelCommons.h"
 #include "CentralUnit.h"
-#include "WatFalPrior.h"
+#include "ExcelCommons.h"
 #include "ExcelOutput.h"
-#include "SummaryView.h"
-#include "WaterfallViewer.h"
-#include "CommonFunctions.h"
-#include <QDate>
-#include <QString>
-#include <QHBoxLayout>
-#include <QFile>
-#include <QIcon>
+#include <CommonFunctions.h>
+#include <CumulativeLossTrigger.h>
+#include <DateTrigger.h>
+#include <DeferredInterestTrigger.h>
+#include <DelinquencyTrigger.h>
+#include <DuringStressTestTrigger.h>
+#include <LoanAssumptionsEditor.h>
+#include <Mortgage.h>
+#include <PDLtrigger.h>
+#include <PoolSizeTrigger.h>
 #include <QApplication>
+#include <QDate>
+#include <QFile>
+#include <QHBoxLayout>
+#include <QIcon>
+#include <QString>
 #include <QTextStream>
-#include "DateTrigger.h"
-#include "VectorTrigger.h"
-#include "PoolSizeTrigger.h"
-#include "TrancheTrigger.h"
-#include "PDLtrigger.h"
-#include "DelinquencyTrigger.h"
-#include "WaterfallStepHelperDialog.h"
-#include "TriggerHelperDialog.h"
-#include "DuringStressTestTrigger.h"
-#include "CumulativeLossTrigger.h"
-#include "LoanAssumptionsEditor.h"
-#include "DeferredInterestTrigger.h"
+#include <SummaryView.h>
+#include <Tranche.h>
+#include <TrancheTrigger.h>
+#include <TriggerHelperDialog.h>
+#include <VectorTrigger.h>
+#include <WatFalPrior.h>
+#include <WaterfallStepHelperDialog.h>
 void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	bool RunStress;
 	CentralUnit TempUnit;
@@ -65,14 +66,19 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			Curr=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			currOut=pdFreq->dblVal;pdFreq++;
 			TempSize = pdFreq->intVal; pdFreq++;
+            LOGDEBUG(QString("Reached Coupons %1").arg(TempSize));
 			for (int i = 0; i < TempSize; ++i)
 				{coup.append(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;}
+            LOGDEBUG("Finished Coupons");
 			TempSize = pdFreq->intVal; pdFreq++;
+            LOGDEBUG(QString("Reached Ref Rate %1").arg(TempSize));
 			for (int i = 0; i < TempSize; ++i)
 				{RefRt.append(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;}
+            LOGDEBUG("Reached IPD");
 			PrevIPD=QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd");pdFreq++;
 			BasRt=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			IPDfrq=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
+            LOGDEBUG("Reached Tests");
 			OClim=pdFreq->dblVal;pdFreq++;
 			IClim=pdFreq->dblVal;pdFreq++;
 			Price=pdFreq->dblVal;pdFreq++;
@@ -133,6 +139,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		for (int i = 0; i < TriggerCount; i++) {
 			TriggerTpe = pdFreq->intVal; pdFreq++;
 			switch (TriggerTpe) {
+                // Keep this in sync with the relevant override of AbstractTriggerSettingWidget::parameters()
 			case static_cast<int>(AbstractTrigger::TriggerType::DateTrigger) :
 				TempTrigger.reset(new DateTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
 				TempTrigger.dynamicCast<DateTrigger>()->SetLimitDate(QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal), "yyyy-MM-dd")); pdFreq++;
@@ -294,9 +301,13 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 				.arg(Timespread)
 			);
 			TempUnit.SetupReinvBond(Intr, CPR, CDR, LS, WAL, Frq, ReinvBondAnnuit, Pric, Delay, Timespread, BaseVal, RecLag, Dlq, DlqLag);
+            LOGDEBUG("reinvestment bond set up");
 		}
+        LOGDEBUG(QString("Available Princ %1").arg(pdFreq->dblVal));
 		TempUnit.SetSchedPrincAvailable(pdFreq->dblVal);pdFreq++; //TODO starting Prepay
+        LOGDEBUG("Available principal set up");
 		TempUnit.SetInterestAvailable(pdFreq->dblVal);pdFreq++;
+        LOGDEBUG("Available interest set up");
 		TempUnit.SetPoolCutOff(QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd"));pdFreq++;
 		TempUnit.SetRunCall(pdFreq->boolVal);pdFreq++;
 		LOGDEBUG(QString("Use Call: %1").arg(TempUnit.GetRunCall()));
@@ -415,7 +426,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	QFile file(Filename);
 	if (file.open(QIODevice::WriteOnly)) {
 		QDataStream out(&file);
-		out.setVersion(QDataStream::Qt_5_3);
+		out.setVersion(StreamVersionUsed);
 		out << qint32(ModelVersionNumber) << TempUnit.GetBaseCaseToCall() << TempUnit.GetStructure() << Waterfall();
 		file.close();
 	}
@@ -450,7 +461,7 @@ double __stdcall CLOReturnRate(LPSAFEARRAY *ArrayData){
 	}
 	qint32 VersionChecker;
 	QDataStream out(&file);
-	out.setVersion(QDataStream::Qt_5_3);
+	out.setVersion(StreamVersionUsed);
 	out >> VersionChecker;
 	//if(VersionChecker!=qint32(ModelVersionNumber)) return 0.0;
 	if(VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) return 0.0;
@@ -468,9 +479,8 @@ double __stdcall CLOReturnRate(LPSAFEARRAY *ArrayData){
 	file.close();
     if (TempWaterfall.GetTranchesCount() == 0)
         return 0.0;
-    char *argv[] = { "NoArgumnets" };
-    int argc = sizeof(argv) / sizeof(char*) - 1;
-    QApplication ComputationLoop(argc, argv);
+    int argc =  1;
+    QApplication ComputationLoop(argc, NULL);
 	const Tranche* const TranchPoint=TempWaterfall.GetTranche(TrancheName);
     ComputationLoop.quit();
 	if(Q_LIKELY(TranchPoint))
@@ -501,7 +511,7 @@ double __stdcall CLODiscountMargin(LPSAFEARRAY *ArrayData){
 	}
 	qint32 VersionChecker;
 	QDataStream out(&file);
-	out.setVersion(QDataStream::Qt_5_3);
+	out.setVersion(StreamVersionUsed);
 	out >> VersionChecker;
 	if(VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) return 0.0;
 	if (UsingClom) {
@@ -518,9 +528,8 @@ double __stdcall CLODiscountMargin(LPSAFEARRAY *ArrayData){
     file.close();
     if (TempWaterfall.GetTranchesCount() == 0)
         return 0.0;
-    char *argv[] = { "NoArgumnets" };
-    int argc = sizeof(argv) / sizeof(char*) - 1;
-    QApplication ComputationLoop(argc, argv);
+    int argc =  1;
+    QApplication ComputationLoop(argc, NULL);
 	const Tranche* const TranchPoint=TempWaterfall.GetTranche(TrancheName);
     ComputationLoop.quit();
 	if(Q_LIKELY(TranchPoint))
@@ -549,7 +558,7 @@ double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
 	}
 	if (!file.open(QIODevice::ReadOnly))return 0.0;
 	QDataStream out(&file);
-	out.setVersion(QDataStream::Qt_5_3);
+	out.setVersion(StreamVersionUsed);
 	out >> VersionChecker;
 	if(VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) return 0.0;
 	if (UsingClom) {
@@ -566,9 +575,9 @@ double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
 	file.close();
     if (TempWaterfall.GetTranchesCount() == 0)
         return 0.0;
-    char *argv[] = { "NoArgumnets" };
-    int argc = sizeof(argv) / sizeof(char*) - 1;
-    QApplication ComputationLoop(argc, argv);
+
+    int argc =  1;
+    QApplication ComputationLoop(argc, NULL);
 	const Tranche* const TranchPoint=TempWaterfall.GetTranche(TrancheName);
     ComputationLoop.quit();
 	if(Q_LIKELY(TranchPoint)) 
@@ -600,9 +609,8 @@ double __stdcall GetStressLoss(LPSAFEARRAY *ArrayData) {
 	FolderPath += "StressResult.fcsr";
 	if (!QFile::exists(FolderPath)) { LOGDEBUG("Returned -1"); return -1.0; }
 	Waterfall TempRes = StressTest::GetScenarioFromFile(FolderPath, CPRscenario, CDRscenario, LSscenario, RecLagScenario, DelinqScenario, DelinqLagScenario);
-    char *argv[] = { "NoArgumnets" };
-    int argc = sizeof(argv) / sizeof(char*) - 1;
-    QApplication ComputationLoop(argc, argv);
+    int argc =1;
+    QApplication ComputationLoop(argc, NULL);
 	const Tranche* const Result = TempRes.GetTranche(TrancheName);
     ComputationLoop.quit();
 	if (Result)
@@ -636,9 +644,8 @@ double __stdcall GetStressDM(LPSAFEARRAY *ArrayData) {
 	FolderPath += "StressResult.fcsr";
 	if (!QFile::exists(FolderPath)) { return 0.0; }
 	Waterfall TempRes = StressTest::GetScenarioFromFile(FolderPath, CPRscenario, CDRscenario, LSscenario, RecLagScenario, DelinqScenario, DelinqLagScenario);
-    char *argv[] = { "NoArgumnets" };
-    int argc = sizeof(argv) / sizeof(char*) - 1;
-    QApplication ComputationLoop(argc, argv);
+    int argc =  1;
+    QApplication ComputationLoop(argc, NULL);
     const Tranche* const Result = TempRes.GetTranche(TrancheName);
     ComputationLoop.quit();
 	if (Result)
@@ -654,12 +661,15 @@ BSTR __stdcall WatFallStepEdit(LPSAFEARRAY *ArrayData) {
 	//QString DestinationAddress = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 	bool IsInterestWF = pdFreq->boolVal; pdFreq++;
 	QString CurrentStep = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+    LOGDEBUG("Step Parameters: " + CurrentStep);
 	{ //Triggers
 		int TriggerTpe;
 		const int TriggerCount = pdFreq->intVal; pdFreq++;
+        LOGDEBUG(QString("Num Triggers: %1").arg(TriggerCount));
 		QHash<quint32, QSharedPointer<AbstractTrigger> >::iterator TempIter;
 		for (int i = 0; i < TriggerCount; i++) {
 			TriggerTpe = pdFreq->intVal; pdFreq++;
+            LOGDEBUG(QString("Loading Trigger Type: %1").arg(TriggerTpe));
 			switch (TriggerTpe) {
 			case static_cast<int>(AbstractTrigger::TriggerType::DateTrigger) :
 				TempIter = AvailableTriggers.insert(i, QSharedPointer<AbstractTrigger>(new DateTrigger(QString::fromWCharArray(pdFreq->bstrVal)))); pdFreq++;
@@ -717,20 +727,23 @@ BSTR __stdcall WatFallStepEdit(LPSAFEARRAY *ArrayData) {
                 TempIter->dynamicCast<PDLTrigger>()->SetSizeMultiplier(pdFreq->dblVal); pdFreq++;
                 break;
 			default:
-                Q_ASSERT_X(false, "ExcelInput::WatFallStepEdit", "Unhandled trigger type");
+                Q_UNREACHABLE(); // "Unhandled trigger type"
 				return NULL;
 			}
+            LOGDEBUG("Trigger Loaded");
 		}
 	}
 	SafeArrayUnaccessData(*ArrayData);
-	char *argv[] = { "NoArgumnets" };
-	int argc = sizeof(argv) / sizeof(char*) - 1;
+	int argc = 1;
 	{
-		QApplication a(argc, argv);
+		QApplication a(argc, NULL);
 		WaterfallStepHelperDialog WatfDialog;
 		WatfDialog.SetInterestWF(IsInterestWF);
+        LOGDEBUG("InterestWF loaded");
 		WatfDialog.SetAvailableTriggers(AvailableTriggers);
+        LOGDEBUG("Available triggers loaded");
 		WatfDialog.SetCurrentPars(CurrentStep);
+        LOGDEBUG("Pars Loaded");
 		if (WatfDialog.exec() == QDialog::Accepted) {
 			QString Result = WatfDialog.GetParameters();
 			a.quit();
@@ -746,19 +759,25 @@ BSTR __stdcall TriggerEdit(LPSAFEARRAY *ArrayData) {
 	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
 	if (!SUCCEEDED(hr))return NULL;
 	QString CurrentTrig = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
+    LOGDEBUG(CurrentTrig);
 	SafeArrayUnaccessData(*ArrayData);
+    int argc = 1;
 	{
-		char *argv[] = { "NoArgumnets" };
-		int argc = sizeof(argv) / sizeof(char*) - 1;
-		QApplication a(argc, argv);
+		QApplication a(argc, NULL);
 		TriggerHelperDialog TrigDialog;
 		TrigDialog.SetCurrentPars(CurrentTrig);
-		if (TrigDialog.exec() == QDialog::Accepted) {
-			QString Result = TrigDialog.GetParameters();
+        const auto DialogRes = TrigDialog.exec();
+        if (DialogRes == QDialog::Accepted) {
+			const QString Result = TrigDialog.GetParameters();
 			a.quit();
 			return SysAllocStringByteLen(Result.toStdString().c_str(), Result.size());
 		}
-		a.quit();
+        else if (DialogRes == QDialog::Rejected)
+		    a.quit();
+        else{ //Clear
+            a.quit();
+            return SysAllocStringByteLen("#", 1);
+        }
 	}
 	return NULL;
 }
@@ -769,9 +788,8 @@ BSTR __stdcall LoadLoanScenario(LPSAFEARRAY *ArrayData) {
 	if (!SUCCEEDED(hr))return NULL;
 	const int NumOfLoans = pdFreq->intVal; pdFreq++;
 	Mortgage TempMtg;
-	char *argv[] = { "NoArgumnets" };
-	int argc = sizeof(argv) / sizeof(char*) - 1;
-	QApplication a(argc, argv);
+	int argc = 1;
+	QApplication a(argc, 0);
     QDialog TempDialog;
 	TempDialog.setWindowIcon(QIcon(":/Icons/Logo.png"));
 	TempDialog.setWindowTitle(QObject::tr("Loan Scenarios Editor"));

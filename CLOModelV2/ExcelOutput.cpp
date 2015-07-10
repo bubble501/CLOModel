@@ -1,7 +1,7 @@
 #include "ExcelOutput.h"
-#include "Tranche.h"
-#include "MtgCashFlow.h"
-#include "StressTest.h"
+#include <Tranche.h>
+#include <MtgCashFlow.h>
+#include <StressTest.h>
 #include <qmath.h>
 #include <QString>
 HRESULT ExcelOutput::PrintMortgagesRepLines(
@@ -198,9 +198,10 @@ HRESULT ExcelOutput::PrintMortgagesRepLines(
 			Params.cNamedArgs = 0;
 			if(dispid == 0)
 			{
-				wchar_t *ucName = L"Run";
+                LPOLESTR ucName = SysAllocString(L"Run");
 				hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
 					LOCALE_SYSTEM_DEFAULT, &dispid);
+                SysFreeString(ucName);
 				if(FAILED(hr))
 				{
 					SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
@@ -208,7 +209,7 @@ HRESULT ExcelOutput::PrintMortgagesRepLines(
 					if(PrintDates){
 						SafeArrayAccessData(saData, (void HUGEP* FAR*)&pdFreq);
 						if(PrintCounter) pdFreq+=Numrows;
-						for (DWORD i = 0; i < Numrows; i++)
+						for (int i = 0; i < Numrows; i++)
 						{
 							SysFreeString(pdFreq->bstrVal);
 							pdFreq++;
@@ -227,7 +228,7 @@ HRESULT ExcelOutput::PrintMortgagesRepLines(
 				if(PrintDates){
 					SafeArrayAccessData(saData, (void HUGEP* FAR*)&pdFreq);
 					if(PrintCounter) pdFreq+=Numrows;
-					for (DWORD i = 0; i < Numrows; i++)
+					for (int i = 0; i < Numrows; i++)
 					{
 						SysFreeString(pdFreq->bstrVal);
 						pdFreq++;
@@ -240,13 +241,14 @@ HRESULT ExcelOutput::PrintMortgagesRepLines(
 		catch(_com_error &ce)
 		{
 			hr = ce.Error();
+            return hr;
 		}
 		SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
 		SysFreeString(Params.rgvarg[Params.cArgs-3].bstrVal);
 		if(PrintDates){
 			SafeArrayAccessData(saData, (void HUGEP* FAR*)&pdFreq);
 			if(PrintCounter) pdFreq+=Numrows;
-			for (DWORD i = 0; i < Numrows; i++)
+			for (int i = 0; i < Numrows; i++)
 			{
 				SysFreeString(pdFreq->bstrVal);
 				pdFreq++;
@@ -406,16 +408,17 @@ HRESULT ExcelOutput::PlotMortgagesFlows(
 			Params.cNamedArgs = 0;
 			if(dispid == 0)
 			{
-				wchar_t *ucName = L"Run";
+                LPOLESTR ucName = SysAllocString(L"Run");
 				hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
 					LOCALE_SYSTEM_DEFAULT, &dispid);
+                SysFreeString(ucName);
 				if(FAILED(hr))
 				{
 					SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
 					SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
 					if(PrintDates){
 						SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
-						for (DWORD i = 0; i < source.Count(); i++)
+						for (int i = 0; i < source.Count(); i++)
 						{
 							SysFreeString(pdFreq->bstrVal);
 							pdFreq++;
@@ -433,7 +436,7 @@ HRESULT ExcelOutput::PlotMortgagesFlows(
 				SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
 				if(PrintDates){
 					SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
-					for (DWORD i = 0; i < source.Count(); i++)
+					for (int i = 0; i < source.Count(); i++)
 					{
 						SysFreeString(pdFreq->bstrVal);
 						pdFreq++;
@@ -446,12 +449,13 @@ HRESULT ExcelOutput::PlotMortgagesFlows(
 		catch(_com_error &ce)
 		{
 			hr = ce.Error();
+            return hr;
 		}
 		SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
 		SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
 		if(PrintDates){
 			SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
-			for (DWORD i = 0; i < source.Count(); i++)
+			for (int i = 0; i < source.Count(); i++)
 			{
 				SysFreeString(pdFreq->bstrVal);
 				pdFreq++;
@@ -493,7 +497,7 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 		if (SUCCEEDED(hr))
 		{
 			if(PrintDates){
-				for (DWORD i = 0; i < Numrows; i++)
+				for (int i = 0; i < Numrows; i++)
 				{
 					pdFreq->vt = VT_BSTR;
 					pdFreq->bstrVal = SysAllocString(source.GetCashFlow().GetDate(i).toString("yyyy-MM-dd").toStdWString().c_str());
@@ -501,7 +505,7 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 				}
 			}
 			if(PrintOutstanding){
-				for (DWORD i = 0; i < Numrows; i++)
+                for (int i = 0; i < Numrows; i++)
 				{
 					pdFreq->vt = VT_R8;
 					pdFreq->dblVal = source.GetCashFlow().GetAmountOutstanding(i);
@@ -509,7 +513,7 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 				}
 			}
 			if(PrintInterest){
-				for (DWORD i = 0; i < Numrows; i++)
+                for (int i = 0; i < Numrows; i++)
 				{
 					pdFreq->vt = VT_R8;
 					pdFreq->dblVal = source.GetCashFlow().GetTotalInterest(i);
@@ -517,7 +521,7 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 				}
 			}
 			if(PrintPrincipal){
-				for (DWORD i = 0; i < Numrows; i++)
+                for (int i = 0; i < Numrows; i++)
 				{
 					pdFreq->vt = VT_R8;
 					pdFreq->dblVal = source.GetCashFlow().GetPrincipal(i);
@@ -525,7 +529,7 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 				}
 			}
 			if(PrintTotalFlow){
-				for (DWORD i = 0; i < Numrows; i++)
+                for (int i = 0; i < Numrows; i++)
 				{
 					pdFreq->vt = VT_R8;
 					pdFreq->dblVal = source.GetCashFlow().GetTotalFlow(i);
@@ -533,7 +537,7 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 				}
 			}
 			if(PrintDeferred){
-				for (DWORD i = 0; i < Numrows; i++)
+                for (int i = 0; i < Numrows; i++)
 				{
 					pdFreq->vt = VT_R8;
 					pdFreq->dblVal = source.GetCashFlow().GetTotalDeferred(i);
@@ -541,7 +545,7 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 				}
 			}
 			if(PrintOCtest){
-				for (DWORD i = 0; i < Numrows; i++)
+                for (int i = 0; i < Numrows; i++)
 				{
 					pdFreq->vt = VT_R8;
 					pdFreq->dblVal = source.GetCashFlow().GetOCTest(i);
@@ -549,7 +553,7 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 				}
 			}
 			if(PrintICtest){
-				for (DWORD i = 0; i < Numrows; i++)
+                for (int i = 0; i < Numrows; i++)
 				{
 					pdFreq->vt = VT_R8;
 					pdFreq->dblVal = source.GetCashFlow().GetICTest(i);
@@ -557,12 +561,12 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 				}
 			}
 			if (PrintPDL) {
-				for (DWORD i = 0; i < Numrows; i++) {
+                for (int i = 0; i < Numrows; i++) {
 					pdFreq->vt = VT_R8;
 					pdFreq->dblVal = source.GetCashFlow().GetPDLOutstanding(i);
 					pdFreq++;
 				}
-				for (DWORD i = 0; i < Numrows; i++) {
+                for (int i = 0; i < Numrows; i++) {
 					pdFreq->vt = VT_R8;
 					pdFreq->dblVal = source.GetCashFlow().GetPDLCured(i);
 					pdFreq++;
@@ -579,7 +583,7 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 		SAFEARRAY* OCLimitData = SafeArrayCreate(VT_VARIANT, 1, &OCLimitBound);
 		hr = SafeArrayAccessData(OCLimitData, (void HUGEP* FAR*)&pdFreq);
 		if (SUCCEEDED(hr)) {
-			for (DWORD i = 0; i < Numrows; i++) {
+            for (int i = 0; i < Numrows; i++) {
 				pdFreq->vt = VT_R8;
 				pdFreq->dblVal = source.GetCashFlow().GetOCTarget(i);
 				pdFreq++;
@@ -589,7 +593,7 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 		SAFEARRAY* ICLimitData = SafeArrayCreate(VT_VARIANT, 1, &ICLimitBound);
 		hr = SafeArrayAccessData(ICLimitData, (void HUGEP* FAR*)&pdFreq);
 		if (SUCCEEDED(hr)) {
-			for (DWORD i = 0; i < Numrows; i++) {
+            for (int i = 0; i < Numrows; i++) {
 				pdFreq->vt = VT_R8;
 				pdFreq->dblVal = source.GetCashFlow().GetICTarget(i);
 				pdFreq++;
@@ -644,9 +648,10 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 			Params.cNamedArgs = 0;
 			if(dispid == 0)
 			{
-				wchar_t *ucName = L"Run";
+                LPOLESTR ucName = SysAllocString(L"Run");
 				hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
 					LOCALE_SYSTEM_DEFAULT, &dispid);
+                SysFreeString(ucName);
 				if(FAILED(hr))
 				{
 					SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
@@ -655,7 +660,7 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 					SysFreeString(Params.rgvarg[Params.cArgs-5].bstrVal);
 					if(PrintDates){
 						SafeArrayAccessData(saData, (void HUGEP* FAR*)&pdFreq);
-						for (DWORD i = 0; i < Numrows; i++)
+                        for (int i = 0; i < Numrows; i++)
 						{
 							SysFreeString(pdFreq->bstrVal);
 							pdFreq++;
@@ -676,7 +681,7 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 				SysFreeString(Params.rgvarg[Params.cArgs-5].bstrVal);
 				if(PrintDates){
 					SafeArrayAccessData(saData, (void HUGEP* FAR*)&pdFreq);
-					for (DWORD i = 0; i < Numrows; i++)
+                    for (int i = 0; i < Numrows; i++)
 					{
 						SysFreeString(pdFreq->bstrVal);
 						pdFreq++;
@@ -690,6 +695,7 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 		{
 			hr = ce.Error();
 			LOGDEBUG("Exception in call" + QString::number(hr, 16));
+            return hr;
 		}
 		SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
 		SysFreeString(Params.rgvarg[Params.cArgs-3].bstrVal);
@@ -697,7 +703,7 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 		SysFreeString(Params.rgvarg[Params.cArgs-5].bstrVal);
 		if(PrintDates){
 			SafeArrayAccessData(saData, (void HUGEP* FAR*)&pdFreq);
-			for (DWORD i = 0; i < Numrows; i++)
+            for (int i = 0; i < Numrows; i++)
 			{
 				SysFreeString(pdFreq->bstrVal);
 				pdFreq++;
@@ -742,9 +748,10 @@ HRESULT ExcelOutput::PrintMergedCell(const QString& msg, const QString& TargetCe
 		Params.cNamedArgs = 0;
 		if(dispid == 0)
 		{
-			wchar_t *ucName = L"Run";
+            LPOLESTR ucName = SysAllocString(L"Run");
 			hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
 				LOCALE_SYSTEM_DEFAULT, &dispid);
+            SysFreeString(ucName);
 			if(FAILED(hr))
 			{
 				SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
@@ -768,6 +775,7 @@ HRESULT ExcelOutput::PrintMergedCell(const QString& msg, const QString& TargetCe
 	catch(_com_error &ce)
 	{
 		hr = ce.Error();
+        return hr;
 	}
 	SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
 	SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
@@ -821,9 +829,10 @@ HRESULT ExcelOutput::PrintColumn(const QString& Title, const QList<double>& Valu
 		Params.cNamedArgs = 0;
 		if(dispid == 0)
 		{
-			wchar_t *ucName = L"Run";
+            LPOLESTR ucName = SysAllocString(L"Run");
 			hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
 				LOCALE_SYSTEM_DEFAULT, &dispid);
+            SysFreeString(ucName);
 			if(FAILED(hr))
 			{
 				SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
@@ -849,6 +858,7 @@ HRESULT ExcelOutput::PrintColumn(const QString& Title, const QList<double>& Valu
 	catch(_com_error &ce)
 	{
 		hr = ce.Error();
+        return hr;
 	}
 	SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
 	SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
@@ -897,9 +907,10 @@ HRESULT ExcelOutput::PrintDataColumn(const QList<double>& Values ,const QString&
 		Params.cNamedArgs = 0;
 		if(dispid == 0)
 		{
-			wchar_t *ucName = L"Run";
+            LPOLESTR ucName = SysAllocString(L"Run");
 			hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
 				LOCALE_SYSTEM_DEFAULT, &dispid);
+            SysFreeString(ucName);
 			if(FAILED(hr))
 			{
 				SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
@@ -921,6 +932,7 @@ HRESULT ExcelOutput::PrintDataColumn(const QList<double>& Values ,const QString&
 	catch(_com_error &ce)
 	{
 		hr = ce.Error();
+        return hr;
 	}
 	SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
 	SysFreeString(Params.rgvarg[Params.cArgs-3].bstrVal);
@@ -1004,9 +1016,10 @@ HRESULT ExcelOutput::PlotTranchesDynamic(
 			Params.cNamedArgs = 0;
 			if(dispid == 0)
 			{
-				wchar_t *ucName = L"Run";
+                LPOLESTR ucName = SysAllocString(L"Run");
 				hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
 					LOCALE_SYSTEM_DEFAULT, &dispid);
+                SysFreeString(ucName);
 				if(FAILED(hr))
 				{
 					SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
@@ -1056,6 +1069,7 @@ HRESULT ExcelOutput::PlotTranchesDynamic(
 		catch(_com_error &ce)
 		{
 			hr = ce.Error();
+            return hr;
 		}
 		SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
 		SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
@@ -1068,7 +1082,7 @@ HRESULT ExcelOutput::PlotTranchesDynamic(
 		}
 		SafeArrayUnaccessData(DatesArray);
 		SafeArrayAccessData(TitlesArray, (void HUGEP* FAR*)&pdFreq);
-		for (DWORD i = 0; i < source.GetTranchesCount(); i++)
+        for (int i = 0; i < source.GetTranchesCount(); i++)
 		{
 			SysFreeString(pdFreq->bstrVal);
 			pdFreq++;
@@ -1152,23 +1166,24 @@ HRESULT ExcelOutput::PlotOCTest(
 			Params.cNamedArgs = 0;
 			if(dispid == 0)
 			{
-				wchar_t *ucName = L"Run";
+                LPOLESTR ucName = SysAllocString(L"Run");
 				hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
 					LOCALE_SYSTEM_DEFAULT, &dispid);
+                SysFreeString(ucName);
 				if(FAILED(hr))
 				{
 					SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
 					SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
 					SysFreeString(Params.rgvarg[Params.cArgs-7].bstrVal);
 					SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
-					for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+                    for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
 					{
 						SysFreeString(pdFreq->bstrVal);
 						pdFreq++;
 					}
 					SafeArrayUnaccessData(DatesArray);
 					SafeArrayAccessData(TitlesArray, (void HUGEP* FAR*)&pdFreq);
-					for (DWORD i = 0; i < source.GetTranchesCount(); i++)
+                    for (int i = 0; i < source.GetTranchesCount(); i++)
 					{
 						SysFreeString(pdFreq->bstrVal);
 						pdFreq++;
@@ -1185,14 +1200,14 @@ HRESULT ExcelOutput::PlotOCTest(
 				SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
 				SysFreeString(Params.rgvarg[Params.cArgs-7].bstrVal);
 				SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
-				for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+                for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
 				{
 					SysFreeString(pdFreq->bstrVal);
 					pdFreq++;
 				}
 				SafeArrayUnaccessData(DatesArray);
 				SafeArrayAccessData(TitlesArray, (void HUGEP* FAR*)&pdFreq);
-				for (DWORD i = 0; i < source.GetTranchesCount(); i++)
+                for (int i = 0; i < source.GetTranchesCount(); i++)
 				{
 					SysFreeString(pdFreq->bstrVal);
 					pdFreq++;
@@ -1204,19 +1219,20 @@ HRESULT ExcelOutput::PlotOCTest(
 		catch(_com_error &ce)
 		{
 			hr = ce.Error();
+            return hr;
 		}
 		SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
 		SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
 		SysFreeString(Params.rgvarg[Params.cArgs-7].bstrVal);
 		SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
-		for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+        for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
 		{
 			SysFreeString(pdFreq->bstrVal);
 			pdFreq++;
 		}
 		SafeArrayUnaccessData(DatesArray);
 		SafeArrayAccessData(TitlesArray, (void HUGEP* FAR*)&pdFreq);
-		for (DWORD i = 0; i < source.GetTranchesCount(); i++)
+        for (int i = 0; i < source.GetTranchesCount(); i++)
 		{
 			SysFreeString(pdFreq->bstrVal);
 			pdFreq++;
@@ -1300,23 +1316,24 @@ HRESULT ExcelOutput::PlotICTest(
 			Params.cNamedArgs = 0;
 			if(dispid == 0)
 			{
-				wchar_t *ucName = L"Run";
+                LPOLESTR ucName = SysAllocString(L"Run");
 				hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
 					LOCALE_SYSTEM_DEFAULT, &dispid);
+                SysFreeString(ucName);
 				if(FAILED(hr))
 				{
 					SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
 					SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
 					SysFreeString(Params.rgvarg[Params.cArgs-7].bstrVal);
 					SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
-					for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+                    for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
 					{
 						SysFreeString(pdFreq->bstrVal);
 						pdFreq++;
 					}
 					SafeArrayUnaccessData(DatesArray);
 					SafeArrayAccessData(TitlesArray, (void HUGEP* FAR*)&pdFreq);
-					for (DWORD i = 0; i < source.GetTranchesCount(); i++)
+                    for (int i = 0; i < source.GetTranchesCount(); i++)
 					{
 						SysFreeString(pdFreq->bstrVal);
 						pdFreq++;
@@ -1333,14 +1350,14 @@ HRESULT ExcelOutput::PlotICTest(
 				SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
 				SysFreeString(Params.rgvarg[Params.cArgs-7].bstrVal);
 				SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
-				for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+                for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
 				{
 					SysFreeString(pdFreq->bstrVal);
 					pdFreq++;
 				}
 				SafeArrayUnaccessData(DatesArray);
 				SafeArrayAccessData(TitlesArray, (void HUGEP* FAR*)&pdFreq);
-				for (DWORD i = 0; i < source.GetTranchesCount(); i++)
+                for (int i = 0; i < source.GetTranchesCount(); i++)
 				{
 					SysFreeString(pdFreq->bstrVal);
 					pdFreq++;
@@ -1352,19 +1369,20 @@ HRESULT ExcelOutput::PlotICTest(
 		catch(_com_error &ce)
 		{
 			hr = ce.Error();
+            return hr;
 		}
 		SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
 		SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
 		SysFreeString(Params.rgvarg[Params.cArgs-7].bstrVal);
 		SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
-		for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+        for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
 		{
 			SysFreeString(pdFreq->bstrVal);
 			pdFreq++;
 		}
 		SafeArrayUnaccessData(DatesArray);
 		SafeArrayAccessData(TitlesArray, (void HUGEP* FAR*)&pdFreq);
-		for (DWORD i = 0; i < source.GetTranchesCount(); i++)
+        for (int i = 0; i < source.GetTranchesCount(); i++)
 		{
 			SysFreeString(pdFreq->bstrVal);
 			pdFreq++;
@@ -1433,16 +1451,17 @@ HRESULT ExcelOutput::PlotAnnualExcess(
 			Params.cNamedArgs = 0;
 			if(dispid == 0)
 			{
-				wchar_t *ucName = L"Run";
+                LPOLESTR ucName = SysAllocString(L"Run");
 				hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
 					LOCALE_SYSTEM_DEFAULT, &dispid);
+                SysFreeString(ucName);
 				if(FAILED(hr))
 				{
 					SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
 					SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
 					SysFreeString(Params.rgvarg[Params.cArgs-6].bstrVal);
 					SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
-					for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+                    for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
 					{
 						SysFreeString(pdFreq->bstrVal);
 						pdFreq++;
@@ -1459,7 +1478,7 @@ HRESULT ExcelOutput::PlotAnnualExcess(
 				SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
 				SysFreeString(Params.rgvarg[Params.cArgs-6].bstrVal);
 				SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
-				for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+                for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
 				{
 					SysFreeString(pdFreq->bstrVal);
 					pdFreq++;
@@ -1471,12 +1490,13 @@ HRESULT ExcelOutput::PlotAnnualExcess(
 		catch(_com_error &ce)
 		{
 			hr = ce.Error();
+            return hr;
 		}
 		SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
 		SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
 		SysFreeString(Params.rgvarg[Params.cArgs-6].bstrVal);
 		SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
-		for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+        for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
 		{
 			SysFreeString(pdFreq->bstrVal);
 			pdFreq++;
@@ -1503,11 +1523,15 @@ HRESULT ExcelOutput::PlotCostFunding(
 		SAFEARRAY* LoansCouponArray = SafeArrayCreate(VT_VARIANT, 1, Bound);
 		HRESULT hr = SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&DatesIter);
 		if (SUCCEEDED(hr)) hr = SafeArrayAccessData(CostFundingArray, (void HUGEP* FAR*)&CostFundingIter);
-		else SafeArrayUnaccessData(DatesArray);
+        else {
+            SafeArrayUnaccessData(DatesArray);
+            return hr;
+        }
 		if (SUCCEEDED(hr)) hr = SafeArrayAccessData(LoansCouponArray, (void HUGEP* FAR*)&LoansCouponIter);
 		else{
 			SafeArrayUnaccessData(DatesArray);
 			SafeArrayUnaccessData(CostFundingArray);
+            return hr;
 		}
 		if (SUCCEEDED(hr))
 		{
@@ -1562,16 +1586,17 @@ HRESULT ExcelOutput::PlotCostFunding(
 			Params.cNamedArgs = 0;
 			if(dispid == 0)
 			{
-				wchar_t *ucName = L"Run";
+                LPOLESTR ucName = SysAllocString(L"Run");
 				hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
 					LOCALE_SYSTEM_DEFAULT, &dispid);
+                SysFreeString(ucName);
 				if(FAILED(hr))
 				{
 					SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
 					SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
 					SysFreeString(Params.rgvarg[Params.cArgs-7].bstrVal);
 					SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&DatesIter);
-					for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+                    for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
 					{
 						SysFreeString(DatesIter->bstrVal);
 						DatesIter++;
@@ -1588,7 +1613,7 @@ HRESULT ExcelOutput::PlotCostFunding(
 				SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
 				SysFreeString(Params.rgvarg[Params.cArgs-7].bstrVal);
 				SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&DatesIter);
-				for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+                for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
 				{
 					SysFreeString(DatesIter->bstrVal);
 					DatesIter++;
@@ -1600,12 +1625,13 @@ HRESULT ExcelOutput::PlotCostFunding(
 		catch(_com_error &ce)
 		{
 			hr = ce.Error();
+            return hr;
 		}
 		SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
 		SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
 		SysFreeString(Params.rgvarg[Params.cArgs-7].bstrVal);
 		SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&DatesIter);
-		for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+        for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
 		{
 			SysFreeString(DatesIter->bstrVal);
 			DatesIter++;
@@ -1632,9 +1658,16 @@ HRESULT ExcelOutput::PlotEquityReturn(
 		SAFEARRAY* CumEquityRetArray = SafeArrayCreate(VT_VARIANT, 1, Bound);
 		HRESULT hr = SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&DatesIter);
 		if (SUCCEEDED(hr)) hr = SafeArrayAccessData(EquityRetArray, (void HUGEP* FAR*)&EquityRetIter);
-		else SafeArrayUnaccessData(DatesArray);
+        else { 
+            SafeArrayUnaccessData(DatesArray); 
+            return hr; 
+        }
 		if (SUCCEEDED(hr)) hr = SafeArrayAccessData(CumEquityRetArray, (void HUGEP* FAR*)&CumEquityRetIter);
-		else {SafeArrayUnaccessData(DatesArray); SafeArrayUnaccessData(EquityRetArray);}
+		else {
+            SafeArrayUnaccessData(DatesArray); 
+            SafeArrayUnaccessData(EquityRetArray);
+            return hr;
+        }
 		if (SUCCEEDED(hr))
 		{
 			for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++){
@@ -1679,15 +1712,16 @@ HRESULT ExcelOutput::PlotEquityReturn(
 			Params.cNamedArgs = 0;
 			if(dispid == 0)
 			{
-				wchar_t *ucName = L"Run";
+                LPOLESTR ucName = SysAllocString(L"Run");
 				hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
 					LOCALE_SYSTEM_DEFAULT, &dispid);
+                SysFreeString(ucName);
 				if(FAILED(hr))
 				{
 					SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
 					SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
 					SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&DatesIter);
-					for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+                    for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
 					{
 						SysFreeString(DatesIter->bstrVal);
 						DatesIter++;
@@ -1703,7 +1737,7 @@ HRESULT ExcelOutput::PlotEquityReturn(
 				SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
 				SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
 				SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&DatesIter);
-				for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+                for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
 				{
 					SysFreeString(DatesIter->bstrVal);
 					DatesIter++;
@@ -1715,11 +1749,12 @@ HRESULT ExcelOutput::PlotEquityReturn(
 		catch(_com_error &ce)
 		{
 			hr = ce.Error();
+            return hr;
 		}
 		SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
 		SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
 		SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&DatesIter);
-		for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+        for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
 		{
 			SysFreeString(DatesIter->bstrVal);
 			DatesIter++;
@@ -1744,7 +1779,10 @@ HRESULT ExcelOutput::PlotCallToEquity(
 		SAFEARRAY* allEqtArray = SafeArrayCreate(VT_VARIANT, 1, Bound);
 		HRESULT hr = SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
 		if (SUCCEEDED(hr)) hr = SafeArrayAccessData(allEqtArray, (void HUGEP* FAR*)&pdCallEqtIter);
-		else SafeArrayUnaccessData(DatesArray);
+        else {
+            SafeArrayUnaccessData(DatesArray);
+            return hr;
+        }
 		if (SUCCEEDED(hr))
 		{
 			for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++){
@@ -1785,16 +1823,17 @@ HRESULT ExcelOutput::PlotCallToEquity(
 			Params.cNamedArgs = 0;
 			if(dispid == 0)
 			{
-				wchar_t *ucName = L"Run";
+                LPOLESTR ucName = SysAllocString(L"Run");
 				hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
 					LOCALE_SYSTEM_DEFAULT, &dispid);
+                SysFreeString(ucName);
 				if(FAILED(hr))
 				{
 					SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
 					SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
 					SysFreeString(Params.rgvarg[Params.cArgs-6].bstrVal);
 					SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
-					for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+                    for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
 					{
 						SysFreeString(pdFreq->bstrVal);
 						pdFreq++;
@@ -1811,7 +1850,7 @@ HRESULT ExcelOutput::PlotCallToEquity(
 				SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
 				SysFreeString(Params.rgvarg[Params.cArgs-6].bstrVal);
 				SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
-				for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+                for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
 				{
 					SysFreeString(pdFreq->bstrVal);
 					pdFreq++;
@@ -1823,12 +1862,13 @@ HRESULT ExcelOutput::PlotCallToEquity(
 		catch(_com_error &ce)
 		{
 			hr = ce.Error();
+            return hr;
 		}
 		SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
 		SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);
 		SysFreeString(Params.rgvarg[Params.cArgs-6].bstrVal);
 		SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&pdFreq);
-		for (DWORD i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
+        for (int i = 0; i < source.GetTranche(0)->GetCashFlow().Count(); i++)
 		{
 			SysFreeString(pdFreq->bstrVal);
 			pdFreq++;
@@ -1852,12 +1892,16 @@ HRESULT ExcelOutput::PlotCPRLS(
 		SAFEARRAY* CPRArray = SafeArrayCreate(VT_VARIANT, 1, Bound);
 		SAFEARRAY* LSArray = SafeArrayCreate(VT_VARIANT, 1, Bound);
 		HRESULT hr = SafeArrayAccessData(DatesArray, (void HUGEP* FAR*)&DatesIter);
-		if (SUCCEEDED(hr)) HRESULT hr = SafeArrayAccessData(CPRArray, (void HUGEP* FAR*)&CPRIter);
-		else SafeArrayUnaccessData(DatesArray);
-		if (SUCCEEDED(hr)) HRESULT hr = SafeArrayAccessData(LSArray, (void HUGEP* FAR*)&LSIter);
+		if (SUCCEEDED(hr))  hr = SafeArrayAccessData(CPRArray, (void HUGEP* FAR*)&CPRIter);
+		else {
+            SafeArrayUnaccessData(DatesArray);
+            return hr;
+        }
+		if (SUCCEEDED(hr))  hr = SafeArrayAccessData(LSArray, (void HUGEP* FAR*)&LSIter);
 		else{
 			SafeArrayUnaccessData(DatesArray);
 			SafeArrayUnaccessData(CPRArray);
+            return hr;
 		}
 		if (SUCCEEDED(hr))
 		{
@@ -1911,9 +1955,10 @@ HRESULT ExcelOutput::PlotCPRLS(
 			Params.cNamedArgs = 0;
 			if(dispid == 0)
 			{
-				wchar_t *ucName = L"Run";
+                LPOLESTR ucName = SysAllocString(L"Run");
 				hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
 					LOCALE_SYSTEM_DEFAULT, &dispid);
+                SysFreeString(ucName);
 				if(FAILED(hr))
 				{
 					SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
@@ -1949,6 +1994,7 @@ HRESULT ExcelOutput::PlotCPRLS(
 		{
             LOGDEBUG("Exception trown PlotCPRLS");
 			hr = ce.Error();
+            return hr;
 		}
 		SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
 		SysFreeString(Params.rgvarg[Params.cArgs-2].bstrVal);

@@ -198,9 +198,10 @@ HRESULT ExcelOutput::PrintMortgagesRepLines(
 			Params.cNamedArgs = 0;
 			if(dispid == 0)
 			{
-				wchar_t *ucName = L"Run";
+                LPOLESTR ucName = SysAllocString(L"Run");
 				hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
 					LOCALE_SYSTEM_DEFAULT, &dispid);
+                SysFreeString(ucName);
 				if(FAILED(hr))
 				{
 					SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
@@ -407,9 +408,10 @@ HRESULT ExcelOutput::PlotMortgagesFlows(
 			Params.cNamedArgs = 0;
 			if(dispid == 0)
 			{
-				wchar_t *ucName = L"Run";
+                LPOLESTR ucName = SysAllocString(L"Run");
 				hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
 					LOCALE_SYSTEM_DEFAULT, &dispid);
+                SysFreeString(ucName);
 				if(FAILED(hr))
 				{
 					SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
@@ -646,9 +648,10 @@ HRESULT ExcelOutput::PrintTrancheFlow(
 			Params.cNamedArgs = 0;
 			if(dispid == 0)
 			{
-				wchar_t *ucName = L"Run";
+                LPOLESTR ucName = SysAllocString(L"Run");
 				hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
 					LOCALE_SYSTEM_DEFAULT, &dispid);
+                SysFreeString(ucName);
 				if(FAILED(hr))
 				{
 					SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
@@ -745,9 +748,10 @@ HRESULT ExcelOutput::PrintMergedCell(const QString& msg, const QString& TargetCe
 		Params.cNamedArgs = 0;
 		if(dispid == 0)
 		{
-			wchar_t *ucName = L"Run";
+            LPOLESTR ucName = SysAllocString(L"Run");
 			hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
 				LOCALE_SYSTEM_DEFAULT, &dispid);
+            SysFreeString(ucName);
 			if(FAILED(hr))
 			{
 				SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
@@ -825,9 +829,10 @@ HRESULT ExcelOutput::PrintColumn(const QString& Title, const QList<double>& Valu
 		Params.cNamedArgs = 0;
 		if(dispid == 0)
 		{
-			wchar_t *ucName = L"Run";
+            LPOLESTR ucName = SysAllocString(L"Run");
 			hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
 				LOCALE_SYSTEM_DEFAULT, &dispid);
+            SysFreeString(ucName);
 			if(FAILED(hr))
 			{
 				SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
@@ -902,9 +907,10 @@ HRESULT ExcelOutput::PrintDataColumn(const QList<double>& Values ,const QString&
 		Params.cNamedArgs = 0;
 		if(dispid == 0)
 		{
-			wchar_t *ucName = L"Run";
+            LPOLESTR ucName = SysAllocString(L"Run");
 			hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
 				LOCALE_SYSTEM_DEFAULT, &dispid);
+            SysFreeString(ucName);
 			if(FAILED(hr))
 			{
 				SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
@@ -1010,9 +1016,10 @@ HRESULT ExcelOutput::PlotTranchesDynamic(
 			Params.cNamedArgs = 0;
 			if(dispid == 0)
 			{
-				wchar_t *ucName = L"Run";
+                LPOLESTR ucName = SysAllocString(L"Run");
 				hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
 					LOCALE_SYSTEM_DEFAULT, &dispid);
+                SysFreeString(ucName);
 				if(FAILED(hr))
 				{
 					SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
@@ -1159,9 +1166,10 @@ HRESULT ExcelOutput::PlotOCTest(
 			Params.cNamedArgs = 0;
 			if(dispid == 0)
 			{
-				wchar_t *ucName = L"Run";
+                LPOLESTR ucName = SysAllocString(L"Run");
 				hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
 					LOCALE_SYSTEM_DEFAULT, &dispid);
+                SysFreeString(ucName);
 				if(FAILED(hr))
 				{
 					SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
@@ -1308,9 +1316,10 @@ HRESULT ExcelOutput::PlotICTest(
 			Params.cNamedArgs = 0;
 			if(dispid == 0)
 			{
-				wchar_t *ucName = L"Run";
+                LPOLESTR ucName = SysAllocString(L"Run");
 				hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
 					LOCALE_SYSTEM_DEFAULT, &dispid);
+                SysFreeString(ucName);
 				if(FAILED(hr))
 				{
 					SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
@@ -1442,9 +1451,10 @@ HRESULT ExcelOutput::PlotAnnualExcess(
 			Params.cNamedArgs = 0;
 			if(dispid == 0)
 			{
-				wchar_t *ucName = L"Run";
+                LPOLESTR ucName = SysAllocString(L"Run");
 				hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
 					LOCALE_SYSTEM_DEFAULT, &dispid);
+                SysFreeString(ucName);
 				if(FAILED(hr))
 				{
 					SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
@@ -1576,9 +1586,10 @@ HRESULT ExcelOutput::PlotCostFunding(
 			Params.cNamedArgs = 0;
 			if(dispid == 0)
 			{
-				wchar_t *ucName = L"Run";
+                LPOLESTR ucName = SysAllocString(L"Run");
 				hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
 					LOCALE_SYSTEM_DEFAULT, &dispid);
+                SysFreeString(ucName);
 				if(FAILED(hr))
 				{
 					SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
@@ -1701,9 +1712,10 @@ HRESULT ExcelOutput::PlotEquityReturn(
 			Params.cNamedArgs = 0;
 			if(dispid == 0)
 			{
-				wchar_t *ucName = L"Run";
+                LPOLESTR ucName = SysAllocString(L"Run");
 				hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
 					LOCALE_SYSTEM_DEFAULT, &dispid);
+                SysFreeString(ucName);
 				if(FAILED(hr))
 				{
 					SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
@@ -1811,9 +1823,10 @@ HRESULT ExcelOutput::PlotCallToEquity(
 			Params.cNamedArgs = 0;
 			if(dispid == 0)
 			{
-				wchar_t *ucName = L"Run";
+                LPOLESTR ucName = SysAllocString(L"Run");
 				hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
 					LOCALE_SYSTEM_DEFAULT, &dispid);
+                SysFreeString(ucName);
 				if(FAILED(hr))
 				{
 					SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);
@@ -1942,9 +1955,10 @@ HRESULT ExcelOutput::PlotCPRLS(
 			Params.cNamedArgs = 0;
 			if(dispid == 0)
 			{
-				wchar_t *ucName = L"Run";
+                LPOLESTR ucName = SysAllocString(L"Run");
 				hr = ExcelCommons::pExcelDisp->GetIDsOfNames(IID_NULL, &ucName, 1,
 					LOCALE_SYSTEM_DEFAULT, &dispid);
+                SysFreeString(ucName);
 				if(FAILED(hr))
 				{
 					SysFreeString(Params.rgvarg[Params.cArgs-1].bstrVal);

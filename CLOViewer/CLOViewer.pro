@@ -8,6 +8,8 @@ INCLUDEPATH += ../CLOModelLib \
     ./GeneratedFiles \
     . \
     ./GeneratedFiles/Release
+LIBS += -L"../Win32/Release" \
+    -lCLOModelLib
 DEPENDPATH += .
 MOC_DIR += ./GeneratedFiles/release
 OBJECTS_DIR += release

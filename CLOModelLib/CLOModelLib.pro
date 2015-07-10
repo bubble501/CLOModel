@@ -4,12 +4,12 @@ DESTDIR = ../Win32/Release
 QT += core sql widgets gui
 CONFIG += release
 DEFINES += WIN64 QT_DLL QT_SQL_LIB QT_WIDGETS_LIB CLOMODELLIB_LIB
-INCLUDEPATH += $(QBBGLIBPATH)/QBbgLib \
-    $(SIMSTRINGPATH)/include/simstring \
-    $(QUAZIPPATH)/include \
-    $(ZLIBPATH)/include \
-    $(BOOSTPATH) \
-    $(KDCHARTPATH)/include/KDChart \
+INCLUDEPATH += "$(QBBGLIBPATH)/QBbgLib" \
+    "$(SIMSTRINGPATH)/include/simstring" \
+    "$(QUAZIPPATH)/include" \
+    "$(ZLIBPATH)/include" \
+    "$(BOOSTPATH)" \
+    "$(KDCHARTPATH)/include/KDChart" \
     ./GeneratedFiles \
     . \
     ./GeneratedFiles/Release \

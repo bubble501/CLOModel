@@ -4,7 +4,7 @@ DESTDIR = ../Win32/Release
 QT += core sql widgets gui
 CONFIG += release
 DEFINES += WIN64 QT_DLL QT_SQL_LIB QT_WIDGETS_LIB CLOMODELLIB_LIB
-INCLUDEPATH += "$$(QBBGLIBPATH)/QBbgLib" \
+INCLUDEPATH += "$$(QBBGLIBPATH)/include" \
     "$$(SIMSTRINGPATH)/include/simstring" \
     "$$(QUAZIPPATH)/include" \
     "$$(ZLIBPATH)/include" \
@@ -14,7 +14,7 @@ INCLUDEPATH += "$$(QBBGLIBPATH)/QBbgLib" \
     . \
     ./GeneratedFiles/Release \
     ./Private
-LIBS += -L"$$(QBBGLIBPATH)/Win32/Release" \
+LIBS += -L"$$(QBBGLIBPATH)/lib" \
     -L"$$(KDCHARTPATH)/lib" \
     -L"$$(QUAZIPPATH)/lib" \
     -lQBbgLib \
@@ -26,3 +26,15 @@ OBJECTS_DIR += release
 UI_DIR += ./GeneratedFiles
 RCC_DIR += ./GeneratedFiles
 include(CLOModelLib.pri)
+headers.path=$$PREFIX/include
+headers.files=$$HEADERS
+unix:!symbian {
+    isEmpty(PREFIX){
+		PREFIX=/usr/local
+	}
+	else{
+		target.path=$$PREFIX/lib/$${LIB_ARCH}
+	}
+}
+INSTALLS += headers target
+

@@ -4,10 +4,10 @@ All the components are designed to build on all [platforms supported by Qt](http
 ### C++11
 *Developed using MSVC13*<br/>
 To build the code you'll need a compiler conforming to [C++11 standard](http://en.wikipedia.org/wiki/C%2B%2B11).<br/>
-The code is compatible with the subset of the standard implemented by MSVC.<br/>
+The code is compatible with the subset of the standard implemented by MSVC 2013.<br/>
 [GCC](https://gcc.gnu.org/), Visual Studio's MSVC and XCode's LLVM are all valid compilers
 ### Boost
-*Developed using version 1.57.0*<br/>
+*Developed using version 1.58.0*<br/>
 [Download](http://www.boost.org/users/download/) and unpack the library. There is no need to build it.
 ### Qt
 *Developed using version 5.4.1*<br/>
@@ -17,7 +17,7 @@ If you use versions of the library higher than 5.9, minor changes in the code ma
 *Developed using version 1.2.8*<br/>
 [Download](http://www.zlib.net/) the compiled DLL of the library or download the source code and compile it as a dynamic library following the instructions included with the source.
 ### Bloomberg
-*Developed using version 3.7.5.1*<br/>
+*Developed using version 3.8.8.1*<br/>
 [Download](http://www.bloomberglabs.com/api/libraries/) the Bloomberg API library for C++.
 ### QBbgLib
 *Developed using version 0.0.1*<br/>

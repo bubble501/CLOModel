@@ -22,12 +22,7 @@ If you use versions of the library higher than 5.9, minor changes in the code ma
 ### QBbgLib
 *Developed using version 0.0.1*<br/>
 [Download](https://github.com/VSRonin/QBbgLib) the Qt interface for the Bloomberg API.
-Once downloaded, open the solution in visual studio and compile the library in release configuration.
-You may need to set, in the project properties, the path to the Bloomberg API library mentioned above under:<ul>
-<li>C/C++ &#10142; General &#10142; Additional Include Directories</li>
-<li>Linker &#10142; General &#10142; Additional Library Directories</li>
-</ul>
-A makefile version will be available soon to speed up the build and deploy process
+run qmake nmake to build the library
 ### Quazip
 *Developed using version 0.7.1*<br/>
 [Download](http://sourceforge.net/projects/quazip/) and build Quazip library using the instructions below

@@ -27,14 +27,18 @@ UI_DIR += ./GeneratedFiles
 RCC_DIR += ./GeneratedFiles
 include(CLOModelLib.pri)
 headers.path=$$PREFIX/include
-headers.files=$$HEADERS
+headers.files= *.h
 unix:!symbian {
     isEmpty(PREFIX){
 		PREFIX=/usr/local
 	}
-	else{
-		target.path=$$PREFIX/lib/$${LIB_ARCH}
+	target.path=$$PREFIX/lib/$${LIB_ARCH}
+}
+win32 {
+    isEmpty(PREFIX){
+		PREFIX=C:\CLOModelLib
 	}
+	target.path=$$PREFIX/lib/$${LIB_ARCH}
 }
 INSTALLS += headers target
 

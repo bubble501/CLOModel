@@ -54,7 +54,77 @@ HEADERS += ./AbstractBbgVect.h \
     ./SummaryView.h \
     ./TriggerHelperDialog.h \
     ./TriggerStructHelperWidget.h \
-    ./WaterfallStepHelperDialog.h
+    ./WaterfallStepHelperDialog.h \
+	./Private/InternalItems.h \
+    ./Private/AbstractBbgVect_p.h \
+    ./Private/BaseRateVect_p.h \
+    ./Private/BloombergVector_p.h \
+    ./Private/BoolVector_p.h \
+    ./Private/DayCountVect_p.h \
+    ./Private/FloorCapVector_p.h \
+    ./Private/IntegerVector_p.h \
+    ./Private/RepaymentVector_p.h \
+    ./Private/AbstrAsyncCalculator_p.h \
+    ./Private/AbstrAsyncThread_p.h \
+    ./Private/BackwardCompatibilityInterface_p.h \
+    ./Private/BaseRateTable_p.h \
+    ./Private/GenericCashFlow_p.h \
+    ./Private/TrancheTrigger_p.h \
+    ./Private/VectorTrigger_p.h \
+    ./Private/AbstractTrigger_p.h \
+    ./Private/CumulativeLossTrigger_p.h \
+    ./Private/DateTrigger_p.h \
+    ./Private/DeferredInterestTrigger_p.h \
+    ./Private/DelinquencyTrigger_p.h \
+    ./Private/PDLtrigger_p.h \
+    ./Private/PoolSizeTrigger_p.h \
+    ./Private/TriggersResults_p.h \
+    ./Private/DateTriggerSettingWidget.h \
+    ./Private/AbstractTriggerSettingWidget.h \
+    ./Private/CumulativeLossTriggerSettingWidget.h \
+    ./Private/DelinquencyTriggerSettingWidget.h \
+    ./Private/DeferredInterestTriggerSettingWidget.h \
+    ./Private/PoolSizeTriggerSettingWidget.h \
+    ./Private/PDLTriggerSettingWidget.h \
+    ./Private/TrancheTriggerSettingWidget.h \
+    ./Private/VectorTriggerSettingWidget.h \
+    ./Private/ReinvestmentTest_p.h \
+    ./Private/ReserveFund_p.h \
+    ./Private/WaterfallCalcThread_p.h \
+    ./Private/WaterfallCalculator_p.h \
+    ./Private/Waterfall_p.h \
+    ./Private/WatFalPrior_p.h \
+    ./Private/PrincipalProceeds_p.h \
+    ./Private/Seniority_p.h \
+    ./Private/TrancheCashFlow_p.h \
+    ./Private/Tranche_p.h \
+    ./Private/LoanAssMatcher_p.h \
+    ./Private/ScenarioApplier_p.h \
+    ./Private/ApplyFlowThread_p.h \
+    ./Private/LoanAssMatcherResult_p.h \
+    ./Private/LoanAssMatcherThread_p.h \
+    ./Private/LoanAssumption_p.h \
+    ./Private/Mortgage_p.h \
+    ./Private/MtgCalculatorThread_p.h \
+    ./Private/MtgCalculator_p.h \
+    ./Private/LoanAssumptionsEditor_p.h \
+    ./Private/ReadOnlyColProxy.h \
+    ./Private/StressViewer_p.h \
+    ./Private/SummaryView_p.h \
+    ./Private/TriggerHelperDialog_p.h \
+    ./Private/TriggerStructHelperWidget_p.h \
+    ./Private/WaterfallStepHelperDialog_p.h \
+    ./Private/PhasedProgressWidget.h \
+    ./Private/LoanAssumptionDelegate.h \
+    ./Private/CheckAndEditDelegate.h \
+    ./Private/CheckAndEdit.h \
+    ./Private/ChartsWidget.h \
+    ./Private/AssumptionsComboDelegate.h \
+    ./Private/RichTextDelegate.h \
+    ./Private/TrancheViewer.h \
+    ./Private/WaterfallViewer.h \
+    ./Private/StressTest_p.h \
+    ./Private/AssumptionSet_p.h
 SOURCES += ./AbstractBbgVect.cpp \
     ./BaseRateVect.cpp \
     ./BloombergVector.cpp \

@@ -6,7 +6,7 @@ CONFIG += release
 DEFINES += WIN64 QT_DLL QT_SQL_LIB QT_WIDGETS_LIB CLOMODELLIB_LIB
 INCLUDEPATH += "$$(QBBGLIBPATH)/include" \
     "$$(SIMSTRINGPATH)/include/simstring" \
-    "$$(QUAZIPPATH)/include" \
+    "$$(QUAZIPPATH)/include/quazip" \
     "$$(ZLIBPATH)/include" \
     "$$(BOOSTPATH)" \
     "$$(KDCHARTPATH)/include/KDChart" \

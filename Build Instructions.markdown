@@ -62,11 +62,7 @@ The following environmental variables are needed in order to be able to compile 
 <li>SIMSTRINGPATH - Path to the include folder of the simstring library. (e.g. C:\simstring-1.0)</li></ul>
 To build the Installer you'll need to define these additional variables:
 <ul><li>QTPATH - Path to the include folder of the Qt Libraries. (e.g. C:\Qt5\5.3\msvc2013)</li></ul>
-## Visual Studio
-[Download](http://www.qt.io/download-open-source) and install the Qt Visual Studio Addin.<br/>
-[Download](http://wixtoolset.org/) and install WiX Toolset<br/>
-Open the solution file.<br/>
-Build the projects individually (Do not use "Build Solution" as it will incur in a race condition an possibly fail).
+run qmake nmake to build the library
 ## Documentation
 To generate the library documentation use the [Doxigen](www.doxygen.org) toolset. Just open the .doxyfile file included using doxywizard.exe.<br/>
 You'll need to generate the .Net documentation before building the Installer otherwise it will fail.

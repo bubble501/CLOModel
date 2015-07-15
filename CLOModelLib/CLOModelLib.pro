@@ -1,9 +1,21 @@
 TEMPLATE = lib
-TARGET = CLOModelLib
-DESTDIR = ../Win32/Release
+CONFIG(debug, debug|release) {
+    win32: TARGETNAME=CLOModelLibd
+	mac: TARGETNAME=CLOModelLib_debug
+    DESTDIRNAME = ../bin/Debug
+    MOC_DIR += ./GeneratedFiles/debug
+    OBJECTS_DIR += debug
+}
+CONFIG(release, debug|release) {
+    TARGETNAME = CLOModelLib
+    DESTDIRNAME = ../bin/Release
+    MOC_DIR += ./GeneratedFiles/release
+    OBJECTS_DIR += release
+}
+TARGET = $$TARGETNAME
+DESTDIR = $$DESTDIRNAME
 QT += core sql widgets gui
-CONFIG += release
-DEFINES += WIN64 QT_DLL QT_SQL_LIB QT_WIDGETS_LIB CLOMODELLIB_LIB
+DEFINES += QT_DLL QT_SQL_LIB QT_WIDGETS_LIB CLOMODELLIB_LIB
 INCLUDEPATH += "$$(QBBGLIBPATH)/include" \
     "$$(SIMSTRINGPATH)/include/simstring" \
     "$$(QUAZIPPATH)/include/quazip" \
@@ -21,23 +33,17 @@ LIBS += -L"$$(QBBGLIBPATH)/lib" \
     -lQuaZip \
     -lkdchart2
 DEPENDPATH += .
-MOC_DIR += ./GeneratedFiles/release
-OBJECTS_DIR += release
 UI_DIR += ./GeneratedFiles
 RCC_DIR += ./GeneratedFiles
 include(CLOModelLib.pri)
 headers.path=$$PREFIX/include
 headers.files= *.h
-unix:!symbian {
-    isEmpty(PREFIX){
-		PREFIX=/usr/local
-	}
-	target.path=$$PREFIX/lib/$${LIB_ARCH}
+isEmpty(PREFIX){
+	PREFIX=..\CLOModelLib
+	warning("Prefix not set")
 }
-win32 {
-    isEmpty(PREFIX){
-		PREFIX=C:\CLOModelLib
-	}
+target.path=$$PREFIX/lib
+unix:!symbian {
 	target.path=$$PREFIX/lib/$${LIB_ARCH}
 }
 INSTALLS += headers target

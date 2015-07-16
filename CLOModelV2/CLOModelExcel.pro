@@ -27,3 +27,4 @@ DEPENDPATH += .
 UI_DIR += ./GeneratedFiles
 RCC_DIR += ./GeneratedFiles
 include(CLOModelExcel.pri)
+QMAKE_LFLAGS_WINDOWS_DLL += /DEF:"ExcelFunctionExport.def"

@@ -27,13 +27,13 @@ LIBS += -L"$$(QBBGLIBPATH)/lib" \
     -L"$$(KDCHARTPATH)/lib" \
     -L"$$(QUAZIPPATH)/lib" 
 CONFIG(release, debug|release) {
-LIBS +=
+LIBS += \
     -lQBbgLib \
     -lQuaZip \
     -lkdchart2
 }
 CONFIG(debug, debug|release) {
-LIBS +=
+LIBS += \
     -lQBbgLibd \
     -lQuaZipd \
     -lkdchartd2

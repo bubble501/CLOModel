@@ -879,10 +879,14 @@ bool Tranche::saveCashflowsDatabase() const
                 CheckBondExistQuery.setForwardOnly(true);
                 CheckBondExistQuery.prepare("{CALL " + GetFromConfig("Database", "GetBondDetailsStoredProc") + "}");
                 CheckBondExistQuery.bindValue(":isin", applicableIsin);
-                if (!CheckBondExistQuery.exec())
+                if (!CheckBondExistQuery.exec()) {
+                    DEBG_LOG("Failed to run GetBondDetailsStoredProc")
                     return false;
-                if (!CheckBondExistQuery.next())
+                }
+                if (!CheckBondExistQuery.next()) {
+                    DEBG_LOG("Bond not found in Database")
                     return false;
+                }
             }
             bool dbError;
             QVariantList isinPar, datePar, deferredPar, interestPar, principalPar, balancePar, couponPar;
@@ -909,6 +913,7 @@ bool Tranche::saveCashflowsDatabase() const
                 EraseCashflowQuery.prepare("{CALL " + GetFromConfig("Database", "DeleteCashflowsStoredProc") + "}");
                 EraseCashflowQuery.bindValue(":ISIN", applicableIsin);
                 dbError = !EraseCashflowQuery.exec();
+                DEBG_LOG_CONDITION("Failed to delete previous cash flows", dbError)
             }
             if (!dbError) {
                 QSqlQuery InsertCashflowQuery(db);
@@ -922,6 +927,7 @@ bool Tranche::saveCashflowsDatabase() const
                 InsertCashflowQuery.bindValue(":balance", balancePar);
                 InsertCashflowQuery.bindValue(":coupon", couponPar);
                 dbError = !InsertCashflowQuery.execBatch();
+                DEBG_LOG_CONDITION("Failed to upload new cash flows", dbError)
             }
             if (dbError) {
                 db.rollback();

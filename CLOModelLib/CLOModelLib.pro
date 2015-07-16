@@ -1,19 +1,16 @@
 TEMPLATE = lib
 CONFIG(debug, debug|release) {
-    win32: TARGETNAME=CLOModelLibd
-	mac: TARGETNAME=CLOModelLib_debug
-    DESTDIRNAME = ../bin/Debug
+    TARGET=CLOModelLibd
+    DESTDIR = ../bin/Debug
     MOC_DIR += ./GeneratedFiles/debug
     OBJECTS_DIR += debug
 }
 CONFIG(release, debug|release) {
-    TARGETNAME = CLOModelLib
-    DESTDIRNAME = ../bin/Release
+    TARGET = CLOModelLib
+    DESTDIR = ../bin/Release
     MOC_DIR += ./GeneratedFiles/release
     OBJECTS_DIR += release
 }
-TARGET = $$TARGETNAME
-DESTDIR = $$DESTDIRNAME
 QT += core sql widgets gui
 DEFINES += QT_DLL QT_SQL_LIB QT_WIDGETS_LIB CLOMODELLIB_LIB
 INCLUDEPATH += "$$(QBBGLIBPATH)/include" \
@@ -24,14 +21,23 @@ INCLUDEPATH += "$$(QBBGLIBPATH)/include" \
     "$$(KDCHARTPATH)/include/KDChart" \
     ./GeneratedFiles \
     . \
-    ./GeneratedFiles/Release \
+    "$$MOC_DIR" \
     ./Private
 LIBS += -L"$$(QBBGLIBPATH)/lib" \
     -L"$$(KDCHARTPATH)/lib" \
-    -L"$$(QUAZIPPATH)/lib" \
+    -L"$$(QUAZIPPATH)/lib" 
+CONFIG(release, debug|release) {
+LIBS +=
     -lQBbgLib \
     -lQuaZip \
     -lkdchart2
+}
+CONFIG(debug, debug|release) {
+LIBS +=
+    -lQBbgLibd \
+    -lQuaZipd \
+    -lkdchartd2
+}
 DEPENDPATH += .
 UI_DIR += ./GeneratedFiles
 RCC_DIR += ./GeneratedFiles

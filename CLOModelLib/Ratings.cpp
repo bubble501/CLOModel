@@ -77,7 +77,7 @@ bool Ratings::setRating(const QString& val, RatingAgency ag)
         return false;
     const auto & agencySyntax = RatingsPrivate::m_ratingSyntax[static_cast<qint8>(ag)];
     for (int i = static_cast<qint16>(RatingValue::AAA); i <= static_cast<qint16>(RatingValue::D); ++i){
-        if (val.indexOf(QRegExp("[^ABC]" + agencySyntax[i] +"[^ABC]" ,Qt::CaseInsensitive))>=0){
+        if (val.indexOf(QRegExp("(?:^|[^ABC])" + agencySyntax[i] +"(?:$|[^ABC])" ,Qt::CaseInsensitive))>=0){
             setRating(static_cast<RatingValue>(i), ag);
             break;
         }
@@ -281,6 +281,8 @@ bool Ratings::downloadRatings(const QBbgLib::QBbgSecurity& sec)
 {
     bool oneRatingFound = false;
 #ifndef NO_BLOOMBERG
+    if (!sec.isValid())
+        return false;
     Ratings bachupRating(*this);
     reset();
     using namespace QBbgLib;
@@ -306,6 +308,11 @@ bool Ratings::downloadRatings(const QBbgLib::QBbgSecurity& sec)
         operator=(bachupRating);
 #endif // !NO_BLOOMBERG
     return oneRatingFound;
+}
+
+bool Ratings::downloadRatings(const QString& name, const QString& bbgExtension)
+{
+    return downloadRatings(QBbgLib::QBbgSecurity(name, QBbgLib::QBbgSecurity::stringToYellowKey(bbgExtension)));
 }
 
 int Ratings::numRatings() const

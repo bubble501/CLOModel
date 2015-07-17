@@ -93,6 +93,7 @@ public:
     RatingValue ratingAtRankNoDuplicate(int rnk) const;
     RatingAgency agencyAtRank(int rnk) const;
     bool downloadRatings(const QBbgLib::QBbgSecurity& sec);
+    bool downloadRatings(const QString& name, const QString& bbgExtension);
     int numRatings() const;
     void reset();
     friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const Ratings& flows);

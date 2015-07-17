@@ -817,11 +817,11 @@
     <ClCompile Include="Private\TrancheTriggerSettingWidget.cpp">
       <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
     </ClCompile>
-    <ClCompile Include="InternalItems.cpp">
-      <Filter>Privates\Common Items</Filter>
-    </ClCompile>
     <ClCompile Include="Ratings.cpp">
       <Filter>Source Files\Common Items</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\InternalItems.cpp">
+      <Filter>Privates\Common Items</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

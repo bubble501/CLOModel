@@ -1180,7 +1180,6 @@
     </ClCompile>
     <ClCompile Include="GenericCashFlow.cpp" />
     <ClCompile Include="IntegerVector.cpp" />
-    <ClCompile Include="InternalItems.cpp" />
     <ClCompile Include="LoanAssMatcher.cpp" />
     <ClCompile Include="LoanAssMatcherResult.cpp" />
     <ClCompile Include="LoanAssMatcherThread.cpp" />
@@ -1202,6 +1201,7 @@
     <ClCompile Include="Private\DateTriggerSettingWidget.cpp" />
     <ClCompile Include="Private\DeferredInterestTriggerSettingWidget.cpp" />
     <ClCompile Include="Private\DelinquencyTriggerSettingWidget.cpp" />
+    <ClCompile Include="Private\InternalItems.cpp" />
     <ClCompile Include="Private\LoanAssumptionDelegate.cpp" />
     <ClCompile Include="Private\PDLTriggerSettingWidget.cpp" />
     <ClCompile Include="Private\PhasedProgressWidget.cpp" />

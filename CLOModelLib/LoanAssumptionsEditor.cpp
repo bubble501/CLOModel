@@ -118,7 +118,7 @@ void LoanAssumptionsEditorPrivate::CreateScenarioEditor()
 	m_AliasesList->setSelectionMode(QAbstractItemView::SingleSelection);
 
 	QLabel* SelectScenarioLabel = new QLabel(q);
-	SelectScenarioLabel->setText(q->tr("Select Scenario"));
+	SelectScenarioLabel->setText(LoanAssumptionsEditor::tr("Select Scenario"));
 	QCompleter* ScenariosCompleter = new QCompleter(m_SortScenarios, q);
 	ScenariosCompleter->setCompletionColumn(0);
 	ScenariosCompleter->setCaseSensitivity(Qt::CaseInsensitive);
@@ -130,9 +130,9 @@ void LoanAssumptionsEditorPrivate::CreateScenarioEditor()
 	m_ScenariosCombo->setCompleter(ScenariosCompleter);
 	m_ScenariosCombo->setInsertPolicy(QComboBox::NoInsert);
 	AddScenarioButton = new QPushButton(q);
-    AddScenarioButton->setText(q->tr("Add"));
+    AddScenarioButton->setText(LoanAssumptionsEditor::tr("Add"));
 	RemoveScenarioButton = new QPushButton(q);
-    RemoveScenarioButton->setText(q->tr("Remove"));
+    RemoveScenarioButton->setText(LoanAssumptionsEditor::tr("Remove"));
 	RemoveScenarioButton->setEnabled(false);
 
 	m_ScenarioList = new QListView(q);
@@ -143,7 +143,7 @@ void LoanAssumptionsEditorPrivate::CreateScenarioEditor()
 
 
 	QLabel* AliasLabel = new QLabel(q);
-    AliasLabel->setText(q->tr("Aliases"));
+    AliasLabel->setText(LoanAssumptionsEditor::tr("Aliases"));
 	m_AliasLineEdit = new QLineEdit(q);
 	m_AliasLineEdit->setMaxLength(50);
 	AddAliasButton = new QPushButton(q);
@@ -172,9 +172,9 @@ void LoanAssumptionsEditorPrivate::CreateScenarioEditor()
 		"}"
 		"QLabel { qproperty-alignment: 'AlignRight | AlignVCenter'; }"
 		);
-    NamesGroup->setTitle(q->tr("Identifiers"));
+    NamesGroup->setTitle(LoanAssumptionsEditor::tr("Identifiers"));
 	QLabel* ScenarioNameLabel = new QLabel(q);
-    ScenarioNameLabel->setText(q->tr("Scenario Name"));
+    ScenarioNameLabel->setText(LoanAssumptionsEditor::tr("Scenario Name"));
 	m_ScenarioNameEdit = new QLineEdit(q);
 	QGridLayout* NamesLay = new QGridLayout(NamesGroup);
 	NamesLay->addWidget(ScenarioNameLabel, 0, 0);
@@ -189,11 +189,11 @@ void LoanAssumptionsEditorPrivate::CreateScenarioEditor()
 	m_SeniorAsumptionsModel = new QStandardItemModel(q);
 	m_SeniorAsumptionsModel->setColumnCount(2);
 	m_SeniorAsumptionsModel->setRowCount(1);
-    m_SeniorAsumptionsModel->setHorizontalHeaderLabels(QStringList() << q->tr("Assumption Type") << q->tr("Assumption value"));
+    m_SeniorAsumptionsModel->setHorizontalHeaderLabels(QStringList() << LoanAssumptionsEditor::tr("Assumption Type") << LoanAssumptionsEditor::tr("Assumption value"));
 	m_MezzAsumptionsModel = new QStandardItemModel(q);
 	m_MezzAsumptionsModel->setColumnCount(2);
 	m_MezzAsumptionsModel->setRowCount(1);
-    m_MezzAsumptionsModel->setHorizontalHeaderLabels(QStringList() << q->tr("Assumption Type") << q->tr("Assumption value"));
+    m_MezzAsumptionsModel->setHorizontalHeaderLabels(QStringList() << LoanAssumptionsEditor::tr("Assumption Type") << LoanAssumptionsEditor::tr("Assumption value"));
 
 	m_SeniorTable = new QTableView(q);
 	SafeSetModel(m_SeniorTable, m_SeniorAsumptionsModel);
@@ -206,20 +206,20 @@ void LoanAssumptionsEditorPrivate::CreateScenarioEditor()
 	m_SeniorTable->horizontalHeader()->setStretchLastSection(true);
 	m_SeniorTable->verticalHeader()->hide();
 	QGroupBox* SeniorGroup = new QGroupBox(q);
-    SeniorGroup->setTitle(q->tr("Assumption for Senior Obligations"));
+    SeniorGroup->setTitle(LoanAssumptionsEditor::tr("Assumption for Senior Obligations"));
 	QGridLayout* SeniorLay = new QGridLayout(SeniorGroup);
 	m_seniorDateCheck = new QCheckBox(q);
-    m_seniorDateCheck->setText(q->tr("Scenario Reference Date"));
+    m_seniorDateCheck->setText(LoanAssumptionsEditor::tr("Scenario Reference Date"));
 	m_seniorDateCheck->setLayoutDirection(Qt::RightToLeft);
 	m_SeniorDateEdit = new QDateEdit(q);
 	m_SeniorDateEdit->setCalendarPopup(true);
 	m_SeniorDateEdit->setDate(QDate::currentDate());
 	m_SeniorDateEdit->setEnabled(false);
 	AddSeniorAssumptionButton = new QPushButton(q);
-    AddSeniorAssumptionButton->setText(q->tr("Add"));
+    AddSeniorAssumptionButton->setText(LoanAssumptionsEditor::tr("Add"));
 	AddSeniorAssumptionButton->setEnabled(false);
 	RemoveSeniorAssumptionButton = new QPushButton(q);
-    RemoveSeniorAssumptionButton->setText(q->tr("Remove"));
+    RemoveSeniorAssumptionButton->setText(LoanAssumptionsEditor::tr("Remove"));
 	RemoveSeniorAssumptionButton->setEnabled(false);
 
 	SeniorLay->addItem(new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Preferred), 0, 0);
@@ -243,20 +243,20 @@ void LoanAssumptionsEditorPrivate::CreateScenarioEditor()
 	m_MezzTable->horizontalHeader()->setStretchLastSection(true);
 	m_MezzTable->verticalHeader()->hide();
 	QGroupBox* MezzGroup = new QGroupBox(q);
-    MezzGroup->setTitle(q->tr("Assumption for Mezzanine Obligations"));
+    MezzGroup->setTitle(LoanAssumptionsEditor::tr("Assumption for Mezzanine Obligations"));
 	QGridLayout* MezzLay = new QGridLayout(MezzGroup);
 	m_MezzDateCheck = new QCheckBox(q);
-    m_MezzDateCheck->setText(q->tr("Scenario Reference Date"));
+    m_MezzDateCheck->setText(LoanAssumptionsEditor::tr("Scenario Reference Date"));
 	m_MezzDateCheck->setLayoutDirection(Qt::RightToLeft);
 	m_MezzDateEdit = new QDateEdit(q);
 	m_MezzDateEdit->setCalendarPopup(true);
 	m_MezzDateEdit->setDate(QDate::currentDate());
 	m_MezzDateEdit->setEnabled(false);
 	AddMezzAssumptionButton = new QPushButton(q);
-    AddMezzAssumptionButton->setText(q->tr("Add"));
+    AddMezzAssumptionButton->setText(LoanAssumptionsEditor::tr("Add"));
 	AddMezzAssumptionButton->setEnabled(false);
 	RemoveMezzAssumptionButton = new QPushButton(q);
-    RemoveMezzAssumptionButton->setText(q->tr("Remove"));
+    RemoveMezzAssumptionButton->setText(LoanAssumptionsEditor::tr("Remove"));
 	RemoveMezzAssumptionButton->setEnabled(false);
 
 	MezzLay->addItem(new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Preferred), 0, 0);
@@ -311,16 +311,16 @@ void LoanAssumptionsEditorPrivate::CreateScenarioEditor()
 	BottomLine->setMidLineWidth(0);
 	BottomLine->setFrameShadow(QFrame::Sunken);
 	DiscardAllButton = new QPushButton(q);
-    DiscardAllButton->setText(q->tr("Discard All"));
+    DiscardAllButton->setText(LoanAssumptionsEditor::tr("Discard All"));
 	DiscardAllButton->setEnabled(false);
 	DiscardCurrentButton = new QPushButton(q);
-    DiscardCurrentButton->setText(q->tr("Discard"));
+    DiscardCurrentButton->setText(LoanAssumptionsEditor::tr("Discard"));
 	DiscardCurrentButton->setEnabled(false);
 	SaveAllButton = new QPushButton(q);
-    SaveAllButton->setText(q->tr("Save All"));
+    SaveAllButton->setText(LoanAssumptionsEditor::tr("Save All"));
 	SaveAllButton->setEnabled(false);
 	SaveCurrentButton = new QPushButton(q);
-    SaveCurrentButton->setText(q->tr("Save"));
+    SaveCurrentButton->setText(LoanAssumptionsEditor::tr("Save"));
 	SaveCurrentButton->setEnabled(false);
 
 	
@@ -335,7 +335,7 @@ void LoanAssumptionsEditorPrivate::CreateScenarioEditor()
 	mainLay->addWidget(DiscardCurrentButton, 2, 2);
 	mainLay->addWidget(SaveAllButton, 2, 3);
 	mainLay->addWidget(SaveCurrentButton, 2, 4);
-    BaseTab->addTab(TempTab, q->tr("Scenarios Editor"));
+    BaseTab->addTab(TempTab, LoanAssumptionsEditor::tr("Scenarios Editor"));
 
     q->connect(m_ScenariosModel, &QStandardItemModel::rowsInserted, [&]() {m_ScenarioEditorRightSection->setEnabled(m_ScenariosModel->rowCount() > 0); });
     q->connect(m_ScenariosModel, &QStandardItemModel::rowsRemoved, [&]() {m_ScenarioEditorRightSection->setEnabled(m_ScenariosModel->rowCount() > 0); });
@@ -562,16 +562,16 @@ void LoanAssumptionsEditorPrivate::CreatePoolMatcher() {
 
 	
 	GuessAssumptionsButton = new QPushButton(q);
-	GuessAssumptionsButton->setText(q->tr("Guess Scenarios"));
+	GuessAssumptionsButton->setText(LoanAssumptionsEditor::tr("Guess Scenarios"));
 	GuessAssumptionsButton->setEnabled(false);
 	AcceptAllOldButton = new QPushButton(q);
-    AcceptAllOldButton->setText(q->tr("Select all Current"));
+    AcceptAllOldButton->setText(LoanAssumptionsEditor::tr("Select all Current"));
 	AcceptAllOldButton->setEnabled(false);
 	AcceptAllNewButton = new QPushButton(q);
-    AcceptAllNewButton->setText(q->tr("Select all Suggested"));
+    AcceptAllNewButton->setText(LoanAssumptionsEditor::tr("Select all Suggested"));
 	AcceptAllNewButton->setEnabled(false);
 	AcceptAllNonEmptyButton = new QPushButton(q);
-    AcceptAllNonEmptyButton->setText(q->tr("Select all non-empty Suggested"));
+    AcceptAllNonEmptyButton->setText(LoanAssumptionsEditor::tr("Select all non-empty Suggested"));
 	AcceptAllNonEmptyButton->setEnabled(false);
 	
 
@@ -645,7 +645,7 @@ void LoanAssumptionsEditorPrivate::CreatePoolMatcher() {
 	mainLay->addWidget(AcceptAllOldButton, 2, 1);
 	mainLay->addWidget(AcceptAllNewButton, 2, 2);
 	mainLay->addWidget(AcceptAllNonEmptyButton, 2, 3);
-	BaseTab->addTab(TempTab, q->tr("Pool"));
+	BaseTab->addTab(TempTab, LoanAssumptionsEditor::tr("Pool"));
 }
 
 void LoanAssumptionsEditor::FillFromQuery() {
@@ -1272,12 +1272,11 @@ void LoanAssumptionsEditor::MezzScenarioChanged(const QModelIndex& index) {
 
 }
 bool LoanAssumptionsEditorPrivate::CheckAliasInput() {
-    Q_Q(const LoanAssumptionsEditor);
 	if (m_AliasLineEdit->text().isEmpty() || QRegExp(m_AliasLineEdit->text()).isValid()) {
 		m_AliasLineEdit->setStyleSheet(QString());
 	}
 	else {
-		m_AliasLineEdit->setToolTip(q->tr("Invalid Regular Expression.\nVisit www.regular-expressions.info for more informations on regular expressions"));
+        m_AliasLineEdit->setToolTip(LoanAssumptionsEditor::tr("Invalid Regular Expression.\nVisit www.regular-expressions.info for more informations on regular expressions"));
 		m_AliasLineEdit->setStyleSheet("background-color: #E79292;");
 		return false;
 	}
@@ -1288,7 +1287,7 @@ bool LoanAssumptionsEditorPrivate::CheckAliasInput() {
 		return false;
 	}
 	if(ScenExist(m_AliasLineEdit->text())) {
-        m_AliasLineEdit->setToolTip(q->tr("The selected alias already refers to a scenario"));
+        m_AliasLineEdit->setToolTip(LoanAssumptionsEditor::tr("The selected alias already refers to a scenario"));
 			m_AliasLineEdit->setStyleSheet("background-color: #E79292;");
 			return false;
 	}
@@ -1936,8 +1935,8 @@ void LoanAssumptionsEditorPrivate::CreateStructureComparison()
 	m_NewStructureModel->setColumnCount(ColumnsInStructure);
 	m_OriginalStructureModel->setRowCount(0);
 	m_NewStructureModel->setRowCount(0);
-    m_OriginalStructureModel->setHorizontalHeaderLabels(QStringList() << q->tr("Tranche") << q->tr("Call Date") << q->tr("Price") << q->tr("IRR") << q->tr("WAL") << q->tr("DM") << q->tr("Loss") << q->tr("Call IRR") << q->tr("Call WAL") << q->tr("Call DM") << q->tr("Call Loss"));
-    m_NewStructureModel->setHorizontalHeaderLabels(QStringList() << q->tr("Tranche") << q->tr("Call Date") << q->tr("Price") << q->tr("IRR") << q->tr("WAL") << q->tr("DM") << q->tr("Loss") << q->tr("Call IRR") << q->tr("Call WAL") << q->tr("Call DM") << q->tr("Call Loss"));
+    m_OriginalStructureModel->setHorizontalHeaderLabels(QStringList() << LoanAssumptionsEditor::tr("Tranche") << LoanAssumptionsEditor::tr("Call Date") << LoanAssumptionsEditor::tr("Price") << LoanAssumptionsEditor::tr("IRR") << LoanAssumptionsEditor::tr("WAL") << LoanAssumptionsEditor::tr("DM") << LoanAssumptionsEditor::tr("Loss") << LoanAssumptionsEditor::tr("Call IRR") << LoanAssumptionsEditor::tr("Call WAL") << LoanAssumptionsEditor::tr("Call DM") << LoanAssumptionsEditor::tr("Call Loss"));
+    m_NewStructureModel->setHorizontalHeaderLabels(QStringList() << LoanAssumptionsEditor::tr("Tranche") << LoanAssumptionsEditor::tr("Call Date") << LoanAssumptionsEditor::tr("Price") << LoanAssumptionsEditor::tr("IRR") << LoanAssumptionsEditor::tr("WAL") << LoanAssumptionsEditor::tr("DM") << LoanAssumptionsEditor::tr("Loss") << LoanAssumptionsEditor::tr("Call IRR") << LoanAssumptionsEditor::tr("Call WAL") << LoanAssumptionsEditor::tr("Call DM") << LoanAssumptionsEditor::tr("Call Loss"));
 
 	m_OldStrGenTable = new QTableView(q);
 	SafeSetModel(m_OldStrGenTable, m_OriginalStructureModel);
@@ -2072,15 +2071,15 @@ void LoanAssumptionsEditorPrivate::CreateStructureComparison()
 	});
 
 	CalculateNewStructureButton = new QPushButton(q);
-	CalculateNewStructureButton->setText(q->tr("Assess Impact"));
+	CalculateNewStructureButton->setText(LoanAssumptionsEditor::tr("Assess Impact"));
 	CalculateNewStructureButton->setEnabled(false);
     q->connect(CalculateNewStructureButton, &QPushButton::clicked, q, &LoanAssumptionsEditor::CalculateNewStructure);
 
 	QLabel* BeforeLabel = new QLabel(q);
-    BeforeLabel->setText(q->tr("Before"));
+    BeforeLabel->setText(LoanAssumptionsEditor::tr("Before"));
 	BeforeLabel->setStyleSheet("QLabel { qproperty-alignment: 'AlignCenter'; font-size: 14px; font-weight: bold; }");
 	QLabel* AfterLabel = new QLabel(q);
-    AfterLabel->setText(q->tr("After"));
+    AfterLabel->setText(LoanAssumptionsEditor::tr("After"));
 	AfterLabel->setStyleSheet(BeforeLabel->styleSheet());
 
 	m_OldSelectedTrancheLabel = new QLabel(q);
@@ -2107,7 +2106,7 @@ void LoanAssumptionsEditorPrivate::CreateStructureComparison()
  	mainLay->addWidget(m_OldStrDetTable, 4, 0);
 	mainLay->addWidget(m_NewStrDetTable, 4, 1);
 	mainLay->addWidget(CalculateNewStructureButton, 5, 0, 1, 2);
-    BaseTab->addTab(NewTab, q->tr("Notes"));
+    BaseTab->addTab(NewTab, LoanAssumptionsEditor::tr("Notes"));
 	BaseTab->setTabEnabled(2, false);
 }
 
@@ -2323,7 +2322,7 @@ void LoanAssumptionsEditorPrivate::CreateModelScanner()
     m_ScannedModel = new QStandardItemModel(q);
     m_ScannedModel->setColumnCount(4);
     m_ScannedModel->setRowCount(0);
-    m_ScannedModel->setHorizontalHeaderLabels(QStringList() << q->tr("Issuer") << q->tr("Facility") << q->tr("Current Scenario") << q->tr("Detected Scenario"));
+    m_ScannedModel->setHorizontalHeaderLabels(QStringList() << LoanAssumptionsEditor::tr("Issuer") << LoanAssumptionsEditor::tr("Facility") << LoanAssumptionsEditor::tr("Current Scenario") << LoanAssumptionsEditor::tr("Detected Scenario"));
     m_ScannedModelProxy = new ReadOnlyColProxy(q);
     m_ScannedModelProxy->setSourceModel(m_ScannedModel);
     m_ScannedModelProxy->SetReadOnlyCol(QList<qint32>() << 0 << 1 << 2);
@@ -2353,15 +2352,15 @@ void LoanAssumptionsEditorPrivate::CreateModelScanner()
 
 
     QLabel* PoolScanFilterLaber = new QLabel(q);
-    PoolScanFilterLaber->setText(q->tr("Filter by Scenario"));
+    PoolScanFilterLaber->setText(LoanAssumptionsEditor::tr("Filter by Scenario"));
     m_ClearPoolScanFilterButton = new QPushButton(q);
-    m_ClearPoolScanFilterButton->setText(q->tr("Clear Selection"));
+    m_ClearPoolScanFilterButton->setText(LoanAssumptionsEditor::tr("Clear Selection"));
     m_ClearPoolScanFilterButton->setEnabled(false);
     QLabel* ScannedPoolLaber = new QLabel(q);
-    ScannedPoolLaber->setText(q->tr("Loan Pools"));
+    ScannedPoolLaber->setText(LoanAssumptionsEditor::tr("Loan Pools"));
 
     QGroupBox* LeftGroup = new QGroupBox(q);
-    LeftGroup->setTitle(q->tr("Models"));
+    LeftGroup->setTitle(LoanAssumptionsEditor::tr("Models"));
     QGridLayout* LeftLay = new QGridLayout(LeftGroup);
     LeftLay->addWidget(PoolScanFilterLaber, 0, 0);
     LeftLay->addWidget(m_ClearPoolScanFilterButton, 0, 1);
@@ -2370,11 +2369,11 @@ void LoanAssumptionsEditorPrivate::CreateModelScanner()
     LeftLay->addWidget(m_PoolScanDealsView, 3, 0, 1, 2);
 
     m_ScanPoolsButton = new QPushButton(q);
-    m_ScanPoolsButton->setText(q->tr("Start Scan"));
+    m_ScanPoolsButton->setText(LoanAssumptionsEditor::tr("Start Scan"));
     m_ModelsDirEdit = new QLineEdit(q);
     m_ModelsDirEdit->setText(GetFromConfig("Folders", "UnifiedResultsFolder"));
     QLabel* ModelFolderlabel = new QLabel(q);
-    ModelFolderlabel->setText(q->tr("Models Folder"));
+    ModelFolderlabel->setText(LoanAssumptionsEditor::tr("Models Folder"));
     QPushButton *ModelsDirBrowseButton = new QPushButton(q);
     ModelsDirBrowseButton->setText("Browse"); //Ellipsis (...)
     ModelsDirBrowseButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
@@ -2397,7 +2396,7 @@ void LoanAssumptionsEditorPrivate::CreateModelScanner()
     mainLay->addWidget(m_PoolScanPoolView, 0, 1);
     mainLay->addWidget(m_ScanProgress, 1, 0);
     mainLay->addLayout(BottomLay, 1, 1);
-    BaseTab->addTab(TempTab, q->tr("Scan Models"));
+    BaseTab->addTab(TempTab, LoanAssumptionsEditor::tr("Scan Models"));
 
     q->connect(m_ClearPoolScanFilterButton, &QPushButton::clicked, m_PoolScanFilterView->selectionModel(), &QItemSelectionModel::clearSelection);
     q->connect(m_PoolScanFilterView->selectionModel(), &QItemSelectionModel::selectionChanged, [&](const QItemSelection& index, const QItemSelection&) {

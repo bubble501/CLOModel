@@ -834,6 +834,7 @@ QString TranchePrivate::downloadISIN() const
     QString applicableIsin = ISINcode;
 #ifndef NO_BLOOMBERG
     if (applicableIsin.isEmpty()) {
+        DEBG_LOG("Downloading ISIN from Bloomberg")
         QBbgLib::QBbgReferenceDataRequest isinReq;
         isinReq.setSecurity(QBbgLib::QBbgSecurity(TrancheName, QBbgLib::QBbgSecurity::stringToYellowKey(BloombergExtension)));
         isinReq.setField("ID_ISIN");
@@ -853,11 +854,14 @@ QString TranchePrivate::downloadISIN() const
 
 bool Tranche::saveCashflowsDatabase() const
 {
+    PrintToTempFile("ErrorsLog", "Started");
 #ifndef NO_DATABASE
     Q_D(const Tranche);
     const QString applicableIsin = d->downloadISIN();
-    if (applicableIsin.isEmpty())
+    if (applicableIsin.isEmpty()) {
+        PrintToTempFile("ErrorsLog", "Invalid ISIN");
         return false;
+    }
     {
         QMutexLocker dbLocker(&Db_Mutex);
         QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
@@ -931,6 +935,7 @@ bool Tranche::saveCashflowsDatabase() const
             }
             if (dbError) {
                 db.rollback();
+                DEBG_LOG("Reached Rollback")
                 return false;
             }
             else {
@@ -940,6 +945,7 @@ bool Tranche::saveCashflowsDatabase() const
         }
     }
 #endif // !NO_DATABASE
+    DEBG_LOG("Failed to open DB");
     return false;
 }
 

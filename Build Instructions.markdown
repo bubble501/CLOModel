@@ -4,10 +4,10 @@ All the components are designed to build on all [platforms supported by Qt](http
 ### C++11
 *Developed using MSVC13*<br/>
 To build the code you'll need a compiler conforming to [C++11 standard](http://en.wikipedia.org/wiki/C%2B%2B11).<br/>
-The code is compatible with the subset of the standard implemented by MSVC.<br/>
+The code is compatible with the subset of the standard implemented by MSVC 2013.<br/>
 [GCC](https://gcc.gnu.org/), Visual Studio's MSVC and XCode's LLVM are all valid compilers
 ### Boost
-*Developed using version 1.57.0*<br/>
+*Developed using version 1.58.0*<br/>
 [Download](http://www.boost.org/users/download/) and unpack the library. There is no need to build it.
 ### Qt
 *Developed using version 5.4.1*<br/>
@@ -17,17 +17,12 @@ If you use versions of the library higher than 5.9, minor changes in the code ma
 *Developed using version 1.2.8*<br/>
 [Download](http://www.zlib.net/) the compiled DLL of the library or download the source code and compile it as a dynamic library following the instructions included with the source.
 ### Bloomberg
-*Developed using version 3.7.5.1*<br/>
+*Developed using version 3.8.8.1*<br/>
 [Download](http://www.bloomberglabs.com/api/libraries/) the Bloomberg API library for C++.
 ### QBbgLib
 *Developed using version 0.0.1*<br/>
 [Download](https://github.com/VSRonin/QBbgLib) the Qt interface for the Bloomberg API.
-Once downloaded, open the solution in visual studio and compile the library in release configuration.
-You may need to set, in the project properties, the path to the Bloomberg API library mentioned above under:<ul>
-<li>C/C++ &#10142; General &#10142; Additional Include Directories</li>
-<li>Linker &#10142; General &#10142; Additional Library Directories</li>
-</ul>
-A makefile version will be available soon to speed up the build and deploy process
+run qmake nmake to build the library
 ### Quazip
 *Developed using version 0.7.1*<br/>
 [Download](http://sourceforge.net/projects/quazip/) and build Quazip library using the instructions below
@@ -67,11 +62,7 @@ The following environmental variables are needed in order to be able to compile 
 <li>SIMSTRINGPATH - Path to the include folder of the simstring library. (e.g. C:\simstring-1.0)</li></ul>
 To build the Installer you'll need to define these additional variables:
 <ul><li>QTPATH - Path to the include folder of the Qt Libraries. (e.g. C:\Qt5\5.3\msvc2013)</li></ul>
-## Visual Studio
-[Download](http://www.qt.io/download-open-source) and install the Qt Visual Studio Addin.<br/>
-[Download](http://wixtoolset.org/) and install WiX Toolset<br/>
-Open the solution file.<br/>
-Build the projects individually (Do not use "Build Solution" as it will incur in a race condition an possibly fail).
+run qmake nmake to build the library
 ## Documentation
 To generate the library documentation use the [Doxigen](www.doxygen.org) toolset. Just open the .doxyfile file included using doxywizard.exe.<br/>
 You'll need to generate the .Net documentation before building the Installer otherwise it will fail.

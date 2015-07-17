@@ -1,18 +1,29 @@
 TEMPLATE = app
 TARGET = StandaloneStress
-DESTDIR = ../Win32/Release
+CONFIG(debug, debug|release) {
+    DESTDIR = ../bin/Debug
+    MOC_DIR += ./GeneratedFiles/debug
+    OBJECTS_DIR += debug
+}
+CONFIG(release, debug|release) {
+    DESTDIR = ../bin/Release
+    MOC_DIR += ./GeneratedFiles/release
+    OBJECTS_DIR += release
+}
 QT += core widgets gui
-CONFIG += release
-DEFINES += WIN64 QT_DLL QT_WIDGETS_LIB
+DEFINES += QT_DLL QT_WIDGETS_LIB
 INCLUDEPATH += "../CLOModelLib" \
     ./GeneratedFiles \
     . \
-    ./GeneratedFiles/Release
-LIBS += -L"../Win32/Release" \
-    -lCLOModelLib
+    "$$MOC_DIR"
+LIBS += -L"$$DESTDIR"
+CONFIG(release, debug|release) {
+    LIBS += -lCLOModelLib
+}
+CONFIG(debug, debug|release) {
+    LIBS += -lCLOModelLibd
+}
 DEPENDPATH += .
-MOC_DIR += ./GeneratedFiles/release
-OBJECTS_DIR += release
 UI_DIR += ./GeneratedFiles
 RCC_DIR += ./GeneratedFiles
 include(StandaloneStress.pri)

@@ -1,28 +1,56 @@
 TEMPLATE = lib
-TARGET = CLOModelLib
-DESTDIR = ../Win32/Release
+CONFIG(debug, debug|release) {
+    TARGET=CLOModelLibd
+    DESTDIR = ../bin/Debug
+    MOC_DIR += ./GeneratedFiles/debug
+    OBJECTS_DIR += debug
+}
+CONFIG(release, debug|release) {
+    TARGET = CLOModelLib
+    DESTDIR = ../bin/Release
+    MOC_DIR += ./GeneratedFiles/release
+    OBJECTS_DIR += release
+}
 QT += core sql widgets gui
-CONFIG += release
-DEFINES += WIN64 QT_DLL QT_SQL_LIB QT_WIDGETS_LIB CLOMODELLIB_LIB
-INCLUDEPATH += "$$(QBBGLIBPATH)/QBbgLib" \
+DEFINES += QT_DLL QT_SQL_LIB QT_WIDGETS_LIB CLOMODELLIB_LIB
+INCLUDEPATH += "$$(QBBGLIBPATH)/include" \
     "$$(SIMSTRINGPATH)/include/simstring" \
-    "$$(QUAZIPPATH)/include" \
+    "$$(QUAZIPPATH)/include/quazip" \
     "$$(ZLIBPATH)/include" \
     "$$(BOOSTPATH)" \
     "$$(KDCHARTPATH)/include/KDChart" \
     ./GeneratedFiles \
     . \
-    ./GeneratedFiles/Release \
+    "$$MOC_DIR" \
     ./Private
-LIBS += -L"$$(QBBGLIBPATH)/Win32/Release" \
+LIBS += -L"$$(QBBGLIBPATH)/lib" \
     -L"$$(KDCHARTPATH)/lib" \
-    -L"$$(QUAZIPPATH)/lib" \
+    -L"$$(QUAZIPPATH)/lib" 
+CONFIG(release, debug|release) {
+LIBS += \
     -lQBbgLib \
     -lQuaZip \
     -lkdchart2
+}
+CONFIG(debug, debug|release) {
+LIBS += \
+    -lQBbgLibd \
+    -lQuaZipd \
+    -lkdchartd2
+}
 DEPENDPATH += .
-MOC_DIR += ./GeneratedFiles/release
-OBJECTS_DIR += release
 UI_DIR += ./GeneratedFiles
 RCC_DIR += ./GeneratedFiles
 include(CLOModelLib.pri)
+headers.path=$$PREFIX/include
+headers.files= *.h
+isEmpty(PREFIX){
+	PREFIX=..\CLOModelLib
+	warning("Prefix not set")
+}
+target.path=$$PREFIX/lib
+unix:!symbian {
+	target.path=$$PREFIX/lib/$${LIB_ARCH}
+}
+INSTALLS += headers target
+

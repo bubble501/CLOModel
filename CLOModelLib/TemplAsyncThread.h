@@ -2,7 +2,6 @@
 #define TemplAsyncThread_h__
 #include "AbstrAsyncThread.h"
 #include "CommonFunctions.h"
-#include "Private/AbstrAsyncThread_p.h"
 template <typename ResultType>
 class  CLOMODELLIB_EXPORT TemplAsyncThread : public AbstrAsyncThread
 {

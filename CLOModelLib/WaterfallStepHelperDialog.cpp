@@ -463,7 +463,7 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateJuniorFeesWidget() {
 	int CountRow = 0;
 
 	QLabel* SrcFndLbl = new QLabel(Result);
-	SrcFndLbl->setText(q->tr("Accrue or Pay"));
+	SrcFndLbl->setText(WaterfallStepHelperDialog::tr("Accrue or Pay"));
 	QComboBox* SrcFndCmb = new QComboBox(Result);
 	SrcFndCmb->setEditable(false);
 	SrcFndCmb->addItem("Accrue and Pay", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::AccrueAndPay));
@@ -486,10 +486,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateInterestWidget()
 	int CountRow = 0;
 
 	QLabel* SenGrpLbl = new QLabel(Result);
-	SenGrpLbl->setText(q->tr("Seniority group that will receive the interest"));
+	SenGrpLbl->setText(WaterfallStepHelperDialog::tr("Seniority group that will receive the interest"));
 	QLineEdit* SenGrpEdit = new QLineEdit(Result);
 	SenGrpEdit->setValidator(IntegerVector().GetValidator(SenGrpEdit));
-	SenGrpEdit->setToolTip(q->tr("q is the pro-rata level of the tranches.\nAccepts vectors."));
+	SenGrpEdit->setToolTip(WaterfallStepHelperDialog::tr("q is the pro-rata level of the tranches.\nAccepts vectors."));
 	q->connect(SenGrpEdit, SIGNAL(textChanged(QString)), q, SLOT(SetSeniorityGroup(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), SenGrpEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(ImportSeniorityGroup(QString)), SenGrpEdit, SLOT(setText(QString)), Qt::QueuedConnection);
@@ -498,10 +498,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateInterestWidget()
 	CountRow++;
 
 	QLabel* SenLvlLbl = new QLabel(Result);
-	SenLvlLbl->setText(q->tr("Level of seniority the seniority group refers to"));
+	SenLvlLbl->setText(WaterfallStepHelperDialog::tr("Level of seniority the seniority group refers to"));
 	QLineEdit* SenLvlEdit = new QLineEdit(Result);
 	SenLvlEdit->setValidator(IntegerVector().GetValidator(SenGrpEdit));
-	SenLvlEdit->setToolTip(q->tr("q is the depth of the pro-rata group.\nAccepts vectors.\nNormally 1"));
+	SenLvlEdit->setToolTip(WaterfallStepHelperDialog::tr("q is the depth of the pro-rata group.\nAccepts vectors.\nNormally 1"));
 	q->connect(SenLvlEdit, SIGNAL(textChanged(QString)), q, SLOT(SetSeniorityGroupLevel(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), SenLvlEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(SetTo1(QString)), SenLvlEdit, SLOT(setText(QString)));
@@ -512,10 +512,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateInterestWidget()
 	SenLvlEdit->setText("1");
 
 	QLabel* CoupIdxLbl = new QLabel(Result);
-	CoupIdxLbl->setText(q->tr("Level coupon to be paid"));
+	CoupIdxLbl->setText(WaterfallStepHelperDialog::tr("Level coupon to be paid"));
 	QLineEdit* CoupIdxEdit = new QLineEdit(Result);
 	CoupIdxEdit->setValidator(IntegerVector().GetValidator(SenGrpEdit));
-	CoupIdxEdit->setToolTip(q->tr("q is the coupon to be paid.\nAccepts vectors.\nNormally 1"));
+	CoupIdxEdit->setToolTip(WaterfallStepHelperDialog::tr("q is the coupon to be paid.\nAccepts vectors.\nNormally 1"));
 	q->connect(CoupIdxEdit, SIGNAL(textChanged(QString)), q, SLOT(SetCouponIndex(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), CoupIdxEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(SetTo1(QString)), CoupIdxEdit, SLOT(setText(QString)));
@@ -527,7 +527,7 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateInterestWidget()
 	CoupIdxEdit->setEnabled(false);
 
 	QLabel* SrcFndLbl = new QLabel(Result);
-	SrcFndLbl->setText(q->tr("Accrue or Pay"));
+	SrcFndLbl->setText(WaterfallStepHelperDialog::tr("Accrue or Pay"));
 	QComboBox* SrcFndCmb = new QComboBox(Result);
 	SrcFndCmb->setEditable(false);
 	SrcFndCmb->addItem("Accrue and Pay", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::AccrueAndPay));
@@ -550,10 +550,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreatePrincipalWidget()
 	int CountRow = 0;
 
 	QLabel* SenGrpLbl = new QLabel(Result);
-	SenGrpLbl->setText(q->tr("Seniority group that will be redeemed"));
+	SenGrpLbl->setText(WaterfallStepHelperDialog::tr("Seniority group that will be redeemed"));
 	QLineEdit* SenGrpEdit = new QLineEdit(Result);
 	SenGrpEdit->setValidator(IntegerVector().GetValidator(SenGrpEdit));
-	SenGrpEdit->setToolTip(q->tr("q is the pro-rata level of the tranches.\nAccepts vectors."));
+	SenGrpEdit->setToolTip(WaterfallStepHelperDialog::tr("q is the pro-rata level of the tranches.\nAccepts vectors."));
 	q->connect(SenGrpEdit, SIGNAL(textChanged(QString)), q, SLOT(SetSeniorityGroup(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), SenGrpEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(ImportSeniorityGroup(QString)), SenGrpEdit, SLOT(setText(QString)), Qt::QueuedConnection);
@@ -562,10 +562,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreatePrincipalWidget()
 	CountRow++;
 
 	QLabel* SenLvlLbl = new QLabel(Result);
-	SenLvlLbl->setText(q->tr("Level of seniority the seniority group refers to"));
+	SenLvlLbl->setText(WaterfallStepHelperDialog::tr("Level of seniority the seniority group refers to"));
 	QLineEdit* SenLvlEdit = new QLineEdit(Result);
 	SenLvlEdit->setValidator(IntegerVector().GetValidator(SenGrpEdit));
-	SenLvlEdit->setToolTip(q->tr("q is the depth of the pro-rata group.\nAccepts vectors.\nNormally 1"));
+	SenLvlEdit->setToolTip(WaterfallStepHelperDialog::tr("q is the depth of the pro-rata group.\nAccepts vectors.\nNormally 1"));
 	q->connect(SenLvlEdit, SIGNAL(textChanged(QString)), q, SLOT(SetSeniorityGroupLevel(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), SenLvlEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(SetTo1(QString)), SenLvlEdit, SLOT(setText(QString)));
@@ -587,10 +587,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateICWidget()
 	int CountRow = 0;
 
 	QLabel* SenGrpLbl = new QLabel(Result);
-	SenGrpLbl->setText(q->tr("Seniority group to which the test applies"));
+	SenGrpLbl->setText(WaterfallStepHelperDialog::tr("Seniority group to which the test applies"));
 	QLineEdit* SenGrpEdit = new QLineEdit(Result);
 	SenGrpEdit->setValidator(IntegerVector().GetValidator(SenGrpEdit));
-	SenGrpEdit->setToolTip(q->tr("q is the pro-rata level of the tranches.\nAccepts vectors."));
+	SenGrpEdit->setToolTip(WaterfallStepHelperDialog::tr("q is the pro-rata level of the tranches.\nAccepts vectors."));
 	q->connect(SenGrpEdit, SIGNAL(textChanged(QString)), q, SLOT(SetSeniorityGroup(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), SenGrpEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(ImportSeniorityGroup(QString)), SenGrpEdit, SLOT(setText(QString)), Qt::QueuedConnection);
@@ -599,10 +599,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateICWidget()
 	CountRow++;
 
 	QLabel* SenLvlLbl = new QLabel(Result);
-	SenLvlLbl->setText(q->tr("Level of seniority the seniority group refers to"));
+	SenLvlLbl->setText(WaterfallStepHelperDialog::tr("Level of seniority the seniority group refers to"));
 	QLineEdit* SenLvlEdit = new QLineEdit(Result);
 	SenLvlEdit->setValidator(IntegerVector().GetValidator(SenLvlEdit));
-	SenLvlEdit->setToolTip(q->tr("q is the depth of the pro-rata group.\nAccepts vectors.\nNormally 1"));
+	SenLvlEdit->setToolTip(WaterfallStepHelperDialog::tr("q is the depth of the pro-rata group.\nAccepts vectors.\nNormally 1"));
 	q->connect(SenLvlEdit, SIGNAL(textChanged(QString)), q, SLOT(SetSeniorityGroupLevel(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), SenLvlEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(SetTo1(QString)), SenLvlEdit, SLOT(setText(QString)));
@@ -613,10 +613,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateICWidget()
 	SenLvlEdit->setText("1");
 
 	QLabel* CoupIdxLbl = new QLabel(Result);
-	CoupIdxLbl->setText(q->tr("Level coupon to be considered in the test"));
+	CoupIdxLbl->setText(WaterfallStepHelperDialog::tr("Level coupon to be considered in the test"));
 	QLineEdit* CoupIdxEdit = new QLineEdit(Result);
 	CoupIdxEdit->setValidator(IntegerVector().GetValidator(CoupIdxEdit));
-	CoupIdxEdit->setToolTip(q->tr("q is the coupon to be paid.\nAccepts vectors.\nNormally 1"));
+	CoupIdxEdit->setToolTip(WaterfallStepHelperDialog::tr("q is the coupon to be paid.\nAccepts vectors.\nNormally 1"));
 	q->connect(CoupIdxEdit, SIGNAL(textChanged(QString)), q, SLOT(SetCouponIndex(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), CoupIdxEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(SetTo1(QString)), CoupIdxEdit, SLOT(setText(QString)));
@@ -628,10 +628,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateICWidget()
 	CoupIdxEdit->setEnabled(false);
 
 	QLabel* TestOvrdLbl = new QLabel(Result);
-	TestOvrdLbl->setText(q->tr("Override for the test trigger"));
+	TestOvrdLbl->setText(WaterfallStepHelperDialog::tr("Override for the test trigger"));
 	QLineEdit* TestOvrdEdit = new QLineEdit(Result);
 	TestOvrdEdit->setValidator(BloombergVector().GetValidator(TestOvrdEdit));
-	TestOvrdEdit->setToolTip(q->tr("q is the override for the test hurdle.\nAccepts vectors.\nLeave blank if no override applies"));
+	TestOvrdEdit->setToolTip(WaterfallStepHelperDialog::tr("q is the override for the test hurdle.\nAccepts vectors.\nLeave blank if no override applies"));
 	q->connect(TestOvrdEdit, SIGNAL(textChanged(QString)), q, SLOT(SetTestTargetOverride(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), TestOvrdEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(ImportTestTargetOverride(QString)), TestOvrdEdit, SLOT(setText(QString)), Qt::QueuedConnection);
@@ -640,7 +640,7 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateICWidget()
 	CountRow++;
 
 	QLabel* SrcFndLbl = new QLabel(Result);
-	SrcFndLbl->setText(q->tr("Accrue or Pay"));
+	SrcFndLbl->setText(WaterfallStepHelperDialog::tr("Accrue or Pay"));
 	QComboBox* SrcFndCmb = new QComboBox(Result);
 	SrcFndCmb->setEditable(false);
 	SrcFndCmb->addItem("Calculate and Cure", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::AccrueAndPay));
@@ -664,10 +664,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateOCWidget()
 	int CountRow = 0;
 
 	QLabel* SenGrpLbl = new QLabel(Result);
-	SenGrpLbl->setText(q->tr("Seniority group to which the test applies"));
+	SenGrpLbl->setText(WaterfallStepHelperDialog::tr("Seniority group to which the test applies"));
 	QLineEdit* SenGrpEdit = new QLineEdit(Result);
 	SenGrpEdit->setValidator(IntegerVector().GetValidator(SenGrpEdit));
-	SenGrpEdit->setToolTip(q->tr("q is the pro-rata level of the tranches.\nAccepts vectors."));
+	SenGrpEdit->setToolTip(WaterfallStepHelperDialog::tr("q is the pro-rata level of the tranches.\nAccepts vectors."));
 	q->connect(SenGrpEdit, SIGNAL(textChanged(QString)), q, SLOT(SetSeniorityGroup(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), SenGrpEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(ImportSeniorityGroup(QString)), SenGrpEdit, SLOT(setText(QString)), Qt::QueuedConnection);
@@ -676,10 +676,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateOCWidget()
 	CountRow++;
 
 	QLabel* SenLvlLbl = new QLabel(Result);
-	SenLvlLbl->setText(q->tr("Level of seniority the seniority group refers to"));
+	SenLvlLbl->setText(WaterfallStepHelperDialog::tr("Level of seniority the seniority group refers to"));
 	QLineEdit* SenLvlEdit = new QLineEdit(Result);
 	SenLvlEdit->setValidator(IntegerVector().GetValidator(SenLvlEdit));
-	SenLvlEdit->setToolTip(q->tr("q is the depth of the pro-rata group.\nAccepts vectors.\nNormally 1"));
+	SenLvlEdit->setToolTip(WaterfallStepHelperDialog::tr("q is the depth of the pro-rata group.\nAccepts vectors.\nNormally 1"));
 	q->connect(SenLvlEdit, SIGNAL(textChanged(QString)), q, SLOT(SetSeniorityGroupLevel(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), SenLvlEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(SetTo1(QString)), SenLvlEdit, SLOT(setText(QString)));
@@ -690,10 +690,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateOCWidget()
 	SenLvlEdit->setText("1");
 
 	QLabel* RedGrpLbl = new QLabel(Result);
-	RedGrpLbl->setText(q->tr("Group that will be redeemed through test cure payments"));
+	RedGrpLbl->setText(WaterfallStepHelperDialog::tr("Group that will be redeemed through test cure payments"));
 	QLineEdit* RedGrpEdit = new QLineEdit(Result);
 	RedGrpEdit->setValidator(IntegerVector().GetValidator(RedGrpEdit));
-	RedGrpEdit->setToolTip(q->tr("q is the pro-rata level of the tranches.\nAccepts vectors.\nLeave blank for sequential"));
+	RedGrpEdit->setToolTip(WaterfallStepHelperDialog::tr("q is the pro-rata level of the tranches.\nAccepts vectors.\nLeave blank for sequential"));
 	q->connect(RedGrpEdit, SIGNAL(textChanged(QString)), q, SLOT(SetRedemptionGroup(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedGrpEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(ImportRedemptionGroup(QString)), RedGrpEdit, SLOT(setText(QString)), Qt::QueuedConnection);
@@ -702,10 +702,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateOCWidget()
 	CountRow++;
 
 	QLabel* RedLvlLbl = new QLabel(Result);
-	RedLvlLbl->setText(q->tr("Level of seniority the redemption group refers to"));
+	RedLvlLbl->setText(WaterfallStepHelperDialog::tr("Level of seniority the redemption group refers to"));
 	QLineEdit* RedLvlEdit = new QLineEdit(Result);
 	RedLvlEdit->setValidator(IntegerVector().GetValidator(RedLvlEdit));
-	RedLvlEdit->setToolTip(q->tr("q is the depth of the pro-rata group.\nAccepts vectors.\nNormally 1"));
+	RedLvlEdit->setToolTip(WaterfallStepHelperDialog::tr("q is the depth of the pro-rata group.\nAccepts vectors.\nNormally 1"));
 	q->connect(RedLvlEdit, SIGNAL(textChanged(QString)), q, SLOT(SetRedemptionGroupLevel(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedLvlEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(SetTo1(QString)), RedLvlEdit, SLOT(setText(QString)));
@@ -716,10 +716,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateOCWidget()
 	RedLvlEdit->setText("1");
 
 	QLabel* RedShrLbl = new QLabel(Result);
-	RedShrLbl->setText(q->tr("Maximum share of available funds applied to redemption"));
+	RedShrLbl->setText(WaterfallStepHelperDialog::tr("Maximum share of available funds applied to redemption"));
 	QLineEdit* RedShrEdit = new QLineEdit(Result);
 	RedShrEdit->setValidator(BloombergVector().GetValidator(RedShrEdit));
-	RedShrEdit->setToolTip(q->tr("Maximum share of available funds applied to redemption of the notes in order to cure the test.\nAccepts vectors."));
+	RedShrEdit->setToolTip(WaterfallStepHelperDialog::tr("Maximum share of available funds applied to redemption of the notes in order to cure the test.\nAccepts vectors."));
 	q->connect(RedShrEdit, SIGNAL(textChanged(QString)), q, SLOT(SetRedemptionShare(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedShrEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(SetTo100(QString)), RedShrEdit, SLOT(setText(QString)));
@@ -729,10 +729,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateOCWidget()
 	CountRow++;
 
 	QLabel* ColShrLbl = new QLabel(Result);
-	ColShrLbl->setText(q->tr("Maximum share of available funds applied to reinvestment"));
+	ColShrLbl->setText(WaterfallStepHelperDialog::tr("Maximum share of available funds applied to reinvestment"));
 	QLineEdit* ColShrEdit = new QLineEdit(Result);
 	ColShrEdit->setValidator(BloombergVector().GetValidator(ColShrEdit));
-	ColShrEdit->setToolTip(q->tr("Maximum share of available funds applied to purchase of additional collateral in order to cure the test.\nAccepts vectors."));
+	ColShrEdit->setToolTip(WaterfallStepHelperDialog::tr("Maximum share of available funds applied to purchase of additional collateral in order to cure the test.\nAccepts vectors."));
 	q->connect(ColShrEdit, SIGNAL(textChanged(QString)), q, SLOT(SetAdditionalCollateralShare(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), ColShrEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(SetTo0(QString)), ColShrEdit, SLOT(setText(QString)));
@@ -743,10 +743,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateOCWidget()
 
 
 	QLabel* TestOvrdLbl = new QLabel(Result);
-	TestOvrdLbl->setText(q->tr("Override for the test trigger"));
+	TestOvrdLbl->setText(WaterfallStepHelperDialog::tr("Override for the test trigger"));
 	QLineEdit* TestOvrdEdit = new QLineEdit(Result);
 	TestOvrdEdit->setValidator(BloombergVector().GetValidator(TestOvrdEdit));
-	TestOvrdEdit->setToolTip(q->tr("q is the override for the test hurdle.\nAccepts vectors.\nLeave blank if no override applies"));
+	TestOvrdEdit->setToolTip(WaterfallStepHelperDialog::tr("q is the override for the test hurdle.\nAccepts vectors.\nLeave blank if no override applies"));
 	q->connect(TestOvrdEdit, SIGNAL(textChanged(QString)), q, SLOT(SetTestTargetOverride(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), TestOvrdEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(ImportTestTargetOverride(QString)), TestOvrdEdit, SLOT(setText(QString)), Qt::QueuedConnection);
@@ -755,7 +755,7 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateOCWidget()
 	CountRow++;
 
 	QLabel* SrcFndLbl = new QLabel(Result);
-	SrcFndLbl->setText(q->tr("Accrue or Pay"));
+	SrcFndLbl->setText(WaterfallStepHelperDialog::tr("Accrue or Pay"));
 	QComboBox* SrcFndCmb = new QComboBox(Result);
 	SrcFndCmb->setEditable(false);
 	SrcFndCmb->addItem("Calculate and Cure", static_cast<quint8>(WatFalPrior::wstAccrueOrPay::AccrueAndPay));
@@ -779,10 +779,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateDeferredInterestWidget()
 	int CountRow = 0;
 
 	QLabel* SenGrpLbl = new QLabel(Result);
-	SenGrpLbl->setText(q->tr("Seniority group that will receive the deferred interest"));
+	SenGrpLbl->setText(WaterfallStepHelperDialog::tr("Seniority group that will receive the deferred interest"));
 	QLineEdit* SenGrpEdit = new QLineEdit(Result);
 	SenGrpEdit->setValidator(IntegerVector().GetValidator(SenGrpEdit));
-	SenGrpEdit->setToolTip(q->tr("q is the pro-rata level of the tranches.\nAccepts vectors."));
+	SenGrpEdit->setToolTip(WaterfallStepHelperDialog::tr("q is the pro-rata level of the tranches.\nAccepts vectors."));
 	q->connect(SenGrpEdit, SIGNAL(textChanged(QString)), q, SLOT(SetSeniorityGroup(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), SenGrpEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(ImportSeniorityGroup(QString)), SenGrpEdit, SLOT(setText(QString)), Qt::QueuedConnection);
@@ -791,10 +791,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateDeferredInterestWidget()
 	CountRow++;
 
 	QLabel* SenLvlLbl = new QLabel(Result);
-	SenLvlLbl->setText(q->tr("Level of seniority the seniority group refers to"));
+	SenLvlLbl->setText(WaterfallStepHelperDialog::tr("Level of seniority the seniority group refers to"));
 	QLineEdit* SenLvlEdit = new QLineEdit(Result);
 	SenLvlEdit->setValidator(IntegerVector().GetValidator(SenLvlEdit));
-	SenLvlEdit->setToolTip(q->tr("q is the depth of the pro-rata group.\nAccepts vectors.\nNormally 1"));
+	SenLvlEdit->setToolTip(WaterfallStepHelperDialog::tr("q is the depth of the pro-rata group.\nAccepts vectors.\nNormally 1"));
 	q->connect(SenLvlEdit, SIGNAL(textChanged(QString)), q, SLOT(SetSeniorityGroupLevel(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), SenLvlEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(SetTo1(QString)), SenLvlEdit, SLOT(setText(QString)));
@@ -805,10 +805,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateDeferredInterestWidget()
 	SenLvlEdit->setText("1");
 
 	QLabel* CoupIdxLbl = new QLabel(Result);
-	CoupIdxLbl->setText(q->tr("Level coupon to be paid"));
+	CoupIdxLbl->setText(WaterfallStepHelperDialog::tr("Level coupon to be paid"));
 	QLineEdit* CoupIdxEdit = new QLineEdit(Result);
 	CoupIdxEdit->setValidator(IntegerVector().GetValidator(CoupIdxEdit));
-	CoupIdxEdit->setToolTip(q->tr("q is the coupon to be paid.\nAccepts vectors.\nNormally 1"));
+	CoupIdxEdit->setToolTip(WaterfallStepHelperDialog::tr("q is the coupon to be paid.\nAccepts vectors.\nNormally 1"));
 	q->connect(CoupIdxEdit, SIGNAL(textChanged(QString)), q, SLOT(SetCouponIndex(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), CoupIdxEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(SetTo1(QString)), CoupIdxEdit, SLOT(setText(QString)));
@@ -830,10 +830,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateExcessWidget()
 	QGridLayout *ResLay = new QGridLayout(Result);
 	int CountRow = 0;
 	QLabel* RedGrpLbl = new QLabel(Result);
-	RedGrpLbl->setText(q->tr("Group that will receive excess spread"));
+	RedGrpLbl->setText(WaterfallStepHelperDialog::tr("Group that will receive excess spread"));
 	QLineEdit* RedGrpEdit = new QLineEdit(Result);
 	RedGrpEdit->setValidator(IntegerVector().GetValidator(RedGrpEdit));
-	RedGrpEdit->setToolTip(q->tr("q is the pro-rata level of the tranches.\nAccepts vectors.\nLeave blank to allocate to an external \"Excess Spread\" account"));
+	RedGrpEdit->setToolTip(WaterfallStepHelperDialog::tr("q is the pro-rata level of the tranches.\nAccepts vectors.\nLeave blank to allocate to an external \"Excess Spread\" account"));
 	q->connect(RedGrpEdit, SIGNAL(textChanged(QString)), q, SLOT(SetRedemptionGroup(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedGrpEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(ImportRedemptionGroup(QString)), RedGrpEdit, SLOT(setText(QString)), Qt::QueuedConnection);
@@ -842,10 +842,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateExcessWidget()
 	CountRow++;
 
 	QLabel* RedLvlLbl = new QLabel(Result);
-	RedLvlLbl->setText(q->tr("Level of seniority the redemption group refers to"));
+	RedLvlLbl->setText(WaterfallStepHelperDialog::tr("Level of seniority the redemption group refers to"));
 	QLineEdit* RedLvlEdit = new QLineEdit(Result);
 	RedLvlEdit->setValidator(IntegerVector().GetValidator(RedLvlEdit));
-	RedLvlEdit->setToolTip(q->tr("q is the depth of the pro-rata group.\nAccepts vectors.\nNormally 1"));
+	RedLvlEdit->setToolTip(WaterfallStepHelperDialog::tr("q is the depth of the pro-rata group.\nAccepts vectors.\nNormally 1"));
 	q->connect(RedLvlEdit, SIGNAL(textChanged(QString)), q, SLOT(SetRedemptionGroupLevel(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedLvlEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(SetTo1(QString)), RedLvlEdit, SLOT(setText(QString)));
@@ -856,10 +856,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateExcessWidget()
 	RedLvlEdit->setText("1");
 
 	QLabel* RedShrLbl = new QLabel(Result);
-	RedShrLbl->setText(q->tr("Share of available funds applied to equity"));
+	RedShrLbl->setText(WaterfallStepHelperDialog::tr("Share of available funds applied to equity"));
 	QLineEdit* RedShrEdit = new QLineEdit(Result);
 	RedShrEdit->setValidator(BloombergVector().GetValidator(RedShrEdit));
-	RedShrEdit->setToolTip(q->tr("Share of available funds paid to the notes, the remaining will go to the \"Excess Spread\" account\nAccepts vectors."));
+	RedShrEdit->setToolTip(WaterfallStepHelperDialog::tr("Share of available funds paid to the notes, the remaining will go to the \"Excess Spread\" account\nAccepts vectors."));
 	q->connect(RedShrEdit, SIGNAL(textChanged(QString)), q, SLOT(SetRedemptionShare(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedShrEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(SetTo100(QString)), RedShrEdit, SLOT(setText(QString)));
@@ -880,7 +880,7 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateReinvestPrincipalWidget()
 	int CountRow = 0;
 
 	QLabel* SrcFndLbl = new QLabel(Result);
-	SrcFndLbl->setText(q->tr("Type of funds to be applied"));
+	SrcFndLbl->setText(WaterfallStepHelperDialog::tr("Type of funds to be applied"));
 	QComboBox* SrcFndCmb = new QComboBox(Result);
 	SrcFndCmb->setEditable(false);
 	SrcFndCmb->addItem("All Principal", 3);
@@ -893,10 +893,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateReinvestPrincipalWidget()
 	CountRow++;
 
 	QLabel* ColShrLbl = new QLabel(Result);
-	ColShrLbl->setText(q->tr("Share of available funds applied to reinvestment"));
+	ColShrLbl->setText(WaterfallStepHelperDialog::tr("Share of available funds applied to reinvestment"));
 	QLineEdit* ColShrEdit = new QLineEdit(Result);
 	ColShrEdit->setValidator(BloombergVector().GetValidator(ColShrEdit));
-	ColShrEdit->setToolTip(q->tr("Share of available funds applied to purchase of additional collateral.\nAccepts vectors."));
+	ColShrEdit->setToolTip(WaterfallStepHelperDialog::tr("Share of available funds applied to purchase of additional collateral.\nAccepts vectors."));
 	q->connect(ColShrEdit, SIGNAL(textChanged(QString)), q, SLOT(SetAdditionalCollateralShare(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), ColShrEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(SetTo0(QString)), ColShrEdit, SLOT(setText(QString)));
@@ -917,10 +917,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateReserveReplenishWidget()
 	int CountRow = 0;
 
 	QLabel* ResIdxLbl = new QLabel(Result);
-	ResIdxLbl->setText(q->tr("Index of the reserve to replenish"));
+	ResIdxLbl->setText(WaterfallStepHelperDialog::tr("Index of the reserve to replenish"));
 	QLineEdit* ResIdxEdit = new QLineEdit(Result);
 	ResIdxEdit->setValidator(IntegerVector().GetValidator(ResIdxEdit));
-	ResIdxEdit->setToolTip(q->tr("Accepts vectors."));
+	ResIdxEdit->setToolTip(WaterfallStepHelperDialog::tr("Accepts vectors."));
 	q->connect(ResIdxEdit, SIGNAL(textChanged(QString)), q, SLOT(SetReserveIndex(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), ResIdxEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(ImportReserveIndex(QString)), ResIdxEdit, SLOT(setText(QString)), Qt::QueuedConnection);
@@ -938,10 +938,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateTurboWidget()
 	QGridLayout *ResLay = new QGridLayout(Result);
 	int CountRow = 0;
 	QLabel* RedGrpLbl = new QLabel(Result);
-	RedGrpLbl->setText(q->tr("Group that will be redeemed"));
+	RedGrpLbl->setText(WaterfallStepHelperDialog::tr("Group that will be redeemed"));
 	QLineEdit* RedGrpEdit = new QLineEdit(Result);
 	RedGrpEdit->setValidator(IntegerVector().GetValidator(RedGrpEdit));
-	RedGrpEdit->setToolTip(q->tr("q is the pro-rata level of the tranches.\nAccepts vectors."));
+	RedGrpEdit->setToolTip(WaterfallStepHelperDialog::tr("q is the pro-rata level of the tranches.\nAccepts vectors."));
 	q->connect(RedGrpEdit, SIGNAL(textChanged(QString)), q, SLOT(SetRedemptionGroup(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedGrpEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(ImportRedemptionGroup(QString)), RedGrpEdit, SLOT(setText(QString)), Qt::QueuedConnection);
@@ -950,10 +950,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateTurboWidget()
 	CountRow++;
 
 	QLabel* RedLvlLbl = new QLabel(Result);
-	RedLvlLbl->setText(q->tr("Level of seniority the redemption group refers to"));
+	RedLvlLbl->setText(WaterfallStepHelperDialog::tr("Level of seniority the redemption group refers to"));
 	QLineEdit* RedLvlEdit = new QLineEdit(Result);
 	RedLvlEdit->setValidator(IntegerVector().GetValidator(RedLvlEdit));
-	RedLvlEdit->setToolTip(q->tr("q is the depth of the pro-rata group.\nAccepts vectors.\nNormally 1"));
+	RedLvlEdit->setToolTip(WaterfallStepHelperDialog::tr("q is the depth of the pro-rata group.\nAccepts vectors.\nNormally 1"));
 	q->connect(RedLvlEdit, SIGNAL(textChanged(QString)), q, SLOT(SetRedemptionGroupLevel(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedLvlEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(SetTo1(QString)), RedLvlEdit, SLOT(setText(QString)));
@@ -964,10 +964,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateTurboWidget()
 	RedLvlEdit->setText("1");
 
 	QLabel* RedShrLbl = new QLabel(Result);
-	RedShrLbl->setText(q->tr("Share of available funds applied to the indicated tranche"));
+	RedShrLbl->setText(WaterfallStepHelperDialog::tr("Share of available funds applied to the indicated tranche"));
 	QLineEdit* RedShrEdit = new QLineEdit(Result);
 	RedShrEdit->setValidator(BloombergVector().GetValidator(RedShrEdit));
-	RedShrEdit->setToolTip(q->tr("Share of available funds applied toward the redemption of to the notes.\nAccepts vectors."));
+	RedShrEdit->setToolTip(WaterfallStepHelperDialog::tr("Share of available funds applied toward the redemption of to the notes.\nAccepts vectors."));
 	q->connect(RedShrEdit, SIGNAL(textChanged(QString)), q, SLOT(SetRedemptionShare(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedShrEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(SetTo100(QString)), RedShrEdit, SLOT(setText(QString)));
@@ -988,10 +988,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateCurePDLWidget()
 	int CountRow = 0;
 
 	QLabel* SenGrpLbl = new QLabel(Result);
-	SenGrpLbl->setText(q->tr("Seniority group to which the PDL applies"));
+	SenGrpLbl->setText(WaterfallStepHelperDialog::tr("Seniority group to which the PDL applies"));
 	QLineEdit* SenGrpEdit = new QLineEdit(Result);
 	SenGrpEdit->setValidator(IntegerVector().GetValidator(SenGrpEdit));
-	SenGrpEdit->setToolTip(q->tr("q is the pro-rata level of the tranches.\nAccepts vectors."));
+	SenGrpEdit->setToolTip(WaterfallStepHelperDialog::tr("q is the pro-rata level of the tranches.\nAccepts vectors."));
 	q->connect(SenGrpEdit, SIGNAL(textChanged(QString)), q, SLOT(SetSeniorityGroup(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), SenGrpEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(ImportSeniorityGroup(QString)), SenGrpEdit, SLOT(setText(QString)), Qt::QueuedConnection);
@@ -1000,10 +1000,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateCurePDLWidget()
 	CountRow++;
 
 	QLabel* SenLvlLbl = new QLabel(Result);
-	SenLvlLbl->setText(q->tr("Level of seniority the seniority group refers to"));
+	SenLvlLbl->setText(WaterfallStepHelperDialog::tr("Level of seniority the seniority group refers to"));
 	QLineEdit* SenLvlEdit = new QLineEdit(Result);
 	SenLvlEdit->setValidator(IntegerVector().GetValidator(SenLvlEdit));
-	SenLvlEdit->setToolTip(q->tr("q is the depth of the pro-rata group.\nAccepts vectors.\nNormally 1"));
+	SenLvlEdit->setToolTip(WaterfallStepHelperDialog::tr("q is the depth of the pro-rata group.\nAccepts vectors.\nNormally 1"));
 	q->connect(SenLvlEdit, SIGNAL(textChanged(QString)), q, SLOT(SetSeniorityGroupLevel(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), SenLvlEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(SetTo1(QString)), SenLvlEdit, SLOT(setText(QString)));
@@ -1014,10 +1014,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateCurePDLWidget()
 	SenLvlEdit->setText("1");
 
 	QLabel* RedGrpLbl = new QLabel(Result);
-	RedGrpLbl->setText(q->tr("Group that will be redeemed to cure PDL"));
+	RedGrpLbl->setText(WaterfallStepHelperDialog::tr("Group that will be redeemed to cure PDL"));
 	QLineEdit* RedGrpEdit = new QLineEdit(Result);
 	RedGrpEdit->setValidator(IntegerVector().GetValidator(RedGrpEdit));
-	RedGrpEdit->setToolTip(q->tr("q is the pro-rata level of the tranches.\nAccepts vectors.\nLeave blank for sequential"));
+	RedGrpEdit->setToolTip(WaterfallStepHelperDialog::tr("q is the pro-rata level of the tranches.\nAccepts vectors.\nLeave blank for sequential"));
 	q->connect(RedGrpEdit, SIGNAL(textChanged(QString)), q, SLOT(SetRedemptionGroup(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedGrpEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(ImportRedemptionGroup(QString)), RedGrpEdit, SLOT(setText(QString)), Qt::QueuedConnection);
@@ -1026,10 +1026,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateCurePDLWidget()
 	CountRow++;
 
 	QLabel* RedLvlLbl = new QLabel(Result);
-	RedLvlLbl->setText(q->tr("Level of seniority the redemption group refers to"));
+	RedLvlLbl->setText(WaterfallStepHelperDialog::tr("Level of seniority the redemption group refers to"));
 	QLineEdit* RedLvlEdit = new QLineEdit(Result);
 	RedLvlEdit->setValidator(IntegerVector().GetValidator(RedLvlEdit));
-	RedLvlEdit->setToolTip(q->tr("q is the depth of the pro-rata group.\nAccepts vectors.\nNormally 1"));
+	RedLvlEdit->setToolTip(WaterfallStepHelperDialog::tr("q is the depth of the pro-rata group.\nAccepts vectors.\nNormally 1"));
 	q->connect(RedLvlEdit, SIGNAL(textChanged(QString)), q, SLOT(SetRedemptionGroupLevel(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedLvlEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(SetTo1(QString)), RedLvlEdit, SLOT(setText(QString)));
@@ -1040,10 +1040,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateCurePDLWidget()
 	RedLvlEdit->setText("1");
 
 	QLabel* RedShrLbl = new QLabel(Result);
-	RedShrLbl->setText(q->tr("Share of available funds applied to turbo"));
+	RedShrLbl->setText(WaterfallStepHelperDialog::tr("Share of available funds applied to turbo"));
 	QLineEdit* RedShrEdit = new QLineEdit(Result);
 	RedShrEdit->setValidator(BloombergVector().GetValidator(RedShrEdit));
-	RedShrEdit->setToolTip(q->tr("Share of available funds applied to redemption of the indicated class of notes, the remaining will go sequential.\nAccepts vectors."));
+	RedShrEdit->setToolTip(WaterfallStepHelperDialog::tr("Share of available funds applied to redemption of the indicated class of notes, the remaining will go sequential.\nAccepts vectors."));
 	q->connect(RedShrEdit, SIGNAL(textChanged(QString)), q, SLOT(SetRedemptionShare(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedShrEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(SetTo0(QString)), RedShrEdit, SLOT(setText(QString)));
@@ -1064,10 +1064,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateFeesFromXSWidget()
 	QGridLayout *ResLay = new QGridLayout(Result);
 	int CountRow = 0;
 	QLabel* RedShrLbl = new QLabel(Result);
-	RedShrLbl->setText(q->tr("Share of available funds applied paid as fees"));
+	RedShrLbl->setText(WaterfallStepHelperDialog::tr("Share of available funds applied paid as fees"));
 	QLineEdit* RedShrEdit = new QLineEdit(Result);
 	RedShrEdit->setValidator(BloombergVector().GetValidator(RedShrEdit));
-	RedShrEdit->setToolTip(q->tr("Share of available funds paid as fees, q will appear as junior fees cash flow.\nAccepts vectors."));
+	RedShrEdit->setToolTip(WaterfallStepHelperDialog::tr("Share of available funds paid as fees, q will appear as junior fees cash flow.\nAccepts vectors."));
 	q->connect(RedShrEdit, SIGNAL(textChanged(QString)), q, SLOT(SetRedemptionShare(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedShrEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(SetTo0(QString)), RedShrEdit, SLOT(setText(QString)));
@@ -1086,10 +1086,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateAllocPrepayWidget()
 	QGridLayout *ResLay = new QGridLayout(Result);
 	int CountRow = 0;
 	QLabel* RedGrpLbl = new QLabel(Result);
-	RedGrpLbl->setText(q->tr("Group that will receive prepayment fees"));
+	RedGrpLbl->setText(WaterfallStepHelperDialog::tr("Group that will receive prepayment fees"));
 	QLineEdit* RedGrpEdit = new QLineEdit(Result);
 	RedGrpEdit->setValidator(IntegerVector().GetValidator(RedGrpEdit));
-	RedGrpEdit->setToolTip(q->tr("q is the pro-rata level of the tranches.\nAccepts vectors."));
+	RedGrpEdit->setToolTip(WaterfallStepHelperDialog::tr("q is the pro-rata level of the tranches.\nAccepts vectors."));
 	q->connect(RedGrpEdit, SIGNAL(textChanged(QString)), q, SLOT(SetRedemptionGroup(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedGrpEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(ImportRedemptionGroup(QString)), RedGrpEdit, SLOT(setText(QString)), Qt::QueuedConnection);
@@ -1098,10 +1098,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateAllocPrepayWidget()
 	CountRow++;
 
 	QLabel* RedLvlLbl = new QLabel(Result);
-	RedLvlLbl->setText(q->tr("Level of seniority the redemption group refers to"));
+	RedLvlLbl->setText(WaterfallStepHelperDialog::tr("Level of seniority the redemption group refers to"));
 	QLineEdit* RedLvlEdit = new QLineEdit(Result);
 	RedLvlEdit->setValidator(IntegerVector().GetValidator(RedLvlEdit));
-	RedLvlEdit->setToolTip(q->tr("q is the depth of the pro-rata group.\nAccepts vectors.\nNormally 1"));
+	RedLvlEdit->setToolTip(WaterfallStepHelperDialog::tr("q is the depth of the pro-rata group.\nAccepts vectors.\nNormally 1"));
 	q->connect(RedLvlEdit, SIGNAL(textChanged(QString)), q, SLOT(SetRedemptionGroupLevel(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedLvlEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(SetTo1(QString)), RedLvlEdit, SLOT(setText(QString)));
@@ -1112,10 +1112,10 @@ QWidget* WaterfallStepHelperDialogPrivate::CreateAllocPrepayWidget()
 	RedLvlEdit->setText("1");
 
 	QLabel* RedShrLbl = new QLabel(Result);
-	RedShrLbl->setText(q->tr("Share of prepayment fees applied to indicated tranche"));
+	RedShrLbl->setText(WaterfallStepHelperDialog::tr("Share of prepayment fees applied to indicated tranche"));
 	QLineEdit* RedShrEdit = new QLineEdit(Result);
 	RedShrEdit->setValidator(BloombergVector().GetValidator(RedShrEdit));
-	RedShrEdit->setToolTip(q->tr("Share of prepayment fees applied to the indicated notes.\nAccepts vectors."));
+	RedShrEdit->setToolTip(WaterfallStepHelperDialog::tr("Share of prepayment fees applied to the indicated notes.\nAccepts vectors."));
 	q->connect(RedShrEdit, SIGNAL(textChanged(QString)), q, SLOT(SetRedemptionShare(QString)));
 	q->connect(StepSelectorCombo, SIGNAL(currentIndexChanged(int)), RedShrEdit, SLOT(clear()));
 	q->connect(q, SIGNAL(SetTo100(QString)), RedShrEdit, SLOT(setText(QString)));

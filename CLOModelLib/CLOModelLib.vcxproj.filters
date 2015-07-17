@@ -108,6 +108,9 @@
     <Filter Include="Privates\Triggers\Trigger Settings Widgets">
       <UniqueIdentifier>{167f3f47-ceb8-4e44-a61f-84bc5723d5b6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Privates\Common Items">
+      <UniqueIdentifier>{77137145-9124-489e-9e79-74f8da7a8337}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="clomodellib_global.h">
@@ -172,9 +175,6 @@
     </ClInclude>
     <ClInclude Include="TemplAsyncCalculator.h">
       <Filter>Header Files\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="Private\InternalItems.h">
-      <Filter>Privates</Filter>
     </ClInclude>
     <ClInclude Include="Private\AbstractBbgVect_p.h">
       <Filter>Privates\Vectors</Filter>
@@ -380,6 +380,15 @@
     <ClInclude Include="Private\BaseRateTable_p.h">
       <Filter>Privates\Interfaces</Filter>
     </ClInclude>
+    <ClInclude Include="Ratings.h">
+      <Filter>Header Files\Common Items</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\InternalItems.h">
+      <Filter>Privates\Common Items</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\Ratings_p.h">
+      <Filter>Privates\Common Items</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BackwardCompatibilityInterface.cpp">
@@ -402,9 +411,6 @@
     </ClCompile>
     <ClCompile Include="AbstractTrigger.cpp">
       <Filter>Source Files\Triggers</Filter>
-    </ClCompile>
-    <ClCompile Include="InternalItems.cpp">
-      <Filter>Privates</Filter>
     </ClCompile>
     <ClCompile Include="BoolVector.cpp">
       <Filter>Source Files\Vectors</Filter>
@@ -810,6 +816,12 @@
     </ClCompile>
     <ClCompile Include="Private\TrancheTriggerSettingWidget.cpp">
       <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="InternalItems.cpp">
+      <Filter>Privates\Common Items</Filter>
+    </ClCompile>
+    <ClCompile Include="Ratings.cpp">
+      <Filter>Source Files\Common Items</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -418,6 +418,7 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DCLOMODELLIB_LIB -DNDEBUG -DQT_CORE_LIB -DQT_DLL -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_WINDLL "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtSql" "-I$(QTDIR)\include\QtWidgets" "-I.\Private"</Command>
     </CustomBuild>
+    <ClInclude Include="Private\Ratings_p.h" />
     <ClInclude Include="Private\ReadOnlyColProxy.h" />
     <ClInclude Include="Private\ReinvestmentTest_p.h" />
     <ClInclude Include="Private\ReserveFund_p.h" />
@@ -524,6 +525,7 @@
     <ClInclude Include="Private\WaterfallStepHelperDialog_p.h" />
     <ClInclude Include="Private\Waterfall_p.h" />
     <ClInclude Include="Private\WatFalPrior_p.h" />
+    <ClInclude Include="Ratings.h" />
     <ClInclude Include="ReinvestmentTest.h" />
     <ClInclude Include="ReserveFund.h" />
     <CustomBuild Include="StressTest.h">
@@ -1209,6 +1211,7 @@
     <ClCompile Include="Private\TrancheViewer.cpp" />
     <ClCompile Include="Private\VectorTriggerSettingWidget.cpp" />
     <ClCompile Include="Private\WaterfallViewer.cpp" />
+    <ClCompile Include="Ratings.cpp" />
     <ClCompile Include="ReinvestmentTest.cpp" />
     <ClCompile Include="RepaymentVector.cpp" />
     <ClCompile Include="ReserveFund.cpp" />

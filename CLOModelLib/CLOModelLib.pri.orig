@@ -64,7 +64,10 @@ HEADERS += ./AbstractBbgVect.h \
     ./TriggerHelperDialog.h \
     ./TriggerStructHelperWidget.h \
     ./WaterfallStepHelperDialog.h \
-	./Private/InternalItems.h \
+<<<<<<< Updated upstream
+    ./Private/InternalItems.h \
+=======
+>>>>>>> Stashed changes
     ./Private/AbstractBbgVect_p.h \
     ./Private/BaseRateVect_p.h \
     ./Private/BloombergVector_p.h \

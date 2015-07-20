@@ -8,4 +8,3 @@ int main(int argc, char *argv[])
     RatingsTest ratingsTest;
     return QTest::qExec(&ratingsTest, argc, argv);
 }
-#include "RatingsTest.moc"

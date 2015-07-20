@@ -49,4 +49,8 @@
       <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="CLOModelTest.pri" />
+    <None Include="CLOModelTest.pro" />
+  </ItemGroup>
 </Project>

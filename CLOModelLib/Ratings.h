@@ -99,6 +99,8 @@ public:
     friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const Ratings& flows);
     friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, Ratings& flows);
 };
+Q_DECLARE_METATYPE(Ratings)
+Q_DECLARE_METATYPE(Ratings::RatingValue)
 CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const Ratings& flows);
 CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, Ratings& flows);
 #endif // Ratings_h__

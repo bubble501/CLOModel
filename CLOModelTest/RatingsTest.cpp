@@ -1,6 +1,51 @@
 #include "RatingsTest.h"
 #include <QtTest>
 #include <Ratings.h>
+
+void RatingsTest::averageRating_data()
+{
+    QTest::addColumn<Ratings>("testRating");
+    QTest::addColumn<Ratings::RatingValue>("ratingResult");
+    Ratings testRating;
+    for (qint16 i = static_cast<qint16>(Ratings::RatingValue::AAA); i <= static_cast<qint16>(Ratings::RatingValue::D); ++i) {
+        testRating.reset();
+        testRating.setRating(static_cast<Ratings::RatingValue>(i), static_cast<Ratings::RatingAgency>(0));
+        QTest::newRow("monoDimensional")
+            << testRating
+            << static_cast<Ratings::RatingValue>(i);
+    }
+    for (qint16 i = static_cast<qint16>(Ratings::RatingValue::AAA); i <= static_cast<qint16>(Ratings::RatingValue::D); ++i){
+        for (qint16 j = static_cast<qint16>(Ratings::RatingValue::AAA); j <= static_cast<qint16>(Ratings::RatingValue::D); ++j) {
+            testRating.reset();
+            testRating.setRating(static_cast<Ratings::RatingValue>(i), static_cast<Ratings::RatingAgency>(0));
+            testRating.setRating(static_cast<Ratings::RatingValue>(j), static_cast<Ratings::RatingAgency>(1));
+            QTest::newRow("biDimensional")
+                << testRating
+                << static_cast<Ratings::RatingValue>(static_cast<qint16>(std::ceil((static_cast<double>(i)+static_cast<double>(j)) / 2.0)));
+        }
+    }
+    for (qint16 i = static_cast<qint16>(Ratings::RatingValue::AAA); i <= static_cast<qint16>(Ratings::RatingValue::D); ++i) {
+        for (qint16 j = static_cast<qint16>(Ratings::RatingValue::AAA); j <= static_cast<qint16>(Ratings::RatingValue::D); ++j) {
+            for (qint16 k = static_cast<qint16>(Ratings::RatingValue::AAA); k <= static_cast<qint16>(Ratings::RatingValue::D); ++k) {
+                testRating.reset();
+                testRating.setRating(static_cast<Ratings::RatingValue>(i), static_cast<Ratings::RatingAgency>(0));
+                testRating.setRating(static_cast<Ratings::RatingValue>(j), static_cast<Ratings::RatingAgency>(1));
+                testRating.setRating(static_cast<Ratings::RatingValue>(j), static_cast<Ratings::RatingAgency>(2));
+                QTest::newRow("triDimensional")
+                    << testRating
+                    << static_cast<Ratings::RatingValue>(static_cast<qint16>(std::ceil((static_cast<double>(i)+static_cast<double>(j)+static_cast<double>(k)) / 3.0)));
+            }
+        }
+    }
+}
+
+void RatingsTest::averageRating()
+{
+    QFETCH(Ratings, testRating);
+    QFETCH(Ratings::RatingValue, ratingResult);
+    QCOMPARE(testRating.averageRating(), ratingResult);
+}
+
 void RatingsTest::getBucket()
 {
     QCOMPARE(Ratings::getBucket(Ratings::RatingValue::AAA), Ratings::RatingBucket::AAA);

@@ -73,6 +73,7 @@ public:
     };
 protected:
     virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
+    RatingValue averageRating(double startingVal) const;
 public:
     static QString agencyName(RatingAgency ag);
     static RatingBucket getBucket(RatingValue val);

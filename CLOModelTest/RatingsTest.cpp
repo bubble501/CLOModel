@@ -7,10 +7,13 @@ void RatingsTest::averageRating_data()
     QTest::addColumn<Ratings>("testRating");
     QTest::addColumn<Ratings::RatingValue>("ratingResult");
     Ratings testRating;
+    QTest::newRow("Non Rated")
+        << testRating
+        << Ratings::RatingValue::NR;
     for (qint16 i = static_cast<qint16>(Ratings::RatingValue::AAA); i <= static_cast<qint16>(Ratings::RatingValue::D); ++i) {
         testRating.reset();
         testRating.setRating(static_cast<Ratings::RatingValue>(i), static_cast<Ratings::RatingAgency>(0));
-        QTest::newRow("monoDimensional")
+        QTest::newRow((QString("monoDimensional %1").arg(Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i)))).toLatin1().data())
             << testRating
             << static_cast<Ratings::RatingValue>(i);
     }
@@ -19,7 +22,7 @@ void RatingsTest::averageRating_data()
             testRating.reset();
             testRating.setRating(static_cast<Ratings::RatingValue>(i), static_cast<Ratings::RatingAgency>(0));
             testRating.setRating(static_cast<Ratings::RatingValue>(j), static_cast<Ratings::RatingAgency>(1));
-            QTest::newRow("biDimensional")
+            QTest::newRow((QString("biDimensional %1 %2").arg(Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i))).arg(Ratings::RatingValueString(static_cast<Ratings::RatingValue>(j)))).toLatin1().data())
                 << testRating
                 << static_cast<Ratings::RatingValue>(static_cast<qint16>(std::ceil((static_cast<double>(i)+static_cast<double>(j)) / 2.0)));
         }
@@ -31,7 +34,7 @@ void RatingsTest::averageRating_data()
                 testRating.setRating(static_cast<Ratings::RatingValue>(i), static_cast<Ratings::RatingAgency>(0));
                 testRating.setRating(static_cast<Ratings::RatingValue>(j), static_cast<Ratings::RatingAgency>(1));
                 testRating.setRating(static_cast<Ratings::RatingValue>(k), static_cast<Ratings::RatingAgency>(2));
-                QTest::newRow("triDimensional")
+                QTest::newRow((QString("triDimensional %1 %2 %3").arg(Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i))).arg(Ratings::RatingValueString(static_cast<Ratings::RatingValue>(j))).arg(Ratings::RatingValueString(static_cast<Ratings::RatingValue>(k)))).toLatin1().data())
                     << testRating
                     << static_cast<Ratings::RatingValue>(static_cast<qint16>(std::ceil((static_cast<double>(i)+static_cast<double>(j)+static_cast<double>(k)) / 3.0)));
             }

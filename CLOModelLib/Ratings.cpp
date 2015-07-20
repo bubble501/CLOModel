@@ -159,23 +159,30 @@ Ratings::RatingAgency Ratings::lowestAgency() const
 Ratings::RatingValue Ratings::averageRating() const
 {
     Q_D(const Ratings);
+    return averageRating(0.0);
+}
+
+Ratings::RatingValue Ratings::averageRating(double startingVal) const
+{
+    Q_D(const Ratings);
+    if (numRatings() == 0)
+        return RatingValue::NR;
     return static_cast<RatingValue>(static_cast<qint16>(std::ceil(
-    std::accumulate(std::begin(d->m_ratings), std::end(d->m_ratings), 0.0, [](double sum, RatingValue val)->double {return qMax(sum, sum + static_cast<double>(val)); })
-        /static_cast<double>(numRatings())
+        std::accumulate(std::begin(d->m_ratings), std::end(d->m_ratings), startingVal, [](double sum, RatingValue val)->double {return qMax(sum, sum + static_cast<double>(val)); })
+        / static_cast<double>(numRatings())
         )));
 }
 
 int Ratings::notchesToAverageUpgrade() const
 {
     Q_D(const Ratings);
-    int result = 1;
+    if (numRatings() == 0)
+        return 0;
     const RatingValue currAvg = averageRating();
-    while (
-        static_cast<RatingValue>(static_cast<qint16>(std::ceil(
-        std::accumulate(std::begin(d->m_ratings), std::end(d->m_ratings), -result, [](double sum, RatingValue val)->double {return qMax(sum, sum + static_cast<double>(val)); })
-        / static_cast<double>(numRatings())
-        ))) == currAvg
-        )
+    if (currAvg == RatingValue::AAA)
+        return 0;
+    int result = 1;
+    while (averageRating(-result) == currAvg)
         ++result;
     return result;
 }
@@ -183,14 +190,13 @@ int Ratings::notchesToAverageUpgrade() const
 int Ratings::notchesToAverageDowngrade() const
 {
     Q_D(const Ratings);
-    int result = 1;
+    if (numRatings() == 0)
+        return 0;
     const RatingValue currAvg = averageRating();
-    while (
-        static_cast<RatingValue>(static_cast<qint16>(std::ceil(
-        std::accumulate(std::begin(d->m_ratings), std::end(d->m_ratings), result, [](double sum, RatingValue val)->double {return qMax(sum, sum + static_cast<double>(val)); })
-        / static_cast<double>(numRatings())
-        ))) == currAvg
-        )
+    if (currAvg == RatingValue::D)
+        return 0;
+    int result = 1;
+    while (averageRating(result) == currAvg)
         ++result;
     return result;
 }
@@ -198,14 +204,13 @@ int Ratings::notchesToAverageDowngrade() const
 int Ratings::notchesToAverageUpgradeBucket() const
 {
     Q_D(const Ratings);
-    int result = 1;
+    if (numRatings() == 0)
+        return 0;
     const RatingBucket currAvg = getBucket(averageRating());
-    while (
-        getBucket(static_cast<RatingValue>(static_cast<qint16>(std::ceil(
-        std::accumulate(std::begin(d->m_ratings), std::end(d->m_ratings), -result, [](double sum, RatingValue val)->double {return qMax(sum, sum + static_cast<double>(val)); })
-        / static_cast<double>(numRatings())
-        )))) == currAvg
-        )
+    if (currAvg == RatingBucket::AAA)
+        return 0;
+    int result = 1;
+    while (getBucket(averageRating(-result)) == currAvg)
         ++result;
     return result;
 }
@@ -213,14 +218,13 @@ int Ratings::notchesToAverageUpgradeBucket() const
 int Ratings::notchesToAverageDowngradeBucket() const
 {
     Q_D(const Ratings);
-    int result = 1;
+    if (numRatings() == 0)
+        return 0;
     const RatingBucket currAvg = getBucket(averageRating());
-    while (
-        getBucket(static_cast<RatingValue>(static_cast<qint16>(std::ceil(
-        std::accumulate(std::begin(d->m_ratings), std::end(d->m_ratings), result, [](double sum, RatingValue val)->double {return qMax(sum, sum + static_cast<double>(val)); })
-        / static_cast<double>(numRatings())
-        )))) == currAvg
-        )
+    if (currAvg == RatingBucket::D)
+        return 0;
+    int result = 1;
+    while (getBucket(averageRating(result)) == currAvg)
         ++result;
     return result;
 }

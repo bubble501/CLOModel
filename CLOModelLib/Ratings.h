@@ -2,7 +2,10 @@
 #define Ratings_h__
 #include "BackwardCompatibilityInterface.h"
 class RatingsPrivate;
-namespace QBbgLib { class QBbgSecurity; }
+namespace QBbgLib { 
+    class QBbgSecurity; 
+    class QBbgAbstractResponse; 
+}
 class CLOMODELLIB_EXPORT Ratings : public BackwardInterface
 {
     DECLARE_PUBLIC_COMMONS(Ratings)
@@ -71,6 +74,7 @@ public:
 protected:
     virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 public:
+    static QString agencyName(RatingAgency ag);
     static RatingBucket getBucket(RatingValue val);
     static QString RatingValueString(RatingValue val, RatingAgency agencySyntax = RatingAgency::SP);
     static QString RatingValueString(RatingBucket val, RatingAgency agencySyntax = RatingAgency::SP);
@@ -93,6 +97,7 @@ public:
     RatingValue ratingAtRankNoDuplicate(int rnk) const;
     RatingAgency agencyAtRank(int rnk) const;
     bool downloadRatings(const QBbgLib::QBbgSecurity& sec);
+    bool downloadRatings(const  QBbgLib::QBbgAbstractResponse  * const res);
     bool downloadRatings(const QString& name, const QString& bbgExtension);
     int numRatings() const;
     void reset();

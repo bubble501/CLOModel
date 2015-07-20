@@ -40,6 +40,13 @@ Ratings::Ratings(RatingsPrivate *d)
 
 
 
+QString Ratings::agencyName(RatingAgency ag)
+{
+    if (ag == RatingAgency::CountAgencies)
+        return QString();
+    return RatingsPrivate::m_AgencyName[static_cast<qint8>(ag)];
+}
+
 Ratings::RatingBucket Ratings::getBucket(RatingValue val)
 {
     if (val == RatingValue::AAA)
@@ -317,6 +324,26 @@ bool Ratings::downloadRatings(const QString& name, const QString& bbgExtension)
     return downloadRatings(QBbgLib::QBbgSecurity(name, QBbgLib::QBbgSecurity::stringToYellowKey(bbgExtension)));
 }
 
+bool Ratings::downloadRatings(const QBbgLib::QBbgAbstractResponse * const res)
+{
+    using namespace QBbgLib;
+    if(res->hasErrors())
+        return false;
+    auto refResponse = dynamic_cast<const QBbgReferenceDataResponse*>(res);
+    if (!refResponse)
+        return false;
+    for (auto i = std::begin(RatingsPrivate::m_ratingFields); i != std::end(RatingsPrivate::m_ratingFields);++i){
+        if (refResponse->header().indexOf(*i, 0, Qt::CaseInsensitive) >= 0) {
+            if(refResponse->hasValue()){
+                if(!refResponse->value().toString().isEmpty()){
+                    return setRating(refResponse->value().toString(), static_cast<RatingAgency>(std::distance(std::begin(RatingsPrivate::m_ratingFields), i)));
+                }
+            }
+        }
+    }
+    return false;
+}
+
 int Ratings::numRatings() const
 {
     Q_D(const Ratings);
@@ -331,6 +358,7 @@ void Ratings::reset()
 }
 
 const QString RatingsPrivate::m_ratingFields[static_cast<qint8>(Ratings::RatingAgency::CountAgencies)] = { "RTG_SP", "RTG_MOODY", "RTG_FITCH", "RTG_DBRS" };
+const QString RatingsPrivate::m_AgencyName[static_cast<qint8>(Ratings::RatingAgency::CountAgencies)] = { "S&P", "Moody's", "Fitch", "DBRS" };
 const QString RatingsPrivate::m_ratingSyntax[static_cast<qint8>(Ratings::RatingAgency::CountAgencies)][static_cast<qint16>(Ratings::RatingValue::D) + 1] = {
     { //S&P
         "NR",

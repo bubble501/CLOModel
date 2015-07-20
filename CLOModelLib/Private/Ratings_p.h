@@ -13,6 +13,7 @@ public:
     Ratings::CreditWatch m_watch[static_cast<qint8>(Ratings::RatingAgency::CountAgencies)];
     static const QString m_ratingSyntax[static_cast<qint8>(Ratings::RatingAgency::CountAgencies)][static_cast<qint16>(Ratings::RatingValue::D) + 1];
     static const QString m_ratingFields[static_cast<qint8>(Ratings::RatingAgency::CountAgencies)];
+    static const QString m_AgencyName[static_cast<qint8>(Ratings::RatingAgency::CountAgencies)];
 };
 
 

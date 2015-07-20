@@ -46,6 +46,8 @@ Ratings::RatingBucket Ratings::getBucket(RatingValue val)
         return RatingBucket::AAA;
     else if (val == RatingValue::NR)
         return RatingBucket::NR;
+    else if (val == RatingValue::D)
+        return RatingBucket::D;
     else
         return static_cast<RatingBucket>((((static_cast<qint16>(val)-2) / 3) * 3) + 3);
 }

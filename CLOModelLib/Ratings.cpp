@@ -158,7 +158,6 @@ Ratings::RatingAgency Ratings::lowestAgency() const
 
 Ratings::RatingValue Ratings::averageRating() const
 {
-    Q_D(const Ratings);
     return averageRating(0.0);
 }
 
@@ -175,7 +174,6 @@ Ratings::RatingValue Ratings::averageRating(double startingVal) const
 
 int Ratings::notchesToAverageUpgrade() const
 {
-    Q_D(const Ratings);
     if (numRatings() == 0)
         return 0;
     const RatingValue currAvg = averageRating();
@@ -189,7 +187,6 @@ int Ratings::notchesToAverageUpgrade() const
 
 int Ratings::notchesToAverageDowngrade() const
 {
-    Q_D(const Ratings);
     if (numRatings() == 0)
         return 0;
     const RatingValue currAvg = averageRating();
@@ -203,7 +200,6 @@ int Ratings::notchesToAverageDowngrade() const
 
 int Ratings::notchesToAverageUpgradeBucket() const
 {
-    Q_D(const Ratings);
     if (numRatings() == 0)
         return 0;
     const RatingBucket currAvg = getBucket(averageRating());
@@ -217,7 +213,6 @@ int Ratings::notchesToAverageUpgradeBucket() const
 
 int Ratings::notchesToAverageDowngradeBucket() const
 {
-    Q_D(const Ratings);
     if (numRatings() == 0)
         return 0;
     const RatingBucket currAvg = getBucket(averageRating());

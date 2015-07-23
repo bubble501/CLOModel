@@ -12,6 +12,8 @@ private slots:
     void getBucket();
     void rankedRatings_data();
     void rankedRatings();
+    void rankedAgency_data();
+    void rankedAgency();
 };
 
 #endif // RATINGSTEST_H

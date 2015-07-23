@@ -767,7 +767,7 @@ void MtgCalculator::AddTempProperty(qint32 LoanID, const QString& PropertyName, 
 	iter.value()->operator[](PropertyName) = PropertyValue;
 }
 
-bool MtgCalculator::uploadGeographyToDatabase(const QString& DealName, const QDate& startDate, const QDate& endDate) const
+bool MtgCalculator::uploadGeographyToDatabase(const QString& DealName, QDate startDate, QDate endDate) const
 {
 #ifndef NO_DATABASE
     if (DealName.isEmpty() || startDate.isNull() || endDate.isNull())

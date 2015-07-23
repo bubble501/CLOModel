@@ -680,7 +680,6 @@ void Mortgage::RemoveProperty(const QString& PropName) {
 void Mortgage::RemoveProperty(qint32 PropIndex) {
     Q_D(Mortgage);
 	if (PropIndex < 0) return;
-	qint32 pos = 0;
     const QRegularExpression TempReg("#<#(.+?)#=#.+?#>#", QRegularExpression::CaseInsensitiveOption);
     Q_ASSERT(TempReg.isValid());
     auto i = TempReg.globalMatch(d->m_Properties);

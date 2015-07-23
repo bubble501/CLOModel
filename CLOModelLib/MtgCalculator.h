@@ -30,7 +30,7 @@ protected:
 public slots:
 	virtual bool StartCalculation() override;
 public:
-    virtual bool uploadGeographyToDatabase(const QString& DealName, const QDate& startDate, const QDate& endDate) const;
+    virtual bool uploadGeographyToDatabase(const QString& DealName, QDate startDate, QDate endDate) const;
 	virtual QHash<QString, double> GetGeographicBreakdown() const;
 	virtual QString ReadyToCalculate() const override;
     MtgCalculator(QObject* parent = nullptr);

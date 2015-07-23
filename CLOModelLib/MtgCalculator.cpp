@@ -767,6 +767,74 @@ void MtgCalculator::AddTempProperty(qint32 LoanID, const QString& PropertyName, 
 	iter.value()->operator[](PropertyName) = PropertyValue;
 }
 
+bool MtgCalculator::uploadGeographyToDatabase(const QString& DealName, const QDate& startDate, const QDate& endDate) const
+{
+#ifndef NO_DATABASE
+    if (DealName.isEmpty() || startDate.isNull() || endDate.isNull())
+        return false;
+    if (startDate > endDate)
+        std::swap(startDate, endDate);
+    const auto geogBreak = GetGeographicBreakdown();
+    if (geogBreak.isEmpty()) {
+        DEBG_LOG("uploadGeographyToDatabase() No geographic information found");
+        return false;
+    }
+    {
+        QMutexLocker dbLocker(&Db_Mutex);
+        QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
+        if (!db.isValid()) {
+            db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype"), "TwentyFourDB");
+            db.setDatabaseName(
+                "Driver={" + GetFromConfig("Database", "Driver")
+                + "}; "
+                + GetFromConfig("Database", "DataSource")
+                );
+
+        }
+        bool DbOpen = db.isOpen();
+        if (!DbOpen) DbOpen = db.open();
+        if (DbOpen) {
+            {
+                //Check deal exist in the database
+                QSqlQuery CheckBondExistQuery(db);
+                CheckBondExistQuery.setForwardOnly(true);
+                CheckBondExistQuery.prepare("{CALL " + GetFromConfig("Database", "GetDealInfoStoredProc") + "}");
+                CheckBondExistQuery.bindValue(":dealName", DealName);
+                if (!CheckBondExistQuery.exec()) {
+                    DEBG_LOG("uploadGeographyToDatabase() Failed to run GetBondDetailsStoredProc");
+                    return false;
+                }
+                if (!CheckBondExistQuery.next()) {
+                    DEBG_LOG("uploadGeographyToDatabase() Deal not found in Database");
+                    return false;
+                }
+            }
+            db.transaction();
+            for (auto i = geogBreak.constBegin(); i != geogBreak.constEnd(); ++i) {
+                QSqlQuery UploadGeogrQuery(db);
+                UploadGeogrQuery.setForwardOnly(true);
+                UploadGeogrQuery.prepare("{CALL " + GetFromConfig("Database", "SetGeographyStoredProc") + "}");
+                UploadGeogrQuery.bindValue(":dealName", DealName);
+                UploadGeogrQuery.bindValue(":filedName", "Geography" + i.key());
+                UploadGeogrQuery.bindValue(":fieldDisplayName", i.key());
+                UploadGeogrQuery.bindValue(":startDate", startDate.toString(Qt::ISODate));
+                UploadGeogrQuery.bindValue(":endDate", endDate.toString(Qt::ISODate));
+                UploadGeogrQuery.bindValue(":Value", i.value());
+                if (!UploadGeogrQuery.exec()){
+                    DEBG_LOG(QString("uploadGeographyToDatabase() Unable to upload data to Database. Country: %1, Value: %2").arg(i.key()).arg(i.value()));
+                    db.rollback();
+                    return false;
+                }
+            }
+            db.commit();
+            return true;
+        }
+        DEBG_LOG("uploadGeographyToDatabase() Unable to open DB");
+    }
+#endif
+    return false;
+}
+
 QHash<QString, double> MtgCalculator::GetGeographicBreakdown() const
 {
     Q_D(const MtgCalculator);
@@ -784,10 +852,13 @@ QHash<QString, double> MtgCalculator::GetGeographicBreakdown() const
     if (d->Loans.isEmpty()) return Result;
 	QString CurrentGuess;
 	simstring::reader dbr;
-	const std::string DbRootFolder(qgetenv("CLO_MODEL_FOLDER").constData());
-	if (DbRootFolder.empty()) return Result;
-	if (!QFile::exists(QString::fromStdString(DbRootFolder + "CountriesDB\\ISO3166-1.ssdb"))) BuildDBCountries(QString::fromStdString(DbRootFolder + "CountriesDB\\ISO3166-1.ssdb"));
-	if (!dbr.open(DbRootFolder + "CountriesDB\\ISO3166-1.ssdb")) return Result;
+    const std::string DbRootFolder(GetFromConfig("Folder","CountriesDBFolder").toStdString());
+	if (DbRootFolder.empty()) 
+        return Result;
+	if (!QFile::exists(QString::fromStdString(DbRootFolder + "CountriesDB\\ISO3166-1.ssdb"))) 
+        BuildDBCountries(QString::fromStdString(DbRootFolder + "CountriesDB\\ISO3166-1.ssdb"));
+	if (!dbr.open(DbRootFolder + "CountriesDB\\ISO3166-1.ssdb")) 
+        return Result;
     for (auto i = d->Loans.constBegin(); i != d->Loans.constEnd(); ++i) {
 		if ((*i)->GetSize()<0.01) continue;
 		SumOut += (*i)->GetSize();
@@ -797,8 +868,10 @@ QHash<QString, double> MtgCalculator::GetGeographicBreakdown() const
             CurrentGuess = GetCountryISOCode(CurrentGuess);
             if (!InsertUnknown(CurrentGuess, (*i)->GetSize())) {
                 auto Curres = Result.find(CurrentGuess);
-                if (Curres == Result.end()) Result.insert(CurrentGuess, (*i)->GetSize());
-                else Curres.value() += (*i)->GetSize();
+                if (Curres == Result.end()) 
+                    Result.insert(CurrentGuess, (*i)->GetSize());
+                else 
+                    Curres.value() += (*i)->GetSize();
             }
 		}
 	}

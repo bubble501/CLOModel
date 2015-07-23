@@ -736,13 +736,11 @@ double Tranche::GetDiscountMargin(double NewPrice)const{
     Q_ASSERT(d->ReferenceRate.contains(-1));
     BaseRateVector ApplicableRate = *(d->ReferenceRate.value(0, d->ReferenceRate.value(-1)));
     ApplicableRate.replaceValue("ZERO", *d->ReferenceRate.value(-1));
-    DEBUG_CHECK(check1, ApplicableRate.GetVector());
     BloombergVector ApplicableRateValue;
     if (d->m_UseForwardCurve)
         ApplicableRateValue = ApplicableRate.GetBaseRatesDatabase(d->m_FrwRateCache);
     else
         ApplicableRateValue = ApplicableRate.GetBaseRatesDatabase(d->m_CnstRateCache);
-    DEBUG_CHECK(check2, ApplicableRateValue.GetVector());
     if (ApplicableRateValue.IsEmpty() || d->m_DayCount.value(0)->IsEmpty())
          return 0.0;
     return qMax(0.0, CalculateDM(FlowsDates, FlowsValues, ApplicableRateValue, *(d->m_DayCount.value(0))));
@@ -834,7 +832,7 @@ QString TranchePrivate::downloadISIN() const
     QString applicableIsin = ISINcode;
 #ifndef NO_BLOOMBERG
     if (applicableIsin.isEmpty()) {
-        DEBG_LOG("Downloading ISIN from Bloomberg")
+        DEBG_LOG("Downloading ISIN from Bloomberg");
         QBbgLib::QBbgReferenceDataRequest isinReq;
         isinReq.setSecurity(QBbgLib::QBbgSecurity(TrancheName, QBbgLib::QBbgSecurity::stringToYellowKey(BloombergExtension)));
         isinReq.setField("ID_ISIN");
@@ -858,7 +856,7 @@ bool Tranche::saveCashflowsDatabase() const
     Q_D(const Tranche);
     const QString applicableIsin = d->downloadISIN();
     if (applicableIsin.isEmpty()) {
-        DEBG_LOG("saveCashflowsDatabase() Invalid ISIN")
+        DEBG_LOG("saveCashflowsDatabase() Invalid ISIN");
         return false;
     }
     {
@@ -883,11 +881,11 @@ bool Tranche::saveCashflowsDatabase() const
                 CheckBondExistQuery.prepare("{CALL " + GetFromConfig("Database", "GetBondDetailsStoredProc") + "}");
                 CheckBondExistQuery.bindValue(":isin", applicableIsin);
                 if (!CheckBondExistQuery.exec()) {
-                    DEBG_LOG("saveCashflowsDatabase() Failed to run GetBondDetailsStoredProc")
+                    DEBG_LOG("saveCashflowsDatabase() Failed to run GetBondDetailsStoredProc");
                     return false;
                 }
                 if (!CheckBondExistQuery.next()) {
-                    DEBG_LOG("saveCashflowsDatabase() Bond not found in Database")
+                    DEBG_LOG("saveCashflowsDatabase() Bond not found in Database");
                     return false;
                 }
             }
@@ -916,7 +914,7 @@ bool Tranche::saveCashflowsDatabase() const
                 EraseCashflowQuery.prepare("{CALL " + GetFromConfig("Database", "DeleteCashflowsStoredProc") + "}");
                 EraseCashflowQuery.bindValue(":ISIN", applicableIsin);
                 dbError = !EraseCashflowQuery.exec();
-                DEBG_LOG_CONDITION("saveCashflowsDatabase() Failed to delete previous cash flows", dbError)
+                DEBG_LOG_CONDITION("saveCashflowsDatabase() Failed to delete previous cash flows", dbError);
             }
             if (!dbError) {
                 QSqlQuery InsertCashflowQuery(db);
@@ -930,11 +928,11 @@ bool Tranche::saveCashflowsDatabase() const
                 InsertCashflowQuery.bindValue(":balance", balancePar);
                 InsertCashflowQuery.bindValue(":coupon", couponPar);
                 dbError = !InsertCashflowQuery.execBatch();
-                DEBG_LOG_CONDITION("saveCashflowsDatabase() Failed to upload new cash flows", dbError)
+                DEBG_LOG_CONDITION("saveCashflowsDatabase() Failed to upload new cash flows", dbError);
             }
             if (dbError) {
                 db.rollback();
-                DEBG_LOG("saveCashflowsDatabase() Reached Rollback")
+                DEBG_LOG("saveCashflowsDatabase() Reached Rollback");
                 return false;
             }
             else {
@@ -955,7 +953,7 @@ void Tranche::getCashflowsDatabase()
 #ifndef NO_DATABASE 
     const QString applicableIsin = d->downloadISIN();
     if (applicableIsin.isEmpty()) {
-        DEBG_LOG("GetDataFromDatabase() Invalid ISIN")
+        DEBG_LOG("GetDataFromDatabase() Invalid ISIN");
             return;
     }
     QMutexLocker dbLocker(&Db_Mutex);
@@ -977,7 +975,7 @@ void Tranche::getCashflowsDatabase()
         CheckBondExistQuery.prepare("{CALL " + GetFromConfig("Database", "GetCashFlowsProc") + "}");
         CheckBondExistQuery.bindValue(":isin", applicableIsin);
         if (!CheckBondExistQuery.exec()) {
-            DEBG_LOG("getCashflowsDatabase() Failed to run GetCashFlowsProc")
+            DEBG_LOG("getCashflowsDatabase() Failed to run GetCashFlowsProc");
                 return;
         }
         bool firstFlow = true;
@@ -993,8 +991,7 @@ void Tranche::getCashflowsDatabase()
             d->CashFlow.SetFlow(flowDate, currRec.value("Balance").toDouble(), TrancheCashFlow::AmountOutstandingFlow);
             d->CashFlow.SetFlow(flowDate, currRec.value("Deferred").toDouble(), TrancheCashFlow::DeferredFlow);
         }
-        if (d->CashFlow.Count() == 0)
-            DEBG_LOG("getCashflowsDatabase() No cashflows in DB")
+        DEBG_LOG_CONDITION("getCashflowsDatabase() No cashflows in DB", d->CashFlow.Count() == 0);
     }
 #endif
 }

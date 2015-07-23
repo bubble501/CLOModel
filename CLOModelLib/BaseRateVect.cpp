@@ -333,7 +333,6 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ConstantBaseRateTable& Refe
 					!ReferencesValues.GetValues().contains(query.value(0).toString())
 					&& (DownloadAll || d->m_VectVal.indexOf(QRegularExpression(query.value(0).toString() + "(?:\\[\\S+\\])?"))>=0)
 					) {
-                    DEBUG_CHECK(check1, query.value(1).toDouble());
 					ReferencesValues.GetValues().insert(query.value(0).toString(), query.value(1).toDouble());
 					if (MinUpdateDate.isNull() || query.value(2).toDateTime().date() < MinUpdateDate) 
                         MinUpdateDate = query.value(2).toDateTime().date();

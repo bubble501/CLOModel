@@ -14,6 +14,7 @@
 		<SetLoanAssumptionStoredProc>setLoanAssumption(:OldScenName,:scenarioName,:scanarioAlias,:seniorScenario,:scenarioMaturityExtension,:scenarioInitialHaircut,:scenarioPrepaymentFee,:scenarioDayCount,:scenarioCPR,:scenarioCDR,:scenarioLS,:scenarioRecoveryLag,:scenarioDelinquency,:scenarioDelinquencyLag,:scenarioPrice,:scenarioHaircut,:scenarioPrepayMultiplier,:scenarioLossMultiplier,:scenarioUpdateDate)</SetLoanAssumptionStoredProc>
         <GetBondDetailsStoredProc>getBondDetails(:isin)</GetBondDetailsStoredProc>
         <DeleteCashflowsStoredProc>deleteCashflows(:ISIN)</DeleteCashflowsStoredProc>
+        <GetCashFlowsProc>getCashFlows(:ISIN)</GetCashFlowsProc>
         <InsertCashFlowsQuery xml:space="preserve">INSERT INTO  Cashflows (ISIN,Date,Deferred,Interest,Principal,Balance,Coupon) VALUES (:isin,:date,:deferred,:interest,:principal,:balance,:coupon)</InsertCashFlowsQuery>
     </Database>
 	<Folders>

@@ -854,12 +854,11 @@ QString TranchePrivate::downloadISIN() const
 
 bool Tranche::saveCashflowsDatabase() const
 {
-    PrintToTempFile("ErrorsLog", "Started");
 #ifndef NO_DATABASE
     Q_D(const Tranche);
     const QString applicableIsin = d->downloadISIN();
     if (applicableIsin.isEmpty()) {
-        PrintToTempFile("ErrorsLog", "Invalid ISIN");
+        DEBG_LOG("saveCashflowsDatabase() Invalid ISIN")
         return false;
     }
     {
@@ -884,11 +883,11 @@ bool Tranche::saveCashflowsDatabase() const
                 CheckBondExistQuery.prepare("{CALL " + GetFromConfig("Database", "GetBondDetailsStoredProc") + "}");
                 CheckBondExistQuery.bindValue(":isin", applicableIsin);
                 if (!CheckBondExistQuery.exec()) {
-                    DEBG_LOG("Failed to run GetBondDetailsStoredProc")
+                    DEBG_LOG("saveCashflowsDatabase() Failed to run GetBondDetailsStoredProc")
                     return false;
                 }
                 if (!CheckBondExistQuery.next()) {
-                    DEBG_LOG("Bond not found in Database")
+                    DEBG_LOG("saveCashflowsDatabase() Bond not found in Database")
                     return false;
                 }
             }
@@ -917,7 +916,7 @@ bool Tranche::saveCashflowsDatabase() const
                 EraseCashflowQuery.prepare("{CALL " + GetFromConfig("Database", "DeleteCashflowsStoredProc") + "}");
                 EraseCashflowQuery.bindValue(":ISIN", applicableIsin);
                 dbError = !EraseCashflowQuery.exec();
-                DEBG_LOG_CONDITION("Failed to delete previous cash flows", dbError)
+                DEBG_LOG_CONDITION("saveCashflowsDatabase() Failed to delete previous cash flows", dbError)
             }
             if (!dbError) {
                 QSqlQuery InsertCashflowQuery(db);
@@ -931,11 +930,11 @@ bool Tranche::saveCashflowsDatabase() const
                 InsertCashflowQuery.bindValue(":balance", balancePar);
                 InsertCashflowQuery.bindValue(":coupon", couponPar);
                 dbError = !InsertCashflowQuery.execBatch();
-                DEBG_LOG_CONDITION("Failed to upload new cash flows", dbError)
+                DEBG_LOG_CONDITION("saveCashflowsDatabase() Failed to upload new cash flows", dbError)
             }
             if (dbError) {
                 db.rollback();
-                DEBG_LOG("Reached Rollback")
+                DEBG_LOG("saveCashflowsDatabase() Reached Rollback")
                 return false;
             }
             else {
@@ -944,9 +943,60 @@ bool Tranche::saveCashflowsDatabase() const
             }
         }
     }
+    DEBG_LOG("saveCashflowsDatabase() Failed to open DB");
 #endif // !NO_DATABASE
-    DEBG_LOG("Failed to open DB");
     return false;
+}
+
+void Tranche::getCashflowsDatabase()
+{
+    Q_D(Tranche);
+    d->CashFlow.Clear();
+#ifndef NO_DATABASE 
+    const QString applicableIsin = d->downloadISIN();
+    if (applicableIsin.isEmpty()) {
+        DEBG_LOG("GetDataFromDatabase() Invalid ISIN")
+            return;
+    }
+    QMutexLocker dbLocker(&Db_Mutex);
+    QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
+    if (!db.isValid()) {
+        db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype"), "TwentyFourDB");
+        db.setDatabaseName(
+            "Driver={" + GetFromConfig("Database", "Driver")
+            + "}; "
+            + GetFromConfig("Database", "DataSource")
+            );
+
+    }
+    bool DbOpen = db.isOpen();
+    if (!DbOpen) DbOpen = db.open();
+    if (DbOpen) {
+        QSqlQuery CheckBondExistQuery(db);
+        CheckBondExistQuery.setForwardOnly(true);
+        CheckBondExistQuery.prepare("{CALL " + GetFromConfig("Database", "GetCashFlowsProc") + "}");
+        CheckBondExistQuery.bindValue(":isin", applicableIsin);
+        if (!CheckBondExistQuery.exec()) {
+            DEBG_LOG("getCashflowsDatabase() Failed to run GetCashFlowsProc")
+                return;
+        }
+        bool firstFlow = true;
+        while (CheckBondExistQuery.next()) {
+            const QSqlRecord currRec = CheckBondExistQuery.record();
+            const QDate flowDate = currRec.value("Date").toDate();
+            if (firstFlow) {
+                d->CashFlow.SetInitialOutstanding(currRec.value("Balance").toDouble() + currRec.value("Deferred").toDouble());
+                firstFlow = false;
+            }
+            d->CashFlow.SetFlow(flowDate, currRec.value("Interest").toDouble(), TrancheCashFlow::InterestFlow);
+            d->CashFlow.SetFlow(flowDate, currRec.value("Principal").toDouble(), TrancheCashFlow::PrincipalFlow);
+            d->CashFlow.SetFlow(flowDate, currRec.value("Balance").toDouble(), TrancheCashFlow::AmountOutstandingFlow);
+            d->CashFlow.SetFlow(flowDate, currRec.value("Deferred").toDouble(), TrancheCashFlow::DeferredFlow);
+        }
+        if (d->CashFlow.Count() == 0)
+            DEBG_LOG("getCashflowsDatabase() No cashflows in DB")
+    }
+#endif
 }
 
 double Tranche::getTotalActualCoupon(const QDate& index) const

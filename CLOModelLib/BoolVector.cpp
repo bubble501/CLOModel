@@ -1,7 +1,7 @@
 #include "BoolVector.h"
 #include "Private/BoolVector_p.h"
 #include "CommonFunctions.h"
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QStringList>
 DEFINE_PUBLIC_COMMONS(BoolVector)
 DEFINE_PUBLIC_COMMONS_COPY(BoolVector)
@@ -42,12 +42,12 @@ void BoolVector::UnpackVector(){
     if (d->m_Vector.isEmpty()) return;
 	ExtractAnchorDate();
     QString TempVec(d->m_Vector.trimmed().toUpper());
-	QStringList StringParts=TempVec.trimmed().toUpper().split(QRegExp("\\s"),QString::SkipEmptyParts);
+	QStringList StringParts=TempVec.trimmed().toUpper().split(QRegularExpression("\\s"),QString::SkipEmptyParts);
 	int StepLen;
 	QString TempStr;
 	for (int i=1;i<StringParts.size();i+=2){
 		TempStr=StringParts.at(i);
-		TempStr.replace(QRegExp("\\D"),"");
+		TempStr.replace(QRegularExpression("\\D"),"");
 		StepLen=TempStr.toInt();
 		for (int j=0;j<StepLen;j++){
             d->m_VectVal.append(StringParts.at(i - 1).at(0) == 'T' || StringParts.at(i - 1).at(0) == 'Y');
@@ -58,7 +58,7 @@ void BoolVector::UnpackVector(){
 bool BoolVector::IsValid() const{
 	return AbstractBbgVect::IsValid("[TFNY]", false);
 }
-QRegExpValidator* BoolVector::GetValidator(QObject* parent) const {
+QRegularExpressionValidator* BoolVector::GetValidator(QObject* parent) const {
 	return AbstractBbgVect::GetValidator("[TFNY]", false, parent);
 }
 bool BoolVector::GetValue(const QDate& index)const{

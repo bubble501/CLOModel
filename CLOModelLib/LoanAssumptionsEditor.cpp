@@ -1272,7 +1272,7 @@ void LoanAssumptionsEditor::MezzScenarioChanged(const QModelIndex& index) {
 
 }
 bool LoanAssumptionsEditorPrivate::CheckAliasInput() {
-	if (m_AliasLineEdit->text().isEmpty() || QRegExp(m_AliasLineEdit->text()).isValid()) {
+	if (m_AliasLineEdit->text().isEmpty() || QRegularExpression(m_AliasLineEdit->text()).isValid()) {
 		m_AliasLineEdit->setStyleSheet(QString());
 	}
 	else {
@@ -2442,8 +2442,8 @@ void LoanAssumptionsEditorPrivate::CreateModelScanner()
 				FilterRegExp += "(?:#,#" + i->model()->data(*i, Qt::EditRole).toString() + "#,#)|";
 			}
 			FilterRegExp.chop(1);
-			m_ScannedPoolsProxy->setFilterRegExp(QRegExp(FilterRegExp, Qt::CaseInsensitive));
-			m_ScannedModelProxy->setFilterRegExp(QRegExp(FilterRegExp, Qt::CaseInsensitive));
+            m_ScannedPoolsProxy->setFilterRegExp(QRegExp(FilterRegExp, Qt::CaseInsensitive));
+            m_ScannedModelProxy->setFilterRegExp(QRegExp(FilterRegExp, Qt::CaseInsensitive));
 		}
 	});
     q->connect(ModelsDirBrowseButton, &QPushButton::clicked, [&]() {

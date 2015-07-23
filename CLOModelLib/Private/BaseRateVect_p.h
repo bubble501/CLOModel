@@ -15,24 +15,28 @@ public:
     {
         static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetValue can be used only with int or QDate");
         QString RawVal = GetValueTemplate(m_VectVal, index, QString()).trimmed();
-        RawVal.replace(QRegExp("\\[(?:-?\\d*\\.?\\d+)?(?:,-?\\d*\\.?\\d+)?\\]"), "");
+        RawVal.replace(QRegularExpression("\\[(?:-?\\d*\\.?\\d+)?(?:,-?\\d*\\.?\\d+)?\\]"), "");
         return RawVal;
     }
     template<class T> QString GetFloor(const T& index) const
     {
         static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetFloor can be used only with int or QDate");
         QString RawVal = GetValueTemplate(m_VectVal, index, QString()).trimmed();
-        QRegExp CaptureFloor("\\[(-?\\d*\\.?\\d+)?(?:,-?\\d*\\.?\\d+)?\\]");
-        if (CaptureFloor.indexIn(RawVal) < 0) return QString();
-        return CaptureFloor.cap(1);
+        QRegularExpression CaptureFloor("\\[(-?\\d*\\.?\\d+)?(?:,-?\\d*\\.?\\d+)?\\]");
+        const auto CaptureFloorMatch = CaptureFloor.match(RawVal);
+        if (!CaptureFloorMatch.hasMatch())
+            return QString();
+        return CaptureFloorMatch.captured(1);
     }
     template<class T> QString GetCap(const T& index) const
     {
         static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetCap can be used only with int or QDate");
         QString RawVal = GetValueTemplate(m_VectVal, index, QString()).trimmed();
-        QRegExp CaptureFloor("\\[(?:-?\\d*\\.?\\d+)?,(-?\\d*\\.?\\d+)?\\]");
-        if (CaptureFloor.indexIn(RawVal) < 0) return QString();
-        return CaptureFloor.cap(1);
+        QRegularExpression CaptureFloor("\\[(?:-?\\d*\\.?\\d+)?,(-?\\d*\\.?\\d+)?\\]");
+        const auto CaptureFloorMatch = CaptureFloor.match(RawVal);
+        if (!CaptureFloorMatch.hasMatch())
+            return QString();
+        return CaptureFloorMatch.captured(2);
     }
 };
 #endif // BaseRateVect_p_h__

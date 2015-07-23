@@ -19,7 +19,7 @@ public:
 		, Capitalization = 0x8
 	};
 protected:
-	virtual QRegExpValidator* GetValidator(QObject* parent = 0) const override;
+	virtual QRegularExpressionValidator* GetValidator(QObject* parent = 0) const override;
 	virtual void UnpackVector() override;
 	virtual bool IsValid() const override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;

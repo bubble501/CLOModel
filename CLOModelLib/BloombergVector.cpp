@@ -4,7 +4,7 @@
 #include "FloorCapVector.h"
 #include "Private/InternalItems.h"
 #include <QMap>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QSet>
 #include <QStringList>
 #include <boost/math/tools/toms748_solve.hpp>
@@ -222,15 +222,15 @@ void BloombergVector::UnpackVector(){
         return;
 	ExtractAnchorDate();
     QString TempVec(d->m_Vector.trimmed().toUpper());
-	QStringList StringParts=TempVec.trimmed().toUpper().split(QRegExp("\\s"),QString::SkipEmptyParts);
+	QStringList StringParts=TempVec.trimmed().toUpper().split(QRegularExpression("\\s"),QString::SkipEmptyParts);
 	int StepLen;
 	QString TempStr;
 	for (int i=1;i<StringParts.size();i+=2){
 		TempStr=StringParts.at(i);
-		TempStr.replace(QRegExp("\\D"),"");
+		TempStr.replace(QRegularExpression("\\D"),"");
 		StepLen=TempStr.toInt();
 		TempStr=StringParts.at(i);
-		TempStr.replace(QRegExp("\\d"),"");
+		TempStr.replace(QRegularExpression("\\d"),"");
 		if(TempStr=="S"){
 			for (int j=0;j<StepLen;j++){
                 d->m_VectVal.append(StringParts.at(i - 1).toDouble() / d->m_Divisor);
@@ -249,7 +249,7 @@ void BloombergVector::UnpackVector(){
 bool BloombergVector::IsValid() const{
 	return AbstractBbgVect::IsValid("-?\\d*\\.?\\d+",true);
 }
-QRegExpValidator* BloombergVector::GetValidator(QObject* parent) const {
+QRegularExpressionValidator* BloombergVector::GetValidator(QObject* parent) const {
 	return AbstractBbgVect::GetValidator("-?\\d*\\.?\\d+", true, parent);
 }
 double BloombergVector::GetValue(const QDate& index,int Frequency)const{

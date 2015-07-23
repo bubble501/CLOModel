@@ -15,7 +15,7 @@ protected:
 	virtual bool IsValid() const override;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 public:
-	virtual QRegExpValidator* GetValidator(QObject* parent = 0) const override;
+	virtual QRegularExpressionValidator* GetValidator(QObject* parent = 0) const override;
 	using AbstractBbgVect::IsEmpty;
 	virtual bool IsEmpty(int Lbound, int Ubound=INT_MAX, bool IgnoreShift=false)const;
 	IntegerVector(const QString& Vec);

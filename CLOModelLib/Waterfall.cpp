@@ -20,6 +20,7 @@
 #include "Mortgage.h"
 #include "Seniority.h"
 #include "BaseRateTable.h"
+#include <QRegularExpression>
 #ifndef NO_BLOOMBERG
 #include <QBbgManager.h>
 #include <QBbgRequestGroup.h>
@@ -2821,14 +2822,11 @@ bool Waterfall::ValidTriggerStructure(const QString& TriggerStructure)const
         LOGDEBUG("Failed in Postfix");
         return false;
     }
-    QRegExp SignleTriggers("(\\d+|T|F)", Qt::CaseInsensitive);
+    const QRegularExpression SignleTriggers("(\\d+|T|F)", QRegularExpression::CaseInsensitiveOption);
+    Q_ASSERT(SignleTriggers.isValid());
     QStringList CapturedTriggers;
-    {
-        int pos = 0;
-        while ((pos = SignleTriggers.indexIn(AdjStructure, pos)) >= 0) {
-            CapturedTriggers.append(SignleTriggers.cap(1));
-            pos += SignleTriggers.matchedLength();
-        }
+    for (auto i = SignleTriggers.globalMatch(AdjStructure); i.hasNext();){
+        CapturedTriggers.append(i.next().captured(1));
     }
     if (CapturedTriggers.isEmpty()) return false;
     for (auto i = CapturedTriggers.constBegin(); i != CapturedTriggers.constEnd(); ++i) {
@@ -2846,19 +2844,16 @@ bool Waterfall::TriggerPassing(const QString& TriggerStructure, int PeriodIndex,
     Q_D( Waterfall);
     QString AdjStructure = InfixToPostfix(TriggerStructure);
     if (AdjStructure.isEmpty()) return false;
-    QRegExp SignleTriggers("(\\d+)");
+    const QRegularExpression SignleTriggers("(\\d+)");
     QStringList CapturedTriggers;
-    {
-        int pos = 0;
-        while ((pos = SignleTriggers.indexIn(AdjStructure, pos)) >= 0) {
-            CapturedTriggers.append(SignleTriggers.cap(1));
-            pos += SignleTriggers.matchedLength();
-        }
+    for (auto i = SignleTriggers.globalMatch(AdjStructure); i.hasNext();) {
+        CapturedTriggers.append(i.next().captured(1));
     }
     //if (CapturedTriggers.isEmpty()) return false;
     for (auto i = CapturedTriggers.constBegin(); i != CapturedTriggers.constEnd(); ++i) {
         quint32 CurrentTrigger = i->toUInt();
-        if (!d->m_Triggers.contains(CurrentTrigger)) 	return false;
+        if (!d->m_Triggers.contains(CurrentTrigger)) 	
+            return false;
         TriggersResults::TrigRes SingleRes = d->m_TriggersResults.GetResult(CurrentTrigger, CurrentIPD);
         if (SingleRes == TriggersResults::TrigRes::trNA) {
             bool TempRes = EvaluateTrigger(CurrentTrigger, PeriodIndex, CurrentIPD, IsCallDate);
@@ -2868,14 +2863,14 @@ bool Waterfall::TriggerPassing(const QString& TriggerStructure, int PeriodIndex,
     }
     QStack<bool> PolishStack;
     QStringList PolishParts = AdjStructure.split(' ');
-    SignleTriggers.setPattern("(\\d+)");
     foreach(const QString& SinglePart, PolishParts)
     {
-        if (SinglePart.compare("F", Qt::CaseInsensitive) == 0) PolishStack.push(false);
-        else if (SinglePart.compare("T", Qt::CaseInsensitive) == 0) PolishStack.push(true);
-        else if (SignleTriggers.exactMatch(SinglePart)) {
+        if (SinglePart.compare("F", Qt::CaseInsensitive) == 0) 
+            PolishStack.push(false);
+        else if (SinglePart.compare("T", Qt::CaseInsensitive) == 0)
+            PolishStack.push(true);
+        else if (SignleTriggers.match(SinglePart).hasMatch())
             PolishStack.push(d->m_TriggersResults.GetResult(SinglePart.toUInt(), CurrentIPD) == TriggersResults::TrigRes::trTrue);
-        }
         else {
             bool Pusher;
             switch (SinglePart.at(0).toLatin1()) {

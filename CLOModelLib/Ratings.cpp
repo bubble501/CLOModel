@@ -1,7 +1,7 @@
 #include "Ratings.h"
 #include "Private/Ratings_p.h"
 #include <numeric>
-#include <QRegExp>
+#include <QRegularExpression>
 #ifndef NO_BLOOMBERG
 #include <QbbgReferenceDataRequest.h>
 #include <QBbgSecurity.h>
@@ -86,7 +86,7 @@ bool Ratings::setRating(const QString& val, RatingAgency ag)
         return false;
     const auto & agencySyntax = RatingsPrivate::m_ratingSyntax[static_cast<qint8>(ag)];
     for (int i = static_cast<qint16>(RatingValue::AAA); i <= static_cast<qint16>(RatingValue::D); ++i){
-        if (val.indexOf(QRegExp("(?:^|[^ABC])" + agencySyntax[i] +"(?:$|[^ABC])" ,Qt::CaseInsensitive))>=0){
+        if (val.indexOf(QRegularExpression("(?:^|[^ABC])" + agencySyntax[i] + "(?:$|[^ABC])", QRegularExpression::CaseInsensitiveOption)) >= 0) {
             setRating(static_cast<RatingValue>(i), ag);
             break;
         }

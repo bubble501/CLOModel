@@ -4,7 +4,7 @@
 #include "BackwardCompatibilityInterface.h"
 class QDate;
 class QObject;
-class QRegExpValidator;
+class QRegularExpressionValidator;
 class AbstractBbgVectPrivate;
 class CLOMODELLIB_EXPORT AbstractBbgVect : public BackwardInterface
 {
@@ -13,12 +13,12 @@ class CLOMODELLIB_EXPORT AbstractBbgVect : public BackwardInterface
 protected:
     virtual bool IsValid() const = 0;
     virtual bool IsValid(const QString& ValidInputs, bool AllowRamps) const;
-    virtual QRegExpValidator* GetValidator(const QString& ValidInputs, bool AllowRamps, QObject* parent = 0) const;
+    virtual QRegularExpressionValidator* GetValidator(const QString& ValidInputs, bool AllowRamps, QObject* parent = 0) const;
     virtual void UnpackVector() = 0;
     virtual bool ValidAnchorDate() const;
     virtual bool ExtractAnchorDate();
 public:
-	virtual QRegExpValidator* GetValidator(QObject* parent = 0) const =0;
+	virtual QRegularExpressionValidator* GetValidator(QObject* parent = 0) const =0;
 	virtual void Clear();
 	virtual void SetVector(const QString& Vec);
 	AbstractBbgVect(const QString& Vec);

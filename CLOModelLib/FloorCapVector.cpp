@@ -1,6 +1,6 @@
 #include "FloorCapVector.h"
 #include "Private/FloorCapVector_p.h"
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QStringList>
 #include "CommonFunctions.h"
 DEFINE_PUBLIC_COMMONS(FloorCapVector)
@@ -94,15 +94,15 @@ void FloorCapVector::UnpackVector()
     if (d->m_Vector.isEmpty()) return;
     ExtractAnchorDate();
     QString TempVec(d->m_Vector.trimmed().toUpper());
-    QStringList StringParts = TempVec.trimmed().toUpper().split(QRegExp("\\s"), QString::SkipEmptyParts);
+    QStringList StringParts = TempVec.trimmed().toUpper().split(QRegularExpression("\\s"), QString::SkipEmptyParts);
     int StepLen;
     QString TempStr;
     for (int i = 1; i < StringParts.size(); i += 2) {
         TempStr = StringParts.at(i);
-        TempStr.replace(QRegExp("\\D"), "");
+        TempStr.replace(QRegularExpression("\\D"), "");
         StepLen = TempStr.toInt();
         TempStr = StringParts.at(i);
-        TempStr.replace(QRegExp("\\d"), "");
+        TempStr.replace(QRegularExpression("\\d"), "");
         for (int j = 0; j < StepLen; j++) {
             QString RawVal = StringParts.at(i - 1);
             RawVal.replace("[", "");
@@ -141,13 +141,15 @@ bool FloorCapVector::IsValid() const
 {
     Q_D(const FloorCapVector);
     if (!AbstractBbgVect::IsValid(R"**(\[(?:(?:-?\d*\.?\d+)|(?:(?:-?\d*\.?\d+)?(?:,-?\d*\.?\d+)))\])**", false)) return false;
-    QRegExp rx("\\[(-?\\d*\\.?\\d+),(-?\\d*\\.?\\d+)\\]");
-    for (int pos = 0; (pos = rx.indexIn(d->m_Vector, pos)) >= 0; pos += rx.matchedLength()) {
-        if (rx.cap(1).toDouble() > rx.cap(2).toDouble()) return false;
+    QRegularExpression rx("\\[(-?\\d*\\.?\\d+),(-?\\d*\\.?\\d+)\\]");
+    for (auto i = rx.globalMatch(d->m_Vector); i.hasNext();) {
+        const auto singleMatch = i.next();
+        if (singleMatch.captured(1).toDouble() > singleMatch.captured(2).toDouble())
+            return false;
     }
     return true;
 }
-QRegExpValidator* FloorCapVector::GetValidator(QObject* parent) const
+QRegularExpressionValidator* FloorCapVector::GetValidator(QObject* parent) const
 {
     return AbstractBbgVect::GetValidator("\\[(?:-?\\d*\\.?\\d+)?(?:,-?\\d*\\.?\\d+)?\\]", false, parent);
 }

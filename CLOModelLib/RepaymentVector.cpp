@@ -1,7 +1,7 @@
 #include "RepaymentVector.h"
 #include "Private/RepaymentVector_p.h"
 #include "CommonFunctions.h"
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QStringList>
 DEFINE_PUBLIC_COMMONS(RepaymentVector)
 DEFINE_PUBLIC_COMMONS_COPY(RepaymentVector)
@@ -42,12 +42,12 @@ void RepaymentVector::UnpackVector() {
     if (d->m_Vector.isEmpty()) return;
 	ExtractAnchorDate();
     QString TempVec(d->m_Vector.trimmed().toUpper());
-	QStringList StringParts = TempVec.trimmed().toUpper().split(QRegExp("\\s"), QString::SkipEmptyParts);
+	QStringList StringParts = TempVec.trimmed().toUpper().split(QRegularExpression("\\s"), QString::SkipEmptyParts);
 	int StepLen;
 	QString TempStr;
 	for (int i = 1; i < StringParts.size(); i += 2) {
 		TempStr = StringParts.at(i);
-		TempStr.replace(QRegExp("\\D"), "");
+		TempStr.replace(QRegularExpression("\\D"), "");
 		StepLen = TempStr.toInt();
 		for (int j = 0; j < StepLen; j++) {
             d->m_VectVal.append(d->ConvertRepayment(StringParts.at(i - 1).at(0)));
@@ -67,7 +67,7 @@ bool RepaymentVector::IsValid() const {
 	PossibleRatesPattern += ']';
 	return AbstractBbgVect::IsValid(PossibleRatesPattern, false);
 }
-QRegExpValidator* RepaymentVector::GetValidator(QObject* parent) const {
+QRegularExpressionValidator* RepaymentVector::GetValidator(QObject* parent) const {
     Q_D(const RepaymentVector);
 	QString PossibleRatesPattern = "[YNP";
 	QString TempPart;

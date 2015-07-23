@@ -56,7 +56,7 @@ TriggerHelperDialog::TriggerHelperDialog(TriggerHelperDialogPrivate* d, QWidget 
 	QLabel *TriggerLabelLabel = new QLabel(this);
 	TriggerLabelLabel->setText(tr("Insert Trigger Label"));
     d->TriggerLabelEdit = new QLineEdit(this);
-    d->TriggerLabelEdit->setValidator(new QRegExpValidator(QRegExp(".+"), d->TriggerLabelEdit));
+    d->TriggerLabelEdit->setValidator(new QRegularExpressionValidator(QRegularExpression(".+"), d->TriggerLabelEdit));
     d->TriggerLabelEdit->setText("Trigger");
     d->TriggerLabelEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 

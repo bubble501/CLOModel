@@ -2,7 +2,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include "BoolVector.h"
-#include <QRegExpValidator>
+#include <QRegularExpressionValidator>
 #include <QGridLayout>
 #include <QStringList>
 VectorTriggerSettingWidget::VectorTriggerSettingWidget(QWidget *parent)

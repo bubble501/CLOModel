@@ -1,8 +1,8 @@
 #include "AbstractBbgVect.h"
 #include "Private/AbstractBbgVect_p.h"
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QStringList>
-#include <QRegExpValidator>
+#include <QRegularExpressionValidator>
 #include <QDate>
 DEFINE_PUBLIC_COMMONS(AbstractBbgVect)
 DEFINE_PUBLIC_COMMONS_COPY(AbstractBbgVect)
@@ -85,39 +85,42 @@ AbstractBbgVect& AbstractBbgVect::operator=(const QString& a)
 bool AbstractBbgVect::ValidAnchorDate() const
 {
     Q_D(const AbstractBbgVect);
-	QRegExp AnchorCheck(QString("^A\\s+") + VectorAnchorDateFormat + "\\s+.+", Qt::CaseInsensitive);
-    if (AnchorCheck.exactMatch(d->m_Vector.trimmed())) {
-		QStringList dateVals = AnchorCheck.capturedTexts();
-		return QDate::isValid(dateVals.at(3).toInt(), dateVals.at(1).toInt(), dateVals.at(2).toInt());
-	}
+    QRegularExpression AnchorCheck(QString("^A\\s+") + VectorAnchorDateFormat + "\\s+.+", QRegularExpression::CaseInsensitiveOption);
+    Q_ASSERT(AnchorCheck.isValid());
+    const auto anchorMatch = AnchorCheck.match(d->m_Vector.trimmed());
+    if (anchorMatch.hasMatch())
+        return QDate::isValid(anchorMatch.captured(3).toInt(), anchorMatch.captured(1).toInt(), anchorMatch.captured(2).toInt());
 	return true;
 }
 bool AbstractBbgVect::IsValid(const QString& ValidInputs, bool AllowRamps) const {
     Q_D(const AbstractBbgVect);
 	QString PatternString = QString("^(?:A\\s+") + VectorAnchorDateFormat + "\\s+){0,1}" + ValidInputs + "(?:\\s+[1-9][0-9]*";
-	if (AllowRamps) PatternString += "[RS]";
-	else PatternString += 'S';
+	if (AllowRamps) 
+        PatternString += "[RS]";
+	else 
+        PatternString += 'S';
 	PatternString += "\\s+" + ValidInputs + ")*$";
-	QRegExp Vigil(PatternString, Qt::CaseInsensitive);
-    return (Vigil.exactMatch(d->m_Vector.trimmed()) && ValidAnchorDate()) || d->m_Vector.isEmpty();
+    QRegularExpression Vigil(PatternString, QRegularExpression::CaseInsensitiveOption | QRegularExpression::DontCaptureOption);
+    Q_ASSERT(Vigil.isValid());
+    return (Vigil.match(d->m_Vector.trimmed()).hasMatch() && ValidAnchorDate()) || d->m_Vector.isEmpty();
 }
-QRegExpValidator* AbstractBbgVect::GetValidator(const QString& ValidInputs, bool AllowRamps, QObject* parent) const {
+QRegularExpressionValidator* AbstractBbgVect::GetValidator(const QString& ValidInputs, bool AllowRamps, QObject* parent) const {
 	QString PatternString = QString("(^$|^(?:A\\s+") + VectorAnchorDateFormat + "\\s+){0,1}" + ValidInputs + "(?:\\s+[1-9][0-9]*";
 	if (AllowRamps) PatternString += "[RS]";
 	else PatternString += 'S';
 	PatternString += "\\s+" + ValidInputs + ")*$)";
-	QRegExp ValidReg(PatternString,Qt::CaseInsensitive);
-	return new QRegExpValidator(ValidReg, parent);
+    QRegularExpression ValidReg(PatternString, QRegularExpression::CaseInsensitiveOption | QRegularExpression::DontCaptureOption);
+    return new QRegularExpressionValidator(ValidReg, parent);
 }
 bool AbstractBbgVect::ExtractAnchorDate() {
     Q_D(AbstractBbgVect);
     QString TempVec(d->m_Vector.trimmed().toUpper());
-	QRegExp AnchorCheck(QString("^A\\s+") + VectorAnchorDateFormat + "\\s+(.+)", Qt::CaseInsensitive);
-	if (AnchorCheck.exactMatch(TempVec)) {
-		QStringList dateVals = AnchorCheck.capturedTexts();
-        d->m_AnchorDate.setDate(dateVals.at(3).toInt(), dateVals.at(1).toInt(), dateVals.at(2).toInt());
-		TempVec = dateVals.at(4);
-        d->m_Vector = TempVec;
+    QRegularExpression AnchorCheck(QString("^A\\s+") + VectorAnchorDateFormat + "\\s+(.+)", QRegularExpression::CaseInsensitiveOption);
+    Q_ASSERT(AnchorCheck.isValid());
+    const auto anchorMatch = AnchorCheck.match(TempVec);
+    if (anchorMatch.hasMatch()) {
+        d->m_AnchorDate.setDate(anchorMatch.captured(3).toInt(), anchorMatch.captured(1).toInt(), anchorMatch.captured(2).toInt());
+        d->m_Vector = anchorMatch.captured(4);
 		return true;
 	}
     d->m_AnchorDate = QDate();

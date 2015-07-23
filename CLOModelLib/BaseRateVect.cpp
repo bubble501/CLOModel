@@ -1,6 +1,6 @@
 #include "BaseRateVect.h"
 #include "Private/BaseRateVect_p.h"
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QStringList>
 #include "CommonFunctions.h"
 #include "Private/InternalItems.h"
@@ -54,11 +54,14 @@ BaseRateVector::BaseRateVector(const QString& Vec,const QDate& Anchor)
 }
 bool BaseRateVector::IsValid() const{
     Q_D(const BaseRateVector);
-	if (!AbstractBbgVect::IsValid(R"**([^\s,\[\]]+(?:\[(?:(?:-?\d*\.?\d+)|(?:(?:-?\d*\.?\d+)?(?:,-?\d*\.?\d+)))\])?)**", false)) return false;
-	QRegExp rx("\\[(-?\\d*\\.?\\d+),(-?\\d*\\.?\\d+)\\]");
-	for (int pos = 0; (pos = rx.indexIn(d->m_Vector, pos)) >= 0; pos += rx.matchedLength()) {
-		if (rx.cap(1).toDouble() > rx.cap(2).toDouble()) return false;
-	}
+	if (!AbstractBbgVect::IsValid(R"**([^\s,\[\]]+(?:\[(?:(?:-?\d*\.?\d+)|(?:(?:-?\d*\.?\d+)?(?:,-?\d*\.?\d+)))\])?)**", false)) 
+        return false;
+	QRegularExpression rx("\\[(-?\\d*\\.?\\d+),(-?\\d*\\.?\\d+)\\]");
+    for (auto i = rx.globalMatch(d->m_Vector); i.hasNext();) {
+        const auto singleMatch = i.next();
+        if (singleMatch.captured(1).toDouble() > singleMatch.captured(2).toDouble())
+            return false;
+    }
 	return true;
 }
 
@@ -68,7 +71,7 @@ bool BaseRateVector::IsZero() const
     return d->m_Vector.trimmed().toUpper() == "ZERO";
 }
 
-QRegExpValidator* BaseRateVector::GetValidator(QObject* parent) const
+QRegularExpressionValidator* BaseRateVector::GetValidator(QObject* parent) const
 {
 	return AbstractBbgVect::GetValidator(R"**([^\s,\[\]]+(?:\[(?:(?:-?\d*\.?\d+)|(?:(?:-?\d*\.?\d+)?(?:,-?\d*\.?\d+)))\])?)**", false, parent);
 }
@@ -117,12 +120,12 @@ void BaseRateVector::UnpackVector()
     if (d->m_Vector.isEmpty()) return;
 	ExtractAnchorDate();
     QString TempVec(d->m_Vector.trimmed().toUpper());
-	QStringList StringParts=TempVec.trimmed().toUpper().split(QRegExp("\\s"),QString::SkipEmptyParts);
+	QStringList StringParts=TempVec.trimmed().toUpper().split(QRegularExpression("\\s"),QString::SkipEmptyParts);
 	int StepLen;
 	QString TempStr;
 	for (int i=1;i<StringParts.size();i+=2){
 		TempStr=StringParts.at(i);
-		TempStr.replace(QRegExp("\\D"),"");
+		TempStr.replace(QRegularExpression("\\D"),"");
 		StepLen=TempStr.toInt();
 		for (int j=0;j<StepLen;j++){
             d->m_VectVal.append(StringParts.at(i - 1));
@@ -179,7 +182,7 @@ BloombergVector BaseRateVector::CompileReferenceRateValue(ForwardBaseRateTable& 
     Q_D(const BaseRateVector);
 	BloombergVector Result;
 	if (IsEmpty()) return Result;
-    QStringList StringParts = d->m_Vector.trimmed().toUpper().split(QRegExp("\\s"), QString::SkipEmptyParts);
+    QStringList StringParts = d->m_Vector.trimmed().toUpper().split(QRegularExpression("\\s"), QString::SkipEmptyParts);
 	int StepLen = 0;
 	QString TempStr;
 	if (!Values.GetValues().contains(StringParts.first()) || Values.GetValues().value(StringParts.first()).IsEmpty())
@@ -191,7 +194,7 @@ BloombergVector BaseRateVector::CompileReferenceRateValue(ForwardBaseRateTable& 
 	Result = Values.GetValues().value(StringParts.first());
 	for (int i = 1; i < StringParts.size(); i += 2) {
 		TempStr = StringParts.at(i);
-		TempStr.replace(QRegExp("\\D"), "");
+		TempStr.replace(QRegularExpression("\\D"), "");
 		StepLen = TempStr.toInt();
 		if (!Values.GetValues().contains(StringParts.at(i + 1)) || Values.GetValues().value(StringParts.at(i + 1)).IsEmpty())
 #ifdef NO_BLOOMBERG
@@ -216,7 +219,7 @@ BloombergVector BaseRateVector::CompileReferenceRateValue(ConstantBaseRateTable&
 	const QHash<QString, double>& Sobstitutes = Values.GetValues();
 	QString NewVector = d->m_Vector;
 	for (QHash<QString, double>::const_iterator i = Sobstitutes.constBegin(); i != Sobstitutes.constEnd(); i++) {
-		NewVector.replace(QRegExp(i.key() +"(?:\\[\\S+\\])?"), QString::number(i.value()*100.0,'f'));
+		NewVector.replace(QRegularExpression(i.key() +"(?:\\[\\S+\\])?"), QString::number(i.value()*100.0,'f'));
 	}
     BloombergVector Reslt(NewVector, d->m_AnchorDate);
 	Reslt.ApplyFloorCap(ExtractFloorCapVector());
@@ -328,9 +331,8 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ConstantBaseRateTable& Refe
 			while (query.next()) {
 				if (
 					!ReferencesValues.GetValues().contains(query.value(0).toString())
-					&& (DownloadAll || d->m_VectVal.indexOf(QRegExp(query.value(0).toString() + "(?:\\[\\S+\\])?"))>=0)
+					&& (DownloadAll || d->m_VectVal.indexOf(QRegularExpression(query.value(0).toString() + "(?:\\[\\S+\\])?"))>=0)
 					) {
-                    DEBUG_CHECK(check1, query.value(1).toDouble());
 					ReferencesValues.GetValues().insert(query.value(0).toString(), query.value(1).toDouble());
 					if (MinUpdateDate.isNull() || query.value(2).toDateTime().date() < MinUpdateDate) 
                         MinUpdateDate = query.value(2).toDateTime().date();
@@ -380,7 +382,7 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ForwardBaseRateTable& Refer
 			while (query.next()) {
 				if (
 					!ReferencesValues.GetValues().contains(query.value(0).toString().trimmed().toUpper())
-                    && (DownloadAll || d->m_VectVal.indexOf(QRegExp(query.value(0).toString() + "(?:\\[\\S+\\])?")) >= 0)
+                    && (DownloadAll || d->m_VectVal.indexOf(QRegularExpression(query.value(0).toString() + "(?:\\[\\S+\\])?")) >= 0)
 				) {
 					QueryResults[query.value(0).toString().trimmed().toUpper()][query.value(1).toDateTime().date()] = query.value(2).toDouble();
 					if (MinUpdateDate.isNull() || query.value(3).toDateTime().date() < MinUpdateDate) MinUpdateDate = query.value(3).toDateTime().date();
@@ -411,15 +413,16 @@ BaseRateVector& BaseRateVector::operator=(const QString& a)
 }
 
 
-int BaseRateVector::replaceValue(const QString& oldVal, BaseRateVector newVal, bool replaceFloorCaps /*= true*/)
+int BaseRateVector::replaceValue(const QString& oldVal, BaseRateVector newVal, bool replaceFloorCaps)
 {
     Q_D(BaseRateVector);
     if (!BaseRateVector(oldVal).IsValid() || !newVal.IsValid() || !d->m_Vector.contains(oldVal))
         return 0;
-    QRegExp subOld(oldVal.trimmed());
+    QRegularExpression subOld(oldVal.trimmed());
     if (replaceFloorCaps){
         subOld.setPattern(oldVal.trimmed()+ R"**((?:\[(?:(?:-?\d*\.?\d+)|(?:(?:-?\d*\.?\d+)?(?:,-?\d*\.?\d+)))\])?)**");
     }
+    Q_ASSERT(subOld.isValid());
     if (d->m_AnchorDate.isNull()) 
         newVal.RemoveAnchorDate();
     else if(newVal.GetAnchorDate().isNull())
@@ -428,7 +431,7 @@ int BaseRateVector::replaceValue(const QString& oldVal, BaseRateVector newVal, b
     QString newValue;
     int countReplaced = 0;
     for (qint32 i = 0; i < d->m_VectVal.size(); ++i) {
-        if (subOld.indexIn(d->m_VectVal.at(i)) >= 0) {
+        if (subOld.match(d->m_VectVal.at(i)).hasMatch()) {
             ++countReplaced;
             if (d->m_AnchorDate.isNull()) {
                 if (replaceFloorCaps)
@@ -458,7 +461,7 @@ FloorCapVector BaseRateVector::ExtractFloorCapVector() const
     QString ResultStr = d->m_Vector;
 	for (int i = 0; i < NumElements(); i++) {
 		ResultStr.replace(
-			QRegExp(GetValue(i) + "(?:\\[(\\S+,?\\S*)\\])?")
+			QRegularExpression(GetValue(i) + "(?:\\[(\\S+,?\\S*)\\])?")
 			, "[\\1]");
 	}
 	FloorCapVector Result(ResultStr);

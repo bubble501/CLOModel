@@ -25,7 +25,7 @@ public:
 	BaseRateVector(const QString& Vec);
 	BaseRateVector(const QString& Vec,const QDate& Anchor);
 	virtual bool IsZero()const;
-	virtual QRegExpValidator* GetValidator(QObject* parent = 0) const override;
+	virtual QRegularExpressionValidator* GetValidator(QObject* parent = 0) const override;
 	int NumElements() const;
     QString GetValue(const QDate& index) const;
     QString GetValue(int index) const;

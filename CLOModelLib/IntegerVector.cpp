@@ -1,5 +1,5 @@
 #include "IntegerVector.h"
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QStringList>
 #include "CommonFunctions.h"
 #include <qmath.h>
@@ -53,15 +53,15 @@ void IntegerVector::UnpackVector() {
     if (d->m_Vector.isEmpty()) return;
 	ExtractAnchorDate();
     QString TempVec(d->m_Vector.trimmed().toUpper());
-	QStringList StringParts = TempVec.trimmed().toUpper().split(QRegExp("\\s"), QString::SkipEmptyParts);
+	QStringList StringParts = TempVec.trimmed().toUpper().split(QRegularExpression("\\s"), QString::SkipEmptyParts);
 	int StepLen;
 	QString TempStr;
 	for (int i = 1; i < StringParts.size(); i += 2) {
 		TempStr = StringParts.at(i);
-		TempStr.replace(QRegExp("\\D"), "");
+		TempStr.replace(QRegularExpression("\\D"), "");
 		StepLen = TempStr.toInt();
 		TempStr = StringParts.at(i);
-		TempStr.replace(QRegExp("\\d"), "");
+		TempStr.replace(QRegularExpression("\\d"), "");
 		if (TempStr == "S") {
 			for (int j = 0; j < StepLen; j++) {
                 d->m_VectVal.append(StringParts.at(i - 1).toInt());
@@ -80,7 +80,7 @@ void IntegerVector::UnpackVector() {
 bool IntegerVector::IsValid() const {
 	return AbstractBbgVect::IsValid("-?\\d+", true);
 }
-QRegExpValidator* IntegerVector::GetValidator(QObject* parent) const {
+QRegularExpressionValidator* IntegerVector::GetValidator(QObject* parent) const {
 	return AbstractBbgVect::GetValidator("-?\\d+", true, parent);
 }
 int IntegerVector::GetValue(const QDate& index)const {

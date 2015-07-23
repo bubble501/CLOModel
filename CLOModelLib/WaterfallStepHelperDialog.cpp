@@ -453,7 +453,7 @@ void WaterfallStepHelperDialog::SetInterestWF(const bool& val)
     if (d->m_InterestWF) FilterPattern += QString::number(WaterfallStepHelperDialogPrivate::InterestWFonly);
     else FilterPattern += QString::number(WaterfallStepHelperDialogPrivate::PrincipalWFonly);
     FilterPattern += "]$";
-    d->StepsFilter->setFilterRegExp(QRegExp(FilterPattern));
+    d->StepsFilter->setFilterRegExp(FilterPattern);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 QWidget* WaterfallStepHelperDialogPrivate::CreateJuniorFeesWidget() {

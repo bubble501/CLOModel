@@ -1,5 +1,5 @@
 #include "ExcelCommons.h"
-#include <QRegExp>
+#include <QRegularExpression>
 #include <qmath.h>
 IDispatch* ExcelCommons::pExcelDisp = NULL;
 bool ExcelCommons::xll_initialised = false;
@@ -42,10 +42,9 @@ void ExcelCommons::UninitExcelOLE(){
 QString ExcelCommons::CellOffset(const QString& StrtCell,int RowOff, int ColOff){
 	QString StartCell(StrtCell);
 	StartCell.replace("$","");
-	QRegExp PathFinder;
-	PathFinder.setPattern("^(.+)!.+$");
-	PathFinder.exactMatch(StartCell);
-	QString SheetName=PathFinder.cap(1);
+    QRegularExpression PathFinder("^(.+)!.+$");
+    const auto PathFinderMatch = PathFinder.match(StartCell);
+    QString SheetName = PathFinderMatch.hasMatch() ? PathFinderMatch.captured(1):QString();
 	SheetName.replace('\'',"");
 	//if(SheetName.at(0)!='\'') SheetName.prepend('\'');
 	//if(SheetName.at(SheetName.size()-1)!='\'') SheetName.append('\'');

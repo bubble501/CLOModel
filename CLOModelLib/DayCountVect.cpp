@@ -1,6 +1,6 @@
 #include "DayCountVect.h"
 #include "Private/DayCountVect_p.h"
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QStringList>
 #include "CommonFunctions.h"
 DEFINE_PUBLIC_COMMONS(DayCountVector)
@@ -47,15 +47,15 @@ void DayCountVector::UnpackVector() {
     if (d->m_Vector.isEmpty()) return;
 	ExtractAnchorDate();
     QString TempVec(d->m_Vector.trimmed().toUpper());
-	QStringList StringParts = TempVec.trimmed().toUpper().split(QRegExp("\\s"), QString::SkipEmptyParts);
+	QStringList StringParts = TempVec.trimmed().toUpper().split(QRegularExpression("\\s"), QString::SkipEmptyParts);
 	int StepLen;
 	QString TempStr;
 	for (int i = 1; i < StringParts.size(); i += 2) {
 		TempStr = StringParts.at(i);
-		TempStr.replace(QRegExp("\\D"), "");
+		TempStr.replace(QRegularExpression("\\D"), "");
 		StepLen = TempStr.toInt();
 		TempStr = StringParts.at(i);
-		TempStr.replace(QRegExp("\\d"), "");
+		TempStr.replace(QRegularExpression("\\d"), "");
 		for (int j = 0; j < StepLen; j++) {
             d->m_VectVal.append(static_cast<DayCountConvention>(StringParts.at(i - 1).toInt()));
 		}
@@ -85,7 +85,7 @@ bool DayCountVector::IsValid() const {
 	Result.append(')');
 	return AbstractBbgVect::IsValid(Result, false);
 }
-QRegExpValidator* DayCountVector::GetValidator(QObject* parent) const {
+QRegularExpressionValidator* DayCountVector::GetValidator(QObject* parent) const {
 	QString Result = "(";
 	qint16 i = 0;
 	while (i <= (1 << (1 + CompoundShift))) {

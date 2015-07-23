@@ -1,5 +1,5 @@
 #include "Private/InternalItems.h"
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QStringList>
 #include <QStack>
 #include <QFile>
@@ -36,27 +36,32 @@ QString InfixToPostfix(const QString& a)
     QString ops("-+/*");
     {
         //Prevent Operators at the beginning of the string
-        QRegExp CheckDoubleOperator("^[" + ops + ']', Qt::CaseInsensitive);
-        if (CheckDoubleOperator.indexIn(a) >= 0) return QString();
+        QRegularExpression CheckDoubleOperator("^[" + ops + ']', QRegularExpression::CaseInsensitiveOption);
+        if (CheckDoubleOperator.match(a).hasMatch()) 
+            return QString();
         //Prevent Unmatched parenthesis
-        if (a.count('(') != a.count(')')) return QString();
+        if (a.count('(') != a.count(')')) 
+            return QString();
         //Prevent two operators one after another
         CheckDoubleOperator.setPattern('[' + ops + "]\\s*[" + ops + ']');
-        if (CheckDoubleOperator.indexIn(a) >= 0) return QString();
+        if (CheckDoubleOperator.match(a).hasMatch())
+            return QString();
         //Prevent operator just after NOT
         CheckDoubleOperator.setPattern("![" + ops + ']');
-        if (CheckDoubleOperator.indexIn(a) >= 0) return QString();
-
+        if (CheckDoubleOperator.match(a).hasMatch()) 
+            return QString();
         ops += '!';
 
         //Prevent operators just before close of parenthesis
         CheckDoubleOperator.setPattern('[' + ops + "]\\)");
-        if (CheckDoubleOperator.indexIn(a) >= 0) return QString();
+        if (CheckDoubleOperator.match(a).hasMatch())
+            return QString();
         //Prevent Operators at the end of the string
         CheckDoubleOperator.setPattern('[' + ops + "]$");
-        if (CheckDoubleOperator.indexIn(a) >= 0) return QString();
+        if (CheckDoubleOperator.match(a).hasMatch())
+            return QString();
     }
-    QRegExp CheckValidNumber("(?:\\d+|F|T)", Qt::CaseInsensitive);
+    QRegularExpression CheckValidNumber("^(?:\\d+|F|T)$", QRegularExpression::CaseInsensitiveOption);
     QString Spaced("");
     for (auto i = a.constBegin(); i != a.constEnd(); ++i) {
         if (i->isSpace()) continue;
@@ -70,7 +75,7 @@ QString InfixToPostfix(const QString& a)
     }
     QStack<qint32> s;
     QString sb("");
-    const QStringList parts = Spaced.split(QRegExp("\\s"));
+    const QStringList parts = Spaced.split(QRegularExpression("\\s"));
     for (auto token = parts.constBegin(); token != parts.constEnd();++token)
     {
         int idx = ops.indexOf(token->at(0));
@@ -97,7 +102,7 @@ QString InfixToPostfix(const QString& a)
             s.pop();
         }
         else {
-            if (!CheckValidNumber.exactMatch(*token))
+            if (!CheckValidNumber.match(*token).hasMatch())
                 return QString();
             sb.append(*token).append(' ');
         }
@@ -116,11 +121,11 @@ QString NormaliseTriggerStructure(QString a)
     a.replace("or", "+");
     a.replace("not", "!");
     a.replace("^", "!");
-    a.replace(QRegExp("&?&"), "*");
-    a.replace(QRegExp("|?|"), "+");
+    a.replace(QRegularExpression("&?&"), "*");
+    a.replace(QRegularExpression("|?|"), "+");
     a.replace("false", "f");
     a.replace("true", "t");
-    a.replace(QRegExp("\\s"), "");
+    a.replace(QRegularExpression("\\s"), "");
     return a.toUpper();
 }
 int NumberOfSetBits(quint32 i)

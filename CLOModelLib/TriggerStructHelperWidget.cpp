@@ -58,7 +58,7 @@ TriggerStructHelperWidget::TriggerStructHelperWidget(TriggerStructHelperWidgetPr
 	QLabel* Resultlabel = new QLabel(this);
 	Resultlabel->setText(tr("Result", "Resulting trigger Structure from editor"));
     d->EncriptedTriggers = new QLineEdit(this);
-    d->EncriptedTriggers->setValidator(new QRegExpValidator(QRegExp("(?:\\*|\\+|/|-|T|F|!|\\(|\\))*"), d->EncriptedTriggers));
+    d->EncriptedTriggers->setValidator(new QRegularExpressionValidator(QRegularExpression("(?:\\*|\\+|/|-|T|F|!|\\(|\\))*"), d->EncriptedTriggers));
     connect(d->EncriptedTriggers, &QLineEdit::textChanged, this, &TriggerStructHelperWidget::DecriptTriggers);
     d->DecriptedTriggers = new QLineEdit(this);
     d->DecriptedTriggers->setReadOnly(true);
@@ -118,8 +118,7 @@ void TriggerStructHelperWidget::SetAvailableTriggers(const QHash<quint32, QShare
     d->TriggersModel->setRowCount(AvailableTriggers.count() + 2);
 	QString RegExpString = "(?:\\*|\\+|/|-|T|F";
 	int RowCount = 2;
-	QRegExp LabelRegExp("Label: .+\n");
-	LabelRegExp.setMinimal(true);
+	QRegularExpression LabelRegExp("Label: .+?\n");
 	for (auto i = AvailableTriggers.constBegin(); i != AvailableTriggers.constEnd(); ++i, ++RowCount) {
         d->TriggersModel->setData(d->TriggersModel->index(RowCount, 0), i.key());
         d->TriggersModel->setData(d->TriggersModel->index(RowCount, 1), i.value()->GetTriggerLabel());
@@ -130,7 +129,7 @@ void TriggerStructHelperWidget::SetAvailableTriggers(const QHash<quint32, QShare
 	}
     d->TriggersModel->sort(0);
 	RegExpString += "|!|\\(|\\))*";
-    d->EncriptedTriggers->setValidator(new QRegExpValidator(QRegExp(RegExpString, Qt::CaseInsensitive), d->EncriptedTriggers));
+    d->EncriptedTriggers->setValidator(new QRegularExpressionValidator(QRegularExpression(RegExpString, QRegularExpression::CaseInsensitiveOption), d->EncriptedTriggers));
 }
 
 void TriggerStructHelperWidget::InsertOperator()

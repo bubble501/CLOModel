@@ -3,6 +3,7 @@
 #include "Private/InternalItems.h"
 #include "CommonFunctions.h"
 #include <qmath.h>
+#include <QRegularExpression>
 #ifndef NO_DATABASE
 #include <QSqlDatabase>
 #include <QSqlError>
@@ -606,38 +607,43 @@ void Mortgage::SetSize(double a)
  void Mortgage::SetProperty(const QString& PropName, const QString& Value)
  {
      Q_D(Mortgage);
-	 if (PropName.isEmpty() || Value.isEmpty() || PropName.contains(QRegExp("#[<>=]#")) || Value.contains(QRegExp("#[<>=]#"))) return;
+	 if (PropName.isEmpty() || Value.isEmpty() || PropName.contains(QRegularExpression("#[<>=]#")) || Value.contains(QRegularExpression("#[<>=]#"))) return;
 	 if (HasProperty(PropName)) {
-		 QRegExp TempReg("#<#" + PropName.trimmed() + "#=#(.+)#>#", Qt::CaseInsensitive);
-		 TempReg.setMinimal(true);
+         const QRegularExpression TempReg("#<#" + PropName.trimmed() + "#=#(.+?)#>#", QRegularExpression::CaseInsensitiveOption);
+         Q_ASSERT(TempReg.isValid());
          d->m_Properties.replace(TempReg, "#<#" + PropName.trimmed() + "#=#" + Value.trimmed() + "#>#");
 	 }
 	 else {
          d->m_Properties += "#<#" + PropName.trimmed() + "#=#" + Value.trimmed() + "#>#";
-		 //LOGDEBUG("Property Set: "+m_Properties);
 	 }
  }
 
 QString Mortgage::GetProperty(const QString& PropName) const {
     Q_D(const Mortgage);
-	QRegExp TempReg("#<#" + PropName.trimmed() + "#=#(.+)#>#", Qt::CaseInsensitive);
-	TempReg.setMinimal(true);
-    if (TempReg.indexIn(d->m_Properties) != -1) {
-		return TempReg.cap(1);
+    const QRegularExpression TempReg("#<#" + PropName.trimmed() + "#=#(.+?)#>#", QRegularExpression::CaseInsensitiveOption);
+    Q_ASSERT(TempReg.isValid());
+    const auto TempRegMatch = TempReg.match(d->m_Properties);
+    if (TempRegMatch.hasMatch()) {
+        return TempRegMatch.captured(1);
 	}
 	return QString();
 }
 
 QString Mortgage::GetProperty(qint32 PropIndex, bool PropValue) const {
     Q_D(const Mortgage);
-	if (PropIndex < 0) return QString();
-	qint32 pos=0;
-	QRegExp TempReg("#<#(.+)#=#(.+)#>#", Qt::CaseInsensitive);
-	TempReg.setMinimal(true);
-	for (qint32 i = 0; i <= PropIndex; ++i) {
-        if ((pos = TempReg.indexIn(d->m_Properties, pos)) == -1) return QString();
-	}
-	return TempReg.cap(PropValue ? 2:1);
+	if (PropIndex < 0) 
+        return QString();
+    const QRegularExpression TempReg("#<#(.+)#=#(.+?)#>#", QRegularExpression::CaseInsensitiveOption);
+    Q_ASSERT(TempReg.isValid());
+    auto i = TempReg.globalMatch(d->m_Properties);
+    for (; PropIndex >0; --PropIndex) {
+        if (!i.hasNext())
+            return QString();
+        i.next();
+    }
+    if (!i.hasNext())
+        return QString();
+    return i.next().captured(PropValue ? 2 : 1);
 }
 
 QString Mortgage::GetPropertyValue(qint32 PropIndex) const
@@ -653,9 +659,9 @@ QString Mortgage::GetPropertyName(qint32 PropIndex) const
 bool Mortgage::HasProperty(const QString& PropName) const
 {
     Q_D(const Mortgage);
-	QRegExp TempReg("#<#" + PropName.trimmed() + "#=#(.+)#>#", Qt::CaseInsensitive);
-	TempReg.setMinimal(true);
-	return  TempReg.indexIn(d->m_Properties) != -1;
+    QRegularExpression TempReg("#<#" + PropName.trimmed() + "#=#.+?#>#", QRegularExpression::CaseInsensitiveOption);
+    Q_ASSERT(TempReg.isValid());
+	return  TempReg.match(d->m_Properties).hasMatch();
 }
 
 qint32 Mortgage::GetNumProperties() const {
@@ -666,8 +672,8 @@ qint32 Mortgage::GetNumProperties() const {
 void Mortgage::RemoveProperty(const QString& PropName) {
     Q_D( Mortgage);
 	if (HasProperty(PropName)) {
-		QRegExp TempReg("#<#" + PropName.trimmed() + "#=#.+#>#", Qt::CaseInsensitive);
-		TempReg.setMinimal(true);
+        QRegularExpression TempReg("#<#" + PropName.trimmed() + "#=#.+?#>#", QRegularExpression::CaseInsensitiveOption);
+        Q_ASSERT(TempReg.isValid());
 		d->m_Properties.replace(TempReg, "");
 	}
 }
@@ -675,12 +681,17 @@ void Mortgage::RemoveProperty(qint32 PropIndex) {
     Q_D(Mortgage);
 	if (PropIndex < 0) return;
 	qint32 pos = 0;
-	QRegExp TempReg("#<#(.+)#=#.+#>#", Qt::CaseInsensitive);
-	TempReg.setMinimal(true);
-	for (qint32 i = 0; i <= PropIndex; ++i) {
-		if ((pos=TempReg.indexIn(d->m_Properties, pos)) == -1) return;
-	}
-	return RemoveProperty(TempReg.cap(1));
+    const QRegularExpression TempReg("#<#(.+?)#=#.+?#>#", QRegularExpression::CaseInsensitiveOption);
+    Q_ASSERT(TempReg.isValid());
+    auto i = TempReg.globalMatch(d->m_Properties);
+    for (; PropIndex >0; --PropIndex) {
+        if (!i.hasNext())
+            return;
+        i.next();
+    }
+    if (!i.hasNext())
+        return;
+    return RemoveProperty(i.next().captured(1));
 }
 
 void Mortgage::FillDiscountOutstanding() {

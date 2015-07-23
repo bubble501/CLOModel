@@ -2,6 +2,7 @@
 #include "Private/LoanAssumption_p.h"
 #include "AbstractBbgVect.h"
 #include "Private/AbstractBbgVect_p.h"
+#include <QRegularExpression>
 DEFINE_PUBLIC_COMMONS(LoanAssumption)
 DEFINE_PUBLIC_COMMONS_COPY(LoanAssumption)
 LoanAssumptionPrivate::LoanAssumptionPrivate(LoanAssumption *q,const LoanAssumptionPrivate& other)
@@ -503,24 +504,30 @@ bool LoanAssumption::MatchPattern(const QString& Pat) const
     Q_D(const LoanAssumption);
 	if (Pat.isEmpty())return false;
 	QString Pattern("(?:");
-    if (QRegExp(d->m_ScenarioName).isValid()) Pattern += "(?:\\b" + d->m_ScenarioName + "\\b)";
-    for (auto i = d->m_Aliases.constBegin(); i != d->m_Aliases.constEnd(); ++i) {
+    if (QRegularExpression(d->m_ScenarioName).isValid())
+        Pattern += "(?:\\b" + d->m_ScenarioName + "\\b)";
+    for (auto i = d->m_Aliases.constBegin(); i != d->m_Aliases.constEnd(); ++i)
 		Pattern +="|(?:\\b" + *i + "\\b)";
-	}
 	Pattern += ')';
-	if (Pattern == "(?:)") return false;
-	QRegExp MatchFinder(Pattern, Qt::CaseInsensitive);
-	return MatchFinder.indexIn(Pat) >= 0;
+	if (Pattern == "(?:)")
+        return false;
+    QRegularExpression MatchFinder(Pattern, QRegularExpression::CaseInsensitiveOption);
+    Q_ASSERT(MatchFinder.isValid());
+	return MatchFinder.match(Pat).hasMatch();
 }
 
 
 QString LoanAssumption::GetAssumption(AssumptionType at, Seniority sn) const {
     Q_D(const LoanAssumption);
 	QString Result( d->m_Assumptions[at][sn].trimmed());
-	if (Result.isEmpty()) return Result;
-    if (d->m_LastUpdate[sn].isNull()) return Result;
-    QRegExp AnchorMatch(QString("^(?:A\\s+") + VectorAnchorDateFormat + "\\s+)");
-	if (AnchorMatch.indexIn(Result) >= 0) return Result;
+	if (Result.isEmpty()) 
+        return Result;
+    if (d->m_LastUpdate[sn].isNull()) 
+        return Result;
+    QRegularExpression AnchorMatch(QString("^(?:A\\s+") + VectorAnchorDateFormat + "\\s+)");
+    Q_ASSERT(AnchorMatch.isValid());
+	if (AnchorMatch.match(Result).hasMatch()) 
+        return Result;
     return "A " + d->m_LastUpdate[sn].toString("MM/dd/yyyy") + ' ' + Result;
 }
 
@@ -548,7 +555,7 @@ void LoanAssumption::SetAliases(const QString& val)
 void LoanAssumption::AddAlias(const QString& val) {
     Q_D(LoanAssumption);
 	if (
-		QRegExp(val).isValid()
+		QRegularExpression(val).isValid()
 		&& !d->m_Aliases.contains(val, Qt::CaseInsensitive)
         ) 
         d->m_Aliases.append(val);

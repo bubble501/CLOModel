@@ -1,6 +1,7 @@
 #include "Seniority.h"
 #include "Private/Seniority_p.h"
 #include <QStringList>
+#include <QRegularExpression>
 DEFINE_PUBLIC_COMMONS(Seniority)
 DEFINE_PUBLIC_COMMONS_COPY(Seniority)
 SeniorityPrivate::SeniorityPrivate(Seniority *q,const SeniorityPrivate& other)
@@ -70,16 +71,18 @@ bool Seniority::SetSeniorityScale(const QString& a)
     if (a.isEmpty()) return false;
     const QStringList senLvls = a.split(static_cast<char>(SeniorityPrivate::SeniorityStringSeparator),QString::SkipEmptyParts);
     const QString validNumber("0*[1-9]\\d*");
-    QRegExp singleLvlRX("^(" + validNumber + ")(?:G(" + validNumber + ")(?:R(" + validNumber + ")?)?)?$");
+    QRegularExpression singleLvlRX("^(" + validNumber + ")(?:G(" + validNumber + ")(?:R(" + validNumber + ")?)?)?$");
+    Q_ASSERT(singleLvlRX.isValid());
     for (auto i = senLvls.constBegin(); i!=senLvls.constEnd();++i){
-        if (!singleLvlRX.exactMatch(*i)) {
+        const auto singleLvlRXMatch = singleLvlRX.match(*i);
+        if (!singleLvlRXMatch.hasMatch()) {
             Clear();
             return false;
         }
         AddSeniorityLevel(
-            singleLvlRX.cap(1).toUInt()
-            , singleLvlRX.cap(2).isEmpty()  ? 1:singleLvlRX.cap(2).toUInt() 
-            , singleLvlRX.cap(3).isEmpty()  ? 1:singleLvlRX.cap(3).toUInt() 
+            singleLvlRXMatch.captured(1).toUInt()
+            , singleLvlRXMatch.captured(2).isEmpty() ? 1 : singleLvlRXMatch.captured(2).toUInt()
+            , singleLvlRXMatch.captured(3).isEmpty() ? 1 : singleLvlRXMatch.captured(3).toUInt()
             );
     }
     return true;

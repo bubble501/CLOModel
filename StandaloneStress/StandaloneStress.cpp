@@ -268,15 +268,12 @@ void StandaloneStress::PasteClipboard(){
 	const QMimeData *mimeData = QApplication::clipboard()->mimeData();
 	if (mimeData->hasHtml()) {
 		QString Test=mimeData->html();
-		QRegExp TableCell("<td.*>(.+)</td>");
-		TableCell.setMinimal(true);
-		int CurrIndex=-1;
+		const QRegularExpression TableCell("<td.*>(.+?)</td>");
+        Q_ASSERT(TableCell.isValid());
 		QStringList SingleValues;
-        for (;;) {
-			CurrIndex=TableCell.indexIn(Test,CurrIndex+1);
-			if(CurrIndex<0) break;
-			SingleValues.append(TableCell.capturedTexts().last());
-		}
+        for (auto i = TableCell.globalMatch(Test); i.hasNext();){
+            SingleValues.append(i.next().captured(1));
+        }
 		if(SingleValues.size()>=1){
 			VariablesList[j]->setRowCount(SingleValues.size());
 			for(int i=0;i<SingleValues.size();i++){

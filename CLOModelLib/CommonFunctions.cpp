@@ -1,6 +1,6 @@
 #include "CommonFunctions.h"
 #include <QDate>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QStringList>
 #include <QList>
 #include <qmath.h>

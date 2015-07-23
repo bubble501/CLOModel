@@ -2,7 +2,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include "BloombergVector.h"
-#include <QRegExpValidator>
+#include <QRegularExpressionValidator>
 #include <QGridLayout>
 #include <QStringList>
 #include <QComboBox>

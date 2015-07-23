@@ -19,7 +19,7 @@ protected:
 	virtual bool IsValid() const override;
 	virtual void RepackVector();
 public:
-	virtual QRegExpValidator* GetValidator(QObject* parent = 0) const override;
+	virtual QRegularExpressionValidator* GetValidator(QObject* parent = 0) const override;
 	QString BloombergSafeVector(QDate CurrentDate=QDate::currentDate()) const;
 	using AbstractBbgVect::IsEmpty;
 	virtual bool IsEmpty(double Lbound, double Ubound = std::numeric_limits<double>::max())const;

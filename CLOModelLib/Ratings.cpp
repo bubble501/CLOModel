@@ -85,10 +85,20 @@ bool Ratings::setRating(const QString& val, RatingAgency ag)
     if (ag == RatingAgency::CountAgencies)
         return false;
     const auto & agencySyntax = RatingsPrivate::m_ratingSyntax[static_cast<qint8>(ag)];
+    QRegularExpression syntaxCheck;
+    syntaxCheck.setPatternOptions(QRegularExpression::CaseInsensitiveOption | QRegularExpression::DontCaptureOption);
     for (int i = static_cast<qint16>(RatingValue::AAA); i <= static_cast<qint16>(RatingValue::D); ++i){
-        if (val.indexOf(QRegularExpression("(?:^|[^ABC])" + agencySyntax[i] + "(?:$|[^ABC])", QRegularExpression::CaseInsensitiveOption)) >= 0) {
-            setRating(static_cast<RatingValue>(i), ag);
-            break;
+        if (!agencySyntax[i].isEmpty()) {
+            syntaxCheck.setPattern(
+                "(^|[^" + QRegularExpression::escape(RatingsPrivate::m_reservedChars[static_cast<qint8>(ag)]) + "])" 
+                + QRegularExpression::escape(agencySyntax[i])
+                + "($|[^" + QRegularExpression::escape(RatingsPrivate::m_reservedChars[static_cast<qint8>(ag)]) + "])"
+                );
+            Q_ASSERT(syntaxCheck.isValid());
+            if (syntaxCheck.match(val).hasMatch()){
+                    setRating(static_cast<RatingValue>(i), ag);
+                    break;
+            }
         }
         if (i == static_cast<qint16>(RatingValue::D)) {
             setRating(RatingValue::NR, ag, Stable);
@@ -358,6 +368,7 @@ void Ratings::reset()
 
 const QString RatingsPrivate::m_ratingFields[static_cast<qint8>(Ratings::RatingAgency::CountAgencies)] = { "RTG_SP", "RTG_MOODY", "RTG_FITCH", "RTG_DBRS" };
 const QString RatingsPrivate::m_AgencyName[static_cast<qint8>(Ratings::RatingAgency::CountAgencies)] = { "S&P", "Moody's", "Fitch", "DBRS" };
+const QString RatingsPrivate::m_reservedChars[static_cast<qint8>(Ratings::RatingAgency::CountAgencies)] = { "ABC+-", "ABCa+-", "ABC+-", "ABCHL" };
 const QString RatingsPrivate::m_ratingSyntax[static_cast<qint8>(Ratings::RatingAgency::CountAgencies)][static_cast<qint16>(Ratings::RatingValue::D) + 1] = {
     { //S&P
         "NR",
@@ -380,12 +391,12 @@ const QString RatingsPrivate::m_ratingSyntax[static_cast<qint8>(Ratings::RatingA
         "CCC+",
         "CCC",
         "CCC-",
+        "", // Does not exist
         "CC",
-        "CC",
-        "CC",
-        "C",
-        "C",
-        "C",
+        "", // Does not exist
+        "", // Does not exist
+        "C", 
+        "", // Does not exist
         "D"
     }, 
     { // Moody's
@@ -409,12 +420,12 @@ const QString RatingsPrivate::m_ratingSyntax[static_cast<qint8>(Ratings::RatingA
         "Caa1",
         "Caa2",
         "Caa3",
+        "", // Does not exist
         "Ca",
-        "Ca",
-        "Ca",
+        "", // Does not exist
+        "", // Does not exist
         "C",
-        "C",
-        "C",
+        "", // Does not exist
         "D"
     }, 
     { // Fitch

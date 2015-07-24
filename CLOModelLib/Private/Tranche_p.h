@@ -3,6 +3,7 @@
 #include "IntegerVector.h"
 #include "BaseRateTable.h"
 #include "Private/BackwardCompatibilityInterface_p.h"
+#include "Ratings.h"
 class TranchePrivate : public BackwardInterfacePrivate
 {
     DECLARE_PRIVATE_COMMONS(Tranche)
@@ -27,6 +28,7 @@ public:
     double OriginalAmt;
     double OutstandingAmt;
     double Price;
+    Ratings m_rating;
     mutable ConstantBaseRateTable m_CnstRateCache;
     mutable ForwardBaseRateTable m_FrwRateCache;
     mutable QHash<qint32, BloombergVector*> ReferenceRateValue;

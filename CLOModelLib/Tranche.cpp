@@ -37,6 +37,7 @@ TranchePrivate::TranchePrivate(Tranche *q,const TranchePrivate& other)
     , SettlementDate(other.SettlementDate)
     , ISINcode(other.ISINcode)
     , m_UseForwardCurve(other.m_UseForwardCurve)
+    , m_rating(other.m_rating)
 {
     for (QHash<qint32, BloombergVector*>::const_iterator i = other.Coupon.constBegin(); i != other.Coupon.constEnd(); ++i)
         Coupon.insert(i.key(), new BloombergVector(*(i.value())));
@@ -91,6 +92,7 @@ Tranche& Tranche::operator=(const Tranche& other){
     d->ISINcode = other.d_func()->ISINcode;
     d->m_LoadProtocolVersion = other.d_func()->m_LoadProtocolVersion;
     d->m_UseForwardCurve = other.d_func()->m_UseForwardCurve;
+    d->m_rating = other.d_func()->m_rating;
     ClearInterest();
     for (auto i = other.d_func()->Coupon.constBegin(); i != other.d_func()->Coupon.constEnd(); ++i)
         d->Coupon.insert(i.key(), new BloombergVector(*(i.value())));
@@ -477,7 +479,30 @@ double Tranche::GetBondFactor() const
     Q_D(const Tranche);
     return  d->OutstandingAmt / d->OriginalAmt;
 }
-
+void Tranche::getRatingsBloomberg()
+{
+#ifndef NO_BLOOMBERG
+    Q_D(Tranche);
+    d->m_rating.reset();
+    QBbgLib::QBbgManager Bee;
+    QBbgLib::QBbgRequestGroup ReqGr;
+    QBbgLib::QBbgReferenceDataRequest TempReq;
+    const QString IdentityCode = (d->ISINcode.isEmpty() ? d->TrancheName : d->ISINcode);
+    if (IdentityCode.isEmpty())
+        return;
+    const auto BdpExt = QBbgLib::QBbgSecurity::stringToYellowKey(d->BloombergExtension);
+    if (BdpExt == QBbgLib::QBbgSecurity::Invalid)
+        return;
+    TempReq.setSecurity(QBbgLib::QBbgSecurity(IdentityCode, BdpExt));
+    TempReq.setField("RTG_SP"); ReqGr.addRequest(TempReq);
+    TempReq.setField("RTG_MOODY"); ReqGr.addRequest(TempReq);
+    TempReq.setField("RTG_FITCH"); ReqGr.addRequest(TempReq);
+    TempReq.setField("RTG_DBRS"); ReqGr.addRequest(TempReq);
+    const auto& TmpResponse = Bee.processRequest(ReqGr);
+    for (auto i = TmpResponse.constBegin(); i != TmpResponse.constEnd(); ++i)
+        d->m_rating.downloadRatings(i.value());
+#endif
+}
 void Tranche::GetDataFromBloomberg()
 {
 #ifndef NO_BLOOMBERG
@@ -487,10 +512,12 @@ void Tranche::GetDataFromBloomberg()
 		QBbgLib::QBbgManager Bee;
         QBbgLib::QBbgRequestGroup ReqGr;
 		QBbgLib::QBbgReferenceDataRequest TempReq;
-        QString IdentityCode = (d->ISINcode.isEmpty() ? d->TrancheName : d->ISINcode);
-		if (IdentityCode.isEmpty()) return;
-        auto BdpExt = QBbgLib::QBbgSecurity::stringToYellowKey(d->BloombergExtension);
-        if (BdpExt == QBbgLib::QBbgSecurity::Invalid) return;
+        const QString IdentityCode = (d->ISINcode.isEmpty() ? d->TrancheName : d->ISINcode);
+		if (IdentityCode.isEmpty()) 
+            return;
+        const auto BdpExt = QBbgLib::QBbgSecurity::stringToYellowKey(d->BloombergExtension);
+        if (BdpExt == QBbgLib::QBbgSecurity::Invalid)
+            return;
         TempReq.setSecurity(QBbgLib::QBbgSecurity(IdentityCode, BdpExt));
         TempReq.setField("MTG_ORIG_AMT"); TempReq.setID(1); ReqGr.addRequest(TempReq);
         TempReq.setField("AMT_OUTSTANDING"); TempReq.setID(2); ReqGr.addRequest(TempReq);
@@ -506,6 +533,10 @@ void Tranche::GetDataFromBloomberg()
         TempReq.setField("ID_ISIN"); TempReq.setID(13); ReqGr.addRequest(TempReq);
         TempReq.setField("DAY_CNT"); TempReq.setID(14); ReqGr.addRequest(TempReq);
         TempReq.setField("MTG_INT_DEFERRED"); TempReq.setID(15); ReqGr.addRequest(TempReq);
+        TempReq.setField("RTG_SP"); TempReq.setID(16); ReqGr.addRequest(TempReq);
+        TempReq.setField("RTG_MOODY"); TempReq.setID(17); ReqGr.addRequest(TempReq);
+        TempReq.setField("RTG_FITCH"); TempReq.setID(18); ReqGr.addRequest(TempReq);
+        TempReq.setField("RTG_DBRS"); TempReq.setID(19); ReqGr.addRequest(TempReq);
         const auto& TmpResponse=Bee.processRequest(ReqGr);
 
         if (TmpResponse.value(1)->hasErrors())
@@ -631,6 +662,8 @@ void Tranche::GetDataFromBloomberg()
         if (!TmpResponse.value(15)->hasErrors()) {
             currentDefer = dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(15))->value().toDouble();
         }
+        for (int i = 16; i <= 19; ++i)
+            d->m_rating.downloadRatings(TmpResponse.value(i));
 	}
 	DownloadBaseRates();
 	GetCashFlowsFromBloomberg();
@@ -996,6 +1029,20 @@ void Tranche::getCashflowsDatabase()
 #endif
 }
 
+const Ratings& Tranche::getRating() const
+{
+    Q_D(const Tranche);
+    return d->m_rating;
+}
+
+void Tranche::setRating(const Ratings& val)
+{
+    Q_D(Tranche);
+    d->m_rating=val;
+}
+
+
+
 double Tranche::getTotalActualCoupon(const QDate& index) const
 {
     Q_D(const Tranche);
@@ -1032,6 +1079,7 @@ QDataStream& operator<<(QDataStream & stream, const Tranche& flows){
         << flows.d_func()->PaymentFrequency
         << flows.d_func()->SettlementDate
         << flows.d_func()->m_UseForwardCurve
+        << flows.d_func()->m_rating
 	;
     stream << static_cast<qint32>(flows.d_func()->Coupon.size());
     for (auto i = flows.d_func()->Coupon.constBegin(); i != flows.d_func()->Coupon.constEnd(); ++i)
@@ -1072,6 +1120,8 @@ QDataStream& Tranche::LoadOldVersion(QDataStream& stream){
     d->PaymentFrequency.SetLoadProtocolVersion(loadProtocolVersion()); stream >> d->PaymentFrequency;
     stream >> d->SettlementDate;
     stream >> d->m_UseForwardCurve;
+    if (loadProtocolVersion() > 188)
+        stream >> d->m_rating;
 
 	ClearInterest();
 	stream >> TempSize;

@@ -216,6 +216,85 @@ void RatingsTest::rankedAgency()
     QCOMPARE(testRating.agencyAtRank(3), rankRating3);
 }
 
+void RatingsTest::ratingFromString()
+{
+    QFETCH(QString, testRating);
+    QFETCH(Ratings::RatingAgency, rtgSyntax);
+    Ratings tmp;
+    tmp.setRating(testRating, rtgSyntax);
+    QTEST(tmp.getRating(rtgSyntax), "resultRating");
+    QTEST(tmp.getWatch(rtgSyntax), "resultWatch");
+}
+
+void RatingsTest::ratingFromString_data()
+{
+    QTest::addColumn<QString>("testRating");
+    QTest::addColumn<Ratings::RatingAgency>("rtgSyntax");
+    QTest::addColumn<Ratings::RatingValue>("resultRating");
+    QTest::addColumn<Ratings::CreditWatch>("resultWatch");
+
+    for (qint8 j = 0; j < static_cast<qint8>(Ratings::RatingAgency::CountAgencies); ++j) {
+        for (qint16 i = static_cast<qint16>(Ratings::RatingValue::NR); i <= static_cast<qint16>(Ratings::RatingValue::D); ++i) {
+            if (!Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i), static_cast<Ratings::RatingAgency>(j)).isEmpty())
+                QTest::newRow(QString("%1 No Watch %2").arg(Ratings::agencyName(static_cast<Ratings::RatingAgency>(j))).arg(Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i))).toLatin1().data())
+                << Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i), static_cast<Ratings::RatingAgency>(j))
+                << static_cast<Ratings::RatingAgency>(j) //rtgSyntax
+                << static_cast<Ratings::RatingValue>(i) //resultRating
+                << Ratings::CreditWatch::Stable //resultWatch
+                ;
+        }
+    }
+    for (qint8 j = 0; j < static_cast<qint8>(Ratings::RatingAgency::CountAgencies); ++j) {
+        for (qint16 i = static_cast<qint16>(Ratings::RatingValue::AAA); i <= static_cast<qint16>(Ratings::RatingValue::D); ++i) {
+            if (!Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i), static_cast<Ratings::RatingAgency>(j)).isEmpty())
+                QTest::newRow(QString("%1 Positive Watch %2").arg(Ratings::agencyName(static_cast<Ratings::RatingAgency>(j))).arg(Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i))).toLatin1().data())
+                << Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i), static_cast<Ratings::RatingAgency>(j)) + " *+"
+                << static_cast<Ratings::RatingAgency>(j) //rtgSyntax
+                << static_cast<Ratings::RatingValue>(i) //resultRating
+                << Ratings::CreditWatch::Positive //resultWatch
+                ;
+        }
+    }
+    for (qint8 j = 0; j < static_cast<qint8>(Ratings::RatingAgency::CountAgencies); ++j) {
+        for (qint16 i = static_cast<qint16>(Ratings::RatingValue::AAA); i <= static_cast<qint16>(Ratings::RatingValue::D); ++i) {
+            if (!Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i), static_cast<Ratings::RatingAgency>(j)).isEmpty())
+                QTest::newRow(QString("%1 Negative Watch %2").arg(Ratings::agencyName(static_cast<Ratings::RatingAgency>(j))).arg(Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i))).toLatin1().data())
+                    << Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i), static_cast<Ratings::RatingAgency>(j)) + " *-"
+                    << static_cast<Ratings::RatingAgency>(j) //rtgSyntax
+                    << static_cast<Ratings::RatingValue>(i) //resultRating
+                    << Ratings::CreditWatch::Negative //resultWatch
+                ;
+        }
+    }
+    for (qint16 i = static_cast<qint16>(Ratings::RatingValue::NR); i <= static_cast<qint16>(Ratings::RatingValue::D); ++i) {
+        if (!Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i), Ratings::RatingAgency::SP).isEmpty())
+        QTest::newRow("S&P Expected No Watch")
+            << "(P)" + Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i), Ratings::RatingAgency::SP)
+            << Ratings::RatingAgency::SP //rtgSyntax
+            << static_cast<Ratings::RatingValue>(i) //resultRating
+            << Ratings::CreditWatch::Stable //resultWatch
+            ;
+    }
+    for (qint16 i = static_cast<qint16>(Ratings::RatingValue::NR); i <= static_cast<qint16>(Ratings::RatingValue::D); ++i) {
+        if (!Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i), Ratings::RatingAgency::Moody).isEmpty())
+        QTest::newRow("Moody's Expected No Watch")
+            << "(P)" + Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i), Ratings::RatingAgency::Moody)
+            << Ratings::RatingAgency::Moody //rtgSyntax
+            << static_cast<Ratings::RatingValue>(i) //resultRating
+            << Ratings::CreditWatch::Stable //resultWatch
+            ;
+    }
+    for (qint16 i = static_cast<qint16>(Ratings::RatingValue::NR); i <= static_cast<qint16>(Ratings::RatingValue::D); ++i) {
+        if (!Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i), Ratings::RatingAgency::Fitch).isEmpty())
+        QTest::newRow("Fitch Expected No Watch")
+            << Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i), Ratings::RatingAgency::Fitch) + 'e'
+            << Ratings::RatingAgency::Fitch //rtgSyntax
+            << static_cast<Ratings::RatingValue>(i) //resultRating
+            << Ratings::CreditWatch::Stable //resultWatch
+            ;
+    }
+}
+
 void RatingsTest::rankedRatings()
 {
     QFETCH(Ratings, testRating);
@@ -397,4 +476,12 @@ void RatingsTest::rankedRatings_data()
         << Ratings::RatingValue::NR //rankRatingUnique3
         << Ratings::RatingValue::NR //rankRatingUnique4
         ;
+}
+namespace QTest {
+    template<>
+    char *toString(const Ratings::RatingValue &val)
+    {
+        QString ba = "RatingValue: " + QString::number(static_cast<qint16>(val)) + " - " + Ratings::RatingValueString(val);
+        return qstrdup(ba.toLatin1().data());
+    }
 }

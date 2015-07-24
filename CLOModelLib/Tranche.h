@@ -8,6 +8,7 @@
 class IntegerVector;
 class Seniority;
 class TranchePrivate;
+class Ratings;
 class CLOMODELLIB_EXPORT  Tranche : public BackwardInterface
 {
     DECLARE_PUBLIC_COMMONS(Tranche)
@@ -27,10 +28,11 @@ protected:
         return T();
     }
     template<typename T>
-    void SetCouponPart(const QString& val, qint32 CoupIndex, QHash<qint32, T*>& vec)
+    void SetCouponPart(const QString& val, qint32 CoupIndex, QHash<qint32, T*>& vec) const
     {
         static_assert(std::is_base_of<AbstractBbgVect, T>::value, "SetCouponPart requires a hash of vectors");
-        if(CoupIndex < 0 || CoupIndex >= (1 << MaximumInterestsTypes)) return;
+        if(CoupIndex < 0 || CoupIndex >= (1 << MaximumInterestsTypes)) 
+            return;
         auto iter = vec.find(CoupIndex);
         if (T(val).IsEmpty()) {
             //return; // #TODO check this
@@ -132,6 +134,9 @@ public:
     double getActualCoupon(int index, qint32 CouponIdx) const;
     bool saveCashflowsDatabase() const;
     void getCashflowsDatabase();
+    const Ratings& getRating() const;
+    void setRating(const Ratings& val);
+    void getRatingsBloomberg();
 	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const Tranche& flows);
 	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, Tranche& flows);
 };

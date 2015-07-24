@@ -55,7 +55,7 @@ public:
         C,
         Cm,
         D,
-        NR = -1
+        NR = 0
     };
     enum class RatingBucket : qint16
     {
@@ -69,7 +69,7 @@ public:
         CC = static_cast<qint16>(RatingValue::CC),
         C = static_cast<qint16>(RatingValue::C),
         D = static_cast<qint16>(RatingValue::D),
-        NR = -1
+        NR = static_cast<qint16>(RatingValue::NR)
     };
 protected:
     virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
@@ -108,6 +108,7 @@ public:
 Q_DECLARE_METATYPE(Ratings)
 Q_DECLARE_METATYPE(Ratings::RatingValue)
 Q_DECLARE_METATYPE(Ratings::RatingAgency)
+Q_DECLARE_METATYPE(Ratings::CreditWatch)
 CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const Ratings& flows);
 CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, Ratings& flows);
 #endif // Ratings_h__

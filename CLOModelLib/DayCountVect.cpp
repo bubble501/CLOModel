@@ -64,23 +64,56 @@ void DayCountVector::UnpackVector() {
 }
 bool DayCountVector::IsValid() const {
 	QString Result = "(";
-	qint16 i = 0;
-	while (i <= (1 << (1 + CompoundShift))) {
+    for (qint16 i = 0; i <= (1 << (1 + CompoundShift));) {
 		if (i>0) Result.append('|');
-		Result.append('|' + QString::number(i + static_cast<qint16>(DayCountConvention::ACTACT)));
-		Result.append('|' + QString::number(i + static_cast<qint16>(DayCountConvention::ACT360)));
-		Result.append('|' + QString::number(i + static_cast<qint16>(DayCountConvention::ACT365)));
-		Result.append('|' + QString::number(i + static_cast<qint16>(DayCountConvention::N30360)));
-		Result.append('|' + QString::number(i + static_cast<qint16>(DayCountConvention::NACTACT)));
-		Result.append('|' + QString::number(i + static_cast<qint16>(DayCountConvention::NACT360)));
-		Result.append('|' + QString::number(i + static_cast<qint16>(DayCountConvention::NACT365)));
-		Result.append('|' + QString::number(i + static_cast<qint16>(DayCountConvention::ISMA30360)));
-		Result.append('|' + QString::number(i + static_cast<qint16>(DayCountConvention::ISDAACTACT)));
-		Result.append('|' + QString::number(i + static_cast<qint16>(DayCountConvention::AFBACTACT)));
-		Result.append('|' + QString::number(i + static_cast<qint16>(DayCountConvention::NISDAACTACT)));
-		Result.append('|' + QString::number(i + static_cast<qint16>(DayCountConvention::NAFBACTACT)));
-		if (i == 0) i = (1 << CompoundShift);
-		else i <<= 1;
+        Result.append('|' + QString::number(i + DayCountConvention::FiACTACT));
+        Result.append('|' + QString::number(i + DayCountConvention::FiACT360));
+        Result.append('|' + QString::number(i + DayCountConvention::FiACT365));
+        Result.append('|' + QString::number(i + DayCountConvention::Fi30ACT));
+        Result.append('|' + QString::number(i + DayCountConvention::FiSIA30360));
+        Result.append('|' + QString::number(i + DayCountConvention::Fi30365));
+        Result.append('|' + QString::number(i + DayCountConvention::FiNLACT));
+        Result.append('|' + QString::number(i + DayCountConvention::FiNL360));
+        Result.append('|' + QString::number(i + DayCountConvention::FiNL365));
+        Result.append('|' + QString::number(i + DayCountConvention::FiACTACTneom));
+        Result.append('|' + QString::number(i + DayCountConvention::FiACT360neom));
+        Result.append('|' + QString::number(i + DayCountConvention::FiACT365neom));
+        Result.append('|' + QString::number(i + DayCountConvention::Fi30ACTneom));
+        Result.append('|' + QString::number(i + DayCountConvention::FiSIA30360neom));
+        Result.append('|' + QString::number(i + DayCountConvention::Fi30365neom));
+        Result.append('|' + QString::number(i + DayCountConvention::FiNLACTneom));
+        Result.append('|' + QString::number(i + DayCountConvention::FiNL360neom));
+        Result.append('|' + QString::number(i + DayCountConvention::FiNL365neom));
+        Result.append('|' + QString::number(i + DayCountConvention::FiISMA30ACT));
+        Result.append('|' + QString::number(i + DayCountConvention::FiISMA30360));
+        Result.append('|' + QString::number(i + DayCountConvention::FiISMA30365));
+        Result.append('|' + QString::number(i + DayCountConvention::FiISMA30ACTneom));
+        Result.append('|' + QString::number(i + DayCountConvention::FiISMA30360neom));
+        Result.append('|' + QString::number(i + DayCountConvention::FiISMA30365neom));
+        Result.append('|' + QString::number(i + DayCountConvention::FiACT364));
+        //Result.append('|' + QString::number(i +  DayCountConvention::FiUSMUNI30360));
+        //Result.append('|' + QString::number(i +  DayCountConvention::FiBusiness252));
+        Result.append('|' + QString::number(i + DayCountConvention::FiGerman30360));
+        //Result.append('|' + QString::number(i +  DayCountConvention::FiBusiness252neom));
+        Result.append('|' + QString::number(i + DayCountConvention::FiGerman30360neom));
+        //Result.append('|' + QString::number(i +  DayCountConvention::FiUSWITACTACTneom));
+        //Result.append('|' + QString::number(i +  DayCountConvention::FiUSIWIBACT360neom));
+		Result.append('|' + QString::number(i + DayCountConvention::ACTACT));
+		Result.append('|' + QString::number(i + DayCountConvention::ACT360));
+		Result.append('|' + QString::number(i + DayCountConvention::ACT365));
+		Result.append('|' + QString::number(i + DayCountConvention::N30360));
+		Result.append('|' + QString::number(i + DayCountConvention::NACTACT));
+		Result.append('|' + QString::number(i + DayCountConvention::NACT360));
+		Result.append('|' + QString::number(i + DayCountConvention::NACT365));
+		Result.append('|' + QString::number(i + DayCountConvention::ISMA30360));
+		Result.append('|' + QString::number(i + DayCountConvention::ISDAACTACT));
+		Result.append('|' + QString::number(i + DayCountConvention::AFBACTACT));
+		Result.append('|' + QString::number(i + DayCountConvention::NISDAACTACT));
+		Result.append('|' + QString::number(i + DayCountConvention::NAFBACTACT));
+		if (i == 0) 
+            i = (1 << CompoundShift);
+		else 
+            i <<= 1;
 	}
 	Result.append(')');
 	return AbstractBbgVect::IsValid(Result, false);

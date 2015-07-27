@@ -62,10 +62,11 @@ void DayCountVector::UnpackVector() {
 	}
     d->m_VectVal.append(static_cast<DayCountConvention>(StringParts.last().toInt()));
 }
-bool DayCountVector::IsValid() const {
-	QString Result = "(";
+QString DayCountVectorPrivate::getValidString() const
+{
+    QString Result = "(";
     for (qint16 i = 0; i <= (1 << (1 + CompoundShift));) {
-		if (i>0) Result.append('|');
+        if (i > 0) Result.append('|');
         Result.append('|' + QString::number(i + DayCountConvention::FiACTACT));
         Result.append('|' + QString::number(i + DayCountConvention::FiACT360));
         Result.append('|' + QString::number(i + DayCountConvention::FiACT365));
@@ -98,48 +99,33 @@ bool DayCountVector::IsValid() const {
         Result.append('|' + QString::number(i + DayCountConvention::FiGerman30360neom));
         //Result.append('|' + QString::number(i +  DayCountConvention::FiUSWITACTACTneom));
         //Result.append('|' + QString::number(i +  DayCountConvention::FiUSIWIBACT360neom));
-		Result.append('|' + QString::number(i + DayCountConvention::ACTACT));
-		Result.append('|' + QString::number(i + DayCountConvention::ACT360));
-		Result.append('|' + QString::number(i + DayCountConvention::ACT365));
-		Result.append('|' + QString::number(i + DayCountConvention::N30360));
-		Result.append('|' + QString::number(i + DayCountConvention::NACTACT));
-		Result.append('|' + QString::number(i + DayCountConvention::NACT360));
-		Result.append('|' + QString::number(i + DayCountConvention::NACT365));
-		Result.append('|' + QString::number(i + DayCountConvention::ISMA30360));
-		Result.append('|' + QString::number(i + DayCountConvention::ISDAACTACT));
-		Result.append('|' + QString::number(i + DayCountConvention::AFBACTACT));
-		Result.append('|' + QString::number(i + DayCountConvention::NISDAACTACT));
-		Result.append('|' + QString::number(i + DayCountConvention::NAFBACTACT));
-		if (i == 0) 
+        Result.append('|' + QString::number(i + DayCountConvention::ACTACT));
+        Result.append('|' + QString::number(i + DayCountConvention::ACT360));
+        Result.append('|' + QString::number(i + DayCountConvention::ACT365));
+        Result.append('|' + QString::number(i + DayCountConvention::N30360));
+        Result.append('|' + QString::number(i + DayCountConvention::NACTACT));
+        Result.append('|' + QString::number(i + DayCountConvention::NACT360));
+        Result.append('|' + QString::number(i + DayCountConvention::NACT365));
+        Result.append('|' + QString::number(i + DayCountConvention::ISMA30360));
+        Result.append('|' + QString::number(i + DayCountConvention::ISDAACTACT));
+        Result.append('|' + QString::number(i + DayCountConvention::AFBACTACT));
+        Result.append('|' + QString::number(i + DayCountConvention::NISDAACTACT));
+        Result.append('|' + QString::number(i + DayCountConvention::NAFBACTACT));
+        if (i == 0)
             i = (1 << CompoundShift);
-		else 
+        else
             i <<= 1;
-	}
-	Result.append(')');
-	return AbstractBbgVect::IsValid(Result, false);
+    }
+    Result.append(')');
+    return Result;
+}
+bool DayCountVector::IsValid() const {
+    Q_D(const DayCountVector);
+    return AbstractBbgVect::IsValid(d->getValidString(), false);
 }
 QRegularExpressionValidator* DayCountVector::GetValidator(QObject* parent) const {
-	QString Result = "(";
-	qint16 i = 0;
-	while (i <= (1 << (1 + CompoundShift))) {
-		if (i > 0) Result.append('|');
-		Result.append('|' + QString::number(i + static_cast<qint16>(DayCountConvention::ACTACT)));
-		Result.append('|' + QString::number(i + static_cast<qint16>(DayCountConvention::ACT360)));
-		Result.append('|' + QString::number(i + static_cast<qint16>(DayCountConvention::ACT365)));
-		Result.append('|' + QString::number(i + static_cast<qint16>(DayCountConvention::N30360)));
-		Result.append('|' + QString::number(i + static_cast<qint16>(DayCountConvention::NACTACT)));
-		Result.append('|' + QString::number(i + static_cast<qint16>(DayCountConvention::NACT360)));
-		Result.append('|' + QString::number(i + static_cast<qint16>(DayCountConvention::NACT365)));
-		Result.append('|' + QString::number(i + static_cast<qint16>(DayCountConvention::ISMA30360)));
-		Result.append('|' + QString::number(i + static_cast<qint16>(DayCountConvention::ISDAACTACT)));
-		Result.append('|' + QString::number(i + static_cast<qint16>(DayCountConvention::AFBACTACT)));
-		Result.append('|' + QString::number(i + static_cast<qint16>(DayCountConvention::NISDAACTACT)));
-		Result.append('|' + QString::number(i + static_cast<qint16>(DayCountConvention::NAFBACTACT)));
-		if (i == 0) i = (1 << CompoundShift);
-		else i <<= 1;
-	}
-	Result.append(')');
-	return AbstractBbgVect::GetValidator(Result, false, parent);
+    Q_D(const DayCountVector);
+    return AbstractBbgVect::GetValidator(d->getValidString(), false, parent);
 }
 DayCountConvention DayCountVector::GetValue(const QDate& index)const {
     Q_D(const DayCountVector);

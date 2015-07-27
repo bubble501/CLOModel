@@ -880,7 +880,7 @@ QString TranchePrivate::downloadISIN() const
         applicableIsin = isinRes->value().toString();
     }
 #endif // !NO_BLOOMBERG
-    return applicableIsin;
+    return applicableIsin.trimmed();
 }
 
 bool Tranche::saveCashflowsDatabase() const
@@ -1003,17 +1003,17 @@ void Tranche::getCashflowsDatabase()
     bool DbOpen = db.isOpen();
     if (!DbOpen) DbOpen = db.open();
     if (DbOpen) {
-        QSqlQuery CheckBondExistQuery(db);
-        CheckBondExistQuery.setForwardOnly(true);
-        CheckBondExistQuery.prepare("{CALL " + GetFromConfig("Database", "GetCashFlowsProc") + "}");
-        CheckBondExistQuery.bindValue(":isin", applicableIsin);
-        if (!CheckBondExistQuery.exec()) {
+        QSqlQuery CashFlowsQuery(db);
+        CashFlowsQuery.setForwardOnly(true);
+        CashFlowsQuery.prepare("{CALL " + GetFromConfig("Database", "GetCashFlowsProc") + "}");
+        CashFlowsQuery.bindValue(":isin", applicableIsin);
+        if (!CashFlowsQuery.exec()) {
             DEBG_LOG("getCashflowsDatabase() Failed to run GetCashFlowsProc");
                 return;
         }
         bool firstFlow = true;
-        while (CheckBondExistQuery.next()) {
-            const QSqlRecord currRec = CheckBondExistQuery.record();
+        while (CashFlowsQuery.next()) {
+            const QSqlRecord currRec = CashFlowsQuery.record();
             const QDate flowDate = currRec.value("Date").toDate();
             if (firstFlow) {
                 d->CashFlow.SetInitialOutstanding(currRec.value("Balance").toDouble() + currRec.value("Deferred").toDouble());
@@ -1024,7 +1024,7 @@ void Tranche::getCashflowsDatabase()
             d->CashFlow.SetFlow(flowDate, currRec.value("Balance").toDouble(), TrancheCashFlow::AmountOutstandingFlow);
             d->CashFlow.SetFlow(flowDate, currRec.value("Deferred").toDouble(), TrancheCashFlow::DeferredFlow);
         }
-        DEBG_LOG_CONDITION("getCashflowsDatabase() No cashflows in DB", d->CashFlow.Count() == 0);
+        DEBG_LOG_CONDITION("getCashflowsDatabase() No cashflows in DB. ISIN: " + applicableIsin  , d->CashFlow.Count() == 0);
     }
 #endif
 }

@@ -137,18 +137,50 @@ bool IsHoliday(const QDate& a/*, const QString& CountryCode*/) {
 }
 bool ValidDayCount(qint16 a) {
 	switch (a & (((1 << CompoundShift) - 1))) {
-	case static_cast<qint16>(DayCountConvention::ACTACT) :
-	case static_cast<qint16>(DayCountConvention::ACT360) :
-	case static_cast<qint16>(DayCountConvention::ACT365) :
-	case static_cast<qint16>(DayCountConvention::N30360) :
-	case static_cast<qint16>(DayCountConvention::NACTACT) :
-	case static_cast<qint16>(DayCountConvention::NACT360) :
-	case static_cast<qint16>(DayCountConvention::NACT365) :
-	case static_cast<qint16>(DayCountConvention::ISMA30360) :
-	case static_cast<qint16>(DayCountConvention::ISDAACTACT) :
-	case static_cast<qint16>(DayCountConvention::AFBACTACT) :
-	case static_cast<qint16>(DayCountConvention::NISDAACTACT) :
-	case static_cast<qint16>(DayCountConvention::NAFBACTACT) :
+    case DayCountConvention::FiACTACT:
+    case DayCountConvention::FiACT360:
+    case DayCountConvention::FiACT365:
+    case DayCountConvention::Fi30ACT:
+    case DayCountConvention::FiSIA30360:
+    case DayCountConvention::Fi30365:
+    case DayCountConvention::FiNLACT:
+    case DayCountConvention::FiNL360:
+    case DayCountConvention::FiNL365:
+    case DayCountConvention::FiACTACTneom:
+    case DayCountConvention::FiACT360neom:
+    case DayCountConvention::FiACT365neom:
+    case DayCountConvention::Fi30ACTneom:
+    case DayCountConvention::FiSIA30360neom:
+    case DayCountConvention::Fi30365neom:
+    case DayCountConvention::FiNLACTneom:
+    case DayCountConvention::FiNL360neom:
+    case DayCountConvention::FiNL365neom:
+    case DayCountConvention::FiISMA30ACT:
+    case DayCountConvention::FiISMA30360:
+    case DayCountConvention::FiISMA30365:
+    case DayCountConvention::FiISMA30ACTneom:
+    case DayCountConvention::FiISMA30360neom:
+    case DayCountConvention::FiISMA30365neom:
+    case DayCountConvention::FiACT364:
+    //case DayCountConvention::FiUSMUNI30360:
+    //case DayCountConvention::FiBusiness252:
+    case DayCountConvention::FiGerman30360:
+    //case DayCountConvention::FiBusiness252neom:
+    case DayCountConvention::FiGerman30360neom:
+    //case DayCountConvention::FiUSWITACTACTneom:
+    //case DayCountConvention::FiUSIWIBACT360neom:
+	case DayCountConvention::ACTACT :
+	case DayCountConvention::ACT360 :
+	case DayCountConvention::ACT365 :
+	case DayCountConvention::N30360 :
+	case DayCountConvention::NACTACT :
+	case DayCountConvention::NACT360 :
+	case DayCountConvention::NACT365 :
+	case DayCountConvention::ISMA30360 :
+	case DayCountConvention::ISDAACTACT :
+	case DayCountConvention::AFBACTACT :
+	case DayCountConvention::NISDAACTACT :
+	case DayCountConvention::NAFBACTACT :
 		return (a >> CompoundShift)<=2; //Special case
 		//return NumberOfSetBits(a >> CompoundShift) <= 1; //General case
 	default:

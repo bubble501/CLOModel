@@ -144,7 +144,10 @@ double getTimeFactor(QDate PrevIPD, QDate CurrIPD, DayCountConvention DayCount)
         CurrIPD = Temp;
     }
     double TimeFactor=1.0; //This is the factor by which the coupon must be adjusted
-    int Offset = 0;
+    int CurrOffset = 0;
+    int PrevOffset = 0;
+    const QDate PrevIPDeom(PrevIPD.year(), PrevIPD.month(), PrevIPD.daysInMonth());
+    const QDate CurrIPDeom(CurrIPD.year(), CurrIPD.month(), CurrIPD.daysInMonth());
     /*
     DayCount is a 16 bit integer;
     the bit 1 to CompoundShift contain the day count convention Bloomberg code (see DAY COUNT CODES - MBS <HELP>)
@@ -154,6 +157,180 @@ double getTimeFactor(QDate PrevIPD, QDate CurrIPD, DayCountConvention DayCount)
     */
     // check the first CompoundShift bits of the DayCount
     switch (static_cast<DayCountConvention>(static_cast<qint16>(DayCount)& (((1 << CompoundShift) - 1)))) {
+    case DayCountConvention::FiSIA30360:
+        if (PrevIPD.day() == 31) PrevIPD.setDate(PrevIPD.year(), PrevIPD.month(), 30); //if start accrue falls on the 31st move it to the 30th
+        if (CurrIPD.day() == 31 && PrevIPD.day() == 30) CurrIPD.setDate(CurrIPD.year(), CurrIPD.month(), 30); //if end accrue falls on the 31st and start accrue falls on the 30th move end accrue to the 30th
+        //fall through next case
+    case DayCountConvention::FiSIA30360neom:
+        if (PrevIPD.day() == 29 && PrevIPD.month() == 2 && QDate::isLeapYear(PrevIPD.year())) PrevOffset = 1;
+        if (PrevIPD.day() == 28 && PrevIPD.month() == 2 && !QDate::isLeapYear(PrevIPD.year())) PrevOffset = 2;
+        if (PrevOffset > 0 && CurrIPD.day() == 29 && CurrIPD.month() == 2 && QDate::isLeapYear(CurrIPD.year())) CurrOffset = 1;
+        if (PrevOffset > 0 && CurrIPD.day() == 28 && CurrIPD.month() == 2 && !QDate::isLeapYear(CurrIPD.year())) CurrOffset = 2;
+        TimeFactor = (
+            (360.0*static_cast<double>(CurrIPD.year() - PrevIPD.year())) +
+            (30.0*static_cast<double>(CurrIPD.month() - PrevIPD.month())) +
+            static_cast<double>(CurrIPD.day() - PrevIPD.day() + CurrOffset - PrevOffset)
+            ) / 360.0;
+        break;
+    case DayCountConvention::FiISMA30365:
+        if (PrevIPD == PrevIPDeom || CurrIPD == CurrIPDeom) {
+            PrevIPD = PrevIPDeom;
+            CurrIPD = CurrIPDeom;
+        }
+        //fall through next case
+    case DayCountConvention::FiISMA30365neom:
+        //if an accrual date falls on day 31 move it to day 30
+        if (PrevIPD.day() == 31) PrevIPD.setDate(PrevIPD.year(), PrevIPD.month(), 30);
+        if (CurrIPD.day() == 31) CurrIPD.setDate(CurrIPD.year(), CurrIPD.month(), 30);
+        /* The adjustment factor is:
+        (
+        (360 * difference in years of the two dates)
+        + (30 * difference in months of the two dates)
+        + difference in days of the two dates
+        )/360
+        */
+        TimeFactor = (
+            (360.0*static_cast<double>(CurrIPD.year() - PrevIPD.year())) +
+            (30.0*static_cast<double>(CurrIPD.month() - PrevIPD.month())) +
+            static_cast<double>(CurrIPD.day() - PrevIPD.day())
+            ) / 365.0;
+        break;
+    case DayCountConvention::FiISMA30ACT:
+        if (PrevIPD == PrevIPDeom || CurrIPD == CurrIPDeom) {
+            PrevIPD = PrevIPDeom;
+            CurrIPD = CurrIPDeom;
+        }
+        //fall through next case
+    case DayCountConvention::FiISMA30ACTneom:
+        //if an accrual date falls on day 31 move it to day 30
+        if (PrevIPD.day() == 31) PrevIPD.setDate(PrevIPD.year(), PrevIPD.month(), 30);
+        if (CurrIPD.day() == 31) CurrIPD.setDate(CurrIPD.year(), CurrIPD.month(), 30);
+        /* The adjustment factor is:
+        (
+        (360 * difference in years of the two dates)
+        + (30 * difference in months of the two dates)
+        + difference in days of the two dates
+        )/360
+        */
+        TimeFactor = (
+            (360.0*static_cast<double>(CurrIPD.year() - PrevIPD.year())) +
+            (30.0*static_cast<double>(CurrIPD.month() - PrevIPD.month())) +
+            static_cast<double>(CurrIPD.day() - PrevIPD.day())
+            ) / CurrIPD.daysInYear();
+        break;
+    case DayCountConvention::Fi30ACT:
+        if (PrevIPD == PrevIPDeom || CurrIPD == CurrIPDeom) {
+            PrevIPD = PrevIPDeom;
+            CurrIPD = CurrIPDeom;
+        }
+        //fall through next case
+    case DayCountConvention::Fi30ACTneom:
+        if (PrevIPD.day() == 31) PrevIPD.setDate(PrevIPD.year(), PrevIPD.month(), 30); //if start accrue falls on the 31st move it to the 30th
+        if (CurrIPD.day() == 31 && PrevIPD.day() == 30) CurrIPD.setDate(CurrIPD.year(), CurrIPD.month(), 30); //if end accrue falls on the 31st and start accrue falls on the 30th move end accrue to the 30th
+        // if the previous IPD was on the last day of Feb set an offset to simulate it happening on the 30th of Feb
+        if (PrevIPD.day() == 29 && PrevIPD.month() == 2 && QDate::isLeapYear(PrevIPD.year())) PrevOffset = 1;
+        if (PrevIPD.day() == 28 && PrevIPD.month() == 2 && !QDate::isLeapYear(PrevIPD.year())) PrevOffset = 2;
+
+        TimeFactor = (
+            (360.0*static_cast<double>(CurrIPD.year() - PrevIPD.year())) +
+            (30.0*static_cast<double>(CurrIPD.month() - PrevIPD.month())) +
+            static_cast<double>(CurrIPD.day() - PrevIPD.day() - PrevOffset)
+            ) / CurrIPD.daysInYear();
+        break;
+    case DayCountConvention::Fi30365neom:
+        if (PrevIPD.day() == 31) PrevIPD.setDate(PrevIPD.year(), PrevIPD.month(), 30); //if start accrue falls on the 31st move it to the 30th
+        if (CurrIPD.day() == 31 && PrevIPD.day() == 30) CurrIPD.setDate(CurrIPD.year(), CurrIPD.month(), 30); //if end accrue falls on the 31st and start accrue falls on the 30th move end accrue to the 30th
+        // if the previous IPD was on the last day of Feb set an offset to simulate it happening on the 30th of Feb
+        if (PrevIPD.day() == 29 && PrevIPD.month() == 2 && QDate::isLeapYear(PrevIPD.year())) PrevOffset = 1;
+        if (PrevIPD.day() == 28 && PrevIPD.month() == 2 && !QDate::isLeapYear(PrevIPD.year())) PrevOffset = 2;
+
+        TimeFactor = (
+            (360.0*static_cast<double>(CurrIPD.year() - PrevIPD.year())) +
+            (30.0*static_cast<double>(CurrIPD.month() - PrevIPD.month())) +
+            static_cast<double>(CurrIPD.day() - PrevIPD.day() - PrevOffset)
+            ) / 365.0;
+        break;
+    case DayCountConvention::FiACTACT:
+        if (PrevIPD == PrevIPDeom || CurrIPD == CurrIPDeom) {
+            PrevIPD = PrevIPDeom;
+            CurrIPD = CurrIPDeom;
+        }
+        //fall through next case
+    case DayCountConvention::FiACTACTneom:
+        //difference between the dates divided by days in the end accrue year
+        TimeFactor = static_cast<double>(PrevIPD.daysTo(CurrIPD)) / CurrIPD.daysInYear();
+        break;
+    case DayCountConvention::FiACT364:
+        if (PrevIPD == PrevIPDeom || CurrIPD == CurrIPDeom) {
+            PrevIPD = PrevIPDeom;
+            CurrIPD = CurrIPDeom;
+        }
+        //difference between the dates divided by days in the end accrue year
+        TimeFactor = static_cast<double>(PrevIPD.daysTo(CurrIPD)) / 364.0;
+        break;
+    case DayCountConvention::FiNLACT:
+        if (PrevIPD == PrevIPDeom || CurrIPD == CurrIPDeom) {
+            PrevIPD = PrevIPDeom;
+            CurrIPD = CurrIPDeom;
+        }
+        //fall through next case
+    case DayCountConvention::FiNLACTneom:
+        if (PrevIPD.month() == 2 && PrevIPD.day() > 28) PrevIPD.setDate(PrevIPD.year(), PrevIPD.month(), 28);
+        if (CurrIPD.month() == 2 && CurrIPD.day() > 28) CurrIPD.setDate(CurrIPD.year(), CurrIPD.month(), 28);
+        //difference between the dates divided by days in the end accrue year
+        TimeFactor = static_cast<double>(PrevIPD.daysTo(CurrIPD)) / CurrIPD.daysInYear();
+        break;
+    case DayCountConvention::FiNL360:
+        if (PrevIPD == PrevIPDeom || CurrIPD == CurrIPDeom) {
+            PrevIPD = PrevIPDeom;
+            CurrIPD = CurrIPDeom;
+        }
+        //fall through next case
+    case DayCountConvention::FiNL360neom:
+        if (PrevIPD.month() == 2 && PrevIPD.day() > 28) PrevIPD.setDate(PrevIPD.year(), PrevIPD.month(), 28);
+        if (CurrIPD.month() == 2 && CurrIPD.day() > 28) CurrIPD.setDate(CurrIPD.year(), CurrIPD.month(), 28);
+        //difference between the dates divided by days in the end accrue year
+        TimeFactor = static_cast<double>(PrevIPD.daysTo(CurrIPD)) / 360.0;
+        break;
+    case DayCountConvention::FiNL365:
+        if (PrevIPD == PrevIPDeom || CurrIPD == CurrIPDeom) {
+            PrevIPD = PrevIPDeom;
+            CurrIPD = CurrIPDeom;
+        }
+        //fall through next case
+    case DayCountConvention::FiNL365neom:
+        if (PrevIPD.month() == 2 && PrevIPD.day() > 28) PrevIPD.setDate(PrevIPD.year(), PrevIPD.month(), 28);
+        if (CurrIPD.month() == 2 && CurrIPD.day() > 28) CurrIPD.setDate(CurrIPD.year(), CurrIPD.month(), 28);
+        //difference between the dates divided by days in the end accrue year
+        TimeFactor = static_cast<double>(PrevIPD.daysTo(CurrIPD)) / 365.0;
+        break;
+    case DayCountConvention::FiACT360:
+        if (PrevIPD == PrevIPDeom || CurrIPD == CurrIPDeom) {
+            PrevIPD = PrevIPDeom;
+            CurrIPD = CurrIPDeom;
+        }
+        //fall through next case
+    case DayCountConvention::FiACT360neom:
+        //Difference between the dates divided 360
+        TimeFactor = static_cast<double>(PrevIPD.daysTo(CurrIPD)) / 360.0;
+        break;
+    case DayCountConvention::FiACT365:
+        if (PrevIPD == PrevIPDeom || CurrIPD == CurrIPDeom) {
+            PrevIPD = PrevIPDeom;
+            CurrIPD = CurrIPDeom;
+        }
+        //fall through next case
+    case DayCountConvention::FiACT365neom:
+        //Difference between the dates divided 365
+        TimeFactor = static_cast<double>(PrevIPD.daysTo(CurrIPD)) / 365.0;
+        break;
+    case DayCountConvention::FiISMA30360:
+        if (PrevIPD == PrevIPDeom || CurrIPD == CurrIPDeom) {
+            PrevIPD = PrevIPDeom;
+            CurrIPD = CurrIPDeom;
+        }
+        //fall through next case
+    case DayCountConvention::FiISMA30360neom:
     case DayCountConvention::ISMA30360:
         //if an accrual date falls on day 31 move it to day 30
         if (PrevIPD.day() == 31) PrevIPD.setDate(PrevIPD.year(), PrevIPD.month(), 30);
@@ -171,12 +348,19 @@ double getTimeFactor(QDate PrevIPD, QDate CurrIPD, DayCountConvention DayCount)
             static_cast<double>(CurrIPD.day() - PrevIPD.day())
             ) / 360.0;
         break;
+    case DayCountConvention::FiGerman30360:
+        if (PrevIPD == PrevIPDeom || CurrIPD == CurrIPDeom) {
+            PrevIPD = PrevIPDeom;
+            CurrIPD = CurrIPDeom;
+        }
+        //fall through next case
+    case DayCountConvention::FiGerman30360neom:
     case DayCountConvention::N30360:
         if (PrevIPD.day() == 31) PrevIPD.setDate(PrevIPD.year(), PrevIPD.month(), 30); //if start accrue falls on the 31st move it to the 30th
         if (CurrIPD.day() == 31 && PrevIPD.day() == 30) CurrIPD.setDate(CurrIPD.year(), CurrIPD.month(), 30); //if end accrue falls on the 31st and start accrue falls on the 30th move end accrue to the 30th
         // if the previous IPD was on the last day of Feb set an offset to simulate it happening on the 30th of Feb
-        if (PrevIPD.day() == 29 && PrevIPD.month() == 2 && QDate::isLeapYear(PrevIPD.year())) Offset = 1;
-        if (PrevIPD.day() == 28 && PrevIPD.month() == 2 && !QDate::isLeapYear(PrevIPD.year())) Offset = 2;
+        if (PrevIPD.day() == 29 && PrevIPD.month() == 2 && QDate::isLeapYear(PrevIPD.year())) CurrOffset = 1;
+        if (PrevIPD.day() == 28 && PrevIPD.month() == 2 && !QDate::isLeapYear(PrevIPD.year())) CurrOffset = 2;
         /* The adjustment factor is:
         (
         (360 * difference in years of the two dates)
@@ -188,7 +372,7 @@ double getTimeFactor(QDate PrevIPD, QDate CurrIPD, DayCountConvention DayCount)
         TimeFactor = (
             (360.0*static_cast<double>(CurrIPD.year() - PrevIPD.year())) +
             (30.0*static_cast<double>(CurrIPD.month() - PrevIPD.month())) +
-            static_cast<double>(CurrIPD.day() - PrevIPD.day() - Offset)
+            static_cast<double>(CurrIPD.day() - PrevIPD.day() - CurrOffset)
             ) / 360.0;
         break;
     case DayCountConvention::ISDAACTACT:
@@ -260,6 +444,7 @@ double getTimeFactor(QDate PrevIPD, QDate CurrIPD, DayCountConvention DayCount)
         TimeFactor = static_cast<double>(PrevIPD.daysTo(CurrIPD)) / CurrIPD.daysInYear();
         break;
     default:
+
         TimeFactor = 1.0;
     }
     return TimeFactor;

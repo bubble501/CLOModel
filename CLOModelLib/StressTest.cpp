@@ -690,7 +690,7 @@ void StressTest::SaveResults(const QString& DestPath)const
 	if (!OldName.isEmpty()) {
 		QuaZip OldZip(OldName);
 		QuaZipFile OldFile(&OldZip);
-		QuaZipFileInfo OldFileInfo;
+		QuaZipFileInfo64 OldFileInfo;
 		if (!OldZip.open(QuaZip::mdUnzip)) return;
 		for (bool more = OldZip.goToFirstFile(); more; more = OldZip.goToNextFile()) {
 			if (OldFile.open(QIODevice::ReadOnly)) {

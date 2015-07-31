@@ -5,7 +5,7 @@ function Component()
 Component.prototype.createOperations = function()
 {
     component.createOperations();
-    if (installer.value("os") === "win") {
+   if (systemInfo.productType === "windows") {
         var viewerPath = "Z:/24AM/Analytics/Development/CLOModel2/Environment/CLOViewer.exe";
         component.addOperation("RegisterFileType",
                                "clo",

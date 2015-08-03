@@ -329,7 +329,10 @@ void TrancheCashFlow::ResetStartingDeferredInterest()
 bool TrancheCashFlow::HasFlowType(qint32 FlowTpe) const
 {
     Q_D(const TrancheCashFlow);
-    return GenericCashFlow::HasFlowType(FlowTpe) || d->StartingDeferredInterest.contains(FlowTpe);
+    return 
+        GenericCashFlow::HasFlowType(FlowTpe) 
+        || d->StartingDeferredInterest.contains(FlowTpe) 
+        || (d->OutstandingAmt>0.0 && FlowTpe==TrancheFlowType::AmountOutstandingFlow);
 }
 
 bool TrancheCashFlow::HasInterest() const

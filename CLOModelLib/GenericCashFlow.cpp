@@ -92,18 +92,22 @@ void GenericCashFlow::AddFlow(QDate Dte, double Amt, qint32 FlowTpe)
 void GenericCashFlow::SetFlow(QDate Dte, double Amt, qint32 FlowTpe) {
     Q_D(GenericCashFlow);
 	if (Dte.isNull()) return;
-    if (d->m_AdjustHolidays) { while (IsHoliday(Dte)) Dte = Dte.addDays(1); }
+    if (d->m_AdjustHolidays) {
+        while (IsHoliday(Dte)) 
+            Dte = Dte.addDays(1);
+    }
 	if (qAbs(Amt) < 0.01) Amt = 0.0;
     auto index = d->m_CashFlows.begin();
     for (; index != d->m_CashFlows.end(); ++index) {
-        if (d->SamePeriod(Dte, index.key(), d->m_AggregationLevel)) break;
+        if (d->SamePeriod(Dte, index.key(), d->m_AggregationLevel)) 
+            break;
 	}
     if (index != d->m_CashFlows.end()) {
 		if (index.value()->contains(FlowTpe)) {
-            if (Amt == 0.0 && !d->m_Stocks.contains(FlowTpe)) index.value()->remove(FlowTpe);
-			else {
+            if (Amt == 0.0 && !d->m_Stocks.contains(FlowTpe)) 
+                index.value()->remove(FlowTpe);
+			else
 				index.value()->operator[](FlowTpe) = Amt;
-			}
 		}
 		else {
             if (qAbs(Amt) > 0.0 || d->m_Stocks.contains(FlowTpe)) {
@@ -432,7 +436,8 @@ bool GenericCashFlow::HasFlowType(qint32 FlowTpe) const {
     for (auto MainIter = d->m_CashFlows.constBegin(); MainIter != d->m_CashFlows.constEnd(); ++MainIter) {
 		if (MainIter.value()->contains(FlowTpe)){
             if (d->m_Stocks.contains(FlowTpe)) {
-				if (MainIter.value()->value(FlowTpe) >= 0.01) return true; 
+				if (MainIter.value()->value(FlowTpe) >= 0.01) 
+                    return true; 
 			}
 			else return true;
 		}

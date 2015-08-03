@@ -293,7 +293,8 @@ void TrancheCashFlow::SetFlow(const QDate& Dte, double Amt, TrancheFlowType FlwT
 void TrancheCashFlow::AddFlow(QDate Dte, double Amt, qint32 FlwTpe) {
     Q_D(TrancheCashFlow);
     if (d->m_CashFlows.isEmpty()) {
-        if (d->OutstandingAmt>0.0) GenericCashFlow::SetFlow(Dte, d->OutstandingAmt, TrancheFlowType::AmountOutstandingFlow);
+        if (d->OutstandingAmt>0.0)
+            GenericCashFlow::SetFlow(Dte, d->OutstandingAmt, TrancheFlowType::AmountOutstandingFlow);
         for (auto i = d->StartingDeferredInterest.constBegin(); i != d->StartingDeferredInterest.constEnd(); ++i) {
 			if (i.value()>0.0) GenericCashFlow::SetFlow(Dte, i.value(), i.key());
 		}
@@ -304,7 +305,8 @@ void TrancheCashFlow::AddFlow(QDate Dte, double Amt, qint32 FlwTpe) {
 void TrancheCashFlow::SetFlow(QDate Dte, double Amt, qint32 FlwTpe) {
     Q_D(TrancheCashFlow);
     if (d->m_CashFlows.isEmpty()) {
-        if (d->OutstandingAmt > 0.0) GenericCashFlow::SetFlow(Dte, d->OutstandingAmt, TrancheFlowType::AmountOutstandingFlow);
+        if (d->OutstandingAmt > 0.0) 
+            GenericCashFlow::SetFlow(Dte, d->OutstandingAmt, TrancheFlowType::AmountOutstandingFlow);
         for (auto i = d->StartingDeferredInterest.constBegin(); i != d->StartingDeferredInterest.constEnd(); ++i) {
 			if (i.value() > 0.0) GenericCashFlow::SetFlow(Dte, i.value(), i.key());
 		}
@@ -329,10 +331,19 @@ void TrancheCashFlow::ResetStartingDeferredInterest()
 bool TrancheCashFlow::HasFlowType(qint32 FlowTpe) const
 {
     Q_D(const TrancheCashFlow);
-    return 
-        GenericCashFlow::HasFlowType(FlowTpe) 
-        || d->StartingDeferredInterest.contains(FlowTpe) 
-        || (d->OutstandingAmt>0.0 && FlowTpe==TrancheFlowType::AmountOutstandingFlow);
+    if (d->StartingDeferredInterest.contains(FlowTpe))
+        return true;
+    // Almost equal to the inherited version
+    for (auto MainIter = d->m_CashFlows.constBegin(); MainIter != d->m_CashFlows.constEnd(); ++MainIter) {
+        if (MainIter.value()->contains(FlowTpe)) {
+            if (d->m_Stocks.contains(FlowTpe) && FlowTpe!=TrancheFlowType::AmountOutstandingFlow) {
+                if (MainIter.value()->value(FlowTpe) >= 0.01)
+                    return true;
+            }
+            else return true;
+        }
+    }
+    return false;
 }
 
 bool TrancheCashFlow::HasInterest() const

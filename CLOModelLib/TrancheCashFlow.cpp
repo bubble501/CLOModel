@@ -331,16 +331,16 @@ void TrancheCashFlow::ResetStartingDeferredInterest()
 bool TrancheCashFlow::HasFlowType(qint32 FlowTpe) const
 {
     Q_D(const TrancheCashFlow);
-    if (d->StartingDeferredInterest.contains(FlowTpe))
-        return true;
-    // Almost equal to the inherited version
+    return
+        GenericCashFlow::HasFlowType(FlowTpe)
+        || d->StartingDeferredInterest.contains(FlowTpe);
+}
+bool TrancheCashFlow::HasAmountOutstanding() const
+{
+    Q_D(const TrancheCashFlow);
     for (auto MainIter = d->m_CashFlows.constBegin(); MainIter != d->m_CashFlows.constEnd(); ++MainIter) {
-        if (MainIter.value()->contains(FlowTpe)) {
-            if (d->m_Stocks.contains(FlowTpe) && FlowTpe!=TrancheFlowType::AmountOutstandingFlow) {
-                if (MainIter.value()->value(FlowTpe) >= 0.01)
-                    return true;
-            }
-            else return true;
+        if (MainIter.value()->contains(TrancheFlowType::AmountOutstandingFlow)) {
+            return true;
         }
     }
     return false;

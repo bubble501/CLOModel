@@ -84,7 +84,7 @@ public:
     }
 	template<class T> double GetAmountOutstanding(const T& a)const { 
 		static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetAmountOutstanding can be used only with int or QDate"); 
-		if (HasFlowType(TrancheFlowType::AmountOutstandingFlow))
+        if (HasAmountOutstanding())
 			return GetFlow(a, TrancheFlowType::AmountOutstandingFlow);
 		else
 			return GetInitialOutstanding();
@@ -131,6 +131,7 @@ public:
 protected:
     virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
     bool HasAnyInterest(TrancheFlowType base) const;
+    bool HasAmountOutstanding() const;
 	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const TrancheCashFlow& flows);
 	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, TrancheCashFlow& flows);
 };

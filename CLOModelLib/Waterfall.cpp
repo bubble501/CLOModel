@@ -2031,7 +2031,7 @@ bool Waterfall::CalculateTranchesCashFlows()
                         }
                         if (TotalPayable != 0.0 && TestTarget > 0.0) {
                             if (
-                                TotalPayable < TestTarget //if it fails,
+                                Solution / TotalPayable < TestTarget //if it fails,
                                 && (// and you have funds available 
                                 (AvailablePrincipal.Total()>0.0 && CurrSourceOfFunding == 2)
                                 || (AvailableInterest && CurrSourceOfFunding == 1)

@@ -499,11 +499,11 @@ void MtgCalculator::DownloadScenarios() {
     Q_D( MtgCalculator);
 	RETURN_WHEN_RUNNING(true, )
 	ClearTempProperties();
-	QCache<QString, LoanAssumption> AssumptionCache;
+	QHash<QString, LoanAssumption> AssumptionCache;
     for (auto i = d->Loans.constBegin(); i != d->Loans.constEnd(); ++i) {
 		if (i.value()->HasProperty("Scenario") && i.value()->HasProperty("Mezzanine")) {
 			if (!AssumptionCache.contains(i.value()->GetProperty("Scenario"))) {
-				LoanAssumption* DownloadedAssumption = new LoanAssumption(i.value()->GetProperty("Scenario"));
+				LoanAssumption DownloadedAssumption(i.value()->GetProperty("Scenario"));
 				Db_Mutex.lock();
 				QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
 				if (!db.isValid()) {
@@ -529,21 +529,21 @@ void MtgCalculator::DownloadScenarios() {
 						if (LoanAssQuerry.next()) {
 							auto DbgRecord = LoanAssQuerry.record();
 							int FieldCount = 0;
-							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption->SetSeniorLastUpdate(DbgRecord.value(FieldCount).toDate()); ++FieldCount;
-							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption->SetSeniorMaturityExtension(QString::number(DbgRecord.value(FieldCount).toInt())); ++FieldCount;
-							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption->SetSeniorInitialHaircut(QString::number(DbgRecord.value(FieldCount).toDouble(),'f')); ++FieldCount;
-							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption->SetSeniorPrepaymentFee(DbgRecord.value(FieldCount).toString()); ++FieldCount;
-							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption->SetSeniorDayCount(DbgRecord.value(FieldCount).toString()); ++FieldCount;
-							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption->SetSeniorCPR(DbgRecord.value(FieldCount).toString()); ++FieldCount;
-							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption->SetSeniorCDR(DbgRecord.value(FieldCount).toString()); ++FieldCount;
-							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption->SetSeniorLS(DbgRecord.value(FieldCount).toString()); ++FieldCount;
-							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption->SetSeniorRecoveryLag ( DbgRecord.value(FieldCount).toString()); ++FieldCount;
-							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption->SetSeniorDelinquency (DbgRecord.value(FieldCount).toString()); ++FieldCount;
-							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption->SetSeniorDelinquencyLag (DbgRecord.value(FieldCount).toString()); ++FieldCount;
-							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption->SetSeniorPrice(QString::number(DbgRecord.value(FieldCount).toDouble(), 'f')); ++FieldCount;
-							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption->SetSeniorHaircut ( DbgRecord.value(FieldCount).toString()); ++FieldCount;
-							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption->SetSeniorPrepayMultiplier ( DbgRecord.value(FieldCount).toString()); ++FieldCount;
-							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption->SetSeniorLossMultiplier ( DbgRecord.value(FieldCount).toString()); ++FieldCount;
+							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption.SetSeniorLastUpdate(DbgRecord.value(FieldCount).toDate()); ++FieldCount;
+							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption.SetSeniorMaturityExtension(QString::number(DbgRecord.value(FieldCount).toInt())); ++FieldCount;
+							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption.SetSeniorInitialHaircut(QString::number(DbgRecord.value(FieldCount).toDouble(),'f')); ++FieldCount;
+							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption.SetSeniorPrepaymentFee(DbgRecord.value(FieldCount).toString()); ++FieldCount;
+							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption.SetSeniorDayCount(DbgRecord.value(FieldCount).toString()); ++FieldCount;
+							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption.SetSeniorCPR(DbgRecord.value(FieldCount).toString()); ++FieldCount;
+							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption.SetSeniorCDR(DbgRecord.value(FieldCount).toString()); ++FieldCount;
+							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption.SetSeniorLS(DbgRecord.value(FieldCount).toString()); ++FieldCount;
+							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption.SetSeniorRecoveryLag ( DbgRecord.value(FieldCount).toString()); ++FieldCount;
+							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption.SetSeniorDelinquency (DbgRecord.value(FieldCount).toString()); ++FieldCount;
+							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption.SetSeniorDelinquencyLag (DbgRecord.value(FieldCount).toString()); ++FieldCount;
+							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption.SetSeniorPrice(QString::number(DbgRecord.value(FieldCount).toDouble(), 'f')); ++FieldCount;
+							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption.SetSeniorHaircut ( DbgRecord.value(FieldCount).toString()); ++FieldCount;
+							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption.SetSeniorPrepayMultiplier ( DbgRecord.value(FieldCount).toString()); ++FieldCount;
+							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption.SetSeniorLossMultiplier ( DbgRecord.value(FieldCount).toString()); ++FieldCount;
 						}
 					}
 					LoanAssQuerry.bindValue(":isSenior", false);
@@ -551,26 +551,26 @@ void MtgCalculator::DownloadScenarios() {
 						if (LoanAssQuerry.next()) {
 							auto DbgRecord = LoanAssQuerry.record();
 							int FieldCount = 0;
-							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption->SetMezzLastUpdate(DbgRecord.value(FieldCount).toDate()); ++FieldCount;
-							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption->SetMezzMaturityExtension(QString::number(DbgRecord.value(FieldCount).toInt())); ++FieldCount;
-							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption->SetMezzInitialHaircut(QString::number(DbgRecord.value(FieldCount).toDouble(), 'f')); ++FieldCount;
-							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption->SetMezzPrepaymentFee(DbgRecord.value(FieldCount).toString()); ++FieldCount;
-							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption->SetMezzDayCount(DbgRecord.value(FieldCount).toString()); ++FieldCount;
-							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption->SetMezzCPR(DbgRecord.value(FieldCount).toString()); ++FieldCount;
-							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption->SetMezzCDR(DbgRecord.value(FieldCount).toString()); ++FieldCount;
-							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption->SetMezzLS(DbgRecord.value(FieldCount).toString()); ++FieldCount;
-							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption->SetMezzRecoveryLag(DbgRecord.value(FieldCount).toString()); ++FieldCount;
-							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption->SetMezzDelinquency(DbgRecord.value(FieldCount).toString()); ++FieldCount;
-							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption->SetMezzDelinquencyLag(DbgRecord.value(FieldCount).toString()); ++FieldCount;
-							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption->SetMezzPrice(QString::number(DbgRecord.value(FieldCount).toDouble(), 'f')); ++FieldCount;
-							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption->SetMezzHaircut(DbgRecord.value(FieldCount).toString()); ++FieldCount;
-							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption->SetMezzPrepayMultiplier(DbgRecord.value(FieldCount).toString()); ++FieldCount;
-							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption->SetMezzLossMultiplier(DbgRecord.value(FieldCount).toString()); ++FieldCount;
+							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption.SetMezzLastUpdate(DbgRecord.value(FieldCount).toDate()); ++FieldCount;
+							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption.SetMezzMaturityExtension(QString::number(DbgRecord.value(FieldCount).toInt())); ++FieldCount;
+							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption.SetMezzInitialHaircut(QString::number(DbgRecord.value(FieldCount).toDouble(), 'f')); ++FieldCount;
+							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption.SetMezzPrepaymentFee(DbgRecord.value(FieldCount).toString()); ++FieldCount;
+							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption.SetMezzDayCount(DbgRecord.value(FieldCount).toString()); ++FieldCount;
+							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption.SetMezzCPR(DbgRecord.value(FieldCount).toString()); ++FieldCount;
+							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption.SetMezzCDR(DbgRecord.value(FieldCount).toString()); ++FieldCount;
+							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption.SetMezzLS(DbgRecord.value(FieldCount).toString()); ++FieldCount;
+							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption.SetMezzRecoveryLag(DbgRecord.value(FieldCount).toString()); ++FieldCount;
+							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption.SetMezzDelinquency(DbgRecord.value(FieldCount).toString()); ++FieldCount;
+							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption.SetMezzDelinquencyLag(DbgRecord.value(FieldCount).toString()); ++FieldCount;
+							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption.SetMezzPrice(QString::number(DbgRecord.value(FieldCount).toDouble(), 'f')); ++FieldCount;
+							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption.SetMezzHaircut(DbgRecord.value(FieldCount).toString()); ++FieldCount;
+							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption.SetMezzPrepayMultiplier(DbgRecord.value(FieldCount).toString()); ++FieldCount;
+							if (!DbgRecord.isNull(FieldCount)) DownloadedAssumption.SetMezzLossMultiplier(DbgRecord.value(FieldCount).toString()); ++FieldCount;
 						}
 					}
 				}
 				Db_Mutex.unlock();
-				AssumptionCache.insert(DownloadedAssumption->GetScenarioName(), DownloadedAssumption);
+				AssumptionCache.insert(DownloadedAssumption.GetScenarioName(), DownloadedAssumption);
 			}
 			const bool OverrideCurrent=
 				#ifdef Assumptions_ExcelOverDB
@@ -579,67 +579,96 @@ void MtgCalculator::DownloadScenarios() {
 					true
 				#endif
 			;
+            Q_ASSERT(AssumptionCache.contains(i.value()->GetProperty("Scenario")));
 			if (i.value()->GetProperty("Mezzanine").compare("Yes", Qt::CaseInsensitive) == 0) {
-				auto CurrentAss = AssumptionCache.object(i.value()->GetProperty("Scenario"));
+				const auto CurrentAss = AssumptionCache.value(i.value()->GetProperty("Scenario"));
 				if ((OverrideCurrent || !i.value()->HasProperty("MaturityExtension"))
-					&&!CurrentAss->GetRawMezzMaturityExtension().isEmpty()) AddTempProperty(i.key(),"MaturityExtension", CurrentAss->GetMezzMaturityExtension());
+					&&!CurrentAss.GetRawMezzMaturityExtension().isEmpty()) 
+                    AddTempProperty(i.key(),"MaturityExtension", CurrentAss.GetMezzMaturityExtension());
 				if ((OverrideCurrent || !i.value()->HasProperty("StartingHaircut"))
-					&& !CurrentAss->GetRawMezzInitialHaircut().isEmpty())  AddTempProperty(i.key(),"StartingHaircut", CurrentAss->GetMezzHaircut());
+					&& !CurrentAss.GetRawMezzInitialHaircut().isEmpty())  
+                    AddTempProperty(i.key(),"StartingHaircut", CurrentAss.GetMezzInitialHaircut());
 				if ((OverrideCurrent || !i.value()->HasProperty("PrepaymentFee"))
-					&& !CurrentAss->GetRawMezzPrepaymentFee().isEmpty())AddTempProperty(i.key(),"PrepaymentFee", CurrentAss->GetMezzPrepaymentFee());
+					&& !CurrentAss.GetRawMezzPrepaymentFee().isEmpty())
+                    AddTempProperty(i.key(),"PrepaymentFee", CurrentAss.GetMezzPrepaymentFee());
 				if ((OverrideCurrent || !i.value()->HasProperty("DayCount"))
-					&&!CurrentAss->GetRawMezzDayCount().isEmpty()) AddTempProperty(i.key(),"DayCount", CurrentAss->GetMezzDayCount());
+					&&!CurrentAss.GetRawMezzDayCount().isEmpty()) 
+                    AddTempProperty(i.key(),"DayCount", CurrentAss.GetMezzDayCount());
 				if ((OverrideCurrent || !i.value()->HasProperty("Haircut"))
-					&& !CurrentAss->GetRawMezzHaircut().isEmpty()) AddTempProperty(i.key(),"Haircut", CurrentAss->GetMezzHaircut());
+					&& !CurrentAss.GetRawMezzHaircut().isEmpty()) 
+                    AddTempProperty(i.key(),"Haircut", CurrentAss.GetMezzHaircut());
 				if ((OverrideCurrent || !i.value()->HasProperty("PrepayMultiplier"))
-					&& !CurrentAss->GetRawMezzPrepayMultiplier().isEmpty())AddTempProperty(i.key(),"PrepayMultiplier", CurrentAss->GetMezzPrepayMultiplier());
+					&& !CurrentAss.GetRawMezzPrepayMultiplier().isEmpty())
+                    AddTempProperty(i.key(),"PrepayMultiplier", CurrentAss.GetMezzPrepayMultiplier());
 				if ((OverrideCurrent || !i.value()->HasProperty("LossMultiplier"))
-					&& !CurrentAss->GetRawMezzLossMultiplier().isEmpty()) AddTempProperty(i.key(),"LossMultiplier", CurrentAss->GetMezzLossMultiplier());
+					&& !CurrentAss.GetRawMezzLossMultiplier().isEmpty()) 
+                    AddTempProperty(i.key(),"LossMultiplier", CurrentAss.GetMezzLossMultiplier());
 				if ((OverrideCurrent || !i.value()->HasProperty("CPR"))
-					&& !CurrentAss->GetRawMezzCPR().isEmpty()) AddTempProperty(i.key(),"CPR", CurrentAss->GetMezzCPR());
+					&& !CurrentAss.GetRawMezzCPR().isEmpty())
+                    AddTempProperty(i.key(),"CPR", CurrentAss.GetMezzCPR());
 				if ((OverrideCurrent || !i.value()->HasProperty("CDR"))
-					&& !CurrentAss->GetRawMezzCDR().isEmpty()) AddTempProperty(i.key(),"CDR", CurrentAss->GetMezzCDR());
+					&& !CurrentAss.GetRawMezzCDR().isEmpty()) 
+                    AddTempProperty(i.key(),"CDR", CurrentAss.GetMezzCDR());
 				if ((OverrideCurrent || !i.value()->HasProperty("LS"))
-					&& !CurrentAss->GetRawMezzLS().isEmpty()) AddTempProperty(i.key(),"LS", CurrentAss->GetMezzLS());
+					&& !CurrentAss.GetRawMezzLS().isEmpty()) 
+                    AddTempProperty(i.key(),"LS", CurrentAss.GetMezzLS());
 				if ((OverrideCurrent || !i.value()->HasProperty("RecoveryLag"))
-					&& !CurrentAss->GetRawMezzRecoveryLag().isEmpty()) AddTempProperty(i.key(),"RecoveryLag", CurrentAss->GetMezzRecoveryLag());
+					&& !CurrentAss.GetRawMezzRecoveryLag().isEmpty())
+                    AddTempProperty(i.key(),"RecoveryLag", CurrentAss.GetMezzRecoveryLag());
 				if ((OverrideCurrent || !i.value()->HasProperty("Delinquency"))
-					&& !CurrentAss->GetRawMezzDelinquency().isEmpty())  AddTempProperty(i.key(),"Delinquency", CurrentAss->GetMezzDelinquency());
+					&& !CurrentAss.GetRawMezzDelinquency().isEmpty())  
+                    AddTempProperty(i.key(),"Delinquency", CurrentAss.GetMezzDelinquency());
 				if ((OverrideCurrent || !i.value()->HasProperty("DelinquencyLag"))
-					&& !CurrentAss->GetRawMezzDelinquencyLag().isEmpty())  AddTempProperty(i.key(),"DelinquencyLag", CurrentAss->GetMezzDelinquencyLag());
+					&& !CurrentAss.GetRawMezzDelinquencyLag().isEmpty())  
+                    AddTempProperty(i.key(),"DelinquencyLag", CurrentAss.GetMezzDelinquencyLag());
 				if ((OverrideCurrent || !i.value()->HasProperty("Price"))
-					&& !CurrentAss->GetRawMezzPrice().isEmpty())  AddTempProperty(i.key(),"Price", CurrentAss->GetMezzPrice());
+					&& !CurrentAss.GetRawMezzPrice().isEmpty())  
+                    AddTempProperty(i.key(),"Price", CurrentAss.GetMezzPrice());
 			}
 			else {
-				auto CurrentAss = AssumptionCache.object(i.value()->GetProperty("Scenario"));
+				auto CurrentAss = AssumptionCache.value(i.value()->GetProperty("Scenario"));
 				if ((OverrideCurrent || !i.value()->HasProperty("MaturityExtension"))
-					&& !CurrentAss->GetRawSeniorMaturityExtension().isEmpty()) AddTempProperty(i.key(),"MaturityExtension", CurrentAss->GetSeniorMaturityExtension());
+					&& !CurrentAss.GetRawSeniorMaturityExtension().isEmpty()) 
+                    AddTempProperty(i.key(),"MaturityExtension", CurrentAss.GetSeniorMaturityExtension());
 				if ((OverrideCurrent || !i.value()->HasProperty("StartingHaircut"))
-					&& !CurrentAss->GetRawSeniorInitialHaircut().isEmpty())  AddTempProperty(i.key(),"StartingHaircut", CurrentAss->GetSeniorHaircut());
+					&& !CurrentAss.GetRawSeniorInitialHaircut().isEmpty())  
+                    AddTempProperty(i.key(),"StartingHaircut", CurrentAss.GetSeniorInitialHaircut());
 				if ((OverrideCurrent || !i.value()->HasProperty("PrepaymentFee"))
-					&& !CurrentAss->GetRawSeniorPrepaymentFee().isEmpty())AddTempProperty(i.key(),"PrepaymentFee", CurrentAss->GetSeniorPrepaymentFee());
+					&& !CurrentAss.GetRawSeniorPrepaymentFee().isEmpty())
+                    AddTempProperty(i.key(),"PrepaymentFee", CurrentAss.GetSeniorPrepaymentFee());
 				if ((OverrideCurrent || !i.value()->HasProperty("DayCount"))
-					&& !CurrentAss->GetRawSeniorDayCount().isEmpty()) AddTempProperty(i.key(),"DayCount", CurrentAss->GetSeniorDayCount());
+					&& !CurrentAss.GetRawSeniorDayCount().isEmpty()) 
+                    AddTempProperty(i.key(),"DayCount", CurrentAss.GetSeniorDayCount());
 				if ((OverrideCurrent || !i.value()->HasProperty("Haircut"))
-					&& !CurrentAss->GetRawSeniorHaircut().isEmpty()) AddTempProperty(i.key(),"Haircut", CurrentAss->GetSeniorHaircut());
+					&& !CurrentAss.GetRawSeniorHaircut().isEmpty()) 
+                    AddTempProperty(i.key(),"Haircut", CurrentAss.GetSeniorHaircut());
 				if ((OverrideCurrent || !i.value()->HasProperty("PrepayMultiplier"))
-					&& !CurrentAss->GetRawSeniorPrepayMultiplier().isEmpty())AddTempProperty(i.key(),"PrepayMultiplier", CurrentAss->GetSeniorPrepayMultiplier());
+					&& !CurrentAss.GetRawSeniorPrepayMultiplier().isEmpty())
+                    AddTempProperty(i.key(),"PrepayMultiplier", CurrentAss.GetSeniorPrepayMultiplier());
 				if ((OverrideCurrent || !i.value()->HasProperty("LossMultiplier"))
-					&& !CurrentAss->GetRawSeniorLossMultiplier().isEmpty()) AddTempProperty(i.key(),"LossMultiplier", CurrentAss->GetSeniorLossMultiplier());
+					&& !CurrentAss.GetRawSeniorLossMultiplier().isEmpty()) 
+                    AddTempProperty(i.key(),"LossMultiplier", CurrentAss.GetSeniorLossMultiplier());
 				if ((OverrideCurrent || !i.value()->HasProperty("CPR"))
-					&& !CurrentAss->GetRawSeniorCPR().isEmpty()) AddTempProperty(i.key(),"CPR", CurrentAss->GetSeniorCPR());
+					&& !CurrentAss.GetRawSeniorCPR().isEmpty()) 
+                    AddTempProperty(i.key(),"CPR", CurrentAss.GetSeniorCPR());
 				if ((OverrideCurrent || !i.value()->HasProperty("CDR"))
-					&& !CurrentAss->GetRawSeniorCDR().isEmpty()) AddTempProperty(i.key(),"CDR", CurrentAss->GetSeniorCDR());
+					&& !CurrentAss.GetRawSeniorCDR().isEmpty())
+                    AddTempProperty(i.key(),"CDR", CurrentAss.GetSeniorCDR());
 				if ((OverrideCurrent || !i.value()->HasProperty("LS"))
-					&& !CurrentAss->GetRawSeniorLS().isEmpty()) AddTempProperty(i.key(),"LS", CurrentAss->GetSeniorLS());
+					&& !CurrentAss.GetRawSeniorLS().isEmpty()) 
+                    AddTempProperty(i.key(),"LS", CurrentAss.GetSeniorLS());
 				if ((OverrideCurrent || !i.value()->HasProperty("RecoveryLag"))
-					&& !CurrentAss->GetRawSeniorRecoveryLag().isEmpty()) AddTempProperty(i.key(),"RecoveryLag", CurrentAss->GetSeniorRecoveryLag());
+					&& !CurrentAss.GetRawSeniorRecoveryLag().isEmpty()) 
+                    AddTempProperty(i.key(),"RecoveryLag", CurrentAss.GetSeniorRecoveryLag());
 				if ((OverrideCurrent || !i.value()->HasProperty("Delinquency"))
-					&& !CurrentAss->GetRawSeniorDelinquency().isEmpty())  AddTempProperty(i.key(),"Delinquency", CurrentAss->GetSeniorDelinquency());
+					&& !CurrentAss.GetRawSeniorDelinquency().isEmpty())  
+                    AddTempProperty(i.key(),"Delinquency", CurrentAss.GetSeniorDelinquency());
 				if ((OverrideCurrent || !i.value()->HasProperty("DelinquencyLag"))
-					&& !CurrentAss->GetRawSeniorDelinquencyLag().isEmpty())  AddTempProperty(i.key(),"DelinquencyLag", CurrentAss->GetSeniorDelinquencyLag());
+					&& !CurrentAss.GetRawSeniorDelinquencyLag().isEmpty())  
+                    AddTempProperty(i.key(),"DelinquencyLag", CurrentAss.GetSeniorDelinquencyLag());
 				if ((OverrideCurrent || !i.value()->HasProperty("Price"))
-					&& !CurrentAss->GetRawSeniorPrice().isEmpty())  AddTempProperty(i.key(),"Price", CurrentAss->GetSeniorPrice());
+					&& !CurrentAss.GetRawSeniorPrice().isEmpty())  
+                    AddTempProperty(i.key(),"Price", CurrentAss.GetSeniorPrice());
 			}
 		}
 	}

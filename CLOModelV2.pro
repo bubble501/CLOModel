@@ -1,10 +1,8 @@
 TEMPLATE = subdirs
 SUBDIRS = CLOModelLib
-CONFIG(debug, debug|release) {
-    CLOModelTest.file= CLOModelTest/CLOModelTest.pro
-    CLOModelTest.depends = CLOModelLib
-    SUBDIRS += CLOModelTest
-}
+CLOModelTest.file= CLOModelTest/CLOModelTest.pro
+CLOModelTest.depends = CLOModelLib
+SUBDIRS += CLOModelTest
 CONFIG(release, debug|release) {
     CLOViewer.file= CLOViewer/CLOViewer.pro
     CLOViewer.depends = CLOModelLib

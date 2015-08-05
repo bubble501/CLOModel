@@ -82,10 +82,11 @@ public:
     BaseRateVector GetDefaultRefRate() const { return GetReferenceRate(-1); }
 	double GetExchangeRate() const;
 	const IntegerVector& GetPaymentFrequency() const;
-	const QString& GetISIN() const;
+	const QSet<QString>& GetISIN() const;
     BloombergVector GetCouponVector(qint32 CoupIndex) const;
-	void SetISIN(const QString& a);
-	void SetTrancheName(const QString& a);
+	void AddISIN(const QString& a);
+    void ClearISIN();
+    void SetTrancheName(const QString& a);
 	void SetCurrency(const QString& a);
 	void SetOriginalAmount(double a);
 	void SetOutstandingAmt(double a);

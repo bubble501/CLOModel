@@ -742,8 +742,10 @@ int Waterfall::FindTrancheIndex(const QString& Tranchename)const
     for (int j = 0; j<d->m_Tranches.size(); j++) {
         if (d->m_Tranches.at(j)->GetTrancheName() == Tranchename) 
             return j;
-        if (d->m_Tranches.at(j)->GetISIN() == Tranchename) 
-            return j;
+        for (auto isinIter = d->m_Tranches.at(j)->GetISIN().constBegin(); isinIter != d->m_Tranches.at(j)->GetISIN().constEnd(); ++isinIter) {
+            if (isinIter->trimmed().compare(Tranchename.trimmed(), Qt::CaseInsensitive)==0)
+                return j;
+        }
     }
 #ifndef NO_BLOOMBERG
     QBbgLib::QBbgManager ISINparser;
@@ -779,8 +781,10 @@ int Waterfall::FindTrancheIndex(const QString& Tranchename)const
         if (!CurrentResponse)
             continue;
         for (int i = 0; i < d->m_Tranches.size(); i++) {
-            if (CurrentResponse->value().toString().compare(d->m_Tranches.at(i)->GetISIN().trimmed(), Qt::CaseInsensitive) == 0)
-                return i;
+            for (auto isinIter = d->m_Tranches.at(i)->GetISIN().constBegin(); isinIter != d->m_Tranches.at(i)->GetISIN().constEnd(); ++isinIter) {
+                if (CurrentResponse->value().toString().compare(isinIter->trimmed(), Qt::CaseInsensitive) == 0)
+                    return i;
+            }
             if (CurrentResponse->value().toString().compare(d->m_Tranches.at(i)->GetTrancheName().trimmed(), Qt::CaseInsensitive) == 0)
                 return i;
         }

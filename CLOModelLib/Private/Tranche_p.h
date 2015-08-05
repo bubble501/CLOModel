@@ -4,6 +4,7 @@
 #include "BaseRateTable.h"
 #include "Private/BackwardCompatibilityInterface_p.h"
 #include "Ratings.h"
+#include <QSet>
 class TranchePrivate : public BackwardInterfacePrivate
 {
     DECLARE_PRIVATE_COMMONS(Tranche)
@@ -18,7 +19,7 @@ public:
     QHash<qint32, DayCountVector*> m_DayCount;
     QString BloombergExtension;
     QString Currency;
-    QString ISINcode;
+    QSet<QString> ISINcode;
     QString TrancheName;
     Seniority ProrataGroup;
     TrancheCashFlow CashFlow;

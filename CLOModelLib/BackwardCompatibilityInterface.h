@@ -1,7 +1,7 @@
 #ifndef BackwardCompatibilityInterface_h__
 #define BackwardCompatibilityInterface_h__
 //! The current Version of the Model
-#define ModelVersionNumber 189
+#define ModelVersionNumber 190
 #define MinimumSupportedVersion 188
 #include "clomodellib_global.h"
 #include "CommonFunctions.h"

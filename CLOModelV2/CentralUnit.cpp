@@ -107,7 +107,9 @@ void CentralUnit::AddTranche(
 ){
 	Tranche TempTrnch;
 	TempTrnch.SetTrancheName(Name);
-	TempTrnch.SetISIN(ISIN);
+    const auto allISINS = ISIN.split(';', QString::SkipEmptyParts);
+    for (auto i = allISINS.constBegin(); i != allISINS.constEnd();++i)
+	    TempTrnch.AddISIN(*i);
 	TempTrnch.SetProrataGroup(ProRataGroup);
 	TempTrnch.SetOriginalAmount(OrigAmnt);
 	TempTrnch.SetCurrency(Crncy);

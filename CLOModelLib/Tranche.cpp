@@ -487,7 +487,7 @@ void Tranche::getRatingsBloomberg()
     QBbgLib::QBbgManager Bee;
     QBbgLib::QBbgRequestGroup ReqGr;
     QBbgLib::QBbgReferenceDataRequest TempReq;
-    const QString IdentityCode = (d->ISINcode.isEmpty() ? d->TrancheName : d->ISINcode);
+    const QString IdentityCode = d->downloadISIN();
     if (IdentityCode.isEmpty())
         return;
     const auto BdpExt = QBbgLib::QBbgSecurity::stringToYellowKey(d->BloombergExtension);
@@ -512,7 +512,7 @@ void Tranche::GetDataFromBloomberg()
 		QBbgLib::QBbgManager Bee;
         QBbgLib::QBbgRequestGroup ReqGr;
 		QBbgLib::QBbgReferenceDataRequest TempReq;
-        const QString IdentityCode = (d->ISINcode.isEmpty() ? d->TrancheName : d->ISINcode);
+        const QString IdentityCode = d->downloadISIN();
 		if (IdentityCode.isEmpty()) 
             return;
         const auto BdpExt = QBbgLib::QBbgSecurity::stringToYellowKey(d->BloombergExtension);
@@ -642,10 +642,8 @@ void Tranche::GetDataFromBloomberg()
         else 
             d->TrancheName = dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(12))->value().toString();
 
-        if (TmpResponse.value(13)->hasErrors()) 
-            d->ISINcode = "";
-        else 
-            d->ISINcode = dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(13))->value().toString();
+        if (!TmpResponse.value(13)->hasErrors()) 
+            d->ISINcode.insert(dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(13))->value().toString());
 
         if (TmpResponse.value(14)->hasErrors()) {
             if (d->m_DayCount.contains(0))
@@ -675,7 +673,7 @@ void Tranche::GetCashFlowsFromBloomberg(bool useFwdRates)
 {
     Q_D(Tranche);
     d->CashFlow.Clear();
-    QBbgLib::QBbgSecurity TempSecurity(d->ISINcode.isEmpty() ? d->TrancheName : d->ISINcode, QBbgLib::QBbgSecurity::stringToYellowKey(d->BloombergExtension));
+    QBbgLib::QBbgSecurity TempSecurity(d->ISINcode.isEmpty() ? d->TrancheName : *d->ISINcode.constBegin(), QBbgLib::QBbgSecurity::stringToYellowKey(d->BloombergExtension));
     if (TempSecurity.name().isEmpty() || TempSecurity.extension() == QBbgLib::QBbgSecurity::Invalid) return;
     QBbgLib::QBbgOverride Ovr;
 #ifndef NO_DATABASE
@@ -693,21 +691,24 @@ void Tranche::GetCashFlowsFromBloomberg(bool useFwdRates)
 		}
 		bool DbOpen = db.isOpen();
 		if (!DbOpen) DbOpen = db.open();
-		if (DbOpen) {
-			QSqlQuery GetPrepaySpeedQuery(db);
-			GetPrepaySpeedQuery.setForwardOnly(true);
-			GetPrepaySpeedQuery.prepare("{CALL " + GetFromConfig("Database", "GetPrepaySpeedStoredProc") + "}");
-			GetPrepaySpeedQuery.bindValue(":TrancheID", d->ISINcode);
-			if (GetPrepaySpeedQuery.exec()) {
-				if (GetPrepaySpeedQuery.next()){
-					auto GetPrepaySpeedRecord = GetPrepaySpeedQuery.record();
-					for (int RecIter = 0; RecIter < GetPrepaySpeedRecord.count(); ++RecIter) {
-						if (GetPrepaySpeedRecord.value(RecIter).toString().isEmpty()) continue;
-                        Ovr.setOverride(GetPrepaySpeedRecord.fieldName(RecIter), GetPrepaySpeedRecord.value(RecIter).toString());
-					}
-				}
-			}
-		}
+        if (DbOpen) {
+            for (auto ISINiter = d->ISINcode.constBegin(); ISINiter != d->ISINcode.constEnd(); ++ISINiter) {
+                QSqlQuery GetPrepaySpeedQuery(db);
+                GetPrepaySpeedQuery.setForwardOnly(true);
+                GetPrepaySpeedQuery.prepare("{CALL " + GetFromConfig("Database", "GetPrepaySpeedStoredProc") + "}");
+                GetPrepaySpeedQuery.bindValue(":TrancheID", *ISINiter);
+                if (GetPrepaySpeedQuery.exec()) {
+                    if (GetPrepaySpeedQuery.next()) {
+                        auto GetPrepaySpeedRecord = GetPrepaySpeedQuery.record();
+                        for (int RecIter = 0; RecIter < GetPrepaySpeedRecord.count(); ++RecIter) {
+                            if (GetPrepaySpeedRecord.value(RecIter).toString().isEmpty()) continue;
+                            Ovr.setOverride(GetPrepaySpeedRecord.fieldName(RecIter), GetPrepaySpeedRecord.value(RecIter).toString());
+                        }
+                        break;
+                    }
+                }
+            }
+        }
 	}
 	Db_Mutex.unlock();
 #endif // !NO_DATABASE
@@ -862,7 +863,7 @@ double Tranche::getActualCoupon(int index, qint32 CouponIdx) const
 
 QString TranchePrivate::downloadISIN() const
 {
-    QString applicableIsin = ISINcode;
+    QString applicableIsin = ISINcode.isEmpty() ? QString() : *ISINcode.constBegin();
 #ifndef NO_BLOOMBERG
     if (applicableIsin.isEmpty()) {
         DEBG_LOG("Downloading ISIN from Bloomberg");
@@ -1105,7 +1106,14 @@ QDataStream& Tranche::LoadOldVersion(QDataStream& stream){
 	BaseRateVector* TempBRV;
     DayCountVector* TempDCV;
 	stream >> d->TrancheName;
-    stream >> d->ISINcode;
+    if(loadProtocolVersion()<190){
+        QString tempISIN;
+        stream >> tempISIN;
+        d->ISINcode.insert(tempISIN);
+    }
+    else {
+        stream >> d->ISINcode;
+    }
     stream >> d->OriginalAmt;
     stream >> d->Currency;
     stream >> d->OutstandingAmt;
@@ -1255,7 +1263,7 @@ const IntegerVector& Tranche::GetPaymentFrequency() const
     return d->PaymentFrequency;
 }
 
-const QString& Tranche::GetISIN() const
+const QSet<QString>& Tranche::GetISIN() const
 {
     Q_D(const Tranche);
     return d->ISINcode;
@@ -1267,10 +1275,17 @@ BloombergVector Tranche::GetCouponVector(qint32 CoupIndex) const
     return GetCouponPart(CoupIndex, d->Coupon);
 }
 
-void Tranche::SetISIN(const QString& a)
+void Tranche::AddISIN(const QString& a)
 {
     Q_D(Tranche);
-    d->ISINcode = a;
+    if (a.isEmpty())
+        return;
+    d->ISINcode.insert(a);
+}
+void Tranche::ClearISIN()
+{
+    Q_D(Tranche);
+    d->ISINcode.clear();
 }
 
 DayCountVector Tranche::GetDayCount(qint32 CoupIndex) const

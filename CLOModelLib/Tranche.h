@@ -49,8 +49,8 @@ protected:
 public:
 	~Tranche();
 	const QHash<qint32, BloombergVector*>& GetRefRateValues() const;
-	double GetStartingDeferredInterest(qint32 CoupIdx = TrancheCashFlow::TrancheFlowType::DeferredFlow) const;
-	void SetStartingDeferredInterest(const double& val, qint32 CoupIdx = TrancheCashFlow::TrancheFlowType::DeferredFlow);
+	double GetStartingDeferredInterest(qint32 CoupIdx = 0) const;
+	void SetStartingDeferredInterest(const double& val, qint32 CoupIdx=0);
 	const QString& GetTrancheName() const;
 	const QString& GetCurrency() const;
 	double GetOriginalAmount() const;

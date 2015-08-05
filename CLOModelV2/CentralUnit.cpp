@@ -129,7 +129,9 @@ void CentralUnit::AddTranche(
 	TempTrnch.SetBloombergExtension(BbgExt);
 	TempTrnch.SetStartingDeferredInterest(StartingDeferredInterest);
 	Structure.AddTranche(TempTrnch);
-	if (Stresser)Stresser->SetStructure(Structure);
+    LOGDEBUG(QString("Starting Deferred Interest - Input: %1 Tranche: %3 Structure: %2").arg(StartingDeferredInterest, 0, 'f').arg(Structure.GetTranche(Structure.GetTranchesCount() - 1)->GetStartingDeferredInterest(), 0, 'f').arg(TempTrnch.GetStartingDeferredInterest(), 0, 'f'));
+	if (Stresser)
+        Stresser->SetStructure(Structure);
 }
 void CentralUnit::AddWaterfallStep(
 	WatFalPrior::WaterfallStepType Tpe
@@ -165,7 +167,8 @@ void CentralUnit::AddWaterfallStep(
 	TempStep.SetParameter(WatFalPrior::wstParameters::PayAccrue, QString::number(ArgAccruePay));
 	TempStep.SetPriorityType(Tpe);
 	Structure.AddStep(TempStep);
-	if(Stresser)Stresser->SetStructure(Structure);
+	if(Stresser)
+        Stresser->SetStructure(Structure);
 }
 void CentralUnit::Reset(){
 	LoansCalculator.Reset();
@@ -174,8 +177,12 @@ void CentralUnit::Reset(){
 	Structure.ResetTranches();
 	Structure.ResetReserve();
 	if(Stresser) Stresser->deleteLater();
-	if (LastRateTable) { delete LastRateTable; LastRateTable = nullptr; }
-	if (MtgsProgress) MtgsProgress->deleteLater();
+	if (LastRateTable) { 
+        delete LastRateTable; 
+        LastRateTable = nullptr; 
+    }
+	if (MtgsProgress) 
+        MtgsProgress->deleteLater();
 }
 
 void CentralUnit::SetupStress(const QString& ConstPar,QList<QString> XSpann,QList<QString> YSpann, int Xvar,int Yvar){

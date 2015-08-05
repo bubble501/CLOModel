@@ -53,7 +53,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		QString TrName, Curr, BasRt, TrancheISIN, IPDfrq, ProRat;
         QList<QString> RefRt, coup, DayCnt;
 		int TempSize;
-		double origOut,currOut,OClim,IClim,Price,Exchan,startingDeferred/*,coup*/;
+		double origOut,currOut,OClim,IClim,Price,Exchan,startingDeferred;
 		QDate PrevIPD,SettDate;
 		NumElements=pdFreq++->intVal;
 		LOGDEBUG(QString("Numero Tranches: %1").arg(NumElements));
@@ -89,7 +89,8 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
                 DayCnt.append(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
             }
 			startingDeferred = pdFreq->dblVal; pdFreq++;
-			TempUnit.AddTranche(TrName, TrancheISIN, ProRat, origOut, Curr, currOut, coup, RefRt, PrevIPD, BasRt, IPDfrq, SettDate, startingDeferred, /*RefRtVal,*/ OClim, IClim, Price, Exchan, "Mtge", DayCnt);
+
+			TempUnit.AddTranche(TrName, TrancheISIN, ProRat, origOut, Curr, currOut, coup, RefRt, PrevIPD, BasRt, IPDfrq, SettDate, startingDeferred, OClim, IClim, Price, Exchan, "Mtge", DayCnt);
             LOGDEBUG("Tranche Added");
         }
 	}

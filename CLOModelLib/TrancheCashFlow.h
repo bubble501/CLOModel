@@ -91,8 +91,9 @@ public:
 	}
 	template<class T> double GetDeferred(const T& a, qint32 CouponIdx/*=0*/)const {
 		static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "GetDeferred can be used only with int or QDate");
-		if (CouponIdx < 0 || CouponIdx >= (1 << MaximumInterestsTypes)) return 0.0;
-		if (HasFlowType(TrancheFlowType::DeferredFlow | CouponIdx))
+		if (CouponIdx < 0 || CouponIdx >= (1 << MaximumInterestsTypes)) 
+            return 0.0;
+		if (HasDeferred(CouponIdx))
 			return GetFlow(a, TrancheFlowType::DeferredFlow | CouponIdx);
 		return GetStartingDeferredInterest(CouponIdx);
 	}
@@ -130,8 +131,9 @@ public:
 	virtual TrancheCashFlow ScaledCashFlows(double NewSize) const;
 protected:
     virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
-    bool HasAnyInterest(TrancheFlowType base) const;
-    bool HasAmountOutstanding() const;
+    virtual bool HasAnyInterest(TrancheFlowType base) const;
+    virtual bool HasAmountOutstanding() const;
+    virtual bool HasDeferred(qint32 CouponIdx) const;
 	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const TrancheCashFlow& flows);
 	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, TrancheCashFlow& flows);
 };

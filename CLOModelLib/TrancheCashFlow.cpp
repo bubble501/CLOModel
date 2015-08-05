@@ -317,8 +317,10 @@ void TrancheCashFlow::SetFlow(QDate Dte, double Amt, qint32 FlwTpe) {
 void TrancheCashFlow::SetStartingDeferredInterest(const double& val, qint32 CoupIdx ) {
     Q_D(TrancheCashFlow);
 	if (CoupIdx >= 0 && CoupIdx < (1 << MaximumInterestsTypes)) {
-        if (val == 0.0) d->StartingDeferredInterest.remove(CoupIdx);
-        else d->StartingDeferredInterest[CoupIdx] = val;
+        if (val == 0.0) 
+            d->StartingDeferredInterest.remove(CoupIdx);
+        else 
+            d->StartingDeferredInterest[CoupIdx] = val;
 	}
 }
 
@@ -345,7 +347,18 @@ bool TrancheCashFlow::HasAmountOutstanding() const
     }
     return false;
 }
-
+bool TrancheCashFlow::HasDeferred(qint32 CouponIdx) const
+{
+    if (CouponIdx < 0 || CouponIdx >= (1 << MaximumInterestsTypes))
+        return false;
+    Q_D(const TrancheCashFlow);
+    for (auto MainIter = d->m_CashFlows.constBegin(); MainIter != d->m_CashFlows.constEnd(); ++MainIter) {
+        if (MainIter.value()->contains(TrancheFlowType::DeferredFlow | CouponIdx)) {
+            return true;
+        }
+    }
+    return false;
+}
 bool TrancheCashFlow::HasInterest() const
 {
     return HasAnyInterest(TrancheFlowType::InterestFlow);
@@ -355,6 +368,8 @@ bool TrancheCashFlow::HasDeferred() const
 {
     return HasAnyInterest(TrancheFlowType::DeferredFlow);
 }
+
+
 
 bool TrancheCashFlow::HasAccrued() const
 {

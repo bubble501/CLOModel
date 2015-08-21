@@ -775,8 +775,10 @@ double Tranche::GetDiscountMargin(double NewPrice)const{
         ApplicableRateValue = ApplicableRate.GetBaseRatesDatabase(d->m_FrwRateCache);
     else
         ApplicableRateValue = ApplicableRate.GetBaseRatesDatabase(d->m_CnstRateCache);
-    if (ApplicableRateValue.IsEmpty() || d->m_DayCount.value(0)->IsEmpty())
-         return 0.0;
+    if (ApplicableRateValue.IsEmpty() || d->m_DayCount.value(0)->IsEmpty()) {
+        DEBG_LOG(QString("Failed DM calculation\nApplicableRateValue.IsEmpty()==%1\nd->m_DayCount.value(0)->IsEmpty()==%2").arg(ApplicableRateValue.IsEmpty()).arg(d->m_DayCount.value(0)->IsEmpty()));
+        return 0.0;
+    }
     return qMax(0.0, CalculateDM(FlowsDates, FlowsValues, ApplicableRateValue, *(d->m_DayCount.value(0))));
 }
 double Tranche::GetIRR() const {
@@ -1174,12 +1176,13 @@ QDataStream& Tranche::LoadOldVersion(QDataStream& stream){
 }
 double Tranche::GetPrice(double DiscountMargin) const {
     Q_D(const Tranche);
-	boost::math::tools::eps_tolerance<double> tol(std::numeric_limits<double>::digits / 2);
+    using namespace boost::math;
+	tools::eps_tolerance<double> tol(std::numeric_limits<double>::digits / 2);
 	double StartGuess = d->Price;
 	boost::uintmax_t MaxIter(MaximumIRRIterations);
-	std::pair<double, double> Result = boost::math::tools::bracket_and_solve_root(
+	std::pair<double, double> Result = tools::bracket_and_solve_root(
 		[this, &DiscountMargin](double Price) -> double {return GetDiscountMargin(Price) - DiscountMargin; }
-		, StartGuess, 2.0, false, tol, MaxIter, boost::math::policies::policy<>());
+    , StartGuess, 2.0, false, tol, MaxIter, policies::policy<policies::evaluation_error<policies::ignore_error>>());
 	if (MaxIter >= MaximumIRRIterations) return -1.0;
 	return (Result.first + Result.second) / 2.0;
 }

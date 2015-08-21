@@ -50,13 +50,14 @@ double CalculateNPV(const QList<QDate>& Dte, const QList<double>& Flws, const QS
 	return CalculateNPV(Dte,Flws,BloombergVector(Interest),Daycount);
 }
 double CalculateIRR(const QList<QDate>& Dte, const QList<double>& Flws, const DayCountVector& Daycount, double Guess) {
+    using namespace boost::math;
 	if (Flws.size() <= 1 || Dte.size() != Flws.size() || Daycount.IsEmpty()) return 0.0;
 	if (Guess <= 0 || Guess > 10) Guess = 0.05;
-	boost::math::tools::eps_tolerance<double> tol(std::numeric_limits<double>::digits / 2);
+	tools::eps_tolerance<double> tol(std::numeric_limits<double>::digits / 2);
 	boost::uintmax_t MaxIter(MaximumIRRIterations);
-	std::pair<double, double> Result = boost::math::tools::bracket_and_solve_root(
+	std::pair<double, double> Result = tools::bracket_and_solve_root(
 		[&](double Discount) -> double {return CalculateNPV(Dte, Flws, Discount, Daycount); }
-	, Guess, 2.0, false, tol, MaxIter);
+    , Guess, 2.0, false, tol, MaxIter, policies::policy<policies::evaluation_error<policies::ignore_error>>());
 	if (MaxIter >= MaximumIRRIterations) return 0.0;
 	return (Result.first + Result.second) / 2.0;
 }
@@ -65,13 +66,14 @@ double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, double Ba
 }
 
 double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const BloombergVector& BaseRate, const DayCountVector& Daycount, double Guess) {
+    using namespace boost::math;
 	if (Flws.size() <= 1 || Dte.size() != Flws.size() || BaseRate.IsEmpty() || Daycount.IsEmpty()) return 0.0;
 	if (Guess <= 0 || Guess>10) Guess = 0.05;
-	boost::math::tools::eps_tolerance<double> tol(std::numeric_limits<double>::digits / 2);
+	tools::eps_tolerance<double> tol(std::numeric_limits<double>::digits / 2);
 	boost::uintmax_t MaxIter(MaximumIRRIterations);
-	std::pair<double, double> Result = boost::math::tools::bracket_and_solve_root(
+	std::pair<double, double> Result = tools::bracket_and_solve_root(
 		[&](double Discount) -> double {return CalculateNPV(Dte, Flws, BaseRate + Discount, Daycount); }
-	, Guess, 2.0, false, tol, MaxIter);
+    , Guess, 2.0, false, tol, MaxIter, policies::policy<policies::evaluation_error<policies::ignore_error>>());
 	if (MaxIter >= MaximumIRRIterations) return 0.0;
 	return 10000.0*(Result.first + Result.second) / 2.0;
 }

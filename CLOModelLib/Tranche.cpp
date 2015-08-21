@@ -1016,7 +1016,7 @@ void Tranche::getCashflowsDatabase()
         CashFlowsQuery.setForwardOnly(true);
         CashFlowsQuery.prepare("{CALL " + GetFromConfig("Database", "GetCashFlowsProc") + "}");
         CashFlowsQuery.bindValue(":ISIN", *applicableIsin);
-        DEBG_LOG(QString("Asking Cash Flows Query: %1").arg(getLastExecutedQuery(CashFlowsQuery)));
+        //DEBG_LOG(QString("Asking Cash Flows Query: %1").arg(getLastExecutedQuery(CashFlowsQuery)));
         if (!CashFlowsQuery.exec()) {
             DEBG_LOG("getCashflowsDatabase() Failed to run GetCashFlowsProc");
                 return;
@@ -1178,13 +1178,21 @@ double Tranche::GetPrice(double DiscountMargin) const {
     Q_D(const Tranche);
     using namespace boost::math;
 	tools::eps_tolerance<double> tol(std::numeric_limits<double>::digits / 2);
-	double StartGuess = d->Price;
+	double StartGuess = qMax(1.0,d->Price);
 	boost::uintmax_t MaxIter(MaximumIRRIterations);
-	std::pair<double, double> Result = tools::bracket_and_solve_root(
-		[this, &DiscountMargin](double Price) -> double {return GetDiscountMargin(Price) - DiscountMargin; }
-    , StartGuess, 2.0, false, tol, MaxIter, policies::policy<policies::evaluation_error<policies::ignore_error>>());
-	if (MaxIter >= MaximumIRRIterations) return -1.0;
-	return (Result.first + Result.second) / 2.0;
+    try{
+        const std::pair<double, double> Result = tools::bracket_and_solve_root(
+            [this, &DiscountMargin](double Price) -> double {return GetDiscountMargin(Price) - DiscountMargin; }
+        , StartGuess, 2.0, false, tol, MaxIter, policies::policy<policies::evaluation_error<policies::throw_on_error>>());
+        if (MaxIter >= MaximumIRRIterations) return -1.0;
+        return (Result.first + Result.second) / 2.0;
+    }
+    catch(evaluation_error){
+        DEBG_LOG("GetPrice(): Evaluation Error");
+        return -1;
+    }
+
+	
 }
 
 double Tranche::GetPrice() const

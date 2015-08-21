@@ -55,11 +55,17 @@ double CalculateIRR(const QList<QDate>& Dte, const QList<double>& Flws, const Da
 	if (Guess <= 0 || Guess > 10) Guess = 0.05;
 	tools::eps_tolerance<double> tol(std::numeric_limits<double>::digits / 2);
 	boost::uintmax_t MaxIter(MaximumIRRIterations);
-	std::pair<double, double> Result = tools::bracket_and_solve_root(
-		[&](double Discount) -> double {return CalculateNPV(Dte, Flws, Discount, Daycount); }
-    , Guess, 2.0, false, tol, MaxIter, policies::policy<policies::evaluation_error<policies::ignore_error>>());
-	if (MaxIter >= MaximumIRRIterations) return 0.0;
-	return (Result.first + Result.second) / 2.0;
+    try {
+        const std::pair<double, double> Result = tools::bracket_and_solve_root(
+            [&](double Discount) -> double {return CalculateNPV(Dte, Flws, Discount, Daycount); }
+        , Guess, 2.0, false, tol, MaxIter, policies::policy<policies::evaluation_error<policies::throw_on_error>>());
+        if (MaxIter >= MaximumIRRIterations) return 0.0;
+        return (Result.first + Result.second) / 2.0;
+    }
+    catch (evaluation_error) {
+        DEBG_LOG("CalculateIRR(): Evaluation Error");
+        return 0.0;
+    }
 }
 double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, double BaseRate, const DayCountVector& Daycount, double Guess) {
 	return CalculateDM(Dte, Flws, BloombergVector(QString("%1").arg(BaseRate)), Daycount, Guess);
@@ -71,11 +77,17 @@ double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const Blo
 	if (Guess <= 0 || Guess>10) Guess = 0.05;
 	tools::eps_tolerance<double> tol(std::numeric_limits<double>::digits / 2);
 	boost::uintmax_t MaxIter(MaximumIRRIterations);
-	std::pair<double, double> Result = tools::bracket_and_solve_root(
-		[&](double Discount) -> double {return CalculateNPV(Dte, Flws, BaseRate + Discount, Daycount); }
-    , Guess, 2.0, false, tol, MaxIter, policies::policy<policies::evaluation_error<policies::ignore_error>>());
-	if (MaxIter >= MaximumIRRIterations) return 0.0;
-	return 10000.0*(Result.first + Result.second) / 2.0;
+    try {
+        const std::pair<double, double> Result = tools::bracket_and_solve_root(
+            [&](double Discount) -> double {return CalculateNPV(Dte, Flws, BaseRate + Discount, Daycount); }
+        , Guess, 2.0, false, tol, MaxIter, policies::policy<policies::evaluation_error<policies::throw_on_error>>());
+        if (MaxIter >= MaximumIRRIterations) return 0.0;
+        return 10000.0*(Result.first + Result.second) / 2.0;
+    }
+    catch (evaluation_error) {
+        DEBG_LOG("CalculateDM(): Evaluation Error");
+        return 0.0;
+    }
 }
 double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const QString& BaseRate, const DayCountVector& Daycount, double Guess) {
 	return CalculateDM(Dte,Flws,BloombergVector(BaseRate),Daycount,Guess);

@@ -7,9 +7,30 @@
 #include <QTextStream>
 #include <QDateTime>
 #include "CommonFunctions.h"
+#ifdef _DEBUG
+#include <QSqlQuery>
+QString getLastExecutedQuery(const QSqlQuery& query)
+{
+    QString str = query.lastQuery();
+    QMapIterator<QString, QVariant> it(query.boundValues());
+    while (it.hasNext()) {
+        it.next();
+        str.replace(it.key(), it.value().toString());
+    }
+    return str;
+}
+#else
+QString getLastExecutedQuery(const QSqlQuery& query)
+{return QString();}
+#endif // !_DEBUG
+
+
 #ifndef NO_DATABASE
 QMutex Db_Mutex;
 #endif
+
+
+
 const QString LoansPropertiesToSearch[] = { "Issuer", "Facility" };
 QString Commarize(double num, unsigned int precision)
 {
@@ -449,3 +470,5 @@ double getTimeFactor(QDate PrevIPD, QDate CurrIPD, DayCountConvention DayCount)
     }
     return TimeFactor;
 }
+
+

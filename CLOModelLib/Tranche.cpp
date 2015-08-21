@@ -994,7 +994,7 @@ void Tranche::getCashflowsDatabase()
         allIsins << d->downloadISIN();
     if (allIsins.constBegin()->isEmpty()) {
         DEBG_LOG("GetDataFromDatabase() Invalid ISIN");
-            return;
+        return;
     }
     QMutexLocker dbLocker(&Db_Mutex);
     QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);

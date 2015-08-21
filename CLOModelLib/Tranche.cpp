@@ -1013,7 +1013,7 @@ void Tranche::getCashflowsDatabase()
         QSqlQuery CashFlowsQuery(db);
         CashFlowsQuery.setForwardOnly(true);
         CashFlowsQuery.prepare("{CALL " + GetFromConfig("Database", "GetCashFlowsProc") + "}");
-        CashFlowsQuery.bindValue(":isin", *applicableIsin);
+        CashFlowsQuery.bindValue(":ISIN", *applicableIsin);
         DEBG_LOG(QString("Asking Cash Flows Query: %1").arg(getLastExecutedQuery(CashFlowsQuery)));
         if (!CashFlowsQuery.exec()) {
             DEBG_LOG("getCashflowsDatabase() Failed to run GetCashFlowsProc");

@@ -54,7 +54,15 @@ public:
         Cp,
         C,
         Cm,
+        DDDp,
+        DDD,
+        DDDm,
+        DDp,
+        DD,
+        DDm,
+        Dp,
         D,
+        Dm,
         NR = 0
     };
     enum class RatingBucket : qint16
@@ -68,6 +76,8 @@ public:
         CCC = static_cast<qint16>(RatingValue::CCC),
         CC = static_cast<qint16>(RatingValue::CC),
         C = static_cast<qint16>(RatingValue::C),
+        DDD = static_cast<qint16>(RatingValue::DDD),
+        DD = static_cast<qint16>(RatingValue::DD),
         D = static_cast<qint16>(RatingValue::D),
         NR = static_cast<qint16>(RatingValue::NR)
     };

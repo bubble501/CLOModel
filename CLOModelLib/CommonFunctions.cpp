@@ -58,12 +58,24 @@ double CalculateIRR(const QList<QDate>& Dte, const QList<double>& Flws, const Da
     try {
         const std::pair<double, double> Result = tools::bracket_and_solve_root(
             [&](double Discount) -> double {return CalculateNPV(Dte, Flws, Discount, Daycount); }
-        , Guess, 2.0, false, tol, MaxIter, policies::policy<policies::evaluation_error<policies::throw_on_error>>());
+        , Guess, 2.0, false, tol, MaxIter, optim_policy());
         if (MaxIter >= MaximumIRRIterations) return 0.0;
         return (Result.first + Result.second) / 2.0;
     }
     catch (evaluation_error) {
         DEBG_LOG("CalculateIRR(): Evaluation Error");
+        return 0.0;
+    }
+    catch (std::underflow_error) {
+        DEBG_LOG("GetPrice(): Underflow Error");
+        return 0.0;
+    }
+    catch (std::overflow_error) {
+        DEBG_LOG("GetPrice(): Overflow Error");
+        return std::numeric_limits<double>::max() / 2.0;
+    }
+    catch (std::domain_error) {
+        DEBG_LOG("GetPrice(): Domain Error");
         return 0.0;
     }
 }
@@ -80,12 +92,24 @@ double CalculateDM(const QList<QDate>& Dte, const QList<double>& Flws, const Blo
     try {
         const std::pair<double, double> Result = tools::bracket_and_solve_root(
             [&](double Discount) -> double {return CalculateNPV(Dte, Flws, BaseRate + Discount, Daycount); }
-        , Guess, 2.0, false, tol, MaxIter, policies::policy<policies::evaluation_error<policies::throw_on_error>>());
+        , Guess, 2.0, false, tol, MaxIter, optim_policy());
         if (MaxIter >= MaximumIRRIterations) return 0.0;
         return 10000.0*(Result.first + Result.second) / 2.0;
     }
     catch (evaluation_error) {
         DEBG_LOG("CalculateDM(): Evaluation Error");
+        return 0.0;
+    }
+    catch (std::underflow_error) {
+        DEBG_LOG("GetPrice(): Underflow Error");
+        return 0.0;
+    }
+    catch (std::overflow_error) {
+        DEBG_LOG("GetPrice(): Overflow Error");
+        return std::numeric_limits<double>::max() / 2.0;
+    }
+    catch (std::domain_error) {
+        DEBG_LOG("GetPrice(): Domain Error");
         return 0.0;
     }
 }
@@ -115,7 +139,6 @@ bool removeDir(const QString & dirName)
 }
 
 double deannualiseCoupon(double AnnualCoupon /*Annualised Coupon*/, QDate PrevIPD /*Interesty start accrual date*/, QDate CurrIPD /*Interesty end accrual date*/, DayCountConvention DayCount) {
-	
 	if (AnnualCoupon == 0.0) return 0.0; //If the annual coupon is 0 there is no need to adjust it
 	//Check the CompoundShift+1 th bit, if it's set calculate the interest as ((1+r)^t)-1
 	if (DayCount& (1 << CompoundShift)) //Compounded

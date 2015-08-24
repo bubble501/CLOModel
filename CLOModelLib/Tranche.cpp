@@ -1026,7 +1026,7 @@ void Tranche::getCashflowsDatabase()
             const QSqlRecord currRec = CashFlowsQuery.record();
             const QDate flowDate = currRec.value("Date").toDate();
             if (firstFlow) {
-                d->CashFlow.SetInitialOutstanding(currRec.value("Balance").toDouble() + currRec.value("Deferred").toDouble());
+                d->CashFlow.SetInitialOutstanding(currRec.value("Balance").toDouble() + currRec.value("Principal").toDouble());
                 firstFlow = false;
             }
             d->CashFlow.SetFlow(flowDate, currRec.value("Interest").toDouble(), TrancheCashFlow::InterestFlow);
@@ -1183,7 +1183,7 @@ double Tranche::GetPrice(double DiscountMargin) const {
     try{
         const std::pair<double, double> Result = tools::bracket_and_solve_root(
             [this, &DiscountMargin](double Price) -> double {return GetDiscountMargin(Price) - DiscountMargin; }
-        , StartGuess, 2.0, false, tol, MaxIter, policies::policy<policies::evaluation_error<policies::throw_on_error>>());
+        , StartGuess, 2.0, false, tol, MaxIter, optim_policy());
         if (MaxIter >= MaximumIRRIterations) return -1.0;
         return (Result.first + Result.second) / 2.0;
     }
@@ -1191,7 +1191,18 @@ double Tranche::GetPrice(double DiscountMargin) const {
         DEBG_LOG("GetPrice(): Evaluation Error");
         return -1;
     }
-
+    catch (std::underflow_error) {
+        DEBG_LOG("GetPrice(): Underflow Error");
+        return 0.0;
+    }
+    catch (std::overflow_error) {
+        DEBG_LOG("GetPrice(): Overflow Error");
+        return std::numeric_limits<double>::max()/2.0;
+    }
+    catch (std::domain_error) {
+        DEBG_LOG("GetPrice(): Domain Error");
+        return -1;
+    }
 	
 }
 

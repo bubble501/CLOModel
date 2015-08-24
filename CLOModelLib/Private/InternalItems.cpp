@@ -20,7 +20,7 @@ QString getLastExecutedQuery(const QSqlQuery& query)
     return str;
 }
 #else
-QString getLastExecutedQuery(const QSqlQuery& query)
+QString getLastExecutedQuery(const QSqlQuery&)
 {return QString();}
 #endif // !_DEBUG
 
@@ -158,6 +158,8 @@ int NumberOfSetBits(quint32 i)
 
 double getTimeFactor(QDate PrevIPD, QDate CurrIPD, DayCountConvention DayCount)
 {
+    DEBG_LOG_CONDITION("getTimeFactor() - CurrIPD in year 2000", CurrIPD < QDate(2001, 1, 1));
+    DEBG_LOG_CONDITION("getTimeFactor() - CurrIPD in year 2000", PrevIPD < QDate(2001, 1, 1));
     if (PrevIPD.isNull() || CurrIPD.isNull()) return 1.0; //If dates are invalid return 1
     if (PrevIPD > CurrIPD) { //If start accrual is after end accrual invert the two dates
         QDate Temp = PrevIPD;

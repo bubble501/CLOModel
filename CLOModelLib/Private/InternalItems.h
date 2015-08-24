@@ -3,6 +3,7 @@
 #include <QString>
 #include <QMetaType>
 #include <typeinfo>
+#include <boost/math/policies/error_handling.hpp>
 #ifndef NO_DATABASE
 #include <QMutex>
 extern QMutex Db_Mutex;
@@ -54,4 +55,9 @@ QString Commarize(double num, unsigned int precision = 0);
         qRegisterMetaTypeStreamOperators<T>(typeid(T).name()); \
     } \
 }
+typedef boost::math::policies::policy<
+    boost::math::policies::overflow_error<boost::math::policies::throw_on_error>,
+    boost::math::policies::underflow_error<boost::math::policies::throw_on_error>,
+    boost::math::policies::evaluation_error<boost::math::policies::throw_on_error>
+> optim_policy;
 #endif // InternalItems_h__

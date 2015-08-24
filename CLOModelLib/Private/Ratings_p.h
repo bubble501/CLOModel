@@ -11,7 +11,7 @@ class RatingsPrivate : public BackwardInterfacePrivate
 public:
     Ratings::RatingValue m_ratings[static_cast<qint8>(Ratings::RatingAgency::CountAgencies)];
     Ratings::CreditWatch m_watch[static_cast<qint8>(Ratings::RatingAgency::CountAgencies)];
-    static const QString m_ratingSyntax[static_cast<qint8>(Ratings::RatingAgency::CountAgencies)][static_cast<qint16>(Ratings::RatingValue::D) + 1];
+    static const QString m_ratingSyntax[static_cast<qint8>(Ratings::RatingAgency::CountAgencies)][static_cast<qint16>(Ratings::RatingValue::Dm) + 1];
     static const QString m_ratingFields[static_cast<qint8>(Ratings::RatingAgency::CountAgencies)];
     static const QString m_AgencyName[static_cast<qint8>(Ratings::RatingAgency::CountAgencies)];
     static const QString m_reservedChars[static_cast<qint8>(Ratings::RatingAgency::CountAgencies)];

@@ -29,6 +29,7 @@ CentralUnit::CentralUnit(QObject* parent)
 	, m_SaveBaseCase(true)
 	, m_BaseCaseToCall(true)
 	, LastRateTable(nullptr)
+    , m_SaveInputs(false)
 {
 	for(int i=0;i<NumberOfPlots;i++) PlotIndexes[i]=0;
     if (QMetaType::type("Waterfall")==QMetaType::UnknownType) {
@@ -44,6 +45,17 @@ CentralUnit::CentralUnit(QObject* parent)
 }
 void CentralUnit::SetPoolCutOff(const QDate& a) { PoolCutOff = a; if (Stresser) Stresser->SetStartDate(PoolCutOff); }
 void CentralUnit::SetFolderPath(const QString& a){FolderPath=a;}
+
+bool CentralUnit::SaveInputs() const
+{
+    return m_SaveInputs;
+}
+
+void CentralUnit::SaveInputs(bool val)
+{
+    m_SaveInputs = val;
+}
+
 void CentralUnit::AddLoan(
 	const QDate& Maturity
 	, double Size
@@ -283,16 +295,17 @@ void CentralUnit::CalculationStep1(){
 	LoansCalculator.SetDelinquency(Structure.GetReinvestmentTest().GetDelinquency().GetVector());
 	LoansCalculator.SetDelinquencyLag(Structure.GetReinvestmentTest().GetDelinquencyLag().GetVector());
 	LoansCalculator.SetStartDate(PoolCutOff);
-#ifdef SAVE_EXCEL_INPUTS
-    QString Filename = "C:\\Temp\\ModelInputs";
-    QFile file(Filename);
-    if (file.open(QIODevice::WriteOnly)) {
-        QDataStream out(&file);
-        out.setVersion(StreamVersionUsed);
-        out << qint32(ModelVersionNumber) << LoansCalculator << Structure;
-        file.close();
+    if(m_SaveInputs){
+        QString Filename = "C:\\Temp\\ModelInputs";
+        QFile file(Filename);
+        if (file.open(QIODevice::WriteOnly)) {
+            QDataStream out(&file);
+            out.setVersion(StreamVersionUsed);
+            out << qint32(ModelVersionNumber) << LoansCalculator << Structure;
+            file.close();
+        }
     }
-#endif // SAVE_EXCEL_INPUTS
+
 
     //Add Fake cash flows to structure to check inputs
     {
@@ -360,31 +373,31 @@ void CentralUnit::showErrorDialog(const QString& errList)
 
 void CentralUnit::CalculationStep2()
 {
-	LOGDEBUG("Reached CalculationStep2");
-	MtgsProgress->setLabelText(tr("Calculating Tranches"));
-	MtgsProgress->setAutoClose(true);
-	QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
-	Structure.ResetMtgFlows();
-	if (Q_LIKELY(LoansCalculator.GetAggregatedResults())) 
+    LOGDEBUG("Reached CalculationStep2");
+    MtgsProgress->setLabelText(tr("Calculating Tranches"));
+    MtgsProgress->setAutoClose(true);
+    QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+    Structure.ResetMtgFlows();
+    if (Q_LIKELY(LoansCalculator.GetAggregatedResults()))
         Structure.AddMortgagesFlows(*LoansCalculator.GetAggregatedResults());
-	Structure.SetUseCall(false);
-	QString TmpStr=Structure.ReadyToCalculate();
+    Structure.SetUseCall(false);
+    QString TmpStr = Structure.ReadyToCalculate();
     if (Q_UNLIKELY(!TmpStr.isEmpty())) {
         showErrorDialog(TmpStr);
-		//QMessageBox::critical(0,"Invalid Input","The following Inputs are missing or invalid:\n"+TmpStr);
-		QApplication::quit();
-		return;
-	}
-#ifdef SAVE_EXCEL_INPUTS
-	QString Filename = "C:\\Temp\\.SavedInputs.clo";
-	QFile file(Filename);
-	if (file.open(QIODevice::WriteOnly)) {
-		QDataStream out(&file);
-		out.setVersion(StreamVersionUsed);
-		out << qint32(ModelVersionNumber) << m_BaseCaseToCall << Structure << Waterfall();
-		file.close();
-	}
-#endif // SAVE_EXCEL_INPUTS
+        //QMessageBox::critical(0,"Invalid Input","The following Inputs are missing or invalid:\n"+TmpStr);
+        QApplication::quit();
+        return;
+    }
+    if (m_SaveInputs) {
+        QString Filename = "C:\\Temp\\.SavedInputs.clo";
+        QFile file(Filename);
+        if (file.open(QIODevice::WriteOnly)) {
+            QDataStream out(&file);
+            out.setVersion(StreamVersionUsed);
+            out << qint32(ModelVersionNumber) << m_BaseCaseToCall << Structure << Waterfall();
+            file.close();
+        }
+    }
 	if(!RunCall){
 		CallStructure.ResetMtgFlows();
 		CallStructure.ResetTranches();

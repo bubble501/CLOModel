@@ -1,5 +1,8 @@
 Attribute VB_Name = "Internals"
 Option Explicit
+
+
+
 Public Sub PlotBloobergVector(BbgVct As String, TargetPlot As Chart, Optional StartDate As Date = 36526, Optional Percent As Boolean = True)
     While (TargetPlot.SeriesCollection.Count > 0)
         TargetPlot.SeriesCollection(1).Delete
@@ -168,7 +171,7 @@ End Sub
 Public Function ValidBloombergVector(BloombergVector As String) As Boolean
     Dim BloombergVecRegExp As New RegExp
     BloombergVecRegExp.Pattern = "^(A\s+\d{1,2}/\d{1,2}/\d{2,4}\s+)?\d*\.?\d+(\s+\d+[RS]\s+\d*\.?\d+)*$"
-    ValidBloombergVector = BloombergVecRegExp.Test(UCase(Trim(BloombergVector)))
+    ValidBloombergVector = BloombergVecRegExp.test(UCase(Trim(BloombergVector)))
 End Function
 Private Function UnpackVect(ByVal Vect As String, Optional PaymFreq As Long = 1, Optional AdjustFreq As Boolean = True)
     Dim result As New Collection
@@ -184,12 +187,12 @@ Private Function UnpackVect(ByVal Vect As String, Optional PaymFreq As Long = 1,
     Dim i As Long, j As Long, StepLen As Long
     i = 2
     While (i <= UBound(StringParts))
-        StepLen = CLng((Left(StringParts(i - 1), Len(StringParts(i - 1)) - 1)) / PaymFreq)
-        If (Right(StringParts(i - 1), 1) = "S") Then
+        StepLen = CLng((Mid(StringParts(i - 1), 1, Len(StringParts(i - 1)) - 1)) / PaymFreq)
+        If (Mid(StringParts(i - 1), Len(StringParts(i - 1))) = "S") Then
             For j = 1 To StepLen
                 result.Add CDbl(StringParts(i - 2))
             Next j
-        ElseIf (Right(StringParts(i - 1), 1) = "R") Then
+        ElseIf (Mid(StringParts(i - 1), Len(StringParts(i - 1))) = "R") Then
             For j = 0 To StepLen - 1
                 result.Add CDbl(StringParts(i - 2)) + (CDbl(StringParts(i)) - CDbl(StringParts(i - 2))) * j / StepLen
             Next j
@@ -250,7 +253,7 @@ End Function
 '    Dim i As Long
 '    Dim DealName As String
 '    DealName = bdp24(UCase(Trim(Identifier)) + " " + BloombergExtension, "MTG_DEAL_NAME")
-'    If (Left(DealName, 4) = "#N/A") Then
+'    If (mid(DealName,1, 4) = "#N/A") Then
 '        Call MsgBox("Impossible to get required data from Bloomberg" _
 '                    & vbCrLf & "Make sure you specified the right security Identifier" _
 '                    , vbCritical, "Error")
@@ -408,7 +411,7 @@ Public Sub RunCLOModel(SaveBase As Boolean)
     Call GetInputFromStructure( _
         "Loans Pool" _
         , "Liabilities + input" _
-        , Left(ActiveWorkbook.FullName, InStrRev(ActiveWorkbook.FullName, "\")) _
+        , Mid(ActiveWorkbook.FullName, 1, InStrRev(ActiveWorkbook.FullName, "\")) _
         , FieldsLabels _
         , SaveBase _
     )
@@ -1087,9 +1090,15 @@ Unload ProgressForm
 End Sub
 Sub DeleteCloFile()
     Dim FileToDelete As String
-    FileToDelete = Left(ActiveWorkbook.FullName, InStrRev(ActiveWorkbook.FullName, "\")) + "\BaseCase.clo"
+    FileToDelete = Mid(ActiveWorkbook.FullName, 1, InStrRev(ActiveWorkbook.FullName, "\")) + "\BaseCase.clo"
     If (Dir(FileToDelete) <> "") Then
         SetAttr FileToDelete, vbNormal
         Kill FileToDelete
     End If
 End Sub
+Public Function Eval(val As String) As Double
+    Eval = Evaluate(val)
+End Function
+
+
+

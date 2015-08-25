@@ -291,6 +291,7 @@ ReferenceRateFromBBg:
     On Error GoTo 0
     
     Dim AllTheInputs As New Collection
+    AllTheInputs.Add False 'Switch to true to save the inputs
     i = 1
     j = 0
     Do While (True)
@@ -339,7 +340,7 @@ ReferenceRateFromBBg:
                     propCounter = propCounter + 1
                 Loop
             End If
-            Call AddInput(AllTheInputs, Left(PropertyString, Len(PropertyString) - 3))
+            Call AddInput(AllTheInputs, Mid(PropertyString, 1, Len(PropertyString) - 3))
         End If
         i = i + 1
     Loop
@@ -875,8 +876,8 @@ DefaultExchange:
     Else
         Call AddInput(AllTheInputs, CStr(DelinqLagCell.Offset(0, 1).Value))
     End If
-    Call AddInput(AllTheInputs, AvailPrincCell.Offset(0, 1).Value)
-    Call AddInput(AllTheInputs, AvailIntrCell.Offset(0, 1).Value)
+    Call AddInput(AllTheInputs, CDbl(AvailPrincCell.Offset(0, 1).Value))
+    Call AddInput(AllTheInputs, CDbl(AvailIntrCell.Offset(0, 1).Value))
     Call AddInput(AllTheInputs, Format(CutOffcell.Offset(0, 1).Value, "yyyy-mm-dd"))
     Dim RunCallScenario As Boolean
     RunCallScenario = _
@@ -1339,7 +1340,7 @@ FromPriortyToString_Error:
 End Function
 Public Function GetDM(TrancheName As String, DealName As String, Price As Double, Optional ToCall As Boolean = False)
     Dim result(0 To 4) As Variant
-    result(0) = Left(ActiveWorkbook.FullName, InStrRev(ActiveWorkbook.FullName, "\"))
+    result(0) = Mid(ActiveWorkbook.FullName, 1, InStrRev(ActiveWorkbook.FullName, "\"))
     result(2) = TrancheName
     result(1) = DealName
     result(3) = ToCall
@@ -1348,7 +1349,7 @@ Public Function GetDM(TrancheName As String, DealName As String, Price As Double
 End Function
 Public Function GetIRR(TrancheName As String, DealName As String, Price As Double, Optional ToCall As Boolean = False)
     Dim result(0 To 4) As Variant
-    result(0) = Left(ActiveWorkbook.FullName, InStrRev(ActiveWorkbook.FullName, "\"))
+    result(0) = Mid(ActiveWorkbook.FullName, 1, InStrRev(ActiveWorkbook.FullName, "\"))
     result(2) = TrancheName
     result(1) = DealName
     result(3) = ToCall
@@ -1357,7 +1358,7 @@ Public Function GetIRR(TrancheName As String, DealName As String, Price As Doubl
 End Function
 Public Function GetWAL(TrancheName As String, DealName As String, CutOffDate As Date, Price As Double, Optional ToCall As Boolean = False)
     Dim result(0 To 4) As Variant
-    result(0) = Left(ActiveWorkbook.FullName, InStrRev(ActiveWorkbook.FullName, "\"))
+    result(0) = Mid(ActiveWorkbook.FullName, 1, InStrRev(ActiveWorkbook.FullName, "\"))
     result(2) = TrancheName
     result(1) = DealName
     result(3) = Format(CutOffDate, "yyyy-mm-dd")
@@ -1371,7 +1372,7 @@ Public Sub StressTargetEvent(NewTrancheName As String, StressSheet As String, St
     Dim LossInput(0 To 7) As Variant
     Dim DMInput(0 To 8)
     DMInput(8) = NewPrice
-    LossInput(0) = Left(ActiveWorkbook.FullName, InStrRev(ActiveWorkbook.FullName, "\"))
+    LossInput(0) = Mid(ActiveWorkbook.FullName, 1, InStrRev(ActiveWorkbook.FullName, "\"))
     LossInput(1) = NewTrancheName
     LossInput(5) = "0"
     LossInput(6) = "0"

@@ -213,7 +213,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	}
 	{ //General Inputs
 		LOGDEBUG(QString("General Inputs"));
-		TempUnit.SetDealName(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+		TempUnit.AddDealName(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
 		TempUnit.SetStartingDeferredJunFees(pdFreq->dblVal); pdFreq++;
 		TempUnit.SetGICinterest(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
 		TempUnit.SetGICBaseRate(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;

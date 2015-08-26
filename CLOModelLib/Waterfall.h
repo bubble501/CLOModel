@@ -4,6 +4,7 @@
 #include <QMetaType>
 #include <QSharedPointer>
 #include <QString>
+#include <QSet>
 class MtgCashFlow;
 class GenericCashFlow;
 class AssumptionSet;
@@ -102,7 +103,7 @@ public:
     const ReserveFund* const GetReserveFund(int RFindex) const;
     bool GetCumulativeReserves() const;
     int GetNumReserves()const;
-    const QString& GetDealName() const;
+    const QSet<QString>& GetDealName() const;
     const double& GetStartingDeferredJunFees() const;
     QString GetGICBaseRate() const;
     const DayCountVector& GetDealDayCountConvention() const;
@@ -122,7 +123,8 @@ public:
     void SetDealDayCountConvention(const QString&  val);
     void SetGICBaseRate(const QString& a);
     void SetStartingDeferredJunFees(const double& val);
-    void SetDealName(const QString& a);
+    void AddDealName(const QString& a);
+    void ClearDealName();
     void SetCumulativeReserves(bool a);
     void SetGICinterest(const QString& a);
     void SetSeniorExpenses(const QString& a);

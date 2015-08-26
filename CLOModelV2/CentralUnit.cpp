@@ -484,11 +484,12 @@ void CentralUnit::CheckCalculationDone()
         // Save it to File
 		QDir UnifiedDir(GetFromConfig("Folders", "UnifiedResultsFolder"));
 		if (UnifiedDir.exists()) {
-			QString AdjDealName = Structure.GetDealName();
+			QStringList AdjDealName = Structure.GetDealName().toList();
 			if (AdjDealName.isEmpty() && Structure.GetTranchesCount() > 0) {
-				AdjDealName = Structure.GetTranche(0)->GetTrancheName();
+				AdjDealName << Structure.GetTranche(0)->GetTrancheName();
 			}
-			QFile UnifiedFile(UnifiedDir.absoluteFilePath(AdjDealName + ".clom"));
+            std::sort(AdjDealName.begin(), AdjDealName.end());
+			QFile UnifiedFile(UnifiedDir.absoluteFilePath(AdjDealName.first() + ".clom"));
 			if (UnifiedFile.open(QIODevice::WriteOnly)) {
 				QDataStream out(&UnifiedFile);
 				out.setVersion(StreamVersionUsed);

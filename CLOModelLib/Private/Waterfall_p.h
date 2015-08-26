@@ -2,12 +2,12 @@
 #include "Waterfall.h"
 #include "Private/BackwardCompatibilityInterface_p.h"
 #include <QList>
+#include <QSet>
 #include "Tranche.h"
 #include "WatFalPrior.h"
 #include "MtgCashFlow.h"
 #include "ReinvestmentTest.h"
 #include "BloombergVector.h"
-
 #include "IntegerVector.h"
 #include "ReserveFund.h"
 #include "DayCountVect.h"
@@ -56,7 +56,7 @@ public:
     bool m_IsStressTest;
     double m_CallMultiple;
     double m_CallReserve;
-    QString m_DealName;
+    QSet<QString> m_DealName;
     BloombergVector m_GICinterest;
     BaseRateVector m_GICBaseRate;
     BloombergVector m_GICBaseRateValue;

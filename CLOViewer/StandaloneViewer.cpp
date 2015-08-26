@@ -156,7 +156,7 @@ void StandaloneViewer::LoadFile(const QString& fileName){
 		TheViewer->ShowCallStructure();
 		QList<int> IndexesToDelete;
 		for (int i = 0; i < recentNames.size(); ++i) {
-			if (recentNames.at(i) == TempWaterfall.GetDealName()) {
+            if (TempWaterfall.GetDealName().contains(recentNames.at(i))) {
 				IndexesToDelete << i;
 			}
 		}
@@ -165,8 +165,11 @@ void StandaloneViewer::LoadFile(const QString& fileName){
 			recentNames.removeAt(IndexToDelete);
 			recentFiles.removeAt(IndexToDelete);
 		}
-		recentNames.prepend(TempWaterfall.GetDealName());
-		recentFiles.prepend(fileName);
+        if (!TempWaterfall.GetDealName().isEmpty()){
+            recentNames.prepend(*TempWaterfall.GetDealName().begin());
+            recentFiles.prepend(fileName);
+        }
+		
 		updateRecentFileActions();
 	}
 	else if (QFileInfo(file).suffix().toLower()=="fcsr"){

@@ -875,7 +875,7 @@ int Waterfall::GetNumReserves() const
     return d->m_Reserves.size();
 }
 
-const QString& Waterfall::GetDealName() const
+const QSet<QString>& Waterfall::GetDealName() const
 {
     Q_D(const Waterfall);
     return d->m_DealName;
@@ -2347,8 +2347,15 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream)
     stream >> d->m_UseCall
         >> d->m_IsStressTest
         >> d->m_CallMultiple
-        >> d->m_CallReserve
-        >> d->m_DealName;
+        >> d->m_CallReserve;
+    if(loadProtocolVersion()<191){
+        QString tempDealName;
+        stream >> tempDealName;
+        ClearDealName();
+        AddDealName(tempDealName);
+    }
+    else
+        stream >> d->m_DealName;
     d->m_GICinterest.SetLoadProtocolVersion(loadProtocolVersion()); stream >> d->m_GICinterest;
     d->m_GICBaseRate.SetLoadProtocolVersion(loadProtocolVersion()); stream >> d->m_GICBaseRate;
     d->m_GICBaseRateValue.SetLoadProtocolVersion(loadProtocolVersion()); stream >> d->m_GICBaseRateValue;
@@ -3005,10 +3012,17 @@ void Waterfall::SetStartingDeferredJunFees(const double& val)
     d->m_StartingDeferredJunFees = val;
 }
 
-void Waterfall::SetDealName(const QString& a)
+void Waterfall::AddDealName(const QString& a)
 {
     Q_D( Waterfall);
-    d->m_DealName = a;
+    if(!a.isEmpty())
+        d->m_DealName << a;
+}
+
+void Waterfall::ClearDealName()
+{
+    Q_D(Waterfall);
+    d->m_DealName.clear();
 }
 
 void Waterfall::SetCumulativeReserves(bool a)

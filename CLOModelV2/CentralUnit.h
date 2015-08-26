@@ -148,7 +148,7 @@ public:
 	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll = false);
 	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll=false);
 #endif
-	void SetDealName(const QString& a) {Structure.SetDealName(a);}
+    void AddDealName(const QString& a) { Structure.AddDealName(a); }
 	bool GetBaseCaseToCall() const { return m_BaseCaseToCall; }
 	void SetBaseCaseToCall(bool val) { m_BaseCaseToCall = val; }
 	bool GetSaveBaseCase() const { return m_SaveBaseCase; }

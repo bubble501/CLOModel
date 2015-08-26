@@ -174,7 +174,10 @@ StressViewer::~StressViewer()
 QString StressViewer::GetFirstName() const
 {
     Q_D(const StressViewer);
-    return (*(d->StressTarget->GetResults().begin()))->GetDealName();
+     const auto& tempDN = (*(d->StressTarget->GetResults().begin()))->GetDealName();
+     if (tempDN.isEmpty())
+         return QString();
+     return *tempDN.begin();
 }
 
 bool StressViewer::LoadStress(const QString& filename)

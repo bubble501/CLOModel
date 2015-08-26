@@ -31,6 +31,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	VARIANT HUGEP *pdFreq;
 	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
 	if (!SUCCEEDED(hr))return;
+    TempUnit.SaveInputs(pdFreq->boolVal); pdFreq++;
 	int NumElements;
 	{ //Loans
 		QDate Matur;
@@ -212,7 +213,9 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	}
 	{ //General Inputs
 		LOGDEBUG(QString("General Inputs"));
-		TempUnit.SetDealName(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+        const QStringList dealNames = QString::fromWCharArray(pdFreq->bstrVal).split(";", QString::SkipEmptyParts); pdFreq++;
+        for (auto singleDN = dealNames.constBegin(); singleDN != dealNames.constEnd();++singleDN)
+            TempUnit.AddDealName(*singleDN);
 		TempUnit.SetStartingDeferredJunFees(pdFreq->dblVal); pdFreq++;
 		TempUnit.SetGICinterest(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
 		TempUnit.SetGICBaseRate(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
@@ -422,16 +425,17 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		}
 	}
 	SafeArrayUnaccessData(*ArrayData);
-#ifdef SAVE_EXCEL_INPUTS
-	QString Filename="C:\\Temp\\.SavedInputs.clo";
-	QFile file(Filename);
-	if (file.open(QIODevice::WriteOnly)) {
-		QDataStream out(&file);
-		out.setVersion(StreamVersionUsed);
-		out << qint32(ModelVersionNumber) << TempUnit.GetBaseCaseToCall() << TempUnit.GetStructure() << Waterfall();
-		file.close();
-	}
-#endif // SAVE_EXCEL_INPUTS
+    if (TempUnit.SaveInputs()) {
+        QString Filename = "C:\\Temp\\.SavedInputs.clo";
+        QFile file(Filename);
+        if (file.open(QIODevice::WriteOnly)) {
+            QDataStream out(&file);
+            out.setVersion(StreamVersionUsed);
+            out << qint32(ModelVersionNumber) << TempUnit.GetBaseCaseToCall() << TempUnit.GetStructure() << Waterfall();
+            file.close();
+        }
+    }
+
 
 	if(RunStress) TempUnit.CalculateStress();
 	else TempUnit.Calculate();

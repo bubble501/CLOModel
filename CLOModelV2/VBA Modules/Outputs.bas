@@ -22,10 +22,10 @@ Public Sub PrintTranche( _
     ColOffset = 0
     Dim TargetCell As Range
     Dim DestinationAddress As String
-    DestinationAddress = Right(DestinatAddress, Len(DestinatAddress) - InStr(1, DestinatAddress, "!"))
-    Set TargetCell = Sheets(Left(DestinatAddress, InStr(1, DestinatAddress, "!") - 1)).Cells( _
-            CLng(Left(DestinationAddress, InStr(1, DestinationAddress, ",") - 1)), _
-            CLng(Right(DestinationAddress, Len(DestinationAddress) - InStr(1, DestinationAddress, ","))) _
+    DestinationAddress = Mid(DestinatAddress, 1 + InStr(1, DestinatAddress, "!"))
+    Set TargetCell = Sheets(Mid(DestinatAddress, 1, InStr(1, DestinatAddress, "!") - 1)).Cells( _
+            CLng(Mid(DestinationAddress, 1, InStr(1, DestinationAddress, ",") - 1)), _
+            CLng(Mid(DestinationAddress, 1 + InStr(1, DestinationAddress, ","))) _
         )
     If (TargetCell.Count > 1) Then Set TargetCell = TargetCell.Cells(1, 1)
     Set TargetCell = TargetCell.Offset(1, 0)
@@ -203,10 +203,10 @@ Public Sub PrintMortgagesRepLines( _
     Application.ScreenUpdating = False
     Dim TargetCell As Range
     Dim DestinationAddress As String
-    DestinationAddress = Right(DestinatAddress, Len(DestinatAddress) - InStr(1, DestinatAddress, "!"))
-    Set TargetCell = Sheets(Left(DestinatAddress, InStr(1, DestinatAddress, "!") - 1)).Cells( _
-            CLng(Left(DestinationAddress, InStr(1, DestinationAddress, ",") - 1)), _
-            CLng(Right(DestinationAddress, Len(DestinationAddress) - InStr(1, DestinationAddress, ","))) _
+    DestinationAddress = Mid(DestinatAddress, 1 + InStr(1, DestinatAddress, "!"))
+    Set TargetCell = Sheets(Mid(DestinatAddress, 1, InStr(1, DestinatAddress, "!") - 1)).Cells( _
+            CLng(Mid(DestinationAddress, 1, InStr(1, DestinationAddress, ",") - 1)), _
+            CLng(Mid(DestinationAddress, 1 + InStr(1, DestinationAddress, ","))) _
         )
     If (TargetCell.Count > 1) Then Set TargetCell = TargetCell.Cells(1, 1)
     Dim ColOffset As Long, i As Long
@@ -476,10 +476,10 @@ Public Sub PrintMergedCell(msg As String, DestinatAddress As String, RowSpann As
     Application.ScreenUpdating = False
     Dim TargetCell As Range
     Dim DestinationAddress As String
-    DestinationAddress = Right(DestinatAddress, Len(DestinatAddress) - InStr(1, DestinatAddress, "!"))
-    Set TargetCell = Sheets(Left(DestinatAddress, InStr(1, DestinatAddress, "!") - 1)).Cells( _
-            CLng(Left(DestinationAddress, InStr(1, DestinationAddress, ",") - 1)), _
-            CLng(Right(DestinationAddress, Len(DestinationAddress) - InStr(1, DestinationAddress, ","))) _
+    DestinationAddress = Mid(DestinatAddress, 1 + InStr(1, DestinatAddress, "!"))
+    Set TargetCell = Sheets(Mid(DestinatAddress, 1, InStr(1, DestinatAddress, "!") - 1)).Cells( _
+            CLng(Mid(DestinationAddress, 1, InStr(1, DestinationAddress, ",") - 1)), _
+            CLng(Mid(DestinationAddress, 1 + InStr(1, DestinationAddress, ","))) _
         )
     If (TargetCell.Count > 1) Then Set TargetCell = TargetCell.Cells(1, 1)
     TargetCell.Value = msg
@@ -503,10 +503,10 @@ Public Sub PrintColumn(Title As String, Values As Variant, DestinatAddress As St
     Dim i As Long
     Dim TargetCell As Range
     Dim DestinationAddress As String
-    DestinationAddress = Right(DestinatAddress, Len(DestinatAddress) - InStr(1, DestinatAddress, "!"))
-    Set TargetCell = Sheets(Left(DestinatAddress, InStr(1, DestinatAddress, "!") - 1)).Cells( _
-            CLng(Left(DestinationAddress, InStr(1, DestinationAddress, ",") - 1)), _
-            CLng(Right(DestinationAddress, Len(DestinationAddress) - InStr(1, DestinationAddress, ","))) _
+    DestinationAddress = Mid(DestinatAddress, 1 + InStr(1, DestinatAddress, "!"))
+    Set TargetCell = Sheets(Mid(DestinatAddress, 1, InStr(1, DestinatAddress, "!") - 1)).Cells( _
+            CLng(Mid(DestinationAddress, 1, InStr(1, DestinationAddress, ",") - 1)), _
+            CLng(Mid(DestinationAddress, 1 + InStr(1, DestinationAddress, ","))) _
         )
     If (TargetCell.Count > 1) Then Set TargetCell = TargetCell.Cells(1, 1)
     TargetCell.Value = Title
@@ -543,10 +543,10 @@ Public Sub PrintDataColumn(Values As Variant, DestinatAddress As String, NuForma
     Dim i As Long
     Dim TargetCell As Range
     Dim DestinationAddress As String
-    DestinationAddress = Right(DestinatAddress, Len(DestinatAddress) - InStr(1, DestinatAddress, "!"))
-    Set TargetCell = Sheets(Left(DestinatAddress, InStr(1, DestinatAddress, "!") - 1)).Cells( _
-            CLng(Left(DestinationAddress, InStr(1, DestinationAddress, ",") - 1)), _
-            CLng(Right(DestinationAddress, Len(DestinationAddress) - InStr(1, DestinationAddress, ","))) _
+    DestinationAddress = Mid(DestinatAddress, 1 + InStr(1, DestinatAddress, "!"))
+    Set TargetCell = Sheets(Mid(DestinatAddress, 1, InStr(1, DestinatAddress, "!") - 1)).Cells( _
+            CLng(Mid(DestinationAddress, 1, InStr(1, DestinationAddress, ",") - 1)), _
+            CLng(Mid(DestinationAddress, 1 + InStr(1, DestinationAddress, ","))) _
         )
     If (TargetCell.Count > 1) Then Set TargetCell = TargetCell.Cells(1, 1)
     For i = LBound(Values) To UBound(Values)

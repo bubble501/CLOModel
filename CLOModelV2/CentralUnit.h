@@ -16,6 +16,8 @@ class CentralUnit : public QObject{
 public:
 	~CentralUnit();
 	CentralUnit(QObject* parent=0);
+    bool SaveInputs() const;
+    void SaveInputs(bool val);
 	void AddLoan(const Mortgage& TempMtg) {LoansCalculator.AddLoan(TempMtg,LoansCalculator.NumBees());}
 	void AddLoan(
 		const QDate& Maturity
@@ -146,7 +148,7 @@ public:
 	void GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll = false);
 	void GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAll=false);
 #endif
-	void SetDealName(const QString& a) {Structure.SetDealName(a);}
+    void AddDealName(const QString& a) { Structure.AddDealName(a); }
 	bool GetBaseCaseToCall() const { return m_BaseCaseToCall; }
 	void SetBaseCaseToCall(bool val) { m_BaseCaseToCall = val; }
 	bool GetSaveBaseCase() const { return m_SaveBaseCase; }
@@ -181,6 +183,7 @@ private:
 	bool m_BaseCaseToCall;
 	ForwardBaseRateTable m_OverrideForwards;
 	ConstantBaseRateTable m_OverrideConstants;
+    bool m_SaveInputs;
     void showErrorDialog(const QString& errList);
 signals:
 	void LoopStarted();

@@ -1027,6 +1027,7 @@ void Tranche::getCashflowsDatabase()
             const QDate flowDate = currRec.value("Date").toDate();
             if (firstFlow) {
                 d->CashFlow.SetInitialOutstanding(currRec.value("Balance").toDouble() + currRec.value("Principal").toDouble());
+                SetOutstandingAmt(d->CashFlow.GetInitialOutstanding());
                 firstFlow = false;
             }
             d->CashFlow.SetFlow(flowDate, currRec.value("Interest").toDouble(), TrancheCashFlow::InterestFlow);
@@ -1120,7 +1121,8 @@ QDataStream& Tranche::LoadOldVersion(QDataStream& stream){
     if(loadProtocolVersion()<190){
         QString tempISIN;
         stream >> tempISIN;
-        d->ISINcode.insert(tempISIN);
+        ClearISIN();
+        AddISIN(tempISIN);
     }
     else {
         stream >> d->ISINcode;
@@ -1309,9 +1311,8 @@ BloombergVector Tranche::GetCouponVector(qint32 CoupIndex) const
 void Tranche::AddISIN(const QString& a)
 {
     Q_D(Tranche);
-    if (a.isEmpty())
-        return;
-    d->ISINcode.insert(a);
+    if (!a.isEmpty())
+        d->ISINcode.insert(a);
 }
 void Tranche::ClearISIN()
 {

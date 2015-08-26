@@ -1680,7 +1680,7 @@ void LoanAssumptionsEditor::LoadModel()
 	}
 	LoadProgress->setValue(4);
 
-    d->m_ModelNameLabel->setText(tr("Model Loaded: %1").arg(d->m_WtfToExtension.GetDealName()));
+    d->m_ModelNameLabel->setText(tr("Model Loaded: %1").arg(QStringList::fromSet(d->m_WtfToExtension.GetDealName()).join(" - ")));
 
     d->m_OriginalStructureModel->setRowCount(d->m_WtfToExtension.GetTranchesCount());
     for (int i = 0; i < d->m_WtfToExtension.GetTranchesCount(); ++i) {

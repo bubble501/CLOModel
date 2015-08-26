@@ -22,7 +22,8 @@ public:
 	virtual QRegularExpressionValidator* GetValidator(QObject* parent = 0) const override;
 	QString BloombergSafeVector(QDate CurrentDate=QDate::currentDate()) const;
 	using AbstractBbgVect::IsEmpty;
-	virtual bool IsEmpty(double Lbound, double Ubound = std::numeric_limits<double>::max())const;
+	virtual bool IsEmpty(double Lbound, double Ubound)const;
+    virtual bool IsEmpty(double Lbound)const;
 	static BloombergVector Combine(const BloombergVector& StartVect, const BloombergVector& SwitchVect, quint32 Periods);
 	void Combine(const BloombergVector& SwitchVect, quint32 Periods);
 	BloombergVector(const QString& Vec);

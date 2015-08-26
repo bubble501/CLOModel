@@ -64,7 +64,7 @@ void LoanAssMatcherThread::run()
 	{QDate Junk; out >> Junk; }
 	{bool Junk; out >> Junk; }
 	{bool Junk; out >> Junk; }
-	QString NewModelName;
+	QSet<QString> NewModelName;
 	{Waterfall Junk; Junk.SetLoadProtocolVersion(VersionChecker); out >> Junk; NewModelName = Junk.GetDealName(); }
 	{Waterfall Junk; Junk.SetLoadProtocolVersion(VersionChecker); out >> Junk; }
 	QHash<qint32, Mortgage*> LoanPool;
@@ -85,7 +85,7 @@ void LoanAssMatcherThread::run()
 	}
     if (d->Result.ScenarioCount() > 0) {
         d->Result.SetFilePath(d->m_ModelToScan);
-        d->Result.SetDealName(NewModelName.isEmpty() ? QFileInfo(ModelFile).completeBaseName() : NewModelName);
+        d->Result.SetDealName(NewModelName.isEmpty() ? QFileInfo(ModelFile).completeBaseName() : *NewModelName.begin());
 	}
     emit AnonimCalculated(d->Identifier);
 }

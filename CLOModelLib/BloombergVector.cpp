@@ -361,7 +361,13 @@ bool BloombergVector::IsEmpty(double Lbound, double Ubound) const
 	return false;*/
 }
 
-QString BloombergVector::BloombergSafeVector(QDate CurrentDate) const {
+bool BloombergVector::IsEmpty(double Lbound) const
+{
+    return IsEmpty(Lbound, std::numeric_limits<double>::max());
+}
+
+QString BloombergVector::BloombergSafeVector(QDate CurrentDate) const
+{
     Q_D(const BloombergVector);
     if (d->m_AnchorDate.isNull())
         return d->m_Vector;

@@ -35,6 +35,8 @@ public:
 	virtual double GetFlow(const QDate& index, qint32 FlowTpe) const;
 	virtual void Clear();
 	virtual void RemoveFlow(qint32 FlowTpe);
+    virtual void RemoveFlowsAt(qint32 index);
+    virtual void RemoveFlowsAt(const QDate& a);
 	virtual void RemoveAllFlows();
 	virtual void ResetFlows();
 	virtual QDate MaturityDate() const;

@@ -551,6 +551,23 @@ void GenericCashFlow::RemoveFlow(qint32 FlowTpe) {
 	}
 }
 
+void GenericCashFlow::RemoveFlowsAt(qint32 index)
+{
+    return RemoveFlowsAt(GetDate(index));
+}
+
+void GenericCashFlow::RemoveFlowsAt(const QDate& a)
+{
+    if (a.isNull())
+        return;
+    Q_D(GenericCashFlow);
+    auto flowIter = d->m_CashFlows.find(a);
+    if (flowIter == d->m_CashFlows.end())
+        return;
+    delete flowIter.value();
+    d->m_CashFlows.erase(flowIter);
+}
+
 void GenericCashFlow::RemoveAllFlows()
 {
     Clear();

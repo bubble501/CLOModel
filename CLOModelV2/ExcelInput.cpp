@@ -213,7 +213,9 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	}
 	{ //General Inputs
 		LOGDEBUG(QString("General Inputs"));
-		TempUnit.AddDealName(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+        const QStringList dealNames = QString::fromWCharArray(pdFreq->bstrVal).split(";", QString::SkipEmptyParts); pdFreq++;
+        for (auto singleDN = dealNames.constBegin(); singleDN != dealNames.constEnd();++singleDN)
+            TempUnit.AddDealName(*singleDN);
 		TempUnit.SetStartingDeferredJunFees(pdFreq->dblVal); pdFreq++;
 		TempUnit.SetGICinterest(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
 		TempUnit.SetGICBaseRate(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;

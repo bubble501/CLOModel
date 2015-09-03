@@ -63,12 +63,60 @@ QString Ratings::RatingValueString(RatingBucket val, RatingAgency agencySyntax)
 {
     return RatingValueString(static_cast<RatingValue>(static_cast<qint16>(val)), agencySyntax);
 }
+QString Ratings::RatingValueString(RatingBucket val)
+{
+    return RatingValueString(static_cast<RatingValue>(static_cast<qint16>(val)));
+}
 
 QString Ratings::RatingValueString(RatingValue val, RatingAgency agencySyntax )
 {
     if (agencySyntax == RatingAgency::CountAgencies)
         return QString();
     return RatingsPrivate::m_ratingSyntax[static_cast<qint8>(agencySyntax)][static_cast<qint16>(val)];
+}
+
+QString Ratings::RatingValueString(RatingValue val)
+{
+    const QString BloombergCompositeSyntax[static_cast<qint16>(Ratings::RatingValue::Dm) + 1] =
+    {
+        "NR",
+        "AAA",
+        "AA+",
+        "AA",
+        "AA-",
+        "A+",
+        "A",
+        "A-",
+        "BBB+",
+        "BBB",
+        "BBB-",
+        "BB+",
+        "BB",
+        "BB-",
+        "B+",
+        "B",
+        "B-",
+        "CCC+",
+        "CCC",
+        "CCC-",
+        "CC+", 
+        "CC",
+        "CC-", 
+        "C+", 
+        "C",
+        "C-", 
+        "DDD+", 
+        "DDD", 
+        "DDD-", 
+        "DD+", 
+        "DD", 
+        "DD-", 
+        "D+", 
+        "D"
+        "D-", 
+    };
+    return BloombergCompositeSyntax[static_cast<qint16>(val)];
+
 }
 
 void Ratings::setRating(RatingValue val, RatingAgency ag, CreditWatch wtch)

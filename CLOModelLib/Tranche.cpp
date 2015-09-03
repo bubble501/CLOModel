@@ -67,7 +67,7 @@ TranchePrivate::TranchePrivate(Tranche *q)
     TempCoup->SetDivisor(10000.0);
     Coupon.insert(0, TempCoup);
     m_DayCount.insert(0, new DayCountVector(DayCountConvention::ACT360));
-    ReferenceRate.insert(-1, new BaseRateVector("BP0003M"));
+    ReferenceRate.insert(-1, new BaseRateVector("ZERO"));
 }
 Tranche::Tranche(TranchePrivate *d, const Tranche& other)
 	:BackwardInterface(d,other)

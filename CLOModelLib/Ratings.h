@@ -87,8 +87,10 @@ protected:
 public:
     static QString agencyName(RatingAgency ag);
     static RatingBucket getBucket(RatingValue val);
-    static QString RatingValueString(RatingValue val, RatingAgency agencySyntax = RatingAgency::SP);
-    static QString RatingValueString(RatingBucket val, RatingAgency agencySyntax = RatingAgency::SP);
+    static QString RatingValueString(RatingValue val, RatingAgency agencySyntax);
+    static QString RatingValueString(RatingBucket val, RatingAgency agencySyntax);
+    static QString RatingValueString(RatingValue val);
+    static QString RatingValueString(RatingBucket val);
     void setRating(RatingValue val, RatingAgency ag, CreditWatch wtch);
     void setRating(RatingValue val, RatingAgency ag);
     bool setRating(const QString& val, RatingAgency ag);

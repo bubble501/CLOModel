@@ -296,12 +296,20 @@ void CentralUnit::CalculationStep1(){
 	LoansCalculator.SetDelinquencyLag(Structure.GetReinvestmentTest().GetDelinquencyLag().GetVector());
 	LoansCalculator.SetStartDate(PoolCutOff);
     if(m_SaveInputs){
-        QString Filename = "C:\\Temp\\ModelInputs";
+        QString Filename = "C:\\Temp\\ModelInputs.clom";
         QFile file(Filename);
         if (file.open(QIODevice::WriteOnly)) {
             QDataStream out(&file);
             out.setVersion(StreamVersionUsed);
-            out << qint32(ModelVersionNumber) << LoansCalculator << Structure;
+            out << qint32(ModelVersionNumber) 
+                << LiborUpdateDate
+                << m_UseForwardCurve
+                << m_BaseCaseToCall
+                << Structure
+                << CallStructure
+                << LoansCalculator
+                << m_OverrideConstants
+                << m_OverrideForwards;
             file.close();
         }
     }

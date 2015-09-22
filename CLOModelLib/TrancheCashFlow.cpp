@@ -213,7 +213,7 @@ bool TrancheCashFlow::GetCashFlowsBloomberg(const QBbgLib::QBbgAbstractResponse*
     Q_D(TrancheCashFlow);
     if (a->hasErrors()) 
         return false;
-    if (a->responseType() == QBbgLib::QBbgAbstractResponse::ReferenceDataResponse) {
+    if (a->responseType() == QBbgLib::QBbgAbstractResponse::ResponseType::ReferenceDataResponse) {
         const QBbgLib::QBbgReferenceDataResponse* const casted = dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(a);
         Q_ASSERT(casted);
         if (casted->header() != "MTG_CASH_FLOW" && casted->header() != "EXTENDED_CASH_FLOW" && casted->header() != "DES_CASH_FLOW" && casted->header() != "HIST_CASH_FLOW")

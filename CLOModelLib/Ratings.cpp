@@ -44,7 +44,13 @@ Ratings::Ratings(RatingsPrivate *d)
 
 QString Ratings::agencyName(RatingAgency ag)
 {
-    return RatingsPrivate::m_AgencyName[static_cast<qint32>(ag)];
+    for (qint32 i = 1;; ++i) {
+        Q_ASSERT(i <= CountRatingAcencies);
+        if (static_cast<qint32>(ag) == (1 << i))
+            RatingsPrivate::m_AgencyName[i];
+    }
+    Q_UNREACHABLE();
+    return RatingsPrivate::m_AgencyName[0];
 }
 
 Ratings::RatingBucket Ratings::getBucket(RatingValue val)
@@ -70,7 +76,13 @@ QString Ratings::RatingValueString(RatingBucket val)
 
 QString Ratings::RatingValueString(RatingValue val, RatingAgency agencySyntax )
 {
-    return RatingsPrivate::m_ratingSyntax[static_cast<qint32>(agencySyntax)][static_cast<qint16>(val)];
+    for (qint32 i = 1;; ++i) {
+        Q_ASSERT(i <= CountRatingAcencies);
+        if (static_cast<qint32>(agencySyntax) == (1 << i))
+            RatingsPrivate::m_ratingSyntax[i][static_cast<qint16>(val)];
+    }
+    Q_UNREACHABLE();
+    return RatingsPrivate::m_ratingSyntax[0][static_cast<qint16>(val)];
 }
 
 QString Ratings::RatingValueString(RatingValue val)
@@ -119,9 +131,8 @@ QString Ratings::RatingValueString(RatingValue val)
 
 void Ratings::setRating(RatingValue val, RatingAgency ag, CreditWatch wtch)
 {
-    Q_D(Ratings);
-    d->m_ratings[static_cast<qint32>(ag)] = val;
-    d->m_watch[static_cast<qint32>(ag)] = wtch;
+    setRating(val,ag);
+    setWatch(wtch, ag);
 }
 
 bool Ratings::setRating(const QString& val, RatingAgency ag)
@@ -159,25 +170,46 @@ bool Ratings::setRating(const QString& val, RatingAgency ag)
 void Ratings::setRating(RatingValue val, RatingAgency ag)
 {
     Q_D(Ratings);
-    d->m_ratings[static_cast<qint32>(ag)] = val;
+    for (qint32 i = 1;;++i){
+        Q_ASSERT(i <= CountRatingAcencies);
+        if (static_cast<qint32>(ag) == (1<<i))
+            d->m_ratings[i] = val;
+    }
+    
 }
 
 void Ratings::setWatch(CreditWatch wtch, RatingAgency ag)
 {
     Q_D(Ratings);
-    d->m_watch[static_cast<qint32>(ag)] = wtch;
+    for (qint32 i = 1;; ++i) {
+        Q_ASSERT(i <= CountRatingAcencies);
+        if (static_cast<qint32>(ag) == (1 << i))
+            d->m_watch[i] = wtch;
+    }
 }
 
 Ratings::RatingValue Ratings::getRating(RatingAgency ag) const
 {
     Q_D(const Ratings);
-    return  d->m_ratings[static_cast<qint32>(ag)];
+    for (qint32 i = 1;; ++i) {
+        Q_ASSERT(i <= CountRatingAcencies);
+        if (static_cast<qint32>(ag) == (1 << i))
+            return  d->m_ratings[i];
+    }
+    Q_UNREACHABLE();
+    return  d->m_ratings[0];
 }
 
 Ratings::CreditWatch Ratings::getWatch(RatingAgency ag) const
 {
     Q_D(const Ratings);
-    return  d->m_watch[static_cast<qint32>(ag)];
+    for (qint32 i = 1;; ++i) {
+        Q_ASSERT(i <= CountRatingAcencies);
+        if (static_cast<qint32>(ag) == (1 << i))
+            return  d->m_watch[i];
+    }
+    Q_UNREACHABLE();
+    return  d->m_watch[0];
 }
 
 Ratings::RatingValue Ratings::highestRating() const
@@ -187,7 +219,7 @@ Ratings::RatingValue Ratings::highestRating() const
 
 Ratings::RatingValue Ratings::lowestRating() const
 {
-
+    return ratingAtRank(CountRatingAcencies-1);
 }
 
 Ratings::RatingAgency Ratings::highestAgency() const
@@ -197,7 +229,7 @@ Ratings::RatingAgency Ratings::highestAgency() const
 
 Ratings::RatingAgency Ratings::lowestAgency() const
 {
-   
+    return agencyAtRank(CountRatingAcencies-1);
 }
 
 Ratings::RatingValue Ratings::averageRating() const
@@ -321,7 +353,7 @@ Ratings::RatingAgency Ratings::agencyAtRank(int rnk) const
 {
     Q_D(const Ratings);
     const auto ratingToFind = ratingAtRank(rnk);
-    for (qint32 i = 1; i <= static_cast<qint32>(Ratings::CountRatingAcencies); ++i) {
+    for (qint32 i = 1; i <= Ratings::CountRatingAcencies; ++i) {
         if (d->m_ratings[i-1] == ratingToFind)
             return static_cast<RatingAgency>(1 << i);
     }

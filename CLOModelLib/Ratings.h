@@ -1,6 +1,7 @@
 #ifndef Ratings_h__
 #define Ratings_h__
 #include "BackwardCompatibilityInterface.h"
+#include <QFlags>
 class RatingsPrivate;
 class RatingsTest;
 namespace QBbgLib { 
@@ -14,11 +15,13 @@ class CLOMODELLIB_EXPORT Ratings : public BackwardInterface
 public:
     enum class RatingAgency : qint32
     {
+        Invalid=0,
         SP = 0x1,
         Moody = 0x2,
         Fitch = 0x4,
-        DBRS = 0x5
+        DBRS = 0x8
     };
+    Q_DECLARE_FLAGS(RatingAgencies, RatingAgency)
     enum CreditWatch : qint8
     {
         Positive = 1,
@@ -98,8 +101,8 @@ public:
     CreditWatch getWatch(RatingAgency ag) const;
     RatingValue highestRating() const;
     RatingValue lowestRating() const;
-    RatingAgency highestAgency() const;
-    RatingAgency lowestAgency() const;
+    RatingAgencies highestAgency() const;
+    RatingAgencies lowestAgency() const;
     RatingValue averageRating() const;
     int notchesToAverageUpgrade() const;
     int notchesToAverageDowngrade() const;
@@ -107,7 +110,7 @@ public:
     int notchesToAverageDowngradeBucket() const;
     RatingValue ratingAtRank(int rnk) const;
     RatingValue ratingAtRankNoDuplicate(int rnk) const;
-    RatingAgency agencyAtRank(int rnk) const;
+    RatingAgencies agencyAtRank(int rnk) const;
     bool downloadRatings(const QBbgLib::QBbgSecurity& sec);
     bool downloadRatings(const  QBbgLib::QBbgAbstractResponse  * const res);
     bool downloadRatings(const QString& name, const QString& bbgExtension);
@@ -122,6 +125,7 @@ Q_DECLARE_METATYPE(Ratings)
 Q_DECLARE_METATYPE(Ratings::RatingValue)
 Q_DECLARE_METATYPE(Ratings::RatingAgency)
 Q_DECLARE_METATYPE(Ratings::CreditWatch)
+Q_DECLARE_OPERATORS_FOR_FLAGS(Ratings::RatingAgencies);
 CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const Ratings& flows);
 CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, Ratings& flows);
 #endif // Ratings_h__

@@ -44,10 +44,10 @@ Ratings::Ratings(RatingsPrivate *d)
 
 QString Ratings::agencyName(RatingAgency ag)
 {
-    for (qint32 i = 1;; ++i) {
+    for (qint32 i = 0;; ++i) {
         Q_ASSERT(i <= CountRatingAcencies);
-        if (static_cast<qint32>(ag) == (1 << i))
-            RatingsPrivate::m_AgencyName[i];
+        if (static_cast<qint32>(ag) == (1 << i)) 
+            return RatingsPrivate::m_AgencyName[i];
     }
     Q_UNREACHABLE();
     return RatingsPrivate::m_AgencyName[0];
@@ -76,10 +76,10 @@ QString Ratings::RatingValueString(RatingBucket val)
 
 QString Ratings::RatingValueString(RatingValue val, RatingAgency agencySyntax )
 {
-    for (qint32 i = 1;; ++i) {
+    for (qint32 i = 0;; ++i) {
         Q_ASSERT(i <= CountRatingAcencies);
         if (static_cast<qint32>(agencySyntax) == (1 << i))
-            RatingsPrivate::m_ratingSyntax[i][static_cast<qint16>(val)];
+            return RatingsPrivate::m_ratingSyntax[i][static_cast<qint16>(val)];
     }
     Q_UNREACHABLE();
     return RatingsPrivate::m_ratingSyntax[0][static_cast<qint16>(val)];
@@ -137,15 +137,22 @@ void Ratings::setRating(RatingValue val, RatingAgency ag, CreditWatch wtch)
 
 bool Ratings::setRating(const QString& val, RatingAgency ag)
 {
-    const auto & agencySyntax = RatingsPrivate::m_ratingSyntax[static_cast<qint32>(ag)];
+    qint32 agencyIndex;
+
+    for (agencyIndex = 0;; ++agencyIndex) {
+        Q_ASSERT(agencyIndex <= CountRatingAcencies);
+        if (static_cast<qint32>(ag) == (1 << agencyIndex))
+            break;
+    }
+    const  auto agencySyntax = RatingsPrivate::m_ratingSyntax[agencyIndex];
     QRegularExpression syntaxCheck;
     syntaxCheck.setPatternOptions(QRegularExpression::CaseInsensitiveOption | QRegularExpression::DontCaptureOption);
     for (int i = static_cast<qint16>(RatingValue::AAA); i <= static_cast<qint16>(RatingValue::Dm); ++i){
         if (!agencySyntax[i].isEmpty()) {
             syntaxCheck.setPattern(
-                "(^|[^" + QRegularExpression::escape(RatingsPrivate::m_reservedChars[static_cast<qint32>(ag)]) + "])" 
+                "(^|[^" + QRegularExpression::escape(RatingsPrivate::m_reservedChars[agencyIndex]) + "])"
                 + QRegularExpression::escape(agencySyntax[i])
-                + "($|[^" + QRegularExpression::escape(RatingsPrivate::m_reservedChars[static_cast<qint32>(ag)]) + "])"
+                + "($|[^" + QRegularExpression::escape(RatingsPrivate::m_reservedChars[agencyIndex]) + "])"
                 );
             Q_ASSERT(syntaxCheck.isValid());
             if (syntaxCheck.match(val).hasMatch()){
@@ -170,10 +177,14 @@ bool Ratings::setRating(const QString& val, RatingAgency ag)
 void Ratings::setRating(RatingValue val, RatingAgency ag)
 {
     Q_D(Ratings);
-    for (qint32 i = 1;;++i){
-        Q_ASSERT(i <= CountRatingAcencies);
-        if (static_cast<qint32>(ag) == (1<<i))
+    for (qint32 i = 0;;++i){
+        if (i > CountRatingAcencies)
+            i = i;
+        Q_ASSERT(i <= CountRatingAcencies);    
+        if (static_cast<qint32>(ag) == (1 << i)) {
             d->m_ratings[i] = val;
+            return;
+        }
     }
     
 }
@@ -181,17 +192,19 @@ void Ratings::setRating(RatingValue val, RatingAgency ag)
 void Ratings::setWatch(CreditWatch wtch, RatingAgency ag)
 {
     Q_D(Ratings);
-    for (qint32 i = 1;; ++i) {
+    for (qint32 i = 0;; ++i) {
         Q_ASSERT(i <= CountRatingAcencies);
-        if (static_cast<qint32>(ag) == (1 << i))
+        if (static_cast<qint32>(ag) == (1 << i)) {
             d->m_watch[i] = wtch;
+            return;
+        }
     }
 }
 
 Ratings::RatingValue Ratings::getRating(RatingAgency ag) const
 {
     Q_D(const Ratings);
-    for (qint32 i = 1;; ++i) {
+    for (qint32 i = 0;; ++i) {
         Q_ASSERT(i <= CountRatingAcencies);
         if (static_cast<qint32>(ag) == (1 << i))
             return  d->m_ratings[i];
@@ -203,7 +216,7 @@ Ratings::RatingValue Ratings::getRating(RatingAgency ag) const
 Ratings::CreditWatch Ratings::getWatch(RatingAgency ag) const
 {
     Q_D(const Ratings);
-    for (qint32 i = 1;; ++i) {
+    for (qint32 i = 0;; ++i) {
         Q_ASSERT(i <= CountRatingAcencies);
         if (static_cast<qint32>(ag) == (1 << i))
             return  d->m_watch[i];
@@ -222,12 +235,12 @@ Ratings::RatingValue Ratings::lowestRating() const
     return ratingAtRank(CountRatingAcencies-1);
 }
 
-Ratings::RatingAgency Ratings::highestAgency() const
+Ratings::RatingAgencies Ratings::highestAgency() const
 {
     return agencyAtRank(0);
 }
 
-Ratings::RatingAgency Ratings::lowestAgency() const
+Ratings::RatingAgencies Ratings::lowestAgency() const
 {
     return agencyAtRank(CountRatingAcencies-1);
 }
@@ -349,16 +362,16 @@ Ratings::RatingValue Ratings::ratingAtRankNoDuplicate(int rnk) const
     return *result;
 }
 
-Ratings::RatingAgency Ratings::agencyAtRank(int rnk) const
+Ratings::RatingAgencies Ratings::agencyAtRank(int rnk) const
 {
+    RatingAgencies result(Ratings::RatingAgency::Invalid);
     Q_D(const Ratings);
     const auto ratingToFind = ratingAtRank(rnk);
-    for (qint32 i = 1; i <= Ratings::CountRatingAcencies; ++i) {
-        if (d->m_ratings[i-1] == ratingToFind)
-            return static_cast<RatingAgency>(1 << i);
+    for (qint32 i = 0; i < Ratings::CountRatingAcencies; ++i) {
+        if (d->m_ratings[i] == ratingToFind)
+            result |= static_cast<RatingAgency>(1 << i);
     }
-    Q_UNREACHABLE();
-    return Ratings::RatingAgency::SP;
+    return result;
 }
 
 bool Ratings::downloadRatings(const QBbgLib::QBbgSecurity& sec)
@@ -373,16 +386,16 @@ bool Ratings::downloadRatings(const QBbgLib::QBbgSecurity& sec)
     QBbgRequestGroup allRq;
     QBbgReferenceDataRequest singleRq;
     singleRq.setSecurity(sec);
-    for (int i = 1; i <= static_cast<qint32>(CountRatingAcencies); ++i)
+    for (int i = 0; i < CountRatingAcencies; ++i)
     {
-        singleRq.setField(RatingsPrivate::m_ratingFields[i-1]);
+        singleRq.setField(RatingsPrivate::m_ratingFields[i]);
         singleRq.setID(i + 100);
         allRq.addRequest(singleRq);
     }
     QBbgManager manager;
     const auto& allres= manager.processRequest(allRq);
     
-    for (int i = 1; i <= static_cast<qint32>(CountRatingAcencies); ++i) {
+    for (int i = 0; i < CountRatingAcencies; ++i) {
         Q_ASSERT(allres.contains(i + 100));
         if (!allres.value(i + 100)->hasErrors()) {
             oneRatingFound = oneRatingFound || setRating(dynamic_cast<const QBbgReferenceDataResponse*>(allres.value(i + 100))->value().toString(), static_cast<RatingAgency>(1 << i));

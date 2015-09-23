@@ -5,6 +5,7 @@
 #include "Private/BackwardCompatibilityInterface_p.h"
 #include "Ratings.h"
 #include <QSet>
+
 class TranchePrivate : public BackwardInterfacePrivate
 {
     DECLARE_PRIVATE_COMMONS(Tranche)
@@ -14,9 +15,9 @@ public:
     IntegerVector PaymentFrequency;
     QDate LastPaymentDate;
     QDate SettlementDate;
-    QHash<qint32, BaseRateVector*> ReferenceRate;
-    QHash<qint32, BloombergVector*> Coupon;
-    QHash<qint32, DayCountVector*> m_DayCount;
+    QHash<qint32, std::shared_ptr<BaseRateVector> > ReferenceRate;
+    QHash<qint32, std::shared_ptr<BloombergVector> > Coupon;
+    QHash<qint32, std::shared_ptr<DayCountVector> > m_DayCount;
     QString BloombergExtension;
     QString Currency;
     QSet<QString> ISINcode;
@@ -32,7 +33,7 @@ public:
     Ratings m_rating;
     mutable ConstantBaseRateTable m_CnstRateCache;
     mutable ForwardBaseRateTable m_FrwRateCache;
-    mutable QHash<qint32, BloombergVector*> ReferenceRateValue;
+    mutable QHash<qint32, std::shared_ptr<BloombergVector> > ReferenceRateValue;
     mutable bool m_UseForwardCurve;
     QString downloadISIN() const;
     template <class T> double getTotalActualCoupon(const T& index) const

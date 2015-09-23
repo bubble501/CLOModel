@@ -39,14 +39,14 @@ TranchePrivate::TranchePrivate(Tranche *q,const TranchePrivate& other)
     , m_UseForwardCurve(other.m_UseForwardCurve)
     , m_rating(other.m_rating)
 {
-    for (QHash<qint32, BloombergVector*>::const_iterator i = other.Coupon.constBegin(); i != other.Coupon.constEnd(); ++i)
-        Coupon.insert(i.key(), new BloombergVector(*(i.value())));
-    for (QHash<qint32, BloombergVector*>::const_iterator i = other.ReferenceRateValue.constBegin(); i != other.ReferenceRateValue.constEnd(); ++i)
-        ReferenceRateValue.insert(i.key(), new BloombergVector(*(i.value())));
-    for (QHash<qint32, BaseRateVector*>::const_iterator i = other.ReferenceRate.constBegin(); i != other.ReferenceRate.constEnd(); ++i)
-        ReferenceRate.insert(i.key(), new BaseRateVector(*(i.value())));
+    for (auto i = other.Coupon.constBegin(); i != other.Coupon.constEnd(); ++i)
+        Coupon.insert(i.key(), std::make_shared<BloombergVector>(*(i.value())));
+    for (auto i = other.ReferenceRateValue.constBegin(); i != other.ReferenceRateValue.constEnd(); ++i)
+        ReferenceRateValue.insert(i.key(), std::make_shared<BloombergVector>(*(i.value())));
+    for (auto i = other.ReferenceRate.constBegin(); i != other.ReferenceRate.constEnd(); ++i)
+        ReferenceRate.insert(i.key(), std::make_shared<BaseRateVector>(*(i.value())));
     for (auto i = other.m_DayCount.constBegin(); i != other.m_DayCount.constEnd(); ++i)
-        m_DayCount.insert(i.key(), new DayCountVector(*(i.value())));
+        m_DayCount.insert(i.key(), std::make_shared<DayCountVector>(*(i.value())));
 }
 TranchePrivate::TranchePrivate(Tranche *q)
 	:BackwardInterfacePrivate(q)
@@ -63,11 +63,11 @@ TranchePrivate::TranchePrivate(Tranche *q)
     , PaymentFrequency("3")
     , m_UseForwardCurve(false)
 {
-    BloombergVector* TempCoup = new BloombergVector("0");
+    auto TempCoup = std::make_shared<BloombergVector>("0");
     TempCoup->SetDivisor(10000.0);
     Coupon.insert(0, TempCoup);
-    m_DayCount.insert(0, new DayCountVector(DayCountConvention::ACT360));
-    ReferenceRate.insert(-1, new BaseRateVector("ZERO"));
+    m_DayCount.insert(0, std::make_shared< DayCountVector>(DayCountConvention::ACT360));
+    ReferenceRate.insert(-1, std::make_shared< BaseRateVector>("ZERO"));
 }
 Tranche::Tranche(TranchePrivate *d, const Tranche& other)
 	:BackwardInterface(d,other)
@@ -95,13 +95,13 @@ Tranche& Tranche::operator=(const Tranche& other){
     d->m_rating = other.d_func()->m_rating;
     ClearInterest();
     for (auto i = other.d_func()->Coupon.constBegin(); i != other.d_func()->Coupon.constEnd(); ++i)
-        d->Coupon.insert(i.key(), new BloombergVector(*(i.value())));
+        d->Coupon.insert(i.key(), std::make_shared< BloombergVector>(*(i.value())));
     for (auto i = other.d_func()->ReferenceRateValue.constBegin(); i != other.d_func()->ReferenceRateValue.constEnd(); ++i)
-        d->ReferenceRateValue.insert(i.key(), new BloombergVector(*(i.value())));
+        d->ReferenceRateValue.insert(i.key(), std::make_shared< BloombergVector>(*(i.value())));
     for (auto i = other.d_func()->ReferenceRate.constBegin(); i != other.d_func()->ReferenceRate.constEnd(); ++i)
-        d->ReferenceRate.insert(i.key(), new BaseRateVector(*(i.value())));
+        d->ReferenceRate.insert(i.key(), std::make_shared< BaseRateVector>(*(i.value())));
     for (auto i = other.d_func()->m_DayCount.constBegin(); i != other.d_func()->m_DayCount.constEnd(); ++i)
-        d->m_DayCount.insert(i.key(), new DayCountVector(*(i.value())));
+        d->m_DayCount.insert(i.key(), std::make_shared< DayCountVector>(*(i.value())));
     return *this;
 }
 Tranche::Tranche(TranchePrivate *d)
@@ -112,7 +112,7 @@ Tranche::~Tranche() {
 	ClearInterest();
 }
 
-const QHash<qint32, BloombergVector*>& Tranche::GetRefRateValues() const
+const QHash<qint32, std::shared_ptr<BloombergVector> >& Tranche::GetRefRateValues() const
 {
     Q_D(const Tranche);
     return d->ReferenceRateValue;
@@ -121,14 +121,6 @@ const QHash<qint32, BloombergVector*>& Tranche::GetRefRateValues() const
 void Tranche::ClearInterest()
 {
     Q_D(Tranche);
-    for (auto i = d->Coupon.begin(); i != d->Coupon.end(); ++i)
-		delete (i.value());
-    for (auto i = d->ReferenceRateValue.begin(); i != d->ReferenceRateValue.end(); ++i)
-		delete (i.value());
-    for (auto i = d->ReferenceRate.begin(); i != d->ReferenceRate.end(); ++i)
-		delete (i.value());
-    for (auto i = d->m_DayCount.begin(); i != d->m_DayCount.end(); ++i)
-        delete (i.value());
     d->Coupon.clear();
     d->ReferenceRateValue.clear();
     d->ReferenceRate.clear();
@@ -178,7 +170,7 @@ void Tranche::GetRefRateValueFromBloomberg()const{
             (*(d->ReferenceRateValue[i.key()])) = i.value()->GetRefRateValueFromBloomberg(d->m_CnstRateCache);
 		}
 		else {
-            d->ReferenceRateValue.insert(i.key(), new BloombergVector(i.value()->GetRefRateValueFromBloomberg(d->m_CnstRateCache)));
+            d->ReferenceRateValue.insert(i.key(), std::make_shared< BloombergVector>(i.value()->GetRefRateValueFromBloomberg(d->m_CnstRateCache)));
 		}
 	}
     d->m_UseForwardCurve = false;
@@ -191,7 +183,7 @@ void Tranche::CompileReferenceRateValue(ConstantBaseRateTable& Values) const {
             (*(d->ReferenceRateValue[i.key()])) = i.value()->CompileReferenceRateValue(Values);
 		}
 		else {
-            d->ReferenceRateValue.insert(i.key(), new BloombergVector(i.value()->CompileReferenceRateValue(Values)));
+            d->ReferenceRateValue.insert(i.key(), std::make_shared< BloombergVector>(i.value()->CompileReferenceRateValue(Values)));
 		}
 	}
     d->m_UseForwardCurve = false;
@@ -203,7 +195,7 @@ void Tranche::CompileReferenceRateValue(ForwardBaseRateTable& Values) const {
             (*(d->ReferenceRateValue[i.key()])) = i.value()->CompileReferenceRateValue(Values);
 		}
 		else {
-            d->ReferenceRateValue.insert(i.key(), new BloombergVector(i.value()->CompileReferenceRateValue(Values)));
+            d->ReferenceRateValue.insert(i.key(), std::make_shared< BloombergVector>(i.value()->CompileReferenceRateValue(Values)));
 		}
 	}
     d->m_UseForwardCurve = true;
@@ -225,7 +217,7 @@ void Tranche::GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadA
             (*(d->ReferenceRateValue[i.key()])) = i.value()->GetBaseRatesDatabase(Values, DownloadAll);
 		}
 		else {
-            d->ReferenceRateValue.insert(i.key(), new BloombergVector(i.value()->GetBaseRatesDatabase(Values, DownloadAll)));
+            d->ReferenceRateValue.insert(i.key(), std::make_shared< BloombergVector>(i.value()->GetBaseRatesDatabase(Values, DownloadAll)));
 		}
 	}
     d->m_UseForwardCurve = false;
@@ -239,7 +231,7 @@ void Tranche::GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool DownloadAl
             (*(d->ReferenceRateValue[i.key()])) = i.value()->GetBaseRatesDatabase(Values, DownloadAll);
 		}
 		else {
-            d->ReferenceRateValue.insert(i.key(), new BloombergVector(i.value()->GetBaseRatesDatabase(Values, DownloadAll)));
+            d->ReferenceRateValue.insert(i.key(), std::make_shared< BloombergVector>(i.value()->GetBaseRatesDatabase(Values, DownloadAll)));
 		}
 	}
     d->m_UseForwardCurve = true;
@@ -567,30 +559,30 @@ void Tranche::GetDataFromBloomberg()
                 if (d->Coupon.contains(0))
                     *(d->Coupon[0]) = "";
                 else 
-                    d->Coupon.insert(0, new BloombergVector());
+                    d->Coupon.insert(0, std::make_shared< BloombergVector>());
             }
 			else { 
                 if (d->Coupon.contains(0))
                     *(d->Coupon[0]) = dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(6))->value().toString();
                 else 
-                    d->Coupon.insert(0, new BloombergVector(dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(6))->value().toString()));
+                    d->Coupon.insert(0, std::make_shared< BloombergVector>(dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(6))->value().toString()));
             }
 
             if (TmpResponse.value(7)->hasErrors()) { 
                 if (d->ReferenceRate.contains(0))
                     *(d->ReferenceRate[0]) = "";
                 else 
-                    d->ReferenceRate.insert(0, new BaseRateVector());
+                    d->ReferenceRate.insert(0, std::make_shared< BaseRateVector>());
             }
 			else {
                 if (d->ReferenceRate.contains(0))
                     *(d->ReferenceRate[0]) = dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(7))->value().toString();
                 else 
-                    d->ReferenceRate.insert(0, new BaseRateVector(dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(7))->value().toString()));
+                    d->ReferenceRate.insert(0, std::make_shared< BaseRateVector>(dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(7))->value().toString()));
                 if (d->ReferenceRate.contains(-1))
                     *(d->ReferenceRate[-1]) = dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(7))->value().toString();
                 else
-                    d->ReferenceRate.insert(-1, new BaseRateVector(dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(7))->value().toString()));
+                    d->ReferenceRate.insert(-1, std::make_shared< BaseRateVector>(dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(7))->value().toString()));
 			}
 		}
 		else {
@@ -598,13 +590,13 @@ void Tranche::GetDataFromBloomberg()
                 if (d->Coupon.contains(0))
                     *(d->Coupon[0]) = "";
                 else 
-                    d->Coupon.insert(0, new BloombergVector());
+                    d->Coupon.insert(0, std::make_shared< BloombergVector>());
             }
 			else { 
                 if (d->Coupon.contains(0))
                     *(d->Coupon[0]) = QString("%1").arg(dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(8))->value().toDouble()*100.0);
                 else 
-                    d->Coupon.insert(0, new BloombergVector(QString("%1").arg(dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(8))->value().toDouble()*100.0)));
+                    d->Coupon.insert(0, std::make_shared< BloombergVector>(QString("%1").arg(dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(8))->value().toDouble()*100.0)));
             }
 
 
@@ -624,7 +616,7 @@ void Tranche::GetDataFromBloomberg()
             if (d->ReferenceRate.contains(-1))
                 *(d->ReferenceRate[-1]) = DeafultRefRateString;
             else 
-                d->ReferenceRate.insert(-1, new BaseRateVector(DeafultRefRateString));
+                d->ReferenceRate.insert(-1, std::make_shared< BaseRateVector>(DeafultRefRateString));
 		}
 
         if (TmpResponse.value(9)->hasErrors()) 
@@ -649,13 +641,13 @@ void Tranche::GetDataFromBloomberg()
             if (d->m_DayCount.contains(0))
                 d->m_DayCount[0]->operator=(QString::number(static_cast<qint16>(DayCountConvention::ACT360)));
             else
-                d->m_DayCount.insert(0, new DayCountVector(DayCountConvention::ACT360));
+                d->m_DayCount.insert(0, std::make_shared< DayCountVector>(DayCountConvention::ACT360));
         }
         else {
             if (d->m_DayCount.contains(0))
                 d->m_DayCount[0]->operator=(dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(14))->value().toString());
             else
-                d->m_DayCount.insert(0, new DayCountVector(dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(14))->value().toString()));
+                d->m_DayCount.insert(0, std::make_shared< DayCountVector>(dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(14))->value().toString()));
         }
         if (!TmpResponse.value(15)->hasErrors()) {
             currentDefer = dynamic_cast<const QBbgLib::QBbgReferenceDataResponse*>(TmpResponse.value(15))->value().toDouble();
@@ -1114,9 +1106,9 @@ QDataStream& operator>>(QDataStream & stream, Tranche& flows){
 QDataStream& Tranche::LoadOldVersion(QDataStream& stream){
     Q_D(Tranche);
 	qint32 TempSize, TempKey;
-	BloombergVector* TempBV;
-	BaseRateVector* TempBRV;
-    DayCountVector* TempDCV;
+	std::shared_ptr<BloombergVector> TempBV;
+    std::shared_ptr<BaseRateVector> TempBRV;
+    std::shared_ptr<DayCountVector> TempDCV;
 	stream >> d->TrancheName;
     if(loadProtocolVersion()<190){
         QString tempISIN;
@@ -1147,28 +1139,28 @@ QDataStream& Tranche::LoadOldVersion(QDataStream& stream){
 	ClearInterest();
 	stream >> TempSize;
 	for (qint32 i = 0; i < TempSize; i++) {
-		TempBV = new BloombergVector();
+        TempBV = std::make_shared< BloombergVector>();
         TempBV->SetLoadProtocolVersion(loadProtocolVersion());
 		stream >> TempKey >> (*TempBV);
         d->Coupon.insert(TempKey, TempBV);
 	}
 	stream >> TempSize;
 	for (qint32 i = 0; i < TempSize; i++) {
-		TempBRV = new BaseRateVector();
+        TempBRV = std::make_shared< BaseRateVector>();
         TempBRV->SetLoadProtocolVersion(loadProtocolVersion());
 		stream >> TempKey >> (*TempBRV);
         d->ReferenceRate.insert(TempKey, TempBRV);
 	}
 	stream >> TempSize;
 	for (qint32 i = 0; i < TempSize; i++) {
-		TempBV = new BloombergVector();
+        TempBV = std::make_shared< BloombergVector>();
         TempBV->SetLoadProtocolVersion(loadProtocolVersion());
 		stream >> TempKey >> (*TempBV);
         d->ReferenceRateValue.insert(TempKey, TempBV);
 	}
     stream >> TempSize;
     for (qint32 i = 0; i < TempSize; i++) {
-        TempDCV = new DayCountVector();
+        TempDCV = std::make_shared< DayCountVector>();
         TempDCV->SetLoadProtocolVersion(loadProtocolVersion());
         stream >> TempKey >> (*TempDCV);
         d->m_DayCount.insert(TempKey, TempDCV);
@@ -1363,7 +1355,7 @@ void Tranche::SetDefaultRefRate(const QString& a)
     if (d->ReferenceRate.contains(-1))
         (*(d->ReferenceRate[-1])) = a;
 	else
-        d->ReferenceRate.insert(-1, new BaseRateVector(a));
+        d->ReferenceRate.insert(-1, std::make_shared< BaseRateVector>(a));
 }
 void Tranche::SetDayCount(QString val, qint32 CoupIndex)
 {

@@ -2,6 +2,7 @@
 #define Ratings_h__
 #include "BackwardCompatibilityInterface.h"
 class RatingsPrivate;
+class RatingsTest;
 namespace QBbgLib { 
     class QBbgSecurity; 
     class QBbgAbstractResponse; 
@@ -11,15 +12,12 @@ class CLOMODELLIB_EXPORT Ratings : public BackwardInterface
     DECLARE_PUBLIC_COMMONS(Ratings)
     DECLARE_PUBLIC_COMMONS_COPY(Ratings)
 public:
-    enum class RatingAgency : qint8
+    enum class RatingAgency : qint32
     {
-        SP,
-        Moody,
-        Fitch,
-        DBRS,
-
-        //Leave this as last
-        CountAgencies
+        SP = 0x1,
+        Moody = 0x2,
+        Fitch = 0x4,
+        DBRS = 0x5
     };
     enum CreditWatch : qint8
     {
@@ -82,6 +80,7 @@ public:
         NR = static_cast<qint16>(RatingValue::NR)
     };
 protected:
+    enum { CountRatingAcencies = 4 };
     virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
     RatingValue averageRating(double startingVal) const;
 public:
@@ -114,8 +113,10 @@ public:
     bool downloadRatings(const QString& name, const QString& bbgExtension);
     int numRatings() const;
     void reset();
+    friend class RatingsTest;
     friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const Ratings& flows);
     friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, Ratings& flows);
+    //static_assert(std::numeric_limits<RatingAgency>::max() == (1 << CountRatingAcencies), "Count of agencies not equal to the actual count of the agencies");
 };
 Q_DECLARE_METATYPE(Ratings)
 Q_DECLARE_METATYPE(Ratings::RatingValue)

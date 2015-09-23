@@ -9,12 +9,12 @@ class RatingsPrivate : public BackwardInterfacePrivate
     DECLARE_PRIVATE_COMMONS_COPY(Ratings)
     DECLARE_PRIVATE_COMMONS_DATASTREAM(Ratings)
 public:
-    Ratings::RatingValue m_ratings[static_cast<qint8>(Ratings::RatingAgency::CountAgencies)];
-    Ratings::CreditWatch m_watch[static_cast<qint8>(Ratings::RatingAgency::CountAgencies)];
-    static const QString m_ratingSyntax[static_cast<qint8>(Ratings::RatingAgency::CountAgencies)][static_cast<qint16>(Ratings::RatingValue::Dm) + 1];
-    static const QString m_ratingFields[static_cast<qint8>(Ratings::RatingAgency::CountAgencies)];
-    static const QString m_AgencyName[static_cast<qint8>(Ratings::RatingAgency::CountAgencies)];
-    static const QString m_reservedChars[static_cast<qint8>(Ratings::RatingAgency::CountAgencies)];
+    Ratings::RatingValue m_ratings[Ratings::CountRatingAcencies];
+    Ratings::CreditWatch m_watch[Ratings::CountRatingAcencies];
+    static const QString m_ratingSyntax[Ratings::CountRatingAcencies][static_cast<qint16>(Ratings::RatingValue::Dm) + 1];
+    static const QString m_ratingFields[Ratings::CountRatingAcencies];
+    static const QString m_AgencyName[Ratings::CountRatingAcencies];
+    static const QString m_reservedChars[Ratings::CountRatingAcencies];
 };
 
 

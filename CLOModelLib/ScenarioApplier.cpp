@@ -40,7 +40,7 @@ void ScenarioApplier::AddAssumption(const AssumptionSet& a, qint32 idx)
     d->m_Scenarios.insert(idx, new AssumptionSet(a));
 }
 
-const MtgCashFlow* ScenarioApplier::GetResult(const AssumptionSet& a) const
+const std::shared_ptr<MtgCashFlow> ScenarioApplier::GetResult(const AssumptionSet& a) const
 {
     return GetResult(FindAssumption(a));
 }

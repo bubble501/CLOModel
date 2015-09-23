@@ -10,7 +10,7 @@ class MtgCalculatorPrivate : public AbstrAsyncCalculatorPrivate
     DECLARE_PRIVATE_COMMONS(MtgCalculator)
     DECLARE_PRIVATE_COMMONS_DATASTREAM(MtgCalculator)
 public:
-    QHash<qint32, Mortgage*> Loans;
+    QHash<qint32, std::shared_ptr<Mortgage> > Loans;
     QString m_CPRass;
     QString m_CDRass;
     QString m_LSass;
@@ -23,6 +23,6 @@ public:
     bool m_SaveIndividualFlows;
     QDate StartDate;
     MtgCashFlow m_AggregatedRes;
-    QHash<qint32, QHash<QString, QString>* > TempProperties;
+    QHash<qint32, std::shared_ptr<QHash<QString, QString> > > TempProperties;
 };
 #endif // MtgCalculator_p_h__

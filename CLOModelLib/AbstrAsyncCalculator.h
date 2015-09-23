@@ -3,6 +3,7 @@
 #define AbstrAsyncCalculator_h__
 #include "BackwardCompatibilityInterface.h"
 #include <QObject>
+#include <memory>
 #ifndef RETURN_WHEN_RUNNING
 #define RETURN_WHEN_RUNNING(rvr,retval) if( ContinueCalculation() == rvr) return retval;
 #endif
@@ -15,15 +16,15 @@ protected:
     inline const AbstrAsyncCalculatorPrivate* d_func() const { return reinterpret_cast<const AbstrAsyncCalculatorPrivate *>(qGetPtrHelper(BackwardInterface::d_ptr)); }
     friend class AbstrAsyncCalculatorPrivate;
     AbstrAsyncCalculator(AbstrAsyncCalculatorPrivate *d, QObject* parent = nullptr);
-    virtual QHash<qint32, void*>& getResultVoid();
-    virtual const QHash<qint32, void*>& getResultVoid() const;
+    virtual QHash<qint32, std::shared_ptr<void>>& getResultVoid();
+    virtual const QHash<qint32, std::shared_ptr<void>>& getResultVoid() const;
     virtual QHash<qint32, QPointer<QObject> >& getThreadPool();
     virtual const QHash<qint32, QPointer<QObject> >& getThreadPool() const;
     virtual const QSet<qint32>& getBeeSent() const;
     virtual QSet<qint32>& getBeeSent();
     virtual qint32& getBeesReturned();
     virtual const qint32& getBeesReturned() const;
-    virtual const void* getResultVoid(qint32 key)const;
+    virtual const std::shared_ptr<void> getResultVoid(qint32 key)const;
     virtual void insertResult(qint32 Key, void* val);
     virtual bool ContinueCalculation() const;
     virtual void ContinueCalculation(bool val);

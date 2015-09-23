@@ -1840,7 +1840,7 @@ void LoanAssumptionsEditor::SavePool()
 	bool SomethingToChange = false;
     for (int i = 0; i < d->m_PoolModel->rowCount(); ++i) {
         if (d->m_PoolModel->data(d->m_PoolModel->index(i, 3), Qt::UserRole + Qt::CheckStateRole).toInt() == Qt::Checked) {
-            Mortgage* CurrLoan = d->m_LoanPool.GetLoans().value(d->m_PoolModel->data(d->m_PoolModel->index(i, 0), Qt::UserRole).toInt(), nullptr);
+            auto CurrLoan = d->m_LoanPool.GetLoans().value(d->m_PoolModel->data(d->m_PoolModel->index(i, 0), Qt::UserRole).toInt(), nullptr);
 			if (CurrLoan) {
                 auto NewScenario = d->m_PoolModel->data(d->m_PoolModel->index(i, 3), Qt::EditRole).toString();
 				if (NewScenario.isEmpty()) CurrLoan->RemoveProperty("Scenario");

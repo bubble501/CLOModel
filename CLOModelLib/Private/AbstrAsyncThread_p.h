@@ -9,6 +9,6 @@ protected:
 public:
     virtual ~AbstrAsyncThreadPrivate();
     int Identifier;
-    void* m_Result;
+    std::shared_ptr<void> m_Result;
 };
 #endif // AbstrAsyncThread_p_h__

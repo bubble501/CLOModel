@@ -32,7 +32,7 @@ public:
 	virtual QList<qint32> GetAssumptionKeys()const;
 	virtual void AddAssumption(const AssumptionSet& a, qint32 idx);
 	using  TemplAsyncCalculator<ApplyFlowThread, MtgCashFlow>::GetResult;
-	const MtgCashFlow* GetResult(const AssumptionSet& a)const;
+    const std::shared_ptr<MtgCashFlow> GetResult(const AssumptionSet& a)const;
 	virtual QString ReadyToCalculate() const override;
 	virtual void Reset() override;
 	virtual int NumBees() const override;

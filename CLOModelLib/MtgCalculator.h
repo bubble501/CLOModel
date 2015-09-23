@@ -38,11 +38,11 @@ public:
 	virtual void Reset() override;
 	virtual void ClearResults() override;
     virtual QList<qint32> GetResultsKeys() const override;
-    virtual const MtgCashFlow* GetResult(qint32 key)const override;
+    virtual const std::shared_ptr<MtgCashFlow> GetResult(qint32 key)const override;
 	virtual int NumBees() const override;
 	void AddLoan(const Mortgage& a, qint32 Index);
-	const QHash<qint32, Mortgage*>& GetLoans() const;
-	QHash<qint32, Mortgage*>& GetLoans();
+    const QHash<qint32, std::shared_ptr<Mortgage> >& GetLoans() const;
+    QHash<qint32, std::shared_ptr<Mortgage> >& GetLoans();
 	void SetLoans(const QHash<qint32, Mortgage*>& a);
 	void SetStartDate(const QDate& a);
 	const QDate& GetStartDate()const;

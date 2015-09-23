@@ -68,19 +68,19 @@ qint32& AbstrAsyncCalculator::getBeesReturned()
     return d->BeesReturned;
 }
 
-QHash<qint32, void*>& AbstrAsyncCalculator::getResultVoid()
+QHash<qint32, std::shared_ptr<void> >& AbstrAsyncCalculator::getResultVoid()
 {
     Q_D(AbstrAsyncCalculator);
     return d->m_Result;
 }
 
-const void* AbstrAsyncCalculator::getResultVoid(qint32 key) const
+const std::shared_ptr<void> AbstrAsyncCalculator::getResultVoid(qint32 key) const
 {
     Q_D(const AbstrAsyncCalculator);
-    return d->m_Result.value(key,nullptr);
+    return d->m_Result.value(key, std::shared_ptr<void>());
 }
 
-const QHash<qint32, void*>& AbstrAsyncCalculator::getResultVoid() const
+const QHash<qint32, std::shared_ptr<void> >& AbstrAsyncCalculator::getResultVoid() const
 {
     Q_D(const AbstrAsyncCalculator);
     return d->m_Result;
@@ -89,7 +89,7 @@ const QHash<qint32, void*>& AbstrAsyncCalculator::getResultVoid() const
 void AbstrAsyncCalculator::insertResult(qint32 Key, void* val)
 {
     Q_D(AbstrAsyncCalculator);
-    d->m_Result.insert(Key, val);
+    d->m_Result.insert(Key, std::shared_ptr<void>(val));
 }
 
 bool AbstrAsyncCalculator::ContinueCalculation() const

@@ -67,10 +67,10 @@ void LoanAssMatcherThread::run()
 	QSet<QString> NewModelName;
 	{Waterfall Junk; Junk.SetLoadProtocolVersion(VersionChecker); out >> Junk; NewModelName = Junk.GetDealName(); }
 	{Waterfall Junk; Junk.SetLoadProtocolVersion(VersionChecker); out >> Junk; }
-	QHash<qint32, Mortgage*> LoanPool;
-	MtgCalculator Junk; Junk.SetLoadProtocolVersion(VersionChecker);out >> Junk;
+	//QHash<qint32, std::shared_ptr<Mortgage> > LoanPool;
+    MtgCalculator MtgCalc; MtgCalc.SetLoadProtocolVersion(VersionChecker); out >> MtgCalc;
 	ModelFile.close();
-	LoanPool = Junk.GetLoans();
+    const auto& LoanPool = MtgCalc.GetLoans();
 
 	for (auto i = LoanPool.constBegin(); i != LoanPool.constEnd(); ++i) {
         for (auto j = d->m_AvailableAssumptions->constBegin(); j != d->m_AvailableAssumptions->constEnd(); ++j) {

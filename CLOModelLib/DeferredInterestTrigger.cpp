@@ -102,12 +102,12 @@ QDataStream& DeferredInterestTrigger::LoadOldVersion(QDataStream& stream) {
 	return AbstractTrigger::LoadOldVersion(stream);
 }
 
-bool DeferredInterestTrigger::Failing(const QList<Tranche*>& currentTranches, const QDate& CurrentPeriod) const
+bool DeferredInterestTrigger::Failing(const QList<std::shared_ptr< Tranche> >& currentTranches, const QDate& CurrentPeriod) const
 {
     return !Passing(currentTranches, CurrentPeriod);
 }
 
-bool DeferredInterestTrigger::Failing(const QList<Tranche*>& currentTranches, int CurrentPeriod) const
+bool DeferredInterestTrigger::Failing(const QList<std::shared_ptr<Tranche> >& currentTranches, int CurrentPeriod) const
 {
     return !Passing(currentTranches, CurrentPeriod);
 }
@@ -212,13 +212,13 @@ void DeferredInterestTrigger::SetTargetCoupon(const QString& val)
     d->m_TargetCoupon = val;
 }
 
-bool DeferredInterestTrigger::Passing(const QList<Tranche*>& currentTranches, const QDate& CurrentPeriod) const
+bool DeferredInterestTrigger::Passing(const QList<std::shared_ptr<Tranche> >& currentTranches, const QDate& CurrentPeriod) const
 {
     Q_D(const DeferredInterestTrigger);
     return d->passingTemplate(currentTranches, CurrentPeriod);
 }
 
-bool DeferredInterestTrigger::Passing(const QList<Tranche*>& currentTranches, int CurrentPeriod) const
+bool DeferredInterestTrigger::Passing(const QList<std::shared_ptr<Tranche> >& currentTranches, int CurrentPeriod) const
 {
     Q_D(const DeferredInterestTrigger);
     return d->passingTemplate(currentTranches, CurrentPeriod);

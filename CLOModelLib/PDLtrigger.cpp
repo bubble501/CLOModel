@@ -89,24 +89,24 @@ QDataStream& PDLTrigger::LoadOldVersion(QDataStream& stream)
     return AbstractTrigger::LoadOldVersion(stream);
 }
 
-bool PDLTrigger::Passing(const QList<Tranche*>& currentTranches, double Assets, int CurrentPeriod) const
+bool PDLTrigger::Passing(const QList<std::shared_ptr<Tranche> >& currentTranches, double Assets, int CurrentPeriod) const
 {
     Q_D(const PDLTrigger);
     return d->PassingTemplate(currentTranches, Assets, CurrentPeriod);
 }
 
-bool PDLTrigger::Passing(const QList<Tranche*>& currentTranches, double Assets, const QDate& CurrentPeriod) const
+bool PDLTrigger::Passing(const QList<std::shared_ptr<Tranche> >& currentTranches, double Assets, const QDate& CurrentPeriod) const
 {
     Q_D(const PDLTrigger);
     return d->PassingTemplate(currentTranches, Assets, CurrentPeriod);
 }
 
-bool PDLTrigger::Failing(const QList<Tranche*>& currentTranches, double Assets, int CurrentPeriod) const
+bool PDLTrigger::Failing(const QList<std::shared_ptr<Tranche> >& currentTranches, double Assets, int CurrentPeriod) const
 {
     return !Passing(currentTranches, Assets, CurrentPeriod);
 }
 
-bool PDLTrigger::Failing(const QList<Tranche*>& currentTranches, double Assets, const QDate& CurrentPeriod) const
+bool PDLTrigger::Failing(const QList<std::shared_ptr<Tranche> >& currentTranches, double Assets, const QDate& CurrentPeriod) const
 {
     return !Passing(currentTranches, Assets, CurrentPeriod);
 }

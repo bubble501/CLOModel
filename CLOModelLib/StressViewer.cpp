@@ -279,7 +279,7 @@ void StressViewer::UpdateTable()
                 CurrentItem->setBackgroundColor(d->GrayFill);
 			}
 			else {
-                const Tranche* const CurrTran = CurrentRes->GetTranche(d->TrancheCombo->currentText());
+                const auto CurrTran = CurrentRes->GetTranche(d->TrancheCombo->currentText());
 				if (!CurrTran) {
 					CurrentItem = new QTableWidgetItem("N/A");
 					CurrentItem->setData(Qt::UserRole, "N/A");

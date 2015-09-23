@@ -2003,7 +2003,7 @@ void LoanAssumptionsEditorPrivate::CreateStructureComparison()
 
     q->connect(m_OriginalStructureModel, &QStandardItemModel::dataChanged, [&](const QModelIndex& index, const QModelIndex&) {
 		if (index.column() == PriceCol) {
-			const Tranche* ApplicableExtTran = m_WtfToExtension.GetTranche(index.row());
+			const auto ApplicableExtTran = m_WtfToExtension.GetTranche(index.row());
 			if (ApplicableExtTran) {
 				double NewIRR = ApplicableExtTran->GetIRR(m_OriginalStructureModel->data(index, Qt::UserRole).toDouble());
 				double NewDM = ApplicableExtTran->GetDiscountMargin(m_OriginalStructureModel->data(index, Qt::UserRole).toDouble());
@@ -2018,7 +2018,7 @@ void LoanAssumptionsEditorPrivate::CreateStructureComparison()
                 m_OriginalStructureModel->setData(m_OriginalStructureModel->index(index.row(), DMCol), q_func()->tr("N/A"), Qt::EditRole);
 				m_OriginalStructureModel->setData(m_OriginalStructureModel->index(index.row(), DMCol), QVariant(), Qt::UserRole);
 			}
-			const Tranche* ApplicableCallTran = m_WtfToCall.GetTranche(index.row());
+			const auto ApplicableCallTran = m_WtfToCall.GetTranche(index.row());
 			if (ApplicableCallTran) {
 				double NewIRR = ApplicableCallTran->GetIRR(m_OriginalStructureModel->data(index, Qt::UserRole).toDouble());
 				double NewDM = ApplicableCallTran->GetDiscountMargin(m_OriginalStructureModel->data(index, Qt::UserRole).toDouble());
@@ -2037,7 +2037,7 @@ void LoanAssumptionsEditorPrivate::CreateStructureComparison()
 	});
     q->connect(m_NewStructureModel, &QStandardItemModel::dataChanged, [&](const QModelIndex& index, const QModelIndex&) {
 		if (index.column() == PriceCol) {
-			const Tranche* ApplicableExtTran = m_WtfToExtension.GetTranche(index.row());
+			const auto ApplicableExtTran = m_WtfToExtension.GetTranche(index.row());
 			if (ApplicableExtTran) {
 				double NewIRR = ApplicableExtTran->GetIRR(m_NewStructureModel->data(index, Qt::UserRole).toDouble());
 				double NewDM = ApplicableExtTran->GetDiscountMargin(m_NewStructureModel->data(index, Qt::UserRole).toDouble());
@@ -2052,7 +2052,7 @@ void LoanAssumptionsEditorPrivate::CreateStructureComparison()
                 m_NewStructureModel->setData(m_NewStructureModel->index(index.row(), DMCol), q_func()->tr("N/A"), Qt::EditRole);
 				m_NewStructureModel->setData(m_NewStructureModel->index(index.row(), DMCol), QVariant(), Qt::UserRole);
 			}
-			const Tranche* ApplicableCallTran = m_WtfToCall.GetTranche(index.row());
+            const auto ApplicableCallTran = m_WtfToCall.GetTranche(index.row());
 			if (ApplicableCallTran) {
 				double NewIRR = ApplicableCallTran->GetIRR(m_NewStructureModel->data(index, Qt::UserRole).toDouble());
 				double NewDM = ApplicableCallTran->GetDiscountMargin(m_NewStructureModel->data(index, Qt::UserRole).toDouble());

@@ -18,7 +18,7 @@ public:
     PDLTrigger::TriggerSenioritySide m_SenioritySide;
     BloombergVector m_TargetSize;
     template<class T>
-    bool PassingTemplate(const QList<Tranche*>& currentTranches, double Assets, const T& CurrentPeriod) const
+    bool PassingTemplate(const QList<std::shared_ptr<Tranche> >& currentTranches, double Assets, const T& CurrentPeriod) const
     {
         Q_Q(const PDLTrigger);
         static_assert(std::is_same<T, QDate>::value || std::is_integral<T>::value, "PassingTemplate can be used only with int or QDate");

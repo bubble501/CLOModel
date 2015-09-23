@@ -2,6 +2,7 @@
 #define TrancheTrigger_h__
 #include "AbstractTrigger.h"
 #include <QString>
+#include <memory>
 class TrancheTriggerPrivate;
 class Tranche;
 class QDate;
@@ -33,10 +34,10 @@ public:
 	QString TriggerSenioritySideToString(TriggerSenioritySide a) const;
 	TrancheTrigger(QString TargetSenior, QString TargetSeniorLevel, QString TargetSize = "0", TriggerSizeSide szd = TriggerSizeSide::Invalid, TriggerSenioritySide ssd = TriggerSenioritySide::Invalid, const QString& lab = QString());
 	TrancheTrigger(const QString& lab);
-	virtual bool Passing(const QList<Tranche*>& currentTranches, const QDate& CurrentPeriod) const;
-	virtual bool Passing(const QList<Tranche*>& currentTranches, int CurrentPeriod) const;
-	virtual bool Failing(const QList<Tranche*>& currentTranches, const QDate& CurrentPeriod) const;
-	virtual bool Failing(const QList<Tranche*>& currentTranches, int CurrentPeriod) const;
+    virtual bool Passing(const QList<std::shared_ptr<Tranche> >& currentTranches, const QDate& CurrentPeriod) const;
+    virtual bool Passing(const QList<std::shared_ptr<Tranche> >& currentTranches, int CurrentPeriod) const;
+    virtual bool Failing(const QList<std::shared_ptr<Tranche> >& currentTranches, const QDate& CurrentPeriod) const;
+    virtual bool Failing(const QList<std::shared_ptr<Tranche> >& currentTranches, int CurrentPeriod) const;
 	virtual QString ReadyToCalculate() const override;
 	const TrancheTrigger::TriggerSizeSide& GetSizeSide() const;
 	void SetSizeSide(const TrancheTrigger::TriggerSizeSide& val);

@@ -1,6 +1,7 @@
 #ifndef PDLtrigger_h__
 #define PDLtrigger_h__
 #include "AbstractTrigger.h"
+#include <memory>
 class IntegerVector;
 class Tranche;
 class PDLTriggerPrivate;
@@ -34,10 +35,10 @@ public:
     QString TriggerSenioritySideToString(TriggerSenioritySide a) const;
     PDLTrigger(QString TargetSenior, QString TargetSeniorLevel, QString TargetSize = "0", TriggerSizeSide szd = TriggerSizeSide::Invalid, TriggerSenioritySide ssd = TriggerSenioritySide::Invalid, const QString& lab = QString());
     PDLTrigger(const QString& lab);
-    virtual bool Passing(const QList<Tranche*>& currentTranches, double Assets, const QDate& CurrentPeriod) const;
-    virtual bool Passing(const QList<Tranche*>& currentTranches, double Assets, int CurrentPeriod) const;
-    virtual bool Failing(const QList<Tranche*>& currentTranches, double Assets, const QDate& CurrentPeriod) const;
-    virtual bool Failing(const QList<Tranche*>& currentTranches, double Assets, int CurrentPeriod) const;
+    virtual bool Passing(const QList<std::shared_ptr<Tranche> >& currentTranches, double Assets, const QDate& CurrentPeriod) const;
+    virtual bool Passing(const QList<std::shared_ptr<Tranche> >& currentTranches, double Assets, int CurrentPeriod) const;
+    virtual bool Failing(const QList<std::shared_ptr<Tranche> >& currentTranches, double Assets, const QDate& CurrentPeriod) const;
+    virtual bool Failing(const QList<std::shared_ptr<Tranche> >& currentTranches, double Assets, int CurrentPeriod) const;
     virtual QString ReadyToCalculate() const override;
     const PDLTrigger::TriggerSizeSide& GetSizeSide() const;
     void SetSizeSide(const PDLTrigger::TriggerSizeSide& val);

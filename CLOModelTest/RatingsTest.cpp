@@ -12,7 +12,7 @@ void RatingsTest::averageRating_data()
         << Ratings::RatingValue::NR;
     for (qint16 i = static_cast<qint16>(Ratings::RatingValue::AAA); i <= static_cast<qint16>(Ratings::RatingValue::Dm); ++i) {
         testRating.reset();
-        testRating.setRating(static_cast<Ratings::RatingValue>(i), static_cast<Ratings::RatingAgency>(0));
+        testRating.setRating(static_cast<Ratings::RatingValue>(i), static_cast<Ratings::RatingAgency>(0x1));
         QTest::newRow((QString("monoDimensional %1").arg(Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i)))).toLatin1().data())
             << testRating
             << static_cast<Ratings::RatingValue>(i);
@@ -20,8 +20,8 @@ void RatingsTest::averageRating_data()
     for (qint16 i = static_cast<qint16>(Ratings::RatingValue::AAA); i <= static_cast<qint16>(Ratings::RatingValue::Dm); ++i){
         for (qint16 j = static_cast<qint16>(Ratings::RatingValue::AAA); j <= static_cast<qint16>(Ratings::RatingValue::Dm); ++j) {
             testRating.reset();
-            testRating.setRating(static_cast<Ratings::RatingValue>(i), static_cast<Ratings::RatingAgency>(0));
-            testRating.setRating(static_cast<Ratings::RatingValue>(j), static_cast<Ratings::RatingAgency>(1));
+            testRating.setRating(static_cast<Ratings::RatingValue>(i), static_cast<Ratings::RatingAgency>(0x1));
+            testRating.setRating(static_cast<Ratings::RatingValue>(j), static_cast<Ratings::RatingAgency>(0x2));
             QTest::newRow((QString("biDimensional %1 %2").arg(Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i))).arg(Ratings::RatingValueString(static_cast<Ratings::RatingValue>(j)))).toLatin1().data())
                 << testRating
                 << static_cast<Ratings::RatingValue>(static_cast<qint16>(std::ceil((static_cast<double>(i)+static_cast<double>(j)) / 2.0)));
@@ -31,9 +31,9 @@ void RatingsTest::averageRating_data()
         for (qint16 j = static_cast<qint16>(Ratings::RatingValue::AAA); j <= static_cast<qint16>(Ratings::RatingValue::Dm); ++j) {
             for (qint16 k = static_cast<qint16>(Ratings::RatingValue::AAA); k <= static_cast<qint16>(Ratings::RatingValue::Dm); ++k) {
                 testRating.reset();
-                testRating.setRating(static_cast<Ratings::RatingValue>(i), static_cast<Ratings::RatingAgency>(0));
-                testRating.setRating(static_cast<Ratings::RatingValue>(j), static_cast<Ratings::RatingAgency>(1));
-                testRating.setRating(static_cast<Ratings::RatingValue>(k), static_cast<Ratings::RatingAgency>(2));
+                testRating.setRating(static_cast<Ratings::RatingValue>(i), static_cast<Ratings::RatingAgency>(0x1));
+                testRating.setRating(static_cast<Ratings::RatingValue>(j), static_cast<Ratings::RatingAgency>(0x2));
+                testRating.setRating(static_cast<Ratings::RatingValue>(k), static_cast<Ratings::RatingAgency>(0x4));
                 QTest::newRow((QString("triDimensional %1 %2 %3").arg(Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i))).arg(Ratings::RatingValueString(static_cast<Ratings::RatingValue>(j))).arg(Ratings::RatingValueString(static_cast<Ratings::RatingValue>(k)))).toLatin1().data())
                     << testRating
                     << static_cast<Ratings::RatingValue>(static_cast<qint16>(std::ceil((static_cast<double>(i)+static_cast<double>(j)+static_cast<double>(k)) / 3.0)));
@@ -82,7 +82,7 @@ void RatingsTest::getBucket()
 
 void RatingsTest::rankedAgency_data()
 {
-    static_assert(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) >= 2, "You need at least 2 agencies to run the test" );
+    static_assert(Ratings::CountRatingAcencies >= 2, "You need at least 2 agencies to run the test" );
     QTest::addColumn<Ratings>("testRating");
     QTest::addColumn<Ratings::RatingAgency>("highestRating");
     QTest::addColumn<Ratings::RatingAgency>("lowestRating");
@@ -101,98 +101,98 @@ void RatingsTest::rankedAgency_data()
 
     {
         Ratings tempRating;
-        for (qint8 i = 0; i<static_cast<qint8>(Ratings::RatingAgency::CountAgencies);++i)
-            tempRating.setRating(Ratings::RatingValue::A, static_cast<Ratings::RatingAgency>(i));
+        for (qint32 i = 0; i<Ratings::CountRatingAcencies; ++i)
+            tempRating.setRating(Ratings::RatingValue::A, static_cast<Ratings::RatingAgency>(1 << i));
         QTest::newRow("All Ratings Equal")
             << tempRating
-            << static_cast<Ratings::RatingAgency>(0) //highestRating
-            << static_cast<Ratings::RatingAgency>(0)  //lowestRating
-            << static_cast<Ratings::RatingAgency>(0)  //rankRatingNeg1
-            << static_cast<Ratings::RatingAgency>(0)  //rankRating0
-            << static_cast<Ratings::RatingAgency>(0)  //rankRating1
-            << static_cast<Ratings::RatingAgency>(0)  //rankRating2
-            << static_cast<Ratings::RatingAgency>(0)  //rankRating3
-            << static_cast<Ratings::RatingAgency>(0)  //rankRating4
+            << static_cast<Ratings::RatingAgency>(0x1) //highestRating
+            << static_cast<Ratings::RatingAgency>(0x1)  //lowestRating
+            << static_cast<Ratings::RatingAgency>(0x1)  //rankRatingNeg1
+            << static_cast<Ratings::RatingAgency>(0x1)  //rankRating0
+            << static_cast<Ratings::RatingAgency>(0x1)  //rankRating1
+            << static_cast<Ratings::RatingAgency>(0x1)  //rankRating2
+            << static_cast<Ratings::RatingAgency>(0x1)  //rankRating3
+            << static_cast<Ratings::RatingAgency>(0x1)  //rankRating4
             ;
     }
     {
         Ratings tempRating;
-        for (qint8 i = 0; i < static_cast<qint8>(Ratings::RatingAgency::CountAgencies); ++i)
-            tempRating.setRating(static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm)+i), static_cast<Ratings::RatingAgency>(i));
+        for (qint32 i = 0; i < Ratings::CountRatingAcencies; ++i)
+            tempRating.setRating(static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm)+i), static_cast<Ratings::RatingAgency>(1 << i));
         QTest::newRow("All Ratings Split Uniques")
             << tempRating
-            << static_cast<Ratings::RatingAgency>(0) //highestRating
-            << static_cast<Ratings::RatingAgency>(static_cast<qint8>(Ratings::RatingAgency::CountAgencies)-1) //lowestRating
-            << static_cast<Ratings::RatingAgency>(0) //rankRatingNeg1
-            << static_cast<Ratings::RatingAgency>(0) //rankRating0
-            << static_cast<Ratings::RatingAgency>(qMin(1, static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 1)) //rankRating1
-            << static_cast<Ratings::RatingAgency>(qMin(2, static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 1)) //rankRating2
-            << static_cast<Ratings::RatingAgency>(qMin(3, static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 1)) //rankRating3
-            << static_cast<Ratings::RatingAgency>(qMin(4, static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 1)) //rankRating4
+            << static_cast<Ratings::RatingAgency>(0x1) //highestRating
+            << static_cast<Ratings::RatingAgency>(1 << (Ratings::CountRatingAcencies-1)) //lowestRating
+            << static_cast<Ratings::RatingAgency>(0x1) //rankRatingNeg1
+            << static_cast<Ratings::RatingAgency>(0x1) //rankRating0
+            << static_cast<Ratings::RatingAgency>(qMin(0x1, 1 << (Ratings::CountRatingAcencies -3))) //rankRating1
+            << static_cast<Ratings::RatingAgency>(qMin(0x2, 1 << (Ratings::CountRatingAcencies -2))) //rankRating2
+            << static_cast<Ratings::RatingAgency>(qMin(0x4, 1 << (Ratings::CountRatingAcencies - 1))) //rankRating3
+            << static_cast<Ratings::RatingAgency>(qMin(0x8, 1 << (Ratings::CountRatingAcencies - 1))) //rankRating4
             ;
     }
     {
         Ratings tempRating;
-        for (qint8 i = 0; i < 2; ++i)
-            tempRating.setRating(Ratings::RatingValue::AAm, static_cast<Ratings::RatingAgency>(i));
-        for (qint8 i = 2; i < static_cast<qint8>(Ratings::RatingAgency::CountAgencies); ++i)
-            tempRating.setRating(static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + i - 2), static_cast<Ratings::RatingAgency>(i));
+        for (qint32 i = 0; i < 2; ++i)
+            tempRating.setRating(Ratings::RatingValue::AAm, static_cast<Ratings::RatingAgency>(1 << i));
+        for (qint32 i = 2; i < Ratings::CountRatingAcencies; ++i)
+            tempRating.setRating(static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + i - 2), static_cast<Ratings::RatingAgency>(1 << i));
         QTest::newRow("All Ratings Split Duplicates")
             << tempRating
-            << static_cast<Ratings::RatingAgency>(0) //highestRating
-            << static_cast<Ratings::RatingAgency>(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 1) //lowestRating
-            << static_cast<Ratings::RatingAgency>(0) //rankRatingNeg1
-            << static_cast<Ratings::RatingAgency>(0) //rankRating0
-            << static_cast<Ratings::RatingAgency>(0) //rankRating1
-            << static_cast<Ratings::RatingAgency>(qMin(2, static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 1)) //rankRating2
-            << static_cast<Ratings::RatingAgency>(qMin(3, static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 1)) //rankRating3
-            << static_cast<Ratings::RatingAgency>(qMin(4, static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 1)) //rankRating4
+            << static_cast<Ratings::RatingAgency>(0x1) //highestRating
+            << static_cast<Ratings::RatingAgency>(1 << (Ratings::CountRatingAcencies - 1)) //lowestRating
+            << static_cast<Ratings::RatingAgency>(0x1) //rankRatingNeg1
+            << static_cast<Ratings::RatingAgency>(0x1) //rankRating0
+            << static_cast<Ratings::RatingAgency>(0x1) //rankRating1
+            << static_cast<Ratings::RatingAgency>(1 << (Ratings::CountRatingAcencies - 2)) //rankRating2
+            << static_cast<Ratings::RatingAgency>(1 << (Ratings::CountRatingAcencies - 1)) //rankRating3
+            << static_cast<Ratings::RatingAgency>(1 << (Ratings::CountRatingAcencies - 1)) //rankRating4
             ;
     }
     {
         Ratings tempRating;
-        for (qint8 i = 0; i < static_cast<qint8>(Ratings::RatingAgency::CountAgencies)-1; ++i)
-            tempRating.setRating(static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + i), static_cast<Ratings::RatingAgency>(i));
+        for (qint32 i = 0; i < Ratings::CountRatingAcencies - 1; ++i)
+            tempRating.setRating(static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + i), static_cast<Ratings::RatingAgency>(1 << i));
         QTest::newRow("One NR Split Uniques")
             << tempRating
-            << static_cast<Ratings::RatingAgency>(0) //highestRating
-            << static_cast<Ratings::RatingAgency>(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 2) //lowestRating
-            << static_cast<Ratings::RatingAgency>(0) //rankRatingNeg1
-            << static_cast<Ratings::RatingAgency>(0) //rankRating0
-            << static_cast<Ratings::RatingAgency>(qMin(1, static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 2)) //rankRating1
-            << static_cast<Ratings::RatingAgency>(qMin(2, static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 2)) //rankRating2
-            << static_cast<Ratings::RatingAgency>(qMin(3, static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 2)) //rankRating3
-            << static_cast<Ratings::RatingAgency>(qMin(4, static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 2)) //rankRating4
+            << static_cast<Ratings::RatingAgency>(0x1) //highestRating
+            << static_cast<Ratings::RatingAgency>(1 << (Ratings::CountRatingAcencies - 2)) //lowestRating
+            << static_cast<Ratings::RatingAgency>(0x1) //rankRatingNeg1
+            << static_cast<Ratings::RatingAgency>(0x1) //rankRating0
+            << static_cast<Ratings::RatingAgency>(qMin(0x1, 1 << (Ratings::CountRatingAcencies - 3))) //rankRating1
+            << static_cast<Ratings::RatingAgency>(qMin(0x2, 1 << (Ratings::CountRatingAcencies - 2))) //rankRating2
+            << static_cast<Ratings::RatingAgency>(qMin(0x4, 1 << (Ratings::CountRatingAcencies - 2))) //rankRating3
+            << static_cast<Ratings::RatingAgency>(qMin(0x8, 1 << (Ratings::CountRatingAcencies - 2))) //rankRating4
             ;
     }
     {
         Ratings tempRating;
-        for (qint8 i = 0; i < 2; ++i)
-            tempRating.setRating(Ratings::RatingValue::AAm, static_cast<Ratings::RatingAgency>(i));
-        for (qint8 i = 2; i < static_cast<qint8>(Ratings::RatingAgency::CountAgencies)-1; ++i)
-            tempRating.setRating(static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + i - 2), static_cast<Ratings::RatingAgency>(i));
+        for (qint32 i = 0; i < 2; ++i)
+            tempRating.setRating(Ratings::RatingValue::AAm, static_cast<Ratings::RatingAgency>(1 << i));
+        for (qint32 i = 2; i < Ratings::CountRatingAcencies - 1; ++i)
+            tempRating.setRating(static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + i - 2), static_cast<Ratings::RatingAgency>(1 << i));
         QTest::newRow("All Ratings Split Duplicates one NR")
             << tempRating
-            << static_cast<Ratings::RatingAgency>(0) //highestRating
-            << static_cast<Ratings::RatingAgency>(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 2) //lowestRating
-            << static_cast<Ratings::RatingAgency>(0) //rankRatingNeg1
-            << static_cast<Ratings::RatingAgency>(0) //rankRating0
-            << static_cast<Ratings::RatingAgency>(0) //rankRating1
-            << static_cast<Ratings::RatingAgency>(qMin(2, static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 2)) //rankRating2
-            << static_cast<Ratings::RatingAgency>(qMin(3, static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 2)) //rankRating3
-            << static_cast<Ratings::RatingAgency>(qMin(4, static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 2)) //rankRating4
+            << static_cast<Ratings::RatingAgency>(0x1) //highestRating
+            << static_cast<Ratings::RatingAgency>(1 << (Ratings::CountRatingAcencies - 2)) //lowestRating
+            << static_cast<Ratings::RatingAgency>(0x1) //rankRatingNeg1
+            << static_cast<Ratings::RatingAgency>(0x1) //rankRating0
+            << static_cast<Ratings::RatingAgency>(0x1) //rankRating1
+            << static_cast<Ratings::RatingAgency>(qMin(0x2, 1 << (Ratings::CountRatingAcencies - 2))) //rankRating2
+            << static_cast<Ratings::RatingAgency>(qMin(0x4, 1 << (Ratings::CountRatingAcencies - 2))) //rankRating3
+            << static_cast<Ratings::RatingAgency>(qMin(0x8, 1 << (Ratings::CountRatingAcencies - 2))) //rankRating4
             ;
     }
     QTest::newRow("No Ratings") 
         << Ratings()
-        << static_cast<Ratings::RatingAgency>(0) //highestRating
-        << static_cast<Ratings::RatingAgency>(0)  //lowestRating
-        << static_cast<Ratings::RatingAgency>(0)  //rankRatingNeg1
-        << static_cast<Ratings::RatingAgency>(0)  //rankRating0
-        << static_cast<Ratings::RatingAgency>(0)  //rankRating1
-        << static_cast<Ratings::RatingAgency>(0)  //rankRating2
-        << static_cast<Ratings::RatingAgency>(0)  //rankRating3
-        << static_cast<Ratings::RatingAgency>(0)  //rankRating4
+        << static_cast<Ratings::RatingAgency>(0x1) //highestRating
+        << static_cast<Ratings::RatingAgency>(0x1)  //lowestRating
+        << static_cast<Ratings::RatingAgency>(0x1) //rankRatingNeg1
+        << static_cast<Ratings::RatingAgency>(0x1)  //rankRating0
+        << static_cast<Ratings::RatingAgency>(0x1)  //rankRating1
+        << static_cast<Ratings::RatingAgency>(0x1)  //rankRating2
+        << static_cast<Ratings::RatingAgency>(0x1)  //rankRating3
+        << static_cast<Ratings::RatingAgency>(0x1)  //rankRating4
   ;
 }
 
@@ -206,14 +206,16 @@ void RatingsTest::rankedAgency()
     QFETCH(Ratings::RatingAgency, rankRating1);
     QFETCH(Ratings::RatingAgency, rankRating2);
     QFETCH(Ratings::RatingAgency, rankRating3);
+    QFETCH(Ratings::RatingAgency, rankRating4);
 
-    QCOMPARE(testRating.highestAgency(), highestRating);
-    QCOMPARE(testRating.lowestAgency(), lowestRating);
-    QCOMPARE(testRating.agencyAtRank(-1), rankRatingNeg1);
-    QCOMPARE(testRating.agencyAtRank(0), rankRating0);
-    QCOMPARE(testRating.agencyAtRank(1), rankRating1);
-    QCOMPARE(testRating.agencyAtRank(2), rankRating2);
-    QCOMPARE(testRating.agencyAtRank(3), rankRating3);
+    QVERIFY2(testRating.highestAgency() | highestRating, QString("Actual: %1 Expected: %2").arg(testRating.highestAgency().operator int(), 0, 2).arg(static_cast<qint32>(highestRating), 0, 2).toLatin1().data());
+    QVERIFY2(testRating.lowestAgency()|lowestRating, QString("Actual: %1 Expected: %2").arg(testRating.highestAgency().operator int(), 0, 2).arg(static_cast<qint32>(lowestRating), 0, 2).toLatin1().data());
+    QVERIFY2(testRating.agencyAtRank(-1)|rankRatingNeg1, QString("Actual: %1 Expected: %2").arg(testRating.highestAgency().operator int(), 0, 2).arg(static_cast<qint32>(rankRatingNeg1), 0, 2).toLatin1().data());
+    QVERIFY2(testRating.agencyAtRank(0)|rankRating0, QString("Actual: %1 Expected: %2").arg(testRating.highestAgency().operator int(), 0, 2).arg(static_cast<qint32>(rankRating0), 0, 2).toLatin1().data());
+    QVERIFY2(testRating.agencyAtRank(1)|rankRating1, QString("Actual: %1 Expected: %2").arg(testRating.highestAgency().operator int(), 0, 2).arg(static_cast<qint32>(rankRating1), 0, 2).toLatin1().data());
+    QVERIFY2(testRating.agencyAtRank(2)|rankRating2, QString("Actual: %1 Expected: %2").arg(testRating.highestAgency().operator int(), 0, 2).arg(static_cast<qint32>(rankRating2), 0, 2).toLatin1().data());
+    QVERIFY2(testRating.agencyAtRank(3)|rankRating3, QString("Actual: %1 Expected: %2").arg(testRating.highestAgency().operator int(), 0, 2).arg(static_cast<qint32>(rankRating3), 0, 2).toLatin1().data());
+    QVERIFY2(testRating.agencyAtRank(4)|rankRating4, QString("Actual: %1 Expected: %2").arg(testRating.highestAgency().operator int(), 0, 2).arg(static_cast<qint32>(rankRating4), 0, 2).toLatin1().data());
 }
 
 void RatingsTest::ratingFromString()
@@ -233,36 +235,36 @@ void RatingsTest::ratingFromString_data()
     QTest::addColumn<Ratings::RatingValue>("resultRating");
     QTest::addColumn<Ratings::CreditWatch>("resultWatch");
 
-    for (qint8 j = 0; j < static_cast<qint8>(Ratings::RatingAgency::CountAgencies); ++j) {
+    for (qint32 j = 0; j < Ratings::CountRatingAcencies; ++j) {
         for (qint16 i = static_cast<qint16>(Ratings::RatingValue::NR); i <= static_cast<qint16>(Ratings::RatingValue::D); ++i) {
-            if (!Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i), static_cast<Ratings::RatingAgency>(j)).isEmpty())
-                QTest::newRow(QString("%1 No Watch %2").arg(Ratings::agencyName(static_cast<Ratings::RatingAgency>(j))).arg(Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i))).toLatin1().data())
-                << Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i), static_cast<Ratings::RatingAgency>(j))
-                << static_cast<Ratings::RatingAgency>(j) //rtgSyntax
+            if (!Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i), static_cast<Ratings::RatingAgency>(1 << j)).isEmpty())
+                QTest::newRow(QString("%1 No Watch %2").arg(Ratings::agencyName(static_cast<Ratings::RatingAgency>(1 << j))).arg(Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i))).toLatin1().data())
+                << Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i), static_cast<Ratings::RatingAgency>(1 << j))
+                << static_cast<Ratings::RatingAgency>(1 << j) //rtgSyntax
                 << static_cast<Ratings::RatingValue>(i) //resultRating
                 << Ratings::CreditWatch::Stable //resultWatch
                 ;
         }
     }
-    for (qint8 j = 0; j < static_cast<qint8>(Ratings::RatingAgency::CountAgencies); ++j) {
+    for (qint32 j = 0; j < Ratings::CountRatingAcencies; ++j) {
         for (qint16 i = static_cast<qint16>(Ratings::RatingValue::AAA); i <= static_cast<qint16>(Ratings::RatingValue::D); ++i) {
-            if (!Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i), static_cast<Ratings::RatingAgency>(j)).isEmpty())
-                QTest::newRow(QString("%1 Positive Watch %2").arg(Ratings::agencyName(static_cast<Ratings::RatingAgency>(j))).arg(Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i))).toLatin1().data())
-                << Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i), static_cast<Ratings::RatingAgency>(j)) + " *+"
-                << static_cast<Ratings::RatingAgency>(j) //rtgSyntax
+            if (!Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i), static_cast<Ratings::RatingAgency>(1 << j)).isEmpty())
+                QTest::newRow(QString("%1 Positive Watch %2").arg(Ratings::agencyName(static_cast<Ratings::RatingAgency>(1 << j))).arg(Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i))).toLatin1().data())
+                << Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i), static_cast<Ratings::RatingAgency>(1 << j)) + " *+"
+                << static_cast<Ratings::RatingAgency>(1 << j) //rtgSyntax
                 << static_cast<Ratings::RatingValue>(i) //resultRating
                 << Ratings::CreditWatch::Positive //resultWatch
                 ;
         }
     }
-    for (qint8 j = 0; j < static_cast<qint8>(Ratings::RatingAgency::CountAgencies); ++j) {
+    for (qint8 j = 0; j < Ratings::CountRatingAcencies; ++j) {
         for (qint16 i = static_cast<qint16>(Ratings::RatingValue::AAA); i <= static_cast<qint16>(Ratings::RatingValue::D); ++i) {
-            if (!Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i), static_cast<Ratings::RatingAgency>(j)).isEmpty())
-                QTest::newRow(QString("%1 Negative Watch %2").arg(Ratings::agencyName(static_cast<Ratings::RatingAgency>(j))).arg(Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i))).toLatin1().data())
-                    << Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i), static_cast<Ratings::RatingAgency>(j)) + " *-"
-                    << static_cast<Ratings::RatingAgency>(j) //rtgSyntax
-                    << static_cast<Ratings::RatingValue>(i) //resultRating
-                    << Ratings::CreditWatch::Negative //resultWatch
+            if (!Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i), static_cast<Ratings::RatingAgency>(1 << j)).isEmpty())
+                QTest::newRow(QString("%1 Negative Watch %2").arg(Ratings::agencyName(static_cast<Ratings::RatingAgency>(1 << j))).arg(Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i))).toLatin1().data())
+                << Ratings::RatingValueString(static_cast<Ratings::RatingValue>(i), static_cast<Ratings::RatingAgency>(1 << j)) + " *-"
+                << static_cast<Ratings::RatingAgency>(1 << j) //rtgSyntax
+                << static_cast<Ratings::RatingValue>(i) //resultRating
+                << Ratings::CreditWatch::Negative //resultWatch
                 ;
         }
     }
@@ -305,11 +307,13 @@ void RatingsTest::rankedRatings()
     QFETCH(Ratings::RatingValue, rankRating1);
     QFETCH(Ratings::RatingValue, rankRating2);
     QFETCH(Ratings::RatingValue, rankRating3);
+    QFETCH(Ratings::RatingValue, rankRating4);
     QFETCH(Ratings::RatingValue, rankRatingUniqueNeg1);
     QFETCH(Ratings::RatingValue, rankRatingUnique0);
     QFETCH(Ratings::RatingValue, rankRatingUnique1);
     QFETCH(Ratings::RatingValue, rankRatingUnique2);
     QFETCH(Ratings::RatingValue, rankRatingUnique3);
+    QFETCH(Ratings::RatingValue, rankRatingUnique4);
 
     QCOMPARE(testRating.highestRating(), highestRating);
     QCOMPARE(testRating.lowestRating(), lowestRating);
@@ -318,17 +322,19 @@ void RatingsTest::rankedRatings()
     QCOMPARE(testRating.ratingAtRank(1), rankRating1);
     QCOMPARE(testRating.ratingAtRank(2), rankRating2);
     QCOMPARE(testRating.ratingAtRank(3), rankRating3);
+    QCOMPARE(testRating.ratingAtRank(4), rankRating4);
     QCOMPARE(testRating.ratingAtRankNoDuplicate(-1), rankRatingUniqueNeg1);
     QCOMPARE(testRating.ratingAtRankNoDuplicate(0), rankRatingUnique0);
     QCOMPARE(testRating.ratingAtRankNoDuplicate(1), rankRatingUnique1);
     QCOMPARE(testRating.ratingAtRankNoDuplicate(2), rankRatingUnique2);
     QCOMPARE(testRating.ratingAtRankNoDuplicate(3), rankRatingUnique3);
+    QCOMPARE(testRating.ratingAtRankNoDuplicate(3), rankRatingUnique4);
 
 }
 
 void RatingsTest::rankedRatings_data()
 {
-    static_assert(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) >= 2, "You need at least 2 agencies to run the test");
+    static_assert(Ratings::CountRatingAcencies >= 2, "You need at least 2 agencies to run the test");
     QTest::addColumn<Ratings>("testRating");
     QTest::addColumn<Ratings::RatingValue>("highestRating");
     QTest::addColumn<Ratings::RatingValue>("lowestRating");
@@ -347,8 +353,8 @@ void RatingsTest::rankedRatings_data()
 
     {
         Ratings tempRating;
-        for (qint8 i = 0; i < static_cast<qint8>(Ratings::RatingAgency::CountAgencies); ++i)
-            tempRating.setRating(Ratings::RatingValue::A, static_cast<Ratings::RatingAgency>(i));
+        for (qint32 i = 0; i <Ratings::CountRatingAcencies; ++i)
+            tempRating.setRating(Ratings::RatingValue::A, static_cast<Ratings::RatingAgency>(1 << i));
         QTest::newRow("All Ratings Equal")
             << tempRating
             << Ratings::RatingValue::A //highestRating
@@ -369,94 +375,94 @@ void RatingsTest::rankedRatings_data()
     }
     {
         Ratings tempRating;
-        for (qint8 i = 0; i < static_cast<qint8>(Ratings::RatingAgency::CountAgencies); ++i)
-            tempRating.setRating(static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + i), static_cast<Ratings::RatingAgency>(i));
+        for (qint32 i = 0; i < Ratings::CountRatingAcencies; ++i)
+            tempRating.setRating(static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + i), static_cast<Ratings::RatingAgency>(1 << i));
         QTest::newRow("All Ratings Split Uniques")
             << tempRating
             << Ratings::RatingValue::AAm //highestRating
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 1) //lowestRating
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + Ratings::CountRatingAcencies - 1) //lowestRating
             << Ratings::RatingValue::AAm //rankRatingNeg1
             << Ratings::RatingValue::AAm //rankRating0
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 1, 1)) //rankRating1
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 1, 2)) //rankRating2
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 1, 3)) //rankRating3
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 1, 4)) //rankRating4
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(Ratings::CountRatingAcencies - 1, 1)) //rankRating1
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(Ratings::CountRatingAcencies - 1, 2)) //rankRating2
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(Ratings::CountRatingAcencies - 1, 3)) //rankRating3
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(Ratings::CountRatingAcencies - 1, 4)) //rankRating4
             << Ratings::RatingValue::AAm //rankRatingUniqueNeg1
             << Ratings::RatingValue::AAm //rankRatingUnique0
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 1, 1)) //rankRatingUnique1
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 1, 2)) //rankRatingUnique2
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 1, 3)) //rankRatingUnique3
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 1, 4)) //rankRatingUnique4
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(Ratings::CountRatingAcencies - 1, 1)) //rankRatingUnique1
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(Ratings::CountRatingAcencies - 1, 2)) //rankRatingUnique2
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(Ratings::CountRatingAcencies - 1, 3)) //rankRatingUnique3
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(Ratings::CountRatingAcencies - 1, 4)) //rankRatingUnique4
             ;
     }
     {
         Ratings tempRating;
-        for (qint8 i = 0; i < 2; ++i)
-            tempRating.setRating(Ratings::RatingValue::AAm, static_cast<Ratings::RatingAgency>(i));
-        for (qint8 i = 2; i < static_cast<qint8>(Ratings::RatingAgency::CountAgencies); ++i)
-            tempRating.setRating(static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + i - 2), static_cast<Ratings::RatingAgency>(i));
+        for (qint32 i = 0; i < 2; ++i)
+            tempRating.setRating(Ratings::RatingValue::AAm, static_cast<Ratings::RatingAgency>(1 << i));
+        for (qint32 i = 2; i <Ratings::CountRatingAcencies; ++i)
+            tempRating.setRating(static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + i - 2), static_cast<Ratings::RatingAgency>(1 << i));
         QTest::newRow("All Ratings Split Duplicates")
             << tempRating
             << Ratings::RatingValue::AAm //highestRating
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 3) //lowestRating
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + Ratings::CountRatingAcencies - 3) //lowestRating
             << Ratings::RatingValue::AAm //rankRatingNeg1
             << Ratings::RatingValue::AAm //rankRating0
             << Ratings::RatingValue::AAm //rankRating1
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + qMin(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 1, 2) - 2) //rankRating2
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + qMin(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 1, 3) - 2) //rankRating3
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + qMin(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 1, 4) - 2) //rankRating4
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + qMin(Ratings::CountRatingAcencies - 3, 2) - 1) //rankRating2
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + qMin(Ratings::CountRatingAcencies - 2, 3) - 1) //rankRating3
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + qMin(Ratings::CountRatingAcencies - 2, 4) - 1) //rankRating4
             << Ratings::RatingValue::AAm //rankRatingUniqueNeg1
             << Ratings::RatingValue::AAm //rankRatingUnique0
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + qMin(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 1, 2) - 2) //rankRatingUnique1
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + qMin(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 1, 3) - 2) //rankRatingUnique2
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + qMin(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 1, 4) - 2) //rankRatingUnique3
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + qMin(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 1, 5) - 2) //rankRatingUnique4
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + qMin(Ratings::CountRatingAcencies - 3, 2) - 1) //rankRatingUnique1
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + qMin(Ratings::CountRatingAcencies - 2, 3) - 1) //rankRatingUnique2
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + qMin(Ratings::CountRatingAcencies - 2, 4) - 1) //rankRatingUnique3
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + qMin(Ratings::CountRatingAcencies - 2, 5) - 1) //rankRatingUnique4
             ;
     }
     {
         Ratings tempRating;
-        for (qint8 i = 0; i < static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 1; ++i)
-            tempRating.setRating(static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + i), static_cast<Ratings::RatingAgency>(i));
+        for (qint32 i = 0; i < Ratings::CountRatingAcencies - 1; ++i)
+            tempRating.setRating(static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + i), static_cast<Ratings::RatingAgency>(1<<i));
         QTest::newRow("One NR Split Uniques")
             << tempRating
             << Ratings::RatingValue::AAm //highestRating
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 2) //lowestRating
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + Ratings::CountRatingAcencies - 2) //lowestRating
             << Ratings::RatingValue::AAm //rankRatingNeg1
             << Ratings::RatingValue::AAm //rankRating0
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 2, 1)) //rankRating1
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 2, 2)) //rankRating2
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 2, 3)) //rankRating3
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 2, 4)) //rankRating4
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(Ratings::CountRatingAcencies - 2, 1)) //rankRating1
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(Ratings::CountRatingAcencies - 2, 2)) //rankRating2
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(Ratings::CountRatingAcencies - 2, 3)) //rankRating3
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(Ratings::CountRatingAcencies - 2, 4)) //rankRating4
             << Ratings::RatingValue::AAm //rankRatingUniqueNeg1
             << Ratings::RatingValue::AAm //rankRatingUnique0
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 2, 1)) //rankRatingUnique1
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 2, 2)) //rankRatingUnique2
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 2, 3)) //rankRatingUnique3
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 2, 4)) //rankRatingUnique4
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(Ratings::CountRatingAcencies - 2, 1)) //rankRatingUnique1
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(Ratings::CountRatingAcencies - 2, 2)) //rankRatingUnique2
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(Ratings::CountRatingAcencies - 2, 3)) //rankRatingUnique3
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::AAm) + qMin(Ratings::CountRatingAcencies - 2, 4)) //rankRatingUnique4
             ;
     }
     {
         Ratings tempRating;
-        for (qint8 i = 0; i < 2; ++i)
-            tempRating.setRating(Ratings::RatingValue::AAm, static_cast<Ratings::RatingAgency>(i));
-        for (qint8 i = 2; i < static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 1; ++i)
-            tempRating.setRating(static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + i - 2), static_cast<Ratings::RatingAgency>(i));
-        QTest::newRow("All Ratings Split Duplicates")
+        for (qint32 i = 0; i < 2; ++i)
+            tempRating.setRating(Ratings::RatingValue::AAm, static_cast<Ratings::RatingAgency>(1 << i));
+        for (qint32 i = 2; i < Ratings::CountRatingAcencies-1; ++i)
+            tempRating.setRating(static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + i - 2), static_cast<Ratings::RatingAgency>(1 << i));
+        QTest::newRow("One NR Split Duplicates")
             << tempRating
             << Ratings::RatingValue::AAm //highestRating
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 4) //lowestRating
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + Ratings::CountRatingAcencies - 4) //lowestRating
             << Ratings::RatingValue::AAm //rankRatingNeg1
             << Ratings::RatingValue::AAm //rankRating0
             << Ratings::RatingValue::AAm //rankRating1
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + qMin(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 2, 2) - 2) //rankRating2
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + qMin(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 2, 3) - 2) //rankRating3
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + qMin(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 2, 4) - 2) //rankRating4
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + qMin(Ratings::CountRatingAcencies - 2, 2) - 2) //rankRating2
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + qMin(Ratings::CountRatingAcencies - 2, 3) - 2) //rankRating3
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + qMin(Ratings::CountRatingAcencies - 2, 4) - 2) //rankRating4
             << Ratings::RatingValue::AAm //rankRatingUniqueNeg1
             << Ratings::RatingValue::AAm //rankRatingUnique0
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + qMin(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 2, 2) - 2) //rankRatingUnique1
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + qMin(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 2, 3) - 2) //rankRatingUnique2
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + qMin(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 2, 4) - 2) //rankRatingUnique3
-            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + qMin(static_cast<qint8>(Ratings::RatingAgency::CountAgencies) - 2, 5) - 2) //rankRatingUnique4
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + qMin(Ratings::CountRatingAcencies - 2, 2) - 2) //rankRatingUnique1
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + qMin(Ratings::CountRatingAcencies - 2, 3) - 2) //rankRatingUnique2
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + qMin(Ratings::CountRatingAcencies - 2, 4) - 2) //rankRatingUnique3
+            << static_cast<Ratings::RatingValue>(static_cast<qint16>(Ratings::RatingValue::Ap) + qMin(Ratings::CountRatingAcencies - 2, 5) - 2) //rankRatingUnique4
             ;
     }
     QTest::newRow("No Ratings")

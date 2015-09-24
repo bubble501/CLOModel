@@ -5,7 +5,7 @@
 #include "LoanAssMatcherResult.h"
 #include "LoanAssumption.h"
 #include <QHash>
-#include <QSharedPointer>
+#include <memory>
 #include "LoanAssMatcherThread.h"
 class LoanAssMatcherThreadPrivate : public AbstrAsyncThreadPrivate
 {
@@ -13,6 +13,6 @@ class LoanAssMatcherThreadPrivate : public AbstrAsyncThreadPrivate
 public:
     QString m_ModelToScan;
     LoanAssMatcherResult Result;
-    const QHash<QString, QSharedPointer<LoanAssumption> >* m_AvailableAssumptions;
+    const QHash<QString, std::shared_ptr<LoanAssumption> >* m_AvailableAssumptions;
 };
 #endif // LoanAssMatcherThread_p_h__

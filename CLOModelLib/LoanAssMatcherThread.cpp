@@ -31,7 +31,7 @@ void LoanAssMatcherThread::SetModelToScan(const QString& val)
     d->m_ModelToScan = val;
 }
 
-void LoanAssMatcherThread::SetAvailableAssumptions(const QHash<QString, QSharedPointer<LoanAssumption> >& a)
+void LoanAssMatcherThread::SetAvailableAssumptions(const QHash<QString, std::shared_ptr<LoanAssumption> >& a)
 {
     Q_D( LoanAssMatcherThread);
     d->m_AvailableAssumptions = &a;

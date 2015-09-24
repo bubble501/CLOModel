@@ -24,7 +24,7 @@ LoanAssMatcher::LoanAssMatcher(LoanAssMatcherPrivate *d, QObject* parent)
 void LoanAssMatcher::GetAssumptionsDatabase() {
     RETURN_WHEN_RUNNING(true, )
     Q_D(LoanAssMatcher);
-    QHash<QString, LoanAssumption*> NewAssumptions;
+    QHash<QString, std::shared_ptr<LoanAssumption> > NewAssumptions;
 #ifndef NO_DATABASE
 	d->m_AvailableAssumptions.clear();
 	Db_Mutex.lock();
@@ -51,7 +51,7 @@ void LoanAssMatcher::GetAssumptionsDatabase() {
 				FieldCount = 0;
 				auto LoanAssRecord = LoanAssQuery.record();
 				QString CurrentScenario = LoanAssRecord.value(FieldCount).toString(); ++FieldCount;
-				LoanAssumption* CurrentAss(nullptr);
+				std::shared_ptr<LoanAssumption> CurrentAss(nullptr);
 				for (auto i = NewAssumptions.begin(); i != NewAssumptions.end(); ++i) {
 					if (i.key().compare(CurrentScenario, Qt::CaseInsensitive) == 0) {
 						CurrentAss = i.value();
@@ -59,7 +59,7 @@ void LoanAssMatcher::GetAssumptionsDatabase() {
 					}
 				}
 				if (!CurrentAss) {
-					CurrentAss = new LoanAssumption(CurrentScenario);
+					CurrentAss = std::make_shared< LoanAssumption>(CurrentScenario);
 					if (!LoanAssRecord.isNull(FieldCount)) CurrentAss->SetAliases(LoanAssRecord.value(FieldCount).toString());
 					NewAssumptions.insert(CurrentAss->GetScenarioName(), CurrentAss);
 				}++FieldCount;
@@ -131,7 +131,7 @@ void LoanAssMatcher::GetAssumptionsDatabase() {
 	Db_Mutex.unlock();
 #endif
 	for (auto i = NewAssumptions.begin(); i != NewAssumptions.end(); ++i) {
-        d->m_AvailableAssumptions.insert(i.key(), QSharedPointer<LoanAssumption>(i.value()));
+        d->m_AvailableAssumptions.insert(i.key(), i.value());
 	}
 }
 
@@ -140,7 +140,7 @@ void LoanAssMatcher::AddAssumption(const QString& key, const LoanAssumption& a)
     Q_D(LoanAssMatcher);
 	RETURN_WHEN_RUNNING(true, )
         d->m_AvailableAssumptions.remove(key);
-    d->m_AvailableAssumptions.insert(key, QSharedPointer<LoanAssumption>(new LoanAssumption(a)));
+    d->m_AvailableAssumptions.insert(key, std::make_shared< LoanAssumption>(a));
 }
 
 void LoanAssMatcher::RemoveAssumption(const QString& key)
@@ -245,7 +245,7 @@ QDataStream& LoanAssMatcher::LoadOldVersion(QDataStream& stream)
     stream >> d->m_FolderToScan >> TempSize;
 	for (int i = 0; i < TempSize; ++i) {
 		stream >> TempString >> TempAss;
-        d->m_AvailableAssumptions.insert(TempString, QSharedPointer<LoanAssumption>(new LoanAssumption(TempAss)));
+        d->m_AvailableAssumptions.insert(TempString,std::make_shared< LoanAssumption>(TempAss));
 	}
 	ResetProtocolVersion();
 	return stream;

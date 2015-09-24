@@ -366,7 +366,7 @@ Ratings::RatingAgencies Ratings::agencyAtRank(int rnk) const
 {
     RatingAgencies result(Ratings::RatingAgency::Invalid);
     Q_D(const Ratings);
-    const auto ratingToFind = ratingAtRank(rnk);
+    const auto ratingToFind = ratingAtRankNoDuplicate(rnk);
     for (qint32 i = 0; i < Ratings::CountRatingAcencies; ++i) {
         if (d->m_ratings[i] == ratingToFind)
             result |= static_cast<RatingAgency>(1 << i);

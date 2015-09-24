@@ -125,6 +125,7 @@ Q_DECLARE_METATYPE(Ratings)
 Q_DECLARE_METATYPE(Ratings::RatingValue)
 Q_DECLARE_METATYPE(Ratings::RatingAgency)
 Q_DECLARE_METATYPE(Ratings::CreditWatch)
+Q_DECLARE_METATYPE(Ratings::RatingAgencies)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Ratings::RatingAgencies);
 CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const Ratings& flows);
 CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, Ratings& flows);

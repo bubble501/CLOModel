@@ -17,11 +17,12 @@ WaterfallCalculator::~WaterfallCalculator()
 void WaterfallCalculator::AddWaterfall(const Waterfall& a, qint32 ID)
 {
     Q_D(WaterfallCalculator);
-	RETURN_WHEN_RUNNING(true, )
-	if (d->m_Cascades.contains(ID)) {
-        delete d->m_Cascades[ID];
-	}
-    d->m_Cascades[ID] = new Waterfall(a);
+    RETURN_WHEN_RUNNING(true, )
+    auto cascIter= d->m_Cascades.find(ID);
+    if (cascIter == d->m_Cascades.end())
+        d->m_Cascades.insert(ID, std::make_shared<Waterfall>(a));
+    else
+        cascIter.value().reset(new Waterfall(a));
 }
 bool WaterfallCalculator::StartCalculation()
 {
@@ -90,9 +91,6 @@ void WaterfallCalculator::ClearWaterfalls()
 {
     Q_D(WaterfallCalculator);
 	RETURN_WHEN_RUNNING(true, )
-        for (auto i = d->m_Cascades.begin(); i != d->m_Cascades.end(); ++i) {
-		delete i.value();
-	}
     d->m_Cascades.clear();
 }
 QDataStream& operator<<(QDataStream & stream, const WaterfallCalculator& flows)

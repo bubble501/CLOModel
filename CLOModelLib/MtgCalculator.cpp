@@ -672,7 +672,7 @@ void MtgCalculator::DownloadScenarios() {
 void MtgCalculator::GuessLoanScenarios(bool OverrideAss) {
     Q_D( MtgCalculator);
 	RETURN_WHEN_RUNNING(true, )
-	QHash<QString,LoanAssumption*> AvailableAssumptions;
+	QHash<QString, std::shared_ptr< LoanAssumption> > AvailableAssumptions;
 	Db_Mutex.lock();
 	{
 		QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
@@ -697,7 +697,7 @@ void MtgCalculator::GuessLoanScenarios(bool OverrideAss) {
 				while (LoanAssQuerry.next()) {
 					auto DbgRecord = LoanAssQuerry.record();
 					if (AvailableAssumptions.contains(DbgRecord.value(0).toString())) continue;
-					auto CurrAss = AvailableAssumptions.insert(DbgRecord.value(0).toString(), new LoanAssumption(DbgRecord.value(0).toString()));
+					auto CurrAss = AvailableAssumptions.insert(DbgRecord.value(0).toString(), std::make_shared<LoanAssumption>(DbgRecord.value(0).toString()));
 					(*CurrAss)->SetAliases(DbgRecord.value(1).toString());
 				}
 			}
@@ -715,9 +715,6 @@ void MtgCalculator::GuessLoanScenarios(bool OverrideAss) {
 				}
 			}
 		}
-	}
-	for (auto i = AvailableAssumptions.begin(); i != AvailableAssumptions.end(); ++i) {
-		delete i.value();
 	}
 }
 

@@ -156,7 +156,7 @@ public:
 	const Waterfall& GetStructure() { return Structure; }
 	const Waterfall& GetCallStructure() { return CallStructure; }
 private:
-	AbstractBaseRateTable* LastRateTable;
+	std::shared_ptr<AbstractBaseRateTable> LastRateTable;
 	QPointer<QProgressDialog> MtgsProgress;
 	WaterfallCalculator* ParallWatFalls;
 	MtgCalculator LoansCalculator;

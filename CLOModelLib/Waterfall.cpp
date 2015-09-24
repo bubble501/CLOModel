@@ -995,12 +995,12 @@ double Waterfall::RedeemNotes(double AvailableFunds, int GroupTarget, int Selior
         return ((AvailableFunds - TotalPayable) >= 0.01 ? (AvailableFunds - TotalPayable) : 0.0);
     }
     QMap<qint32, double> groupAccrue;
-    QHash < qint32, QList<qint32> * > groupRanks;
+    QHash < qint32, std::shared_ptr< QList<qint32> > > groupRanks;
     auto groupKeys = groups.keys();
     for (auto i = groupKeys.constBegin(); i != groupKeys.constEnd(); ++i) {
         auto currVals = groups.values(*i);
         groupAccrue.insert(*i, 0.0);
-        groupRanks.insert(*i, new QList<qint32>());
+        groupRanks.insert(*i, std::make_shared< QList<qint32> >());
         for (auto j = currVals.constBegin(); j != currVals.constEnd(); ++j) {
             groupAccrue[*i] += (**j)->GetCashFlow().GetAmountOutstanding(TargetDate);
             if (!groupRanks.value(*i)->contains((**j)->GetProrataGroup().GetRank(SeliorityScaleLevel)))
@@ -1038,8 +1038,6 @@ double Waterfall::RedeemNotes(double AvailableFunds, int GroupTarget, int Selior
         }
         Q_ASSERT(i.value() > -0.01);
     }
-    for (auto i = groupRanks.begin(); i != groupRanks.end(); ++i)
-        delete i.value();
     return 0.0;
 }
 double Waterfall::RedeemSequential(double AvailableFunds, const QDate& TargetDate, int SeliorityScaleLevel, int MaxGroup)

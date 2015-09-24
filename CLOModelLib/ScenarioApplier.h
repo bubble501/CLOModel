@@ -4,6 +4,7 @@
 #include "MtgCashFlow.h"
 #include "ApplyFlowThread.h"
 #include "TemplAsyncCalculator.h"
+#include <memory>
 class ScenarioApplierPrivate;
 class AssumptionSet;
 class ScenarioApplier;
@@ -28,7 +29,7 @@ public:
 	const MtgCashFlow& GetBaseFlows() const;
 	virtual void SetBaseFlows(const MtgCashFlow& val);
 	virtual void ClearScenarios();
-	virtual const AssumptionSet* GetAssumption(qint32 idx)const;
+	virtual const std::shared_ptr<AssumptionSet> GetAssumption(qint32 idx)const;
 	virtual QList<qint32> GetAssumptionKeys()const;
 	virtual void AddAssumption(const AssumptionSet& a, qint32 idx);
 	using  TemplAsyncCalculator<ApplyFlowThread, MtgCashFlow>::GetResult;

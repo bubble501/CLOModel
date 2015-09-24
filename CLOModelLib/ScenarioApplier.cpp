@@ -33,11 +33,10 @@ void ScenarioApplier::AddAssumption(const AssumptionSet& a, qint32 idx)
     Q_D( ScenarioApplier);
 	RETURN_WHEN_RUNNING(true, )
     auto FoundAss = d->m_Scenarios.find(idx);
-    if (FoundAss != d->m_Scenarios.end()) {
-		delete FoundAss.value();
-        d->m_Scenarios.erase(FoundAss);
-	}
-    d->m_Scenarios.insert(idx, new AssumptionSet(a));
+    if (FoundAss == d->m_Scenarios.end())
+        d->m_Scenarios.insert(idx, std::make_shared< AssumptionSet>(a));
+    else
+        FoundAss.value().reset(new AssumptionSet(a));   
 }
 
 const std::shared_ptr<MtgCashFlow> ScenarioApplier::GetResult(const AssumptionSet& a) const
@@ -101,13 +100,10 @@ void ScenarioApplier::ClearScenarios()
 {
     Q_D( ScenarioApplier);
 	RETURN_WHEN_RUNNING(true, )
-    for (auto i = d->m_Scenarios.begin(); i != d->m_Scenarios.end(); ++i) {
-		delete i.value();
-	}
     d->m_Scenarios.clear();
 }
 
-const AssumptionSet* ScenarioApplier::GetAssumption(qint32 idx) const
+const std::shared_ptr<AssumptionSet> ScenarioApplier::GetAssumption(qint32 idx) const
 {
     Q_D(const ScenarioApplier);
     return d->m_Scenarios.value(idx, nullptr);
@@ -150,9 +146,9 @@ QDataStream& ScenarioApplier::LoadOldVersion(QDataStream& stream)
 	qint32 TempSize, TempKey;
     stream >> d->m_BaseFlows;
 	stream >> TempSize;
-	AssumptionSet* TempRes=nullptr;
+	std::shared_ptr<AssumptionSet> TempRes(nullptr);
 	for (qint32 i = 0; i < TempSize; i++) {
-		TempRes = new AssumptionSet();
+		TempRes.reset(new AssumptionSet());
 		stream >> TempKey;
 		TempRes->SetLoadProtocolVersion(loadProtocolVersion());
 		stream >> (*TempRes);

@@ -1,8 +1,12 @@
 #include "BackwardCompatibilityInterface.h"
 #include "Private/BackwardCompatibilityInterface_p.h"
+
 DEFINE_PUBLIC_COMMONS(BackwardInterface)
 DEFINE_PUBLIC_COMMONS_COPY(BackwardInterface)
+BackwardInterfacePrivate::~BackwardInterfacePrivate()
+{
 
+}
 BackwardInterfacePrivate::BackwardInterfacePrivate(BackwardInterface* q)
     : q_ptr(q)
     , m_LoadProtocolVersion(ModelVersionNumber)

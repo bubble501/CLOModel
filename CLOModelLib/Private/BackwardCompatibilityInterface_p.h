@@ -10,7 +10,9 @@ protected:
     BackwardInterface* q_ptr;
 public:
     qint32 m_LoadProtocolVersion;
+    virtual ~BackwardInterfacePrivate();
 };
+
 
 
 

@@ -1,7 +1,7 @@
 #ifndef FloorCapVector_h__
 #define FloorCapVector_h__
 #include "AbstractBbgVect.h"
-#include <QSharedPointer>
+#include <memory>
 #include <QMetaType>
 class FloorCapVectorPrivate;
 class FloorCapVector;
@@ -20,10 +20,10 @@ public:
 	using AbstractBbgVect::IsEmpty;
 	FloorCapVector(const QString& Vec);
 	FloorCapVector(const QString& Vec, const QDate& Anchor);
-	QSharedPointer<double> GetFloor(const QDate& index) const;
-    QSharedPointer<double> GetCap(const QDate& index) const;
-    QSharedPointer<double> GetFloor(int index) const;
-    QSharedPointer<double> GetCap(int index) const;
+	std::shared_ptr<double> GetFloor(const QDate& index) const;
+    std::shared_ptr<double> GetCap(const QDate& index) const;
+    std::shared_ptr<double> GetFloor(int index) const;
+    std::shared_ptr<double> GetCap(int index) const;
 	int NumElements() const;
 	FloorCapVector& operator=(const QString& a);
 	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const FloorCapVector& flows);

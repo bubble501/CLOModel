@@ -29,16 +29,16 @@ FloorCapVector& FloorCapVector::operator=(const FloorCapVector& other)
     for (auto SingleFloor = other.d_func()->m_FloorVal.constBegin(); SingleFloor != other.d_func()->m_FloorVal.constEnd(); ++SingleFloor)
     {
         if (*SingleFloor)
-            d->m_FloorVal.append(QSharedPointer<double>(new double(**SingleFloor)));
+            d->m_FloorVal.append(std::make_shared<double>(**SingleFloor));
         else 
-            d->m_FloorVal.append(QSharedPointer<double>(NULL));
+            d->m_FloorVal.append(std::shared_ptr<double>(nullptr));
     }
     for (auto SingleCap = other.d_func()->m_CapVal.constBegin(); SingleCap != other.d_func()->m_CapVal.constEnd(); ++SingleCap)
     {
         if (*SingleCap) 
-            d->m_CapVal.append(QSharedPointer<double>(new double(**SingleCap)));
+            d->m_CapVal.append(std::make_shared<double>(**SingleCap));
         else  
-            d->m_CapVal.append(QSharedPointer<double>(NULL));
+            d->m_CapVal.append(std::shared_ptr<double>(nullptr));
     }
     return *this;
 }
@@ -49,22 +49,22 @@ FloorCapVector::FloorCapVector(const QString& Vec)
     SetVector(Vec);
 }
 
-QSharedPointer<double> FloorCapVector::GetFloor(const QDate& index) const
+std::shared_ptr<double> FloorCapVector::GetFloor(const QDate& index) const
 {
     Q_D(const FloorCapVector);
     return d->GetFloor(index);
 }
-QSharedPointer<double> FloorCapVector::GetFloor(int index) const
+std::shared_ptr<double> FloorCapVector::GetFloor(int index) const
 {
     Q_D(const FloorCapVector);
     return d->GetFloor(index);
 }
-QSharedPointer<double> FloorCapVector::GetCap(const QDate& index) const
+std::shared_ptr<double> FloorCapVector::GetCap(const QDate& index) const
 {
     Q_D(const FloorCapVector);
     return d->GetCap(index);
 }
-QSharedPointer<double> FloorCapVector::GetCap(int index) const
+std::shared_ptr<double> FloorCapVector::GetCap(int index) const
 {
     Q_D(const FloorCapVector);
     return d->GetCap(index);
@@ -109,15 +109,15 @@ void FloorCapVector::UnpackVector()
             RawVal.replace("]", "");
             auto CapFloor = RawVal.split(',', QString::KeepEmptyParts);
             if (CapFloor.size() > 0) {
-                if (CapFloor.at(0).isEmpty()) d->m_FloorVal.append(QSharedPointer<double>(NULL));
-                else d->m_FloorVal.append(QSharedPointer<double>(new double(CapFloor.at(0).toDouble())));
+                if (CapFloor.at(0).isEmpty()) d->m_FloorVal.append(std::shared_ptr<double>(nullptr));
+                else d->m_FloorVal.append(std::make_shared<double>(CapFloor.at(0).toDouble()));
             }
-            else d->m_FloorVal.append(QSharedPointer<double>(NULL));
+            else d->m_FloorVal.append(std::shared_ptr<double>(nullptr));
             if (CapFloor.size() > 1) {
-                if (CapFloor.at(1).isEmpty()) d->m_CapVal.append(QSharedPointer<double>(NULL));
-                else d->m_CapVal.append(QSharedPointer<double>(new double(CapFloor.at(1).toDouble())));
+                if (CapFloor.at(1).isEmpty()) d->m_CapVal.append(std::shared_ptr<double>(nullptr));
+                else d->m_CapVal.append(std::make_shared<double>(CapFloor.at(1).toDouble()));
             }
-            else d->m_CapVal.append(QSharedPointer<double>(NULL));
+            else d->m_CapVal.append(std::shared_ptr<double>(nullptr));
         }
     }
     {
@@ -126,15 +126,15 @@ void FloorCapVector::UnpackVector()
         RawVal.replace("]", "");
         auto CapFloor = RawVal.split(',', QString::KeepEmptyParts);
         if (CapFloor.size() > 0) {
-            if (CapFloor.at(0).isEmpty()) d->m_FloorVal.append(QSharedPointer<double>(NULL));
-            else d->m_FloorVal.append(QSharedPointer<double>(new double(CapFloor.at(0).toDouble())));
+            if (CapFloor.at(0).isEmpty()) d->m_FloorVal.append(std::shared_ptr<double>(nullptr));
+            else d->m_FloorVal.append(std::make_shared<double>(CapFloor.at(0).toDouble()));
         }
-        else d->m_FloorVal.append(QSharedPointer<double>(NULL));
+        else d->m_FloorVal.append(std::shared_ptr<double>(nullptr));
         if (CapFloor.size() > 1) {
-            if (CapFloor.at(1).isEmpty()) d->m_CapVal.append(QSharedPointer<double>(NULL));
-            else d->m_CapVal.append(QSharedPointer<double>(new double(CapFloor.at(1).toDouble())));
+            if (CapFloor.at(1).isEmpty()) d->m_CapVal.append(std::shared_ptr<double>(nullptr));
+            else d->m_CapVal.append(std::make_shared<double>(CapFloor.at(1).toDouble()));
         }
-        else d->m_CapVal.append(QSharedPointer<double>(NULL));
+        else d->m_CapVal.append(std::shared_ptr<double>(nullptr));
     }
 }
 bool FloorCapVector::IsValid() const

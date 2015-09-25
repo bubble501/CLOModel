@@ -84,12 +84,12 @@ QDataStream& TrancheTrigger::LoadOldVersion(QDataStream& stream) {
 	return AbstractTrigger::LoadOldVersion(stream);
 }
 
-bool TrancheTrigger::Failing(const QList<Tranche*>& currentTranches, const QDate& CurrentPeriod) const
+bool TrancheTrigger::Failing(const QList<std::shared_ptr<Tranche> >& currentTranches, const QDate& CurrentPeriod) const
 {
     return !Passing(currentTranches, CurrentPeriod);
 }
 
-bool TrancheTrigger::Failing(const QList<Tranche*>& currentTranches, int CurrentPeriod) const
+bool TrancheTrigger::Failing(const QList<std::shared_ptr<Tranche> >& currentTranches, int CurrentPeriod) const
 {
     return !Passing(currentTranches, CurrentPeriod);
 }
@@ -170,7 +170,8 @@ void TrancheTrigger::SetTargetSize(const QString& val)
 
 
 
-bool TrancheTrigger::Passing(const QList<Tranche*>& currentTranches, const QDate& CurrentPeriod) const {
+bool TrancheTrigger::Passing(const QList<std::shared_ptr<Tranche> >& currentTranches, const QDate& CurrentPeriod) const
+{
     Q_D(const TrancheTrigger);
 	if (!ReadyToCalculate().isEmpty()) return false;
 	double RelevantAmount=0.0;
@@ -194,7 +195,7 @@ bool TrancheTrigger::Passing(const QList<Tranche*>& currentTranches, const QDate
 	}
 	return Result;
 }
-bool TrancheTrigger::Passing(const QList<Tranche*>& currentTranches, int CurrentPeriod) const
+bool TrancheTrigger::Passing(const QList<std::shared_ptr<Tranche> >& currentTranches, int CurrentPeriod) const
 {
     Q_D(const TrancheTrigger);
 	if (!ReadyToCalculate().isEmpty()) return false;

@@ -78,7 +78,7 @@ void GenericCashFlow::AddFlow(QDate Dte, double Amt, qint32 FlowTpe)
 		}
 	}
 	else {
-        d->m_CashFlows.insert(Dte, new QHash<qint32, double>());
+        d->m_CashFlows.insert(Dte, std::make_shared<QHash<qint32, double> >());
 		//if (qAbs(Amt) > 0.0) {
 			Amt += GetFlow(Dte, FlowTpe);
 			if (qAbs(Amt) < 0.01) 
@@ -116,7 +116,7 @@ void GenericCashFlow::SetFlow(QDate Dte, double Amt, qint32 FlowTpe) {
 		}
 	}
 	else {
-        d->m_CashFlows.insert(Dte, new QHash<qint32, double>());
+        d->m_CashFlows.insert(Dte, std::make_shared<QHash<qint32, double> >());
         if (qAbs(Amt) > 0.0 || d->m_Stocks.contains(FlowTpe)) {
             d->m_CashFlows[Dte]->insert(FlowTpe, Amt);
 		}
@@ -188,9 +188,6 @@ void GenericCashFlow::SetFlow(const GenericCashFlow& a) {
 
 void GenericCashFlow::Clear() {
     Q_D(GenericCashFlow);
-    for (auto i = d->m_CashFlows.begin(); i != d->m_CashFlows.end(); i++) {
-		delete (i.value());
-	}
     d->m_CashFlows.clear();
 }
 
@@ -244,7 +241,7 @@ void GenericCashFlow::ReplaceDate(const QDate& OriginalDate, const QDate& NewDat
     Q_D(GenericCashFlow);
     auto TempIter = d->m_CashFlows.find(OriginalDate);
     if (TempIter != d->m_CashFlows.end()) {
-		QHash<qint32, double>* TempPoint = TempIter.value();
+		std::shared_ptr<QHash<qint32, double> > TempPoint = TempIter.value();
         d->m_CashFlows.erase(TempIter);
         d->m_CashFlows.insert(NewDate, TempPoint);
 	}
@@ -257,15 +254,14 @@ void GenericCashFlow::Aggregate(CashFlowAggregation Freq) {
     for (auto MainIter = d->m_CashFlows.begin(); MainIter != d->m_CashFlows.end(); ++MainIter) {
         for (auto SecondIter = MainIter + 1; SecondIter != d->m_CashFlows.end();) {
             if (d->SamePeriod(MainIter.key(), SecondIter.key(), Freq)) {
-				QHash<qint32, double>* TempMain = MainIter.value();
-				const QHash<qint32, double>* TempSecond = SecondIter.value();
+                std::shared_ptr<QHash<qint32, double> > TempMain = MainIter.value();
+                std::shared_ptr<QHash<qint32, double> > TempSecond = SecondIter.value();
 				for (auto i = TempSecond->constBegin(); i != TempSecond->constEnd(); ++i) {
 					if (!TempMain->contains(i.key())) 
 						TempMain->insert(i.key(), 0.0); //Should never happen but just to be safe
                     if (d->m_Stocks.contains(i.key())) TempMain->operator[](i.key()) = i.value();
 					else TempMain->operator[](i.key()) += i.value();
 				}
-				delete (SecondIter.value());
                 SecondIter = d->m_CashFlows.erase(SecondIter);
 			}
 			else break;
@@ -323,7 +319,7 @@ QDataStream& GenericCashFlow::LoadOldVersion(QDataStream& stream) {
 	stream >> TempSize;
 	for (quint32 i = 0; i < TempSize; i++) {
 		stream >> TempDate >> TempMain;
-        d->m_CashFlows.insert(TempDate, new QHash<qint32, double>(TempMain));
+        d->m_CashFlows.insert(TempDate, std::make_shared <QHash<qint32, double> >(TempMain));
 		TempMain.clear();
 	}
 	ResetProtocolVersion();
@@ -336,9 +332,12 @@ QDate GenericCashFlow::MaturityDate() const {
     Q_D(const GenericCashFlow);
     if (d->m_CashFlows.isEmpty()) return QDate();
     for (auto i = d->m_CashFlows.constEnd() - 1; ; --i) {
-		if (!i.value()->isEmpty()) return i.key();
-        if (i == d->m_CashFlows.constBegin()) return QDate();
+		if (!i.value()->isEmpty()) 
+            return i.key();
+        if (i == d->m_CashFlows.constBegin()) 
+            return QDate();
 	}
+    Q_UNREACHABLE();
 	return QDate();
 }
 
@@ -355,8 +354,8 @@ bool GenericCashFlow::operator==(const GenericCashFlow& a) const
     if (d->m_CashFlows.size() != a.d_func()->m_CashFlows.size()) return false;
     for (auto MainIter = d->m_CashFlows.constBegin(); MainIter != d->m_CashFlows.constEnd(); ++MainIter) {
 		if (!a.d_func()->m_CashFlows.contains(MainIter.key())) return false;
-		const QHash<qint32, double>* TempMain = MainIter.value();
-        const QHash<qint32, double>* TempSec = a.d_func()->m_CashFlows.value(MainIter.key());
+		const auto& TempMain = MainIter.value();
+        const auto& TempSec = a.d_func()->m_CashFlows.value(MainIter.key());
 		if (TempMain->size() != TempSec->size()) return false;
 
 		for (auto SecIter = TempMain->constBegin(); SecIter != TempMain->constEnd(); ++SecIter) {
@@ -564,7 +563,6 @@ void GenericCashFlow::RemoveFlowsAt(const QDate& a)
     auto flowIter = d->m_CashFlows.find(a);
     if (flowIter == d->m_CashFlows.end())
         return;
-    delete flowIter.value();
     d->m_CashFlows.erase(flowIter);
 }
 

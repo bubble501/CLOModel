@@ -31,7 +31,6 @@ MtgCalculator::MtgCalculator(MtgCalculatorPrivate *d, QObject* parent)
 
 MtgCalculator::~MtgCalculator()
 {
-    Reset();
 }
 
 void MtgCalculator::AddLoan(const Mortgage& a, qint32 Index)
@@ -40,10 +39,9 @@ void MtgCalculator::AddLoan(const Mortgage& a, qint32 Index)
 	RETURN_WHEN_RUNNING(true, )
 	auto FoundLn = d->Loans.find(Index);
     if (FoundLn != d->Loans.end()) {
-		delete FoundLn.value();
         d->Loans.erase(FoundLn);
 	}
-    d->Loans.insert(Index, new Mortgage(a));
+    d->Loans.insert(Index, std::make_shared<Mortgage>(a));
 }
 bool MtgCalculator::StartCalculation() {
     Q_D(MtgCalculator);
@@ -236,9 +234,6 @@ void MtgCalculator::BeeReturned(int Ident, const MtgCashFlow& a) {
 void MtgCalculator::ClearLoans() {
     Q_D(MtgCalculator);
 	RETURN_WHEN_RUNNING(true, )
-    for (auto i = d->Loans.begin(); i != d->Loans.end(); i++) {
-		delete i.value();
-	}
     d->Loans.clear();
 }
 void MtgCalculator::Reset(){
@@ -436,13 +431,13 @@ QDataStream& operator>>(QDataStream & stream, MtgCalculator& flows) {
 	return flows.LoadOldVersion(stream);
 }
 
-QHash<qint32, Mortgage*>& MtgCalculator::GetLoans()
+QHash<qint32, std::shared_ptr<Mortgage> >& MtgCalculator::GetLoans()
 {
     Q_D( MtgCalculator);
     return d->Loans;
 }
 
-const QHash<qint32, Mortgage*>& MtgCalculator::GetLoans() const
+const QHash<qint32, std::shared_ptr<Mortgage> >& MtgCalculator::GetLoans() const
 {
     Q_D(const MtgCalculator);
     return d->Loans;
@@ -454,7 +449,7 @@ void MtgCalculator::SetLoans(const QHash<qint32, Mortgage*>& a)
 	RETURN_WHEN_RUNNING(true, )
 	ClearLoans();
 	for (auto i = a.constBegin(); i != a.constEnd(); ++i) {
-        d->Loans.insert(i.key(), new Mortgage(*(i.value())));
+        d->Loans.insert(i.key(), std::make_shared<Mortgage>(*(i.value())));
 	}
 }
 
@@ -480,12 +475,12 @@ QList<qint32> MtgCalculator::GetResultsKeys() const
     return d->Loans.keys();
 }
 
-const MtgCashFlow* MtgCalculator::GetResult(qint32 key) const
+const std::shared_ptr<MtgCashFlow> MtgCalculator::GetResult(qint32 key) const
 {
     Q_D(const MtgCalculator);
     if (d->Loans.value(key, nullptr))
-        return &(d->Loans.value(key)->GetCashFlow());
-    return nullptr;
+        return std::make_shared<MtgCashFlow>(d->Loans.value(key)->GetCashFlow());
+    return std::shared_ptr<MtgCashFlow>();
 }
 
 int MtgCalculator::NumBees() const
@@ -677,7 +672,7 @@ void MtgCalculator::DownloadScenarios() {
 void MtgCalculator::GuessLoanScenarios(bool OverrideAss) {
     Q_D( MtgCalculator);
 	RETURN_WHEN_RUNNING(true, )
-	QHash<QString,LoanAssumption*> AvailableAssumptions;
+	QHash<QString, std::shared_ptr< LoanAssumption> > AvailableAssumptions;
 	Db_Mutex.lock();
 	{
 		QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
@@ -702,7 +697,7 @@ void MtgCalculator::GuessLoanScenarios(bool OverrideAss) {
 				while (LoanAssQuerry.next()) {
 					auto DbgRecord = LoanAssQuerry.record();
 					if (AvailableAssumptions.contains(DbgRecord.value(0).toString())) continue;
-					auto CurrAss = AvailableAssumptions.insert(DbgRecord.value(0).toString(), new LoanAssumption(DbgRecord.value(0).toString()));
+					auto CurrAss = AvailableAssumptions.insert(DbgRecord.value(0).toString(), std::make_shared<LoanAssumption>(DbgRecord.value(0).toString()));
 					(*CurrAss)->SetAliases(DbgRecord.value(1).toString());
 				}
 			}
@@ -720,9 +715,6 @@ void MtgCalculator::GuessLoanScenarios(bool OverrideAss) {
 				}
 			}
 		}
-	}
-	for (auto i = AvailableAssumptions.begin(); i != AvailableAssumptions.end(); ++i) {
-		delete i.value();
 	}
 }
 
@@ -781,8 +773,6 @@ void MtgCalculator::ClearTempProperties()
 {
     Q_D( MtgCalculator);
 	RETURN_WHEN_RUNNING(true, )
-        for (auto i = d->TempProperties.begin(); i != d->TempProperties.end(); ++i)
-		delete i.value();
     d->TempProperties.clear();
 }
 
@@ -792,7 +782,7 @@ void MtgCalculator::AddTempProperty(qint32 LoanID, const QString& PropertyName, 
 	RETURN_WHEN_RUNNING(true, )
         if (!d->Loans.contains(LoanID) || PropertyName.isEmpty() || PropertyValue.isEmpty())return;
     auto iter = d->TempProperties.find(LoanID);
-    if (iter == d->TempProperties.end()) iter = d->TempProperties.insert(LoanID, new QHash<QString, QString>());
+    if (iter == d->TempProperties.end()) iter = d->TempProperties.insert(LoanID, std::make_shared<QHash<QString, QString>>());
 	iter.value()->operator[](PropertyName) = PropertyValue;
 }
 

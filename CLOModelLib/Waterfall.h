@@ -2,9 +2,9 @@
 #define Waterfall_h__
 #include "BackwardCompatibilityInterface.h"
 #include <QMetaType>
-#include <QSharedPointer>
 #include <QString>
 #include <QSet>
+#include <memory>
 class MtgCashFlow;
 class GenericCashFlow;
 class AssumptionSet;
@@ -41,7 +41,7 @@ public:
     ~Waterfall();
     const QDate& GetLegalFinal() const;
     void SetLegalFinal(const QDate& val);
-    const QHash<quint32, QSharedPointer<AbstractTrigger> >& GetTriggers() const;
+    const QHash<quint32, std::shared_ptr<AbstractTrigger> >& GetTriggers() const;
     QString GetGICinterest() const;
     QString GetSeniorExpenses() const;
     QString GetSeniorFees() const;
@@ -87,12 +87,12 @@ public:
     const QDate& GetCallDate() const;
     const QDate& GetCalledPeriod() const;
     QDate GetStructureMaturity() const;
-    const WatFalPrior* GetStep(int Index) const;
-    WatFalPrior* GetStep(int Index);
-    Tranche* GetTranche(const QString& TrancheName);
-    const Tranche* GetTranche(const QString& TrancheName) const;
-    Tranche* GetTranche(int Index);
-    const Tranche* GetTranche(int Index) const;
+    const std::shared_ptr<WatFalPrior> GetStep(int Index) const;
+    std::shared_ptr<WatFalPrior> GetStep(int Index);
+    std::shared_ptr<Tranche> GetTranche(const QString& TrancheName);
+    const std::shared_ptr<Tranche> GetTranche(const QString& TrancheName) const;
+    std::shared_ptr<Tranche> GetTranche(int Index);
+    const std::shared_ptr<Tranche> GetTranche(int Index) const;
     double GetWACostOfCapital(int index)const;
     double GetCreditEnhancement(const QString& Tranchename, int TimeIndex = -1)const { return GetCreditEnhancement(FindTrancheIndex(Tranchename), TimeIndex); }
     double GetCreditEnhancement(int TrancheIndex, int TimeIndex = -1)const;
@@ -100,15 +100,15 @@ public:
     int GetStepsCount()const;
     const MtgCashFlow& GetCalculatedMtgPayments() const;
     MtgCashFlow& GetCalculatedMtgPayments();
-    const ReserveFund* const GetReserveFund(int RFindex) const;
+    const std::shared_ptr<ReserveFund> GetReserveFund(int RFindex) const;
     bool GetCumulativeReserves() const;
     int GetNumReserves()const;
     const QSet<QString>& GetDealName() const;
     const double& GetStartingDeferredJunFees() const;
     QString GetGICBaseRate() const;
     const DayCountVector& GetDealDayCountConvention() const;
-    const QSharedPointer<AbstractTrigger> GetTrigger(quint32 key) const;
-    QSharedPointer<AbstractTrigger> GetTrigger(quint32 key);
+    const std::shared_ptr<AbstractTrigger> GetTrigger(quint32 key) const;
+    std::shared_ptr<AbstractTrigger> GetTrigger(quint32 key);
     GenericCashFlow GetAggregatedReinvestment() const;
     GenericCashFlow GetAggregatedGIC() const;
     MtgCashFlow GetAggregatedMtgFlows() const;
@@ -117,7 +117,7 @@ public:
     void SetIsStressTest(const bool& val);
     void SetAssumptions(const AssumptionSet& a);
     const TriggersResults& GetTriggersResults() const;
-    void SetTrigger(quint32 key, QSharedPointer<AbstractTrigger> val);
+    void SetTrigger(quint32 key, std::shared_ptr<AbstractTrigger> val);
     void ResetTriggers();
     void RemoveTrigger(quint32 key);
     void SetDealDayCountConvention(const QString&  val);

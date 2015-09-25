@@ -6,8 +6,6 @@ AbstrAsyncThreadPrivate::AbstrAsyncThreadPrivate(AbstrAsyncThread *q)
 {}
 AbstrAsyncThreadPrivate::~AbstrAsyncThreadPrivate()
 {
-    if (m_Result)
-        delete m_Result;
 }
 AbstrAsyncThread::AbstrAsyncThread(int ID, QObject* parent)
     :AbstrAsyncThread(new AbstrAsyncThreadPrivate(this), ID, parent)

@@ -7,7 +7,7 @@ TriggersResultsPrivate::TriggersResultsPrivate(TriggersResults *q,const Triggers
 	:BackwardInterfacePrivate(q,other)
 {
     for (auto i = other.m_Results.constBegin(); i != other.m_Results.constEnd(); ++i) {
-        m_Results.insert(i.key(), new QMap<QDate, bool>(*(i.value())));
+        m_Results.insert(i.key(), std::make_shared< QMap<QDate, bool> >(*(i.value())));
     }
 }
 TriggersResultsPrivate::TriggersResultsPrivate(TriggersResults *q)
@@ -21,7 +21,7 @@ TriggersResults& TriggersResults::operator=(const TriggersResults& other){
 	BackwardInterface::operator=(other);
     ClearResults();
     for (auto i = other.d_func()->m_Results.constBegin(); i != other.d_func()->m_Results.constEnd(); ++i) {
-        d->m_Results.insert(i.key(), new QMap<QDate, bool>(*(i.value())));
+        d->m_Results.insert(i.key(), std::make_shared< QMap<QDate, bool> >(*(i.value())));
     }
 	return *this;
 }
@@ -37,14 +37,12 @@ TriggersResults::~TriggersResults()
 void TriggersResults::ClearResults()
 {
     Q_D(TriggersResults);
-    for (auto i = d->m_Results.begin(); i != d->m_Results.end(); ++i)
-		delete i.value();
     d->m_Results.clear();
 }
 
 TriggersResults::TrigRes TriggersResults::GetResult(quint32 TrigType, const QDate& RefDate)const {
     Q_D(const TriggersResults);
-    const QMap<QDate, bool>* Tempmap = d->m_Results.value(TrigType, nullptr);
+    const auto Tempmap = d->m_Results.value(TrigType, nullptr);
 	if (Tempmap) {
 		auto MapIter = Tempmap->constFind(RefDate);
 		if (MapIter == Tempmap->constEnd()) return TrigRes::trNA;
@@ -57,7 +55,7 @@ void TriggersResults::SetResult(quint32 TrigType, const QDate& RefDate, bool Res
     Q_D(TriggersResults);
     auto hashIter = d->m_Results.find(TrigType);
     if (hashIter == d->m_Results.end()) {
-        hashIter = d->m_Results.insert(TrigType, new QMap<QDate, bool>());
+        hashIter = d->m_Results.insert(TrigType, std::make_shared< QMap<QDate, bool> >());
 	}
 	hashIter.value()->operator[](RefDate) = Res;
 }
@@ -71,7 +69,7 @@ QDataStream& TriggersResults::LoadOldVersion(QDataStream& stream) {
 	for (qint32 i = 0; i < tempInt; i++) {
 		Tempmap.clear();
 		stream >> tempKey >> Tempmap;
-        d->m_Results.insert(tempKey, new QMap<QDate, bool>(Tempmap));
+        d->m_Results.insert(tempKey, std::make_shared< QMap<QDate, bool> >(Tempmap));
 	}
 	ResetProtocolVersion();
 	return stream;

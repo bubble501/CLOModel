@@ -14,7 +14,7 @@ class AbstrAsyncCalculatorPrivate : public BackwardInterfacePrivate
 public:
     std::atomic_bool m_ContinueCalculation;
     QHash<qint32, QPointer<QObject> > m_ThreadPool;
-    QHash<qint32, void*> m_Result;
+    QHash<qint32, std::shared_ptr<void> > m_Result;
     QSet<qint32> BeesSent;
     qint32 BeesReturned;
     bool m_SequentialComputation;

@@ -5,6 +5,7 @@
 #include "BloombergVector.h"
 #include "BackwardCompatibilityInterface.h"
 #include "BaseRateVect.h"
+#include <memory>
 class IntegerVector;
 class Seniority;
 class TranchePrivate;
@@ -20,7 +21,7 @@ protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 	static bool AdjHolidays(DayCountConvention a);
     template<typename T>
-    T GetCouponPart(qint32 CoupIndex, const QHash<qint32, T*>& vec) const
+    T GetCouponPart(qint32 CoupIndex, const QHash<qint32, std::shared_ptr<T> >& vec) const
     {
         static_assert(std::is_base_of<AbstractBbgVect, T>::value, "GetCouponPart requires a hash of vectors");
         if (vec.contains(CoupIndex))
@@ -28,7 +29,7 @@ protected:
         return T();
     }
     template<typename T>
-    void SetCouponPart(const QString& val, qint32 CoupIndex, QHash<qint32, T*>& vec) const
+    void SetCouponPart(const QString& val, qint32 CoupIndex, QHash<qint32, std::shared_ptr<T> >& vec) const
     {
         static_assert(std::is_base_of<AbstractBbgVect, T>::value, "SetCouponPart requires a hash of vectors");
         if(CoupIndex < 0 || CoupIndex >= (1 << MaximumInterestsTypes)) 
@@ -36,19 +37,17 @@ protected:
         auto iter = vec.find(CoupIndex);
         if (T(val).IsEmpty()) {
             //return; // #TODO check this
-            if (iter != vec.end()) {
-                delete iter.value();
+            if (iter != vec.end())
                 vec.erase(iter);
-            }
         }
         if (iter != vec.end())
             iter.value()->operator=(val);
         else
-            vec.insert(CoupIndex, new T(val));
+            vec.insert(CoupIndex, std::make_shared< T>(val));
     }
 public:
 	~Tranche();
-	const QHash<qint32, BloombergVector*>& GetRefRateValues() const;
+	const QHash<qint32,std::shared_ptr<BloombergVector> >& GetRefRateValues() const;
 	double GetStartingDeferredInterest(qint32 CoupIdx = 0) const;
 	void SetStartingDeferredInterest(const double& val, qint32 CoupIdx=0);
 	const QString& GetTrancheName() const;

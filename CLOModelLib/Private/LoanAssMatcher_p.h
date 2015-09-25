@@ -4,7 +4,7 @@
 #include "LoanAssMatcher.h"
 #include <QFileInfoList>
 #include <QHash>
-#include <QSharedPointer>
+#include <memory>
 #include "LoanAssumption.h"
 class LoanAssMatcherPrivate : public AbstrAsyncCalculatorPrivate
 {
@@ -12,7 +12,7 @@ class LoanAssMatcherPrivate : public AbstrAsyncCalculatorPrivate
     DECLARE_PRIVATE_COMMONS_DATASTREAM(LoanAssMatcher)
 public:
     QFileInfoList m_FilesInFolder;
-    QHash<QString, QSharedPointer<LoanAssumption> > m_AvailableAssumptions;
+    QHash<QString, std::shared_ptr<LoanAssumption> > m_AvailableAssumptions;
     QString m_FolderToScan;
 };
 #endif // LoanAssMatcher_p_h__

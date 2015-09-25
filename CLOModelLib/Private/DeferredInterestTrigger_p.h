@@ -21,7 +21,7 @@ public:
     BloombergVector m_TargetSize;
 
     template <typename T>
-    bool passingTemplate(const QList<Tranche*>& currentTranches, const T& CurrentPeriod) const
+    bool passingTemplate(const QList<std::shared_ptr<Tranche> >& currentTranches, const T& CurrentPeriod) const
     {
         Q_Q(const DeferredInterestTrigger);
         if (!q->ReadyToCalculate().isEmpty()) return false;

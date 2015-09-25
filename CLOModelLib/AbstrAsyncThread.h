@@ -2,6 +2,7 @@
 #define AbstrAsyncThread_h__
 #include <QThread>
 #include "CommonFunctions.h"
+#include <memory>
 class AbstrAsyncThreadPrivate;
 class  CLOMODELLIB_EXPORT AbstrAsyncThread : public QThread
 {

@@ -1,6 +1,7 @@
 #ifndef DeferredInterestTrigger_h__
 #define DeferredInterestTrigger_h__
 #include "AbstractTrigger.h"
+#include <memory>
 class Tranche;
 class IntegerVector;
 class DeferredInterestTriggerPrivate;
@@ -50,10 +51,10 @@ public:
 		, const QString& lab = QString()
 	);
 	DeferredInterestTrigger(const QString& lab);
-	virtual bool Passing(const QList<Tranche*>& currentTranches, const QDate& CurrentPeriod) const;
-	virtual bool Passing(const QList<Tranche*>& currentTranches, int CurrentPeriod) const;
-	virtual bool Failing(const QList<Tranche*>& currentTranches, const QDate& CurrentPeriod) const;
-	virtual bool Failing(const QList<Tranche*>& currentTranches, int CurrentPeriod) const;
+	virtual bool Passing(const QList<std::shared_ptr<Tranche> >& currentTranches, const QDate& CurrentPeriod) const;
+    virtual bool Passing(const QList<std::shared_ptr<Tranche> >& currentTranches, int CurrentPeriod) const;
+    virtual bool Failing(const QList<std::shared_ptr<Tranche> >& currentTranches, const QDate& CurrentPeriod) const;
+    virtual bool Failing(const QList<std::shared_ptr<Tranche> >& currentTranches, int CurrentPeriod) const;
 	virtual QString ReadyToCalculate() const override;
 	const DeferredInterestTrigger::TriggerSizeSide& GetSizeSide() const;
 	void SetSizeSide(const DeferredInterestTrigger::TriggerSizeSide& val);

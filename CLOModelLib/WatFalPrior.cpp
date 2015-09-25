@@ -14,9 +14,9 @@ WatFalPriorPrivate::WatFalPriorPrivate(WatFalPrior *q,const WatFalPriorPrivate& 
     , m_AccrueOrPay(other.m_AccrueOrPay)
 {
     for (auto i = other.IntParameters.constBegin(); i != other.IntParameters.constEnd(); ++i)
-        IntParameters.insert(i.key(), new IntegerVector(*(i.value())));
+        IntParameters.insert(i.key(), std::make_shared< IntegerVector>(*(i.value())));
     for (auto i = other.DoubleParameters.constBegin(); i != other.DoubleParameters.constEnd(); ++i)
-        DoubleParameters.insert(i.key(), new BloombergVector(*(i.value())));
+        DoubleParameters.insert(i.key(), std::make_shared< BloombergVector>(*(i.value())));
 }
 WatFalPriorPrivate::WatFalPriorPrivate(WatFalPrior *q)
 	:BackwardInterfacePrivate(q)
@@ -35,9 +35,9 @@ WatFalPrior& WatFalPrior::operator=(const WatFalPrior& other){
     d->TriggerStruc = other.d_func()->TriggerStruc;
     d->m_AccrueOrPay = other.d_func()->m_AccrueOrPay;
     for (auto i = other.d_func()->IntParameters.constBegin(); i != other.d_func()->IntParameters.constEnd(); ++i)
-        d->IntParameters.insert(i.key(), new IntegerVector(*(i.value())));
+        d->IntParameters.insert(i.key(), std::make_shared< IntegerVector>(*(i.value())));
     for (auto i = other.d_func()->DoubleParameters.constBegin(); i != other.d_func()->DoubleParameters.constEnd(); ++i)
-        d->DoubleParameters.insert(i.key(), new BloombergVector(*(i.value())));
+        d->DoubleParameters.insert(i.key(), std::make_shared< BloombergVector>(*(i.value())));
 	return *this;
 }
 WatFalPrior::WatFalPrior(WatFalPriorPrivate *d)
@@ -167,13 +167,13 @@ QDataStream& WatFalPrior::LoadOldVersion(QDataStream& stream)
 	for (int i = 0; i < TempSize; i++) {
 		stream >> TempInt;
 		TempIV.SetLoadProtocolVersion(loadProtocolVersion()); stream >> TempIV;
-        d->IntParameters.insert(TempInt, new IntegerVector(TempIV));
+        d->IntParameters.insert(TempInt, std::make_shared< IntegerVector>(TempIV));
 	}
 	stream >> TempSize;
 	for (int i = 0; i < TempSize; i++) {
 		stream >> TempInt;
         TempBV.SetLoadProtocolVersion(loadProtocolVersion()); stream >> TempBV;
-        d->DoubleParameters.insert(TempInt, new BloombergVector(TempBV));
+        d->DoubleParameters.insert(TempInt, std::make_shared< BloombergVector>(TempBV));
 	}
     stream >> TempInt >> d->TriggerStruc >> TempUChar >> d->FilledNullAnchors;
     d->PriorityType = static_cast<WaterfallStepType>(TempInt);
@@ -185,10 +185,6 @@ QDataStream& WatFalPrior::LoadOldVersion(QDataStream& stream)
 void WatFalPrior::ClearParameters()
 {
     Q_D( WatFalPrior);
-    for (auto i = d->IntParameters.begin(); i != d->IntParameters.end(); ++i)
-		delete i.value();
-    for (auto i = d->DoubleParameters.begin(); i != d->DoubleParameters.end(); ++i)
-		delete i.value();
     d->IntParameters.clear();
     d->DoubleParameters.clear();
     d->TriggerStruc = QString();
@@ -249,14 +245,14 @@ void WatFalPrior::SetParameter(qint32 ParameterType, const QString& val)
 	case wstParameters::AdditionalCollateralShare:
 	case wstParameters::TestTargetOverride:
 	case wstParameters::IRRtoEquityTarget:{
-		BloombergVector* TempV = new BloombergVector(val);
-        if (d->DoubleParameters.contains(ParameterType))
-            delete d->DoubleParameters[ParameterType];
-		if (TempV->IsEmpty()) {
-            d->DoubleParameters.remove(ParameterType);
-			delete TempV;
-		}
-        else d->DoubleParameters[ParameterType] = TempV;
+        auto TempV = std::make_shared<BloombergVector>(val);
+        auto parIter = d->DoubleParameters.find(ParameterType);
+        if (parIter == d->DoubleParameters.end())
+            d->DoubleParameters.insert(ParameterType, TempV);
+        else if (TempV->IsEmpty())
+            d->DoubleParameters.erase(parIter);
+        else
+            parIter.value() = TempV;
 	break;
 	}
 	case wstParameters::Trigger:
@@ -285,27 +281,27 @@ void WatFalPrior::SetParameter(qint32 ParameterType, const QString& val)
 	case wstParameters::CouponIndex:
 	case wstParameters::ReserveIndex:
 	{
-		IntegerVector* TempV = new IntegerVector(val);
-		TempV->SetShift(-1);
-        if (d->IntParameters.contains(ParameterType))
-            delete d->IntParameters[ParameterType];
-		if (TempV->IsEmpty()) {
-            d->IntParameters.remove(ParameterType);
-			delete TempV;
-		}
-        else d->IntParameters[ParameterType] = TempV;
+        auto TempV = std::make_shared<IntegerVector>(val);
+        TempV->SetShift(-1);
+        auto parIter = d->IntParameters.find(ParameterType);
+        if (parIter == d->IntParameters.end())
+            d->IntParameters.insert(ParameterType, TempV);
+        else if (TempV->IsEmpty())
+            d->IntParameters.erase(parIter);
+        else
+            parIter.value() = TempV;
 	}
 	break;
 	default:
 	{
-		IntegerVector* TempV = new IntegerVector(val);
-        if (d->IntParameters.contains(ParameterType))
-            delete d->IntParameters[ParameterType];
-		if (TempV->IsEmpty()) {
-            d->IntParameters.remove(ParameterType);
-			delete TempV;
-		}
-        else d->IntParameters[ParameterType] = TempV;
+        auto TempV = std::make_shared<IntegerVector>(val);
+        auto parIter = d->IntParameters.find(ParameterType);
+        if (parIter == d->IntParameters.end())
+            d->IntParameters.insert(ParameterType, TempV);
+        else if (TempV->IsEmpty())
+            d->IntParameters.erase(parIter);
+        else
+            parIter.value() = TempV;
 	}
 	}
 }
@@ -318,14 +314,8 @@ void WatFalPrior::SetParameter(wstParameters ParameterType, const QString& val)
 void WatFalPrior::RemoveParameter(qint32 ParameterType)
 {
     Q_D( WatFalPrior);
-    if (d->DoubleParameters.contains(ParameterType)) {
-        delete d->DoubleParameters[ParameterType];
-        d->DoubleParameters.remove(ParameterType);
-	}
-    if (d->IntParameters.contains(ParameterType)) {
-        delete d->IntParameters[ParameterType];
-        d->IntParameters.remove(ParameterType);
-	}
+    d->DoubleParameters.remove(ParameterType);
+    d->IntParameters.remove(ParameterType);
     if (ParameterType == static_cast<qint32>(wstParameters::Trigger)) 
         d->TriggerStruc = QString();
     if (ParameterType == static_cast<qint32>(wstParameters::PayAccrue)) 

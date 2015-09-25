@@ -949,7 +949,7 @@ void StressTest::ResetScenarios()
 void StressTest::FastLoansCalculated() {
     Q_D( StressTest);
     QList<qint32> AllKeys = d->BaseApplier->GetAssumptionKeys();
-	const AssumptionSet* CurrentAss;
+	std::shared_ptr<AssumptionSet> CurrentAss;
 	foreach(qint32 SingleKey, AllKeys) {
         CurrentAss = d->BaseApplier->GetAssumption(SingleKey);
 		if (!CurrentAss)continue;

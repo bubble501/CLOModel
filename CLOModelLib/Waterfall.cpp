@@ -75,42 +75,42 @@ WaterfallPrivate::WaterfallPrivate(Waterfall *q,const WaterfallPrivate& other)
     , m_LegalFinal(other.m_LegalFinal)
 {
     for (auto i = other.m_Tranches.constBegin(); i != other.m_Tranches.constEnd(); i++) {
-        m_Tranches.append(new Tranche(**i));
+        m_Tranches.append(std::make_shared< Tranche>(**i));
     }
     for (auto i = other.m_WaterfallStesps.constBegin(); i != other.m_WaterfallStesps.constEnd(); i++) {
-        m_WaterfallStesps.append(new WatFalPrior(**i));
+        m_WaterfallStesps.append(std::make_shared< WatFalPrior>(**i));
     }
     for (auto i = other.m_Reserves.constBegin(); i != other.m_Reserves.constEnd(); i++) {
-        m_Reserves.append(new ReserveFund(**i));
+        m_Reserves.append(std::make_shared< ReserveFund>(**i));
     }
     for (auto i = other.m_Triggers.constBegin(); i != other.m_Triggers.constEnd(); ++i) {
         switch (i.value()->GetTriggerType()) {
         case AbstractTrigger::TriggerType::DateTrigger:
-            m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DateTrigger(*(i.value().dynamicCast<DateTrigger>()))));
+            m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new DateTrigger(*(std::static_pointer_cast<DateTrigger>(i.value())))));
             break;
         case AbstractTrigger::TriggerType::VectorTrigger:
-            m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new VectorTrigger(*(i.value().dynamicCast<VectorTrigger>()))));
+            m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new VectorTrigger(*(std::static_pointer_cast<VectorTrigger>(i.value())))));
             break;
         case AbstractTrigger::TriggerType::PoolSizeTrigger:
-            m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new PoolSizeTrigger(*(i.value().dynamicCast<PoolSizeTrigger>()))));
+            m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new PoolSizeTrigger(*(std::static_pointer_cast<PoolSizeTrigger>(i.value())))));
             break;
         case AbstractTrigger::TriggerType::TrancheTrigger:
-            m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new TrancheTrigger(*(i.value().dynamicCast<TrancheTrigger>()))));
+            m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new TrancheTrigger(*(std::static_pointer_cast<TrancheTrigger>(i.value())))));
             break;
         case AbstractTrigger::TriggerType::DelinquencyTrigger:
-            m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DelinquencyTrigger(*(i.value().dynamicCast<DelinquencyTrigger>()))));
+            m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new DelinquencyTrigger(*(std::static_pointer_cast<DelinquencyTrigger>(i.value())))));
             break;
         case AbstractTrigger::TriggerType::DuringStressTestTrigger:
-            m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DuringStressTestTrigger(*(i.value().dynamicCast<DuringStressTestTrigger>()))));
+            m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new DuringStressTestTrigger(*(std::static_pointer_cast<DuringStressTestTrigger>(i.value())))));
             break;
         case AbstractTrigger::TriggerType::CumulativeLossTrigger:
-            m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new CumulativeLossTrigger(*(i.value().dynamicCast<CumulativeLossTrigger>()))));
+            m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new CumulativeLossTrigger(*(std::static_pointer_cast<CumulativeLossTrigger>(i.value())))));
             break;
         case AbstractTrigger::TriggerType::DeferredInterestTrigger:
-            m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DeferredInterestTrigger(*(i.value().dynamicCast<DeferredInterestTrigger>()))));
+            m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new DeferredInterestTrigger(*(std::static_pointer_cast<DeferredInterestTrigger>(i.value())))));
             break;
         case AbstractTrigger::TriggerType::PDLTrigger:
-            m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new PDLTrigger(*(i.value().dynamicCast<PDLTrigger>()))));
+            m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new PDLTrigger(*(std::static_pointer_cast<PDLTrigger>(i.value())))));
             break;
         default:
             Q_UNREACHABLE(); //Unhandled Trigger Type
@@ -205,45 +205,45 @@ Waterfall& Waterfall::operator=(const Waterfall& other){
     d->m_LegalFinal = other.d_func()->m_LegalFinal;
     ResetTranches();
     for (auto i = other.d_func()->m_Tranches.constBegin(); i != other.d_func()->m_Tranches.constEnd(); i++) {
-        d->m_Tranches.append(new Tranche(**i));
+        d->m_Tranches.append(std::make_shared< Tranche>(**i));
     }
     ResetSteps();
     for (auto i = other.d_func()->m_WaterfallStesps.constBegin(); i != other.d_func()->m_WaterfallStesps.constEnd(); i++) {
-        d->m_WaterfallStesps.append(new WatFalPrior(**i));
+        d->m_WaterfallStesps.append(std::make_shared< WatFalPrior>(**i));
     }
     RemoveReserve();
     for (auto i = other.d_func()->m_Reserves.constBegin(); i != other.d_func()->m_Reserves.constEnd(); i++) {
-        d->m_Reserves.append(new ReserveFund(**i));
+        d->m_Reserves.append(std::make_shared< ReserveFund>(**i));
     }
     d->m_Triggers.clear();
     for (auto i = other.d_func()->m_Triggers.constBegin(); i != other.d_func()->m_Triggers.constEnd(); ++i) {
         switch (i.value()->GetTriggerType()) {
         case AbstractTrigger::TriggerType::DateTrigger:
-            d->m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DateTrigger(*(i.value().dynamicCast<DateTrigger>()))));
+            d->m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new DateTrigger(*(std::static_pointer_cast<DateTrigger>(i.value())))));
             break;
         case AbstractTrigger::TriggerType::VectorTrigger:
-            d->m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new VectorTrigger(*(i.value().dynamicCast<VectorTrigger>()))));
+            d->m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new VectorTrigger(*(std::static_pointer_cast<VectorTrigger>(i.value())))));
             break;
         case AbstractTrigger::TriggerType::PoolSizeTrigger:
-            d->m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new PoolSizeTrigger(*(i.value().dynamicCast<PoolSizeTrigger>()))));
+            d->m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new PoolSizeTrigger(*(std::static_pointer_cast<PoolSizeTrigger>(i.value())))));
             break;
         case AbstractTrigger::TriggerType::TrancheTrigger:
-            d->m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new TrancheTrigger(*(i.value().dynamicCast<TrancheTrigger>()))));
+            d->m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new TrancheTrigger(*(std::static_pointer_cast<TrancheTrigger>(i.value())))));
             break;
         case AbstractTrigger::TriggerType::DelinquencyTrigger:
-            d->m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DelinquencyTrigger(*(i.value().dynamicCast<DelinquencyTrigger>()))));
+            d->m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new DelinquencyTrigger(*(std::static_pointer_cast<DelinquencyTrigger>(i.value())))));
             break;
         case AbstractTrigger::TriggerType::DuringStressTestTrigger:
-            d->m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DuringStressTestTrigger(*(i.value().dynamicCast<DuringStressTestTrigger>()))));
+            d->m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new DuringStressTestTrigger(*(std::static_pointer_cast<DuringStressTestTrigger>(i.value())))));
             break;
         case AbstractTrigger::TriggerType::CumulativeLossTrigger:
-            d->m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new CumulativeLossTrigger(*(i.value().dynamicCast<CumulativeLossTrigger>()))));
+            d->m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new CumulativeLossTrigger(*(std::static_pointer_cast<CumulativeLossTrigger>(i.value())))));
             break;
         case AbstractTrigger::TriggerType::DeferredInterestTrigger:
-            d->m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new DeferredInterestTrigger(*(i.value().dynamicCast<DeferredInterestTrigger>()))));
+            d->m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new DeferredInterestTrigger(*(std::static_pointer_cast<DeferredInterestTrigger>(i.value())))));
             break;
         case AbstractTrigger::TriggerType::PDLTrigger:
-            d->m_Triggers.insert(i.key(), QSharedPointer<AbstractTrigger>(new PDLTrigger(*(i.value().dynamicCast<PDLTrigger>()))));
+            d->m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new PDLTrigger(*(std::static_pointer_cast<PDLTrigger>(i.value())))));
             break;
         default:
             Q_UNREACHABLE(); //Unhandled Trigger Type
@@ -257,14 +257,14 @@ Waterfall::Waterfall(WaterfallPrivate *d)
 {}
 
 
-const WatFalPrior* Waterfall::GetStep(int Index)const
+const std::shared_ptr<WatFalPrior> Waterfall::GetStep(int Index)const
 {
     Q_D(const Waterfall);
     if (Index<0 || Index >= d->m_WaterfallStesps.size()) 
         return nullptr;
     return d->m_WaterfallStesps.at(Index);
 }
-WatFalPrior* Waterfall::GetStep(int Index)
+std::shared_ptr<WatFalPrior> Waterfall::GetStep(int Index)
 {
     Q_D( Waterfall);
     if (Index<0 || Index >= d->m_WaterfallStesps.size()) return nullptr;
@@ -294,30 +294,30 @@ void Waterfall::SetCallDate(const QDate& a)
     d->m_CallDate = a;
 }
 
-const Tranche* Waterfall::GetTranche(int Index) const
+const std::shared_ptr<Tranche> Waterfall::GetTranche(int Index) const
 {
     Q_D(const Waterfall);
     if (Index<0 || Index >= d->m_Tranches.size()) return nullptr;
     return d->m_Tranches.at(Index);
 }
-Tranche* Waterfall::GetTranche(int Index)
+std::shared_ptr<Tranche> Waterfall::GetTranche(int Index)
 {
     Q_D( Waterfall);
     if (Index<0 || Index >= d->m_Tranches.size()) return nullptr;
     return d->m_Tranches[Index];
 }
-const Tranche* Waterfall::GetTranche(const QString& TrancheName) const
+const std::shared_ptr<Tranche> Waterfall::GetTranche(const QString& TrancheName) const
 {
     return GetTranche(FindTrancheIndex(TrancheName));
 }
-Tranche* Waterfall::GetTranche(const QString& TrancheName)
+std::shared_ptr<Tranche> Waterfall::GetTranche(const QString& TrancheName)
 {
     return GetTranche(FindTrancheIndex(TrancheName));
 }
 void Waterfall::SortByProRataGroup()
 {
     Q_D( Waterfall);
-    std::sort(d->m_Tranches.begin(), d->m_Tranches.end(), [](const Tranche* a, const Tranche* b) -> bool { return a->GetProrataGroup(0) < b->GetProrataGroup(0); });
+    std::sort(d->m_Tranches.begin(), d->m_Tranches.end(), [](const std::shared_ptr<Tranche>& a, const std::shared_ptr<Tranche>& b) -> bool { return a->GetProrataGroup(0) < b->GetProrataGroup(0); });
 }
 QDate Waterfall::GetStructureMaturity()const
 {
@@ -386,7 +386,7 @@ void Waterfall::SetLegalFinal(const QDate& val)
     d->m_LegalFinal = val;
 }
 
-const QHash<quint32, QSharedPointer<AbstractTrigger> >& Waterfall::GetTriggers() const
+const QHash<quint32, std::shared_ptr<AbstractTrigger> >& Waterfall::GetTriggers() const
 {
     Q_D(const Waterfall);
     return d->m_Triggers;
@@ -593,22 +593,18 @@ const GenericCashFlow& Waterfall::GetGICflows() const
 void Waterfall::ResetSteps()
 {
     Q_D( Waterfall);
-    for (auto i = d->m_WaterfallStesps.begin(); i != d->m_WaterfallStesps.end(); i++)
-        delete (*i);
     d->m_WaterfallStesps.clear();
 }
 
 void Waterfall::AddTranche(const Tranche& a)
 {
     Q_D( Waterfall);
-    d->m_Tranches.append(new Tranche(a));
+    d->m_Tranches.append(std::make_shared<Tranche>(a));
 }
 
 void Waterfall::ResetTranches()
 {
     Q_D( Waterfall);
-    for (auto i = d->m_Tranches.begin(); i != d->m_Tranches.end(); i++)
-        delete (*i);
     d->m_Tranches.clear();
 }
 int Waterfall::FindMostJuniorLevel(int SeliorityScaleLevel)const
@@ -659,7 +655,7 @@ void Waterfall::FillAllDates()
         }
     }
     //dates from reserve funds to all the tranches
-    for (QList<ReserveFund*>::const_iterator i = d->m_Reserves.constBegin(); i != d->m_Reserves.constEnd(); i++) {
+    for (auto i = d->m_Reserves.constBegin(); i != d->m_Reserves.constEnd(); i++) {
         if ((*i)->GetReserveFundFlow().Count() == 0) continue;
         for (int j = 0; j < d->m_Tranches.size(); j++) {
             for (int h = 0; h < (*i)->GetReserveFundFlow().Count(); h++) {
@@ -812,7 +808,7 @@ double Waterfall::GetCreditEnhancement(int TrancheIndex, int TimeIndex)const
     if (Runningsum == 0.0) return 1.0;
     if (TimeIndex >= 0) {
         ReserveSum = d->m_CalculatedMtgPayments.GetAmountOut(d->m_Tranches.first()->GetCashFlow().GetDate(TimeIndex));
-        for (QList<ReserveFund*>::const_iterator ResIter = d->m_Reserves.constBegin(); ResIter != d->m_Reserves.constEnd(); ResIter++) {
+        for (auto ResIter = d->m_Reserves.constBegin(); ResIter != d->m_Reserves.constEnd(); ResIter++) {
             if ((*ResIter)->GetReserveFundFlow().Count() > 0 && TrancheIndex <= (*ResIter)->GetReserveFundFreed())
                 ReserveSum += (*ResIter)->GetReserveFundCurrent((*ResIter)->GetReserveFundFlow().GetDate(TimeIndex));
         }
@@ -822,7 +818,7 @@ double Waterfall::GetCreditEnhancement(int TrancheIndex, int TimeIndex)const
     else {
         ReserveSum = d->m_MortgagesPayments.GetAmountOut(0);
         ReserveSum += d->m_PrincipalAvailable.Total();
-        for (QList<ReserveFund*>::const_iterator ResIter = d->m_Reserves.constBegin(); ResIter != d->m_Reserves.constEnd(); ResIter++) {
+        for (auto ResIter = d->m_Reserves.constBegin(); ResIter != d->m_Reserves.constEnd(); ResIter++) {
             if (TrancheIndex <= (*ResIter)->GetReserveFundFreed())
                 ReserveSum += (*ResIter)->GetReserveFundCurrent();
         }
@@ -856,7 +852,7 @@ MtgCashFlow& Waterfall::GetCalculatedMtgPayments()
     return d->m_CalculatedMtgPayments;
 }
 
-const ReserveFund* const Waterfall::GetReserveFund(int RFindex) const
+const std::shared_ptr<ReserveFund> Waterfall::GetReserveFund(int RFindex) const
 {
     Q_D(const Waterfall);
     if (RFindex < 0 || RFindex >= d->m_Reserves.size()) return nullptr;
@@ -969,21 +965,21 @@ void Waterfall::SetupReinvBond(
 void Waterfall::AddStep(const WatFalPrior& a)
 {
     Q_D( Waterfall);
-    d->m_WaterfallStesps.append(new WatFalPrior(a));
+    d->m_WaterfallStesps.append(std::make_shared< WatFalPrior>(a));
 }
 
 void Waterfall::SetReinvestementPeriod(const QDate& ReinvPer)
 {
     Q_D( Waterfall);
     d->m_ReinvestmentTest.SetReinvestementPeriod(ReinvPer);
-    QSharedPointer<AbstractTrigger> TempReinvTrigger(new DateTrigger(ReinvPer, DateTrigger::TriggerSide::BeforeIncluding, "Reinvestment Period"));
+    std::shared_ptr<AbstractTrigger> TempReinvTrigger(new DateTrigger(ReinvPer, DateTrigger::TriggerSide::BeforeIncluding, "Reinvestment Period"));
     SetTrigger(0, TempReinvTrigger);
 }
 double Waterfall::RedeemNotes(double AvailableFunds, int GroupTarget, int SeliorityScaleLevel, const QDate& TargetDate)
 {
     Q_D( Waterfall);
     if (AvailableFunds<0.01) return 0.0;
-    QMultiMap<quint32, QList<Tranche*>::iterator> groups;
+    QMultiMap<quint32, QList<std::shared_ptr<Tranche> >::iterator> groups;
     double TotalPayable = 0.0;
     for (auto i = d->m_Tranches.begin(); i != d->m_Tranches.end(); ++i) {
         if ((*i)->GetProrataGroup(SeliorityScaleLevel) == GroupTarget) {
@@ -999,12 +995,12 @@ double Waterfall::RedeemNotes(double AvailableFunds, int GroupTarget, int Selior
         return ((AvailableFunds - TotalPayable) >= 0.01 ? (AvailableFunds - TotalPayable) : 0.0);
     }
     QMap<qint32, double> groupAccrue;
-    QHash < qint32, QList<qint32> * > groupRanks;
+    QHash < qint32, std::shared_ptr< QList<qint32> > > groupRanks;
     auto groupKeys = groups.keys();
     for (auto i = groupKeys.constBegin(); i != groupKeys.constEnd(); ++i) {
         auto currVals = groups.values(*i);
         groupAccrue.insert(*i, 0.0);
-        groupRanks.insert(*i, new QList<qint32>());
+        groupRanks.insert(*i, std::make_shared< QList<qint32> >());
         for (auto j = currVals.constBegin(); j != currVals.constEnd(); ++j) {
             groupAccrue[*i] += (**j)->GetCashFlow().GetAmountOutstanding(TargetDate);
             if (!groupRanks.value(*i)->contains((**j)->GetProrataGroup().GetRank(SeliorityScaleLevel)))
@@ -1017,12 +1013,12 @@ double Waterfall::RedeemNotes(double AvailableFunds, int GroupTarget, int Selior
         auto currentGroup = groups.values(i.key());
         for (auto j = groupRanks[i.key()]->begin(); j != groupRanks[i.key()]->end() && i.value()>=0.01; ++j) {
             double sumRank = 0.0;
-            for (QList<Tranche*>::iterator &singleTranche : currentGroup) {
+            for (auto &singleTranche : currentGroup) {
                 if ((*singleTranche)->GetProrataGroup().GetRank(SeliorityScaleLevel) != *j) continue;
                 sumRank += (*singleTranche)->GetCashFlow().GetAmountOutstanding(TargetDate);
             }
             if (i.value() >= sumRank) {
-                for (QList<Tranche*>::iterator &singleTranche : currentGroup) {
+                for (auto &singleTranche : currentGroup) {
                     if ((*singleTranche)->GetProrataGroup().GetRank(SeliorityScaleLevel) != *j) continue;
                     (*singleTranche)->AddCashFlow(TargetDate, (*singleTranche)->GetCashFlow().GetAmountOutstanding(TargetDate), TrancheCashFlow::TrancheFlowType::PrincipalFlow);
                     (*singleTranche)->SetCashFlow(TargetDate, 0.0, TrancheCashFlow::TrancheFlowType::AmountOutstandingFlow);
@@ -1030,7 +1026,7 @@ double Waterfall::RedeemNotes(double AvailableFunds, int GroupTarget, int Selior
                 i.value() -= sumRank;
             }
             else {
-                for (QList<Tranche*>::iterator &singleTranche : currentGroup) {
+                for (auto &singleTranche : currentGroup) {
                     if ((*singleTranche)->GetProrataGroup().GetRank(SeliorityScaleLevel) != *j) continue;
                     double Paymade = i.value()*(*singleTranche)->GetCashFlow().GetAmountOutstanding(TargetDate) / sumRank;
                     (*singleTranche)->AddCashFlow(TargetDate, Paymade, TrancheCashFlow::TrancheFlowType::PrincipalFlow);
@@ -1042,8 +1038,6 @@ double Waterfall::RedeemNotes(double AvailableFunds, int GroupTarget, int Selior
         }
         Q_ASSERT(i.value() > -0.01);
     }
-    for (auto i = groupRanks.begin(); i != groupRanks.end(); ++i)
-        delete i.value();
     return 0.0;
 }
 double Waterfall::RedeemSequential(double AvailableFunds, const QDate& TargetDate, int SeliorityScaleLevel, int MaxGroup)
@@ -1351,7 +1345,7 @@ bool Waterfall::CalculateTranchesCashFlows()
                 AvailablePrincipal += d->m_ReinvestmentTest.GetQueuedCash(CurrentDate);
                 d->m_ReinvestmentTest.ResetReinvestQueueue();
             }
-            foreach(WatFalPrior* SingleStep, d->m_WaterfallStesps)
+            foreach(auto&& SingleStep, d->m_WaterfallStesps)
             {//Cycle through the steps of the waterfall
                 if (SingleStep->HasParameter(WatFalPrior::wstParameters::Trigger)) {
                     if (!TriggerPassing(SingleStep->GetParameter(WatFalPrior::wstParameters::Trigger).toString(), CurrentPeriodIndex, RollingNextIPD, IsCallPaymentDate || IsMaturityDate))
@@ -1472,7 +1466,7 @@ bool Waterfall::CalculateTranchesCashFlows()
                         TestTarget = 0.0;
                         if (qRound(d->m_Reserves.at(RevIdx)->GetReserveFundTarget().GetValue(CurrentDate))>MostJun) TestTarget = d->m_Reserves.at(RevIdx)->GetReserveFundTarget().GetValue(CurrentDate);
                         else {
-                            foreach(Tranche* SingleTranche, d->m_Tranches)
+                            foreach(auto&& SingleTranche, d->m_Tranches)
                             {
                                 if (SingleTranche->GetProrataGroup(0) <= qRound(d->m_Reserves.at(RevIdx)->GetReserveFundTarget().GetValue(CurrentDate))) TestTarget += SingleTranche->GetCashFlow().GetAmountOutstanding(CurrentDate);
                             }
@@ -1519,7 +1513,7 @@ bool Waterfall::CalculateTranchesCashFlows()
                         return false;
                     }
                     if (SingleStep->GetParameter(WatFalPrior::wstParameters::PayAccrue).toInt() & WatFalPrior::wstAccrueOrPay::Accrue) {
-                        foreach(Tranche* SingleTranche, d->m_Tranches)
+                        foreach(auto&& SingleTranche, d->m_Tranches)
                         {
                             if (SingleTranche->GetProrataGroup(CurrSenGrpLvl) == CurrSenGrp) {
                                 if (!SingleTranche->HasCoupon(CurrCoupIndx)) {
@@ -2120,7 +2114,7 @@ bool Waterfall::CalculateTranchesCashFlows()
                     - d->m_TotalJuniorFees.GetTotalFlow(CurrentDate, QList<qint32>() << TrancheCashFlow::TrancheFlowType::InterestFlow << TrancheCashFlow::TrancheFlowType::PrincipalFlow)
                     ;
                 if (NewDeferred>0.0) d->m_TotalJuniorFees.SetFlow(CurrentDate, NewDeferred, TrancheCashFlow::TrancheFlowType::DeferredFlow);
-                foreach(Tranche* SingleTranche, d->m_Tranches)
+                foreach(auto&& SingleTranche, d->m_Tranches)
                 {
                     for (qint32 CoupIdx = 0; CoupIdx<(1 << MaximumInterestsTypes); ++CoupIdx) {
                         if (SingleTranche->HasCoupon(CoupIdx)) {
@@ -2173,10 +2167,8 @@ bool Waterfall::CalculateTranchesCashFlows()
         if (NullCCCanchor[7]) d->m_JuniorFeesFixed.RemoveAnchorDate();
         if (NullCCCanchor[8]) d->m_GICinterest.RemoveAnchorDate();
         if (NullCCCanchor[9]) d->m_GICBaseRateValue.RemoveAnchorDate();
-        foreach(WatFalPrior* SingleStp, d->m_WaterfallStesps)
-        {
-            SingleStp->ResetMissinAnchors();
-        }
+        for (auto stepiter = d->m_WaterfallStesps.begin(); stepiter != d->m_WaterfallStesps.end(); ++stepiter)
+            (*stepiter)->ResetMissinAnchors();
         //Check that there is no losses of cash flows
         TrancheCashFlow CheckTranCashFlow;
         MtgCashFlow CheckMtgCashFlow;
@@ -2185,10 +2177,8 @@ bool Waterfall::CalculateTranchesCashFlows()
         CheckTranCashFlow.Aggregate(GenericCashFlow::TotalAggragate);
         CheckMtgCashFlow.Aggregate(GenericCashFlow::TotalAggragate);
         // Sources of funding
-        foreach(ReserveFund* SingleRes, d->m_Reserves)
-        {
-            CheckResults -= SingleRes->GetStartingReserve();
-        }
+        for (auto resiter = d->m_Reserves.begin(); resiter != d->m_Reserves.end(); ++resiter)
+            CheckResults -= (*resiter)->GetStartingReserve();
         LOGDEBUG(QString("After Reserve Funds:\t%1").arg(CheckResults, 0, 'f'));
         CheckMtgCashFlow.Clear();
         if (ActualCallDate.isNull()) {
@@ -2226,9 +2216,10 @@ bool Waterfall::CalculateTranchesCashFlows()
         LOGDEBUG(QString("After Junior Fees:\t%1").arg(CheckResults, 0, 'f'));
         CheckTranCashFlow.Clear(); CheckTranCashFlow.AddFlow(d->m_ExcessCashFlow); CheckResults += CheckTranCashFlow.GetTotalFlow(0);
         LOGDEBUG(QString("After Excess Spread:\t%1").arg(CheckResults, 0, 'f'));
-        foreach(const Tranche* SingleTranche, d->m_Tranches)
+        for (auto traniter = d->m_Tranches.begin(); traniter != d->m_Tranches.end(); ++traniter)
         {
-            CheckTranCashFlow.Clear(); CheckTranCashFlow.AddFlow(SingleTranche->GetCashFlow());	CheckResults += CheckTranCashFlow.GetTotalFlow(0);
+            CheckTranCashFlow.Clear(); CheckTranCashFlow.AddFlow((*traniter)->GetCashFlow());	
+            CheckResults += CheckTranCashFlow.GetTotalFlow(0);
             LOGDEBUG(QString("After Tranche %1:\t%2").arg(SingleTranche->GetTrancheName()).arg(CheckResults, 0, 'f'));
         }
         LOGDEBUG(QString("Final Test\t%1").arg(CheckResults, 0, 'f'));
@@ -2286,7 +2277,7 @@ QDataStream& operator<<(QDataStream & stream, const Waterfall& flows)
         << flows.d_func()->m_GICflows
         << static_cast<qint32>(flows.d_func()->m_WaterfallStesps.size());
     ;
-    foreach(const WatFalPrior* SingleStep, flows.d_func()->m_WaterfallStesps)
+    foreach(auto&& SingleStep, flows.d_func()->m_WaterfallStesps)
         stream << (*SingleStep);
     stream << static_cast<qint32>(flows.d_func()->m_Triggers.size() - 1);
     for (auto i = flows.d_func()->m_Triggers.constBegin(); i != flows.d_func()->m_Triggers.constEnd(); ++i) {
@@ -2294,10 +2285,10 @@ QDataStream& operator<<(QDataStream & stream, const Waterfall& flows)
         stream << static_cast<quint8>(i.value()->GetTriggerType()) << i.key() << *(i.value());
     }
     stream << static_cast<qint32>(flows.d_func()->m_Tranches.size());
-    foreach(const Tranche* SingleTranche, flows.d_func()->m_Tranches)
+    foreach(auto&& SingleTranche, flows.d_func()->m_Tranches)
         stream << (*SingleTranche);
     stream << flows.d_func()->m_CumulativeReserves << static_cast<qint32>(flows.d_func()->m_Reserves.size());
-    for (QList<ReserveFund*>::const_iterator ResIter = flows.d_func()->m_Reserves.constBegin(); ResIter != flows.d_func()->m_Reserves.constEnd(); ResIter++)
+    for (auto ResIter = flows.d_func()->m_Reserves.constBegin(); ResIter != flows.d_func()->m_Reserves.constEnd(); ResIter++)
         stream << (**ResIter);
     return stream;
 }
@@ -2375,7 +2366,7 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream)
     {
         quint8 TempChar;
         quint32 TempKey;
-        QSharedPointer<AbstractTrigger> TempTrig;
+        std::shared_ptr<AbstractTrigger> TempTrig;
         stream >> TempInt;
         for (int i = 0; i < TempInt; i++) {
             stream >> TempChar >> TempKey;
@@ -2429,7 +2420,7 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream)
     for (int i = 0; i < TempInt; i++) {
         TempReserve.SetLoadProtocolVersion(loadProtocolVersion());
         stream >> TempReserve;
-        d->m_Reserves.append(new ReserveFund(TempReserve));
+        d->m_Reserves.append(std::make_shared< ReserveFund>(TempReserve));
     }
     ResetProtocolVersion();
     return stream;
@@ -2481,7 +2472,7 @@ QString Waterfall::ReadyToCalculate()const
         if (d->m_Reserves.at(ResIter)->GetReserveFundFreed() < 0) Result += QString("Reserve %1 Freed After Redemption\n").arg(ResIter + 1);
         if (d->m_Reserves.at(ResIter)->GetReserveFundCurrent() < 0.0) Result += QString("Reserve %1 Current Amount\n").arg(ResIter + 1);
     }
-    foreach(const Tranche* SingleTranche, d->m_Tranches)
+    foreach(auto&& SingleTranche, d->m_Tranches)
     {
         const auto tempCoupons = SingleTranche->GetDayCountsIndexes();
         for (auto singlCoup = tempCoupons.constBegin(); singlCoup != tempCoupons.constEnd(); ++singlCoup) {
@@ -2493,7 +2484,7 @@ QString Waterfall::ReadyToCalculate()const
         if (SingleTranche->GetPrice() < 0.0) Result += "Tranche Price\n";
         if (!SingleTranche->GetProrataGroup().isValid()) Result += "Tranche Seniority Structure\n";
     }
-    foreach(const WatFalPrior* SingleStep, d->m_WaterfallStesps)
+    foreach(auto&& SingleStep, d->m_WaterfallStesps)
     {
         Result += SingleStep->ReadyToCalculate();
         if (SingleStep->HasParameter(WatFalPrior::wstParameters::Trigger)) {
@@ -2502,7 +2493,7 @@ QString Waterfall::ReadyToCalculate()const
             }
         }
     }
-    foreach(const QSharedPointer<AbstractTrigger>& SingleTrig, d->m_Triggers)
+    foreach(auto&& SingleTrig, d->m_Triggers)
     {
         Result += SingleTrig->ReadyToCalculate();
     }
@@ -2516,7 +2507,7 @@ double Waterfall::GetEquityReturn(int index)const
     if (d->m_PaymentFrequency.GetAnchorDate().isNull()) AdjPaymentFreq.SetAnchorDate(d->m_MortgagesPayments.GetDate(0));
     if (index<0 || index >= d->m_EquityIncome.Count()) return 0.0;
     int EquityTranche=0.0;
-    foreach(WatFalPrior* SingleStep, d->m_WaterfallStesps)
+    foreach(auto&& SingleStep, d->m_WaterfallStesps)
     {
         if (SingleStep->GetPriorityType() == WatFalPrior::WaterfallStepType::wst_Excess) {
             EquityTranche = SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroup).value<IntegerVector>().GetValue(d->m_EquityIncome.GetDate(index));
@@ -2525,15 +2516,18 @@ double Waterfall::GetEquityReturn(int index)const
     }
     double denominator = 0.0;
     if (EquityTranche>0) {
-        foreach(Tranche* SingleTranche, d->m_Tranches)
+        foreach(auto&& SingleTranche, d->m_Tranches)
         {
-            if (SingleTranche->GetProrataGroup(0) == EquityTranche) denominator += SingleTranche->GetOriginalAmount();
+            if (SingleTranche->GetProrataGroup(0) == EquityTranche) 
+                denominator += SingleTranche->GetOriginalAmount();
         }
-        if (denominator>0) return qPow(1.0 + ((d->m_EquityIncome.GetFlow(index, TrancheCashFlow::TrancheFlowType::InterestFlow) + d->m_EquityIncome.GetFlow(index, TrancheCashFlow::TrancheFlowType::PrincipalFlow)) / denominator), 12.0 / ((AdjPaymentFreq.GetValue(d->m_EquityIncome.GetDate(index))))) - 1.0;
-        else return 0.0;
+        if (denominator>0) 
+            return qPow(1.0 + ((d->m_EquityIncome.GetFlow(index, TrancheCashFlow::TrancheFlowType::InterestFlow) + d->m_EquityIncome.GetFlow(index, TrancheCashFlow::TrancheFlowType::PrincipalFlow)) / denominator), 12.0 / ((AdjPaymentFreq.GetValue(d->m_EquityIncome.GetDate(index))))) - 1.0;
+        else 
+            return 0.0;
     }
     denominator = 0.0;
-    foreach(Tranche* SingleTranche, d->m_Tranches)
+    foreach(auto&& SingleTranche, d->m_Tranches)
     {
         denominator += SingleTranche->GetOriginalAmount();
     }
@@ -2549,7 +2543,7 @@ double Waterfall::GetCumulativeEquityReturn(int index)const
     double numerator = 0.0;
     for (int i = 0; i <= index; i++) numerator += (d->m_EquityIncome.GetFlow(i, TrancheCashFlow::TrancheFlowType::InterestFlow) + d->m_EquityIncome.GetFlow(i, TrancheCashFlow::TrancheFlowType::PrincipalFlow));
     int EquityTranche=0.0;
-    foreach(WatFalPrior* SingleStep, d->m_WaterfallStesps)
+    foreach(auto&& SingleStep, d->m_WaterfallStesps)
     {
         if (SingleStep->GetPriorityType() == WatFalPrior::WaterfallStepType::wst_Excess) {
             EquityTranche = SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroup).value<IntegerVector>().GetValue(d->m_EquityIncome.GetDate(index));
@@ -2558,15 +2552,18 @@ double Waterfall::GetCumulativeEquityReturn(int index)const
     }
     double denominator = 0.0;
     if (EquityTranche>0) {
-        foreach(Tranche* SingleTranche, d->m_Tranches)
+        foreach(auto&& SingleTranche, d->m_Tranches)
         {
-            if (SingleTranche->GetProrataGroup(0) == EquityTranche) denominator += SingleTranche->GetOriginalAmount();
+            if (SingleTranche->GetProrataGroup(0) == EquityTranche) 
+                denominator += SingleTranche->GetOriginalAmount();
         }
-        if (denominator>0) return numerator / denominator;
-        else return 0.0;
+        if (denominator>0) 
+            return numerator / denominator;
+        else 
+            return 0.0;
     }
     denominator = 0.0;
-    foreach(Tranche* SingleTranche, d->m_Tranches)
+    foreach(auto&& SingleTranche, d->m_Tranches)
     {
         denominator += SingleTranche->GetOriginalAmount();
     }
@@ -2588,7 +2585,7 @@ double Waterfall::GetCallEquityRatio(int index)const
     }
     if (MtgIndex<0) return 0.0;
     int EquityTranche=0.0;
-    foreach(WatFalPrior* SingleStep, d->m_WaterfallStesps)
+    foreach(auto&& SingleStep, d->m_WaterfallStesps)
     {
         if (SingleStep->GetPriorityType() == WatFalPrior::WaterfallStepType::wst_Excess) {
             EquityTranche = SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroup).value<IntegerVector>().GetValue(d->m_CalculatedMtgPayments.GetDate(MtgIndex));
@@ -2603,7 +2600,7 @@ double Waterfall::GetCallEquityRatio(int index)const
         numerator = d->m_PoolValueAtCall.GetValue(d->m_CalculatedMtgPayments.GetDate(MtgIndex));
     numerator *= d->m_CalculatedMtgPayments.GetAmountOut(MtgIndex);
     if (EquityTranche>0) {
-        foreach(Tranche* SingleTranche, d->m_Tranches)
+        foreach(auto&& SingleTranche, d->m_Tranches)
         {
             if (SingleTranche->GetProrataGroup(0) == EquityTranche) denominator += SingleTranche->GetCashFlow().GetAmountOutstanding(index);
             else numerator -= SingleTranche->GetCashFlow().GetAmountOutstanding(index);
@@ -2617,14 +2614,16 @@ double Waterfall::GetCallEquityRatio(int index)const
     else
         numerator = d->m_PoolValueAtCall.GetValue(d->m_CalculatedMtgPayments.GetDate(MtgIndex));
     numerator *= d->m_CalculatedMtgPayments.GetAmountOut(MtgIndex);
-    foreach(Tranche* SingleTranche, d->m_Tranches)
+    foreach(auto&& SingleTranche, d->m_Tranches)
     {
         denominator += SingleTranche->GetCashFlow().GetAmountOutstanding(index);
         numerator -= SingleTranche->GetCashFlow().GetAmountOutstanding(index);
     }
     denominator = d->m_CalculatedMtgPayments.GetAmountOut(index) - denominator;
-    if (denominator>0) return numerator / denominator;
-    else return 0.0;
+    if (denominator>0) 
+        return numerator / denominator;
+    else 
+        return 0.0;
 }
 
 const QDate& Waterfall::GetFirstIPDdate() const
@@ -2666,13 +2665,13 @@ void Waterfall::SetReserveFund(int RFindex, const ReserveFund& source)
 void Waterfall::AddReserveFund(const QString& RFtarget, const QString& RFmultiple, const QString& RFfloor, const QString& RFcap, double RFcurrent, int RFfreed, bool RFtoInterest)
 {
     Q_D( Waterfall);
-    d->m_Reserves.append(new ReserveFund());
+    d->m_Reserves.append(std::make_shared< ReserveFund>());
     d->m_Reserves.last()->SetReserveFund(RFtarget, RFmultiple, RFfloor, RFcap, RFcurrent, RFfreed, RFtoInterest);
 }
 void Waterfall::AddReserveFund(const ReserveFund& source)
 {
     Q_D( Waterfall);
-    d->m_Reserves.append(new ReserveFund(source));
+    d->m_Reserves.append(std::make_shared< ReserveFund>(source));
 }
 void Waterfall::ResetReserve(int RFindex)
 {
@@ -2689,13 +2688,11 @@ void Waterfall::RemoveReserve(int RFindex)
 {
     Q_D( Waterfall);
     if (RFindex == -1) {
-        for (int i = 0; i < d->m_Reserves.size(); i++)
-            delete d->m_Reserves[i];
         d->m_Reserves.clear();
         return;
     }
-    if (RFindex < 0 || RFindex >= d->m_Reserves.size()) return;
-    delete d->m_Reserves[RFindex];
+    if (RFindex < 0 || RFindex >= d->m_Reserves.size()) 
+        return;
     d->m_Reserves.removeAt(RFindex);
 }
 void Waterfall::SetPaymentFrequency(const QString& a)
@@ -2819,7 +2816,7 @@ void Waterfall::GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool Download
 }
 
 
-void Waterfall::SetTrigger(quint32 key, QSharedPointer<AbstractTrigger> val)
+void Waterfall::SetTrigger(quint32 key, std::shared_ptr<AbstractTrigger> val)
 {
     Q_D(Waterfall);
     d->m_Triggers[key] = val;
@@ -2917,57 +2914,57 @@ bool Waterfall::TriggerPassing(const QString& TriggerStructure, int PeriodIndex,
 bool Waterfall::EvaluateTrigger(quint32 TrigID, int PeriodIndex, const QDate& CurrentIPD, bool /*IsCallDate*/) const
 {
     Q_D(const Waterfall);
-    const QSharedPointer<AbstractTrigger> CurrentTrigger = d->m_Triggers.value(TrigID, QSharedPointer<AbstractTrigger>());
+    const std::shared_ptr<AbstractTrigger> CurrentTrigger = d->m_Triggers.value(TrigID, std::shared_ptr<AbstractTrigger>());
     if (!CurrentTrigger) return false;
     if (PeriodIndex < 0 || PeriodIndex >= d->m_MortgagesPayments.Count()) return false;
     switch (CurrentTrigger->GetTriggerType()) {
     case AbstractTrigger::TriggerType::DateTrigger:
-        return CurrentTrigger.dynamicCast<DateTrigger>()->Passing(CurrentIPD);
+        return std::static_pointer_cast<DateTrigger>(CurrentTrigger)->Passing(CurrentIPD);
     case AbstractTrigger::TriggerType::VectorTrigger:{
-        VectorTrigger TempTrig(*CurrentTrigger.dynamicCast<VectorTrigger>());
+        VectorTrigger TempTrig(*std::static_pointer_cast<VectorTrigger>(CurrentTrigger));
         if (!TempTrig.HasAnchor())
             TempTrig.SetAnchor(d->m_MortgagesPayments.GetDate(0));
         return TempTrig.Passing(CurrentIPD);
     }
     case AbstractTrigger::TriggerType::PoolSizeTrigger:{
-        PoolSizeTrigger TempTrig(*CurrentTrigger.dynamicCast<PoolSizeTrigger>());
+        PoolSizeTrigger TempTrig(*std::static_pointer_cast<PoolSizeTrigger>(CurrentTrigger));
         if (!TempTrig.HasAnchor())
             TempTrig.SetAnchorDate(d->m_MortgagesPayments.GetDate(0));
         return TempTrig.Passing(d->m_MortgagesPayments.GetAmountOut(PeriodIndex), d->m_MortgagesPayments.GetDate(PeriodIndex));
     }
     case AbstractTrigger::TriggerType::TrancheTrigger:{
-        TrancheTrigger TempTrig(*CurrentTrigger.dynamicCast<TrancheTrigger>());
+        TrancheTrigger TempTrig(*std::static_pointer_cast<TrancheTrigger>(CurrentTrigger));
         if (!TempTrig.HasAnchor())
             TempTrig.FillMissingAnchorDate(d->m_MortgagesPayments.GetDate(0));
         return TempTrig.Passing(d->m_Tranches, CurrentIPD);
     }
     case AbstractTrigger::TriggerType::DelinquencyTrigger:{
-        DelinquencyTrigger TempTrig(*CurrentTrigger.dynamicCast<DelinquencyTrigger>());
+        DelinquencyTrigger TempTrig(*std::static_pointer_cast<DelinquencyTrigger>(CurrentTrigger));
         if (!TempTrig.HasAnchor())
             TempTrig.SetAnchorDate(d->m_MortgagesPayments.GetDate(0));
         return TempTrig.Passing(d->m_MortgagesPayments.GetDelinquentShare(PeriodIndex), d->m_MortgagesPayments.GetDate(PeriodIndex));
     }
     case AbstractTrigger::TriggerType::DuringStressTestTrigger:{
-        return CurrentTrigger.dynamicCast<DuringStressTestTrigger>()->Passing(d->m_IsStressTest);
+        return std::static_pointer_cast<DuringStressTestTrigger>(CurrentTrigger)->Passing(d->m_IsStressTest);
     }
     case AbstractTrigger::TriggerType::CumulativeLossTrigger:{
         double TotalLoss = 0.0;
         for (int CumIter = 0; CumIter <= PeriodIndex; ++CumIter) {
             TotalLoss += d->m_MortgagesPayments.GetLoss(CumIter);
         }
-        CumulativeLossTrigger TempTrig(*CurrentTrigger.dynamicCast<CumulativeLossTrigger>());
+        CumulativeLossTrigger TempTrig(*std::static_pointer_cast<CumulativeLossTrigger>(CurrentTrigger));
         if (!TempTrig.HasAnchor())
             TempTrig.SetAnchorDate(d->m_MortgagesPayments.GetDate(0));
         return TempTrig.Passing(TotalLoss, d->m_MortgagesPayments.GetDate(PeriodIndex));
     }
     case AbstractTrigger::TriggerType::DeferredInterestTrigger:{
-        DeferredInterestTrigger TempTrig(*CurrentTrigger.dynamicCast<DeferredInterestTrigger>());
+        DeferredInterestTrigger TempTrig(*std::static_pointer_cast<DeferredInterestTrigger>(CurrentTrigger));
         if (!TempTrig.HasAnchor())
             TempTrig.FillMissingAnchorDate(d->m_MortgagesPayments.GetDate(0));
         return TempTrig.Passing(d->m_Tranches, CurrentIPD);
     }
     case AbstractTrigger::TriggerType::PDLTrigger:{
-        PDLTrigger TempTrig(*CurrentTrigger.dynamicCast<PDLTrigger>());
+        PDLTrigger TempTrig(*std::static_pointer_cast<PDLTrigger>(CurrentTrigger));
         if (!TempTrig.HasAnchor())
             TempTrig.FillMissingAnchorDate(d->m_MortgagesPayments.GetDate(0));
         return TempTrig.Passing(d->m_Tranches, d->m_MortgagesPayments.GetAmountOut(PeriodIndex) + d->m_InterestAvailable + d->m_PrincipalAvailable.Total(), CurrentIPD);
@@ -2983,7 +2980,7 @@ void Waterfall::ResetTriggers()
     Q_D( Waterfall);
     d->m_Triggers.clear();
     if (!d->m_ReinvestmentTest.GetReinvestmentPeriod().isNull()) {
-        QSharedPointer<AbstractTrigger> TempReinvTrigger(new DateTrigger(d->m_ReinvestmentTest.GetReinvestmentPeriod(), DateTrigger::TriggerSide::BeforeIncluding, "Reinvestment Period"));
+        std::shared_ptr<AbstractTrigger> TempReinvTrigger(new DateTrigger(d->m_ReinvestmentTest.GetReinvestmentPeriod(), DateTrigger::TriggerSide::BeforeIncluding, "Reinvestment Period"));
         SetTrigger(0, TempReinvTrigger);
     }
 }
@@ -3073,16 +3070,16 @@ void Waterfall::SetJuniorFeesFixed(const QString& a)
     d->m_JuniorFeesFixed = a;
 }
 
-const QSharedPointer<AbstractTrigger> Waterfall::GetTrigger(quint32 key) const
+const std::shared_ptr<AbstractTrigger> Waterfall::GetTrigger(quint32 key) const
 {
     Q_D(const Waterfall);
-    return d->m_Triggers.value(key, QSharedPointer<AbstractTrigger>());
+    return d->m_Triggers.value(key, std::shared_ptr<AbstractTrigger>());
 }
 
-QSharedPointer<AbstractTrigger> Waterfall::GetTrigger(quint32 key)
+std::shared_ptr<AbstractTrigger> Waterfall::GetTrigger(quint32 key)
 {
     Q_D(Waterfall);
-    return d->m_Triggers.value(key, QSharedPointer<AbstractTrigger>());
+    return d->m_Triggers.value(key, std::shared_ptr<AbstractTrigger>());
 }
 
 GenericCashFlow Waterfall::GetAggregatedReinvestment() const

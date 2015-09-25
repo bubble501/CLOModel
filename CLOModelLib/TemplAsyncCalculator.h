@@ -49,12 +49,8 @@ public:
     }
     virtual void ClearResults()
     {
-        RETURN_WHEN_RUNNING(true, )
         auto& tempRes = getResultVoid();
-        for (auto j = tempRes.begin(); j != tempRes.end();) {
-            delete j.value();
-            j = tempRes.erase(j);
-        }
+        tempRes.clear();
         Q_ASSERT(getResultVoid().isEmpty());
     }
     virtual void RemoveResult(qint32 Key)
@@ -63,10 +59,9 @@ public:
         auto i = tempRes.find(Key);
         if (i == tempRes.end())
             return;
-        delete i.value();
         tempRes.erase(i);
     }
-    virtual const ResultType* GetResult(qint32 key)const { return static_cast<const ResultType*>(getResultVoid(key)); }
+    virtual const std::shared_ptr<ResultType> GetResult(qint32 key)const { return std::static_pointer_cast<ResultType>(getResultVoid(key)); }
 protected:	
     TemplAsyncCalculator(AbstrAsyncCalculatorPrivate* d, QObject* parent = nullptr)
         :AbstrAsyncCalculator(d, parent)
@@ -112,7 +107,6 @@ protected:
             auto& tempRes = getResultVoid();
         auto FindRe = tempRes.find(Ident);
         if (FindRe != tempRes.end()) {
-            delete FindRe.value();
             tempRes.erase(FindRe);
             Q_ASSERT(!getResultVoid().contains(Ident));
         }
@@ -136,7 +130,7 @@ protected:
             auto& tempRes = getResultVoid();
         stream << GetSequentialComputation() << static_cast<qint32>(tempRes.size());
         for (auto i = tempRes.constBegin(); i != tempRes.constEnd(); ++i) {
-            stream << i.key() << *static_cast<ResultType*>(i.value());
+            stream << i.key() << *std::static_pointer_cast<ResultType>(i.value());
         }
         return stream;
     }

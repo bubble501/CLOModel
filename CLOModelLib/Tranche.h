@@ -46,7 +46,6 @@ protected:
             vec.insert(CoupIndex, std::make_shared< T>(val));
     }
 public:
-	~Tranche();
 	const QHash<qint32,std::shared_ptr<BloombergVector> >& GetRefRateValues() const;
 	double GetStartingDeferredInterest(qint32 CoupIdx = 0) const;
 	void SetStartingDeferredInterest(const double& val, qint32 CoupIdx=0);

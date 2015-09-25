@@ -19,6 +19,14 @@
 #endif
 DEFINE_PUBLIC_COMMONS(BaseRateVector)
 DEFINE_PUBLIC_COMMONS_COPY(BaseRateVector)
+BaseRateVector::~BaseRateVector()
+{
+
+}
+BaseRateVectorPrivate::~BaseRateVectorPrivate()
+{
+
+}
 BaseRateVectorPrivate::BaseRateVectorPrivate(BaseRateVector *q,const BaseRateVectorPrivate& other)
 	:AbstractBbgVectPrivate(q,other)
     , m_VectVal(other.m_VectVal)

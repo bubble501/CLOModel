@@ -1,12 +1,11 @@
 #include "AbstrAsyncThread.h"
 #include "Private/AbstrAsyncThread_p.h"
+AbstrAsyncThreadPrivate::~AbstrAsyncThreadPrivate(){}
 AbstrAsyncThreadPrivate::AbstrAsyncThreadPrivate(AbstrAsyncThread *q)
     :q_ptr(q)
     , m_Result(nullptr)
 {}
-AbstrAsyncThreadPrivate::~AbstrAsyncThreadPrivate()
-{
-}
+
 AbstrAsyncThread::AbstrAsyncThread(int ID, QObject* parent)
     :AbstrAsyncThread(new AbstrAsyncThreadPrivate(this), ID, parent)
 {}

@@ -12,6 +12,7 @@ protected:
     //AbstrAsyncThreadPrivate* d_ptr;
     ApplyFlowThread(ApplyFlowThreadPrivate* d, int ID, QObject* parent = nullptr);
 public:
+    virtual ~ApplyFlowThread();
 	ApplyFlowThread(int ID, QObject* parent = nullptr);
 	void SetBaseFlow(const MtgCashFlow& a);
 	void SetAssumption(const AssumptionSet& a);

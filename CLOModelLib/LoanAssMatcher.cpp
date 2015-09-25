@@ -11,6 +11,8 @@
 #include <QVariant>
 #endif
 DEFINE_PUBLIC_QOBJECT_COMMONS(LoanAssMatcher)
+LoanAssMatcherPrivate::~LoanAssMatcherPrivate(){}
+LoanAssMatcher::~LoanAssMatcher(){}
 LoanAssMatcherPrivate::LoanAssMatcherPrivate(LoanAssMatcher *q)
 :AbstrAsyncCalculatorPrivate(q)
 {}

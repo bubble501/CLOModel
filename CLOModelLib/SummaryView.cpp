@@ -20,7 +20,7 @@
 #include "Private/InternalItems.h"
 #include "ReserveFund.h"
 #include "Seniority.h"
-
+SummaryViewPrivate::~SummaryViewPrivate(){}
 SummaryViewPrivate::SummaryViewPrivate(SummaryView *q)
     :q_ptr(q)
     , ExpensesTable(nullptr)

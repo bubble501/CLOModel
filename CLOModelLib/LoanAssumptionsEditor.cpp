@@ -45,6 +45,7 @@
 #include <QTabWidget>
 #include <QTableView>
 #include <QSignalBlocker>
+LoanAssumptionsEditorPrivate::~LoanAssumptionsEditorPrivate(){}
 LoanAssumptionsEditorPrivate::LoanAssumptionsEditorPrivate(LoanAssumptionsEditor *q)
 	:q_ptr(q)
     , ActiveAssumption(nullptr)

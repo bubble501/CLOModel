@@ -4,6 +4,14 @@
 #include <QDataStream>
 DEFINE_PUBLIC_COMMONS(PoolSizeTrigger)
 DEFINE_PUBLIC_COMMONS_COPY(PoolSizeTrigger)
+PoolSizeTrigger::~PoolSizeTrigger()
+{
+
+}
+PoolSizeTriggerPrivate::~PoolSizeTriggerPrivate()
+{
+
+}
 PoolSizeTriggerPrivate::PoolSizeTriggerPrivate(PoolSizeTrigger *q,const PoolSizeTriggerPrivate& other)
 	:AbstractTriggerPrivate(q,other)
     , m_TargetSize(other.m_TargetSize)

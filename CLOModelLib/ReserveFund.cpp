@@ -2,6 +2,14 @@
 #include "Private/ReserveFund_p.h"
 DEFINE_PUBLIC_COMMONS(ReserveFund)
 DEFINE_PUBLIC_COMMONS_COPY(ReserveFund)
+ReserveFund::~ReserveFund()
+{
+
+}
+ReserveFundPrivate::~ReserveFundPrivate()
+{
+
+}
 ReserveFundPrivate::ReserveFundPrivate(ReserveFund *q,const ReserveFundPrivate& other)
 	:BackwardInterfacePrivate(q,other)
     , m_ReserveFundCurrent(other.m_ReserveFundCurrent)

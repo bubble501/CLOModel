@@ -15,6 +15,7 @@
 #include "IntegerVector.h"
 #include "BloombergVector.h"
 #include "TriggerStructHelperWidget.h"
+WaterfallStepHelperDialogPrivate::~WaterfallStepHelperDialogPrivate(){}
 WaterfallStepHelperDialogPrivate::WaterfallStepHelperDialogPrivate(WaterfallStepHelperDialog *q)
     :q_ptr(q)
     , m_InterestWF(true)

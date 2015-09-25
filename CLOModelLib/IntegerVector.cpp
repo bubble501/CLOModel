@@ -7,6 +7,14 @@
 #include "Private/InternalItems.h"
 DEFINE_PUBLIC_COMMONS(IntegerVector)
 DEFINE_PUBLIC_COMMONS_COPY(IntegerVector)
+IntegerVector::~IntegerVector()
+{
+
+}
+IntegerVectorPrivate::~IntegerVectorPrivate()
+{
+
+}
 IntegerVectorPrivate::IntegerVectorPrivate(IntegerVector *q,const IntegerVectorPrivate& other)
 	:AbstractBbgVectPrivate(q,other)
     , m_VectVal(other.m_VectVal)

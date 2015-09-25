@@ -3,6 +3,11 @@
 #include <QDataStream>
 DEFINE_PUBLIC_COMMONS(TriggersResults)
 DEFINE_PUBLIC_COMMONS_COPY(TriggersResults)
+
+TriggersResultsPrivate::~TriggersResultsPrivate()
+{
+
+}
 TriggersResultsPrivate::TriggersResultsPrivate(TriggersResults *q,const TriggersResultsPrivate& other)
 	:BackwardInterfacePrivate(q,other)
 {

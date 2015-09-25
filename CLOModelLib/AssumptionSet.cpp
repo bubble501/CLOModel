@@ -6,6 +6,14 @@
 #include "IntegerVector.h"
 DEFINE_PUBLIC_COMMONS(AssumptionSet)
 DEFINE_PUBLIC_COMMONS_COPY(AssumptionSet)
+AssumptionSet::~AssumptionSet()
+{
+
+}
+AssumptionSetPrivate::~AssumptionSetPrivate()
+{
+
+}
 AssumptionSetPrivate::AssumptionSetPrivate(AssumptionSet *q,const AssumptionSetPrivate& other)
 	:BackwardInterfacePrivate(q,other)
     , m_CDRscenario(other.m_CDRscenario)

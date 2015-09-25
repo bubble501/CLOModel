@@ -4,6 +4,14 @@
 #include <QDataStream>
 DEFINE_PUBLIC_COMMONS(DelinquencyTrigger)
 DEFINE_PUBLIC_COMMONS_COPY(DelinquencyTrigger)
+DelinquencyTrigger::~DelinquencyTrigger()
+{
+
+}
+DelinquencyTriggerPrivate::~DelinquencyTriggerPrivate()
+{
+
+}
 DelinquencyTriggerPrivate::DelinquencyTriggerPrivate(DelinquencyTrigger *q,const DelinquencyTriggerPrivate& other)
 	:AbstractTriggerPrivate(q,other)
     , m_Target(other.m_Target)

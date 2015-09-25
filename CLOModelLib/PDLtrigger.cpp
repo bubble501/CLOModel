@@ -4,6 +4,14 @@
 #include <QDataStream>
 DEFINE_PUBLIC_COMMONS(PDLTrigger)
 DEFINE_PUBLIC_COMMONS_COPY(PDLTrigger)
+PDLTrigger::~PDLTrigger()
+{
+
+}
+PDLTriggerPrivate::~PDLTriggerPrivate()
+{
+
+}
 PDLTriggerPrivate::PDLTriggerPrivate(PDLTrigger *q,const PDLTriggerPrivate& other)
 	:AbstractTriggerPrivate(q,other)
     , m_TargetSeniorityLevel(other.m_TargetSeniorityLevel)

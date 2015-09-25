@@ -4,6 +4,14 @@
 #include <QRegularExpression>
 DEFINE_PUBLIC_COMMONS(Seniority)
 DEFINE_PUBLIC_COMMONS_COPY(Seniority)
+Seniority::~Seniority()
+{
+
+}
+SeniorityPrivate::~SeniorityPrivate()
+{
+
+}
 SeniorityPrivate::SeniorityPrivate(Seniority *q,const SeniorityPrivate& other)
 	:BackwardInterfacePrivate(q,other)
     , m_SeniorityScale(other.m_SeniorityScale)

@@ -3,6 +3,14 @@
 #include <QDataStream>
 DEFINE_PUBLIC_COMMONS(LoanAssMatcherResult)
 DEFINE_PUBLIC_COMMONS_COPY(LoanAssMatcherResult)
+LoanAssMatcherResult::~LoanAssMatcherResult()
+{
+
+}
+LoanAssMatcherResultPrivate::~LoanAssMatcherResultPrivate()
+{
+
+}
 LoanAssMatcherResultPrivate::LoanAssMatcherResultPrivate(LoanAssMatcherResult *q)
 	:BackwardInterfacePrivate(q)
 {}

@@ -24,6 +24,7 @@ public:
 protected:
     Q_DECLARE_PRIVATE(AbstractTrigger);
     AbstractTrigger(AbstractTriggerPrivate* d, TriggerType TTP, const QString& lab = QString());
+    virtual ~AbstractTrigger();
 	virtual QDataStream& WriteToStream(QDataStream& stream) const = 0;
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 public:

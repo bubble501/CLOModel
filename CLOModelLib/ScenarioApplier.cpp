@@ -3,6 +3,7 @@
 #include <QDir>
 #include "AssumptionSet.h"
 DEFINE_PUBLIC_QOBJECT_COMMONS(ScenarioApplier)
+ScenarioApplierPrivate::~ScenarioApplierPrivate(){}
 ScenarioApplierPrivate::ScenarioApplierPrivate(ScenarioApplier *q)
     :AbstrAsyncCalculatorPrivate(q)
 {}

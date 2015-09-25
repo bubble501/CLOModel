@@ -1,6 +1,7 @@
 #include "MtgCalculatorThread.h"
 #include "Private/MtgCalculatorThread_p.h"
 #include "CommonFunctions.h"
+MtgCalculatorThreadPrivate::~MtgCalculatorThreadPrivate(){}
 MtgCalculatorThreadPrivate::MtgCalculatorThreadPrivate(MtgCalculatorThread *q)
     :AbstrAsyncThreadPrivate(q)
 {}

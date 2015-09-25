@@ -26,6 +26,7 @@ public:
     virtual int NumBees() const override;
     virtual QString ReadyToCalculate() const override;
     LoanAssMatcher(QObject *parent = nullptr);
+    virtual ~LoanAssMatcher();
     void GetAssumptionsDatabase();
     void AddAssumption(const QString& key, const LoanAssumption& a);
     void RemoveAssumption(const QString& key);

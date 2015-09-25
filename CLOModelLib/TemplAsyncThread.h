@@ -21,6 +21,7 @@ protected:
         }
     }
 public:
+    virtual ~TemplAsyncThread(){}
 	TemplAsyncThread(int ID, QObject* parent = 0) 
         : AbstrAsyncThread(ID,parent)
     {   

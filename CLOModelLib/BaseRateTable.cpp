@@ -7,6 +7,14 @@ DEFINE_PUBLIC_COMMONS(ForwardBaseRateTable)
 DEFINE_PUBLIC_COMMONS_COPY(ForwardBaseRateTable)
 DEFINE_PUBLIC_COMMONS(ConstantBaseRateTable)
 DEFINE_PUBLIC_COMMONS_COPY(ConstantBaseRateTable)
+ConstantBaseRateTable::~ConstantBaseRateTable()
+{
+
+}
+ConstantBaseRateTablePrivate::~ConstantBaseRateTablePrivate()
+{
+
+}
 ConstantBaseRateTablePrivate::ConstantBaseRateTablePrivate(ConstantBaseRateTable *q,const ConstantBaseRateTablePrivate& other)
 	:AbstractBaseRateTablePrivate(q,other)
     , Values(other.Values)
@@ -167,7 +175,14 @@ ForwardBaseRateTable::ForwardBaseRateTable(ForwardBaseRateTablePrivate *d)
 {
 	
 }
+ForwardBaseRateTable::~ForwardBaseRateTable()
+{
 
+}
+ForwardBaseRateTablePrivate::~ForwardBaseRateTablePrivate()
+{
+
+}
 ForwardBaseRateTable& ForwardBaseRateTable::operator=(const ForwardBaseRateTable& other)
 {
     AbstractBaseRateTable::operator=(other);
@@ -318,6 +333,15 @@ AbstractBaseRateTable::AbstractBaseRateTable(const QDate& a)
     : AbstractBaseRateTable()
 {
     SetUpdateDate(a);
+}
+
+AbstractBaseRateTable::~AbstractBaseRateTable()
+{
+
+}
+AbstractBaseRateTablePrivate::~AbstractBaseRateTablePrivate()
+{
+
 }
 
 AbstractBaseRateTable& AbstractBaseRateTable::operator=(const AbstractBaseRateTable& a)

@@ -176,12 +176,14 @@ bool CLOMODELLIB_EXPORT ValidDayCount(qint16 a);
     Q_DECLARE_PRIVATE(Class) \
     Class(Class ## Private *d, QObject* parent =nullptr); \
     public: \
-    Class(QObject* parent =nullptr);
+    Class(QObject* parent =nullptr); \
+    virtual ~Class();
 #define DECLARE_PUBLIC_COMMONS(Class) protected: \
     Q_DECLARE_PRIVATE(Class) \
     Class(Class ## Private *d); \
     public: \
-    Class();
+    Class(); \
+    virtual ~Class();
 #define DECLARE_PUBLIC_COMMONS_COPY(Class) protected: \
     Class(Class ## Private *d, const Class& other); \
     public: \
@@ -201,6 +203,7 @@ bool CLOMODELLIB_EXPORT ValidDayCount(qint16 a);
     Q_DECLARE_PUBLIC(Class) \
     public: \
     Class ## Private(Class *q); \
+    virtual ~Class ## Private(); \
     private: \
     Class ## Private(const Class ## Private &other) =delete; \
     Class ## Private& operator=(const Class ## Private &other) = delete;

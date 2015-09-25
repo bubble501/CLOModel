@@ -38,7 +38,6 @@ protected:
     virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
     double RedeemChilds(double AvailableFunds, int ParentGroupTarget, int SeliorityScaleLevel, const QDate& TargetDate);
 public:
-    ~Waterfall();
     const QDate& GetLegalFinal() const;
     void SetLegalFinal(const QDate& val);
     const QHash<quint32, std::shared_ptr<AbstractTrigger> >& GetTriggers() const;

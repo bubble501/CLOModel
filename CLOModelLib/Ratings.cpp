@@ -12,6 +12,14 @@
 #endif
 DEFINE_PUBLIC_COMMONS(Ratings)
 DEFINE_PUBLIC_COMMONS_COPY(Ratings)
+Ratings::~Ratings()
+{
+
+}
+RatingsPrivate::~RatingsPrivate()
+{
+
+}
 RatingsPrivate::RatingsPrivate(Ratings *q)
 	:BackwardInterfacePrivate(q)
 {

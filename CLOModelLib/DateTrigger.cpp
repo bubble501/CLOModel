@@ -4,6 +4,14 @@
 #include <QDataStream>
 DEFINE_PUBLIC_COMMONS(DateTrigger)
 DEFINE_PUBLIC_COMMONS_COPY(DateTrigger)
+DateTrigger::~DateTrigger()
+{
+
+}
+DateTriggerPrivate::~DateTriggerPrivate()
+{
+
+}
 DateTriggerPrivate::DateTriggerPrivate(DateTrigger *q,const DateTriggerPrivate& other)
 	:AbstractTriggerPrivate(q,other)
     , m_LimitDate(other.m_LimitDate)

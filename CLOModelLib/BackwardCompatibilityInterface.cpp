@@ -3,6 +3,7 @@
 
 DEFINE_PUBLIC_COMMONS(BackwardInterface)
 DEFINE_PUBLIC_COMMONS_COPY(BackwardInterface)
+
 BackwardInterfacePrivate::~BackwardInterfacePrivate()
 {
 

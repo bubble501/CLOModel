@@ -4,6 +4,14 @@
 #include "Private/DeferredInterestTriggerSettingWidget.h"
 DEFINE_PUBLIC_COMMONS(DeferredInterestTrigger)
 DEFINE_PUBLIC_COMMONS_COPY(DeferredInterestTrigger)
+DeferredInterestTrigger::~DeferredInterestTrigger()
+{
+
+}
+DeferredInterestTriggerPrivate::~DeferredInterestTriggerPrivate()
+{
+
+}
 DeferredInterestTriggerPrivate::DeferredInterestTriggerPrivate(DeferredInterestTrigger *q,const DeferredInterestTriggerPrivate& other)
 	:AbstractTriggerPrivate(q,other)
     , m_TargetSeniorityLevel(other.m_TargetSeniorityLevel)

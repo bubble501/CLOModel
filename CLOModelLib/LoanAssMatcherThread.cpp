@@ -9,6 +9,7 @@
 #include "CommonFunctions.h"
 #include "Private/InternalItems.h"
 #include "Mortgage.h"
+LoanAssMatcherThreadPrivate::~LoanAssMatcherThreadPrivate() {}
 LoanAssMatcherThreadPrivate::LoanAssMatcherThreadPrivate(LoanAssMatcherThread *q)
     :AbstrAsyncThreadPrivate(q)
     , m_AvailableAssumptions(nullptr)

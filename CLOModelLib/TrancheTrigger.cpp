@@ -5,6 +5,14 @@
 #include "Tranche.h"
 DEFINE_PUBLIC_COMMONS(TrancheTrigger)
 DEFINE_PUBLIC_COMMONS_COPY(TrancheTrigger)
+TrancheTrigger::~TrancheTrigger()
+{
+
+}
+TrancheTriggerPrivate::~TrancheTriggerPrivate()
+{
+
+}
 TrancheTriggerPrivate::TrancheTriggerPrivate(TrancheTrigger *q,const TrancheTriggerPrivate& other)
 	:AbstractTriggerPrivate(q,other)
     , m_TargetSeniorityLevel(other.m_TargetSeniorityLevel)

@@ -14,7 +14,6 @@ public:
 		,trTrue=1
 		,trNA=-1
 	};
-	virtual ~TriggersResults();
 	virtual void ClearResults();
 	TrigRes GetResult(quint32 TrigType, const QDate& RefDate) const; 
 	void SetResult(quint32 TrigType, const QDate& RefDate, bool Res);

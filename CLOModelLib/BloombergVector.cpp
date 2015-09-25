@@ -11,6 +11,14 @@
 #include <qmath.h>
 DEFINE_PUBLIC_COMMONS(BloombergVector)
 DEFINE_PUBLIC_COMMONS_COPY(BloombergVector)
+BloombergVector::~BloombergVector()
+{
+
+}
+BloombergVectorPrivate::~BloombergVectorPrivate()
+{
+
+}
 BloombergVectorPrivate::BloombergVectorPrivate(BloombergVector *q,const BloombergVectorPrivate& other)
 	:AbstractBbgVectPrivate(q,other)
     , m_Divisor(other.m_Divisor)

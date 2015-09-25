@@ -15,6 +15,14 @@
 #endif // !NO_BLOOMBERG
 DEFINE_PUBLIC_COMMONS(TrancheCashFlow)
 DEFINE_PUBLIC_COMMONS_COPY(TrancheCashFlow)
+TrancheCashFlow::~TrancheCashFlow()
+{
+
+}
+TrancheCashFlowPrivate::~TrancheCashFlowPrivate()
+{
+
+}
 TrancheCashFlowPrivate::TrancheCashFlowPrivate(TrancheCashFlow *q,const TrancheCashFlowPrivate& other)
 	:GenericCashFlowPrivate(q,other)
     , OutstandingAmt(other.OutstandingAmt)

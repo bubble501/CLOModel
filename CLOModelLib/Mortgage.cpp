@@ -16,6 +16,14 @@
 #include "BaseRateTable.h"
 DEFINE_PUBLIC_COMMONS(Mortgage)
 DEFINE_PUBLIC_COMMONS_COPY(Mortgage)
+Mortgage::~Mortgage()
+{
+
+}
+MortgagePrivate::~MortgagePrivate()
+{
+
+}
 MortgagePrivate::MortgagePrivate(Mortgage *q,const MortgagePrivate& other)
 	:BackwardInterfacePrivate(q,other)
     , m_FloatRateBase(other.m_FloatRateBase)

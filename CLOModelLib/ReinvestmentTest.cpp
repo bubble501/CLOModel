@@ -3,6 +3,14 @@
 #include "CommonFunctions.h"
 DEFINE_PUBLIC_COMMONS(ReinvestmentTest)
 DEFINE_PUBLIC_COMMONS_COPY(ReinvestmentTest)
+ReinvestmentTest::~ReinvestmentTest()
+{
+
+}
+ReinvestmentTestPrivate::~ReinvestmentTestPrivate()
+{
+
+}
 ReinvestmentTestPrivate::ReinvestmentTestPrivate(ReinvestmentTest *q,const ReinvestmentTestPrivate& other)
 	:BackwardInterfacePrivate(q,other)
     , CDRAssumption(other.CDRAssumption)

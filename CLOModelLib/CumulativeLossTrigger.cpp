@@ -4,6 +4,14 @@
 #include <QDataStream>
 DEFINE_PUBLIC_COMMONS(CumulativeLossTrigger)
 DEFINE_PUBLIC_COMMONS_COPY(CumulativeLossTrigger)
+CumulativeLossTriggerPrivate::~CumulativeLossTriggerPrivate()
+{
+
+}
+CumulativeLossTrigger::~CumulativeLossTrigger()
+{
+
+}
 CumulativeLossTriggerPrivate::CumulativeLossTriggerPrivate(CumulativeLossTrigger *q,const CumulativeLossTriggerPrivate& other)
 	:AbstractTriggerPrivate(q,other)
     , m_Side(other.m_Side)

@@ -3,6 +3,8 @@
 #include <QDataStream>
 DEFINE_PUBLIC_COMMONS(PrincipalRecip)
 DEFINE_PUBLIC_COMMONS_COPY(PrincipalRecip)
+PrincipalRecip::~PrincipalRecip() {}
+PrincipalRecipPrivate::~PrincipalRecipPrivate() {}
 PrincipalRecipPrivate::PrincipalRecipPrivate(PrincipalRecip *q)
 	:BackwardInterfacePrivate(q)
     , m_Scheduled(0.0)

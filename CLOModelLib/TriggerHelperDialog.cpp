@@ -25,6 +25,7 @@
 #include "Private/DelinquencyTriggerSettingWidget.h"
 #include "Private/CumulativeLossTriggerSettingWidget.h"
 #include "Private/DeferredInterestTriggerSettingWidget.h"
+TriggerHelperDialogPrivate::~TriggerHelperDialogPrivate() {}
 TriggerHelperDialogPrivate::TriggerHelperDialogPrivate(TriggerHelperDialog *q)
     :q_ptr(q)
     , FirstCombodeleted(false)

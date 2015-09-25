@@ -5,6 +5,14 @@
 #include <QStringList>
 DEFINE_PUBLIC_COMMONS(RepaymentVector)
 DEFINE_PUBLIC_COMMONS_COPY(RepaymentVector)
+RepaymentVector::~RepaymentVector()
+{
+
+}
+RepaymentVectorPrivate::~RepaymentVectorPrivate()
+{
+
+}
 RepaymentVectorPrivate::RepaymentVectorPrivate(RepaymentVector *q,const RepaymentVectorPrivate& other)
 	:AbstractBbgVectPrivate(q,other)
     , m_VectVal(other.m_VectVal)

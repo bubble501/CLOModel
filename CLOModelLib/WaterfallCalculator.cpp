@@ -1,6 +1,7 @@
 #include "WaterfallCalculator.h"
 #include "Private/WaterfallCalculator_p.h"
 DEFINE_PUBLIC_QOBJECT_COMMONS(WaterfallCalculator)
+WaterfallCalculatorPrivate::~WaterfallCalculatorPrivate() {}
 WaterfallCalculatorPrivate::WaterfallCalculatorPrivate(WaterfallCalculator *q)
     :AbstrAsyncCalculatorPrivate(q)
 {}

@@ -18,6 +18,14 @@
 #include <QXmlStreamReader>
 #include "BaseRateTable.h"
 DEFINE_PUBLIC_QOBJECT_COMMONS(MtgCalculator)
+MtgCalculator::~MtgCalculator()
+{
+
+}
+MtgCalculatorPrivate::~MtgCalculatorPrivate()
+{
+
+}
 MtgCalculatorPrivate::MtgCalculatorPrivate(MtgCalculator *q)
     :AbstrAsyncCalculatorPrivate(q)
 {}
@@ -29,9 +37,7 @@ MtgCalculator::MtgCalculator(MtgCalculatorPrivate *d, QObject* parent)
     d->m_SaveIndividualFlows = false;
 }
 
-MtgCalculator::~MtgCalculator()
-{
-}
+
 
 void MtgCalculator::AddLoan(const Mortgage& a, qint32 Index)
 {

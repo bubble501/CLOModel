@@ -18,6 +18,7 @@ void StressViewer::closeEvent(QCloseEvent *event){
 	emit Closing();
 	event->accept();
 }
+StressViewerPrivate::~StressViewerPrivate(){}
 StressViewerPrivate::StressViewerPrivate(StressViewer *q)
     :q_ptr(q)
 #ifdef USE_SOFT_COLOUR

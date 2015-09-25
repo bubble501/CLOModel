@@ -19,6 +19,7 @@
 #include "Private/PhasedProgressWidget.h"
 #include <QIcon>
 DEFINE_PUBLIC_QOBJECT_COMMONS(StressTest)
+StressTestPrivate::~StressTestPrivate(){}
 StressTestPrivate::StressTestPrivate(StressTest *q)
     :BackwardInterfacePrivate(q)
 {}

@@ -5,6 +5,14 @@
 #include "CommonFunctions.h"
 DEFINE_PUBLIC_COMMONS(FloorCapVector)
 DEFINE_PUBLIC_COMMONS_COPY(FloorCapVector)
+FloorCapVector::~FloorCapVector()
+{
+
+}
+FloorCapVectorPrivate::~FloorCapVectorPrivate()
+{
+
+}
 FloorCapVectorPrivate::FloorCapVectorPrivate(FloorCapVector *q,const FloorCapVectorPrivate& other)
 	:AbstractBbgVectPrivate(q,other)
 {}

@@ -1,6 +1,10 @@
 #include "DuringStressTestTrigger.h"
 #include "Private/AbstractTrigger_p.h"
 #include "Private/AbstractTriggerSettingWidget.h"
+DuringStressTestTrigger::~DuringStressTestTrigger()
+{
+
+}
 DuringStressTestTrigger::DuringStressTestTrigger(AbstractTriggerPrivate* d)
     :AbstractTrigger(d, TriggerType::DuringStressTestTrigger)
 {}

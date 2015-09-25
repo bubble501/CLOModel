@@ -6,6 +6,10 @@
 #include "Private/InternalItems.h"
 DEFINE_PUBLIC_COMMONS(WatFalPrior)
 DEFINE_PUBLIC_COMMONS_COPY(WatFalPrior)
+WatFalPriorPrivate::~WatFalPriorPrivate()
+{
+
+}
 WatFalPriorPrivate::WatFalPriorPrivate(WatFalPrior *q,const WatFalPriorPrivate& other)
 	:BackwardInterfacePrivate(q,other)
     , PriorityType(other.PriorityType)

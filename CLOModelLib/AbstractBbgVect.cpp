@@ -6,6 +6,14 @@
 #include <QDate>
 DEFINE_PUBLIC_COMMONS(AbstractBbgVect)
 DEFINE_PUBLIC_COMMONS_COPY(AbstractBbgVect)
+AbstractBbgVect::~AbstractBbgVect()
+{
+
+}
+AbstractBbgVectPrivate::~AbstractBbgVectPrivate()
+{
+
+}
 AbstractBbgVectPrivate::AbstractBbgVectPrivate(AbstractBbgVect *q,const AbstractBbgVectPrivate& other)
     :BackwardInterfacePrivate(q, other)
     , m_Vector(other.m_Vector)

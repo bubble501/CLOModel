@@ -66,7 +66,6 @@ public:
 	WaterfallStepType GetPriorityType() const;
 	void SetPriorityType(WaterfallStepType a);
 	QString ReadyToCalculate() const;
-	virtual ~WatFalPrior();
 	QString ToString() const;
 	QString CodeForDialog() const;
 protected:

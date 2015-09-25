@@ -5,6 +5,14 @@
 #include "CommonFunctions.h"
 DEFINE_PUBLIC_COMMONS(DayCountVector)
 DEFINE_PUBLIC_COMMONS_COPY(DayCountVector)
+DayCountVector::~DayCountVector()
+{
+
+}
+DayCountVectorPrivate::~DayCountVectorPrivate()
+{
+
+}
 DayCountVectorPrivate::DayCountVectorPrivate(DayCountVector *q,const DayCountVectorPrivate& other)
 	:AbstractBbgVectPrivate(q,other)
     , m_VectVal(other.m_VectVal)

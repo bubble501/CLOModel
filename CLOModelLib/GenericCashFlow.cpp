@@ -10,6 +10,11 @@
 #include "CommonFunctions.h"
 DEFINE_PUBLIC_COMMONS(GenericCashFlow)
 DEFINE_PUBLIC_COMMONS_COPY(GenericCashFlow)
+
+GenericCashFlowPrivate::~GenericCashFlowPrivate()
+{
+
+}
 GenericCashFlowPrivate::GenericCashFlowPrivate(GenericCashFlow *q,const GenericCashFlowPrivate& other)
 	:BackwardInterfacePrivate(q,other)
     , m_AggregationLevel(other.m_AggregationLevel)

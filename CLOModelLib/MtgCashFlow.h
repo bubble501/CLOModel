@@ -151,6 +151,7 @@ public:
 	using GenericCashFlow::GetFlow; 
 	MtgCashFlow(const MtgCashFlow& a);
 	MtgCashFlow();
+    virtual ~MtgCashFlow();
 };
 Q_DECLARE_METATYPE(MtgCashFlow)
 #endif // MtgCashFlow_h__

@@ -5,6 +5,14 @@
 #include <QDate>
 DEFINE_PUBLIC_COMMONS(VectorTrigger)
 DEFINE_PUBLIC_COMMONS_COPY(VectorTrigger)
+VectorTrigger::~VectorTrigger()
+{
+
+}
+VectorTriggerPrivate::~VectorTriggerPrivate()
+{
+
+}
 VectorTriggerPrivate::VectorTriggerPrivate(VectorTrigger *q,const VectorTriggerPrivate& other)
 	:AbstractTriggerPrivate(q,other)
     , m_TrigVector(other.m_TrigVector)

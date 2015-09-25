@@ -7,7 +7,6 @@ class AbstrAsyncThreadPrivate
 protected:
     AbstrAsyncThread* q_ptr;
 public:
-    virtual ~AbstrAsyncThreadPrivate();
     int Identifier;
     std::shared_ptr<void> m_Result;
 };

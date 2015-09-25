@@ -5,6 +5,14 @@
 #include <QRegularExpression>
 DEFINE_PUBLIC_COMMONS(LoanAssumption)
 DEFINE_PUBLIC_COMMONS_COPY(LoanAssumption)
+LoanAssumption::~LoanAssumption()
+{
+
+}
+LoanAssumptionPrivate::~LoanAssumptionPrivate()
+{
+
+}
 LoanAssumptionPrivate::LoanAssumptionPrivate(LoanAssumption *q,const LoanAssumptionPrivate& other)
 	:BackwardInterfacePrivate(q,other)
     ,m_ScenarioName(other.m_ScenarioName)

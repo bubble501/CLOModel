@@ -30,6 +30,11 @@
 
 DEFINE_PUBLIC_COMMONS(Waterfall)
 DEFINE_PUBLIC_COMMONS_COPY(Waterfall)
+
+WaterfallPrivate::~WaterfallPrivate()
+{
+
+}
 WaterfallPrivate::WaterfallPrivate(Waterfall *q,const WaterfallPrivate& other)
 	:BackwardInterfacePrivate(q,other)
     , m_SeniorExpenses(other.m_SeniorExpenses)

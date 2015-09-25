@@ -8,6 +8,7 @@ class CLOMODELLIB_EXPORT DuringStressTestTrigger : public AbstractTrigger
 public:
     DuringStressTestTrigger(const QString& lab=QString());
     DuringStressTestTrigger(const DuringStressTestTrigger& other);
+    virtual ~DuringStressTestTrigger();
 	virtual bool Passing(bool IsStressTest) const;
 	virtual bool Failing(bool IsStressTest) const;
 	virtual QString ReadyToCalculate() const override;

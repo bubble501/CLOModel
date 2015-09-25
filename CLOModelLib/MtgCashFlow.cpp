@@ -5,6 +5,10 @@
 #include <QDataStream>
 #include <qmath.h>
 #include "Private/GenericCashFlow_p.h"
+MtgCashFlow::~MtgCashFlow()
+{
+
+}
 MtgCashFlow MtgCashFlow::ApplyScenario(BloombergVector CPRv, BloombergVector CDRv, BloombergVector LSv) const {
     Q_D(const GenericCashFlow);
 	MtgCashFlow Result;

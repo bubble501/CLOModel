@@ -8,6 +8,7 @@
 #include <QLabel>
 #include <QGridLayout>
 #include <QHeaderView>
+TriggerStructHelperWidgetPrivate::~TriggerStructHelperWidgetPrivate(){}
 TriggerStructHelperWidgetPrivate::TriggerStructHelperWidgetPrivate(TriggerStructHelperWidget *q)
     :q_ptr(q)
 {}

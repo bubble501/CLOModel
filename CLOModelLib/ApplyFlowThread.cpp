@@ -1,5 +1,7 @@
 #include "ApplyFlowThread.h"
 #include "Private/ApplyFlowThread_p.h"
+ApplyFlowThreadPrivate::~ApplyFlowThreadPrivate(){}
+ApplyFlowThread::~ApplyFlowThread() {}
 ApplyFlowThreadPrivate::ApplyFlowThreadPrivate(ApplyFlowThread *q)
     :AbstrAsyncThreadPrivate(q)
     , BaseFlow(nullptr)

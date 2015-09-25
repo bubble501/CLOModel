@@ -19,6 +19,11 @@
 #endif // !NO_BLOOMBERG
 DEFINE_PUBLIC_COMMONS(Tranche)
 DEFINE_PUBLIC_COMMONS_COPY(Tranche)
+
+TranchePrivate::~TranchePrivate()
+{
+
+}
 TranchePrivate::TranchePrivate(Tranche *q,const TranchePrivate& other)
     :BackwardInterfacePrivate(q, other)
     , LastPaymentDate(other.LastPaymentDate)

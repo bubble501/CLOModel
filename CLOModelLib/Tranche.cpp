@@ -900,78 +900,80 @@ bool Tranche::saveCashflowsDatabase() const
                 + "}; "
                 + GetFromConfig("Database", "DataSource")
                 );
-            
+
         }
         bool DbOpen = db.isOpen();
         if (!DbOpen) DbOpen = db.open();
-        for (auto i = applicableIsin.constBegin(); DbOpen && i != applicableIsin.constEnd();++i) {
-            {
-                //Check bond exist in the database
-                QSqlQuery CheckBondExistQuery(db);
-                CheckBondExistQuery.setForwardOnly(true);
-                CheckBondExistQuery.prepare("{CALL " + GetFromConfig("Database", "GetBondDetailsStoredProc") + "}");
-                CheckBondExistQuery.bindValue(":isin", *i);
-                if (!CheckBondExistQuery.exec()) {
-                    DEBG_LOG("saveCashflowsDatabase() Failed to run GetBondDetailsStoredProc");
+        if (DbOpen) {
+            for (auto i = applicableIsin.constBegin(); DbOpen && i != applicableIsin.constEnd(); ++i) {
+                {
+                    //Check bond exist in the database
+                    QSqlQuery CheckBondExistQuery(db);
+                    CheckBondExistQuery.setForwardOnly(true);
+                    CheckBondExistQuery.prepare("{CALL " + GetFromConfig("Database", "GetBondDetailsStoredProc") + "}");
+                    CheckBondExistQuery.bindValue(":isin", *i);
+                    if (!CheckBondExistQuery.exec()) {
+                        DEBG_LOG("saveCashflowsDatabase() Failed to run GetBondDetailsStoredProc");
+                        return false;
+                    }
+                    if (!CheckBondExistQuery.next()) {
+                        DEBG_LOG("saveCashflowsDatabase() Bond not found in Database");
+                        continue;
+                    }
+                }
+                oneBondFound = true;
+                bool dbError;
+                QVariantList isinPar, datePar, deferredPar, interestPar, principalPar, balancePar, couponPar;
+                isinPar.reserve(d->CashFlow.Count());
+                datePar.reserve(d->CashFlow.Count());
+                deferredPar.reserve(d->CashFlow.Count());
+                interestPar.reserve(d->CashFlow.Count());
+                principalPar.reserve(d->CashFlow.Count());
+                balancePar.reserve(d->CashFlow.Count());
+                couponPar.reserve(d->CashFlow.Count());
+                for (int CashFlowIter = 0; CashFlowIter < d->CashFlow.Count(); ++CashFlowIter) {
+                    isinPar.append(*i);
+                    datePar.append(d->CashFlow.GetDate(CashFlowIter).toString(Qt::ISODate));
+                    deferredPar.append(d->CashFlow.GetTotalDeferred(CashFlowIter));
+                    interestPar.append(d->CashFlow.GetTotalInterest(CashFlowIter));
+                    principalPar.append(d->CashFlow.GetPrincipal(CashFlowIter));
+                    balancePar.append(d->CashFlow.GetAmountOutstanding(CashFlowIter));
+                    couponPar.append(100.0*getTotalActualCoupon(CashFlowIter));
+                }
+                db.transaction();
+                {
+                    QSqlQuery EraseCashflowQuery(db);
+                    EraseCashflowQuery.setForwardOnly(true);
+                    EraseCashflowQuery.prepare("{CALL " + GetFromConfig("Database", "DeleteCashflowsStoredProc") + "}");
+                    EraseCashflowQuery.bindValue(":ISIN", *i);
+                    dbError = !EraseCashflowQuery.exec();
+                    DEBG_LOG_CONDITION("saveCashflowsDatabase() Failed to delete previous cash flows", dbError);
+                }
+                if (!dbError) {
+                    QSqlQuery InsertCashflowQuery(db);
+                    InsertCashflowQuery.setForwardOnly(true);
+                    InsertCashflowQuery.prepare(GetFromConfig("Database", "InsertCashFlowsQuery"));
+                    InsertCashflowQuery.bindValue(":isin", isinPar);
+                    InsertCashflowQuery.bindValue(":date", datePar);
+                    InsertCashflowQuery.bindValue(":deferred", deferredPar);
+                    InsertCashflowQuery.bindValue(":interest", interestPar);
+                    InsertCashflowQuery.bindValue(":principal", principalPar);
+                    InsertCashflowQuery.bindValue(":balance", balancePar);
+                    InsertCashflowQuery.bindValue(":coupon", couponPar);
+                    dbError = !InsertCashflowQuery.execBatch();
+                    DEBG_LOG_CONDITION("saveCashflowsDatabase() Failed to upload new cash flows", dbError);
+                }
+                if (dbError) {
+                    db.rollback();
+                    DEBG_LOG("saveCashflowsDatabase() Reached Rollback");
                     return false;
                 }
-                if (!CheckBondExistQuery.next()) {
-                    DEBG_LOG("saveCashflowsDatabase() Bond not found in Database");
-                    continue;
+                else {
+                    db.commit();
                 }
             }
-            oneBondFound = true;
-            bool dbError;
-            QVariantList isinPar, datePar, deferredPar, interestPar, principalPar, balancePar, couponPar;
-            isinPar.reserve(d->CashFlow.Count());
-            datePar.reserve(d->CashFlow.Count());
-            deferredPar.reserve(d->CashFlow.Count());
-            interestPar.reserve(d->CashFlow.Count());
-            principalPar.reserve(d->CashFlow.Count());
-            balancePar.reserve(d->CashFlow.Count());
-            couponPar.reserve(d->CashFlow.Count());
-            for (int CashFlowIter = 0; CashFlowIter < d->CashFlow.Count(); ++CashFlowIter) {
-                isinPar.append(*i);
-                datePar.append(d->CashFlow.GetDate(CashFlowIter).toString(Qt::ISODate));
-                deferredPar.append(d->CashFlow.GetTotalDeferred(CashFlowIter));
-                interestPar.append(d->CashFlow.GetTotalInterest(CashFlowIter));
-                principalPar.append(d->CashFlow.GetPrincipal(CashFlowIter));
-                balancePar.append(d->CashFlow.GetAmountOutstanding(CashFlowIter));
-                couponPar.append(100.0*getTotalActualCoupon(CashFlowIter));
-            }
-            db.transaction();
-            {
-                QSqlQuery EraseCashflowQuery(db);
-                EraseCashflowQuery.setForwardOnly(true);
-                EraseCashflowQuery.prepare("{CALL " + GetFromConfig("Database", "DeleteCashflowsStoredProc") + "}");
-                EraseCashflowQuery.bindValue(":ISIN", *i);
-                dbError = !EraseCashflowQuery.exec();
-                DEBG_LOG_CONDITION("saveCashflowsDatabase() Failed to delete previous cash flows", dbError);
-            }
-            if (!dbError) {
-                QSqlQuery InsertCashflowQuery(db);
-                InsertCashflowQuery.setForwardOnly(true);
-                InsertCashflowQuery.prepare(GetFromConfig("Database", "InsertCashFlowsQuery"));
-                InsertCashflowQuery.bindValue(":isin", isinPar);
-                InsertCashflowQuery.bindValue(":date", datePar);
-                InsertCashflowQuery.bindValue(":deferred", deferredPar);
-                InsertCashflowQuery.bindValue(":interest", interestPar);
-                InsertCashflowQuery.bindValue(":principal", principalPar);
-                InsertCashflowQuery.bindValue(":balance", balancePar);
-                InsertCashflowQuery.bindValue(":coupon", couponPar);
-                dbError = !InsertCashflowQuery.execBatch();
-                DEBG_LOG_CONDITION("saveCashflowsDatabase() Failed to upload new cash flows", dbError);
-            }
-            if (dbError) {
-                db.rollback();
-                DEBG_LOG("saveCashflowsDatabase() Reached Rollback");
-                return false;
-            }
-            else {
-                db.commit();
-            }
+            return oneBondFound;
         }
-        return oneBondFound;
     }
     DEBG_LOG("saveCashflowsDatabase() Failed to open DB");
 #endif // !NO_DATABASE

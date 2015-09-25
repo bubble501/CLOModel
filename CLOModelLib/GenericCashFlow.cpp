@@ -332,9 +332,12 @@ QDate GenericCashFlow::MaturityDate() const {
     Q_D(const GenericCashFlow);
     if (d->m_CashFlows.isEmpty()) return QDate();
     for (auto i = d->m_CashFlows.constEnd() - 1; ; --i) {
-		if (!i.value()->isEmpty()) return i.key();
-        if (i == d->m_CashFlows.constBegin()) return QDate();
+		if (!i.value()->isEmpty()) 
+            return i.key();
+        if (i == d->m_CashFlows.constBegin()) 
+            return QDate();
 	}
+    Q_UNREACHABLE();
 	return QDate();
 }
 

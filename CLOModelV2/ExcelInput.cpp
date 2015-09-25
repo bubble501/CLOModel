@@ -137,73 +137,73 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 	{ //Triggers
 		int TriggerCount,TriggerTpe;
 		TriggerCount = pdFreq->intVal; pdFreq++;
-		QSharedPointer<AbstractTrigger> TempTrigger;
+		std::shared_ptr<AbstractTrigger> TempTrigger;
 		for (int i = 0; i < TriggerCount; i++) {
 			TriggerTpe = pdFreq->intVal; pdFreq++;
 			switch (TriggerTpe) {
                 // Keep this in sync with the relevant override of AbstractTriggerSettingWidget::parameters()
-			case static_cast<int>(AbstractTrigger::TriggerType::DateTrigger) :
-				TempTrigger.reset(new DateTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
-				TempTrigger.dynamicCast<DateTrigger>()->SetLimitDate(QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal), "yyyy-MM-dd")); pdFreq++;
-				TempTrigger.dynamicCast<DateTrigger>()->SetSide(static_cast<DateTrigger::TriggerSide>(pdFreq->intVal)); pdFreq++;
-				TempUnit.SetTrigger(i + 1, TempTrigger);
-				break;
-			case static_cast<int>(AbstractTrigger::TriggerType::VectorTrigger) :
-				TempTrigger.reset(new VectorTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
-				TempTrigger.dynamicCast<VectorTrigger>()->SetTrigVector(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
-				TempUnit.SetTrigger(i + 1, TempTrigger);
-				break;
-			case static_cast<int>(AbstractTrigger::TriggerType::PoolSizeTrigger) :
-				TempTrigger.reset(new PoolSizeTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
-				TempTrigger.dynamicCast<PoolSizeTrigger>()->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
-				TempTrigger.dynamicCast<PoolSizeTrigger>()->SetSide(static_cast<PoolSizeTrigger::TriggerSide>(pdFreq->intVal)); pdFreq++;
-				TempUnit.SetTrigger(i + 1, TempTrigger);
-				break;
-			case static_cast<int>(AbstractTrigger::TriggerType::CumulativeLossTrigger) :
-				TempTrigger.reset(new CumulativeLossTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
-				TempTrigger.dynamicCast<CumulativeLossTrigger>()->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
-				TempTrigger.dynamicCast<CumulativeLossTrigger>()->SetSide(static_cast<CumulativeLossTrigger::TriggerSide>(pdFreq->intVal)); pdFreq++;
-				TempUnit.SetTrigger(i + 1, TempTrigger);
-				break;
-			case static_cast<int>(AbstractTrigger::TriggerType::TrancheTrigger) :
-				TempTrigger.reset(new TrancheTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
-				TempTrigger.dynamicCast<TrancheTrigger>()->SetTargetSeniority(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
-				TempTrigger.dynamicCast<TrancheTrigger>()->SetTargetSeniorityLevel(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
-				TempTrigger.dynamicCast<TrancheTrigger>()->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
-				TempTrigger.dynamicCast<TrancheTrigger>()->SetSenioritySide(static_cast<TrancheTrigger::TriggerSenioritySide>(pdFreq->intVal)); pdFreq++;
-				TempTrigger.dynamicCast<TrancheTrigger>()->SetSizeSide(static_cast<TrancheTrigger::TriggerSizeSide>(pdFreq->intVal)); pdFreq++;
-				TempTrigger.dynamicCast<TrancheTrigger>()->SetSizeMultiplier(pdFreq->dblVal); pdFreq++;
-				TempUnit.SetTrigger(i + 1, TempTrigger);
-				break;
-			case static_cast<int>(AbstractTrigger::TriggerType::DeferredInterestTrigger) :
-				TempTrigger.reset(new DeferredInterestTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
-				TempTrigger.dynamicCast<DeferredInterestTrigger>()->SetTargetSeniority(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
-				TempTrigger.dynamicCast<DeferredInterestTrigger>()->SetTargetSeniorityLevel(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
-				TempTrigger.dynamicCast<DeferredInterestTrigger>()->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
-				TempTrigger.dynamicCast<DeferredInterestTrigger>()->SetSenioritySide(static_cast<DeferredInterestTrigger::TriggerSenioritySide>(pdFreq->intVal)); pdFreq++;
-				TempTrigger.dynamicCast<DeferredInterestTrigger>()->SetSizeSide(static_cast<DeferredInterestTrigger::TriggerSizeSide>(pdFreq->intVal)); pdFreq++;
-				TempTrigger.dynamicCast<DeferredInterestTrigger>()->SetSizeMultiplier(pdFreq->dblVal); pdFreq++;
-				TempTrigger.dynamicCast<DeferredInterestTrigger>()->SetTargetCoupon(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
-				TempTrigger.dynamicCast<DeferredInterestTrigger>()->SetCouponSide(static_cast<DeferredInterestTrigger::TriggerCouponSide>(pdFreq->intVal)); pdFreq++;
-				TempUnit.SetTrigger(i + 1, TempTrigger);
-				break;
-			case static_cast<int>(AbstractTrigger::TriggerType::DelinquencyTrigger) :
-				TempTrigger.reset(new DelinquencyTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
-				TempTrigger.dynamicCast<DelinquencyTrigger>()->SetTarget(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
-				TempUnit.SetTrigger(i + 1, TempTrigger);
-				break;
-			case static_cast<int>(AbstractTrigger::TriggerType::DuringStressTestTrigger) :
-				TempTrigger.reset(new DuringStressTestTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
-				TempUnit.SetTrigger(i + 1, TempTrigger);
-				break;
+            case static_cast<int>(AbstractTrigger::TriggerType::DateTrigger) :
+                TempTrigger.reset(new DateTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+                std::dynamic_pointer_cast<DateTrigger>(TempTrigger)->SetLimitDate(QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal), "yyyy-MM-dd")); pdFreq++;
+                std::dynamic_pointer_cast<DateTrigger>(TempTrigger)->SetSide(static_cast<DateTrigger::TriggerSide>(pdFreq->intVal)); pdFreq++;
+                TempUnit.SetTrigger(i + 1, TempTrigger);
+                break;
+            case static_cast<int>(AbstractTrigger::TriggerType::VectorTrigger) :
+                TempTrigger.reset(new VectorTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+                std::dynamic_pointer_cast<VectorTrigger>(TempTrigger)->SetTrigVector(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                TempUnit.SetTrigger(i + 1, TempTrigger);
+                break;
+            case static_cast<int>(AbstractTrigger::TriggerType::PoolSizeTrigger) :
+                TempTrigger.reset(new PoolSizeTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+                std::dynamic_pointer_cast<PoolSizeTrigger>(TempTrigger)->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                std::dynamic_pointer_cast<PoolSizeTrigger>(TempTrigger)->SetSide(static_cast<PoolSizeTrigger::TriggerSide>(pdFreq->intVal)); pdFreq++;
+                TempUnit.SetTrigger(i + 1, TempTrigger);
+                break;
+            case static_cast<int>(AbstractTrigger::TriggerType::CumulativeLossTrigger) :
+                TempTrigger.reset(new CumulativeLossTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+                std::dynamic_pointer_cast<CumulativeLossTrigger>(TempTrigger)->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                std::dynamic_pointer_cast<CumulativeLossTrigger>(TempTrigger)->SetSide(static_cast<CumulativeLossTrigger::TriggerSide>(pdFreq->intVal)); pdFreq++;
+                TempUnit.SetTrigger(i + 1, TempTrigger);
+                break;
+            case static_cast<int>(AbstractTrigger::TriggerType::TrancheTrigger) :
+                TempTrigger.reset(new TrancheTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+                std::dynamic_pointer_cast<TrancheTrigger>(TempTrigger)->SetTargetSeniority(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                std::dynamic_pointer_cast<TrancheTrigger>(TempTrigger)->SetTargetSeniorityLevel(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                std::dynamic_pointer_cast<TrancheTrigger>(TempTrigger)->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                std::dynamic_pointer_cast<TrancheTrigger>(TempTrigger)->SetSenioritySide(static_cast<TrancheTrigger::TriggerSenioritySide>(pdFreq->intVal)); pdFreq++;
+                std::dynamic_pointer_cast<TrancheTrigger>(TempTrigger)->SetSizeSide(static_cast<TrancheTrigger::TriggerSizeSide>(pdFreq->intVal)); pdFreq++;
+                std::dynamic_pointer_cast<TrancheTrigger>(TempTrigger)->SetSizeMultiplier(pdFreq->dblVal); pdFreq++;
+                TempUnit.SetTrigger(i + 1, TempTrigger);
+                break;
+            case static_cast<int>(AbstractTrigger::TriggerType::DeferredInterestTrigger) :
+                TempTrigger.reset(new DeferredInterestTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+                std::dynamic_pointer_cast<DeferredInterestTrigger>(TempTrigger)->SetTargetSeniority(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                std::dynamic_pointer_cast<DeferredInterestTrigger>(TempTrigger)->SetTargetSeniorityLevel(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                std::dynamic_pointer_cast<DeferredInterestTrigger>(TempTrigger)->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                std::dynamic_pointer_cast<DeferredInterestTrigger>(TempTrigger)->SetSenioritySide(static_cast<DeferredInterestTrigger::TriggerSenioritySide>(pdFreq->intVal)); pdFreq++;
+                std::dynamic_pointer_cast<DeferredInterestTrigger>(TempTrigger)->SetSizeSide(static_cast<DeferredInterestTrigger::TriggerSizeSide>(pdFreq->intVal)); pdFreq++;
+                std::dynamic_pointer_cast<DeferredInterestTrigger>(TempTrigger)->SetSizeMultiplier(pdFreq->dblVal); pdFreq++;
+                std::dynamic_pointer_cast<DeferredInterestTrigger>(TempTrigger)->SetTargetCoupon(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                std::dynamic_pointer_cast<DeferredInterestTrigger>(TempTrigger)->SetCouponSide(static_cast<DeferredInterestTrigger::TriggerCouponSide>(pdFreq->intVal)); pdFreq++;
+                TempUnit.SetTrigger(i + 1, TempTrigger);
+                break;
+            case static_cast<int>(AbstractTrigger::TriggerType::DelinquencyTrigger) :
+                TempTrigger.reset(new DelinquencyTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+                std::dynamic_pointer_cast<DelinquencyTrigger>(TempTrigger)->SetTarget(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                TempUnit.SetTrigger(i + 1, TempTrigger);
+                break;
+            case static_cast<int>(AbstractTrigger::TriggerType::DuringStressTestTrigger) :
+                TempTrigger.reset(new DuringStressTestTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+                TempUnit.SetTrigger(i + 1, TempTrigger);
+                break;
             case static_cast<int>(AbstractTrigger::TriggerType::PDLTrigger) :
                 TempTrigger.reset(new PDLTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
-                TempTrigger.dynamicCast<PDLTrigger>()->SetTargetSeniority(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
-                TempTrigger.dynamicCast<PDLTrigger>()->SetTargetSeniorityLevel(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
-                TempTrigger.dynamicCast<PDLTrigger>()->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
-                TempTrigger.dynamicCast<PDLTrigger>()->SetSenioritySide(static_cast<PDLTrigger::TriggerSenioritySide>(pdFreq->intVal)); pdFreq++;
-                TempTrigger.dynamicCast<PDLTrigger>()->SetSizeSide(static_cast<PDLTrigger::TriggerSizeSide>(pdFreq->intVal)); pdFreq++;
-                TempTrigger.dynamicCast<PDLTrigger>()->SetSizeMultiplier(pdFreq->dblVal); pdFreq++;
+                std::dynamic_pointer_cast<PDLTrigger>(TempTrigger)->SetTargetSeniority(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                std::dynamic_pointer_cast<PDLTrigger>(TempTrigger)->SetTargetSeniorityLevel(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                std::dynamic_pointer_cast<PDLTrigger>(TempTrigger)->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                std::dynamic_pointer_cast<PDLTrigger>(TempTrigger)->SetSenioritySide(static_cast<PDLTrigger::TriggerSenioritySide>(pdFreq->intVal)); pdFreq++;
+                std::dynamic_pointer_cast<PDLTrigger>(TempTrigger)->SetSizeSide(static_cast<PDLTrigger::TriggerSizeSide>(pdFreq->intVal)); pdFreq++;
+                std::dynamic_pointer_cast<PDLTrigger>(TempTrigger)->SetSizeMultiplier(pdFreq->dblVal); pdFreq++;
                 TempUnit.SetTrigger(i + 1, TempTrigger);
                 break;
             default:
@@ -486,7 +486,7 @@ double __stdcall CLOReturnRate(LPSAFEARRAY *ArrayData){
         return 0.0;
     int argc =  1;
     QApplication ComputationLoop(argc, NULL);
-	const Tranche* const TranchPoint=TempWaterfall.GetTranche(TrancheName);
+	const auto TranchPoint=TempWaterfall.GetTranche(TrancheName);
     ComputationLoop.quit();
 	if(Q_LIKELY(TranchPoint))
         return TranchPoint->GetIRR(NewPrice);
@@ -535,7 +535,7 @@ double __stdcall CLODiscountMargin(LPSAFEARRAY *ArrayData){
         return 0.0;
     int argc =  1;
     QApplication ComputationLoop(argc, NULL);
-	const Tranche* const TranchPoint=TempWaterfall.GetTranche(TrancheName);
+	const auto TranchPoint=TempWaterfall.GetTranche(TrancheName);
     ComputationLoop.quit();
 	if(Q_LIKELY(TranchPoint))
 		return TranchPoint->GetDiscountMargin(NewPrice);
@@ -583,7 +583,7 @@ double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
 
     int argc =  1;
     QApplication ComputationLoop(argc, NULL);
-	const Tranche* const TranchPoint=TempWaterfall.GetTranche(TrancheName);
+	const auto TranchPoint=TempWaterfall.GetTranche(TrancheName);
     ComputationLoop.quit();
 	if(Q_LIKELY(TranchPoint)) 
         return TranchPoint->GetWALife(/*StartDate*/);
@@ -616,7 +616,7 @@ double __stdcall GetStressLoss(LPSAFEARRAY *ArrayData) {
 	Waterfall TempRes = StressTest::GetScenarioFromFile(FolderPath, CPRscenario, CDRscenario, LSscenario, RecLagScenario, DelinqScenario, DelinqLagScenario);
     int argc =1;
     QApplication ComputationLoop(argc, NULL);
-	const Tranche* const Result = TempRes.GetTranche(TrancheName);
+	const auto Result = TempRes.GetTranche(TrancheName);
     ComputationLoop.quit();
 	if (Result)
 		return Result->GetLossRate();
@@ -651,7 +651,7 @@ double __stdcall GetStressDM(LPSAFEARRAY *ArrayData) {
 	Waterfall TempRes = StressTest::GetScenarioFromFile(FolderPath, CPRscenario, CDRscenario, LSscenario, RecLagScenario, DelinqScenario, DelinqLagScenario);
     int argc =  1;
     QApplication ComputationLoop(argc, NULL);
-    const Tranche* const Result = TempRes.GetTranche(TrancheName);
+    const auto Result = TempRes.GetTranche(TrancheName);
     ComputationLoop.quit();
 	if (Result)
 		return Result->GetDiscountMargin(NewPrice);

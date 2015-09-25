@@ -230,7 +230,7 @@ void StandaloneStress::Start() {
 		}
 		ModelFile.close();
 	}
-	const QHash<qint32, Mortgage*>& SourceLoans = TmpMtg.GetLoans();
+	const QHash<qint32, std::shared_ptr<Mortgage> >& SourceLoans = TmpMtg.GetLoans();
 	for (auto i = SourceLoans.constBegin(); i != SourceLoans.constEnd(); ++i) {
 		Stresser->AddLoan(*(i.value()));
 	}

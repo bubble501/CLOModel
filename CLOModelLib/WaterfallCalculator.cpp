@@ -93,8 +93,7 @@ void WaterfallCalculator::BeeReturned(int Ident, const Waterfall& a)
     Q_ASSERT(d->m_CascadesPath.contains(Ident));
 	RETURN_WHEN_RUNNING(false, )
 	TemplAsyncCalculator <WaterfallCalcThread, Waterfall >::BeeReturned(Ident, a);
-    d->removeTempFile(d->m_CascadesPath.value(Ident));
-    d->writeTempFile(*TemplAsyncCalculator <WaterfallCalcThread, Waterfall >::GetResult(Ident));
+    AddWaterfall(*TemplAsyncCalculator <WaterfallCalcThread, Waterfall >::GetResult(Ident), Ident);
     auto& tempRes = getResultVoid();
     auto i = tempRes.find(Ident);
     if (i != tempRes.end())

@@ -262,7 +262,10 @@ void MtgCalculator::BeeReturned(int Ident, const MtgCashFlow& a) {
         SetLoan(tempLoan, Ident);
     }
 	TemplAsyncCalculator<MtgCalculatorThread, MtgCashFlow>::BeeReturned(Ident, a);
-    RemoveResult(Ident);
+    auto& tempRes = getResultVoid();
+    auto i = tempRes.find(Ident);
+    if (i != tempRes.end())
+        i.value().reset();
     if (!d->m_ContinueCalculation)return;
 	MtgCalculatorThread* CurrentThread;
     for (auto SingleLoan = d->m_LoansPath.constBegin(); SingleLoan != d->m_LoansPath.constEnd(); ++SingleLoan) {

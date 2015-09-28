@@ -457,9 +457,16 @@ double __stdcall CLOReturnRate(LPSAFEARRAY *ArrayData){
 	QFile file(Filename);
 	bool UsingClom = false;
 	if (!file.exists()) {
-		file.setFileName(GetFromConfig("Folders", "UnifiedResultsFolder") + '/' + DealName + ".clom");
-		if (!file.exists())return 0.0;
-		UsingClom = true;
+        const auto dealNames = DealName.split(';', QString::SkipEmptyParts);
+        for (auto i = dealNames.constBegin(); i != dealNames.constEnd(); ++i) {
+            file.setFileName(GetFromConfig("Folders", "UnifiedResultsFolder") + '/' + *i + ".clom");
+            if (file.exists()){
+                UsingClom = true;
+                break;
+            } 
+        }
+        if (!UsingClom)
+		    return 0.0;
 	}
 	if (!file.open(QIODevice::ReadOnly)){
 		return 0.0;
@@ -507,9 +514,16 @@ double __stdcall CLODiscountMargin(LPSAFEARRAY *ArrayData){
 	QFile file(Filename);
 	bool UsingClom = false;
 	if(!file.exists()){
-		file.setFileName(GetFromConfig("Folders", "UnifiedResultsFolder") + '/' + DealName + ".clom");
-		if (!file.exists())return 0.0;
-		UsingClom = true;
+        const auto dealNames = DealName.split(';', QString::SkipEmptyParts);
+        for (auto i = dealNames.constBegin(); i != dealNames.constEnd(); ++i) {
+            file.setFileName(GetFromConfig("Folders", "UnifiedResultsFolder") + '/' + *i + ".clom");
+            if (file.exists()) {
+                UsingClom = true;
+                break;
+            }
+        }
+        if (!UsingClom)
+            return 0.0;
 	}
 	if (!file.open(QIODevice::ReadOnly)){
 		return 0.0;
@@ -557,9 +571,16 @@ double __stdcall CLOWALife(LPSAFEARRAY *ArrayData){
 	QFile file(Filename);
 	bool UsingClom = false;
 	if (!file.exists()){
-		file.setFileName(GetFromConfig("Folders", "UnifiedResultsFolder") + '\\' + DealName + ".clom");
-		if (!file.exists())return 0.0;
-		UsingClom = true;
+        const auto dealNames = DealName.split(';', QString::SkipEmptyParts);
+        for (auto i = dealNames.constBegin(); i != dealNames.constEnd(); ++i) {
+            file.setFileName(GetFromConfig("Folders", "UnifiedResultsFolder") + '/' + *i + ".clom");
+            if (file.exists()) {
+                UsingClom = true;
+                break;
+            }
+        }
+        if (!UsingClom)
+            return 0.0;
 	}
 	if (!file.open(QIODevice::ReadOnly))return 0.0;
 	QDataStream out(&file);

@@ -33,6 +33,7 @@ public:
     virtual quint8 operativity() const;
     virtual void setOperativity(quint8 val);
     AbstrAsyncCalculator(QObject* parent =nullptr);
+    virtual ~AbstrAsyncCalculator();
     virtual QString ReadyToCalculate() const = 0;
     virtual void SetSequentialComputation(bool a);
     virtual bool GetSequentialComputation()const;

@@ -11,6 +11,7 @@ protected:
     Q_DECLARE_PRIVATE(MtgCalculatorThread)
     MtgCalculatorThread(MtgCalculatorThreadPrivate* d, int ID, QObject* parent = nullptr);
 public:
+    virtual ~MtgCalculatorThread();
 	MtgCalculatorThread(int Identity,QObject* parent=nullptr);
 	void SetLoan(const Mortgage& a);
 	void SetLoanProperty(const QString& pn, const QString& pv);

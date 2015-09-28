@@ -20,6 +20,7 @@
 #include <QIcon>
 DEFINE_PUBLIC_QOBJECT_COMMONS(StressTest)
 StressTestPrivate::~StressTestPrivate(){}
+StressTest::~StressTest() {}
 StressTestPrivate::StressTestPrivate(StressTest *q)
     :BackwardInterfacePrivate(q)
 {}

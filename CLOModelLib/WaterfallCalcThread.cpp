@@ -1,6 +1,7 @@
 #include "WaterfallCalcThread.h"
 #include "Private/WaterfallCalcThread_p.h"
 WaterfallCalcThreadPrivate::~WaterfallCalcThreadPrivate() {}
+WaterfallCalcThread::~WaterfallCalcThread() {}
 WaterfallCalcThreadPrivate::WaterfallCalcThreadPrivate(WaterfallCalcThread *q)
     :AbstrAsyncThreadPrivate(q)
 {}

@@ -3,6 +3,7 @@
 #include <QThread>
 DEFINE_PUBLIC_QOBJECT_COMMONS(AbstrAsyncCalculator)
 AbstrAsyncCalculatorPrivate::~AbstrAsyncCalculatorPrivate(){}
+AbstrAsyncCalculator::~AbstrAsyncCalculator() {}
 AbstrAsyncCalculatorPrivate::AbstrAsyncCalculatorPrivate(AbstrAsyncCalculator *q)
 	:BackwardInterfacePrivate(q)
 {}

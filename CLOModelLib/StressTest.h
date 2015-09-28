@@ -28,6 +28,7 @@ protected:
 	virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 public:
     StressTest(QObject* parent = nullptr);
+    virtual ~StressTest();
 	void SetShowProgress(bool a=true);
 	bool GetShowProgress()const;
 	const QSet<QString>& GetCDRscenarios() const;

@@ -11,6 +11,7 @@ protected:
     WaterfallCalcThread(WaterfallCalcThreadPrivate* d, int ID, QObject* parent = nullptr);
 public:
 	WaterfallCalcThread(int ID,QObject* parent=nullptr);
+    virtual ~WaterfallCalcThread();
 	void SetWaterfall(const Waterfall& a);
 signals:
 	void Calculated(int,const Waterfall&);

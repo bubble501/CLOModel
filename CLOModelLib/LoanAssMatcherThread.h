@@ -13,6 +13,7 @@ protected:
     LoanAssMatcherThread(LoanAssMatcherThreadPrivate* d, int ID, QObject* parent = nullptr); 
 public:
     LoanAssMatcherThread(int ID, QObject *parent = nullptr);
+    virtual ~LoanAssMatcherThread();
 	const QString& GetModelToScan() const;
 	void SetModelToScan(const QString& val);
 	void SetAvailableAssumptions(const QHash<QString, std::shared_ptr<LoanAssumption> >& a);

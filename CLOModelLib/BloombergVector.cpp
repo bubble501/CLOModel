@@ -144,7 +144,7 @@ BloombergVector BloombergVector::operator+(const BloombergVector& Vec) const
 	else{
 		// The part of the vector up to the most recent anchor date will be discarded
         QDate MaxAnchor = qMax(d->m_AnchorDate, Vec.d_func()->m_AnchorDate);
-        QDate MaxEnd = qMax(d->m_AnchorDate.addMonths(d->m_VectVal.size()), Vec.d_func()->m_AnchorDate.addMonths(Vec.d_func()->m_VectVal.size()));
+        QDate MaxEnd = qMax(d->m_AnchorDate.addMonths(d->m_VectVal.size()-1), Vec.d_func()->m_AnchorDate.addMonths(Vec.d_func()->m_VectVal.size()-1));
 		for(QDate i=MaxAnchor;i<=MaxEnd;i=i.addMonths(1)){
 			ResultVector.append(
 				GetValue(i)
@@ -411,6 +411,21 @@ BloombergVector& BloombergVector::operator-=(double a)
 BloombergVector BloombergVector::operator-(double a) const
 {
     return operator+(-a);
+}
+
+bool BloombergVector::operator==(const BloombergVector& a)const
+{
+    Q_D(const BloombergVector);
+    if (d->m_VectVal.size() != a.d_func()->m_VectVal.size())
+        return false;
+    boost::math::tools::eps_tolerance<double> tol(std::numeric_limits<double>::digits / 2);
+    for (int i = 0; i < d->m_VectVal.size();++i){
+        if (!tol(d->m_VectVal.at(i), a.d_func()->m_VectVal.at(i)))
+            return false;
+    }
+    return 
+        AbstractBbgVect::operator==(a)
+        ;
 }
 
 BloombergVector& BloombergVector::operator+=(double a)

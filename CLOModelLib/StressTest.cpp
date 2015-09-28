@@ -914,7 +914,7 @@ void StressTest::GatherResults()
 	for (auto i = CalcRes.constBegin(); i != CalcRes.constEnd(); ++i) {
         auto MatchingAssumption = d->m_RainbowTable.constFind(*i);
         if (MatchingAssumption != d->m_RainbowTable.constEnd()) {
-            d->Results[MatchingAssumption.value()] = QSharedPointer<Waterfall>(
+            d->Results[MatchingAssumption.value()].reset(
                 new Waterfall(*(d->TranchesCalculator->GetResult(*i)))
 			);
 		}

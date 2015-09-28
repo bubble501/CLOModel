@@ -17,6 +17,7 @@
 #include <QXmlStreamReader>
 #include "BaseRateTable.h"
 #include <QTemporaryFile>
+#include <QMutexLocker>
 DEFINE_PUBLIC_QOBJECT_COMMONS(MtgCalculator)
 MtgCalculator::~MtgCalculator()
 {
@@ -39,6 +40,7 @@ MtgCalculator::MtgCalculator(MtgCalculatorPrivate *d, QObject* parent)
 
 QString MtgCalculatorPrivate::writeTempFile(const Mortgage& val) const
 {
+    QMutexLocker dataDirMutexLock(&m_dataDirMutex);
     QTemporaryFile destFile(m_dataDir.path() + '/');
     destFile.setAutoRemove(false);
     if (destFile.open()) {
@@ -53,12 +55,14 @@ QString MtgCalculatorPrivate::writeTempFile(const Mortgage& val) const
 }
 void MtgCalculatorPrivate::clearTempDir()
 {
+    QMutexLocker dataDirMutexLock(&m_dataDirMutex);
     const auto fileList = QDir(m_dataDir.path()).entryInfoList();
     for (auto i = fileList.constBegin(); i != fileList.constEnd(); ++i)
         QFile::remove(i->absoluteFilePath());
 }
 void MtgCalculatorPrivate::removeTempFile(const QString& path) const
 {
+    QMutexLocker dataDirMutexLock(&m_dataDirMutex);
     QFile::remove(path);
 }
 Mortgage MtgCalculatorPrivate::readTempFile(const QString& path) const

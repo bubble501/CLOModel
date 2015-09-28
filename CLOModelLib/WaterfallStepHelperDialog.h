@@ -2,7 +2,7 @@
 #define WATERFALLSTEPHELPERDIALOG_H
 #include <QDialog>
 #include <QHash>
-#include <QSharedPointer>
+#include <memory>
 #include "AbstractTrigger.h"
 #include "clomodellib_global.h"
 class WaterfallStepHelperDialogPrivate;
@@ -17,7 +17,7 @@ public:
 	WaterfallStepHelperDialog(QWidget *parent=nullptr);
     virtual ~WaterfallStepHelperDialog();
 	QString GetParameters();
-	void SetAvailableTriggers(const QHash<quint32, QSharedPointer<AbstractTrigger> >& AvailableTriggers);
+	void SetAvailableTriggers(const QHash<quint32, std::shared_ptr<AbstractTrigger> >& AvailableTriggers);
 	void SetCurrentPars(const QString& a);
 	const bool& GetInterestWF() const;
 	void SetInterestWF(const bool& val);

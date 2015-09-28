@@ -6,11 +6,13 @@
 #include <QHash>
 #include <QString>
 #include <QTemporaryDir>
+#include <QMutex>
 class MtgCalculatorPrivate : public AbstrAsyncCalculatorPrivate
 {
     DECLARE_PRIVATE_COMMONS(MtgCalculator)
     DECLARE_PRIVATE_COMMONS_DATASTREAM(MtgCalculator)
 public:
+    mutable QMutex m_dataDirMutex;
     QTemporaryDir m_dataDir;
     QHash<qint32, QString > m_LoansPath;
     QString m_CPRass;

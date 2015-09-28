@@ -28,7 +28,7 @@ MtgCalculatorPrivate::~MtgCalculatorPrivate()
 }
 MtgCalculatorPrivate::MtgCalculatorPrivate(MtgCalculator *q)
     :AbstrAsyncCalculatorPrivate(q)
-    , m_dataDir(QDir::tempPath())
+    , m_dataDir(QDir::tempPath() + '/')
     , m_UseStoredCashFlows(false)
     , m_DownloadScenario(false)
 {}
@@ -77,7 +77,6 @@ Mortgage MtgCalculatorPrivate::readTempFile(const QString& path) const
 void MtgCalculator::SetLoan(const Mortgage& a, qint32 Index)
 {
     Q_D(MtgCalculator);
-	RETURN_WHEN_RUNNING(true, )
 	auto FoundLn = d->m_LoansPath.find(Index);
     if (FoundLn == d->m_LoansPath.end()) {
         d->m_LoansPath.insert(Index,d->writeTempFile(a));

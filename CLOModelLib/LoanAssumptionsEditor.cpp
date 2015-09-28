@@ -1626,7 +1626,7 @@ void LoanAssumptionsEditor::AddLoanToPool(qint32 index, Mortgage& a)
     d->m_PoolModel->setData(d->m_PoolModel->index(d->m_PoolModel->rowCount() - 1, 1), a.GetProperty("Facility"), Qt::EditRole);
     d->m_PoolModel->setData(d->m_PoolModel->index(d->m_PoolModel->rowCount() - 1, 2), a.GetProperty("Scenario"), Qt::EditRole);
     d->m_PoolModel->setData(d->m_PoolModel->index(d->m_PoolModel->rowCount() - 1, 2), Qt::Checked, Qt::UserRole + Qt::CheckStateRole);
-    d->m_LoanPool.AddLoan(a, d->m_LoanPool.GetLoans().size());
+    d->m_LoanPool.SetLoan(a, d->m_LoanPool.NumBees());
 }
 
 void LoanAssumptionsEditor::LoadModel()
@@ -1670,13 +1670,15 @@ void LoanAssumptionsEditor::LoadModel()
 	LoadProgress->setValue(3);
 	file.close();
 
-    d->m_PoolModel->setRowCount(d->m_LoanPool.GetLoans().size());
+    d->m_PoolModel->setRowCount(d->m_LoanPool.NumBees());
 	int RowCounter = 0;
-    for (auto i = d->m_LoanPool.GetLoans().constBegin(); i != d->m_LoanPool.GetLoans().constEnd(); ++i, ++RowCounter) {
-        d->m_PoolModel->setData(d->m_PoolModel->index(RowCounter, 0), i.value()->GetProperty("Issuer"), Qt::EditRole);
-        d->m_PoolModel->setData(d->m_PoolModel->index(RowCounter, 0), i.key(), Qt::UserRole);
-        d->m_PoolModel->setData(d->m_PoolModel->index(RowCounter, 1), i.value()->GetProperty("Facility"), Qt::EditRole);
-        d->m_PoolModel->setData(d->m_PoolModel->index(RowCounter, 2), i.value()->GetProperty("Scenario"), Qt::EditRole);
+    const auto loanKeys=d->m_LoanPool.GetResultKeys();
+    for (auto i = loanKeys.constBegin(); i != loanKeys.constEnd(); ++i, ++RowCounter) {
+        const auto tempLoan = d->m_LoanPool.getLoan(*i);
+        d->m_PoolModel->setData(d->m_PoolModel->index(RowCounter, 0), tempLoan.GetProperty("Issuer"), Qt::EditRole);
+        d->m_PoolModel->setData(d->m_PoolModel->index(RowCounter, 0), *i, Qt::UserRole);
+        d->m_PoolModel->setData(d->m_PoolModel->index(RowCounter, 1), tempLoan.GetProperty("Facility"), Qt::EditRole);
+        d->m_PoolModel->setData(d->m_PoolModel->index(RowCounter, 2), tempLoan.GetProperty("Scenario"), Qt::EditRole);
         d->m_PoolModel->setData(d->m_PoolModel->index(RowCounter, 2), Qt::Checked, Qt::UserRole + Qt::CheckStateRole);
 	}
 	LoadProgress->setValue(4);
@@ -1841,11 +1843,14 @@ void LoanAssumptionsEditor::SavePool()
 	bool SomethingToChange = false;
     for (int i = 0; i < d->m_PoolModel->rowCount(); ++i) {
         if (d->m_PoolModel->data(d->m_PoolModel->index(i, 3), Qt::UserRole + Qt::CheckStateRole).toInt() == Qt::Checked) {
-            auto CurrLoan = d->m_LoanPool.GetLoans().value(d->m_PoolModel->data(d->m_PoolModel->index(i, 0), Qt::UserRole).toInt(), nullptr);
-			if (CurrLoan) {
+            if (d->m_LoanPool.hasLoan(d->m_PoolModel->data(d->m_PoolModel->index(i, 0), Qt::UserRole).toInt())) {
+                auto CurrLoan = d->m_LoanPool.getLoan(d->m_PoolModel->data(d->m_PoolModel->index(i, 0), Qt::UserRole).toInt());
                 auto NewScenario = d->m_PoolModel->data(d->m_PoolModel->index(i, 3), Qt::EditRole).toString();
-				if (NewScenario.isEmpty()) CurrLoan->RemoveProperty("Scenario");
-				else CurrLoan->SetProperty("Scenario", NewScenario);
+				if (NewScenario.isEmpty()) 
+                    CurrLoan.RemoveProperty("Scenario");
+				else 
+                    CurrLoan.SetProperty("Scenario", NewScenario);
+                d->m_LoanPool.SetLoan(CurrLoan, d->m_PoolModel->data(d->m_PoolModel->index(i, 0), Qt::UserRole).toInt());
 				SomethingToChange = true;
 			}
 		}
@@ -1924,7 +1929,7 @@ void LoanAssumptionsEditor::SetEnableLoad(bool a)
 int LoanAssumptionsEditor::LoanCount() const
 {
     Q_D(const LoanAssumptionsEditor);
-    return d->m_LoanPool.GetLoans().count();
+    return d->m_LoanPool.NumBees();
 }
 
 void LoanAssumptionsEditorPrivate::CreateStructureComparison()
@@ -2123,7 +2128,7 @@ void LoanAssumptionsEditor::CalculateNewStructure() {
     d->m_NewLoans->SetDelinquencyLag(d->m_LoanPool.GetDelinquencyLag());
     d->m_NewLoans->SetStartDate(d->m_LoanPool.GetStartDate());
     for (int i = 0; i < d->m_PoolModel->rowCount(); ++i) {
-        Mortgage NewLoan(*(d->m_LoanPool.GetLoans().value(d->m_PoolModel->data(d->m_PoolModel->index(i, 0), Qt::UserRole).toInt())));
+        Mortgage NewLoan(d->m_LoanPool.getLoan(d->m_PoolModel->data(d->m_PoolModel->index(i, 0), Qt::UserRole).toInt()));
         bool UseSuggestion = d->m_PoolModel->data(d->m_PoolModel->index(i, 3), Qt::UserRole + Qt::CheckStateRole).toInt() == Qt::Checked;
         QString ScenarioToApply = d->m_PoolModel->data(d->m_PoolModel->index(i, 2 + (UseSuggestion ? 1 : 0)), Qt::EditRole).toString();
 		if (!ScenarioToApply.isEmpty()) {
@@ -2132,7 +2137,7 @@ void LoanAssumptionsEditor::CalculateNewStructure() {
 				NewLoan.SetScenario(*CurrScen);
 			}
 		}
-        d->m_NewLoans->AddLoan(NewLoan, d->m_PoolModel->data(d->m_PoolModel->index(i, 0), Qt::UserRole).toInt());
+        d->m_NewLoans->SetLoan(NewLoan, d->m_PoolModel->data(d->m_PoolModel->index(i, 0), Qt::UserRole).toInt());
 	}
     d->m_NewWatFalls = new WaterfallCalculator(this);
 	

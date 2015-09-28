@@ -53,6 +53,7 @@ public:
 	BloombergVector& operator-=(double a);
 	BloombergVector& operator*=(double a);
 	BloombergVector& operator/=(double a);
+    virtual bool operator==(const BloombergVector& a) const;
 	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const BloombergVector& flows);
 	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, BloombergVector& flows);
 };

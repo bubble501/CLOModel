@@ -72,14 +72,14 @@ void LoanAssMatcherThread::run()
 	//QHash<qint32, std::shared_ptr<Mortgage> > LoanPool;
     MtgCalculator MtgCalc; MtgCalc.SetLoadProtocolVersion(VersionChecker); out >> MtgCalc;
 	ModelFile.close();
-    const auto& LoanPool = MtgCalc.GetLoans();
+    const auto& LoanPoolKeys = MtgCalc.GetResultKeys();
 
-	for (auto i = LoanPool.constBegin(); i != LoanPool.constEnd(); ++i) {
+	for (auto i = LoanPoolKeys.constBegin(); i != LoanPoolKeys.constEnd(); ++i) {
+        const auto tempLoan = MtgCalc.getLoan(*i);
         for (auto j = d->m_AvailableAssumptions->constBegin(); j != d->m_AvailableAssumptions->constEnd(); ++j) {
-			//if (j.value()->GetScenarioName().compare(i.value()->GetProperty("Scenario"),Qt::CaseInsensitive)==0) continue;
 			for (const QString& CurrProperty : LoansPropertiesToSearch) {
-				if (j.value()->MatchPattern(i.value()->GetProperty(CurrProperty))) {
-                    d->Result.AddScenario(j.value()->GetScenarioName(), i.value()->GetProperty("Scenario"), i.value()->GetProperty("Facility"), i.value()->GetProperty("Issuer"), i.key());
+                if (j.value()->MatchPattern(tempLoan.GetProperty(CurrProperty))) {
+                    d->Result.AddScenario(j.value()->GetScenarioName(), tempLoan.GetProperty("Scenario"), tempLoan.GetProperty("Facility"), tempLoan.GetProperty("Issuer"), *i);
 					break;
 				}
 			}

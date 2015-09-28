@@ -22,6 +22,7 @@
 #include <MtgCalculator.h>
 #include <QGroupBox>
 #include <IntegerVector.h>
+#include <Mortgage.h>
 StandaloneStress::StandaloneStress(QWidget *parent)
 	: QWidget(parent)
 {
@@ -230,9 +231,9 @@ void StandaloneStress::Start() {
 		}
 		ModelFile.close();
 	}
-	const QHash<qint32, std::shared_ptr<Mortgage> >& SourceLoans = TmpMtg.GetLoans();
-	for (auto i = SourceLoans.constBegin(); i != SourceLoans.constEnd(); ++i) {
-		Stresser->AddLoan(*(i.value()));
+	const auto SourceLoansKeys = TmpMtg.GetResultKeys();
+    for (auto i = SourceLoansKeys.constBegin(); i != SourceLoansKeys.constEnd(); ++i) {
+        Stresser->AddLoan(TmpMtg.getLoan(*i));
 	}
 	for (int j = 0; j < VariablesList[0]->rowCount(); j++) Stresser->AddCPRscenarios(VariablesList[0]->item(j, 0)->text());
 	for (int j = 0; j < VariablesList[1]->rowCount(); j++) Stresser->AddCDRscenarios(VariablesList[1]->item(j, 0)->text());

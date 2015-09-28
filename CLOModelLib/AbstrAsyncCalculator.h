@@ -37,7 +37,7 @@ public:
     virtual QString ReadyToCalculate() const = 0;
     virtual void SetSequentialComputation(bool a);
     virtual bool GetSequentialComputation()const;
-    virtual QList<qint32> GetResultsKeys() const;
+    virtual QList<qint32> GetResultKeys() const;
     virtual int NumBees() const = 0;
 signals :
 	void Calculated();

@@ -342,7 +342,7 @@ const MtgCalculator& StressTest::GetLoans() const
 void StressTest::AddLoan(const Mortgage& a)
 {
     Q_D( StressTest);
-    d->BaseCalculator->AddLoan(a, d->BaseCalculator->NumBees());
+    d->BaseCalculator->SetLoan(a, d->BaseCalculator->NumBees());
 }
 void StressTest::ResetLoans()
 {
@@ -910,7 +910,7 @@ void StressTest::GatherResults()
     Q_D( StressTest);
     d->Results.clear();
     d->TranchesCalculator->ClearWaterfalls();
-    const auto CalcRes = d->TranchesCalculator->GetResultsKeys();
+    const auto CalcRes = d->TranchesCalculator->GetResultKeys();
 	for (auto i = CalcRes.constBegin(); i != CalcRes.constEnd(); ++i) {
         auto MatchingAssumption = d->m_RainbowTable.constFind(*i);
         if (MatchingAssumption != d->m_RainbowTable.constEnd()) {

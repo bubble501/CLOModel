@@ -78,9 +78,15 @@ void CentralUnit::AddLoan(
 		if (KeyVal.size() != 2) continue;
 		TempMtg.SetProperty(KeyVal.first(), KeyVal.at(1));
 	}
-	LoansCalculator.AddLoan(TempMtg,LoansCalculator.NumBees());
+	LoansCalculator.SetLoan(TempMtg,LoansCalculator.NumBees());
 	if (Stresser)Stresser->AddLoan(TempMtg);
 }
+
+void CentralUnit::AddLoan(const Mortgage& TempMtg)
+{
+    LoansCalculator.SetLoan(TempMtg, LoansCalculator.NumBees());
+}
+
 #ifndef NO_BLOOMBERG
 void CentralUnit::AddTranche(const QString& Name, const QString& ProRataGroup, double MinOC, double MinIC, double Price, double FxRate, const QString& BbgExt) {
 	Tranche TempTrnch;
@@ -260,10 +266,10 @@ void CentralUnit::SetupStress(const QString& ConstPar,QList<QString> XSpann,QLis
 	Stresser->SetStartDate(PoolCutOff);
 	Structure.SetUseCall(StressToCall);
 	Stresser->SetStructure(Structure);
-	const auto& TempLoans = LoansCalculator.GetLoans();
+	const auto& TempLoans = LoansCalculator.GetResultKeys();
 	LOGDEBUG(QString("Loans in stress test: %1\nTranches in Stress: %2").arg(TempLoans.size()).arg(Stresser->GetStructure().GetTranchesCount()));
 	for (auto i = TempLoans.constBegin(); i != TempLoans.constEnd(); ++i)
-		Stresser->AddLoan(*(i.value()));
+        Stresser->AddLoan(LoansCalculator.getLoan(*i));
 	if (LastRateTable) {
 		if (m_UseForwardCurve) 
             Stresser->CompileBaseRates(*(std::dynamic_pointer_cast<ForwardBaseRateTable>(LastRateTable)));

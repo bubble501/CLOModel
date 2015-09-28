@@ -128,7 +128,7 @@ bool AbstrAsyncCalculator::GetSequentialComputation() const
     return d->m_SequentialComputation;
 }
 
-QList<qint32> AbstrAsyncCalculator::GetResultsKeys() const
+QList<qint32> AbstrAsyncCalculator::GetResultKeys() const
 {
     Q_D(const AbstrAsyncCalculator);
     return d->m_Result.keys();

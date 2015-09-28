@@ -57,7 +57,6 @@ public:
 	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const BloombergVector& flows);
 	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, BloombergVector& flows);
 };
-
 Q_DECLARE_METATYPE(BloombergVector)
 #endif // BloombergVector_h__
 

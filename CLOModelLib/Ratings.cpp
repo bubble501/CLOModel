@@ -432,7 +432,7 @@ bool Ratings::downloadRatings(const QBbgLib::QBbgAbstractResponse * const res)
         if (refResponse->header().indexOf(*i, 0, Qt::CaseInsensitive) >= 0) {
             if(refResponse->hasValue()){
                 if(!refResponse->value().toString().isEmpty()){
-                    return setRating(refResponse->value().toString(), static_cast<RatingAgency>(std::distance(std::begin(RatingsPrivate::m_ratingFields), i)));
+                    return setRating(refResponse->value().toString(), static_cast<RatingAgency>(1 << std::distance(std::begin(RatingsPrivate::m_ratingFields), i)));
                 }
             }
         }

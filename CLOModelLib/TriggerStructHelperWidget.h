@@ -1,7 +1,7 @@
 #ifndef TRIGGERSTRUCTHELPERWIDGET_H
 #define TRIGGERSTRUCTHELPERWIDGET_H
 #include <QWidget>
-#include <QSharedPointer>
+#include <memory>
 #include <QHash>
 #include "clomodellib_global.h"
 class AbstractTrigger;
@@ -16,10 +16,10 @@ protected:
 public:
     virtual ~TriggerStructHelperWidget();
     TriggerStructHelperWidget(QWidget *parent = nullptr);
-	TriggerStructHelperWidget(const QHash<quint32, QSharedPointer<AbstractTrigger> >& AvailableTriggers, QWidget *parent = nullptr);
+    TriggerStructHelperWidget(const QHash<quint32, std::shared_ptr<AbstractTrigger> >& AvailableTriggers, QWidget *parent = nullptr);
 	QString GetResult() const;
 public slots:
-	void SetAvailableTriggers(const QHash<quint32, QSharedPointer<AbstractTrigger> >& AvailableTriggers);
+    void SetAvailableTriggers(const QHash<quint32, std::shared_ptr<AbstractTrigger> >& AvailableTriggers);
 	void SetCurrentStructure(const QString& a);
 protected slots :
 	void Negate();

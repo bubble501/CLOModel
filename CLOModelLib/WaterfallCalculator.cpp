@@ -27,7 +27,7 @@ QString WaterfallCalculatorPrivate::writeTempFile(const Waterfall& val) const
         destFile.close();
         return destFile.fileName();
     }
-    Q_UNREACHABLE();
+    PrintToTempFile("PermissionError", "Could not write temporary file to save Waterfall");
     return QString();
 }
 void WaterfallCalculatorPrivate::clearTempDir()
@@ -50,15 +50,18 @@ Waterfall WaterfallCalculatorPrivate::readTempFile(const QString& path) const
         in >> result;
         sourceFile.close();
     }
+    else
+        PrintToTempFile("PermissionError", "Could not read temporary file to load Waterfall");
     return result;
 }
 void WaterfallCalculator::AddWaterfall(const Waterfall& a, qint32 ID)
 {
     Q_D(WaterfallCalculator);
-    RETURN_WHEN_RUNNING(true, )
     auto cascIter= d->m_CascadesPath.find(ID);
-    if (cascIter == d->m_CascadesPath.end())
+    if (cascIter == d->m_CascadesPath.end()) {
+        RETURN_WHEN_RUNNING(true, )
         d->m_CascadesPath.insert(ID, d->writeTempFile(a));
+    }
     else {
         d->removeTempFile(cascIter.value());
         cascIter.value() = d->writeTempFile(a);
@@ -92,8 +95,8 @@ void WaterfallCalculator::BeeReturned(int Ident, const Waterfall& a)
     Q_D(WaterfallCalculator);
     Q_ASSERT(d->m_CascadesPath.contains(Ident));
 	RETURN_WHEN_RUNNING(false, )
-	TemplAsyncCalculator <WaterfallCalcThread, Waterfall >::BeeReturned(Ident, a);
-    AddWaterfall(*TemplAsyncCalculator <WaterfallCalcThread, Waterfall >::GetResult(Ident), Ident);
+    AddWaterfall(a, Ident);
+    TemplAsyncCalculator <WaterfallCalcThread, Waterfall >::BeeReturned(Ident, a);
     auto& tempRes = getResultVoid();
     auto i = tempRes.find(Ident);
     if (i != tempRes.end())

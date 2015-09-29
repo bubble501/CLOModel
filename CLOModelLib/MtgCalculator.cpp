@@ -48,7 +48,7 @@ QString MtgCalculatorPrivate::writeTempFile(const Mortgage& val) const
         destFile.close();
         return destFile.fileName();
     }
-    Q_UNREACHABLE();
+    PrintToTempFile("PermissionError", "Could not write temporary file to save Mortgage");
     return QString();
 }
 void MtgCalculatorPrivate::clearTempDir()
@@ -71,6 +71,8 @@ Mortgage MtgCalculatorPrivate::readTempFile(const QString& path) const
         in >> result;
         sourceFile.close();
     }
+    else
+        PrintToTempFile("PermissionError", "Could not read temporary file to load Mortgage");
     return result;
 }
 
@@ -79,6 +81,7 @@ void MtgCalculator::SetLoan(const Mortgage& a, qint32 Index)
     Q_D(MtgCalculator);
 	auto FoundLn = d->m_LoansPath.find(Index);
     if (FoundLn == d->m_LoansPath.end()) {
+        RETURN_WHEN_RUNNING(true,)
         d->m_LoansPath.insert(Index,d->writeTempFile(a));
 	}
     else {

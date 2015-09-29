@@ -18,7 +18,7 @@ public:
 	CentralUnit(QObject* parent=0);
     bool SaveInputs() const;
     void SaveInputs(bool val);
-	void AddLoan(const Mortgage& TempMtg) {LoansCalculator.AddLoan(TempMtg,LoansCalculator.NumBees());}
+	void AddLoan(const Mortgage& TempMtg);
 	void AddLoan(
 		const QDate& Maturity
 		, double Size

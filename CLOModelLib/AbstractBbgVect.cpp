@@ -84,6 +84,15 @@ bool AbstractBbgVect::IsEmpty() const
     return d->m_Vector.isEmpty();
 }
 
+bool AbstractBbgVect::operator==(const AbstractBbgVect& a) const
+{
+    Q_D(const AbstractBbgVect);
+    return
+        d->m_Vector == a.d_func()->m_Vector
+        && d->m_AnchorDate == a.d_func()->m_AnchorDate
+        ;
+}
+
 AbstractBbgVect& AbstractBbgVect::operator=(const QString& a)
 {
     SetVector(a); 

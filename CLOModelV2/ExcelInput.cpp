@@ -679,7 +679,7 @@ double __stdcall GetStressDM(LPSAFEARRAY *ArrayData) {
 	return 0.0;
 }
 BSTR __stdcall WatFallStepEdit(LPSAFEARRAY *ArrayData) {
-	QHash<quint32, QSharedPointer<AbstractTrigger> >AvailableTriggers;
+	QHash<quint32, std::shared_ptr<AbstractTrigger> >AvailableTriggers;
 	VARIANT HUGEP *pdFreq;
 	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
 	if (!SUCCEEDED(hr))return NULL;
@@ -692,65 +692,65 @@ BSTR __stdcall WatFallStepEdit(LPSAFEARRAY *ArrayData) {
 		int TriggerTpe;
 		const int TriggerCount = pdFreq->intVal; pdFreq++;
         LOGDEBUG(QString("Num Triggers: %1").arg(TriggerCount));
-		QHash<quint32, QSharedPointer<AbstractTrigger> >::iterator TempIter;
+        QHash<quint32, std::shared_ptr<AbstractTrigger> >::iterator TempIter;
 		for (int i = 0; i < TriggerCount; i++) {
 			TriggerTpe = pdFreq->intVal; pdFreq++;
             LOGDEBUG(QString("Loading Trigger Type: %1").arg(TriggerTpe));
 			switch (TriggerTpe) {
 			case static_cast<int>(AbstractTrigger::TriggerType::DateTrigger) :
-				TempIter = AvailableTriggers.insert(i, QSharedPointer<AbstractTrigger>(new DateTrigger(QString::fromWCharArray(pdFreq->bstrVal)))); pdFreq++;
-				TempIter->dynamicCast<DateTrigger>()->SetLimitDate(QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal), "yyyy-MM-dd")); pdFreq++;
-				TempIter->dynamicCast<DateTrigger>()->SetSide(static_cast<DateTrigger::TriggerSide>(pdFreq->intVal)); pdFreq++;
+				TempIter = AvailableTriggers.insert(i, std::make_shared< DateTrigger>(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+                std::static_pointer_cast<DateTrigger>( *TempIter)->SetLimitDate(QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal), "yyyy-MM-dd")); pdFreq++;
+                std::static_pointer_cast < DateTrigger>(*TempIter)->SetSide(static_cast<DateTrigger::TriggerSide>(pdFreq->intVal)); pdFreq++;
 				break;
 			case static_cast<int>(AbstractTrigger::TriggerType::VectorTrigger) :
-				TempIter = AvailableTriggers.insert(i, QSharedPointer<AbstractTrigger>(new VectorTrigger(QString::fromWCharArray(pdFreq->bstrVal)))); pdFreq++;
-				TempIter->dynamicCast<VectorTrigger>()->SetTrigVector(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                TempIter = AvailableTriggers.insert(i, std::make_shared< VectorTrigger>(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+                std::static_pointer_cast<VectorTrigger>(*TempIter)->SetTrigVector(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
 				break;
 			case static_cast<int>(AbstractTrigger::TriggerType::PoolSizeTrigger) :
-				TempIter = AvailableTriggers.insert(i, QSharedPointer<AbstractTrigger>(new PoolSizeTrigger(QString::fromWCharArray(pdFreq->bstrVal)))); pdFreq++;
-				TempIter->dynamicCast<PoolSizeTrigger>()->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
-				TempIter->dynamicCast<PoolSizeTrigger>()->SetSide(static_cast<PoolSizeTrigger::TriggerSide>(pdFreq->intVal)); pdFreq++;
+                TempIter = AvailableTriggers.insert(i, std::make_shared< PoolSizeTrigger>(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+                std::static_pointer_cast<PoolSizeTrigger>(*TempIter)->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                std::static_pointer_cast<PoolSizeTrigger>(*TempIter)->SetSide(static_cast<PoolSizeTrigger::TriggerSide>(pdFreq->intVal)); pdFreq++;
 				break;
 			case static_cast<int>(AbstractTrigger::TriggerType::CumulativeLossTrigger) :
-				TempIter = AvailableTriggers.insert(i, QSharedPointer<AbstractTrigger>(new CumulativeLossTrigger(QString::fromWCharArray(pdFreq->bstrVal)))); pdFreq++;
-				TempIter->dynamicCast<CumulativeLossTrigger>()->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
-				TempIter->dynamicCast<CumulativeLossTrigger>()->SetSide(static_cast<CumulativeLossTrigger::TriggerSide>(pdFreq->intVal)); pdFreq++;
+                TempIter = AvailableTriggers.insert(i, std::make_shared< CumulativeLossTrigger>(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+                std::static_pointer_cast<CumulativeLossTrigger>(*TempIter)->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                std::static_pointer_cast<CumulativeLossTrigger>(*TempIter)->SetSide(static_cast<CumulativeLossTrigger::TriggerSide>(pdFreq->intVal)); pdFreq++;
 				break;
 			case static_cast<int>(AbstractTrigger::TriggerType::TrancheTrigger) :
-				TempIter = AvailableTriggers.insert(i, QSharedPointer<AbstractTrigger>(new TrancheTrigger(QString::fromWCharArray(pdFreq->bstrVal)))); pdFreq++;
-				TempIter->dynamicCast<TrancheTrigger>()->SetTargetSeniority(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
-				TempIter->dynamicCast<TrancheTrigger>()->SetTargetSeniorityLevel(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
-				TempIter->dynamicCast<TrancheTrigger>()->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
-				TempIter->dynamicCast<TrancheTrigger>()->SetSenioritySide(static_cast<TrancheTrigger::TriggerSenioritySide>(pdFreq->intVal)); pdFreq++;
-				TempIter->dynamicCast<TrancheTrigger>()->SetSizeSide(static_cast<TrancheTrigger::TriggerSizeSide>(pdFreq->intVal)); pdFreq++;
-				TempIter->dynamicCast<TrancheTrigger>()->SetSizeMultiplier(pdFreq->dblVal); pdFreq++;
+                TempIter = AvailableTriggers.insert(i, std::make_shared< TrancheTrigger>(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+                std::static_pointer_cast<TrancheTrigger>(*TempIter)->SetTargetSeniority(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                std::static_pointer_cast<TrancheTrigger>(*TempIter)->SetTargetSeniorityLevel(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                std::static_pointer_cast<TrancheTrigger>(*TempIter)->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                std::static_pointer_cast<TrancheTrigger>(*TempIter)->SetSenioritySide(static_cast<TrancheTrigger::TriggerSenioritySide>(pdFreq->intVal)); pdFreq++;
+                std::static_pointer_cast<TrancheTrigger>(*TempIter)->SetSizeSide(static_cast<TrancheTrigger::TriggerSizeSide>(pdFreq->intVal)); pdFreq++;
+                std::static_pointer_cast<TrancheTrigger>(*TempIter)->SetSizeMultiplier(pdFreq->dblVal); pdFreq++;
 				break;
 			case static_cast<int>(AbstractTrigger::TriggerType::DeferredInterestTrigger) :
-				TempIter = AvailableTriggers.insert(i, QSharedPointer<AbstractTrigger>(new DeferredInterestTrigger(QString::fromWCharArray(pdFreq->bstrVal)))); pdFreq++;
-				TempIter->dynamicCast<DeferredInterestTrigger>()->SetTargetSeniority(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
-				TempIter->dynamicCast<DeferredInterestTrigger>()->SetTargetSeniorityLevel(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
-				TempIter->dynamicCast<DeferredInterestTrigger>()->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
-				TempIter->dynamicCast<DeferredInterestTrigger>()->SetSenioritySide(static_cast<DeferredInterestTrigger::TriggerSenioritySide>(pdFreq->intVal)); pdFreq++;
-				TempIter->dynamicCast<DeferredInterestTrigger>()->SetSizeSide(static_cast<DeferredInterestTrigger::TriggerSizeSide>(pdFreq->intVal)); pdFreq++;
-				TempIter->dynamicCast<DeferredInterestTrigger>()->SetSizeMultiplier(pdFreq->dblVal); pdFreq++;
-				TempIter->dynamicCast<DeferredInterestTrigger>()->SetTargetCoupon(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
-				TempIter->dynamicCast<DeferredInterestTrigger>()->SetCouponSide(static_cast<DeferredInterestTrigger::TriggerCouponSide>(pdFreq->intVal)); pdFreq++;
+                TempIter = AvailableTriggers.insert(i, std::make_shared< DeferredInterestTrigger>(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+                std::static_pointer_cast<DeferredInterestTrigger>(*TempIter)->SetTargetSeniority(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                std::static_pointer_cast<DeferredInterestTrigger>(*TempIter)->SetTargetSeniorityLevel(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                std::static_pointer_cast<DeferredInterestTrigger>(*TempIter)->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                std::static_pointer_cast<DeferredInterestTrigger>(*TempIter)->SetSenioritySide(static_cast<DeferredInterestTrigger::TriggerSenioritySide>(pdFreq->intVal)); pdFreq++;
+                std::static_pointer_cast<DeferredInterestTrigger>(*TempIter)->SetSizeSide(static_cast<DeferredInterestTrigger::TriggerSizeSide>(pdFreq->intVal)); pdFreq++;
+                std::static_pointer_cast<DeferredInterestTrigger>(*TempIter)->SetSizeMultiplier(pdFreq->dblVal); pdFreq++;
+                std::static_pointer_cast<DeferredInterestTrigger>(*TempIter)->SetTargetCoupon(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                std::static_pointer_cast<DeferredInterestTrigger>(*TempIter)->SetCouponSide(static_cast<DeferredInterestTrigger::TriggerCouponSide>(pdFreq->intVal)); pdFreq++;
 				break;
 			case static_cast<int>(AbstractTrigger::TriggerType::DelinquencyTrigger) :
-				TempIter = AvailableTriggers.insert(i, QSharedPointer<AbstractTrigger>(new DelinquencyTrigger(QString::fromWCharArray(pdFreq->bstrVal)))); pdFreq++;
-				TempIter->dynamicCast<DelinquencyTrigger>()->SetTarget(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                TempIter = AvailableTriggers.insert(i, std::make_shared< DelinquencyTrigger>(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+                std::static_pointer_cast<DelinquencyTrigger>(*TempIter)->SetTarget(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
 				break;
 			case static_cast<int>(AbstractTrigger::TriggerType::DuringStressTestTrigger) :
-				AvailableTriggers.insert(i, QSharedPointer<AbstractTrigger>(new DuringStressTestTrigger(QString::fromWCharArray(pdFreq->bstrVal)))); pdFreq++;
+                AvailableTriggers.insert(i, std::make_shared< DuringStressTestTrigger>(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
 				break;
             case static_cast<int>(AbstractTrigger::TriggerType::PDLTrigger) :
-                TempIter = AvailableTriggers.insert(i, QSharedPointer<AbstractTrigger>(new PDLTrigger(QString::fromWCharArray(pdFreq->bstrVal)))); pdFreq++;
-                TempIter->dynamicCast<PDLTrigger>()->SetTargetSeniority(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
-                TempIter->dynamicCast<PDLTrigger>()->SetTargetSeniorityLevel(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
-                TempIter->dynamicCast<PDLTrigger>()->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
-                TempIter->dynamicCast<PDLTrigger>()->SetSenioritySide(static_cast<PDLTrigger::TriggerSenioritySide>(pdFreq->intVal)); pdFreq++;
-                TempIter->dynamicCast<PDLTrigger>()->SetSizeSide(static_cast<PDLTrigger::TriggerSizeSide>(pdFreq->intVal)); pdFreq++;
-                TempIter->dynamicCast<PDLTrigger>()->SetSizeMultiplier(pdFreq->dblVal); pdFreq++;
+                TempIter = AvailableTriggers.insert(i, std::make_shared< PDLTrigger>(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+                std::static_pointer_cast<PDLTrigger>(*TempIter)->SetTargetSeniority(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                std::static_pointer_cast<PDLTrigger>(*TempIter)->SetTargetSeniorityLevel(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                std::static_pointer_cast<PDLTrigger>(*TempIter)->SetTargetSize(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
+                std::static_pointer_cast<PDLTrigger>(*TempIter)->SetSenioritySide(static_cast<PDLTrigger::TriggerSenioritySide>(pdFreq->intVal)); pdFreq++;
+                std::static_pointer_cast<PDLTrigger>(*TempIter)->SetSizeSide(static_cast<PDLTrigger::TriggerSizeSide>(pdFreq->intVal)); pdFreq++;
+                std::static_pointer_cast<PDLTrigger>(*TempIter)->SetSizeMultiplier(pdFreq->dblVal); pdFreq++;
                 break;
 			default:
                 Q_UNREACHABLE(); // "Unhandled trigger type"

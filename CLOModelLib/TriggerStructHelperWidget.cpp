@@ -18,7 +18,7 @@ TriggerStructHelperWidget::~TriggerStructHelperWidget()
     delete d_ptr;
 }
 
-TriggerStructHelperWidget::TriggerStructHelperWidget(const QHash<quint32, QSharedPointer<AbstractTrigger> >& AvailableTriggers, QWidget *parent)
+TriggerStructHelperWidget::TriggerStructHelperWidget(const QHash<quint32, std::shared_ptr<AbstractTrigger> >& AvailableTriggers, QWidget *parent)
     : TriggerStructHelperWidget(parent)
 {
     SetAvailableTriggers(AvailableTriggers);
@@ -113,7 +113,7 @@ TriggerStructHelperWidget::TriggerStructHelperWidget(TriggerStructHelperWidgetPr
     d->EnableOperators(false);
 }
 
-void TriggerStructHelperWidget::SetAvailableTriggers(const QHash<quint32, QSharedPointer<AbstractTrigger> >& AvailableTriggers)
+void TriggerStructHelperWidget::SetAvailableTriggers(const QHash<quint32, std::shared_ptr<AbstractTrigger> >& AvailableTriggers)
 {
     Q_D(TriggerStructHelperWidget);
     d->TriggersModel->setRowCount(AvailableTriggers.count() + 2);

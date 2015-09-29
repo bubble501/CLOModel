@@ -130,7 +130,7 @@ WaterfallStepHelperDialog::WaterfallStepHelperDialog(WaterfallStepHelperDialogPr
 	ButtonsLay->addWidget(ClearAcceptButton);
 	ButtonsLay->addWidget(CancelButton);
 
-	d->TriggerBuilder = new TriggerStructHelperWidget(QHash<quint32, QSharedPointer<AbstractTrigger> >(), this);
+    d->TriggerBuilder = new TriggerStructHelperWidget(QHash<quint32, std::shared_ptr<AbstractTrigger> >(), this);
 	d->TriggerBuilder->setEnabled(false);
 	QGroupBox *TrigGroup = new QGroupBox(this);
 	TrigGroup->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -371,7 +371,7 @@ void WaterfallStepHelperDialog::SetbasedOnWaterfall()
 	}
 }
 
-void WaterfallStepHelperDialog::SetAvailableTriggers(const QHash<quint32, QSharedPointer<AbstractTrigger> >& AvailableTriggers)
+void WaterfallStepHelperDialog::SetAvailableTriggers(const QHash<quint32, std::shared_ptr<AbstractTrigger> >& AvailableTriggers)
 {
     Q_D(WaterfallStepHelperDialog);
     d->TriggerBuilder->SetAvailableTriggers(AvailableTriggers);

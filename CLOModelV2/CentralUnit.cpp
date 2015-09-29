@@ -78,9 +78,15 @@ void CentralUnit::AddLoan(
 		if (KeyVal.size() != 2) continue;
 		TempMtg.SetProperty(KeyVal.first(), KeyVal.at(1));
 	}
-	LoansCalculator.AddLoan(TempMtg,LoansCalculator.NumBees());
+	LoansCalculator.SetLoan(TempMtg,LoansCalculator.NumBees());
 	if (Stresser)Stresser->AddLoan(TempMtg);
 }
+
+void CentralUnit::AddLoan(const Mortgage& TempMtg)
+{
+    LoansCalculator.SetLoan(TempMtg, LoansCalculator.NumBees());
+}
+
 #ifndef NO_BLOOMBERG
 void CentralUnit::AddTranche(const QString& Name, const QString& ProRataGroup, double MinOC, double MinIC, double Price, double FxRate, const QString& BbgExt) {
 	Tranche TempTrnch;
@@ -260,10 +266,10 @@ void CentralUnit::SetupStress(const QString& ConstPar,QList<QString> XSpann,QLis
 	Stresser->SetStartDate(PoolCutOff);
 	Structure.SetUseCall(StressToCall);
 	Stresser->SetStructure(Structure);
-	const auto& TempLoans = LoansCalculator.GetLoans();
+	const auto& TempLoans = LoansCalculator.GetResultKeys();
 	LOGDEBUG(QString("Loans in stress test: %1\nTranches in Stress: %2").arg(TempLoans.size()).arg(Stresser->GetStructure().GetTranchesCount()));
 	for (auto i = TempLoans.constBegin(); i != TempLoans.constEnd(); ++i)
-		Stresser->AddLoan(*(i.value()));
+        Stresser->AddLoan(LoansCalculator.getLoan(*i));
 	if (LastRateTable) {
 		if (m_UseForwardCurve) 
             Stresser->CompileBaseRates(*(std::dynamic_pointer_cast<ForwardBaseRateTable>(LastRateTable)));
@@ -387,8 +393,7 @@ void CentralUnit::CalculationStep2()
     MtgsProgress->setAutoClose(true);
     QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
     Structure.ResetMtgFlows();
-    if (Q_LIKELY(LoansCalculator.GetAggregatedResults()))
-        Structure.AddMortgagesFlows(*LoansCalculator.GetAggregatedResults());
+    Structure.AddMortgagesFlows(LoansCalculator.GetAggregatedResults());
     Structure.SetUseCall(false);
     QString TmpStr = Structure.ReadyToCalculate();
     if (Q_UNLIKELY(!TmpStr.isEmpty())) {
@@ -434,7 +439,10 @@ void CentralUnit::CalculationStep2()
 		connect(ParallWatFalls, &WaterfallCalculator::ProgressPct, MtgsProgress, &QProgressDialog::setValue);
 		disconnect(MtgsProgress, &QProgressDialog::canceled,nullptr,nullptr);
 		connect(MtgsProgress, &QProgressDialog::canceled, ParallWatFalls, &WaterfallCalculator::StopCalculation);
-		ParallWatFalls->StartCalculation();
+        if (!ParallWatFalls->StartCalculation()) {
+            QMessageBox::critical(0, "Error", "Critical error in waterfall calculation");
+            QApplication::quit();
+        }
 	}
 
 }
@@ -443,7 +451,8 @@ void CentralUnit::CheckCalculationDone()
 	LOGDEBUG("Reached Calculation Done");
 	MtgsProgress->setValue(100);
 	QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
-	if(MtgsProgress) MtgsProgress->deleteLater();
+	if(MtgsProgress) 
+        MtgsProgress->deleteLater();
 	Tranche TempTranche;
 	if(RunCall){
 		Structure=*(ParallWatFalls->GetResult(0));
@@ -453,21 +462,13 @@ void CentralUnit::CheckCalculationDone()
 			QApplication::quit();
 			return;
 		}
+        if (Structure.GetCalculatedMtgPayments().Count() == 0 || CallStructure.GetCalculatedMtgPayments().Count() == 0) {
+            QMessageBox::critical(0, "Error", QString("Critical error in waterfall calculation, no loans cash flows in %1").arg(Structure.GetCalculatedMtgPayments().Count() == 0 ? "Extension":"Call"));
+            QApplication::quit();
+            return;
+        }
+
 	}
-	#ifdef SaveLoanTape
-	{
-		QFile file(FolderPath+"\\.Loans.clp");
-		if (file.open(QIODevice::WriteOnly)) {
-			QDataStream out(&file);
-			out.setVersion(StreamVersionUsed);
-			out << qint32(ModelVersionNumber) << LoansCalculator;
-			file.close();
-			#ifdef Q_WS_WIN
-				SetFileAttributes((FolderPath+"\\.Loans.clp").toStdWString().c_str(),FILE_ATTRIBUTE_HIDDEN);
-			#endif
-		}
-	}
-	#endif
 	QString Filename=FolderPath+"\\BaseCase.clo";
 	QFile file(Filename);
 	if (file.open(QIODevice::WriteOnly)) {

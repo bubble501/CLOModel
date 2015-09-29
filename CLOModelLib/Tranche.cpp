@@ -1179,6 +1179,7 @@ double Tranche::GetPrice(double DiscountMargin) const {
     Q_D(const Tranche);
     using namespace boost::math;
 	tools::eps_tolerance<double> tol(std::numeric_limits<double>::digits / 2);
+    
 	double StartGuess = qMax(1.0,d->Price);
 	boost::uintmax_t MaxIter(MaximumIRRIterations);
     try{

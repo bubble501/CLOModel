@@ -1,3 +1,5 @@
-HEADERS += ./RatingsTest.h
-SOURCES += ./main.cpp \
+HEADERS += ./RatingsTest.h \
+    ./BloombergVectorTest.h
+SOURCES += ./BloombergVectorTest.cpp \
+    ./main.cpp \
     ./RatingsTest.cpp

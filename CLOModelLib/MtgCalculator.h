@@ -37,13 +37,16 @@ public:
 	virtual ~MtgCalculator();
 	virtual void Reset() override;
 	virtual void ClearResults() override;
-    virtual QList<qint32> GetResultsKeys() const override;
+    virtual QList<qint32> GetResultKeys() const override;
     virtual const std::shared_ptr<MtgCashFlow> GetResult(qint32 key)const override;
 	virtual int NumBees() const override;
-	void AddLoan(const Mortgage& a, qint32 Index);
+    bool hasLoan(qint32 Index);
+	void SetLoan(const Mortgage& a, qint32 Index);
+    Mortgage getLoan(qint32 Index) const;
+/*
     const QHash<qint32, std::shared_ptr<Mortgage> >& GetLoans() const;
     QHash<qint32, std::shared_ptr<Mortgage> >& GetLoans();
-	void SetLoans(const QHash<qint32, Mortgage*>& a);
+	void SetLoans(const QHash<qint32, Mortgage*>& a);*/
 	void SetStartDate(const QDate& a);
 	const QDate& GetStartDate()const;
 	bool GetUseStoredCashFlows() const;
@@ -69,11 +72,12 @@ public:
 	void GuessLoanScenarios(bool OverrideAss);
 	void SetOverrideAssumptions(bool a);
 	bool GetOverrideAssumptions()const;
-	const MtgCashFlow* GetAggregatedResults()const;
+	MtgCashFlow GetAggregatedResults()const;
 	bool GetDownloadScenario() const;
 	void SetDownloadScenario(bool val);
     bool SaveIndividualFlows() const;
     void SaveIndividualFlows(bool val);
+    virtual void RemoveResult(qint32 Key) override;
 	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const MtgCalculator& flows);
 	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, MtgCalculator& flows);
 };

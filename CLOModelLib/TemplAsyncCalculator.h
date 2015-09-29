@@ -130,7 +130,11 @@ protected:
             auto& tempRes = getResultVoid();
         stream << GetSequentialComputation() << static_cast<qint32>(tempRes.size());
         for (auto i = tempRes.constBegin(); i != tempRes.constEnd(); ++i) {
-            stream << i.key() << *std::static_pointer_cast<ResultType>(i.value());
+            stream << i.key();
+            if (i.value())
+                stream << *std::static_pointer_cast<ResultType>(i.value());
+            else
+                stream << ResultType();
         }
         return stream;
     }

@@ -91,31 +91,31 @@ WaterfallPrivate::WaterfallPrivate(Waterfall *q,const WaterfallPrivate& other)
     for (auto i = other.m_Triggers.constBegin(); i != other.m_Triggers.constEnd(); ++i) {
         switch (i.value()->GetTriggerType()) {
         case AbstractTrigger::TriggerType::DateTrigger:
-            m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new DateTrigger(*(std::static_pointer_cast<DateTrigger>(i.value())))));
+            m_Triggers.insert(i.key(), std::make_shared< DateTrigger>(*(std::static_pointer_cast<DateTrigger>(i.value()))));
             break;
         case AbstractTrigger::TriggerType::VectorTrigger:
-            m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new VectorTrigger(*(std::static_pointer_cast<VectorTrigger>(i.value())))));
+            m_Triggers.insert(i.key(), std::make_shared< VectorTrigger>(*(std::static_pointer_cast<VectorTrigger>(i.value()))));
             break;
         case AbstractTrigger::TriggerType::PoolSizeTrigger:
-            m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new PoolSizeTrigger(*(std::static_pointer_cast<PoolSizeTrigger>(i.value())))));
+            m_Triggers.insert(i.key(), std::make_shared< PoolSizeTrigger>(*(std::static_pointer_cast<PoolSizeTrigger>(i.value()))));
             break;
         case AbstractTrigger::TriggerType::TrancheTrigger:
-            m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new TrancheTrigger(*(std::static_pointer_cast<TrancheTrigger>(i.value())))));
+            m_Triggers.insert(i.key(), std::make_shared< TrancheTrigger>(*(std::static_pointer_cast<TrancheTrigger>(i.value()))));
             break;
         case AbstractTrigger::TriggerType::DelinquencyTrigger:
-            m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new DelinquencyTrigger(*(std::static_pointer_cast<DelinquencyTrigger>(i.value())))));
+            m_Triggers.insert(i.key(), std::make_shared< DelinquencyTrigger>(*(std::static_pointer_cast<DelinquencyTrigger>(i.value()))));
             break;
         case AbstractTrigger::TriggerType::DuringStressTestTrigger:
-            m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new DuringStressTestTrigger(*(std::static_pointer_cast<DuringStressTestTrigger>(i.value())))));
+            m_Triggers.insert(i.key(), std::make_shared<DuringStressTestTrigger>(*(std::static_pointer_cast<DuringStressTestTrigger>(i.value()))));
             break;
         case AbstractTrigger::TriggerType::CumulativeLossTrigger:
-            m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new CumulativeLossTrigger(*(std::static_pointer_cast<CumulativeLossTrigger>(i.value())))));
+            m_Triggers.insert(i.key(), std::make_shared< CumulativeLossTrigger>(*(std::static_pointer_cast<CumulativeLossTrigger>(i.value()))));
             break;
         case AbstractTrigger::TriggerType::DeferredInterestTrigger:
-            m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new DeferredInterestTrigger(*(std::static_pointer_cast<DeferredInterestTrigger>(i.value())))));
+            m_Triggers.insert(i.key(), std::make_shared< DeferredInterestTrigger>(*(std::static_pointer_cast<DeferredInterestTrigger>(i.value()))));
             break;
         case AbstractTrigger::TriggerType::PDLTrigger:
-            m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new PDLTrigger(*(std::static_pointer_cast<PDLTrigger>(i.value())))));
+            m_Triggers.insert(i.key(), std::make_shared< PDLTrigger>(*(std::static_pointer_cast<PDLTrigger>(i.value()))));
             break;
         default:
             Q_UNREACHABLE(); //Unhandled Trigger Type
@@ -224,31 +224,31 @@ Waterfall& Waterfall::operator=(const Waterfall& other){
     for (auto i = other.d_func()->m_Triggers.constBegin(); i != other.d_func()->m_Triggers.constEnd(); ++i) {
         switch (i.value()->GetTriggerType()) {
         case AbstractTrigger::TriggerType::DateTrigger:
-            d->m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new DateTrigger(*(std::static_pointer_cast<DateTrigger>(i.value())))));
+            d->m_Triggers.insert(i.key(), std::make_shared< DateTrigger>(*(std::static_pointer_cast<DateTrigger>(i.value()))));
             break;
         case AbstractTrigger::TriggerType::VectorTrigger:
-            d->m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new VectorTrigger(*(std::static_pointer_cast<VectorTrigger>(i.value())))));
+            d->m_Triggers.insert(i.key(), std::make_shared< VectorTrigger>(*(std::static_pointer_cast<VectorTrigger>(i.value()))));
             break;
         case AbstractTrigger::TriggerType::PoolSizeTrigger:
-            d->m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new PoolSizeTrigger(*(std::static_pointer_cast<PoolSizeTrigger>(i.value())))));
+            d->m_Triggers.insert(i.key(), std::make_shared< PoolSizeTrigger>(*(std::static_pointer_cast<PoolSizeTrigger>(i.value()))));
             break;
         case AbstractTrigger::TriggerType::TrancheTrigger:
-            d->m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new TrancheTrigger(*(std::static_pointer_cast<TrancheTrigger>(i.value())))));
+            d->m_Triggers.insert(i.key(), std::make_shared< TrancheTrigger>(*(std::static_pointer_cast<TrancheTrigger>(i.value()))));
             break;
         case AbstractTrigger::TriggerType::DelinquencyTrigger:
-            d->m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new DelinquencyTrigger(*(std::static_pointer_cast<DelinquencyTrigger>(i.value())))));
+            d->m_Triggers.insert(i.key(), std::make_shared< DelinquencyTrigger>(*(std::static_pointer_cast<DelinquencyTrigger>(i.value()))));
             break;
         case AbstractTrigger::TriggerType::DuringStressTestTrigger:
-            d->m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new DuringStressTestTrigger(*(std::static_pointer_cast<DuringStressTestTrigger>(i.value())))));
+            d->m_Triggers.insert(i.key(), std::make_shared< DuringStressTestTrigger>(*(std::static_pointer_cast<DuringStressTestTrigger>(i.value()))));
             break;
         case AbstractTrigger::TriggerType::CumulativeLossTrigger:
-            d->m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new CumulativeLossTrigger(*(std::static_pointer_cast<CumulativeLossTrigger>(i.value())))));
+            d->m_Triggers.insert(i.key(), std::make_shared< CumulativeLossTrigger>(*(std::static_pointer_cast<CumulativeLossTrigger>(i.value()))));
             break;
         case AbstractTrigger::TriggerType::DeferredInterestTrigger:
-            d->m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new DeferredInterestTrigger(*(std::static_pointer_cast<DeferredInterestTrigger>(i.value())))));
+            d->m_Triggers.insert(i.key(), std::make_shared< DeferredInterestTrigger>(*(std::static_pointer_cast<DeferredInterestTrigger>(i.value()))));
             break;
         case AbstractTrigger::TriggerType::PDLTrigger:
-            d->m_Triggers.insert(i.key(), std::shared_ptr<AbstractTrigger>(new PDLTrigger(*(std::static_pointer_cast<PDLTrigger>(i.value())))));
+            d->m_Triggers.insert(i.key(), std::make_shared< PDLTrigger>(*(std::static_pointer_cast<PDLTrigger>(i.value()))));
             break;
         default:
             Q_UNREACHABLE(); //Unhandled Trigger Type
@@ -977,8 +977,7 @@ void Waterfall::SetReinvestementPeriod(const QDate& ReinvPer)
 {
     Q_D( Waterfall);
     d->m_ReinvestmentTest.SetReinvestementPeriod(ReinvPer);
-    std::shared_ptr<AbstractTrigger> TempReinvTrigger(new DateTrigger(ReinvPer, DateTrigger::TriggerSide::BeforeIncluding, "Reinvestment Period"));
-    SetTrigger(0, TempReinvTrigger);
+    SetTrigger(0, std::make_shared<DateTrigger>(ReinvPer, DateTrigger::TriggerSide::BeforeIncluding, "Reinvestment Period"));
 }
 double Waterfall::RedeemNotes(double AvailableFunds, int GroupTarget, int SeliorityScaleLevel, const QDate& TargetDate)
 {
@@ -2984,10 +2983,9 @@ void Waterfall::ResetTriggers()
 {
     Q_D( Waterfall);
     d->m_Triggers.clear();
-    if (!d->m_ReinvestmentTest.GetReinvestmentPeriod().isNull()) {
-        std::shared_ptr<AbstractTrigger> TempReinvTrigger(new DateTrigger(d->m_ReinvestmentTest.GetReinvestmentPeriod(), DateTrigger::TriggerSide::BeforeIncluding, "Reinvestment Period"));
-        SetTrigger(0, TempReinvTrigger);
-    }
+    if (!d->m_ReinvestmentTest.GetReinvestmentPeriod().isNull()) 
+        SetTrigger(0, std::make_shared<DateTrigger>(d->m_ReinvestmentTest.GetReinvestmentPeriod(), DateTrigger::TriggerSide::BeforeIncluding, "Reinvestment Period"));
+    
 }
 
 void Waterfall::RemoveTrigger(quint32 key)

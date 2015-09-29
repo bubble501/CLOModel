@@ -659,9 +659,9 @@ QString GenericCashFlow::ToXML() const {
 void GenericCashFlow::LoadFromXML(const QString& Source) {
     Q_D(GenericCashFlow);
 	Clear();
-	QScopedPointer<qint32> CurrrentId(nullptr);
-	QScopedPointer<QDate> CurrentDate ( nullptr);
-	QScopedPointer<double> CurrentAmt ( nullptr);
+	std::unique_ptr<qint32> CurrrentId(nullptr);
+    std::unique_ptr<QDate> CurrentDate(nullptr);
+    std::unique_ptr<double> CurrentAmt(nullptr);
 	QStack<QString> CurrentElement;
 	bool NoErrorsOccured = true;
 	QXmlStreamReader xml(Source);

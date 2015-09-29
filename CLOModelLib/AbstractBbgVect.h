@@ -28,6 +28,7 @@ public:
 	virtual const QDate& GetAnchorDate() const;
 	AbstractBbgVect& operator=(const QString& a);
 	virtual bool IsEmpty() const;
+    virtual bool operator==(const AbstractBbgVect& a) const;
 };
 
 

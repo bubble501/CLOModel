@@ -542,7 +542,7 @@ const std::shared_ptr<MtgCashFlow> MtgCalculator::GetResult(qint32 key) const
     Q_D(const MtgCalculator);
     if (d->m_LoansPath.contains(key))
         return std::make_shared<MtgCashFlow>(d->readTempFile(d->m_LoansPath.value(key)).GetCashFlow());
-    return std::shared_ptr<MtgCashFlow>();
+    return std::shared_ptr<MtgCashFlow>(nullptr);
 }
 
 int MtgCalculator::NumBees() const

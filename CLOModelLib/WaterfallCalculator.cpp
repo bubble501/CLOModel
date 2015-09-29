@@ -151,11 +151,9 @@ void WaterfallCalculator::RemoveResult(qint32 Key)
 
 const std::shared_ptr<Waterfall> WaterfallCalculator::GetResult(qint32 key) const
 {
-    if (getResultVoid().contains(key)) {
-        Q_D(const WaterfallCalculator);
-        Q_ASSERT(d->m_CascadesPath.contains(key));
+    Q_D(const WaterfallCalculator);
+    if (d->m_CascadesPath.contains(key))
         return std::make_shared<Waterfall>(d->readTempFile(d->m_CascadesPath.value(key)));
-    }
     return std::shared_ptr<Waterfall>(nullptr);
 }
 

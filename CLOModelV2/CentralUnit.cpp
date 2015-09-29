@@ -439,7 +439,10 @@ void CentralUnit::CalculationStep2()
 		connect(ParallWatFalls, &WaterfallCalculator::ProgressPct, MtgsProgress, &QProgressDialog::setValue);
 		disconnect(MtgsProgress, &QProgressDialog::canceled,nullptr,nullptr);
 		connect(MtgsProgress, &QProgressDialog::canceled, ParallWatFalls, &WaterfallCalculator::StopCalculation);
-		ParallWatFalls->StartCalculation();
+        if (!ParallWatFalls->StartCalculation()) {
+            QMessageBox::critical(0, "Error", "Critical error in waterfall calculation");
+            QApplication::quit();
+        }
 	}
 
 }
@@ -448,7 +451,8 @@ void CentralUnit::CheckCalculationDone()
 	LOGDEBUG("Reached Calculation Done");
 	MtgsProgress->setValue(100);
 	QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
-	if(MtgsProgress) MtgsProgress->deleteLater();
+	if(MtgsProgress) 
+        MtgsProgress->deleteLater();
 	Tranche TempTranche;
 	if(RunCall){
 		Structure=*(ParallWatFalls->GetResult(0));
@@ -458,21 +462,13 @@ void CentralUnit::CheckCalculationDone()
 			QApplication::quit();
 			return;
 		}
+        if (Structure.GetCalculatedMtgPayments().Count() == 0 || CallStructure.GetCalculatedMtgPayments().Count() == 0) {
+            QMessageBox::critical(0, "Error", QString("Critical error in waterfall calculation, no loans cash flows in %1").arg(Structure.GetCalculatedMtgPayments().Count() == 0 ? "Extension":"Call"));
+            QApplication::quit();
+            return;
+        }
+
 	}
-	#ifdef SaveLoanTape
-	{
-		QFile file(FolderPath+"\\.Loans.clp");
-		if (file.open(QIODevice::WriteOnly)) {
-			QDataStream out(&file);
-			out.setVersion(StreamVersionUsed);
-			out << qint32(ModelVersionNumber) << LoansCalculator;
-			file.close();
-			#ifdef Q_WS_WIN
-				SetFileAttributes((FolderPath+"\\.Loans.clp").toStdWString().c_str(),FILE_ATTRIBUTE_HIDDEN);
-			#endif
-		}
-	}
-	#endif
 	QString Filename=FolderPath+"\\BaseCase.clo";
 	QFile file(Filename);
 	if (file.open(QIODevice::WriteOnly)) {

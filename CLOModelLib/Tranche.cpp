@@ -1081,9 +1081,18 @@ bool Tranche::getDetailsDatabase()
         }
         if (CashFlowsQuery.next()) {
             const auto currRec = CashFlowsQuery.record();
-            SetReferenceRate(currRec.value("ResetIndex").toString(), 0);
-            SetDefaultRefRate(currRec.value("ResetIndex").toString());
-            SetDayCount(currRec.value("DayCount").toString(), 0);
+            if (currRec.value("ResetIndex").isNull()){
+                SetReferenceRate("ZERO", 0);
+                SetDefaultRefRate("ZERO");
+            }
+            else{
+                SetReferenceRate(currRec.value("ResetIndex").toString(), 0);
+                SetDefaultRefRate(currRec.value("ResetIndex").toString());
+            }
+            if (currRec.value("DayCount").isNull())
+                SetDayCount("102", 0);
+            else
+                SetDayCount(currRec.value("DayCount").toString(), 0);
             return true;
         }
     }

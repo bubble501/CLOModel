@@ -1041,6 +1041,58 @@ void Tranche::getCashflowsDatabase()
 #endif
 }
 
+bool Tranche::getDetailsDatabase()
+{
+    Q_D(Tranche);
+#ifndef NO_DATABASE 
+    auto allIsins = d->ISINcode;
+    if (allIsins.isEmpty())
+        allIsins << d->downloadISIN();
+    if (allIsins.constBegin()->isEmpty()) {
+        DEBG_LOG("getDetailsDatabase() Invalid ISIN");
+        return false;
+    }
+    QMutexLocker dbLocker(&Db_Mutex);
+    QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
+    if (!db.isValid()) {
+        db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype"), "TwentyFourDB");
+        db.setDatabaseName(
+            "Driver={" + GetFromConfig("Database", "Driver")
+            + "}; "
+            + GetFromConfig("Database", "DataSource")
+            );
+
+    }
+    bool DbOpen = db.isOpen();
+    if (!DbOpen) DbOpen = db.open();
+    if (!DbOpen){
+        DEBG_LOG("getDetailsDatabase() Could not open DB");
+        return false;
+    }
+    for (auto applicableIsin = allIsins.constBegin(); DbOpen && applicableIsin != allIsins.constEnd(); ++applicableIsin) {
+        QSqlQuery CashFlowsQuery(db);
+        CashFlowsQuery.setForwardOnly(true);
+        CashFlowsQuery.prepare("{CALL " + GetFromConfig("Database", "GetBondDetailsStoredProc") + "}");
+        CashFlowsQuery.bindValue(":ISIN", *applicableIsin);
+        //DEBG_LOG(QString("Asking Cash Flows Query: %1").arg(getLastExecutedQuery(CashFlowsQuery)));
+        if (!CashFlowsQuery.exec()) {
+            DEBG_LOG("getDetailsDatabase() Failed to run GetBondDetailsStoredProc");
+            return false;
+        }
+        if (CashFlowsQuery.next()) {
+            const auto currRec = CashFlowsQuery.record();
+            SetReferenceRate(currRec.value("ResetIndex").toString(), 0);
+            SetDefaultRefRate(currRec.value("ResetIndex").toString());
+            SetDayCount(currRec.value("DayCount").toString(), 0);
+            return true;
+        }
+    }
+    DEBG_LOG("getDetailsDatabase() No details in DB. ISIN: " << allIsins);
+#endif
+    return false;
+
+}
+
 const Ratings& Tranche::getRating() const
 {
     Q_D(const Tranche);

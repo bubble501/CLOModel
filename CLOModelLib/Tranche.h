@@ -133,6 +133,7 @@ public:
     double getActualCoupon(int index, qint32 CouponIdx) const;
     bool saveCashflowsDatabase() const;
     void getCashflowsDatabase();
+    bool getDetailsDatabase();
     const Ratings& getRating() const;
     void setRating(const Ratings& val);
     void getRatingsBloomberg();

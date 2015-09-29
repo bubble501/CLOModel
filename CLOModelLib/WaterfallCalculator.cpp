@@ -103,7 +103,8 @@ void WaterfallCalculator::BeeReturned(int Ident, const Waterfall& a)
         i.value().reset();
 	WaterfallCalcThread* CurrentThread;
     for (auto SingleWaterfall = d->m_CascadesPath.begin(); SingleWaterfall != d->m_CascadesPath.end(); ++SingleWaterfall) {
-        if (d->BeesSent.contains(SingleWaterfall.key())) continue;
+        if (d->BeesSent.contains(SingleWaterfall.key())) 
+            continue;
 		CurrentThread = AddThread(SingleWaterfall.key());
         CurrentThread->SetWaterfall(d->readTempFile(SingleWaterfall.value()));
 		CurrentThread->start();

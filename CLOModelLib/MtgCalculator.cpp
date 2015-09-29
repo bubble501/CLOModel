@@ -223,7 +223,7 @@ bool MtgCalculator::StartCalculation()
 
     d->BeesReturned = 0;
     d->BeesSent.clear();
-    d->m_ContinueCalculation = true;
+    setContinueCalculation(true);
 	int NumberOfThreads = availableThreads();
     if (d->m_SequentialComputation || NumberOfThreads < 1) NumberOfThreads = 1;
 	int NumofSent = 0;
@@ -269,7 +269,8 @@ void MtgCalculator::BeeReturned(int Ident, const MtgCashFlow& a) {
     auto i = tempRes.find(Ident);
     if (i != tempRes.end())
         i.value().reset();
-    if (!d->m_ContinueCalculation)return;
+    if (!ContinueCalculation())
+        return;
 	MtgCalculatorThread* CurrentThread;
     for (auto SingleLoan = d->m_LoansPath.constBegin(); SingleLoan != d->m_LoansPath.constEnd(); ++SingleLoan) {
         if (d->BeesSent.contains(SingleLoan.key())) continue;
@@ -327,7 +328,7 @@ QString MtgCalculator::ReadyToCalculate()const{
 }
 
 QDataStream& operator<<(QDataStream & stream, const MtgCalculator& flows) {
-	if (flows.d_func()->m_ContinueCalculation) return stream;
+    Q_ASSERT(!flows.ContinueCalculation());
 	stream
         << static_cast<qint32>(flows.d_func()->m_LoansPath.size())
         << flows.d_func()->m_UseStoredCashFlows

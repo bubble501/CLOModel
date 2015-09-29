@@ -53,7 +53,7 @@ bool ScenarioApplier::StartCalculation()
     d->BeesSent.clear();
 	ClearResults();
 	if (!ReadyToCalculate().isEmpty()) return false;
-    d->m_ContinueCalculation = true;
+    setContinueCalculation ( true);
 	int NumberOfThreads = availableThreads();
     if (d->m_SequentialComputation || NumberOfThreads < 1) NumberOfThreads = 1;
 	int NumofSent = 0;
@@ -131,7 +131,7 @@ QString ScenarioApplier::ReadyToCalculate()const
 }
 
 QDataStream& operator<<(QDataStream & stream, const ScenarioApplier& flows) {
-	if (flows.d_func()->m_ContinueCalculation) return stream;
+	Q_ASSERT (!flows.ContinueCalculation()) ;
     stream << flows.d_func()->m_BaseFlows;
     stream << static_cast<qint32>(flows.d_func()->m_Scenarios.size());
     for (auto i = flows.d_func()->m_Scenarios.constBegin(); i != flows.d_func()->m_Scenarios.constEnd(); ++i) {

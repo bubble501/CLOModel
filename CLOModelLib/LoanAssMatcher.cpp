@@ -200,7 +200,7 @@ bool LoanAssMatcher::StartCalculation()
     d->m_FilesInFolder = Source.entryInfoList();
     d->BeesReturned = 0;
     d->BeesSent.clear();
-    d->m_ContinueCalculation = true;
+    setContinueCalculation (true);
 	int NumberOfThreads = availableThreads();
     if (d->m_SequentialComputation || NumberOfThreads < 1) NumberOfThreads = 1;
 	LoanAssMatcherThread* CurrentThread;
@@ -262,7 +262,7 @@ void LoanAssMatcher::ClearFilesInFolder()
 
 QDataStream& operator<<(QDataStream & stream, const LoanAssMatcher& flows)
 {
-	if (flows.d_func()->m_ContinueCalculation) return stream;
+	Q_ASSERT (!flows.ContinueCalculation()) ;
     stream << flows.d_func()->m_FolderToScan << qint32(flows.d_func()->m_AvailableAssumptions.size());
     for (auto i = flows.d_func()->m_AvailableAssumptions.constBegin(); i != flows.d_func()->m_AvailableAssumptions.constEnd(); ++i) {
 		stream << i.key() << *(i.value());

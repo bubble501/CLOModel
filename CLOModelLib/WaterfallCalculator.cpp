@@ -75,7 +75,7 @@ bool WaterfallCalculator::StartCalculation()
         d->BeesReturned = 0;
     d->BeesSent.clear();
 	if (!ReadyToCalculate().isEmpty()) return false;
-    d->m_ContinueCalculation = true;
+    setContinueCalculation (true);
 	int NumberOfThreads = availableThreads();
     if (d->m_SequentialComputation || NumberOfThreads < 1) NumberOfThreads = 1;
 	int NumofSent = 0;
@@ -168,8 +168,7 @@ void WaterfallCalculator::ClearResults()
 
 QDataStream& operator<<(QDataStream & stream, const WaterfallCalculator& flows)
 {
-    if (flows.d_func()->m_ContinueCalculation) 
-        return stream;
+    Q_ASSERT(!flows.ContinueCalculation());
     stream << static_cast<qint32>(flows.d_func()->m_CascadesPath.size());
     for (auto i = flows.d_func()->m_CascadesPath.constBegin(); i != flows.d_func()->m_CascadesPath.constEnd(); i++) {
         stream << i.key() << flows.d_func()->readTempFile(i.value());

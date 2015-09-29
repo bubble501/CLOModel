@@ -28,7 +28,7 @@ AbstrAsyncCalculator::AbstrAsyncCalculator(AbstrAsyncCalculatorPrivate *d, QObje
 {
     d->m_SequentialComputation = false;
     d->BeesReturned = 0;
-    d->m_ContinueCalculation = false;
+    setContinueCalculation(false);
     connect(this, &AbstrAsyncCalculator::Progress, this, &AbstrAsyncCalculator::SendPctSignal);
 }
 
@@ -100,7 +100,7 @@ bool AbstrAsyncCalculator::ContinueCalculation() const
     return  d->m_ContinueCalculation;
 }
 
-void AbstrAsyncCalculator::ContinueCalculation(bool val)
+void AbstrAsyncCalculator::setContinueCalculation(bool val)
 {
     Q_D(AbstrAsyncCalculator);
     d->m_ContinueCalculation = val;
@@ -141,7 +141,6 @@ void AbstrAsyncCalculator::SendPctSignal(double a)
 
 void AbstrAsyncCalculator::StopCalculation()
 {
-    Q_D(AbstrAsyncCalculator);
-    d->m_ContinueCalculation = false; 
+    setContinueCalculation(false); 
     emit Stopped();
 }

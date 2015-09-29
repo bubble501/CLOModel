@@ -29,7 +29,7 @@ public:
     }
     virtual void Reset()
     {
-        ContinueCalculation(false);
+        setContinueCalculation(false);
         ThreadType* CurrentRunning;
         auto& tempThreadPool = getThreadPool();
         for (auto j = tempThreadPool.begin(); j != tempThreadPool.end();) {
@@ -118,7 +118,7 @@ protected:
         emit BeeCalculated(Ident);
         emit Progress(static_cast<double>(getBeesReturned()) / static_cast<double>(NumBees()));
         if (getBeesReturned() == NumBees() && ContinueCalculation()) {
-            ContinueCalculation(false);
+            setContinueCalculation(false);
             emit Calculated();
         }
     }

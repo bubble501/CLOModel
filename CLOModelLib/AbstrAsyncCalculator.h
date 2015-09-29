@@ -27,7 +27,7 @@ protected:
     virtual const std::shared_ptr<void> getResultVoid(qint32 key)const;
     virtual void insertResult(qint32 Key, void* val);
     virtual bool ContinueCalculation() const;
-    virtual void ContinueCalculation(bool val);
+    virtual void setContinueCalculation(bool val);
     virtual int availableThreads() const;
 public:
     virtual quint8 operativity() const;

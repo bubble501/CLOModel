@@ -62,7 +62,8 @@ HRESULT ExcelOutput::PrintMortgagesRepLines(
 				for (int i = 0; i < Numrows; i++)
 				{
 					pdFreq->vt = VT_BSTR;
-					pdFreq->bstrVal = SysAllocString(source.GetDate(i).toString("yyyy-MM-dd").toStdWString().c_str());
+                    Q_ASSERT(!source.GetDate(i).isNull());      
+					pdFreq->bstrVal = SysAllocString(source.GetDate(i).toString(Qt::ISODate).toStdWString().c_str());
 					pdFreq++;
 				}
 			}

@@ -806,11 +806,11 @@ bool MtgCalculator::GetOverrideAssumptions() const
         d->m_OverrideAssumptions;
 }
 
-const MtgCashFlow* MtgCalculator::GetAggregatedResults() const
+MtgCashFlow MtgCalculator::GetAggregatedResults() const
 {
     Q_D(const MtgCalculator);
-    RETURN_WHEN_RUNNING(true, nullptr) 
-        return &(d->m_AggregatedRes);
+    RETURN_WHEN_RUNNING(true, MtgCashFlow())
+        return d->m_AggregatedRes;
 }
 
 bool MtgCalculator::GetDownloadScenario() const

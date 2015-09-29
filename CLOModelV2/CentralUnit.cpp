@@ -393,8 +393,7 @@ void CentralUnit::CalculationStep2()
     MtgsProgress->setAutoClose(true);
     QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
     Structure.ResetMtgFlows();
-    if (Q_LIKELY(LoansCalculator.GetAggregatedResults()))
-        Structure.AddMortgagesFlows(*LoansCalculator.GetAggregatedResults());
+    Structure.AddMortgagesFlows(LoansCalculator.GetAggregatedResults());
     Structure.SetUseCall(false);
     QString TmpStr = Structure.ReadyToCalculate();
     if (Q_UNLIKELY(!TmpStr.isEmpty())) {

@@ -2152,12 +2152,14 @@ void LoanAssumptionsEditor::CalculateNewStructure() {
     connect(d->m_NewLoans, &MtgCalculator::Calculated, [&]() {
         d_func()->m_NewWtfToExtension = d_func()->m_WtfToExtension;
         d_func()->m_NewWtfToExtension.ResetMtgFlows();
-        if (d_func()->m_NewLoans->GetAggregatedResults()) d_func()->m_NewWtfToExtension.AddMortgagesFlows(*d_func()->m_NewLoans->GetAggregatedResults());
+        if (d_func()->m_NewLoans->GetAggregatedResults().Count()>0) 
+            d_func()->m_NewWtfToExtension.AddMortgagesFlows(d_func()->m_NewLoans->GetAggregatedResults());
         d_func()->m_NewWatFalls->AddWaterfall(d_func()->m_NewWtfToExtension, 0);
         d_func()->m_NewWtfToCall = d_func()->m_WtfToCall;
         if (d_func()->m_WtfToCall.GetTranchesCount() > 0) {
             d_func()->m_NewWtfToCall.ResetMtgFlows();
-            if (d_func()->m_NewLoans->GetAggregatedResults()) d_func()->m_NewWtfToCall.AddMortgagesFlows(*d_func()->m_NewLoans->GetAggregatedResults());
+            if (d_func()->m_NewLoans->GetAggregatedResults().Count()>0) 
+                d_func()->m_NewWtfToCall.AddMortgagesFlows(d_func()->m_NewLoans->GetAggregatedResults());
             d_func()->m_NewWatFalls->AddWaterfall(d_func()->m_NewWtfToCall, 1);
 		}
         if (!d_func()->m_NewWatFalls->StartCalculation()) { QMessageBox::critical(this, tr("Error"), tr("An error occurred during the calculations of liabilities cash flows")); }

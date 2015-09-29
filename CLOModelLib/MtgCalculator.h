@@ -72,7 +72,7 @@ public:
 	void GuessLoanScenarios(bool OverrideAss);
 	void SetOverrideAssumptions(bool a);
 	bool GetOverrideAssumptions()const;
-	const MtgCashFlow* GetAggregatedResults()const;
+	MtgCashFlow GetAggregatedResults()const;
 	bool GetDownloadScenario() const;
 	void SetDownloadScenario(bool val);
     bool SaveIndividualFlows() const;

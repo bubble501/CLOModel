@@ -28,7 +28,7 @@ MtgCalculatorPrivate::~MtgCalculatorPrivate()
 }
 MtgCalculatorPrivate::MtgCalculatorPrivate(MtgCalculator *q)
     :AbstrAsyncCalculatorPrivate(q)
-    , m_dataDir(QDir::tempPath() + '/')
+    , m_dataDir(QDir::tempPath() + "/CLOModel/")
     , m_UseStoredCashFlows(false)
     , m_DownloadScenario(false)
 {}

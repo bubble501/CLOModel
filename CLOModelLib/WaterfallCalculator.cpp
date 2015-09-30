@@ -5,7 +5,7 @@ DEFINE_PUBLIC_QOBJECT_COMMONS(WaterfallCalculator)
 WaterfallCalculatorPrivate::~WaterfallCalculatorPrivate() {}
 WaterfallCalculatorPrivate::WaterfallCalculatorPrivate(WaterfallCalculator *q)
     :AbstrAsyncCalculatorPrivate(q)
-    ,m_dataDir(QDir::tempPath()+'/')
+    , m_dataDir(QDir::tempPath() + "/CLOModel/")
 {}
 WaterfallCalculator::WaterfallCalculator(WaterfallCalculatorPrivate *d, QObject* parent)
     : TemplAsyncCalculator <WaterfallCalcThread, Waterfall>(d, parent)

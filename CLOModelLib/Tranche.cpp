@@ -1090,7 +1090,7 @@ bool Tranche::getDetailsDatabase()
                 SetDefaultRefRate(currRec.value("ResetIndex").toString());
             }
             if (currRec.value("DayCount").isNull())
-                SetDayCount("102", 0);
+                SetDayCount(QString(), 0);
             else
                 SetDayCount(currRec.value("DayCount").toString(), 0);
             return true;

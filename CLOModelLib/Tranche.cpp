@@ -1073,7 +1073,7 @@ bool Tranche::getDetailsDatabase()
         QSqlQuery CashFlowsQuery(db);
         CashFlowsQuery.setForwardOnly(true);
         CashFlowsQuery.prepare("{CALL " + GetFromConfig("Database", "GetBondDetailsStoredProc") + "}");
-        CashFlowsQuery.bindValue(":ISIN", *applicableIsin);
+        CashFlowsQuery.bindValue(":isin", *applicableIsin);
         //DEBG_LOG(QString("Asking Cash Flows Query: %1").arg(getLastExecutedQuery(CashFlowsQuery)));
         if (!CashFlowsQuery.exec()) {
             DEBG_LOG("getDetailsDatabase() Failed to run GetBondDetailsStoredProc");

@@ -33,8 +33,8 @@ public:
     QString GetFloor(int index) const;
     QString GetCap(const QDate& index) const;
     QString GetCap(int index) const;
-	BloombergVector CompileReferenceRateValue(ConstantBaseRateTable& Values) const;
-	BloombergVector CompileReferenceRateValue(ForwardBaseRateTable& Values) const;
+    BloombergVector CompileReferenceRateValue(ConstantBaseRateTable& Values, bool fallOnBbg = true) const;
+    BloombergVector CompileReferenceRateValue(ForwardBaseRateTable& Values, bool fallOnBbg = true) const;
 	BloombergVector GetRefRateValueFromBloomberg(ConstantBaseRateTable& Values)const;
 	BloombergVector GetRefRateValueFromBloomberg(ForwardBaseRateTable& Values)const;
 	BloombergVector GetBaseRatesDatabase(ConstantBaseRateTable& ReferencesValues, bool DownloadAll=false) const;

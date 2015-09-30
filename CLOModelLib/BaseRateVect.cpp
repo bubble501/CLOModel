@@ -185,7 +185,7 @@ void BaseRateVector::RepackVector()
     Q_ASSERT(IsValid());
 }
 
-BloombergVector BaseRateVector::CompileReferenceRateValue(ForwardBaseRateTable& Values) const
+BloombergVector BaseRateVector::CompileReferenceRateValue(ForwardBaseRateTable& Values, bool fallOnBbg) const
 {
     Q_D(const BaseRateVector);
 	BloombergVector Result;
@@ -193,35 +193,37 @@ BloombergVector BaseRateVector::CompileReferenceRateValue(ForwardBaseRateTable& 
     QStringList StringParts = d->m_Vector.trimmed().toUpper().split(QRegularExpression("\\s"), QString::SkipEmptyParts);
 	int StepLen = 0;
 	QString TempStr;
-	if (!Values.GetValues().contains(StringParts.first()) || Values.GetValues().value(StringParts.first()).IsEmpty())
-#ifdef NO_BLOOMBERG
-		return BloombergVector();
-#else
-		return GetRefRateValueFromBloomberg(Values);
-#endif
+    if (!Values.GetValues().contains(StringParts.first()) || Values.GetValues().value(StringParts.first()).IsEmpty()) {
+        if (fallOnBbg)
+            return GetRefRateValueFromBloomberg(Values);
+        return BloombergVector();
+    }
 	Result = Values.GetValues().value(StringParts.first());
 	for (int i = 1; i < StringParts.size(); i += 2) {
 		TempStr = StringParts.at(i);
 		TempStr.replace(QRegularExpression("\\D"), "");
 		StepLen = TempStr.toInt();
-		if (!Values.GetValues().contains(StringParts.at(i + 1)) || Values.GetValues().value(StringParts.at(i + 1)).IsEmpty())
-#ifdef NO_BLOOMBERG
-			return BloombergVector();
-#else
-			return GetRefRateValueFromBloomberg(Values);
-#endif
+        if (!Values.GetValues().contains(StringParts.at(i + 1)) || Values.GetValues().value(StringParts.at(i + 1)).IsEmpty()) {
+            if (fallOnBbg)
+                return GetRefRateValueFromBloomberg(Values);
+            return BloombergVector();
+        }
 		Result.Combine(Values.GetValues().value(StringParts.at(i + 1)), StepLen);
 	}
 	Result.ApplyFloorCap(ExtractFloorCapVector());
 	return Result;
 }
-BloombergVector BaseRateVector::CompileReferenceRateValue(ConstantBaseRateTable& Values) const {
+BloombergVector BaseRateVector::CompileReferenceRateValue(ConstantBaseRateTable& Values, bool fallOnBbg) const
+{
     Q_D(const BaseRateVector);
-	if (IsEmpty())return BloombergVector();
+	if (IsEmpty())
+        return BloombergVector();
 	QString ResultingVector("");
 	for (int i = 0; i < NumElements(); i++) {
 		if (!Values.Contains(GetValue(i))) {
-			return GetRefRateValueFromBloomberg(Values);
+            if(fallOnBbg)
+			    return GetRefRateValueFromBloomberg(Values);
+            return BloombergVector();
 		}
 	}
 	const QHash<QString, double>& Sobstitutes = Values.GetValues();
@@ -289,7 +291,7 @@ BloombergVector BaseRateVector::GetRefRateValueFromBloomberg(ConstantBaseRateTab
         if(MinUpdateDate.isValid())
             Values.SetUpdateDate(MinUpdateDate);
 	}
-	return CompileReferenceRateValue(Values);
+	return CompileReferenceRateValue(Values,false);
 #endif
 }
 BloombergVector BaseRateVector::GetRefRateValueFromBloomberg(ForwardBaseRateTable& Values)const {
@@ -300,7 +302,7 @@ BloombergVector BaseRateVector::GetRefRateValueFromBloomberg(ForwardBaseRateTabl
 	ConstantBaseRateTable BloombergRates(Values);
 	GetRefRateValueFromBloomberg(BloombergRates);
 	Values += BloombergRates;
-	return CompileReferenceRateValue(Values);
+	return CompileReferenceRateValue(Values,false);
 #endif
 }
 
@@ -366,7 +368,8 @@ BloombergVector BaseRateVector::GetBaseRatesDatabase(ForwardBaseRateTable& Refer
 	for (int i = 0; i < NumElements() && AllRefFound; i++) {
 		if (!ReferencesValues.GetValues().contains(GetValue(i))) AllRefFound = false;
 	}
-	if (AllRefFound) return CompileReferenceRateValue(ReferencesValues);
+	if (AllRefFound)
+        return CompileReferenceRateValue(ReferencesValues);
 	QDate MinUpdateDate;
 	QMutexLocker DbLocker(&Db_Mutex);
 	QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);

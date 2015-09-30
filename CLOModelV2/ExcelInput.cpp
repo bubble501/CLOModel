@@ -372,6 +372,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 				TempUnit.CompileBaseRates(CompilationTable);
 #endif // NO_BLOOMBERG
 #endif // NO_DATABASE
+                LOGDEBUG("Compiled Base Rates");
 			}
 			else {
 				ConstantBaseRateTable CompilationTable;

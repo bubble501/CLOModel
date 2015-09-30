@@ -448,7 +448,8 @@ const QString& MtgCalculator::GetDelinquency() const
 void MtgCalculator::SetDelinquency(const QString& val)
 {
     Q_D( MtgCalculator);
-    RETURN_WHEN_RUNNING(true, )d->m_Delinquency = val;
+    RETURN_WHEN_RUNNING(true, )
+        d->m_Delinquency = val;
 }
 
 const QString& MtgCalculator::GetDelinquencyLag() const
@@ -460,7 +461,8 @@ const QString& MtgCalculator::GetDelinquencyLag() const
 void MtgCalculator::SetDelinquencyLag(const QString& val)
 {
     Q_D( MtgCalculator);
-    RETURN_WHEN_RUNNING(true, ) d->m_DelinquencyLag = val;
+    RETURN_WHEN_RUNNING(true, ) 
+        d->m_DelinquencyLag = val;
 }
 
 void MtgCalculator::CompileReferenceRateValue(ForwardBaseRateTable& Values)
@@ -492,29 +494,6 @@ void MtgCalculator::GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool Down
 QDataStream& operator>>(QDataStream & stream, MtgCalculator& flows) {
 	return flows.LoadOldVersion(stream);
 }
-
-/*
-QHash<qint32, std::shared_ptr<Mortgage> >& MtgCalculator::GetLoans()
-{
-    Q_D( MtgCalculator);
-    return d->Loans;
-}
-
-const QHash<qint32, std::shared_ptr<Mortgage> >& MtgCalculator::GetLoans() const
-{
-    Q_D(const MtgCalculator);
-    return d->Loans;
-}
-
-void MtgCalculator::SetLoans(const QHash<qint32, Mortgage*>& a)
-{
-    Q_D( MtgCalculator);
-	RETURN_WHEN_RUNNING(true, )
-	ClearLoans();
-	for (auto i = a.constBegin(); i != a.constEnd(); ++i) {
-        d->Loans.insert(i.key(), std::make_shared<Mortgage>(*(i.value())));
-	}
-}*/
 
 void MtgCalculator::SetStartDate(const QDate& a)
 {

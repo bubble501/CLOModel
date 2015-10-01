@@ -4,13 +4,13 @@
 #include "Private/AbstrAsyncCalculator_p.h"
 #include "WaterfallCalculator.h"
 #include <QHash>
-#include <QTemporaryDir>
+#include "Private/CheckedTempDir.h"
 class WaterfallCalculatorPrivate : public AbstrAsyncCalculatorPrivate
 {
     DECLARE_PRIVATE_COMMONS(WaterfallCalculator)
     DECLARE_PRIVATE_COMMONS_DATASTREAM(WaterfallCalculator)
 public:
-    QTemporaryDir m_dataDir;
+    CheckedTempDir m_dataDir;
     QHash<qint32, QString > m_CascadesPath;
     QString writeTempFile(const Waterfall& val) const;
     Waterfall readTempFile(const QString& path) const;

@@ -389,6 +389,9 @@
     <ClInclude Include="Private\Ratings_p.h">
       <Filter>Privates\Common Items</Filter>
     </ClInclude>
+    <ClInclude Include="Private\CheckedTempDir.h">
+      <Filter>Privates\Common Items</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BackwardCompatibilityInterface.cpp">

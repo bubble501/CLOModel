@@ -126,6 +126,7 @@ HEADERS += ./AbstractBbgVect.h \
     ./Private/StressTest_p.h \
     ./Private/AssumptionSet_p.h \
     ./Private/Ratings_p.h \
+    ./Private/CheckedTempDir.h \
     ./Private/InternalItems.h
 SOURCES += ./AbstractBbgVect.cpp \
     ./BaseRateVect.cpp \

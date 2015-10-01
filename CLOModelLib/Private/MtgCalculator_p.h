@@ -5,13 +5,13 @@
 #include "MtgCalculator.h"
 #include <QHash>
 #include <QString>
-#include <QTemporaryDir>
+#include "Private/CheckedTempDir.h"
 class MtgCalculatorPrivate : public AbstrAsyncCalculatorPrivate
 {
     DECLARE_PRIVATE_COMMONS(MtgCalculator)
     DECLARE_PRIVATE_COMMONS_DATASTREAM(MtgCalculator)
 public:
-    QTemporaryDir m_dataDir;
+    CheckedTempDir m_dataDir;
     QHash<qint32, QString > m_LoansPath;
     QString m_CPRass;
     QString m_CDRass;

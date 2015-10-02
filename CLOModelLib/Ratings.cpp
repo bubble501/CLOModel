@@ -72,6 +72,27 @@ bool Ratings::compare(const Ratings& other, CompareOption opt) const
     return result;
 }
 
+bool Ratings::compare(const Ratings& other, CompareOption opt, RatingAgencies agencies) const
+{
+    Q_D(const Ratings);
+    bool result = true;
+    if (opt & CompareOption::CompareRating){
+        int counter = 0;
+        for (auto i = std::begin(d->m_ratings); result && i != std::end(d->m_ratings); ++i, ++counter) {
+            if (agencies & static_cast<RatingAgency>(1 << counter))
+                result = result && (*i == other.d_func()->m_ratings[counter]);
+        }
+    }  
+    if (opt & CompareOption::CompareWatch){
+        int counter = 0;
+        for (auto i = std::begin(d->m_watch); result && i != std::end(d->m_watch); ++i, ++counter) {
+            if (agencies & static_cast<RatingAgency>(1 << counter))
+                result = result && (*i == other.d_func()->m_watch[counter]);
+        }
+    }
+    return result;
+}
+
 QString Ratings::agencyName(RatingAgency ag)
 {
     for (qint32 i = 0;; ++i) {

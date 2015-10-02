@@ -2,6 +2,7 @@
 #include "Private/Ratings_p.h"
 #include <numeric>
 #include <QRegularExpression>
+#include <QDate>
 #ifndef NO_BLOOMBERG
 #include <QbbgReferenceDataRequest.h>
 #include <QBbgSecurity.h>
@@ -10,6 +11,13 @@
 #include <QBbgRequestGroup.h>
 #include <QVariant>
 #endif
+#ifndef NO_DATABASE
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QSqlRecord>
+#include <QVariant>
+#endif
+#include "InternalItems.h"
 DEFINE_PUBLIC_COMMONS(Ratings)
 DEFINE_PUBLIC_COMMONS_COPY(Ratings)
 Ratings::~Ratings()
@@ -438,6 +446,87 @@ bool Ratings::downloadRatings(const QBbgLib::QBbgAbstractResponse * const res)
         }
     }
     return false;
+}
+
+bool Ratings::saveToDatabase(const QString& isin) const
+{
+#ifndef NO_DATABASE
+    if (isin.isEmpty())
+        return false;
+    QMutexLocker dbLocker(&Db_Mutex);
+    QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
+    if (!db.isValid()) {
+        db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype"), "TwentyFourDB");
+        db.setDatabaseName(
+            "Driver={" + GetFromConfig("Database", "Driver")
+            + "}; "
+            + GetFromConfig("Database", "DataSource")
+            );
+
+    }
+    bool DbOpen = db.isOpen();
+    if (!DbOpen) DbOpen = db.open();
+    if (DbOpen) {
+        for (int i = 0; i != CountRatingAcencies; ++i) {
+            const RatingValue currRtg = getRating(static_cast<RatingAgency>(1 << i));
+            QSqlQuery CheckBondExistQuery(db);
+            CheckBondExistQuery.setForwardOnly(true);
+            CheckBondExistQuery.prepare("{CALL " + GetFromConfig("Database", "AddRatingHistoryStoredProc") + "}");
+            CheckBondExistQuery.bindValue(":isin", isin);
+            CheckBondExistQuery.bindValue(":agency", agencyName(static_cast<RatingAgency>(1 << i)));
+            CheckBondExistQuery.bindValue(":rating", static_cast<qint32>(currRtg));
+            CheckBondExistQuery.bindValue(":watch", static_cast<qint8>(getWatch(static_cast<RatingAgency>(1 << i))));
+            if (!CheckBondExistQuery.exec())
+                return false;
+        }
+        return true;
+    }
+#endif
+    return false;
+}
+
+void Ratings::getFromDatabase(const QString& isin)
+{
+    getFromDatabase(isin, QDate::currentDate());
+}
+
+void Ratings::getFromDatabase(const QString& isin, const QDate& refDate)
+{
+    reset();
+#ifndef NO_DATABASE
+    Q_D(Ratings);
+    QMutexLocker dbLocker(&Db_Mutex);
+    QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
+    if (!db.isValid()) {
+        db = QSqlDatabase::addDatabase(GetFromConfig("Database", "DBtype"), "TwentyFourDB");
+        db.setDatabaseName(
+            "Driver={" + GetFromConfig("Database", "Driver")
+            + "}; "
+            + GetFromConfig("Database", "DataSource")
+            );
+    }
+    bool DbOpen = db.isOpen();
+    if (!DbOpen) DbOpen = db.open();
+    if (DbOpen) {
+        QSqlQuery getRatingQuery(db);
+        getRatingQuery.setForwardOnly(true);
+        getRatingQuery.prepare("{CALL " + GetFromConfig("Database", "GetRatingStoredProc") + "}");
+        getRatingQuery.bindValue(":isin", isin);
+        getRatingQuery.bindValue(":referenceDate", refDate.toString(Qt::ISODate));
+        if (!getRatingQuery.exec())
+            return;
+        while (getRatingQuery.next()){
+            const QSqlRecord getRatingRecord = getRatingQuery.record();
+            if (std::find(std::begin(d->m_AgencyName), std::end(d->m_AgencyName), getRatingRecord.value("RatingAgency").toString()) == std::end(d->m_AgencyName))
+                continue;
+            setRating(
+                static_cast<RatingValue>(getRatingRecord.value("Rating").toInt()),
+                static_cast<RatingAgency>(1 << std::distance(std::begin(d->m_AgencyName), std::find(std::begin(d->m_AgencyName), std::end(d->m_AgencyName), getRatingRecord.value("RatingAgency").toString()))),
+                static_cast<CreditWatch>(getRatingRecord.value("RatingWatch").toInt())
+                );
+        }
+    }
+#endif
 }
 
 int Ratings::numRatings() const

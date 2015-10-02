@@ -3,7 +3,8 @@
 	<Database>
 		<DBtype>QODBC</DBtype>
 		<Driver>SQL Server</Driver>
-		<DataSource xml:space="preserve">Server=twe-sql02;Initial Catalog=ABSDB;Integrated Security=SSPI;Trusted_Connection=Yes;</DataSource>
+         <DataSource xml:space="preserve">Server=twe-sql02;Initial Catalog=ABSDB;Integrated Security=SSPI;Trusted_Connection=Yes;</DataSource>
+        <!-- <DataSource xml:space="preserve">Server=DT-FRSCS42\SQLEXPRESS; Initial Catalog = ABSDB; Integrated Security = SSPI; Trusted_Connection = Yes;</DataSource>-->
 		<ConstBaseRatesStoredProc>getLatestIndexPrices(0)</ConstBaseRatesStoredProc>
 		<ForwardBaseRatesStoredProc>getForwardCurveMatrix</ForwardBaseRatesStoredProc>
 		<CashFlowsStoredProc>getCashFlows</CashFlowsStoredProc>
@@ -18,7 +19,9 @@
         <GetDealInfoStoredProc>getDealInfo(:dealName)</GetDealInfoStoredProc>
         <SetGeographyStoredProc>setGeography(:dealName,:filedName,:fieldDisplayName,:startDate,:endDate,:Value)</SetGeographyStoredProc>
         <InsertCashFlowsQuery xml:space="preserve">INSERT INTO  Cashflows (ISIN,Date,Deferred,Interest,Principal,Balance,Coupon) VALUES (:isin,:date,:deferred,:interest,:principal,:balance,:coupon)</InsertCashFlowsQuery>
-    </Database>
+        <AddRatingHistoryStoredProc>addRatingHistory(:isin,:agency,:rating,:watch)</AddRatingHistoryStoredProc>
+        <GetRatingStoredProc>getRating(:isin,:referenceDate)</GetRatingStoredProc>
+</Database>
 	<Folders>
 		<UnifiedResultsFolder xml:space="preserve">Z:/24AM/Monitoring/Model Results</UnifiedResultsFolder>
         <CountriesDBFolder xml:space="preserve">Z:\24AM\Analytics\Development\CLOModel2\Environment</CountriesDBFolder>

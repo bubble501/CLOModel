@@ -56,7 +56,21 @@ Ratings::Ratings(RatingsPrivate *d)
     
 }
 
+bool Ratings::operator==(const Ratings& other) const
+{
+    return compare(other, CompareOption::CompareAll);
+}
 
+bool Ratings::compare(const Ratings& other, CompareOption opt) const
+{
+    Q_D(const Ratings);
+    bool result = true;
+    if(opt & CompareOption::CompareRating)
+        result = result && std::equal(std::begin(d->m_ratings), std::end(d->m_ratings), std::begin(other.d_func()->m_ratings));
+    if (opt & CompareOption::CompareWatch)
+        result = result && std::equal(std::begin(d->m_watch), std::end(d->m_watch), std::begin(other.d_func()->m_watch));
+    return result;
+}
 
 QString Ratings::agencyName(RatingAgency ag)
 {

@@ -16,6 +16,8 @@ private slots:
     void rankedAgency();
     void ratingFromString();
     void ratingFromString_data();
+    void testCompare();
+    void testCompare_data();
 };
 
 #endif // RATINGSTEST_H

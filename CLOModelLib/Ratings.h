@@ -14,6 +14,11 @@ class CLOMODELLIB_EXPORT Ratings : public BackwardInterface
     DECLARE_PUBLIC_COMMONS(Ratings)
     DECLARE_PUBLIC_COMMONS_COPY(Ratings)
 public:
+    enum CompareOption : qint8{
+        CompareRating = 0x1,
+        CompareWatch = 0x2,
+        CompareAll = CompareRating | CompareWatch
+    };
     enum class RatingAgency : qint32
     {
         Invalid=0,
@@ -88,6 +93,8 @@ protected:
     virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
     RatingValue averageRating(double startingVal) const;
 public:
+    bool operator==(const Ratings& other) const;
+    bool compare(const Ratings& other, CompareOption opt)const;
     static QString agencyName(RatingAgency ag);
     static RatingBucket getBucket(RatingValue val);
     static QString RatingValueString(RatingValue val, RatingAgency agencySyntax);

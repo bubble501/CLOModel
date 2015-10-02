@@ -305,6 +305,104 @@ void RatingsTest::ratingFromString_data()
     }
 }
 
+void RatingsTest::testCompare()
+{
+    QFETCH(Ratings, testRating1);
+    QFETCH(Ratings, testRating2);
+    QFETCH(bool, expectedCompRating);
+    QFETCH(bool, expectedCompWatch);
+
+    QCOMPARE(testRating1.compare(testRating2, Ratings::CompareRating), expectedCompRating);
+    QCOMPARE(testRating1.compare(testRating2, Ratings::CompareWatch), expectedCompWatch);
+    QCOMPARE(testRating1.compare(testRating2, Ratings::CompareAll), expectedCompWatch && expectedCompRating);
+    QCOMPARE(testRating1==testRating2, expectedCompWatch && expectedCompRating);
+}
+
+void RatingsTest::testCompare_data()
+{
+    QTest::addColumn<Ratings>("testRating1");
+    QTest::addColumn<Ratings>("testRating2");
+    QTest::addColumn<bool>("expectedCompRating");
+    QTest::addColumn<bool>("expectedCompWatch");
+
+    Ratings testRating1, testRating2;
+    for (qint32 i = 0; i < Ratings::CountRatingAcencies; ++i) {
+        testRating1.setRating(Ratings::RatingValue::A, static_cast<Ratings::RatingAgency>(1 << i));
+        testRating2.setRating(Ratings::RatingValue::A, static_cast<Ratings::RatingAgency>(1 << i));
+    }
+    QTest::newRow("All Ratings, all equal, no watch")
+        << testRating1 << testRating2 << true << true;
+    testRating1.reset();
+    testRating2.reset();
+    for (qint32 i = 0; i < Ratings::CountRatingAcencies; ++i) {
+        testRating1.setRating(Ratings::RatingValue::A, static_cast<Ratings::RatingAgency>(1 << i));
+        testRating2.setRating(Ratings::RatingValue::BBB, static_cast<Ratings::RatingAgency>(1 << i));
+    }
+    QTest::newRow("All Ratings, all different, no watch")
+        << testRating1 << testRating2 << false << true;
+
+    testRating1.reset();
+    testRating2.reset();
+    for (qint32 i = 0; i < Ratings::CountRatingAcencies; ++i) {
+        testRating1.setRating(Ratings::RatingValue::A, static_cast<Ratings::RatingAgency>(1 << i));
+        testRating2.setRating(Ratings::RatingValue::A, static_cast<Ratings::RatingAgency>(1 << i), Ratings::Positive);
+    }
+    QTest::newRow("All Ratings, all equal, different watch")
+        << testRating1 << testRating2 << true << false;
+    testRating1.reset();
+    testRating2.reset();
+    for (qint32 i = 0; i < Ratings::CountRatingAcencies; ++i) {
+        testRating1.setRating(Ratings::RatingValue::A, static_cast<Ratings::RatingAgency>(1 << i));
+        testRating2.setRating(Ratings::RatingValue::BBB, static_cast<Ratings::RatingAgency>(1 << i), Ratings::Positive);
+    }
+    QTest::newRow("All Ratings, all different, different watch")
+        << testRating1 << testRating2 << false << false;
+    //////////////////////////////////////////////////////////////////////////
+    testRating1.reset();
+    testRating2.reset();
+    for (qint32 i = 0; i < Ratings::CountRatingAcencies-1; ++i) {
+        testRating1.setRating(Ratings::RatingValue::A, static_cast<Ratings::RatingAgency>(1 << i));
+        testRating2.setRating(Ratings::RatingValue::A, static_cast<Ratings::RatingAgency>(1 << i));
+    }
+    QTest::newRow("One NR, all equal, no watch")
+        << testRating1 << testRating2 << true << true;
+    testRating1.reset();
+    testRating2.reset();
+    for (qint32 i = 0; i < Ratings::CountRatingAcencies-1; ++i) {
+        testRating1.setRating(Ratings::RatingValue::A, static_cast<Ratings::RatingAgency>(1 << i));
+        testRating2.setRating(Ratings::RatingValue::BBB, static_cast<Ratings::RatingAgency>(1 << i));
+    }
+    QTest::newRow("One NR, all different, no watch")
+        << testRating1 << testRating2 << false << true;
+
+    testRating1.reset();
+    testRating2.reset();
+    for (qint32 i = 0; i < Ratings::CountRatingAcencies-1; ++i) {
+        testRating1.setRating(Ratings::RatingValue::A, static_cast<Ratings::RatingAgency>(1 << i));
+        testRating2.setRating(Ratings::RatingValue::A, static_cast<Ratings::RatingAgency>(1 << i), Ratings::Negative);
+    }
+    QTest::newRow("One NR, all equal, different watch")
+        << testRating1 << testRating2 << true << false;
+    testRating1.reset();
+    testRating2.reset();
+    for (qint32 i = 0; i < Ratings::CountRatingAcencies-1; ++i) {
+        testRating1.setRating(Ratings::RatingValue::A, static_cast<Ratings::RatingAgency>(1 << i));
+        testRating2.setRating(Ratings::RatingValue::BBB, static_cast<Ratings::RatingAgency>(1 << i), Ratings::Negative);
+    }
+    QTest::newRow("One NR, all different, different watch")
+        << testRating1 << testRating2 << false << false;
+    //////////////////////////////////////////////////////////////////////////
+    testRating1.reset();
+    testRating2.reset();
+    for (qint32 i = 0; i < Ratings::CountRatingAcencies; ++i) {
+        testRating1.setRating(Ratings::RatingValue::A, static_cast<Ratings::RatingAgency>(1 << i));
+        if(i>0)
+            testRating2.setRating(Ratings::RatingValue::A, static_cast<Ratings::RatingAgency>(1 << i));
+    }
+    QTest::newRow("One NR in one")
+        << testRating1 << testRating2 << false << true;
+}
+
 void RatingsTest::rankedRatings()
 {
     QFETCH(Ratings, testRating);

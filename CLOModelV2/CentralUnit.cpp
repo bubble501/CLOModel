@@ -280,17 +280,11 @@ void CentralUnit::SetupStress(const QString& ConstPar,QList<QString> XSpann,QLis
 	connect(Stresser,SIGNAL(AllFinished()),this,SLOT(StressFinished()));
 }
 void CentralUnit::Calculate(){
-	int argc = 1;
-	QApplication ComputationLoop(argc,0);
 	emit LoopStarted();
-	ComputationLoop.exec();
 }
 void CentralUnit::CalculateStress(){
-	int argc =  1;
-	QApplication ComputationLoop(argc,0);
 	if(Stresser) Stresser->SetUseFastVersion(UseFastStress);
 	emit StressLoopStarted();
-	ComputationLoop.exec();
 }
 void CentralUnit::CalculationStep1(){
 	LOGDEBUG("Reached CalculationStep1");

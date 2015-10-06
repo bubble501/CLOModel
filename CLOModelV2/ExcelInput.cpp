@@ -25,7 +25,15 @@
 #include <VectorTrigger.h>
 #include <WatFalPrior.h>
 #include <WaterfallStepHelperDialog.h>
+#include <QProgressDialog>
 void __stdcall RunModel(LPSAFEARRAY *ArrayData){
+    int argc = 1;
+    QApplication ComputationLoop(argc, 0);
+    QProgressDialog* loansLoadDialog = new QProgressDialog;
+    loansLoadDialog->setAutoClose(true);
+    loansLoadDialog->setCancelButton(nullptr);
+    loansLoadDialog->setLabelText("Loading Loans");
+    loansLoadDialog->show();
 	bool RunStress;
 	CentralUnit TempUnit;
 	VARIANT HUGEP *pdFreq;
@@ -39,6 +47,8 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		QString Intr, frq, lossm, prem, Ann, Hairc, BaseRte;
 		QString Properties;
 		NumElements=pdFreq->intVal;pdFreq++;
+        loansLoadDialog->setRange(0,NumElements);
+        loansLoadDialog->setValue(0);
 		for(int i=0;i<NumElements;i++){
 			Matur=QDate::fromString(QString::fromWCharArray(pdFreq->bstrVal),"yyyy-MM-dd");pdFreq++;
 			sze=pdFreq->dblVal;pdFreq++;
@@ -47,9 +57,13 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 			Ann=QString::fromWCharArray(pdFreq->bstrVal);pdFreq++;
 			frq = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 			Properties = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
-			if (sze >= 0.01) TempUnit.AddLoan(Matur, sze, Intr, Ann, frq, BaseRte, Properties);
+			if (sze >= 0.01) 
+                TempUnit.AddLoan(Matur, sze, Intr, Ann, frq, BaseRte, Properties);
+            loansLoadDialog->setValue(1 + loansLoadDialog->value());
+            QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 		}
 	}
+    loansLoadDialog->deleteLater();
 	{//Tranches
 		QString TrName, Curr, BasRt, TrancheISIN, IPDfrq, ProRat;
         QList<QString> RefRt, coup, DayCnt;
@@ -438,9 +452,11 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
     }
 
 
-	if(RunStress) TempUnit.CalculateStress();
-	else TempUnit.Calculate();
-
+	if(RunStress) 
+        TempUnit.CalculateStress();
+	else 
+        TempUnit.Calculate();
+    ComputationLoop.exec();
 }
 
 double __stdcall CLOReturnRate(LPSAFEARRAY *ArrayData){

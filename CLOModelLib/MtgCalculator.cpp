@@ -28,7 +28,6 @@ MtgCalculatorPrivate::~MtgCalculatorPrivate()
 }
 MtgCalculatorPrivate::MtgCalculatorPrivate(MtgCalculator *q)
     :AbstrAsyncCalculatorPrivate(q)
-    , m_dataDir(QDir::tempPath() + "/CLOModel/")
     , m_UseStoredCashFlows(false)
     , m_DownloadScenario(false)
 {}
@@ -37,20 +36,6 @@ MtgCalculator::MtgCalculator(MtgCalculatorPrivate *d, QObject* parent)
 {
 }
 
-QString MtgCalculatorPrivate::writeTempFile(const Mortgage& val) const
-{
-    QTemporaryFile destFile(m_dataDir.path() + '/');
-    destFile.setAutoRemove(false);
-    if (destFile.open()) {
-        QDataStream out(&destFile);
-        out.setVersion(StreamVersionUsed);
-        out << val;
-        destFile.close();
-        return destFile.fileName();
-    }
-    PrintToTempFile("PermissionError", "Could not write temporary file to save Mortgage");
-    return QString();
-}
 void MtgCalculatorPrivate::clearTempDir()
 {
     const auto fileList = QDir(m_dataDir.path()).entryInfoList();
@@ -61,20 +46,7 @@ void MtgCalculatorPrivate::removeTempFile(const QString& path) const
 {
     QFile::remove(path);
 }
-Mortgage MtgCalculatorPrivate::readTempFile(const QString& path) const
-{
-    Mortgage result;
-    QFile sourceFile(path);
-    if (sourceFile.open(QIODevice::ReadOnly)) {
-        QDataStream in(&sourceFile);
-        in.setVersion(StreamVersionUsed);
-        in >> result;
-        sourceFile.close();
-    }
-    else
-        PrintToTempFile("PermissionError", "Could not read temporary file to load Mortgage");
-    return result;
-}
+
 
 void MtgCalculator::SetLoan(const Mortgage& a, qint32 Index)
 {
@@ -82,11 +54,11 @@ void MtgCalculator::SetLoan(const Mortgage& a, qint32 Index)
 	auto FoundLn = d->m_LoansPath.find(Index);
     if (FoundLn == d->m_LoansPath.end()) {
         RETURN_WHEN_RUNNING(true,)
-        d->m_LoansPath.insert(Index,d->writeTempFile(a));
+        d->m_LoansPath.insert(Index,writeTempFile(a));
 	}
     else {
         d->removeTempFile(FoundLn.value());
-        FoundLn.value() = d->writeTempFile(a);
+        FoundLn.value() = writeTempFile(a);
     }
 
 }
@@ -94,25 +66,29 @@ void MtgCalculator::SetLoan(const Mortgage& a, qint32 Index)
 Mortgage MtgCalculator::getLoan(qint32 Index) const
 {
     Q_D(const MtgCalculator);
-    return d->readTempFile(d->m_LoansPath.value(Index));
+    return readTempFile<Mortgage>(d->m_LoansPath.value(Index));
 }
 
-bool MtgCalculator::StartCalculation()
+bool MtgCalculator::StartCalculation(bool ignoreCheck)
 {
     Q_D(MtgCalculator);
 	RETURN_WHEN_RUNNING(true, false)
-	if (!ReadyToCalculate().isEmpty()) return false;
+    if (!ignoreCheck) {
+        if (!ReadyToCalculate().isEmpty())
+            return false;
+    }
 	{//Check if all base rates are valid
 		bool CheckAgain = false;
 		ConstantBaseRateTable TempTable;
         for (auto i = d->m_LoansPath.constBegin(); i != d->m_LoansPath.constEnd() && !CheckAgain; ++i) {
-			if (d->readTempFile(i.value()).GetFloatingRateValue().IsEmpty()) {
+            if (readTempFile<Mortgage>(i.value()).GetFloatingRateValue().IsEmpty()) {
 				CompileReferenceRateValue(TempTable);
 				CheckAgain = true;
 			}
 		}
         for (auto i = d->m_LoansPath.constBegin(); CheckAgain && i != d->m_LoansPath.constEnd(); ++i) {
-            if (d->readTempFile(i.value()).GetFloatingRateValue().IsEmpty()) return false;
+            if (readTempFile<Mortgage>(i.value()).GetFloatingRateValue().IsEmpty()) 
+                return false;
 		}
 	}
 
@@ -232,7 +208,7 @@ bool MtgCalculator::StartCalculation()
 		if (NumofSent >= NumberOfThreads) break;
         if (d->BeesSent.contains(SingleLoan.key())) continue;
 		CurrentThread = AddThread(SingleLoan.key());
-		CurrentThread->SetLoan(d->readTempFile(SingleLoan.value()));
+        CurrentThread->SetLoan(readTempFile<Mortgage>(SingleLoan.value()));
         if (d->TempProperties.contains(SingleLoan.key())) {
             const auto CurrProps = d->TempProperties.value(SingleLoan.key());
 			for (auto j = CurrProps->constBegin(); j != CurrProps->constEnd(); ++j) {
@@ -260,22 +236,18 @@ void MtgCalculator::BeeReturned(int Ident, const MtgCashFlow& a) {
 
     Q_ASSERT(d->m_LoansPath.contains(Ident));
     {
-        auto tempLoan =d->readTempFile(d->m_LoansPath.value(Ident));
+        auto tempLoan = readTempFile<Mortgage>(d->m_LoansPath.value(Ident));
         tempLoan.SetCashFlows(a);
         SetLoan(tempLoan, Ident);
     }
 	TemplAsyncCalculator<MtgCalculatorThread, MtgCashFlow>::BeeReturned(Ident, a);
-    auto& tempRes = getResultVoid();
-    auto i = tempRes.find(Ident);
-    if (i != tempRes.end())
-        i.value().reset();
     if (!ContinueCalculation())
         return;
 	MtgCalculatorThread* CurrentThread;
     for (auto SingleLoan = d->m_LoansPath.constBegin(); SingleLoan != d->m_LoansPath.constEnd(); ++SingleLoan) {
         if (d->BeesSent.contains(SingleLoan.key())) continue;
 		CurrentThread = AddThread(SingleLoan.key());
-		CurrentThread->SetLoan(d->readTempFile(SingleLoan.value()));
+		CurrentThread->SetLoan(readTempFile<Mortgage>(SingleLoan.value()));
         if (d->TempProperties.contains(SingleLoan.key())) {
             const auto CurrProps = d->TempProperties.value(SingleLoan.key());
 			for (auto j = CurrProps->constBegin(); j != CurrProps->constEnd(); ++j) {
@@ -314,7 +286,7 @@ QString MtgCalculator::ReadyToCalculate()const{
 	QString TempStr;
     if (d->StartDate.isNull()) Result += "Invalid Start Date\n";
     for (auto i = d->m_LoansPath.constBegin(); i != d->m_LoansPath.constEnd(); i++) {
-		TempStr = d->readTempFile(i.value()).ReadyToCalculate();
+        TempStr = readTempFile<Mortgage>(i.value()).ReadyToCalculate();
 		if(!TempStr.isEmpty()) Result+=TempStr+'\n';
 	}
     if (BloombergVector(d->m_CPRass).IsEmpty(0.0, 1.0)) Result += "CPR Vector: " + d->m_CPRass + '\n';
@@ -341,7 +313,7 @@ QDataStream& operator<<(QDataStream & stream, const MtgCalculator& flows) {
         << flows.d_func()->StartDate
 		;
     for (auto i = flows.d_func()->m_LoansPath.constBegin(); i != flows.d_func()->m_LoansPath.constEnd(); i++) {
-        stream << i.key() << flows.d_func()->readTempFile(i.value());
+        stream << i.key() << flows.readTempFile<Mortgage>(i.value());
 	}
 	return flows.SaveToStream(stream);
 }
@@ -501,33 +473,6 @@ void MtgCalculator::SetStartDate(const QDate& a)
     d->StartDate = a;
 }
 
-void MtgCalculator::ClearResults()
-{
-    Q_D( MtgCalculator);
-	RETURN_WHEN_RUNNING(true, )
-        d->m_AggregatedRes.Clear();
-    for (auto i = d->m_LoansPath.constBegin(); i != d->m_LoansPath.constEnd(); ++i) {
-        auto tempMtg = d->readTempFile(i.value());
-        tempMtg.ResetFlows();
-        SetLoan(tempMtg, i.key());
-    }
-	TemplAsyncCalculator<MtgCalculatorThread, MtgCashFlow>::ClearResults();
-}
-
-QList<qint32> MtgCalculator::GetResultKeys() const
-{
-    Q_D(const MtgCalculator);
-    return d->m_LoansPath.keys();
-}
-
-const std::shared_ptr<MtgCashFlow> MtgCalculator::GetResult(qint32 key) const
-{
-    Q_D(const MtgCalculator);
-    if (d->m_LoansPath.contains(key))
-        return std::make_shared<MtgCashFlow>(d->readTempFile(d->m_LoansPath.value(key)).GetCashFlow());
-    return std::shared_ptr<MtgCashFlow>(nullptr);
-}
-
 int MtgCalculator::NumBees() const
 {
     Q_D(const MtgCalculator);
@@ -547,7 +492,7 @@ void MtgCalculator::DownloadScenarios() {
 	ClearTempProperties();
 	QHash<QString, LoanAssumption> AssumptionCache;
     for (auto i = d->m_LoansPath.constBegin(); i != d->m_LoansPath.constEnd(); ++i) {
-        const auto tempLoan = d->readTempFile(i.value());
+        const auto tempLoan = readTempFile<Mortgage>(i.value());
         if (tempLoan.HasProperty("Scenario") && tempLoan.HasProperty("Mezzanine")) {
             if (!AssumptionCache.contains(tempLoan.GetProperty("Scenario"))) {
 				LoanAssumption DownloadedAssumption(tempLoan.GetProperty("Scenario"));
@@ -760,7 +705,7 @@ void MtgCalculator::GuessLoanScenarios(bool OverrideAss) {
     {
 		for (auto i = AvailableAssumptions.constBegin(); i != AvailableAssumptions.constEnd(); ++i) {
 			for (const QString& CurrProperty : LoansPropertiesToSearch) {
-                auto tempLoan = d->readTempFile(SingleLoan.value());
+                auto tempLoan = readTempFile<Mortgage>(SingleLoan.value());
                 if (i.value()->MatchPattern(tempLoan.GetProperty(CurrProperty))) {
                     if (!tempLoan.HasProperty("Scenario") || OverrideAss) {
                         tempLoan.SetProperty("Scenario", i.key());
@@ -808,16 +753,6 @@ void MtgCalculator::SetDownloadScenario(bool val)
     Q_D( MtgCalculator);
     RETURN_WHEN_RUNNING(true, ) 
         d->m_DownloadScenario = val;
-}
-
-void MtgCalculator::RemoveResult(qint32 Key)
-{
-    Q_D(MtgCalculator);
-    auto loanIter = d->m_LoansPath.find(Key);
-    if (loanIter != d->m_LoansPath.end()) {
-        d->removeTempFile(loanIter.value());
-        d->m_LoansPath.erase(loanIter);
-    }
 }
 
 #endif
@@ -931,7 +866,7 @@ QHash<QString, double> MtgCalculator::GetGeographicBreakdown() const
 	if (!dbr.open(DbRootFolder + "CountriesDB\\ISO3166-1.ssdb")) 
         return Result;
     for (auto i = d->m_LoansPath.constBegin(); i != d->m_LoansPath.constEnd(); ++i) {
-        const auto tempLoan = d->readTempFile(i.value());
+        const auto tempLoan = readTempFile<Mortgage>(i.value());
         if (tempLoan.GetSize()<0.01) continue;
         SumOut += tempLoan.GetSize();
         CurrentGuess = tempLoan.GetProperty("Country");

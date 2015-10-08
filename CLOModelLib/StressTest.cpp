@@ -42,7 +42,7 @@ StressTest::StressTest(StressTestPrivate *d, QObject* parent)
     ResetCurrentAssumption();
     connect(this, SIGNAL(CurrentScenarioCalculated()), this, SLOT(GoToNextScenario()), Qt::QueuedConnection);
     connect(d->BaseCalculator, SIGNAL(BeeError(int)), this, SLOT(ErrorInCalculation()), Qt::QueuedConnection);
-    connect(this, SIGNAL(AllLoansCalculated()), d->TranchesCalculator, SLOT(StartCalculation()), Qt::QueuedConnection);
+    connect(this, &StressTest::AllLoansCalculated, this, &StressTest::startWaterfallCalculation, Qt::QueuedConnection);
     //connect(this, &StressTest::AllLoansCalculated, [&]() { BaseApplier->ClearResults(); BaseApplier->ClearScenarios(); BaseCalculator->ClearLoans(); BaseCalculator->ClearResults(); });
     //connect(this, SIGNAL(AllLoansCalculated()), this, SLOT(ReachedWaterfallCalc()));
 
@@ -426,7 +426,7 @@ void StressTest::RunStressTest()
 #endif
     if (d->ShowProgress) {
         d->ProgressForm = new PhasedProgressWidget();
-        d->ProgressForm->AddPhase(tr("Calculating full assets cash flows"), 0, CountScenarios());
+        d->ProgressForm->AddPhase(tr("Calculating full assets cash flows"), 0, 100);
         d->ProgressForm->AddPhase(tr("Applying scenarios to aggregated cash flows"), 0, 0);
         d->ProgressForm->AddPhase(tr("Generating Waterfalls"), 0, 0);
         d->ProgressForm->AddPhase(tr("Calculating liabilities cash flows"), 0, 100);
@@ -441,7 +441,7 @@ void StressTest::RunStressTest()
         connect(d->BaseCalculator, SIGNAL(Calculated()), this, SLOT(BaseForFastCalculated()));
         if (d->ShowProgress)
             connect(d->BaseCalculator, SIGNAL(Progress(double)), d->ProgressForm, SLOT(SetPhaseProgress(double)));
-        if (!d->BaseCalculator->StartCalculation()) {
+        if (!d->BaseCalculator->StartCalculation(true)) {
 			QMessageBox::critical(0, "Invalid Input", "A base rate in the loans is invalid");
 			return;
 		}
@@ -454,7 +454,8 @@ void StressTest::BaseForFastCalculated() {
     disconnect(d->BaseCalculator, SIGNAL(Calculated()), this, SLOT(BaseForFastCalculated()));
     if (d->ShowProgress)
         disconnect(d->BaseCalculator, SIGNAL(Progress(double)), d->ProgressForm, SLOT(SetPhaseProgress(double)));
-    if (!d->ContinueCalculation) return StoppedCalculation();
+    if (!d->ContinueCalculation) 
+        return StoppedCalculation();
     d->BaseApplier->SetBaseFlows(d->BaseCalculator->GetAggregatedResults());
 	RunCurrentScenario();
 }
@@ -482,7 +483,7 @@ void StressTest::RunCurrentScenario() {
         d->BaseApplier->AddAssumption(CurrentAss, d->BaseApplier->NumBees());
 		emit CurrentScenarioCalculated();
 	}
-	else {
+    else {
         connect(d->BaseCalculator, SIGNAL(Calculated()), this, SLOT(SlowLoansCalculated()), Qt::UniqueConnection);
         d->BaseCalculator->SetCPRass(CurrentAss.GetCPRscenario());
         d->BaseCalculator->SetCDRass(CurrentAss.GetCDRscenario());
@@ -490,7 +491,7 @@ void StressTest::RunCurrentScenario() {
         d->BaseCalculator->SetRecoveryLag(CurrentAss.GetRecLagScenario());
         d->BaseCalculator->SetDelinquency(CurrentAss.GetDelinqScenario());
         d->BaseCalculator->SetDelinquencyLag(CurrentAss.GetDelinqLagScenario());
-        if (!d->BaseCalculator->StartCalculation()) {
+        if (!d->BaseCalculator->StartCalculation(true)) {
 			emit ErrorInCalculation();
 		}
 	}
@@ -498,7 +499,8 @@ void StressTest::RunCurrentScenario() {
 }
 void StressTest::SlowLoansCalculated() {
     Q_D( StressTest);
-    if (!d->ContinueCalculation)  return StoppedCalculation();
+    if (!d->ContinueCalculation) 
+        return StoppedCalculation();
     d->Structure.ResetMtgFlows();
     d->Structure.AddMortgagesFlows(d->BaseCalculator->GetAggregatedResults());
 	AssumptionSet CurrentAss(
@@ -531,11 +533,13 @@ void StressTest::GoToNextScenario()
         QMessageBox::information(0, "Computation Time", QString("Stress Test Took: %1 Seconds").arg(d->ExecutionTime.elapsed() / 1000));
 #endif
         disconnect(d->BaseCalculator);
-        if (d->ProgressForm) d->ProgressForm->NextPhase();
+        if (d->ProgressForm) 
+            d->ProgressForm->NextPhase();
         if (d->BaseApplier->NumBees() > 0) {
             d->BaseApplier->StartCalculation();
 		}
 		else {
+            d->ProgressForm->NextPhase();
 			emit AllLoansCalculated();
 		}
 		return;
@@ -906,6 +910,13 @@ void StressTest::StopCalculation()
 	}
 }
 
+void StressTest::startWaterfallCalculation()
+{
+    Q_D(StressTest);
+    if (!d->TranchesCalculator->StartCalculation(true))
+        emit ErrorInCalculation();
+}
+
 void StressTest::GatherResults()
 {
     Q_D( StressTest);
@@ -915,7 +926,7 @@ void StressTest::GatherResults()
         auto MatchingAssumption = d->m_RainbowTable.constFind(*i);
         if (MatchingAssumption != d->m_RainbowTable.constEnd()) {
             d->Results[MatchingAssumption.value()].reset(
-                new Waterfall(*(d->TranchesCalculator->GetResult(*i)))
+                new Waterfall(d->TranchesCalculator->GetResult(*i))
 			);
 		}
 	}
@@ -951,20 +962,25 @@ void StressTest::ResetScenarios()
 void StressTest::FastLoansCalculated() {
     Q_D( StressTest);
     QList<qint32> AllKeys = d->BaseApplier->GetAssumptionKeys();
-	std::shared_ptr<AssumptionSet> CurrentAss;
-	foreach(qint32 SingleKey, AllKeys) {
-        CurrentAss = d->BaseApplier->GetAssumption(SingleKey);
-		if (!CurrentAss)continue;
-		uint CurrentHash = qHash(*CurrentAss, 88);
+	AssumptionSet CurrentAss;
+    if (d->ProgressForm) {
+        d->ProgressForm->NextPhase();
+        d->ProgressForm->SetPhaseMax(d->ProgressForm->getCurrentPhase(), AllKeys.size());
+    }
+    for (qint32 i = 0; i < AllKeys.size();++i) {
+        CurrentAss = d->BaseApplier->GetAssumption(AllKeys.at(i));
+		uint CurrentHash = qHash(CurrentAss, 88);
         if (d->m_RainbowTable.contains(CurrentHash)) {
 			emit ErrorInCalculation();
 			return;
 		}
-        d->m_RainbowTable.insert(CurrentHash, *CurrentAss);
+        d->m_RainbowTable.insert(CurrentHash, CurrentAss);
         d->Structure.ResetMtgFlows();
-        d->Structure.AddMortgagesFlows(*(d->BaseApplier->GetResult(SingleKey)));
-        d->Structure.SetAssumptions(*CurrentAss);
+        d->Structure.AddMortgagesFlows(d->BaseApplier->GetResult(AllKeys.at(i)));
+        d->Structure.SetAssumptions(CurrentAss);
         d->TranchesCalculator->AddWaterfall(d->Structure, CurrentHash);
+        d->ProgressForm->SetPhaseProgress(i + 1);
+        QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 	}
 	emit AllLoansCalculated();
 }

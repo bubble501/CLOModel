@@ -26,6 +26,7 @@ public:
 	int NumPhases() const { return m_PhasNames.size(); }
 	int GetPhaseProgress() const;
 	int GetTotalProgress() const;
+    int getCurrentPhase() const { return m_CurrentPhase; }
 public slots:
 	bool NextPhase();
 	void SetPhaseProgress(int val);

@@ -49,19 +49,19 @@ public:
     }
     virtual void ClearResults()
     {
-        auto& tempRes = getResultVoid();
+        auto& tempRes = getResultPaths();
         tempRes.clear();
-        Q_ASSERT(getResultVoid().isEmpty());
+        Q_ASSERT(getResultPaths().isEmpty());
     }
     virtual void RemoveResult(qint32 Key)
     {
-        auto& tempRes = getResultVoid();
+        auto& tempRes = getResultPaths();
         auto i = tempRes.find(Key);
         if (i == tempRes.end())
             return;
         tempRes.erase(i);
     }
-    virtual const std::shared_ptr<ResultType> GetResult(qint32 key)const { return std::static_pointer_cast<ResultType>(getResultVoid(key)); }
+    virtual const ResultType GetResult(qint32 key)const { return readTempFile<ResultType>(getResultPaths(key)); }
 protected:	
     TemplAsyncCalculator(AbstrAsyncCalculatorPrivate* d, QObject* parent = nullptr)
         :AbstrAsyncCalculator(d, parent)
@@ -101,16 +101,20 @@ protected:
         Q_ASSERT(getThreadPool().contains(Key));
         return a;
     }
+    void insertResult(qint32 Key, const ResultType& val)
+    {
+        AbstrAsyncCalculator::insertResult(Key, writeTempFile(val));
+    }
     virtual void BeeReturned(int Ident, const ResultType& a)
     {
         RETURN_WHEN_RUNNING(false, )
-            auto& tempRes = getResultVoid();
+            auto& tempRes = getResultPaths();
         auto FindRe = tempRes.find(Ident);
         if (FindRe != tempRes.end()) {
             tempRes.erase(FindRe);
-            Q_ASSERT(!getResultVoid().contains(Ident));
+            Q_ASSERT(!getResultPaths().contains(Ident));
         }
-        insertResult(Ident, std::make_shared<ResultType>(a));
+        insertResult(Ident,a);
         getThreadPool().remove(Ident);
         //emit BeeCalculated(++BeesReturned);
         getBeesReturned()++;
@@ -127,14 +131,11 @@ protected:
     virtual QDataStream& SaveToStream(QDataStream& stream) const final
     {
         RETURN_WHEN_RUNNING(true, stream)
-            auto& tempRes = getResultVoid();
+            auto& tempRes = getResultPaths();
         stream << GetSequentialComputation() << static_cast<qint32>(tempRes.size());
         for (auto i = tempRes.constBegin(); i != tempRes.constEnd(); ++i) {
-            stream << i.key();
-            if (i.value())
-                stream << *std::static_pointer_cast<ResultType>(i.value());
-            else
-                stream << ResultType();
+            stream << i.key()
+                << readTempFile<ResultType>(i.value());
         }
         return stream;
     }
@@ -142,16 +143,15 @@ protected:
     {
         RETURN_WHEN_RUNNING(true, stream)
             qint32 TempSize, TempKey;
-        std::shared_ptr<ResultType> TempRes (nullptr);
+        ResultType TempRes;
         bool sequentComp;
         ClearResults();
         stream >> sequentComp >> TempSize;
         SetSequentialComputation(sequentComp);
         for (qint32 i = 0; i < TempSize; i++) {
-            TempRes = std::make_shared<ResultType>();
             stream >> TempKey;
-            TempRes->SetLoadProtocolVersion(loadProtocolVersion());
-            stream >> (*TempRes);
+            TempRes.SetLoadProtocolVersion(loadProtocolVersion());
+            stream >> TempRes;
             insertResult(TempKey, TempRes);
         }
         ResetProtocolVersion();

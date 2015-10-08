@@ -36,13 +36,16 @@ void WaterfallCalculator::AddWaterfall(const Waterfall& a, qint32 ID)
     }
 
 }
-bool WaterfallCalculator::StartCalculation()
+bool WaterfallCalculator::StartCalculation(bool ignoreCheck/*=false*/)
 {
     Q_D(WaterfallCalculator);
 	RETURN_WHEN_RUNNING(true, false)
         d->BeesReturned = 0;
     d->BeesSent.clear();
-	if (!ReadyToCalculate().isEmpty()) return false;
+    if (!ignoreCheck) {
+        if (!ReadyToCalculate().isEmpty()) 
+            return false;
+    }
     setContinueCalculation (true);
 	int NumberOfThreads = availableThreads();
     if (d->m_SequentialComputation || NumberOfThreads < 1) NumberOfThreads = 1;
@@ -58,6 +61,12 @@ bool WaterfallCalculator::StartCalculation()
 	}
 	return true;
 }
+
+bool WaterfallCalculator::StartCalculation()
+{
+    return StartCalculation(false);
+}
+
 void WaterfallCalculator::BeeReturned(int Ident, const Waterfall& a)
 {
     Q_D(WaterfallCalculator);

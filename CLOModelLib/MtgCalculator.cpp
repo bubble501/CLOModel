@@ -69,11 +69,14 @@ Mortgage MtgCalculator::getLoan(qint32 Index) const
     return readTempFile<Mortgage>(d->m_LoansPath.value(Index));
 }
 
-bool MtgCalculator::StartCalculation()
+bool MtgCalculator::StartCalculation(bool ignoreCheck)
 {
     Q_D(MtgCalculator);
 	RETURN_WHEN_RUNNING(true, false)
-	if (!ReadyToCalculate().isEmpty()) return false;
+    if (!ignoreCheck) {
+        if (!ReadyToCalculate().isEmpty())
+            return false;
+    }
 	{//Check if all base rates are valid
 		bool CheckAgain = false;
 		ConstantBaseRateTable TempTable;

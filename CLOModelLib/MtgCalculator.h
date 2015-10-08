@@ -28,7 +28,8 @@ protected:
     virtual void BeeReturned(int Ident, const MtgCashFlow& a) override;
     virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 public slots:
-	virtual bool StartCalculation() override;
+    virtual bool StartCalculation() override { return StartCalculation(false); }
+    virtual bool StartCalculation(bool ignoreCheck);
 public:
     virtual bool uploadGeographyToDatabase(const QString& DealName, QDate startDate, QDate endDate) const;
 	virtual QHash<QString, double> GetGeographicBreakdown() const;

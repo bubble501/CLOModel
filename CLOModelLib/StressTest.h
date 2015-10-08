@@ -94,6 +94,7 @@ public slots:
 	void RunStressTest();
 	void StopCalculation();
 private slots:
+    void startWaterfallCalculation();
 	void BaseForFastCalculated();
 	void SlowLoansCalculated();
 	void FastLoansCalculated();

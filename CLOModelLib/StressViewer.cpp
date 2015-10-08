@@ -14,6 +14,7 @@
 #include "Private/InternalItems.h"
 #include "Tranche.h"
 #include "AssumptionSet.h"
+
 void StressViewer::closeEvent(QCloseEvent *event){
 	emit Closing();
 	event->accept();
@@ -273,7 +274,7 @@ void StressViewer::UpdateTable()
     for (int i = 0; i < d->StressTable->rowCount(); ++i) {
         for (int j = 0; j <d->StressTable->columnCount(); ++j) {
 			CurrentItem = nullptr;
-            const QSharedPointer<Waterfall> CurrentRes = d->StressTarget->GetResults().value(d->AssembleAssumption(i, j));
+            const auto CurrentRes = d->StressTarget->GetResults().value(d->AssembleAssumption(i, j));
 			if (!CurrentRes) {
 				CurrentItem=new QTableWidgetItem("N/A");
 				CurrentItem->setData(Qt::UserRole, "N/A");
@@ -381,7 +382,7 @@ void StressViewer::SetPriceChange()
 void StressViewer::SetStressLevel(int r, int c)
 {
     Q_D(StressViewer);
-    const QSharedPointer<Waterfall> TempWat = d->StressTarget->GetResults().value(d->AssembleAssumption(r, c), QSharedPointer<Waterfall>(nullptr));
+    const auto TempWat = d->StressTarget->GetResults().value(d->AssembleAssumption(r, c), nullptr);
 	if (TempWat) 
         emit StressLevelChanged(*TempWat);
 }

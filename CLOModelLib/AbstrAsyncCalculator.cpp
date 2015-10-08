@@ -88,7 +88,7 @@ const QHash<qint32, std::shared_ptr<void> >& AbstrAsyncCalculator::getResultVoid
     return d->m_Result;
 }
 
-void AbstrAsyncCalculator::insertResult(qint32 Key, void* val)
+void AbstrAsyncCalculator::insertResult(qint32 Key, std::shared_ptr<void> val)
 {
     Q_D(AbstrAsyncCalculator);
     d->m_Result.insert(Key, std::shared_ptr<void>(val));

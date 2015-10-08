@@ -45,6 +45,7 @@
 #include <QTabWidget>
 #include <QTableView>
 #include <QSignalBlocker>
+#include <memory>
 LoanAssumptionsEditorPrivate::~LoanAssumptionsEditorPrivate(){}
 LoanAssumptionsEditorPrivate::LoanAssumptionsEditorPrivate(LoanAssumptionsEditor *q)
 	:q_ptr(q)
@@ -448,8 +449,8 @@ void LoanAssumptionsEditorPrivate::CreateScenarioEditor()
             {}
             NewScenName = NewScenName.arg(i);
         }
-        m_Assumptions.insert(NewScenName, QSharedPointer<LoanAssumption>(nullptr));
-        m_DirtyAssumptions.insert(NewScenName, QSharedPointer<LoanAssumption>(new LoanAssumption(NewScenName)));
+        m_Assumptions.insert(NewScenName, std::shared_ptr<LoanAssumption>(nullptr));
+        m_DirtyAssumptions.insert(NewScenName, std::make_shared<LoanAssumption>(NewScenName));
         m_ScenariosModel->insertRow(m_ScenariosModel->rowCount());
         m_ScenariosModel->setData(m_ScenariosModel->index(m_ScenariosModel->rowCount() - 1, 0), NewScenName, Qt::EditRole);
         m_ScenariosModel->setData(m_ScenariosModel->index(m_ScenariosModel->rowCount() - 1, 0), RichTextDelegate::Added, Qt::UserRole);
@@ -677,7 +678,7 @@ void LoanAssumptionsEditor::FillFromQuery() {
 				FieldCount = 0;
 				auto LoanAssRecord = LoanAssQuery.record();
 				QString CurrentScenario = LoanAssRecord.value(FieldCount).toString(); ++FieldCount;
-				QSharedPointer<LoanAssumption> CurrentAss(nullptr);
+				std::shared_ptr<LoanAssumption> CurrentAss(nullptr);
                 for (auto i = d->m_Assumptions.begin(); i != d->m_Assumptions.end(); ++i) {
 					if (i.key().compare(CurrentScenario, Qt::CaseInsensitive) == 0) {
 						CurrentAss = i.value();
@@ -685,7 +686,7 @@ void LoanAssumptionsEditor::FillFromQuery() {
 					}
 				}
 				if (!CurrentAss) {
-					CurrentAss = QSharedPointer<LoanAssumption>(new LoanAssumption(CurrentScenario));
+					CurrentAss = std::make_shared<LoanAssumption>(CurrentScenario);
 					if (!LoanAssRecord.isNull(FieldCount)) CurrentAss->SetAliases(LoanAssRecord.value(FieldCount).toString());
                     d->m_Assumptions.insert(CurrentAss->GetScenarioName(), CurrentAss);
 				}++FieldCount;
@@ -787,7 +788,7 @@ void LoanAssumptionsEditor::ChangeScenario(const QModelIndex& curr, const QModel
     Q_D(LoanAssumptionsEditor);
 	if (!curr.isValid()) return;
     d->ActiveAssumption = d->m_DirtyAssumptions.value(d->m_ScenariosModel->data(d->m_SortScenarios->mapToSource(curr)).toString(),
-        d->m_Assumptions.value(d->m_ScenariosModel->data(d->m_SortScenarios->mapToSource(curr)).toString(), QSharedPointer<LoanAssumption>(nullptr)));
+        d->m_Assumptions.value(d->m_ScenariosModel->data(d->m_SortScenarios->mapToSource(curr)).toString(), nullptr));
     d->m_ScenarioNameEdit->setText(d->ActiveAssumption ? d->ActiveAssumption->GetScenarioName() : QString());
     d->m_SeniorAsumptionsModel->setRowCount(0);
     d->m_MezzAsumptionsModel->setRowCount(0);
@@ -1167,12 +1168,12 @@ void LoanAssumptionsEditor::ChangeScenario(const QModelIndex& curr, const QModel
         d->m_MezzDateEdit->setDate(QDate::currentDate());
         d->m_AliasesModel->setRowCount(0);
 	}
-    d->m_MezzDateCheck->setEnabled(d->ActiveAssumption);
-    d->m_seniorDateCheck->setEnabled(d->ActiveAssumption);
-    d->m_ScenarioNameEdit->setEnabled(d->ActiveAssumption);
-    d->m_AliasLineEdit->setEnabled(d->ActiveAssumption);
-    d->AddSeniorAssumptionButton->setEnabled(d->ActiveAssumption);
-    d->AddMezzAssumptionButton->setEnabled(d->ActiveAssumption);
+    d->m_MezzDateCheck->setEnabled(d->ActiveAssumption.operator bool());
+    d->m_seniorDateCheck->setEnabled(d->ActiveAssumption.operator bool());
+    d->m_ScenarioNameEdit->setEnabled(d->ActiveAssumption.operator bool());
+    d->m_AliasLineEdit->setEnabled(d->ActiveAssumption.operator bool());
+    d->AddSeniorAssumptionButton->setEnabled(d->ActiveAssumption.operator bool());
+    d->AddMezzAssumptionButton->setEnabled(d->ActiveAssumption.operator bool());
     d->RemoveSeniorAssumptionButton->setEnabled(d->ActiveAssumption && d->m_SeniorAsumptionsModel->rowCount()>0);
     d->RemoveMezzAssumptionButton->setEnabled(d->ActiveAssumption && d->m_MezzAsumptionsModel->rowCount()>0);
     d->RemoveAliasButton->setEnabled(d->ActiveAssumption && d->m_AliasesModel->rowCount()>0);
@@ -1360,9 +1361,9 @@ void LoanAssumptionsEditor::CheckCurrentDirty() {
     Q_D(LoanAssumptionsEditor);
 	if (d->m_ScenarioList->selectionModel()->currentIndex().isValid()) {
         auto DirtyVersion = d->BuildCurrentAssumption();
-		QSharedPointer<LoanAssumption> OriginalVersion(nullptr);
+		std::shared_ptr<LoanAssumption> OriginalVersion(nullptr);
         auto currIdx = d->m_SortScenarios->mapToSource(d->m_ScenarioList->selectionModel()->currentIndex());
-        OriginalVersion = d->m_Assumptions.value(d->m_ScenariosModel->data(currIdx, Qt::EditRole).toString(), QSharedPointer<LoanAssumption>(nullptr));
+        OriginalVersion = d->m_Assumptions.value(d->m_ScenariosModel->data(currIdx, Qt::EditRole).toString(), nullptr);
 
 		if (OriginalVersion) {
 			if (DirtyVersion == *OriginalVersion) {
@@ -1374,7 +1375,7 @@ void LoanAssumptionsEditor::CheckCurrentDirty() {
         if (d->m_DirtyAssumptions.contains(d->m_ScenariosModel->data(currIdx, Qt::EditRole).toString()))
             d->m_DirtyAssumptions[d->m_ScenariosModel->data(currIdx, Qt::EditRole).toString()]->operator=(DirtyVersion);
 		else 
-            d->m_DirtyAssumptions.insert(d->m_ScenariosModel->data(currIdx, Qt::EditRole).toString(), QSharedPointer<LoanAssumption>(new LoanAssumption(DirtyVersion)));
+            d->m_DirtyAssumptions.insert(d->m_ScenariosModel->data(currIdx, Qt::EditRole).toString(), std::make_shared<LoanAssumption>(DirtyVersion));
         if (d->m_ScenariosModel->data(currIdx, Qt::UserRole) != RichTextDelegate::Added) {
             d->m_ScenariosModel->setData(currIdx, RichTextDelegate::Dirty, Qt::UserRole);
 		}
@@ -1451,7 +1452,7 @@ void LoanAssumptionsEditor::SaveScenario(const QString& key)
 			return;
 		}
 #endif // !NO_DATABASE
-        d->m_Assumptions[key] = QSharedPointer<LoanAssumption>(nullptr);
+        d->m_Assumptions[key].reset();
 		return DiscardScenario(key);
 	}
 #ifndef NO_DATABASE
@@ -1612,7 +1613,7 @@ void LoanAssumptionsEditor::MezzDateChanged(const QDate&)
 void LoanAssumptionsEditor::AddLoanAssumption(const LoanAssumption& a)
 {
     Q_D(LoanAssumptionsEditor);
-    d->m_Assumptions.insert(a.GetScenarioName(), QSharedPointer<LoanAssumption>(new LoanAssumption(a)));
+    d->m_Assumptions.insert(a.GetScenarioName(), std::make_shared<LoanAssumption>(a));
     d->m_ScenariosModel->insertRow(d->m_ScenariosModel->rowCount());
     d->m_ScenariosModel->setData(d->m_ScenariosModel->index(d->m_ScenariosModel->rowCount() - 1, 0), a.GetScenarioName(), Qt::EditRole);
 }
@@ -1745,7 +1746,7 @@ void LoanAssumptionsEditor::GuessAssumptions()
     Q_D(LoanAssumptionsEditor);
 	if (!d->YesNoDialog(tr("Are you sure?"), tr("This action will potentially override the current inputs.\nAre you sure you want to continue?"))) return;
 	int MatchFound = 0;
-	QSharedPointer<LoanAssumption> CurrAss;
+	std::shared_ptr<LoanAssumption> CurrAss;
     QScopedPointer<QProgressDialog, QScopedPointerDeleteLater> LoadProgress(new QProgressDialog(tr("Searching for Matches"), QString(), 0, d->m_PoolModel->rowCount()*d->m_Assumptions.size(), this));
 	LoadProgress->setCancelButton(nullptr);
 	LoadProgress->setWindowModality(Qt::WindowModal);
@@ -1795,17 +1796,17 @@ void LoanAssumptionsEditor::RemoveScenario() {
 		}
 		else {
             d->m_ScenariosModel->setData(currIdx, RichTextDelegate::Erased, Qt::UserRole);
-            d->m_DirtyAssumptions[d->m_ScenariosModel->data(currIdx, Qt::EditRole).toString()] = QSharedPointer<LoanAssumption>(nullptr);
-            d->ActiveAssumption.reset(nullptr);
+            d->m_DirtyAssumptions[d->m_ScenariosModel->data(currIdx, Qt::EditRole).toString()].reset();
+            d->ActiveAssumption.reset();
 		}
-        d->m_ScenarioNameEdit->setEnabled(d->ActiveAssumption);
-        d->m_AliasLineEdit->setEnabled(d->ActiveAssumption);
-        d->AddSeniorAssumptionButton->setEnabled(d->ActiveAssumption);
-        d->AddMezzAssumptionButton->setEnabled(d->ActiveAssumption);
-        d->m_seniorDateCheck->setEnabled(d->ActiveAssumption);
-        d->m_SeniorDateEdit->setEnabled(d->ActiveAssumption);
-        d->m_MezzDateCheck->setEnabled(d->ActiveAssumption);
-        d->m_MezzDateEdit->setEnabled(d->ActiveAssumption);
+        d->m_ScenarioNameEdit->setEnabled(d->ActiveAssumption.operator bool());
+        d->m_AliasLineEdit->setEnabled(d->ActiveAssumption.operator bool());
+        d->AddSeniorAssumptionButton->setEnabled(d->ActiveAssumption.operator bool());
+        d->AddMezzAssumptionButton->setEnabled(d->ActiveAssumption.operator bool());
+        d->m_seniorDateCheck->setEnabled(d->ActiveAssumption.operator bool());
+        d->m_SeniorDateEdit->setEnabled(d->ActiveAssumption.operator bool());
+        d->m_MezzDateCheck->setEnabled(d->ActiveAssumption.operator bool());
+        d->m_MezzDateEdit->setEnabled(d->ActiveAssumption.operator bool());
 	}
     d->RemoveScenarioButton->setEnabled(d->m_ScenariosModel->rowCount() > 0 && d->ActiveAssumption);
 }
@@ -2132,7 +2133,7 @@ void LoanAssumptionsEditor::CalculateNewStructure() {
         bool UseSuggestion = d->m_PoolModel->data(d->m_PoolModel->index(i, 3), Qt::UserRole + Qt::CheckStateRole).toInt() == Qt::Checked;
         QString ScenarioToApply = d->m_PoolModel->data(d->m_PoolModel->index(i, 2 + (UseSuggestion ? 1 : 0)), Qt::EditRole).toString();
 		if (!ScenarioToApply.isEmpty()) {
-            auto CurrScen = d->m_DirtyAssumptions.value(ScenarioToApply, d->m_Assumptions.value(ScenarioToApply, QSharedPointer<LoanAssumption>(nullptr)));
+            auto CurrScen = d->m_DirtyAssumptions.value(ScenarioToApply, d->m_Assumptions.value(ScenarioToApply, nullptr));
 			if (CurrScen) {
 				NewLoan.SetScenario(*CurrScen);
 			}

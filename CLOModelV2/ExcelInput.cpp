@@ -798,7 +798,7 @@ BSTR __stdcall WatFallStepEdit(LPSAFEARRAY *ArrayData) {
 	return NULL; 
 }
 BSTR __stdcall TriggerEdit(LPSAFEARRAY *ArrayData) {
-	QHash<quint32, QSharedPointer<AbstractTrigger> >AvailableTriggers;
+
 	VARIANT HUGEP *pdFreq;
 	HRESULT hr = SafeArrayAccessData(*ArrayData, (void HUGEP* FAR*)&pdFreq);
 	if (!SUCCEEDED(hr))return NULL;

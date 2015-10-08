@@ -312,7 +312,7 @@ const QDate& StressTest::GetStartDate() const
     return d->StartDate;
 }
 
-const QHash<AssumptionSet, QSharedPointer<Waterfall> > & StressTest::GetResults() const
+const QHash<AssumptionSet, std::shared_ptr<Waterfall> > & StressTest::GetResults() const
 {
     Q_D(const StressTest);
     return d->Results;
@@ -428,6 +428,7 @@ void StressTest::RunStressTest()
         d->ProgressForm = new PhasedProgressWidget();
         d->ProgressForm->AddPhase(tr("Calculating full assets cash flows"), 0, CountScenarios());
         d->ProgressForm->AddPhase(tr("Applying scenarios to aggregated cash flows"), 0, 0);
+        d->ProgressForm->AddPhase(tr("Generating Waterfalls"), 0, 0);
         d->ProgressForm->AddPhase(tr("Calculating liabilities cash flows"), 0, 100);
         d->ProgressForm->SetTotalProgressLabel(tr("Stress Test"));
         d->ProgressForm->show();
@@ -609,7 +610,7 @@ QDataStream& StressTest::LoadOldVersion(QDataStream& stream)
 	for (qint32 i = 0; i < tempint; i++) {
 		TempAssSet.SetLoadProtocolVersion(loadProtocolVersion()); stream >> TempAssSet;
         tempWatf.SetLoadProtocolVersion(loadProtocolVersion()); stream >> tempWatf;
-        d->Results.insert(TempAssSet, QSharedPointer<Waterfall>(new Waterfall(tempWatf)));
+        d->Results.insert(TempAssSet, std::make_shared<Waterfall>(tempWatf));
 	}
 	ResetProtocolVersion();
 	return stream;
@@ -796,7 +797,7 @@ bool StressTest::LoadResultsFromFile(const QString& DestPath)
 		}
 		QDataStream out(&TargetFile);
 		out.setVersion(StreamVersionUsed);
-		Waterfall* TempWF = new Waterfall();
+        std::shared_ptr<Waterfall> TempWF = std::make_shared<Waterfall>();
 		out >> VesionCheck;
 		if (VesionCheck<qint32(MinimumSupportedVersion) || VesionCheck>qint32(ModelVersionNumber)) {
 			TargetFile.close();
@@ -804,7 +805,7 @@ bool StressTest::LoadResultsFromFile(const QString& DestPath)
 		}
 		TempWF->SetLoadProtocolVersion(VesionCheck);
 		out >> (*TempWF);
-        d->Results.insert(CurrentAss, QSharedPointer<Waterfall>(TempWF));
+        d->Results.insert(CurrentAss, TempWF);
 		TargetFile.close();
 	}
 	return true;
@@ -909,7 +910,6 @@ void StressTest::GatherResults()
 {
     Q_D( StressTest);
     d->Results.clear();
-    d->TranchesCalculator->ClearWaterfalls();
     const auto CalcRes = d->TranchesCalculator->GetResultKeys();
 	for (auto i = CalcRes.constBegin(); i != CalcRes.constEnd(); ++i) {
         auto MatchingAssumption = d->m_RainbowTable.constFind(*i);

@@ -110,7 +110,7 @@ protected:
             tempRes.erase(FindRe);
             Q_ASSERT(!getResultVoid().contains(Ident));
         }
-        insertResult(Ident, new ResultType(a));
+        insertResult(Ident, std::make_shared<ResultType>(a));
         getThreadPool().remove(Ident);
         //emit BeeCalculated(++BeesReturned);
         getBeesReturned()++;
@@ -142,13 +142,13 @@ protected:
     {
         RETURN_WHEN_RUNNING(true, stream)
             qint32 TempSize, TempKey;
-        ResultType* TempRes = nullptr;
+        std::shared_ptr<ResultType> TempRes (nullptr);
         bool sequentComp;
         ClearResults();
         stream >> sequentComp >> TempSize;
         SetSequentialComputation(sequentComp);
         for (qint32 i = 0; i < TempSize; i++) {
-            TempRes = new ResultType();
+            TempRes = std::make_shared<ResultType>();
             stream >> TempKey;
             TempRes->SetLoadProtocolVersion(loadProtocolVersion());
             stream >> (*TempRes);

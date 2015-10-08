@@ -3,6 +3,7 @@
 #include "MtgCalculator.h"
 #include "Waterfall.h"
 #include "LoanAssumption.h"
+#include <memory>
 #include <QSharedPointer>
 #include "LoanAssumptionsEditor.h"
 //#include "WaterfallCalculator.h"
@@ -39,8 +40,8 @@ public:
     bool ScenExist(const QString& Teststr)const;
     bool CheckAliasInput();
     void FillScenariosModel();
-    QHash<QString, QSharedPointer<LoanAssumption> > m_Assumptions;
-    QSharedPointer<LoanAssumption> ActiveAssumption;
+    QHash<QString, std::shared_ptr<LoanAssumption> > m_Assumptions;
+    std::shared_ptr<LoanAssumption> ActiveAssumption;
     QStandardItemModel* m_ScenariosModel;
     QStandardItemModel* m_AliasesModel;
     QStandardItemModel* m_SeniorAsumptionsModel;
@@ -101,7 +102,7 @@ public:
     QPushButton* CalculateNewStructureButton;
     QLabel* m_OldSelectedTrancheLabel;
     QLabel* m_NewSelectedTrancheLabel;
-    QHash<QString, QSharedPointer<LoanAssumption> > m_DirtyAssumptions;
+    QHash<QString, std::shared_ptr<LoanAssumption> > m_DirtyAssumptions;
     QListView* m_PoolScanFilterView;
     QListView* m_PoolScanDealsView;
     QTableView* m_PoolScanPoolView;

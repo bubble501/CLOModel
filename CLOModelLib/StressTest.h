@@ -70,7 +70,7 @@ public:
 	void ClearAssumptions();
 	const Waterfall& GetStructure()const;
 	const QDate& GetStartDate()const;
-	const QHash<AssumptionSet, QSharedPointer<Waterfall> > & GetResults() const;
+	const QHash<AssumptionSet, std::shared_ptr<Waterfall> > & GetResults() const;
 	bool GetUseMultithread()const;
 	void AddLoan(const Mortgage& a);
 	void ResetLoans();

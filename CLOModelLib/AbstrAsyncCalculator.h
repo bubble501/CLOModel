@@ -25,7 +25,7 @@ protected:
     virtual qint32& getBeesReturned();
     virtual const qint32& getBeesReturned() const;
     virtual const std::shared_ptr<void> getResultVoid(qint32 key)const;
-    virtual void insertResult(qint32 Key, void* val);
+    virtual void insertResult(qint32 Key, std::shared_ptr<void> val);
     virtual bool ContinueCalculation() const;
     virtual void setContinueCalculation(bool val);
     virtual int availableThreads() const;

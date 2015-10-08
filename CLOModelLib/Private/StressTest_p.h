@@ -3,7 +3,7 @@
 #include "Private/BackwardCompatibilityInterface_p.h"
 #include "StressTest.h"
 #include <QDate>
-#include <QSharedPointer>
+#include <memory>
 #include <QPointer>
 #include <QHash>
 #include <QSet>
@@ -36,7 +36,7 @@ public:
     QSet<QString> m_DelinqLagScenarios;
     Waterfall Structure;
     QDate StartDate;
-    QHash<AssumptionSet, QSharedPointer<Waterfall> >  Results;
+    QHash<AssumptionSet, std::shared_ptr<Waterfall> >  Results;
     bool SequentialComputation;
     bool ContinueCalculation;
     bool ShowProgress;

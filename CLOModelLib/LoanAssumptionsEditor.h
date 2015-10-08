@@ -2,7 +2,6 @@
 #define LOANASSUMPTIONSMODEL_H
 #include <QWidget>
 #include <QHash>
-#include <QSharedPointer>
 #include "clomodellib_global.h"
 class LoanAssumptionsEditorPrivate;
 class Mortgage;

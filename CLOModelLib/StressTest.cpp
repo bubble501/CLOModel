@@ -951,19 +951,18 @@ void StressTest::ResetScenarios()
 void StressTest::FastLoansCalculated() {
     Q_D( StressTest);
     QList<qint32> AllKeys = d->BaseApplier->GetAssumptionKeys();
-	std::shared_ptr<AssumptionSet> CurrentAss;
+	AssumptionSet CurrentAss;
 	foreach(qint32 SingleKey, AllKeys) {
         CurrentAss = d->BaseApplier->GetAssumption(SingleKey);
-		if (!CurrentAss)continue;
-		uint CurrentHash = qHash(*CurrentAss, 88);
+		uint CurrentHash = qHash(CurrentAss, 88);
         if (d->m_RainbowTable.contains(CurrentHash)) {
 			emit ErrorInCalculation();
 			return;
 		}
-        d->m_RainbowTable.insert(CurrentHash, *CurrentAss);
+        d->m_RainbowTable.insert(CurrentHash, CurrentAss);
         d->Structure.ResetMtgFlows();
         d->Structure.AddMortgagesFlows(d->BaseApplier->GetResult(SingleKey));
-        d->Structure.SetAssumptions(*CurrentAss);
+        d->Structure.SetAssumptions(CurrentAss);
         d->TranchesCalculator->AddWaterfall(d->Structure, CurrentHash);
 	}
 	emit AllLoansCalculated();

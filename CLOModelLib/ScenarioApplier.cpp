@@ -32,12 +32,16 @@ void ScenarioApplier::SetBaseFlows(const MtgCashFlow& val)
 void ScenarioApplier::AddAssumption(const AssumptionSet& a, qint32 idx)
 {
     Q_D( ScenarioApplier);
-	RETURN_WHEN_RUNNING(true, )
+	
     auto FoundAss = d->m_Scenarios.find(idx);
-    if (FoundAss == d->m_Scenarios.end())
-        d->m_Scenarios.insert(idx, std::make_shared< AssumptionSet>(a));
-    else
-        FoundAss.value().reset(new AssumptionSet(a));   
+    if (FoundAss == d->m_Scenarios.end()) {
+        RETURN_WHEN_RUNNING(true, )
+        d->m_Scenarios.insert(idx, writeTempFile(a));
+    }
+    else {
+        removeTempFile(FoundAss.value());
+        FoundAss.value() = writeTempFile(a);
+    }
 }
 
 const MtgCashFlow ScenarioApplier::GetResult(const AssumptionSet& a) const
@@ -62,7 +66,7 @@ bool ScenarioApplier::StartCalculation()
 		if (NumofSent >= NumberOfThreads) break;
         if (d->BeesSent.contains(SingleScen.key())) continue;
 		CurrentThread = AddThread(SingleScen.key());
-		CurrentThread->SetAssumption(*(SingleScen.value()));
+		CurrentThread->SetAssumption(readTempFile<AssumptionSet>(SingleScen.value()));
         CurrentThread->SetBaseFlow(d->m_BaseFlows);
 		CurrentThread->start();
 		++NumofSent;
@@ -78,7 +82,7 @@ void ScenarioApplier::BeeReturned(int Ident, const MtgCashFlow& a)
     for (auto SingleScen = d->m_Scenarios.constBegin(); SingleScen != d->m_Scenarios.constEnd(); ++SingleScen) {
         if (d->BeesSent.contains(SingleScen.key())) continue;
 		CurrentThread = AddThread(SingleScen.key());
-		CurrentThread->SetAssumption(*(SingleScen.value()));
+        CurrentThread->SetAssumption(readTempFile<AssumptionSet>(SingleScen.value()));
         CurrentThread->SetBaseFlow(d->m_BaseFlows);
 		CurrentThread->start();
 		return;
@@ -104,10 +108,10 @@ void ScenarioApplier::ClearScenarios()
     d->m_Scenarios.clear();
 }
 
-const std::shared_ptr<AssumptionSet> ScenarioApplier::GetAssumption(qint32 idx) const
+AssumptionSet ScenarioApplier::GetAssumption(qint32 idx) const
 {
     Q_D(const ScenarioApplier);
-    return d->m_Scenarios.value(idx, nullptr);
+    return readTempFile<AssumptionSet>(d->m_Scenarios.value(idx, QString()));
 }
 
 QList<qint32> ScenarioApplier::GetAssumptionKeys() const
@@ -123,8 +127,9 @@ QString ScenarioApplier::ReadyToCalculate()const
 	QString Result;
     if (d->m_BaseFlows.IsEmpty()) Result += "Invalid Base Flows\n";
     for (auto i = d->m_Scenarios.constBegin(); i != d->m_Scenarios.constEnd(); i++) {
-		if (!i.value()->IsValid())
-			Result += "Invalid Scenario: " + i.value()->ToString() + '\n';
+        const auto currAss= readTempFile<AssumptionSet>(i.value());
+        if (!currAss.IsValid())
+            Result += "Invalid Scenario: " + currAss.ToString() + '\n';
 	}
 	if (!Result.isEmpty()) return Result.left(Result.size() - 1);
 	return Result;
@@ -135,7 +140,7 @@ QDataStream& operator<<(QDataStream & stream, const ScenarioApplier& flows) {
     stream << flows.d_func()->m_BaseFlows;
     stream << static_cast<qint32>(flows.d_func()->m_Scenarios.size());
     for (auto i = flows.d_func()->m_Scenarios.constBegin(); i != flows.d_func()->m_Scenarios.constEnd(); ++i) {
-		stream << i.key() << *(i.value());
+        stream << i.key() << flows.readTempFile<AssumptionSet>(i.value());
 	}
 	return flows.SaveToStream(stream);
 }
@@ -147,13 +152,12 @@ QDataStream& ScenarioApplier::LoadOldVersion(QDataStream& stream)
 	qint32 TempSize, TempKey;
     stream >> d->m_BaseFlows;
 	stream >> TempSize;
-	std::shared_ptr<AssumptionSet> TempRes(nullptr);
+	AssumptionSet TempRes;
 	for (qint32 i = 0; i < TempSize; i++) {
-		TempRes.reset(new AssumptionSet());
 		stream >> TempKey;
-		TempRes->SetLoadProtocolVersion(loadProtocolVersion());
-		stream >> (*TempRes);
-        d->m_Scenarios.insert(TempKey, TempRes);
+		TempRes.SetLoadProtocolVersion(loadProtocolVersion());
+		stream >> TempRes;
+        d->m_Scenarios.insert(TempKey, writeTempFile(TempRes));
 	}
 	return TemplAsyncCalculator<ApplyFlowThread, MtgCashFlow>::LoadOldVersion(stream);
 }
@@ -162,7 +166,8 @@ qint32 ScenarioApplier::FindAssumption(const AssumptionSet& a)const
 {
     Q_D(const ScenarioApplier);
     for (auto i = d->m_Scenarios.constBegin(); i != d->m_Scenarios.constEnd(); ++i) {
-		if (a == *(i.value())) return i.key();
+        if (a == readTempFile<AssumptionSet>(i.value()))
+            return i.key();
 	}
 	return -1;
 }

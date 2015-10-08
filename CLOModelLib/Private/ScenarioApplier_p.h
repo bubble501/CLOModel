@@ -11,6 +11,6 @@ class ScenarioApplierPrivate : public AbstrAsyncCalculatorPrivate
     DECLARE_PRIVATE_COMMONS_DATASTREAM(ScenarioApplier)
 public:
     MtgCashFlow m_BaseFlows;
-    QHash<qint32, std::shared_ptr<AssumptionSet> > m_Scenarios;
+    QHash<qint32, QString > m_Scenarios;
 };
 #endif // ScenarioApplier_p_h__

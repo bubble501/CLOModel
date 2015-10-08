@@ -915,7 +915,7 @@ void StressTest::GatherResults()
         auto MatchingAssumption = d->m_RainbowTable.constFind(*i);
         if (MatchingAssumption != d->m_RainbowTable.constEnd()) {
             d->Results[MatchingAssumption.value()].reset(
-                new Waterfall(*(d->TranchesCalculator->GetResult(*i)))
+                new Waterfall(d->TranchesCalculator->GetResult(*i))
 			);
 		}
 	}
@@ -962,7 +962,7 @@ void StressTest::FastLoansCalculated() {
 		}
         d->m_RainbowTable.insert(CurrentHash, *CurrentAss);
         d->Structure.ResetMtgFlows();
-        d->Structure.AddMortgagesFlows(*(d->BaseApplier->GetResult(SingleKey)));
+        d->Structure.AddMortgagesFlows(d->BaseApplier->GetResult(SingleKey));
         d->Structure.SetAssumptions(*CurrentAss);
         d->TranchesCalculator->AddWaterfall(d->Structure, CurrentHash);
 	}

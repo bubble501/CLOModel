@@ -21,9 +21,6 @@ public:
 	virtual int NumBees() const override;
 	virtual void Reset() override;
 	virtual void ClearWaterfalls();
-    virtual void RemoveResult(qint32 Key) override;
-    virtual const std::shared_ptr<Waterfall> GetResult(qint32 key)const override;
-    virtual void ClearResults() override;
 public slots:
 	virtual bool StartCalculation() override;
     friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const WaterfallCalculator& flows);

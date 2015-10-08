@@ -2188,9 +2188,8 @@ void LoanAssumptionsEditor::CalculateNewStructure() {
 }
 void LoanAssumptionsEditor::NewTranchesCalculated() {
     Q_D(LoanAssumptionsEditor);
-    d->m_NewWtfToExtension = *(d->m_NewWatFalls->GetResult(0));
-    if (d->m_NewWatFalls->GetResult(1))
-        d->m_NewWtfToCall = *(d->m_NewWatFalls->GetResult(1));
+    d->m_NewWtfToExtension = d->m_NewWatFalls->GetResult(0);
+    d->m_NewWtfToCall = d->m_NewWatFalls->GetResult(1);
 	//////////////////////////////////////////////////////////////////////////
     d->m_NewStructureModel->setRowCount(d->m_NewWtfToExtension.GetTranchesCount());
     d->SafeSetModel(d->m_NewStrGenTable, d->m_NewStructureModel);
@@ -2418,13 +2417,13 @@ void LoanAssumptionsEditorPrivate::CreateModelScanner()
 		}
 		QModelIndex CurrentIndex = m_ScannedPoolsProxy->mapToSource(index);
 		auto CurrAss=m_PoolMatcher->GetResult(m_ScanPoolsModel->data(CurrentIndex, Qt::UserRole + 2).toInt());
-		m_ScannedModel->setRowCount(CurrAss->ScenarioCount());
-		for (int i = 0; i < CurrAss->ScenarioCount(); ++i) {
-			m_ScannedModel->setData(m_ScannedModel->index(i, 0), CurrAss->GetIssuer(i), Qt::EditRole);
-			m_ScannedModel->setData(m_ScannedModel->index(i, 0), "#,#"+CurrAss->GetCurrScen(i) + "#,#" + CurrAss->GetDetectScen(i) + "#,#", Qt::UserRole);
-			m_ScannedModel->setData(m_ScannedModel->index(i, 1), CurrAss->GetFacility(i), Qt::EditRole);
-			m_ScannedModel->setData(m_ScannedModel->index(i, 2), CurrAss->GetCurrScen(i), Qt::EditRole);
-			m_ScannedModel->setData(m_ScannedModel->index(i, 3), CurrAss->GetDetectScen(i), Qt::EditRole);
+		m_ScannedModel->setRowCount(CurrAss.ScenarioCount());
+		for (int i = 0; i < CurrAss.ScenarioCount(); ++i) {
+			m_ScannedModel->setData(m_ScannedModel->index(i, 0), CurrAss.GetIssuer(i), Qt::EditRole);
+			m_ScannedModel->setData(m_ScannedModel->index(i, 0), "#,#"+CurrAss.GetCurrScen(i) + "#,#" + CurrAss.GetDetectScen(i) + "#,#", Qt::UserRole);
+			m_ScannedModel->setData(m_ScannedModel->index(i, 1), CurrAss.GetFacility(i), Qt::EditRole);
+			m_ScannedModel->setData(m_ScannedModel->index(i, 2), CurrAss.GetCurrScen(i), Qt::EditRole);
+			m_ScannedModel->setData(m_ScannedModel->index(i, 3), CurrAss.GetDetectScen(i), Qt::EditRole);
 		}
 	});
     q->connect(m_PoolScanPoolView->horizontalHeader(), &QHeaderView::sectionClicked, [&](int a) {
@@ -2488,17 +2487,16 @@ void LoanAssumptionsEditorPrivate::CreateModelScanner()
 	});
     q->connect(m_PoolMatcher, &LoanAssMatcher::BeeCalculated, [&](int index) {
 		auto CurrentResult = m_PoolMatcher->GetResult(index);
-		if (!CurrentResult) return;
-		if (CurrentResult->isValid()) {
+		if (CurrentResult.isValid()) {
 			m_ScanPoolsModel->insertRow(m_ScanPoolsModel->rowCount());
-			m_ScanPoolsModel->setData(m_ScanPoolsModel->index(m_ScanPoolsModel->rowCount() - 1, 0), CurrentResult->GetDealName(), Qt::EditRole);
+			m_ScanPoolsModel->setData(m_ScanPoolsModel->index(m_ScanPoolsModel->rowCount() - 1, 0), CurrentResult.GetDealName(), Qt::EditRole);
 			QString FilterString("#,#");
-			for (int i = 0; i < CurrentResult->ScenarioCount(); ++i) {
-				if (!FilterString.contains("#,#"+CurrentResult->GetDetectScen(i) + "#,#"))
-					FilterString += CurrentResult->GetDetectScen(i) + "#,#";
+			for (int i = 0; i < CurrentResult.ScenarioCount(); ++i) {
+				if (!FilterString.contains("#,#"+CurrentResult.GetDetectScen(i) + "#,#"))
+					FilterString += CurrentResult.GetDetectScen(i) + "#,#";
 			}
 			m_ScanPoolsModel->setData(m_ScanPoolsModel->index(m_ScanPoolsModel->rowCount() - 1, 0), FilterString, Qt::UserRole);
-			m_ScanPoolsModel->setData(m_ScanPoolsModel->index(m_ScanPoolsModel->rowCount() - 1, 0), CurrentResult->GetFilePath(), Qt::UserRole + 1);
+			m_ScanPoolsModel->setData(m_ScanPoolsModel->index(m_ScanPoolsModel->rowCount() - 1, 0), CurrentResult.GetFilePath(), Qt::UserRole + 1);
 			m_ScanPoolsModel->setData(m_ScanPoolsModel->index(m_ScanPoolsModel->rowCount() - 1, 0), index , Qt::UserRole + 2);
 			m_ScannedPoolsProxy->setFilterKeyColumn(0);
 		}

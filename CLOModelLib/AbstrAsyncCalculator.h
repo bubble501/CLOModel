@@ -4,6 +4,7 @@
 #include "BackwardCompatibilityInterface.h"
 #include <QObject>
 #include <memory>
+#include <QTemporaryFile>
 #ifndef RETURN_WHEN_RUNNING
 #define RETURN_WHEN_RUNNING(rvr,retval) if( ContinueCalculation() == rvr) return retval;
 #endif
@@ -16,19 +17,54 @@ protected:
     inline const AbstrAsyncCalculatorPrivate* d_func() const { return reinterpret_cast<const AbstrAsyncCalculatorPrivate *>(qGetPtrHelper(BackwardInterface::d_ptr)); }
     friend class AbstrAsyncCalculatorPrivate;
     AbstrAsyncCalculator(AbstrAsyncCalculatorPrivate *d, QObject* parent = nullptr);
-    virtual QHash<qint32, std::shared_ptr<void>>& getResultVoid();
-    virtual const QHash<qint32, std::shared_ptr<void>>& getResultVoid() const;
+    virtual const QHash<qint32, QString >& getResultPaths() const;
+    virtual QHash<qint32, QString >& getResultPaths();
     virtual QHash<qint32, QPointer<QObject> >& getThreadPool();
     virtual const QHash<qint32, QPointer<QObject> >& getThreadPool() const;
     virtual const QSet<qint32>& getBeeSent() const;
     virtual QSet<qint32>& getBeeSent();
     virtual qint32& getBeesReturned();
     virtual const qint32& getBeesReturned() const;
-    virtual const std::shared_ptr<void> getResultVoid(qint32 key)const;
-    virtual void insertResult(qint32 Key, std::shared_ptr<void> val);
+    virtual QString getResultPaths(qint32 key)const;
     virtual bool ContinueCalculation() const;
     virtual void setContinueCalculation(bool val);
     virtual int availableThreads() const;
+    void insertResult(qint32 Key, const QString& path);
+    QString getDataDirPath() const;
+    template <class T> QString writeTempFile(const T& val) const
+    {
+        QTemporaryFile destFile(getDataDirPath() + '/');
+        destFile.setAutoRemove(false);
+        if (destFile.open()) {
+            QDataStream out(&destFile);
+            out.setVersion(StreamVersionUsed);
+            out << val;
+            destFile.close();
+            return destFile.fileName();
+        }
+        PrintToTempFile("PermissionError", "Could not write temporary file to save Waterfall");
+        return QString();
+    }
+    void removeTempFile(const QString& path) const;
+    template <class T> T readTempFile(const QString& path) const
+    {
+        
+        static_assert(std::is_base_of<BackwardInterface, T >::value, "T must inherit from BackwardInterface");
+        static_assert(std::is_default_constructible< T >::value, "T must have a default constructor");
+        T result;
+        if (path.isEmpty())
+            return result;
+        QFile sourceFile(path);
+        if (sourceFile.open(QIODevice::ReadOnly)) {
+            QDataStream in(&sourceFile);
+            in.setVersion(StreamVersionUsed);
+            in >> result;
+            sourceFile.close();
+        }
+        else
+            PrintToTempFile("PermissionError", "Could not read temporary file to load Waterfall");
+        return result;
+    }
 public:
     virtual quint8 operativity() const;
     virtual void setOperativity(quint8 val);

@@ -36,9 +36,6 @@ public:
     MtgCalculator(QObject* parent = nullptr);
 	virtual ~MtgCalculator();
 	virtual void Reset() override;
-	virtual void ClearResults() override;
-    virtual QList<qint32> GetResultKeys() const override;
-    virtual const std::shared_ptr<MtgCashFlow> GetResult(qint32 key)const override;
 	virtual int NumBees() const override;
     bool hasLoan(qint32 Index);
 	void SetLoan(const Mortgage& a, qint32 Index);
@@ -77,7 +74,6 @@ public:
 	void SetDownloadScenario(bool val);
     bool SaveIndividualFlows() const;
     void SaveIndividualFlows(bool val);
-    virtual void RemoveResult(qint32 Key) override;
 	friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const MtgCalculator& flows);
 	friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, MtgCalculator& flows);
 };

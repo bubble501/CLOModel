@@ -6,6 +6,7 @@ AbstrAsyncCalculatorPrivate::~AbstrAsyncCalculatorPrivate(){}
 AbstrAsyncCalculator::~AbstrAsyncCalculator() {}
 AbstrAsyncCalculatorPrivate::AbstrAsyncCalculatorPrivate(AbstrAsyncCalculator *q)
 	:BackwardInterfacePrivate(q)
+    , m_dataDir(QDir::tempPath() + "/CLOModel/")
 {}
 
 quint8 AbstrAsyncCalculator::operativity() const
@@ -70,29 +71,28 @@ qint32& AbstrAsyncCalculator::getBeesReturned()
     return d->BeesReturned;
 }
 
-QHash<qint32, std::shared_ptr<void> >& AbstrAsyncCalculator::getResultVoid()
+QHash<qint32, QString >& AbstrAsyncCalculator::getResultPaths()
 {
     Q_D(AbstrAsyncCalculator);
     return d->m_Result;
 }
 
-const std::shared_ptr<void> AbstrAsyncCalculator::getResultVoid(qint32 key) const
+QString AbstrAsyncCalculator::getResultPaths(qint32 key) const
 {
     Q_D(const AbstrAsyncCalculator);
-    return d->m_Result.value(key, std::shared_ptr<void>());
+    return d->m_Result.value(key,QString());
 }
 
-const QHash<qint32, std::shared_ptr<void> >& AbstrAsyncCalculator::getResultVoid() const
+const QHash<qint32, QString >& AbstrAsyncCalculator::getResultPaths() const
 {
     Q_D(const AbstrAsyncCalculator);
     return d->m_Result;
 }
-
-void AbstrAsyncCalculator::insertResult(qint32 Key, std::shared_ptr<void> val)
+void AbstrAsyncCalculator::removeTempFile(const QString& path) const
 {
-    Q_D(AbstrAsyncCalculator);
-    d->m_Result.insert(Key, std::shared_ptr<void>(val));
+    QFile::remove(path);
 }
+
 
 bool AbstrAsyncCalculator::ContinueCalculation() const
 {
@@ -114,6 +114,18 @@ int AbstrAsyncCalculator::availableThreads() const
         * static_cast<double>(d->m_operativity) 
         / 100.0
         );
+}
+
+void AbstrAsyncCalculator::insertResult(qint32 Key, const QString& path)
+{
+    Q_D(AbstrAsyncCalculator);
+    d->m_Result.insert(Key, path);
+}
+
+QString AbstrAsyncCalculator::getDataDirPath() const
+{
+    Q_D(const AbstrAsyncCalculator);
+    return d->m_dataDir.path();
 }
 
 void AbstrAsyncCalculator::SetSequentialComputation(bool a)

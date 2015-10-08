@@ -7,6 +7,8 @@
 #include <QHash>
 #include <QPointer>
 #include <atomic>
+#include <QTemporaryFile>
+#include "Private/CheckedTempDir.h"
 class AbstrAsyncCalculatorPrivate : public BackwardInterfacePrivate
 {
     DECLARE_PRIVATE_COMMONS(AbstrAsyncCalculator)
@@ -14,11 +16,12 @@ class AbstrAsyncCalculatorPrivate : public BackwardInterfacePrivate
 public:
     std::atomic_bool m_ContinueCalculation;
     QHash<qint32, QPointer<QObject> > m_ThreadPool;
-    QHash<qint32, std::shared_ptr<void> > m_Result;
+    QHash<qint32, QString > m_Result;
     QSet<qint32> BeesSent;
     qint32 BeesReturned;
     bool m_SequentialComputation;
     quint8 m_operativity;
+    CheckedTempDir m_dataDir;
     
 };
 #endif // AbstrAsyncCalculator_p_h__

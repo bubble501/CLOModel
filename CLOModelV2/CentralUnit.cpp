@@ -486,14 +486,16 @@ void CentralUnit::CheckCalculationDone()
         if (loadFailed)
             QMessageBox::warning(nullptr, tr("Database Upload Failed"), notLoadedString);
         // Save it to File
-		QDir UnifiedDir(GetFromConfig("Folders", "UnifiedResultsFolder"));
+		const QDir UnifiedDir(GetFromConfig("Folders", "UnifiedResultsFolder"));
 		if (UnifiedDir.exists()) {
 			QStringList AdjDealName = Structure.GetDealName().toList();
 			if (AdjDealName.isEmpty() && Structure.GetTranchesCount() > 0) {
 				AdjDealName << Structure.GetTranche(0)->GetTrancheName();
 			}
-            std::sort(AdjDealName.begin(), AdjDealName.end());
-			QFile UnifiedFile(UnifiedDir.absoluteFilePath(AdjDealName.first() + ".clom"));
+            auto dealNameIter = std::find_if(AdjDealName.constBegin(), AdjDealName.constEnd(), [&UnifiedDir](const QString& val)->bool {return QFile::exists(UnifiedDir.absoluteFilePath(val + ".clom")); });
+            if (dealNameIter == AdjDealName.constEnd())
+                dealNameIter = AdjDealName.constBegin();
+            QFile UnifiedFile(UnifiedDir.absoluteFilePath(*dealNameIter + ".clom"));
 			if (UnifiedFile.open(QIODevice::WriteOnly)) {
 				QDataStream out(&UnifiedFile);
 				out.setVersion(StreamVersionUsed);

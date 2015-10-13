@@ -1,8 +1,12 @@
 TEMPLATE = subdirs
 SUBDIRS = CLOModelLib
-CLOModelTest.file= CLOModelTest/CLOModelTest.pro
-CLOModelTest.depends = CLOModelLib
-SUBDIRS += CLOModelTest
+
+RatingsTest.file= Tests/RatingsTest/RatingsTest.pro
+RatingsTest.depends = CLOModelLib
+BloombergVectorTest.file= Tests/BloombergVectorTest/BloombergVectorTest.pro
+BloombergVectorTest.depends = CLOModelLib
+SUBDIRS += BloombergVectorTest RatingsTest
+
 CONFIG(release, debug|release) {
     CLOViewer.file= CLOViewer/CLOViewer.pro
     CLOViewer.depends = CLOModelLib

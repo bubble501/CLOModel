@@ -405,7 +405,7 @@ void CentralUnit::CalculationStep2()
 		CallStructure.ResetTranches();
 		CallStructure.ResetSteps();
 		if (!Structure.CalculateTranchesCashFlows()) {
-			QMessageBox::critical(0, "Error", "Critical error in waterfall calculation");
+            QMessageBox::critical(0, "Error", "Critical error in waterfall calculation Failed Calculation of Single Waterfall");
 			QApplication::quit();
 			return;
 		}
@@ -428,7 +428,7 @@ void CentralUnit::CalculationStep2()
 		disconnect(MtgsProgress, &QProgressDialog::canceled,nullptr,nullptr);
 		connect(MtgsProgress, &QProgressDialog::canceled, ParallWatFalls, &WaterfallCalculator::StopCalculation);
         if (!ParallWatFalls->StartCalculation()) {
-            QMessageBox::critical(0, "Error", "Critical error in waterfall calculation");
+            QMessageBox::critical(0, "Error", "Critical error in waterfall calculation Failed parallel waterfalls");
             QApplication::quit();
         }
 	}
@@ -446,7 +446,7 @@ void CentralUnit::CheckCalculationDone()
 		Structure=ParallWatFalls->GetResult(0);
 		CallStructure = ParallWatFalls->GetResult(1);
 		if(Structure.GetTranchesCount()==0 || CallStructure.GetTranchesCount()==0){
-			QMessageBox::critical(0, "Error", "Critical error in waterfall calculation");
+			QMessageBox::critical(0, "Error", "Critical error in waterfall calculation Results are empty");
 			QApplication::quit();
 			return;
 		}

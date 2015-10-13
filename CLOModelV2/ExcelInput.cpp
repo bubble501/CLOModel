@@ -30,6 +30,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
     int argc = 1;
     QApplication ComputationLoop(argc, 0);
     ComputationLoop.setWindowIcon(QIcon(":/Icons/Logo.png"));
+    ComputationLoop.setApplicationName("CLO Model");
     QProgressDialog* loansLoadDialog = new QProgressDialog;
     loansLoadDialog->setAutoClose(true);
     loansLoadDialog->setCancelButton(nullptr);

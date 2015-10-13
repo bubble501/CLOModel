@@ -43,7 +43,7 @@ CentralUnit::CentralUnit(QObject* parent)
 	ParallWatFalls=new WaterfallCalculator(this);
 	connect(ParallWatFalls,SIGNAL(Calculated()),this,SLOT(CheckCalculationDone()));
 }
-void CentralUnit::SetPoolCutOff(const QDate& a) { PoolCutOff = a; if (Stresser) Stresser->SetStartDate(PoolCutOff); }
+void CentralUnit::SetPoolCutOff(const QDate& a) { PoolCutOff = a; }
 void CentralUnit::SetFolderPath(const QString& a){FolderPath=a;}
 
 bool CentralUnit::SaveInputs() const
@@ -79,7 +79,6 @@ void CentralUnit::AddLoan(
 		TempMtg.SetProperty(KeyVal.first(), KeyVal.at(1));
 	}
 	LoansCalculator.SetLoan(TempMtg,LoansCalculator.NumBees());
-	if (Stresser)Stresser->AddLoan(TempMtg);
 }
 
 void CentralUnit::AddLoan(const Mortgage& TempMtg)
@@ -99,7 +98,6 @@ void CentralUnit::AddTranche(const QString& Name, const QString& ProRataGroup, d
 	TempTrnch.SetBloombergExtension(BbgExt);
 	TempTrnch.GetDataFromBloomberg();
 	Structure.AddTranche(TempTrnch);
-	if (Stresser)Stresser->SetStructure(Structure);
 }
 #endif
 void CentralUnit::AddTranche(
@@ -150,8 +148,6 @@ void CentralUnit::AddTranche(
 	TempTrnch.SetStartingDeferredInterest(StartingDeferredInterest);
 	Structure.AddTranche(TempTrnch);
     LOGDEBUG(QString("Starting Deferred Interest - Input: %1 Tranche: %3 Structure: %2").arg(StartingDeferredInterest, 0, 'f').arg(Structure.GetTranche(Structure.GetTranchesCount() - 1)->GetStartingDeferredInterest(), 0, 'f').arg(TempTrnch.GetStartingDeferredInterest(), 0, 'f'));
-	if (Stresser)
-        Stresser->SetStructure(Structure);
 }
 void CentralUnit::AddWaterfallStep(
 	WatFalPrior::WaterfallStepType Tpe
@@ -187,8 +183,6 @@ void CentralUnit::AddWaterfallStep(
 	TempStep.SetParameter(WatFalPrior::wstParameters::PayAccrue, QString::number(ArgAccruePay));
 	TempStep.SetPriorityType(Tpe);
 	Structure.AddStep(TempStep);
-	if(Stresser)
-        Stresser->SetStructure(Structure);
 }
 void CentralUnit::Reset(){
 	LoansCalculator.Reset();

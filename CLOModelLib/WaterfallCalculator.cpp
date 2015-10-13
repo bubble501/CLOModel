@@ -1,6 +1,8 @@
 #include "WaterfallCalculator.h"
 #include "Private/WaterfallCalculator_p.h"
 #include <QTemporaryFile>
+#include <QtConcurrent>
+#include "Private/InternalItems.h"
 DEFINE_PUBLIC_QOBJECT_COMMONS(WaterfallCalculator)
 WaterfallCalculatorPrivate::~WaterfallCalculatorPrivate() {}
 WaterfallCalculatorPrivate::WaterfallCalculatorPrivate(WaterfallCalculator *q)
@@ -87,10 +89,12 @@ QString WaterfallCalculator::ReadyToCalculate() const
 {
     Q_D(const WaterfallCalculator);
 	RETURN_WHEN_RUNNING(true, "Calculator Already Running\n")
-	QString Res = "";
+	QString Res;
+/*
     for (auto i = d->m_CascadesPath.constBegin(); i != d->m_CascadesPath.constEnd(); ++i) {
         Res += readTempFile<Waterfall>(i.value()).ReadyToCalculate();
-	}
+	}*/
+    Res += QtConcurrent::blockingMappedReduced(d->m_CascadesPath, ConcurrentFunctions::checkReadyToCalculateLoan, ConcurrentFunctions::reduceReadyToCalculate, QtConcurrent::UnorderedReduce);
 	return Res;
 }
 

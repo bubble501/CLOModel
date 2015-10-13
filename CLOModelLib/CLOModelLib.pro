@@ -11,8 +11,9 @@ CONFIG(release, debug|release) {
     MOC_DIR += ./GeneratedFiles/release
     OBJECTS_DIR += release
 }
-QT += core sql widgets gui
-DEFINES += QT_DLL QT_SQL_LIB QT_WIDGETS_LIB CLOMODELLIB_LIB
+QT += core sql widgets gui concurrent
+DEFINES += QT_DLL QT_SQL_LIB QT_WIDGETS_LIB CLOMODELLIB_LIB QT_CONCURRENT_LIB
+
 INCLUDEPATH += "$$(QBBGLIBPATH)/include" \
     "$$(SIMSTRINGPATH)/include/simstring" \
     "$$(QUAZIPPATH)/include/quazip" \

@@ -88,7 +88,7 @@ const QHash<qint32, QString >& AbstrAsyncCalculator::getResultPaths() const
     Q_D(const AbstrAsyncCalculator);
     return d->m_Result;
 }
-void AbstrAsyncCalculator::removeTempFile(const QString& path) const
+void AbstrAsyncCalculator::removeTempFile(const QString& path)
 {
     QFile::remove(path);
 }

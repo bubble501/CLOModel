@@ -60,3 +60,4 @@ Makefile*
 *.snk
 ConsoleTest*
 */Resources/CountriesDB/*
+*.*.orig

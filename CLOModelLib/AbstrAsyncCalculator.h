@@ -5,14 +5,21 @@
 #include <QObject>
 #include <memory>
 #include <QTemporaryFile>
+#include <QString>
 #ifndef RETURN_WHEN_RUNNING
 #define RETURN_WHEN_RUNNING(rvr,retval) if( ContinueCalculation() == rvr) return retval;
 #endif
 class AbstrAsyncCalculatorPrivate;
+namespace ConcurrentFunctions { 
+    QString checkReadyToCalculateLoan(const QString& path); 
+    QString checkReadyToCalculateWaterfall(const QString& path);
+}
 class CLOMODELLIB_EXPORT AbstrAsyncCalculator : public QObject, public BackwardInterface
 {
 	Q_OBJECT	
 protected:
+    friend QString ConcurrentFunctions::checkReadyToCalculateLoan(const QString& path);
+    friend QString ConcurrentFunctions::checkReadyToCalculateWaterfall(const QString& path);
     inline AbstrAsyncCalculatorPrivate* d_func() { return reinterpret_cast<AbstrAsyncCalculatorPrivate *>(qGetPtrHelper(BackwardInterface::d_ptr)); }
     inline const AbstrAsyncCalculatorPrivate* d_func() const { return reinterpret_cast<const AbstrAsyncCalculatorPrivate *>(qGetPtrHelper(BackwardInterface::d_ptr)); }
     friend class AbstrAsyncCalculatorPrivate;
@@ -45,8 +52,8 @@ protected:
         PrintToTempFile("PermissionError", "Could not write temporary file to save Waterfall");
         return QString();
     }
-    void removeTempFile(const QString& path) const;
-    template <class T> T readTempFile(const QString& path) const
+    static void removeTempFile(const QString& path);
+    template <class T> static T readTempFile(const QString& path)
     {
         
         static_assert(std::is_base_of<BackwardInterface, T >::value, "T must inherit from BackwardInterface");

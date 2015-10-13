@@ -17,6 +17,7 @@
 #include <QXmlStreamReader>
 #include "BaseRateTable.h"
 #include <QTemporaryFile>
+#include <QtConcurrent>
 DEFINE_PUBLIC_QOBJECT_COMMONS(MtgCalculator)
 MtgCalculator::~MtgCalculator()
 {
@@ -279,16 +280,19 @@ void MtgCalculator::Reset(){
 	ClearTempProperties();
 	TemplAsyncCalculator<MtgCalculatorThread, MtgCashFlow>::Reset();
 }
+
 QString MtgCalculator::ReadyToCalculate()const{
     Q_D(const MtgCalculator);
 	RETURN_WHEN_RUNNING(true, "Calculator Already Running\n" )
 	QString Result;
 	QString TempStr;
     if (d->StartDate.isNull()) Result += "Invalid Start Date\n";
+    Result += QtConcurrent::blockingMappedReduced(d->m_LoansPath, ConcurrentFunctions::checkReadyToCalculateLoan, ConcurrentFunctions::reduceReadyToCalculate, QtConcurrent::UnorderedReduce);
+/*
     for (auto i = d->m_LoansPath.constBegin(); i != d->m_LoansPath.constEnd(); i++) {
         TempStr = readTempFile<Mortgage>(i.value()).ReadyToCalculate();
 		if(!TempStr.isEmpty()) Result+=TempStr+'\n';
-	}
+	}*/
     if (BloombergVector(d->m_CPRass).IsEmpty(0.0, 1.0)) Result += "CPR Vector: " + d->m_CPRass + '\n';
     if (BloombergVector(d->m_CDRass).IsEmpty(0.0, 1.0)) Result += "CDR Vector: " + d->m_CDRass + '\n';
     if (BloombergVector(d->m_LSass).IsEmpty()) Result += "LS Vector: " + d->m_LSass + '\n';

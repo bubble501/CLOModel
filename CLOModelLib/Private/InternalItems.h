@@ -40,6 +40,11 @@ extern QMutex Db_Mutex;
 #define LOGCONSOLE(LogMsg)
 #endif
 class QSqlQuery;
+namespace ConcurrentFunctions {
+    QString checkReadyToCalculateLoan(const QString& path);
+    QString checkReadyToCalculateWaterfall(const QString& path);
+    void reduceReadyToCalculate(QString& res, const QString& val);
+}
 QString getLastExecutedQuery(const QSqlQuery& query);
 enum DayCountConvention : qint16;
 extern const QString LoansPropertiesToSearch[2]; //Properties in which scenarios will be searched

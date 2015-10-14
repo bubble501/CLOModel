@@ -94,7 +94,7 @@ QString WaterfallCalculator::ReadyToCalculate() const
     for (auto i = d->m_CascadesPath.constBegin(); i != d->m_CascadesPath.constEnd(); ++i) {
         Res += readTempFile<Waterfall>(i.value()).ReadyToCalculate();
 	}*/
-    Res += QtConcurrent::blockingMappedReduced(d->m_CascadesPath, ConcurrentFunctions::checkReadyToCalculateLoan, ConcurrentFunctions::reduceReadyToCalculate, QtConcurrent::UnorderedReduce);
+    Res += QtConcurrent::blockingMappedReduced(d->m_CascadesPath, ConcurrentFunctions::checkReadyToCalculateWaterfall, ConcurrentFunctions::reduceReadyToCalculate, QtConcurrent::UnorderedReduce);
 	return Res;
 }
 

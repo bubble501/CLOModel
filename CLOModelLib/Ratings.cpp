@@ -529,7 +529,6 @@ void Ratings::getFromDatabase(const QString& isin, const QDate& refDate)
 {
     reset();
 #ifndef NO_DATABASE
-    Q_D(Ratings);
     QMutexLocker dbLocker(&Db_Mutex);
     QSqlDatabase db = QSqlDatabase::database("TwentyFourDB", false);
     if (!db.isValid()) {
@@ -550,6 +549,7 @@ void Ratings::getFromDatabase(const QString& isin, const QDate& refDate)
         getRatingQuery.bindValue(":referenceDate", refDate.toString(Qt::ISODate));
         if (!getRatingQuery.exec())
             return;
+        Q_D(const Ratings);
         while (getRatingQuery.next()){
             const QSqlRecord getRatingRecord = getRatingQuery.record();
             if (std::find(std::begin(d->m_AgencyName), std::end(d->m_AgencyName), getRatingRecord.value("RatingAgency").toString()) == std::end(d->m_AgencyName))

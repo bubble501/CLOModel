@@ -1,22 +1,23 @@
 TEMPLATE = app
 TARGET = BloombergVectorTest
 CONFIG(debug, debug|release) {
-    DESTDIR = ../../bin/Debug
+    DESTDIRPARENT = ../../bin/Debug
     MOC_DIR += ./GeneratedFiles/debug
     OBJECTS_DIR += debug
 }
 CONFIG(release, debug|release) {
-    DESTDIR = ../../bin/Release
+    DESTDIRPARENT = ../../bin/Release
     MOC_DIR += ./GeneratedFiles/release
     OBJECTS_DIR += release
 }
+DESTDIR = $$DESTDIRPARENT/Tests
 QT += core testlib
 CONFIG += debug console testcase
 DEFINES += QT_DLL QT_TESTLIB_LIB
 INCLUDEPATH += ../../CLOModelLib \
     . \
     $$MOC_DIR
-LIBS += -L"$$DESTDIR"
+LIBS += -L"$$DESTDIRPARENT"
 CONFIG(release, debug|release) {
     LIBS += -lCLOModelLib
 }

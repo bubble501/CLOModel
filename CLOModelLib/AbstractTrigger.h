@@ -20,6 +20,7 @@ public:
 		, CumulativeLossTrigger=6
 		, DeferredInterestTrigger=7
         , PDLTrigger=8
+        , OnMaturityTrigger =9
 	};
 protected:
     Q_DECLARE_PRIVATE(AbstractTrigger);

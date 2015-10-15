@@ -25,6 +25,7 @@
 #include "Private/DelinquencyTriggerSettingWidget.h"
 #include "Private/CumulativeLossTriggerSettingWidget.h"
 #include "Private/DeferredInterestTriggerSettingWidget.h"
+#include "OnMaturityTrigger.h"
 TriggerHelperDialogPrivate::~TriggerHelperDialogPrivate() {}
 TriggerHelperDialogPrivate::TriggerHelperDialogPrivate(TriggerHelperDialog *q)
     :q_ptr(q)
@@ -52,6 +53,7 @@ TriggerHelperDialog::TriggerHelperDialog(TriggerHelperDialogPrivate* d, QWidget 
     d->TriggerTypeCombo->addItem("Cumulative Loss Trigger", static_cast<quint8>(AbstractTrigger::TriggerType::CumulativeLossTrigger));
     d->TriggerTypeCombo->addItem("Deferred Interest Trigger", static_cast<quint8>(AbstractTrigger::TriggerType::DeferredInterestTrigger));
     d->TriggerTypeCombo->addItem("PDL Trigger", static_cast<quint8>(AbstractTrigger::TriggerType::PDLTrigger));
+    d->TriggerTypeCombo->addItem("At Maturity Trigger", static_cast<quint8>(AbstractTrigger::TriggerType::OnMaturityTrigger));
     d->TriggerTypeCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	
 	QLabel *TriggerLabelLabel = new QLabel(this);
@@ -71,6 +73,7 @@ TriggerHelperDialog::TriggerHelperDialog(TriggerHelperDialogPrivate* d, QWidget 
     d->TriggerBuilderBase->addWidget(CumulativeLossTrigger::createSettingsWidget(this));
     d->TriggerBuilderBase->addWidget(DeferredInterestTrigger::createSettingsWidget(this));
     d->TriggerBuilderBase->addWidget(PDLTrigger::createSettingsWidget(this));
+    d->TriggerBuilderBase->addWidget(OnMaturityTrigger::createSettingsWidget(this));
     d->TriggerBuilderBase->setMinimumSize(200, 200);
     d->TriggerBuilderBase->setStyleSheet("QLabel { qproperty-alignment: 'AlignRight | AlignVCenter'; }");
 

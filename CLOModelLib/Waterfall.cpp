@@ -11,6 +11,7 @@
 #include "DeferredInterestTrigger.h"
 #include "TrancheTrigger.h"
 #include "CumulativeLossTrigger.h"
+#include "OnMaturityTrigger.h"
 #include <QStack>
 #include "AssumptionSet.h"
 #include "DelinquencyTrigger.h"
@@ -107,6 +108,9 @@ WaterfallPrivate::WaterfallPrivate(Waterfall *q,const WaterfallPrivate& other)
             break;
         case AbstractTrigger::TriggerType::DuringStressTestTrigger:
             m_Triggers.insert(i.key(), std::make_shared<DuringStressTestTrigger>(*(std::static_pointer_cast<DuringStressTestTrigger>(i.value()))));
+            break;
+        case AbstractTrigger::TriggerType::OnMaturityTrigger:
+            m_Triggers.insert(i.key(), std::make_shared<OnMaturityTrigger>(*(std::static_pointer_cast<OnMaturityTrigger>(i.value()))));
             break;
         case AbstractTrigger::TriggerType::CumulativeLossTrigger:
             m_Triggers.insert(i.key(), std::make_shared< CumulativeLossTrigger>(*(std::static_pointer_cast<CumulativeLossTrigger>(i.value()))));
@@ -240,6 +244,9 @@ Waterfall& Waterfall::operator=(const Waterfall& other){
             break;
         case AbstractTrigger::TriggerType::DuringStressTestTrigger:
             d->m_Triggers.insert(i.key(), std::make_shared< DuringStressTestTrigger>(*(std::static_pointer_cast<DuringStressTestTrigger>(i.value()))));
+            break;
+        case AbstractTrigger::TriggerType::OnMaturityTrigger:
+            d->m_Triggers.insert(i.key(), std::make_shared< OnMaturityTrigger>(*(std::static_pointer_cast<OnMaturityTrigger>(i.value()))));
             break;
         case AbstractTrigger::TriggerType::CumulativeLossTrigger:
             d->m_Triggers.insert(i.key(), std::make_shared< CumulativeLossTrigger>(*(std::static_pointer_cast<CumulativeLossTrigger>(i.value()))));
@@ -2399,6 +2406,9 @@ QDataStream& Waterfall::LoadOldVersion(QDataStream& stream)
             case AbstractTrigger::TriggerType::DeferredInterestTrigger:
                 TempTrig.reset(new DeferredInterestTrigger());
                 break;
+            case AbstractTrigger::TriggerType::OnMaturityTrigger:
+                TempTrig.reset(new OnMaturityTrigger());
+                break;
             case AbstractTrigger::TriggerType::PDLTrigger:
                 TempTrig.reset(new PDLTrigger());
                 break;
@@ -2915,7 +2925,7 @@ bool Waterfall::TriggerPassing(const QString& TriggerStructure, int PeriodIndex,
     return PolishStack.pop();
 }
 
-bool Waterfall::EvaluateTrigger(quint32 TrigID, int PeriodIndex, const QDate& CurrentIPD, bool /*IsCallDate*/) const
+bool Waterfall::EvaluateTrigger(quint32 TrigID, int PeriodIndex, const QDate& CurrentIPD, bool IsCallDate) const
 {
     Q_D(const Waterfall);
     const std::shared_ptr<AbstractTrigger> CurrentTrigger = d->m_Triggers.value(TrigID, std::shared_ptr<AbstractTrigger>());
@@ -2950,6 +2960,9 @@ bool Waterfall::EvaluateTrigger(quint32 TrigID, int PeriodIndex, const QDate& Cu
     }
     case AbstractTrigger::TriggerType::DuringStressTestTrigger:{
         return std::static_pointer_cast<DuringStressTestTrigger>(CurrentTrigger)->Passing(d->m_IsStressTest);
+    }
+    case AbstractTrigger::TriggerType::OnMaturityTrigger:{
+        return std::static_pointer_cast<OnMaturityTrigger>(CurrentTrigger)->Passing(IsCallDate);
     }
     case AbstractTrigger::TriggerType::CumulativeLossTrigger:{
         double TotalLoss = 0.0;

@@ -79,11 +79,9 @@ TriggerHelperDialog::TriggerHelperDialog(TriggerHelperDialogPrivate* d, QWidget 
 
 
     d->DialogButtons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Reset, this);
-    d->DialogButtons->button(QDialogButtonBox::Ok)->setEnabled(false);
 
     for (int i = d->TriggerBuilderBase->count() - 1; i >= 0; --i) {
         const auto CurrentWidg= qobject_cast<AbstractTriggerSettingWidget*>(d->TriggerBuilderBase->widget(i));
-        connect(CurrentWidg, &AbstractTriggerSettingWidget::somethingChanged, this, &TriggerHelperDialog::CheckOkEnabled);
         connect(d->TriggerBuilderBase, &QStackedWidget::currentChanged, CurrentWidg, &AbstractTriggerSettingWidget::reset);
     }
     connect(d->TriggerTypeCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), d->TriggerBuilderBase, &QStackedWidget::setCurrentIndex);
@@ -113,12 +111,6 @@ TriggerHelperDialog::TriggerHelperDialog(TriggerHelperDialogPrivate* d, QWidget 
 TriggerHelperDialog::~TriggerHelperDialog()
 {
     delete d_ptr;
-}
-
-void TriggerHelperDialog::CheckOkEnabled()
-{
-    Q_D(TriggerHelperDialog);
-    d->DialogButtons->button(QDialogButtonBox::Ok)->setEnabled(!qobject_cast<AbstractTriggerSettingWidget*>(d->TriggerBuilderBase->currentWidget())->parameters().isEmpty());
 }
 
 QString TriggerHelperDialog::GetParameters() const

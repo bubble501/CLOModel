@@ -61,6 +61,11 @@ bool Ratings::operator==(const Ratings& other) const
     return compare(other, CompareOption::CompareAll);
 }
 
+bool Ratings::operator!=(const Ratings& other) const
+{
+    return !operator==(other);
+}
+
 bool Ratings::compare(const Ratings& other, CompareOption opt) const
 {
     Q_D(const Ratings);
@@ -473,7 +478,9 @@ bool Ratings::downloadRatings(const QBbgLib::QBbgAbstractResponse * const res)
     if (!refResponse)
         return false;
     for (auto i = std::begin(RatingsPrivate::m_ratingFields); i != std::end(RatingsPrivate::m_ratingFields);++i){
-        if (refResponse->header().indexOf(*i, 0, Qt::CaseInsensitive) >= 0) {
+        QString currentHeader = refResponse->header().toUpper();
+        currentHeader.replace(QRegularExpression("\\s+"), "_");
+        if (currentHeader.indexOf(*i, 0, Qt::CaseInsensitive) >= 0) {
             if(refResponse->hasValue()){
                 if(!refResponse->value().toString().isEmpty()){
                     return setRating(refResponse->value().toString(), static_cast<RatingAgency>(1 << std::distance(std::begin(RatingsPrivate::m_ratingFields), i)));

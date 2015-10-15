@@ -94,6 +94,7 @@ protected:
     RatingValue averageRating(double startingVal) const;
 public:
     bool operator==(const Ratings& other) const;
+    bool operator!=(const Ratings& other) const;
     bool compare(const Ratings& other, CompareOption opt)const;
     bool compare(const Ratings& other, CompareOption opt, RatingAgencies agencies)const;
     static QString agencyName(RatingAgency ag);

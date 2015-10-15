@@ -449,7 +449,8 @@ bool Ratings::downloadRatings(const QBbgLib::QBbgSecurity& sec)
     for (int i = 0; i < CountRatingAcencies; ++i) {
         Q_ASSERT(allres.contains(i + 100));
         if (!allres.value(i + 100)->hasErrors()) {
-            oneRatingFound = oneRatingFound || setRating(dynamic_cast<const QBbgReferenceDataResponse*>(allres.value(i + 100))->value().toString(), static_cast<RatingAgency>(1 << i));
+            if (setRating(dynamic_cast<const QBbgReferenceDataResponse*>(allres.value(i + 100))->value().toString(), static_cast<RatingAgency>(1 << i)))
+                oneRatingFound = true;
         }
     }
     if (!oneRatingFound)

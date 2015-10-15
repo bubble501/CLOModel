@@ -26,6 +26,7 @@
 #include <WatFalPrior.h>
 #include <WaterfallStepHelperDialog.h>
 #include <QProgressDialog>
+#include <OnMaturityTrigger.h>
 void __stdcall RunModel(LPSAFEARRAY *ArrayData){
     int argc = 1;
     QApplication ComputationLoop(argc, 0);
@@ -770,6 +771,9 @@ BSTR __stdcall WatFallStepEdit(LPSAFEARRAY *ArrayData) {
                 std::static_pointer_cast<PDLTrigger>(*TempIter)->SetSenioritySide(static_cast<PDLTrigger::TriggerSenioritySide>(pdFreq->intVal)); pdFreq++;
                 std::static_pointer_cast<PDLTrigger>(*TempIter)->SetSizeSide(static_cast<PDLTrigger::TriggerSizeSide>(pdFreq->intVal)); pdFreq++;
                 std::static_pointer_cast<PDLTrigger>(*TempIter)->SetSizeMultiplier(pdFreq->dblVal); pdFreq++;
+                break;
+            case static_cast<int>(AbstractTrigger::TriggerType::OnMaturityTrigger) :
+                AvailableTriggers.insert(i, std::make_shared< OnMaturityTrigger>(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
                 break;
 			default:
                 Q_UNREACHABLE(); // "Unhandled trigger type"

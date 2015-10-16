@@ -10,8 +10,8 @@ public:
     OnMaturityTrigger(const QString& lab = QString());
     OnMaturityTrigger(const OnMaturityTrigger& other);
     virtual ~OnMaturityTrigger();
-    virtual bool Passing(bool IsStressTest) const;
-    virtual bool Failing(bool IsStressTest) const;
+    virtual bool Passing(bool IsMaturity) const;
+    virtual bool Failing(bool IsMaturity) const;
     virtual QString ReadyToCalculate() const override;
     static AbstractTriggerSettingWidget* createSettingsWidget(QWidget* parent = nullptr);
 protected:

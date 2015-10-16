@@ -2929,8 +2929,10 @@ bool Waterfall::EvaluateTrigger(quint32 TrigID, int PeriodIndex, const QDate& Cu
 {
     Q_D(const Waterfall);
     const std::shared_ptr<AbstractTrigger> CurrentTrigger = d->m_Triggers.value(TrigID, std::shared_ptr<AbstractTrigger>());
-    if (!CurrentTrigger) return false;
-    if (PeriodIndex < 0 || PeriodIndex >= d->m_MortgagesPayments.Count()) return false;
+    if (!CurrentTrigger) 
+        return false;
+    if (PeriodIndex < 0 || PeriodIndex >= d->m_MortgagesPayments.Count())
+        return false;
     switch (CurrentTrigger->GetTriggerType()) {
     case AbstractTrigger::TriggerType::DateTrigger:
         return std::static_pointer_cast<DateTrigger>(CurrentTrigger)->Passing(CurrentIPD);

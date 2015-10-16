@@ -213,6 +213,10 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
                 TempTrigger.reset(new DuringStressTestTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
                 TempUnit.SetTrigger(i + 1, TempTrigger);
                 break;
+            case static_cast<int>(AbstractTrigger::TriggerType::OnMaturityTrigger) :
+                TempTrigger.reset(new DuringStressTestTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+                TempUnit.SetTrigger(i + 1, TempTrigger);
+                break;
             case static_cast<int>(AbstractTrigger::TriggerType::PDLTrigger) :
                 TempTrigger.reset(new PDLTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
                 std::dynamic_pointer_cast<PDLTrigger>(TempTrigger)->SetTargetSeniority(QString::fromWCharArray(pdFreq->bstrVal)); pdFreq++;
@@ -224,6 +228,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
                 TempUnit.SetTrigger(i + 1, TempTrigger);
                 break;
             default:
+                Q_UNREACHABLE();
                 PrintToTempFile("Error", "Unhanded Trigger Type in Input");
 			}
 		}

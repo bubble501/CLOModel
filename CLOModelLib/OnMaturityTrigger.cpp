@@ -2,13 +2,10 @@
 #include "Private/AbstractTrigger_p.h"
 #include "Private/AbstractTriggerSettingWidget.h"
 OnMaturityTrigger::~OnMaturityTrigger()
-{
-
-}
+{}
 OnMaturityTrigger::OnMaturityTrigger(AbstractTriggerPrivate* d)
     :AbstractTrigger(d, TriggerType::OnMaturityTrigger)
 {}
-
 OnMaturityTrigger::OnMaturityTrigger(const QString& lab)
     : OnMaturityTrigger(new AbstractTriggerPrivate(this))
 {
@@ -23,14 +20,14 @@ OnMaturityTrigger::OnMaturityTrigger(AbstractTriggerPrivate* d, const OnMaturity
     : AbstractTrigger(d, other)
 {}
 
-bool OnMaturityTrigger::Passing(bool IsStressTest) const
+bool OnMaturityTrigger::Passing(bool IsMaturity) const
 {
-    return IsStressTest;
+    return IsMaturity;
 }
 
-bool OnMaturityTrigger::Failing(bool IsStressTest) const
+bool OnMaturityTrigger::Failing(bool IsMaturity) const
 {
-    return !Passing(IsStressTest);
+    return !Passing(IsMaturity);
 }
 
 QString OnMaturityTrigger::ReadyToCalculate() const
@@ -38,7 +35,7 @@ QString OnMaturityTrigger::ReadyToCalculate() const
     return QString();
 }
 
-AbstractTriggerSettingWidget* OnMaturityTrigger::createSettingsWidget(QWidget* parent /*= nullptr*/)
+AbstractTriggerSettingWidget* OnMaturityTrigger::createSettingsWidget(QWidget* parent)
 {
     return new AbstractTriggerSettingWidget(parent);
 }

@@ -266,7 +266,7 @@ void TriggerStructHelperWidget::DecriptTriggers(QString encr)
 			encr.replace("!", "NOT ");
             QMap<int, QString> triggersMap;
             for (int i = 2; i < d->TriggersModel->rowCount(); ++i) {
-                encr.replace(QRegularExpression("(^|\\D)" + d->TriggersModel->index(i, 0).data().toString() + "(\\D|$)", QRegularExpression::DontCaptureOption), d->TriggersModel->index(i, 1).data().toString());
+                encr.replace(QRegularExpression("(?<=^|\\D)" + d->TriggersModel->index(i, 0).data().toString() + "(?=\\D|$)", QRegularExpression::DontCaptureOption), d->TriggersModel->index(i, 1).data().toString());
 			}
             d->DecriptedTriggers->setText(encr);
             d->DecriptedTriggers->setStyleSheet(QString());

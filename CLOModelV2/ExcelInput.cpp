@@ -157,6 +157,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 		std::shared_ptr<AbstractTrigger> TempTrigger;
 		for (int i = 0; i < TriggerCount; i++) {
 			TriggerTpe = pdFreq->intVal; pdFreq++;
+            LOGDEBUG(QString::number(TriggerTpe));
 			switch (TriggerTpe) {
                 // Keep this in sync with the relevant override of AbstractTriggerSettingWidget::parameters()
             case static_cast<int>(AbstractTrigger::TriggerType::DateTrigger) :

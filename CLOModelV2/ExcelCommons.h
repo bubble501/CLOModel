@@ -1,6 +1,6 @@
 #ifndef ExcelCommons_h__
 #define ExcelCommons_h__
-//#define DebugLogging
+#define DebugLogging
 #ifdef DebugLogging
 #include <QDebug>
 #define LOGASSERT(CheckExp,LogMsg) ((CheckExp) ? qt_noop() : PrintToTempFile("DebugLog.log",LogMsg)); Q_ASSERT_X(CheckExp,"LOGASSERT",LogMsg)

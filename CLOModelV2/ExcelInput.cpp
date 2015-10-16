@@ -215,7 +215,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
                 TempUnit.SetTrigger(i + 1, TempTrigger);
                 break;
             case static_cast<int>(AbstractTrigger::TriggerType::OnMaturityTrigger) :
-                TempTrigger.reset(new DuringStressTestTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
+                TempTrigger.reset(new OnMaturityTrigger(QString::fromWCharArray(pdFreq->bstrVal))); pdFreq++;
                 TempUnit.SetTrigger(i + 1, TempTrigger);
                 break;
             case static_cast<int>(AbstractTrigger::TriggerType::PDLTrigger) :

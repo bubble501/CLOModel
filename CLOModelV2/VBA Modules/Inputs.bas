@@ -291,7 +291,7 @@ ReferenceRateFromBBg:
     On Error GoTo 0
     
     Dim AllTheInputs As New Collection
-    AllTheInputs.Add False 'Switch to true to save the inputs
+    AllTheInputs.Add False
     i = 1
     j = 0
     Do While (True)
@@ -665,6 +665,9 @@ DefaultExchange:
                 Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 5).Value))
                 Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 6).Value))
                 Call AddInput(AllTheInputs, CDbl(TriggerStart.Offset(i, 7).Value))
+            Case 9 'At Maturity Trigger
+                Call AddInput(AllTheInputs, CLng(9))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
             Case Else
                 Call MsgBox("Unhandled Trigger Type", vbCritical, "Error")
                 Exit Sub
@@ -1189,6 +1192,8 @@ Public Function FromStringToTriggerType(a As String) As Long
             FromStringToTriggerType = 7
         Case UCase("PDL Trigger")
             FromStringToTriggerType = 8
+        Case UCase("At Maturirty")
+            FromStringToTriggerType = 9
         Case ""
             Exit Function
         Case Else
@@ -1222,6 +1227,8 @@ Public Function FromTriggerTypeToString(a As Long) As String
             FromTriggerTypeToString = "Deferred Interest Trigger"
         Case 8
             FromTriggerTypeToString = "PDL Trigger"
+        Case 9
+            FromTriggerTypeToString = "At Maturirty"
         Case ""
             Exit Function
         Case Else
@@ -1545,7 +1552,7 @@ Public Sub EditWaterfallStep(InputsSheet As String, Target As Range, FieldsLabel
                 Call AddInput(AllTheInputs, CLng(4))
                 Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
                 Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 2).Value))
-            Case 5 'During Reinvestment Test Trigger
+            Case 5 'During Stress Test Trigger
                 Call AddInput(AllTheInputs, CLng(5))
                 Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
             Case 6 'Pool Size Trigger
@@ -1573,6 +1580,9 @@ Public Sub EditWaterfallStep(InputsSheet As String, Target As Range, FieldsLabel
                 Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 5).Value))
                 Call AddInput(AllTheInputs, CLng(TriggerStart.Offset(i, 6).Value))
                 Call AddInput(AllTheInputs, CDbl(TriggerStart.Offset(i, 7).Value))
+            Case 9 'At Maturity
+                Call AddInput(AllTheInputs, CLng(9))
+                Call AddInput(AllTheInputs, CStr(TriggerStart.Offset(i, 1).Value))
             Case Else
                 Call MsgBox("Unhandled Trigger Type", vbCritical, "Error")
                 Exit Sub

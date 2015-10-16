@@ -36,6 +36,7 @@ QString AbstractTrigger::TriggerTypeToString(TriggerType a)const {
 	case TriggerType::DuringStressTestTrigger: return "During Stress Test Trigger";
 	case TriggerType::CumulativeLossTrigger: return "Cumulative Loss Trigger";
 	case TriggerType::DeferredInterestTrigger: return "Deferred Interest Trigger";
+    case TriggerType::OnMaturityTrigger: return "On Maturity Trigger";
     case TriggerType::PDLTrigger: return "PDL Trigger";
 	default: return QString();
 	}

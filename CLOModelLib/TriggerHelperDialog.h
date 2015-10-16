@@ -18,8 +18,6 @@ public:
 	void SetCurrentPars(const QString& pars);
 public slots:
 	void ClearParameters();
-protected slots:
-	void CheckOkEnabled();
 };
 
 #endif // TRIGGERHELPERDIALOG_H

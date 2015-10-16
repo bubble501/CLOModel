@@ -392,6 +392,9 @@
     <ClInclude Include="Private\CheckedTempDir.h">
       <Filter>Privates\Common Items</Filter>
     </ClInclude>
+    <ClInclude Include="OnMaturityTrigger.h">
+      <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BackwardCompatibilityInterface.cpp">
@@ -825,6 +828,9 @@
     </ClCompile>
     <ClCompile Include="Private\InternalItems.cpp">
       <Filter>Privates\Common Items</Filter>
+    </ClCompile>
+    <ClCompile Include="OnMaturityTrigger.cpp">
+      <Filter>Source Files\Triggers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

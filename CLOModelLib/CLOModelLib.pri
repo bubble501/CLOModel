@@ -24,6 +24,7 @@ HEADERS += ./AbstractBbgVect.h \
     ./DeferredInterestTrigger.h \
     ./DelinquencyTrigger.h \
     ./DuringStressTestTrigger.h \
+    ./OnMaturityTrigger.h \
     ./PDLtrigger.h \
     ./PoolSizeTrigger.h \
     ./TriggersResults.h \
@@ -149,6 +150,7 @@ SOURCES += ./AbstractBbgVect.cpp \
     ./DeferredInterestTrigger.cpp \
     ./DelinquencyTrigger.cpp \
     ./DuringStressTestTrigger.cpp \
+    ./OnMaturityTrigger.cpp \
     ./PDLtrigger.cpp \
     ./PoolSizeTrigger.cpp \
     ./TrancheTrigger.cpp \

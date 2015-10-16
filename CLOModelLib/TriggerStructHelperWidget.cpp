@@ -264,8 +264,9 @@ void TriggerStructHelperWidget::DecriptTriggers(QString encr)
 			encr.replace("-", " NOR ");
 			encr.replace("/", " NAND ");
 			encr.replace("!", "NOT ");
+            QMap<int, QString> triggersMap;
             for (int i = 2; i < d->TriggersModel->rowCount(); ++i) {
-                encr.replace(d->TriggersModel->index(i, 0).data().toString(), d->TriggersModel->index(i, 1).data().toString(), Qt::CaseInsensitive);
+                encr.replace(QRegularExpression("\\D" + d->TriggersModel->index(i, 0).data().toString() + "\\D"), d->TriggersModel->index(i, 1).data().toString());
 			}
             d->DecriptedTriggers->setText(encr);
             d->DecriptedTriggers->setStyleSheet(QString());

@@ -6,6 +6,7 @@
 #include <memory>
 #include <QTemporaryFile>
 #include <QString>
+#include <tuple>
 #ifndef RETURN_WHEN_RUNNING
 #define RETURN_WHEN_RUNNING(rvr,retval) if( ContinueCalculation() == rvr) return retval;
 #endif
@@ -82,18 +83,22 @@ public:
     virtual bool GetSequentialComputation()const;
     virtual QList<qint32> GetResultKeys() const;
     virtual int NumBees() const = 0;
+    const QMultiHash<int, QString>& errors() const;
+    void clearErrors();
+    QString allErrors() const;
 signals :
 	void Calculated();
 	void BeeCalculated(int);
-	void BeeError(int);
+	void BeeError(int,QString);
 	void Progress(double);
 	void ProgressPct(int);
 	void Stopped();
 private slots:
 	void SendPctSignal(double a);
+    void addError(int id, QString err);
 public slots:
 	virtual void StopCalculation();
-	virtual bool StartCalculation()=0;
+	virtual std::tuple<bool,QString> StartCalculation()=0;
 };
 #endif // AbstrAsyncCalculator_h__
 

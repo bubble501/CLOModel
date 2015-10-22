@@ -49,14 +49,16 @@ const MtgCashFlow ScenarioApplier::GetResult(const AssumptionSet& a) const
     return GetResult(FindAssumption(a));
 }
 
-bool ScenarioApplier::StartCalculation()
+std::tuple<bool, QString> ScenarioApplier::StartCalculation()
 {
     Q_D( ScenarioApplier);
-	RETURN_WHEN_RUNNING(true, false)
+    RETURN_WHEN_RUNNING(true, std::make_tuple(false, "Calculator already running"))
     d->BeesReturned = 0;
     d->BeesSent.clear();
 	ClearResults();
-	if (!ReadyToCalculate().isEmpty()) return false;
+    const QString rdyClc = ReadyToCalculate();
+    if (!rdyClc.isEmpty())
+        return std::make_tuple(false, rdyClc);
     setContinueCalculation ( true);
 	int NumberOfThreads = availableThreads();
     if (d->m_SequentialComputation || NumberOfThreads < 1) NumberOfThreads = 1;
@@ -71,7 +73,7 @@ bool ScenarioApplier::StartCalculation()
 		CurrentThread->start();
 		++NumofSent;
 	}
-	return true;
+    return std::make_tuple(true, QString());
 }
 void ScenarioApplier::BeeReturned(int Ident, const MtgCashFlow& a)
 {

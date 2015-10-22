@@ -16,7 +16,7 @@ public:
     virtual ~AbstrAsyncThread();
 signals:
 	void AnonimCalculated(int);
-	void ErrorCalculation(int);
+	void ErrorCalculation(int,QString);
 protected slots:
 	virtual void EmitFromAnonim()=0;
 public slots:

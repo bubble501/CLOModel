@@ -92,11 +92,11 @@ protected:
         }
         getBeeSent().insert(Key);
         connect(a, &ThreadType::Calculated, this, &TemplAsyncCalculator<ThreadType, ResultType>::BeeReturned);
-        connect(a, SIGNAL(AnonimCalculated(int)), a, SLOT(stop()), Qt::QueuedConnection);
+        connect(a, &ThreadType::AnonimCalculated, a, &ThreadType::stop, Qt::QueuedConnection);
 
-        connect(a, SIGNAL(ErrorCalculation(int)), this, SIGNAL(BeeError(int)));
+        connect(a, &ThreadType::ErrorCalculation, this, &TemplAsyncCalculator<ThreadType, ResultType>::BeeError);
         connect(a, &ThreadType::ErrorCalculation, this, &TemplAsyncCalculator<ThreadType, ResultType>::HandleErrorInCalculation);
-        connect(a, SIGNAL(ErrorCalculation(int)), a, SLOT(stop()), Qt::QueuedConnection);
+        connect(a, &ThreadType::ErrorCalculation, a, &ThreadType::stop, Qt::QueuedConnection);
         tempThreadPool[Key] = a;
         Q_ASSERT(getThreadPool().contains(Key));
         return a;

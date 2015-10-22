@@ -97,7 +97,7 @@ SummaryView::SummaryView(SummaryViewPrivate* d, QWidget* parent)
     d->TranchesArea = new QStackedWidget(TranchesWidget);
     d->TranchesList = new QListWidget(TranchesWidget);
     d->TranchesList->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Expanding);
-    connect(d->TranchesList, SIGNAL(currentRowChanged(int)), d->TranchesArea, SLOT(setCurrentIndex(int)));
+    connect(d->TranchesList, &QListWidget::currentRowChanged, d->TranchesArea, &QStackedWidget::setCurrentIndex);
     TranchesLay->addWidget(d->TranchesList);
     TranchesLay->addWidget(d->TranchesArea);
     d->MainWidget->addTab(TranchesWidget, "Tranches Results");
@@ -107,7 +107,7 @@ SummaryView::SummaryView(SummaryViewPrivate* d, QWidget* parent)
     d->CallTranchesArea = new QStackedWidget(CallTranchesWidget);
     d->CallTranchesList = new QListWidget(CallTranchesWidget);
     d->CallTranchesList->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Expanding);
-    connect(d->CallTranchesList, SIGNAL(currentRowChanged(int)), d->CallTranchesArea, SLOT(setCurrentIndex(int)));
+    connect(d->CallTranchesList, &QListWidget::currentRowChanged, d->CallTranchesArea, &QStackedWidget::setCurrentIndex);
     CallTranchesLay->addWidget(d->CallTranchesList);
     CallTranchesLay->addWidget(d->CallTranchesArea);
     d->MainWidget->addTab(CallTranchesWidget, "Call Tranches Results");
@@ -305,7 +305,7 @@ void SummaryViewPrivate::DisplayStructure()
 		PricesLabel.last()->setText(Commarize(Structure.GetTranche(i)->GetPrice(),2U));
 		PricesLabel.last()->setValidator(new QDoubleValidator(0.0,200.0,2,q));
 		PricesLabel.last()->setObjectName(QString("%1").arg(i));
-        q->connect(PricesLabel.last(), SIGNAL(textEdited(QString)), q, SLOT(PriceChanged()));
+        q->connect(PricesLabel.last(), &QLineEdit::textEdited, q, &SummaryView::PriceChanged);
 		StructureTable->setCellWidget(i,9,PricesLabel.last());
 
 		for(int j=0;j<StructureTable->columnCount();j++){

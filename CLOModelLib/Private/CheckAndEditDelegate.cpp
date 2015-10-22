@@ -39,7 +39,7 @@ QWidget *CheckAndEditDelegate::createEditor(QWidget *parent, const QStyleOptionV
 	auto CurrEdit = new CheckAndEdit(parent);
 	CurrEdit->setFixedSize(option.rect.size());
 	CurrEdit->SetReadOnly(index.model()->data(index, Qt::UserRole + 24).toBool());
-	connect(CurrEdit, SIGNAL(CheckChanged(int)), this, SLOT(CommitData()));
+    connect(CurrEdit, &CheckAndEdit::CheckChanged, this, &CheckAndEditDelegate::CommitData);
 	return CurrEdit;
 }
 

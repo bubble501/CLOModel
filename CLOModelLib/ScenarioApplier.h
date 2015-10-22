@@ -22,7 +22,7 @@ protected:
     qint32 FindAssumption(const AssumptionSet& a)const;
     virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 public slots:
-    virtual bool StartCalculation() override;
+    virtual std::tuple<bool, QString> StartCalculation() override;
 public:
     ScenarioApplier(QObject* parent = nullptr);
 	virtual ~ScenarioApplier();

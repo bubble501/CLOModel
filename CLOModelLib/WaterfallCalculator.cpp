@@ -38,15 +38,16 @@ void WaterfallCalculator::AddWaterfall(const Waterfall& a, qint32 ID)
     }
 
 }
-bool WaterfallCalculator::StartCalculation(bool ignoreCheck/*=false*/)
+std::tuple<bool, QString> WaterfallCalculator::StartCalculation(bool ignoreCheck/*=false*/)
 {
     Q_D(WaterfallCalculator);
-	RETURN_WHEN_RUNNING(true, false)
+    RETURN_WHEN_RUNNING(true, std::make_tuple(false, "Calculator already running"))
         d->BeesReturned = 0;
     d->BeesSent.clear();
     if (!ignoreCheck) {
-        if (!ReadyToCalculate().isEmpty()) 
-            return false;
+        const QString rdyClc = ReadyToCalculate();
+        if (!rdyClc.isEmpty())
+            return std::make_tuple(false, rdyClc);
     }
     setContinueCalculation (true);
 	int NumberOfThreads = availableThreads();
@@ -61,10 +62,10 @@ bool WaterfallCalculator::StartCalculation(bool ignoreCheck/*=false*/)
 		CurrentThread->start();
 		++NumofSent;
 	}
-	return true;
+    return std::make_tuple(true, QString());
 }
 
-bool WaterfallCalculator::StartCalculation()
+std::tuple<bool, QString> WaterfallCalculator::StartCalculation()
 {
     return StartCalculation(false);
 }

@@ -398,9 +398,9 @@ void LoanAssumptionsEditorPrivate::CreateScenarioEditor()
 		}
 	});
     q->connect(m_seniorDateCheck, &QCheckBox::clicked, m_SeniorDateEdit, &QDateEdit::setEnabled);
-    q->connect(m_SeniorAsumptionsModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)), q, SLOT(SeniorScenarioChanged(const QModelIndex&)));
+    q->connect(m_SeniorAsumptionsModel, &QStandardItemModel::dataChanged, q, &LoanAssumptionsEditor::SeniorScenarioChanged);
     q->connect(m_MezzDateCheck, &QCheckBox::clicked, m_MezzDateEdit, &QDateEdit::setEnabled);
-    q->connect(m_MezzAsumptionsModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)), q, SLOT(MezzScenarioChanged(const QModelIndex&)));
+    q->connect(m_MezzAsumptionsModel, &QStandardItemModel::dataChanged, q, &LoanAssumptionsEditor::MezzScenarioChanged);
     q->connect(m_AliasesModel, &QStandardItemModel::rowsInserted, [&](const QModelIndex &, int, int) {
 		ReplaceAliasButton->setEnabled(m_AliasesModel->rowCount()>0);
 		RemoveAliasButton->setEnabled(m_AliasesModel->rowCount()>0);
@@ -457,7 +457,7 @@ void LoanAssumptionsEditorPrivate::CreateScenarioEditor()
         m_ScenarioList->selectionModel()->setCurrentIndex(QModelIndex(), QItemSelectionModel::ClearAndSelect);
         m_ScenarioList->selectionModel()->setCurrentIndex(m_SortScenarios->mapFromSource(m_ScenariosModel->index(m_ScenariosModel->rowCount() - 1, 0)), QItemSelectionModel::ClearAndSelect);
     });
-    q->connect(RemoveScenarioButton, SIGNAL(clicked()), q, SLOT(RemoveScenario()));
+    q->connect(RemoveScenarioButton, &QPushButton::clicked, q, &LoanAssumptionsEditor::RemoveScenario);
     q->connect(m_ScenariosModel, &QStandardItemModel::rowsInserted, [&](const QModelIndex &, int, int) {
 		RemoveScenarioButton->setEnabled(m_ScenariosModel->rowCount() > 0);
 	});
@@ -502,24 +502,24 @@ void LoanAssumptionsEditorPrivate::CreateScenarioEditor()
 	});
 
 
-    q->connect(RemoveSeniorAssumptionButton, SIGNAL(clicked()), q, SLOT(CheckCurrentDirty()));
-    q->connect(AddSeniorAssumptionButton, SIGNAL(clicked()), q, SLOT(CheckCurrentDirty()));
-    q->connect(RemoveMezzAssumptionButton, SIGNAL(clicked()), q, SLOT(CheckCurrentDirty()));
-    q->connect(AddMezzAssumptionButton, SIGNAL(clicked()), q, SLOT(CheckCurrentDirty()));
-    q->connect(AddAliasButton, SIGNAL(clicked()), q, SLOT(CheckCurrentDirty()));
-    q->connect(RemoveAliasButton, SIGNAL(clicked()), q, SLOT(CheckCurrentDirty()));
-    q->connect(ReplaceAliasButton, SIGNAL(clicked()), q, SLOT(CheckCurrentDirty()));
+    q->connect(RemoveSeniorAssumptionButton, &QPushButton::clicked, q, &LoanAssumptionsEditor::CheckCurrentDirty);
+    q->connect(AddSeniorAssumptionButton, &QPushButton::clicked, q, &LoanAssumptionsEditor::CheckCurrentDirty);
+    q->connect(RemoveMezzAssumptionButton, &QPushButton::clicked, q, &LoanAssumptionsEditor::CheckCurrentDirty);
+    q->connect(AddMezzAssumptionButton, &QPushButton::clicked, q, &LoanAssumptionsEditor::CheckCurrentDirty);
+    q->connect(AddAliasButton, &QPushButton::clicked, q, &LoanAssumptionsEditor::CheckCurrentDirty);
+    q->connect(RemoveAliasButton, &QPushButton::clicked, q, &LoanAssumptionsEditor::CheckCurrentDirty);
+    q->connect(ReplaceAliasButton, &QPushButton::clicked, q, &LoanAssumptionsEditor::CheckCurrentDirty);
     q->connect(m_ScenarioNameEdit, &QLineEdit::textEdited, [&](const QString& a) {
         if (!a.isEmpty()) q_func()->CheckCurrentDirty();
 	});
-    q->connect(m_seniorDateCheck, SIGNAL(clicked()), q, SLOT(CheckCurrentDirty()));
-    q->connect(m_SeniorDateEdit, SIGNAL(dateChanged(const QDate&)), q, SLOT(SeniorDateChanged(const QDate&)), Qt::QueuedConnection);
-    q->connect(m_SeniorTable->itemDelegateForColumn(0), SIGNAL(Edited()), q, SLOT(CheckCurrentDirty()));
-    q->connect(m_SeniorTable->itemDelegateForColumn(1), SIGNAL(Edited()), q, SLOT(CheckCurrentDirty()));
-    q->connect(m_MezzDateCheck, SIGNAL(clicked()), q, SLOT(CheckCurrentDirty()));
-    q->connect(m_MezzDateEdit, SIGNAL(dateChanged(const QDate&)), q, SLOT(MezzDateChanged(const QDate&)), Qt::QueuedConnection);
-    q->connect(m_MezzTable->itemDelegateForColumn(0), SIGNAL(Edited()), q, SLOT(CheckCurrentDirty()));
-    q->connect(m_MezzTable->itemDelegateForColumn(1), SIGNAL(Edited()), q, SLOT(CheckCurrentDirty()));
+    q->connect(m_seniorDateCheck, &QPushButton::clicked, q, &LoanAssumptionsEditor::CheckCurrentDirty);
+    q->connect(m_SeniorDateEdit, &QDateEdit::dateChanged, q, &LoanAssumptionsEditor::SeniorDateChanged, Qt::QueuedConnection);
+    q->connect(static_cast<AssumptionsComboDelegate*>(m_SeniorTable->itemDelegateForColumn(0)), &AssumptionsComboDelegate::Edited, q, &LoanAssumptionsEditor::CheckCurrentDirty);
+    q->connect(static_cast<LoanAssumptionDelegate*>(m_SeniorTable->itemDelegateForColumn(1)), &LoanAssumptionDelegate::Edited, q, &LoanAssumptionsEditor::CheckCurrentDirty);
+    q->connect(m_MezzDateCheck, &QPushButton::clicked, q, &LoanAssumptionsEditor::CheckCurrentDirty);
+    q->connect(m_MezzDateEdit, &QDateEdit::dateChanged, q, &LoanAssumptionsEditor::MezzDateChanged, Qt::QueuedConnection);
+    q->connect(static_cast<AssumptionsComboDelegate*>(m_MezzTable->itemDelegateForColumn(0)), &AssumptionsComboDelegate::Edited, q, &LoanAssumptionsEditor::CheckCurrentDirty);
+    q->connect(static_cast<LoanAssumptionDelegate*>(m_MezzTable->itemDelegateForColumn(1)), &LoanAssumptionDelegate::Edited, q, &LoanAssumptionsEditor::CheckCurrentDirty);
     q->connect(m_ScenariosModel, &QStandardItemModel::dataChanged, [&](const QModelIndex& index, const QModelIndex&) {
 		bool CurrentDirty, Anydirty;
 		Anydirty = CurrentDirty = m_ScenariosModel->data(index, Qt::UserRole).toInt() != RichTextDelegate::NotDirty;
@@ -1992,12 +1992,12 @@ void LoanAssumptionsEditorPrivate::CreateStructureComparison()
 	m_NewStrDetTable->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 	m_NewStrDetTable->setAlternatingRowColors(true);
 
-    q->connect(m_OriginalStructureModel, SIGNAL(rowsInserted(const QModelIndex&, int, int)), q, SLOT(AdjustOldGenTableHeight()), Qt::QueuedConnection);
-    q->connect(m_OriginalStructureModel, SIGNAL(rowsRemoved(const QModelIndex&, int, int)), q, SLOT(AdjustOldGenTableHeight()), Qt::QueuedConnection);
-    q->connect(m_OriginalStructureModel, SIGNAL(modelReset()), q, SLOT(AdjustOldGenTableHeight()), Qt::QueuedConnection);
-    q->connect(m_NewStructureModel, SIGNAL(rowsInserted(const QModelIndex&, int, int)), q, SLOT(AdjustNewGenTableHeight()), Qt::QueuedConnection);
-    q->connect(m_NewStructureModel, SIGNAL(rowsRemoved(const QModelIndex&, int, int)), q, SLOT(AdjustNewGenTableHeight()), Qt::QueuedConnection);
-    q->connect(m_NewStructureModel, SIGNAL(modelReset()), q, SLOT(AdjustNewGenTableHeight()), Qt::QueuedConnection);
+    q->connect(m_OriginalStructureModel, &QStandardItemModel::rowsInserted, q, &LoanAssumptionsEditor::AdjustOldGenTableHeight, Qt::QueuedConnection);
+    q->connect(m_OriginalStructureModel, &QStandardItemModel::rowsRemoved, q, &LoanAssumptionsEditor::AdjustOldGenTableHeight, Qt::QueuedConnection);
+    q->connect(m_OriginalStructureModel, &QStandardItemModel::modelReset, q, &LoanAssumptionsEditor::AdjustOldGenTableHeight, Qt::QueuedConnection);
+    q->connect(m_NewStructureModel, &QStandardItemModel::rowsInserted, q, &LoanAssumptionsEditor::AdjustNewGenTableHeight, Qt::QueuedConnection);
+    q->connect(m_NewStructureModel, &QStandardItemModel::rowsRemoved, q, &LoanAssumptionsEditor::AdjustNewGenTableHeight, Qt::QueuedConnection);
+    q->connect(m_NewStructureModel, &QStandardItemModel::modelReset, q, &LoanAssumptionsEditor::AdjustNewGenTableHeight, Qt::QueuedConnection);
 
     q->connect(m_OldStrGenTable->verticalScrollBar(), &QScrollBar::valueChanged, m_NewStrGenTable->verticalScrollBar(), &QScrollBar::setValue);
     q->connect(m_NewStrGenTable->verticalScrollBar(), &QScrollBar::valueChanged, m_OldStrGenTable->verticalScrollBar(), &QScrollBar::setValue);
@@ -2163,12 +2163,13 @@ void LoanAssumptionsEditor::CalculateNewStructure() {
                 d_func()->m_NewWtfToCall.AddMortgagesFlows(d_func()->m_NewLoans->GetAggregatedResults());
             d_func()->m_NewWatFalls->AddWaterfall(d_func()->m_NewWtfToCall, 1);
 		}
-        if (!d_func()->m_NewWatFalls->StartCalculation()) { QMessageBox::critical(this, tr("Error"), tr("An error occurred during the calculations of liabilities cash flows")); }
+        const auto calcReturn = d_func()->m_NewWatFalls->StartCalculation();
+        if (!std::get<0>(calcReturn)) { QMessageBox::critical(this, tr("Error"), tr("An error occurred during the calculations of liabilities cash flows: %1").arg(std::get<1>(calcReturn))); }
 	});
     connect(CalcProgress, &QProgressDialog::canceled, d->m_NewLoans, &MtgCalculator::StopCalculation);
     connect(d->m_NewLoans, &MtgCalculator::ProgressPct, CalcProgress, &QProgressDialog::setValue);
     connect(d->m_NewLoans, &MtgCalculator::BeeError, d->m_NewLoans, &MtgCalculator::StopCalculation);
-    connect(d->m_NewLoans, &MtgCalculator::BeeError, [this]() {QMessageBox::critical(this, tr("Error"), tr("An error occurred during the calculations of assets cash flows")); });
+    connect(d->m_NewLoans, &MtgCalculator::BeeError, [this,d]() {QMessageBox::critical(this, tr("Error"), tr("An error occurred during the calculations of assets cash flows: %1").arg(d->m_NewLoans->allErrors())); });
     connect(d->m_NewLoans, &MtgCalculator::Calculated, d->m_NewLoans, &MtgCalculator::deleteLater);
     connect(d->m_NewLoans, &MtgCalculator::Stopped, d->m_NewLoans, &MtgCalculator::deleteLater);
     connect(d->m_NewLoans, &MtgCalculator::Stopped, CalcProgress, &MtgCalculator::deleteLater);
@@ -2178,7 +2179,7 @@ void LoanAssumptionsEditor::CalculateNewStructure() {
     connect(CalcProgress, &QProgressDialog::canceled, d->m_NewWatFalls, &WaterfallCalculator::StopCalculation);
     connect(d->m_NewWatFalls, &WaterfallCalculator::ProgressPct, CalcProgress, &QProgressDialog::setValue);
     connect(d->m_NewWatFalls, &WaterfallCalculator::BeeError, d->m_NewWatFalls, &WaterfallCalculator::StopCalculation);
-    connect(d->m_NewWatFalls, &WaterfallCalculator::BeeError, [this]() {QMessageBox::critical(this, tr("Error"), tr("An error occurred during the calculations of liabilities cash flows")); });
+    connect(d->m_NewWatFalls, &WaterfallCalculator::BeeError, [this,d]() {QMessageBox::critical(this, tr("Error"), tr("An error occurred during the calculations of liabilities cash flows").arg(d->m_NewWatFalls->allErrors())); });
     connect(d->m_NewWatFalls, &WaterfallCalculator::Calculated, d->m_NewWatFalls, &WaterfallCalculator::deleteLater);
     connect(d->m_NewWatFalls, &WaterfallCalculator::Calculated, CalcProgress, &QProgressDialog::deleteLater);
     connect(d->m_NewWatFalls, &WaterfallCalculator::Stopped, d->m_NewWatFalls, &WaterfallCalculator::deleteLater);

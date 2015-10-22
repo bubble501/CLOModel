@@ -14,8 +14,8 @@ AbstrAsyncThread::AbstrAsyncThread(AbstrAsyncThreadPrivate* d, int ID, QObject* 
     ,d_ptr(d)
 {
     d->Identifier = ID;
-    connect(this, SIGNAL(AnonimCalculated(int)), this, SLOT(EmitFromAnonim()));
-    connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
+    connect(this, &AbstrAsyncThread::AnonimCalculated, this, &AbstrAsyncThread::EmitFromAnonim);
+    connect(this, &AbstrAsyncThread::finished, this, &AbstrAsyncThread::deleteLater);
 }
 
 AbstrAsyncThread::~AbstrAsyncThread()

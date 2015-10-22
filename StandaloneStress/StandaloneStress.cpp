@@ -64,7 +64,7 @@ StandaloneStress::StandaloneStress(QWidget *parent)
 	TopLay->addWidget(InPathEdit);
 	QPushButton* BrowseButton = new QPushButton(this);
 	BrowseButton->setText("...");
-	connect(BrowseButton, SIGNAL(clicked()), this, SLOT(BrowseModel()));
+    connect(BrowseButton, &QPushButton::clicked, this, &StandaloneStress::BrowseModel);
 	TopLay->addWidget(BrowseButton);
 
 	PathLabel = new QLabel(this);
@@ -76,7 +76,7 @@ StandaloneStress::StandaloneStress(QWidget *parent)
 	TopLay->addWidget(OutPathEdit);
 	BrowseButton = new QPushButton(this);
 	BrowseButton->setText("...");
-	connect(BrowseButton, SIGNAL(clicked()), this, SLOT(BrowseFolder()));
+    connect(BrowseButton, &QPushButton::clicked, this, &StandaloneStress::BrowseFolder);
 	TopLay->addWidget(BrowseButton);
 	MainLay->addLayout(TopLay);
 
@@ -97,7 +97,7 @@ StandaloneStress::StandaloneStress(QWidget *parent)
 		VariablesList[i]->setSelectionMode(QAbstractItemView::NoSelection);
 		PasteButton[i]= new QPushButton(this);
 		PasteButton[i]->setText(tr("Paste from Clipboard"));
-		connect(PasteButton[i], SIGNAL(clicked()), this, SLOT(PasteClipboard()));
+        connect(PasteButton[i], &QPushButton::clicked, this, &StandaloneStress::PasteClipboard);
 		QHBoxLayout *SpinnsLay = new QHBoxLayout;
 		VariablesCountlabel[i] = new QLabel(this);
 		SpinnsLay->addWidget(VariablesCountlabel[i]);
@@ -105,7 +105,7 @@ StandaloneStress::StandaloneStress(QWidget *parent)
 		VariablesCount[i]->setMinimum(0);
 		VariablesCount[i]->setMaximum(99);
 		VariablesCount[i]->setValue(1);
-		connect(VariablesCount[i], SIGNAL(valueChanged(int)), this, SLOT(RowsChanged(int)));
+        connect(VariablesCount[i], static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &StandaloneStress::RowsChanged);
 		SpinnsLay->addWidget(VariablesCount[i]);
 		GroupLay->addLayout(SpinnsLay);
 		GroupLay->addWidget(VariablesList[i]);
@@ -126,17 +126,17 @@ StandaloneStress::StandaloneStress(QWidget *parent)
 	BottomLay->addWidget(StartButton);
 	MainLay->addLayout(BottomLay);
 
-	connect(InPathEdit,SIGNAL(editingFinished()),this,SLOT(CheckAllValid()),Qt::QueuedConnection);
-	connect(OutPathEdit, SIGNAL(editingFinished()), this, SLOT(CheckAllValid()), Qt::QueuedConnection);
-	connect(StartButton,SIGNAL(clicked()),this,SLOT(Start()));
+    connect(InPathEdit, &QLineEdit::editingFinished, this, &StandaloneStress::CheckAllValid, Qt::QueuedConnection);
+    connect(OutPathEdit, &QLineEdit::editingFinished, this, &StandaloneStress::CheckAllValid, Qt::QueuedConnection);
+    connect(StartButton, &QPushButton::clicked, this, &StandaloneStress::Start);
 	for(int i=0;i<2;i++){
-		connect(VariablesList[i],SIGNAL(itemChanged(QTableWidgetItem *)),this,SLOT(CheckAllValid()),Qt::QueuedConnection);
-		connect(VariablesCount[i],SIGNAL(valueChanged(int)),this,SLOT(RowsChanged()),Qt::QueuedConnection);
+        connect(VariablesList[i], &QTableWidget::itemChanged, this, &StandaloneStress::CheckAllValid, Qt::QueuedConnection);
+        connect(VariablesCount[i], static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &StandaloneStress::RowsChanged, Qt::QueuedConnection);
 	}
-	connect(Stresser, SIGNAL(AllFinished()), this, SLOT(Finished()));
-	connect(Stresser, SIGNAL(FinishedWithErrors()), this, SLOT(FinishedEroors()));
-	connect(Stresser, SIGNAL(ErrorsOccured()), Stresser, SLOT(StopCalculation()));
-	connect(Stresser, SIGNAL(ErrorsOccured()), this, SLOT(FinishedEroors()), Qt::QueuedConnection);
+    connect(Stresser, &StressTest::AllFinished, this, &StandaloneStress::Finished);
+    connect(Stresser, &StressTest::FinishedWithErrors, this, &StandaloneStress::FinishedEroors);
+    connect(Stresser, &StressTest::ErrorsOccured, Stresser, &StressTest::StopCalculation);
+    connect(Stresser, &StressTest::ErrorsOccured, this, &StandaloneStress::FinishedEroors, Qt::QueuedConnection);
 	CheckAllValid();
 }
 

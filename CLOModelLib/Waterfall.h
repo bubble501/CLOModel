@@ -176,7 +176,7 @@ public:
     void ResetSteps();
     void AddTranche(const Tranche& a);
     void ResetTranches();
-    bool CalculateTranchesCashFlows();
+    std::tuple<bool, QString> CalculateTranchesCashFlows();
     QString ReadyToCalculate() const;
     void CompileReferenceRateValue(ForwardBaseRateTable& Values);
     void CompileReferenceRateValue(ConstantBaseRateTable& Values);

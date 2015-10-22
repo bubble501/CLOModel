@@ -26,8 +26,8 @@ StandaloneViewer::StandaloneViewer(QWidget *parent)
 	TheViewer=new SummaryView(this);
 	setCentralWidget(TheViewer);
 	StressWindow=new StressViewer;
-	connect(StressWindow,SIGNAL(Closing()),this,SLOT(closeFile()));
-	connect(StressWindow,SIGNAL(StressLevelChanged(Waterfall)),this,SLOT(HandleStressChange(Waterfall)));
+    connect(StressWindow, &StressViewer::Closing, this, &StandaloneViewer::closeFile);
+    connect(StressWindow, &StressViewer::StressLevelChanged, this, &StandaloneViewer::HandleStressChange);
 	StressWindow->hide();
 	createActions();
 	createMenus();
@@ -50,30 +50,29 @@ void StandaloneViewer::createActions(){
 	openAction=new QAction("&Open",this);
 	openAction->setIcon(QIcon::fromTheme("document-open"));
 	openAction->setStatusTip("Open Base Case Scenario");
-	connect(openAction, SIGNAL(triggered()), this, SLOT(open()));
+	connect(openAction, &QAction::triggered, this, &StandaloneViewer::open);
 
 	openStressAction=new QAction("Open &Stress",this);
 	openStressAction->setIcon(QIcon::fromTheme("folder-new"));
 	openStressAction->setStatusTip("Open Stress Test");
-	connect(openStressAction, SIGNAL(triggered()), this, SLOT(openStress()));
+    connect(openStressAction, &QAction::triggered, this, &StandaloneViewer::openStress);
 
 	exitAction=new QAction("&Exit",this);
 	exitAction->setIcon(QIcon::fromTheme("application-exit"));
 	exitAction->setStatusTip(tr("Quit Application"));
-	connect(exitAction, SIGNAL(triggered()), this, SLOT(close()));
+    connect(exitAction, &QAction::triggered, this, &StandaloneViewer::close);
 
 	CloseFileAction=new QAction("&Close",this);
 	CloseFileAction->setIcon(QIcon::fromTheme("edit-clear"));
 	CloseFileAction->setStatusTip(tr("Close The current File"));
-	connect(CloseFileAction, SIGNAL(triggered()), this, SLOT(closeFile()));
+    connect(CloseFileAction, &QAction::triggered, this, &StandaloneViewer::closeFile);
 	
 
 	for (int i = 0; i < MaxRecentFiles; ++i) {
 		recentFileActions[i] = new QAction(this);
 		recentFileActions[i]->setVisible(false);
 		recentFileActions[i]->setIcon(QIcon::fromTheme("document-open-recent"));
-		connect(recentFileActions[i], SIGNAL(triggered()),
-			this, SLOT(openRecentFile()));
+        connect(recentFileActions[i], &QAction::triggered,this, &StandaloneViewer::openRecentFile);
 	}
 }
 void StandaloneViewer::createMenus()

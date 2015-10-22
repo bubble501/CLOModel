@@ -24,7 +24,7 @@ protected slots:
 public slots :
 	virtual void run() override;
 private:
-	void ReturnError();
+	void ReturnError(const QString& err);
 };
 
 #endif // LOANASSMATCHERTHREAD_H

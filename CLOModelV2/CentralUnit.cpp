@@ -38,10 +38,10 @@ CentralUnit::CentralUnit(QObject* parent)
     if (QMetaType::type("MtgCashFlow")==QMetaType::UnknownType) {
         qRegisterMetaTypeStreamOperators<MtgCashFlow>(typeid(MtgCashFlow).name());
     }
-	connect(&LoansCalculator,SIGNAL(Calculated()),this,SLOT(CalculationStep2()));
-	connect(this,SIGNAL(LoopStarted()),this,SLOT(CalculationStep1()),Qt::QueuedConnection);
+    connect(&LoansCalculator, &MtgCalculator::Calculated, this, &CentralUnit::CalculationStep2);
+    connect(this, &CentralUnit::LoopStarted, this, &CentralUnit::CalculationStep1, Qt::QueuedConnection);
 	ParallWatFalls=new WaterfallCalculator(this);
-	connect(ParallWatFalls,SIGNAL(Calculated()),this,SLOT(CheckCalculationDone()));
+    connect(ParallWatFalls, &WaterfallCalculator::Calculated, this, &CentralUnit::CheckCalculationDone);
 }
 void CentralUnit::SetPoolCutOff(const QDate& a) { PoolCutOff = a; }
 void CentralUnit::SetFolderPath(const QString& a){FolderPath=a;}
@@ -270,8 +270,8 @@ void CentralUnit::SetupStress(const QString& ConstPar,QList<QString> XSpann,QLis
 		else 
             Stresser->CompileBaseRates(*(std::dynamic_pointer_cast<ConstantBaseRateTable>(LastRateTable)));
 	}
-	connect(this,SIGNAL(StressLoopStarted()),Stresser,SLOT(RunStressTest()),Qt::QueuedConnection);
-	connect(Stresser,SIGNAL(AllFinished()),this,SLOT(StressFinished()));
+    connect(this, &CentralUnit::StressLoopStarted, Stresser, &StressTest::RunStressTest, Qt::QueuedConnection);
+    connect(Stresser, &StressTest::AllFinished, this, &CentralUnit::StressFinished);
 }
 void CentralUnit::Calculate(){
 	emit LoopStarted();
@@ -341,8 +341,9 @@ void CentralUnit::CalculationStep1(){
 	connect(MtgsProgress, &QProgressDialog::canceled, &LoansCalculator, &MtgCalculator::StopCalculation);
 	MtgsProgress->show();
 	QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
-	if (!LoansCalculator.StartCalculation()) {
-		QMessageBox::critical(0, "Invalid Input", "A base rate in the loans is invalid");
+    const auto calcRet = LoansCalculator.StartCalculation();
+    if (!std::get<0>(calcRet)){
+        QMessageBox::critical(0, "Invalid Input", std::get<1>(calcRet));
 		QApplication::quit();
 		return;
 	}
@@ -404,8 +405,9 @@ void CentralUnit::CalculationStep2()
 		CallStructure.ResetMtgFlows();
 		CallStructure.ResetTranches();
 		CallStructure.ResetSteps();
-		if (!Structure.CalculateTranchesCashFlows()) {
-            QMessageBox::critical(0, "Error", "Critical error in waterfall calculation Failed Calculation of Single Waterfall");
+        const auto calcRet = Structure.CalculateTranchesCashFlows();
+        if (!std::get<0>(calcRet)) {
+            QMessageBox::critical(0, tr("Error"), tr("Critical error in waterfall calculation: %1").arg(std::get<1>(calcRet)));
 			QApplication::quit();
 			return;
 		}
@@ -427,8 +429,10 @@ void CentralUnit::CalculationStep2()
 		connect(ParallWatFalls, &WaterfallCalculator::ProgressPct, MtgsProgress, &QProgressDialog::setValue);
 		disconnect(MtgsProgress, &QProgressDialog::canceled,nullptr,nullptr);
 		connect(MtgsProgress, &QProgressDialog::canceled, ParallWatFalls, &WaterfallCalculator::StopCalculation);
-        if (!ParallWatFalls->StartCalculation()) {
-            QMessageBox::critical(0, "Error", "Critical error in waterfall calculation Failed parallel waterfalls");
+
+        const auto calcRet = ParallWatFalls->StartCalculation();
+        if (!std::get<0>(calcRet)) {
+            QMessageBox::critical(0, tr("Error"), tr("Critical error in waterfall calculation: %1").arg(std::get<1>(calcRet)));
             QApplication::quit();
         }
 	}

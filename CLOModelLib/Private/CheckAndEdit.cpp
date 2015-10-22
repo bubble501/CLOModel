@@ -15,9 +15,9 @@ CheckAndEdit::CheckAndEdit(QWidget *parent)
 	mainLay->addWidget(m_check);
 	mainLay->addWidget(m_edit);
 
-	connect(m_edit, SIGNAL(textEdited(QString)), this, SIGNAL(LineEdited(QString)));
-	connect(m_check, SIGNAL(stateChanged(int)), this, SIGNAL(CheckChanged(int)));
-	connect(m_edit, SIGNAL(textEdited(const QString&)), this, SLOT(ForceCheck(const QString&)));
+    connect(m_edit, &QLineEdit::textEdited, this, &CheckAndEdit::LineEdited);
+    connect(m_check, &QCheckBox::stateChanged, this, &CheckAndEdit::CheckChanged);
+    connect(m_edit, &QLineEdit::textEdited, this, &CheckAndEdit::ForceCheck);
 }
 
 void CheckAndEdit::SetText(const QString& a) {

@@ -862,12 +862,12 @@ QHash<QString, double> MtgCalculator::GetGeographicBreakdown() const
     if (d->m_LoansPath.isEmpty()) return Result;
 	QString CurrentGuess;
 	simstring::reader dbr;
-    const std::string DbRootFolder(GetFromConfig("Folder","CountriesDBFolder").toStdString());
+    const std::string DbRootFolder(GetFromConfig("Folders","CountriesDBFolder").toStdString());
 	if (DbRootFolder.empty()) 
         return Result;
-	if (!QFile::exists(QString::fromStdString(DbRootFolder + "CountriesDB\\ISO3166-1.ssdb"))) 
-        BuildDBCountries(QString::fromStdString(DbRootFolder + "CountriesDB\\ISO3166-1.ssdb"));
-	if (!dbr.open(DbRootFolder + "CountriesDB\\ISO3166-1.ssdb")) 
+	if (!QFile::exists(QString::fromStdString(DbRootFolder + "\\CountriesDB\\ISO3166-1.ssdb"))) 
+        BuildDBCountries(QString::fromStdString(DbRootFolder + "\\CountriesDB\\ISO3166-1.ssdb"));
+	if (!dbr.open(DbRootFolder + "\\CountriesDB\\ISO3166-1.ssdb")) 
         return Result;
     for (auto i = d->m_LoansPath.constBegin(); i != d->m_LoansPath.constEnd(); ++i) {
         const auto tempLoan = readTempFile<Mortgage>(i.value());

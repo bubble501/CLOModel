@@ -474,15 +474,25 @@ void CentralUnit::CheckCalculationDone()
         for (int tranIter = 0; tranIter < applicableStructure.GetTranchesCount(); ++tranIter) {
             if (!applicableStructure.GetTranche(tranIter)->saveCashflowsDatabase()) {
                 loadFailed = true;
-                notLoadedString += "\n" + applicableStructure.GetTranche(tranIter)->GetTrancheName();
+                notLoadedString += '\n' + applicableStructure.GetTranche(tranIter)->GetTrancheName();
             }
         }
         if (loadFailed)
             QMessageBox::warning(nullptr, tr("Database Upload Failed"), notLoadedString);
+        QStringList AdjDealName = Structure.GetDealName().toList();
+        QString dealsGeoNotLoaded;
+        for (auto i = AdjDealName.constBegin(); i != AdjDealName.constEnd(); ++i) {
+            if (!LoansCalculator.uploadGeographyToDatabase(*i, LoansCalculator.GetStartDate(), LoansCalculator.GetStartDate())) {
+                if (!dealsGeoNotLoaded.isEmpty())
+                    dealsGeoNotLoaded += '\n';
+                dealsGeoNotLoaded += *i;
+            }
+        }
+        if (!dealsGeoNotLoaded.isEmpty())
+            QMessageBox::warning(nullptr, tr("Database Upload Failed"), tr("Failed to save geographic distribution to database for deals:\n%1").arg(dealsGeoNotLoaded));
         // Save it to File
 		const QDir UnifiedDir(GetFromConfig("Folders", "UnifiedResultsFolder"));
 		if (UnifiedDir.exists()) {
-			QStringList AdjDealName = Structure.GetDealName().toList();
 			if (AdjDealName.isEmpty() && Structure.GetTranchesCount() > 0) {
 				AdjDealName << Structure.GetTranche(0)->GetTrancheName();
 			}

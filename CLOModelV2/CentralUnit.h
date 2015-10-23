@@ -137,8 +137,8 @@ public:
 	void SetStressToCall(bool a){StressToCall=a;}
 	void SetPlotsSheet(const QString& a){PlotsSheet=a;}
 	void SetPlotIndexes(int val,int index){if(index>=0 && index<NumberOfPlots) PlotIndexes[index]=val;}
-	void SetReserveFund(int RFindex, const QString& RFtarget, const QString& RFmultiple, const QString& RFfloor, const QString& RFfcap, double RFcurrent, int RFfreed, bool RFtoInterest = true) { Structure.SetReserveFund(RFindex, RFtarget, RFmultiple, RFfloor, RFfcap, RFcurrent, RFfreed, RFtoInterest); }
-	void AddReserveFund(const QString& RFtarget, const QString& RFmultiple, const QString& RFfloor, const QString& RFfcap, double RFcurrent, int RFfreed, bool RFtoInterest = true) { Structure.AddReserveFund(RFtarget, RFmultiple, RFfloor, RFfcap,RFcurrent, RFfreed, RFtoInterest); }
+	void SetReserveFund(int RFindex, const QString& RFtarget, const QString& RFmultiple, const QString& RFfloor, const QString& RFfcap, double RFcurrent, int RFfreed, bool RFtoInterest = true);
+	void AddReserveFund(const QString& RFtarget, const QString& RFmultiple, const QString& RFfloor, const QString& RFfcap, double RFcurrent, int RFfreed, bool RFtoInterest = true);
 	void SetCumulativeReserves(bool a){Structure.SetCumulativeReserves(a);}
 	const  QDate& GetLiborUpdateDate() const { return LiborUpdateDate; }
 	bool GetUseForwardCurve() const { return m_UseForwardCurve; }

@@ -698,7 +698,19 @@ CentralUnit::~CentralUnit(){
 	if(MtgsProgress) 
         MtgsProgress->deleteLater();
 }
-void CentralUnit::CompileBaseRates(ConstantBaseRateTable& Values) {
+
+void CentralUnit::SetReserveFund(int RFindex, const QString& RFtarget, const QString& RFmultiple, const QString& RFfloor, const QString& RFfcap, double RFcurrent, int RFfreed, bool RFtoInterest /*= true*/)
+{
+    Structure.SetReserveFund(RFindex, RFtarget, RFmultiple, RFfloor, RFfcap, RFcurrent, RFfreed, RFtoInterest);
+}
+
+void CentralUnit::AddReserveFund(const QString& RFtarget, const QString& RFmultiple, const QString& RFfloor, const QString& RFfcap, double RFcurrent, int RFfreed, bool RFtoInterest /*= true*/)
+{
+    Structure.AddReserveFund(RFtarget, RFmultiple, RFfloor, RFfcap, RFcurrent, RFfreed, RFtoInterest);
+}
+
+void CentralUnit::CompileBaseRates(ConstantBaseRateTable& Values)
+{
 	m_OverrideConstants = Values;
 	Structure.CompileReferenceRateValue(Values);
 	CallStructure.CompileReferenceRateValue(Values);

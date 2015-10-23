@@ -276,7 +276,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 				RFfree=pdFreq->intVal; pdFreq++;
 				RFtoIntres=pdFreq->boolVal; pdFreq++;
 				if (
-					(!BloombergVector(RFtarget).IsEmpty(0.001) && !BloombergVector(RFmultiple).IsEmpty(0.001))
+					(!BloombergVector(RFtarget).IsEmpty(0.001) && !BloombergVector(RFmultiple).IsEmpty(0.00001))
 					|| !BloombergVector(RFfloor).IsEmpty(0.001)
 					|| RFcurrent>0.0
 				)

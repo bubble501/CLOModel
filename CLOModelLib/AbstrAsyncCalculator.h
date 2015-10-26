@@ -5,7 +5,6 @@
 #include <memory>
 #include <QString>
 #include <QFile>
-#include <random>
 #ifndef RETURN_WHEN_RUNNING
 #define RETURN_WHEN_RUNNING(rvr,retval) if( ContinueCalculation() == rvr) return retval;
 #endif
@@ -41,10 +40,8 @@ protected:
     template <class T> QString writeTempFile(const T& val) const
     {
         QString tempFileName;
-        std::default_random_engine generator;
-        std::uniform_int_distribution<int> distribution(97, 122);
         do { // Generate random file name
-            tempFileName.append(static_cast<char>(distribution(generator)));
+            tempFileName.append(static_cast<char>('a' + qrand() % (1 + 'z' - 'a')));
         } while (tempFileName.size()<3 || QFile::exists(getDataDirPath() + '/' + tempFileName));
         QFile destFile(getDataDirPath() + '/' + tempFileName);
         if (destFile.open(QIODevice::WriteOnly)) {
@@ -55,6 +52,7 @@ protected:
             return destFile.fileName();
         }
         PrintToTempFile("PermissionError", QString("Could not write temporary file %1 to save Waterfall").arg(tempFileName));
+        Q_ASSERT_X(false, "writeTempFile", QString("Unable to write file: %1").arg(getDataDirPath() + '/' + tempFileName));
         return QString();
     }
     static void removeTempFile(const QString& path);

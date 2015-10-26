@@ -5,6 +5,7 @@
 #include <QObject>
 #include <memory>
 #include <QString>
+#include <QFile>
 #ifndef RETURN_WHEN_RUNNING
 #define RETURN_WHEN_RUNNING(rvr,retval) if( ContinueCalculation() == rvr) return retval;
 #endif
@@ -47,7 +48,7 @@ protected:
             }
         } while (QFile::exists(getDataDirPath() + '/' + tempFileName));
         QFile destFile(getDataDirPath() + '/' + tempFileName);
-        if (destFile.open()) {
+        if (destFile.open(QIODevice::WriteOnly)) {
             QDataStream out(&destFile);
             out.setVersion(StreamVersionUsed);
             out << val;

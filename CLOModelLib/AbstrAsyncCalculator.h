@@ -4,7 +4,6 @@
 #include "BackwardCompatibilityInterface.h"
 #include <QObject>
 #include <memory>
-#include <QTemporaryFile>
 #include <QString>
 #ifndef RETURN_WHEN_RUNNING
 #define RETURN_WHEN_RUNNING(rvr,retval) if( ContinueCalculation() == rvr) return retval;
@@ -40,8 +39,14 @@ protected:
     QString getDataDirPath() const;
     template <class T> QString writeTempFile(const T& val) const
     {
-        QTemporaryFile destFile(getDataDirPath() + '/');
-        destFile.setAutoRemove(false);
+        QString tempFileName;
+        do { // Generate random file name
+            tempFileName.clear();
+            for (int j = 0; j < 15; ++j) {
+                tempFileName.append(static_cast<char>(97 + (qrand() % 26)));
+            }
+        } while (QFile::exists(getDataDirPath() + '/' + tempFileName));
+        QFile destFile(getDataDirPath() + '/' + tempFileName);
         if (destFile.open()) {
             QDataStream out(&destFile);
             out.setVersion(StreamVersionUsed);

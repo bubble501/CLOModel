@@ -16,7 +16,6 @@
 #include "simstring.h"
 #include <QXmlStreamReader>
 #include "BaseRateTable.h"
-#include <QTemporaryFile>
 #include <QtConcurrent>
 DEFINE_PUBLIC_QOBJECT_COMMONS(MtgCalculator)
 MtgCalculator::~MtgCalculator()
@@ -37,16 +36,6 @@ MtgCalculator::MtgCalculator(MtgCalculatorPrivate *d, QObject* parent)
 {
 }
 
-void MtgCalculatorPrivate::clearTempDir()
-{
-    const auto fileList = QDir(m_dataDir.path()).entryInfoList();
-    for (auto i = fileList.constBegin(); i != fileList.constEnd(); ++i)
-        QFile::remove(i->absoluteFilePath());
-}
-void MtgCalculatorPrivate::removeTempFile(const QString& path) const
-{
-    QFile::remove(path);
-}
 
 
 void MtgCalculator::SetLoan(const Mortgage& a, qint32 Index)
@@ -58,7 +47,7 @@ void MtgCalculator::SetLoan(const Mortgage& a, qint32 Index)
         d->m_LoansPath.insert(Index,writeTempFile(a));
 	}
     else {
-        d->removeTempFile(FoundLn.value());
+        removeTempFile(FoundLn.value());
         FoundLn.value() = writeTempFile(a);
     }
 
@@ -271,9 +260,10 @@ void MtgCalculator::BeeReturned(int Ident, const MtgCashFlow& a) {
 
 void MtgCalculator::ClearLoans() {
     Q_D(MtgCalculator);
-	RETURN_WHEN_RUNNING(true, )
-    d->m_LoansPath.clear();
-    d->clearTempDir();
+    RETURN_WHEN_RUNNING(true, )
+        for (auto i = d->m_LoansPath.begin(); i != d->m_LoansPath.end(); i = d->m_LoansPath.erase(i))
+            removeTempFile(i.value());
+    Q_ASSERT(d->m_LoansPath.isEmpty());
 }
 void MtgCalculator::Reset(){
 	ClearLoans();

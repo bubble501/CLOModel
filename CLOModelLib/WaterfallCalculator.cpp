@@ -1,6 +1,5 @@
 #include "WaterfallCalculator.h"
 #include "Private/WaterfallCalculator_p.h"
-#include <QTemporaryFile>
 #include <QtConcurrent>
 #include "Private/InternalItems.h"
 DEFINE_PUBLIC_QOBJECT_COMMONS(WaterfallCalculator)
@@ -17,13 +16,6 @@ WaterfallCalculator::~WaterfallCalculator()
 {
     Reset();
 }
-void WaterfallCalculatorPrivate::clearTempDir()
-{
-    const auto fileList = QDir(m_dataDir.path()).entryInfoList();
-    for (auto i = fileList.constBegin(); i != fileList.constEnd(); ++i)
-        QFile::remove(i->absoluteFilePath());
-}
-
 void WaterfallCalculator::AddWaterfall(const Waterfall& a, qint32 ID)
 {
     Q_D(WaterfallCalculator);
@@ -116,7 +108,9 @@ void WaterfallCalculator::ClearWaterfalls()
     Q_D(WaterfallCalculator);
 	RETURN_WHEN_RUNNING(true, )
     d->m_CascadesPath.clear();
-    d->clearTempDir();
+    for (auto i = d->m_CascadesPath.begin(); i != d->m_CascadesPath.end(); i = d->m_CascadesPath.erase(i))
+        removeTempFile(i.value());
+    Q_ASSERT(d->m_CascadesPath.isEmpty());
 }
 
 QDataStream& operator<<(QDataStream & stream, const WaterfallCalculator& flows)

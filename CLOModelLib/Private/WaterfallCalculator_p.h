@@ -10,7 +10,6 @@ class WaterfallCalculatorPrivate : public AbstrAsyncCalculatorPrivate
     DECLARE_PRIVATE_COMMONS_DATASTREAM(WaterfallCalculator)
 public:
     QHash<qint32, QString > m_CascadesPath;
-    void clearTempDir();
 };
 
 

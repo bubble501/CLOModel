@@ -7,7 +7,6 @@
 #include <QHash>
 #include <QPointer>
 #include <atomic>
-#include <QTemporaryFile>
 #include "Private/CheckedTempDir.h"
 class AbstrAsyncCalculatorPrivate : public BackwardInterfacePrivate
 {

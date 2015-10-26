@@ -50,7 +50,8 @@ public:
     virtual void ClearResults()
     {
         auto& tempRes = getResultPaths();
-        tempRes.clear();
+        for (auto i = tempRes.begin(); i != tempRes.end(); i = tempRes.erase(i))
+            removeTempFile(i.value());
         Q_ASSERT(getResultPaths().isEmpty());
     }
     virtual void RemoveResult(qint32 Key)
@@ -59,6 +60,7 @@ public:
         auto i = tempRes.find(Key);
         if (i == tempRes.end())
             return;
+        removeTempFile(i.value());
         tempRes.erase(i);
     }
     virtual const ResultType GetResult(qint32 key)const { return readTempFile<ResultType>(getResultPaths(key)); }

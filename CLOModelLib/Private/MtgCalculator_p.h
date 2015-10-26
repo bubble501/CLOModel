@@ -23,8 +23,6 @@ public:
     QDate StartDate;
     MtgCashFlow m_AggregatedRes;
     QHash<qint32, std::shared_ptr<QHash<QString, QString> > > TempProperties;
-    void removeTempFile(const QString& path) const;
-    void clearTempDir();
     template <class T> void CompileReferenceRateValueTemplate(T& table)
     {
         Q_Q(MtgCalculator);

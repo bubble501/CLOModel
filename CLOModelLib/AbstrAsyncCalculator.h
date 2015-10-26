@@ -44,7 +44,7 @@ protected:
             tempFileName.append(static_cast<char>('a' + qrand() % (1 + 'z' - 'a')));
         } while (tempFileName.size()<3 || QFile::exists(getDataDirPath() + '/' + tempFileName));
         QFile destFile(getDataDirPath() + '/' + tempFileName);
-        if (destFile.open(QIODevice::WriteOnly)) {
+        if (Q_LIKELY(destFile.open(QIODevice::WriteOnly))) {
             QDataStream out(&destFile);
             out.setVersion(StreamVersionUsed);
             out << val;
@@ -52,7 +52,7 @@ protected:
             return destFile.fileName();
         }
         PrintToTempFile("PermissionError", QString("Could not write temporary file %1 to save Waterfall").arg(tempFileName));
-        Q_ASSERT_X(false, "writeTempFile", QString("Unable to write file: %1").arg(getDataDirPath() + '/' + tempFileName));
+        Q_ASSERT_X(false, "writeTempFile", QString("Unable to write file: %1").arg(getDataDirPath() + '/' + tempFileName).toLatin1().data());
         return QString();
     }
     static void removeTempFile(const QString& path);

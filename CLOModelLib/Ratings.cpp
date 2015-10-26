@@ -587,7 +587,7 @@ void Ratings::reset()
 
 const QString RatingsPrivate::m_ratingFields[Ratings::CountRatingAcencies] = { "RTG_SP", "RTG_MOODY", "RTG_FITCH", "RTG_DBRS" };
 const QString RatingsPrivate::m_AgencyName[Ratings::CountRatingAcencies] = { "S&P", "Moody's", "Fitch", "DBRS" };
-const QString RatingsPrivate::m_reservedChars[Ratings::CountRatingAcencies] = { "ABC+-", "ABCa+-", "ABC+-", "ABCHL" };
+const QString RatingsPrivate::m_reservedChars[Ratings::CountRatingAcencies] = { "WABC+-", "WABCa+-", "WABC+-", "WABCHL" };
 const QString RatingsPrivate::m_ratingSyntax[Ratings::CountRatingAcencies][static_cast<qint16>(Ratings::RatingValue::Dm) + 1] = {
     { //S&P
         "NR",

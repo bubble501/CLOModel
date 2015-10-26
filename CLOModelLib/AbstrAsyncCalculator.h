@@ -38,12 +38,12 @@ protected:
     void insertResult(qint32 Key, const QString& path);
     QString getDataDirPath() const;
     template <class T> QString writeTempFile(const T& val) const
-    {
+    { 
         QString tempFileName;
         do { // Generate random file name
             tempFileName.append(static_cast<char>('a' + qrand() % (1 + 'z' - 'a')));
-        } while (tempFileName.size()<3 || QFile::exists(getDataDirPath() + '/' + tempFileName));
-        QFile destFile(getDataDirPath() + '/' + tempFileName);
+        } while (tempFileName.size()<3 || QFile::exists(getDataDirPath() + '/' + tempFileName + ".aactf"));
+        QFile destFile(getDataDirPath() + '/' + tempFileName + ".aactf");
         if (Q_LIKELY(destFile.open(QIODevice::WriteOnly))) {
             QDataStream out(&destFile);
             out.setVersion(StreamVersionUsed);
@@ -52,7 +52,7 @@ protected:
             return destFile.fileName();
         }
         PrintToTempFile("PermissionError", QString("Could not write temporary file %1 to save Waterfall").arg(tempFileName));
-        Q_ASSERT_X(false, "writeTempFile", QString("Unable to write file: %1").arg(getDataDirPath() + '/' + tempFileName).toLatin1().data());
+        Q_ASSERT_X(false, "writeTempFile", QString("Unable to write file: %1").arg(getDataDirPath() + '/' + tempFileName + ".aactf").toLatin1().data());
         return QString();
     }
     static void removeTempFile(const QString& path);

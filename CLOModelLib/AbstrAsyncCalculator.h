@@ -1,4 +1,3 @@
-
 #ifndef AbstrAsyncCalculator_h__
 #define AbstrAsyncCalculator_h__
 #include "BackwardCompatibilityInterface.h"
@@ -6,6 +5,7 @@
 #include <memory>
 #include <QString>
 #include <QFile>
+#include <random>
 #ifndef RETURN_WHEN_RUNNING
 #define RETURN_WHEN_RUNNING(rvr,retval) if( ContinueCalculation() == rvr) return retval;
 #endif
@@ -41,11 +41,10 @@ protected:
     template <class T> QString writeTempFile(const T& val) const
     {
         QString tempFileName;
+        std::default_random_engine generator;
+        std::uniform_int_distribution<int> distribution(97, 122);
         do { // Generate random file name
-            tempFileName.clear();
-            for (int j = 0; j < 15; ++j) {
-                tempFileName.append(static_cast<char>(97 + (qrand() % 26)));
-            }
+            tempFileName.append(static_cast<char>(distribution(generator)));
         } while (QFile::exists(getDataDirPath() + '/' + tempFileName));
         QFile destFile(getDataDirPath() + '/' + tempFileName);
         if (destFile.open(QIODevice::WriteOnly)) {

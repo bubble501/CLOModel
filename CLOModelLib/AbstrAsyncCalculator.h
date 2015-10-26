@@ -40,10 +40,12 @@ protected:
     template <class T> QString writeTempFile(const T& val) const
     { 
         QString tempFileName;
-        do { // Generate random file name
+        // Generate random file name
+        for (int i = 0; i < 5;++i)
             tempFileName.append(static_cast<char>('a' + qrand() % (1 + 'z' - 'a')));
-        } while (tempFileName.size()<3 || QFile::exists(getDataDirPath() + '/' + tempFileName + ".aactf"));
-        QFile destFile(getDataDirPath() + '/' + tempFileName + ".aactf");
+        while (QFile::exists(getDataDirPath() + '/' + tempFileName)) 
+            tempFileName.append(static_cast<char>('a' + qrand() % (1 + 'z' - 'a')));
+        QFile destFile(getDataDirPath() + '/' + tempFileName );
         if (Q_LIKELY(destFile.open(QIODevice::WriteOnly))) {
             QDataStream out(&destFile);
             out.setVersion(StreamVersionUsed);

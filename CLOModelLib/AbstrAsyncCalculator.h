@@ -45,7 +45,7 @@ protected:
         std::uniform_int_distribution<int> distribution(97, 122);
         do { // Generate random file name
             tempFileName.append(static_cast<char>(distribution(generator)));
-        } while (QFile::exists(getDataDirPath() + '/' + tempFileName));
+        } while (tempFileName.size()<3 || QFile::exists(getDataDirPath() + '/' + tempFileName));
         QFile destFile(getDataDirPath() + '/' + tempFileName);
         if (destFile.open(QIODevice::WriteOnly)) {
             QDataStream out(&destFile);
@@ -54,7 +54,7 @@ protected:
             destFile.close();
             return destFile.fileName();
         }
-        PrintToTempFile("PermissionError", "Could not write temporary file to save Waterfall");
+        PrintToTempFile("PermissionError", QString("Could not write temporary file %1 to save Waterfall").arg(tempFileName));
         return QString();
     }
     static void removeTempFile(const QString& path);

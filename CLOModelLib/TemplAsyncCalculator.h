@@ -113,12 +113,12 @@ protected:
             auto& tempRes = getResultPaths();
         auto FindRe = tempRes.find(Ident);
         if (FindRe != tempRes.end()) {
+            removeTempFile(FindRe.value());
             tempRes.erase(FindRe);
             Q_ASSERT(!getResultPaths().contains(Ident));
         }
         insertResult(Ident,a);
         getThreadPool().remove(Ident);
-        //emit BeeCalculated(++BeesReturned);
         getBeesReturned()++;
         Q_ASSERT(getBeesReturned() <= NumBees());
         emit BeeCalculated(Ident);

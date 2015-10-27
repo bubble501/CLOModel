@@ -861,7 +861,8 @@ QHash<QString, double> MtgCalculator::GetGeographicBreakdown() const
         return Result;
     for (auto i = d->m_LoansPath.constBegin(); i != d->m_LoansPath.constEnd(); ++i) {
         const auto tempLoan = readTempFile<Mortgage>(i.value());
-        if (tempLoan.GetSize()<0.01) continue;
+        if (tempLoan.GetSize()<0.01) 
+            continue;
         SumOut += tempLoan.GetSize();
         CurrentGuess = tempLoan.GetProperty("Country");
         if (!InsertUnknown(CurrentGuess, tempLoan.GetSize())) {
@@ -924,6 +925,10 @@ QString MtgCalculator::GetCountryISOCode(QString name) const
                         NameMatched = true;
                 }
 			}
+            else if (xml.name() == "Alpha-3") {
+                if (name.compare(xml.readElementText(), Qt::CaseInsensitive) == 0)
+                    NameMatched = true;
+            }
 			else if (xml.name() == "Alpha-2") {
 				if (!CountryFound) return QString();
                 CurrentCode = xml.readElementText();
@@ -931,8 +936,10 @@ QString MtgCalculator::GetCountryISOCode(QString name) const
 		}
 		else if (xml.isEndElement()) {
 			if (xml.name() == "Country") {
-				if (!CountryFound) return QString();
-                if (NameMatched && !CurrentCode.isEmpty()) return CurrentCode.trimmed().toUpper();
+				if (!CountryFound) 
+                    return QString();
+                if (NameMatched && !CurrentCode.isEmpty()) 
+                    return CurrentCode.trimmed().toUpper();
 				CountryFound = false;
 				NameMatched = false;
 				CurrentCode.clear();

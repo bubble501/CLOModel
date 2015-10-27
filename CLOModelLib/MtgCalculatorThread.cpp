@@ -58,7 +58,7 @@ void MtgCalculatorThread::run()
     if (d->Loan.CalculateCashFlows(d->StartDate, d->CPRass, d->CDRass, d->LSass, d->RecoveryLag, d->Delinquency, d->DelinquencyLag, d->m_OverrideAssumptions, d->m_DownloadScenario))
         emit AnonimCalculated(d->Identifier);
 	else
-        emit ErrorCalculation(d->Identifier);
+        emit ErrorCalculation(d->Identifier,QString());
 	exec();
 }
 void MtgCalculatorThread::SetCPR(const QString& a) { 

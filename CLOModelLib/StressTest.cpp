@@ -40,19 +40,19 @@ StressTest::StressTest(StressTestPrivate *d, QObject* parent)
     d->TranchesCalculator = new WaterfallCalculator(this);
     d->BaseApplier = new ScenarioApplier(this);
     ResetCurrentAssumption();
-    connect(this, SIGNAL(CurrentScenarioCalculated()), this, SLOT(GoToNextScenario()), Qt::QueuedConnection);
-    connect(d->BaseCalculator, SIGNAL(BeeError(int)), this, SLOT(ErrorInCalculation()), Qt::QueuedConnection);
+    connect(this, &StressTest::CurrentScenarioCalculated, this, &StressTest::GoToNextScenario, Qt::QueuedConnection);
+    connect(d->BaseCalculator, &MtgCalculator::BeeError, this, &StressTest::ErrorInCalculation, Qt::QueuedConnection);
     connect(this, &StressTest::AllLoansCalculated, this, &StressTest::startWaterfallCalculation, Qt::QueuedConnection);
     //connect(this, &StressTest::AllLoansCalculated, [&]() { BaseApplier->ClearResults(); BaseApplier->ClearScenarios(); BaseCalculator->ClearLoans(); BaseCalculator->ClearResults(); });
     //connect(this, SIGNAL(AllLoansCalculated()), this, SLOT(ReachedWaterfallCalc()));
 
-    connect(d->TranchesCalculator, SIGNAL(Calculated()), this, SLOT(GatherResults()), Qt::QueuedConnection);
-    connect(d->TranchesCalculator, SIGNAL(BeeError(int)), this, SLOT(ErrorInCalculation()));
-    connect(d->TranchesCalculator, SIGNAL(BeeError(int)), this, SIGNAL(ErrorsOccured()));
+    connect(d->TranchesCalculator, &WaterfallCalculator::Calculated, this, &StressTest::GatherResults, Qt::QueuedConnection);
+    connect(d->TranchesCalculator, &WaterfallCalculator::BeeError, this, &StressTest::ErrorInCalculation);
+    connect(d->TranchesCalculator, &WaterfallCalculator::BeeError, this, &StressTest::ErrorsOccured);
 
-    connect(d->BaseApplier, SIGNAL(Calculated()), this, SLOT(FastLoansCalculated()), Qt::QueuedConnection);
-    connect(d->BaseApplier, SIGNAL(BeeError(int)), this, SIGNAL(ErrorsOccured()));
-    connect(d->BaseApplier, SIGNAL(BeeError(int)), this, SLOT(ErrorInCalculation()));
+    connect(d->BaseApplier, &ScenarioApplier::Calculated, this, &StressTest::FastLoansCalculated, Qt::QueuedConnection);
+    connect(d->BaseApplier, &ScenarioApplier::BeeError, this, &StressTest::ErrorsOccured);
+    connect(d->BaseApplier, &ScenarioApplier::BeeError, this, &StressTest::ErrorInCalculation);
 
     d->m_AssumptionsRef[StressTestPrivate::AssCPR] = &d->m_CPRscenarios;
     d->m_AssumptionsRef[StressTestPrivate::AssCDR] = &d->m_CDRscenarios;
@@ -432,16 +432,16 @@ void StressTest::RunStressTest()
         d->ProgressForm->AddPhase(tr("Calculating liabilities cash flows"), 0, 100);
         d->ProgressForm->SetTotalProgressLabel(tr("Stress Test"));
         d->ProgressForm->show();
-        connect(d->ProgressForm, SIGNAL(Cancelled()), this, SLOT(StopCalculation()));
-        connect(this, SIGNAL(AllLoansCalculated()), d->ProgressForm, SLOT(NextPhase()), Qt::QueuedConnection);
-        connect(d->TranchesCalculator, SIGNAL(Progress(double)), d->ProgressForm, SLOT(SetPhaseProgress(double)));
-        connect(d->BaseApplier, SIGNAL(Progress(double)), d->ProgressForm, SLOT(SetPhaseProgress(double)));
+        connect(d->ProgressForm, &PhasedProgressWidget::Cancelled, this, &StressTest::StopCalculation);
+        connect(this, &StressTest::AllLoansCalculated, d->ProgressForm, &PhasedProgressWidget::NextPhase, Qt::QueuedConnection);
+        connect(d->TranchesCalculator, &WaterfallCalculator::Progress, d->ProgressForm, static_cast<void (PhasedProgressWidget::*)(double)>(&PhasedProgressWidget::SetPhaseProgress));
+        connect(d->BaseApplier, &ScenarioApplier::Progress, d->ProgressForm, static_cast<void (PhasedProgressWidget::*)(double)>(&PhasedProgressWidget::SetPhaseProgress));
 	}
     if (d->UseFastVersion) {
-        connect(d->BaseCalculator, SIGNAL(Calculated()), this, SLOT(BaseForFastCalculated()));
+        connect(d->BaseCalculator, &MtgCalculator::Calculated, this, &StressTest::BaseForFastCalculated);
         if (d->ShowProgress)
-            connect(d->BaseCalculator, SIGNAL(Progress(double)), d->ProgressForm, SLOT(SetPhaseProgress(double)));
-        if (!d->BaseCalculator->StartCalculation(true)) {
+            connect(d->BaseCalculator, &MtgCalculator::Progress, d->ProgressForm, static_cast<void (PhasedProgressWidget::*)(double)>(&PhasedProgressWidget::SetPhaseProgress));
+        if (!std::get<0>(d->BaseCalculator->StartCalculation(true))) {
 			QMessageBox::critical(0, "Invalid Input", "A base rate in the loans is invalid");
 			return;
 		}
@@ -451,9 +451,9 @@ void StressTest::RunStressTest()
 }
 void StressTest::BaseForFastCalculated() {
     Q_D( StressTest);
-    disconnect(d->BaseCalculator, SIGNAL(Calculated()), this, SLOT(BaseForFastCalculated()));
+    disconnect(d->BaseCalculator, &MtgCalculator::Calculated, this, &StressTest::BaseForFastCalculated);
     if (d->ShowProgress)
-        disconnect(d->BaseCalculator, SIGNAL(Progress(double)), d->ProgressForm, SLOT(SetPhaseProgress(double)));
+        disconnect(d->BaseCalculator, &MtgCalculator::Progress, d->ProgressForm, static_cast<void (PhasedProgressWidget::*)(double)>(&PhasedProgressWidget::SetPhaseProgress));
     if (!d->ContinueCalculation) 
         return StoppedCalculation();
     d->BaseApplier->SetBaseFlows(d->BaseCalculator->GetAggregatedResults());
@@ -484,14 +484,14 @@ void StressTest::RunCurrentScenario() {
 		emit CurrentScenarioCalculated();
 	}
     else {
-        connect(d->BaseCalculator, SIGNAL(Calculated()), this, SLOT(SlowLoansCalculated()), Qt::UniqueConnection);
+        connect(d->BaseCalculator, &MtgCalculator::Calculated, this, &StressTest::SlowLoansCalculated, Qt::UniqueConnection);
         d->BaseCalculator->SetCPRass(CurrentAss.GetCPRscenario());
         d->BaseCalculator->SetCDRass(CurrentAss.GetCDRscenario());
         d->BaseCalculator->SetLSass(CurrentAss.GetLSscenario());
         d->BaseCalculator->SetRecoveryLag(CurrentAss.GetRecLagScenario());
         d->BaseCalculator->SetDelinquency(CurrentAss.GetDelinqScenario());
         d->BaseCalculator->SetDelinquencyLag(CurrentAss.GetDelinqLagScenario());
-        if (!d->BaseCalculator->StartCalculation(true)) {
+        if (std::get<0>(d->BaseCalculator->StartCalculation(true))) {
 			emit ErrorInCalculation();
 		}
 	}
@@ -913,7 +913,7 @@ void StressTest::StopCalculation()
 void StressTest::startWaterfallCalculation()
 {
     Q_D(StressTest);
-    if (!d->TranchesCalculator->StartCalculation(true))
+    if (!std::get<0>(d->TranchesCalculator->StartCalculation(true)))
         emit ErrorInCalculation();
 }
 

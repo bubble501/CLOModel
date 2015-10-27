@@ -5,6 +5,7 @@
 #include "Private/BackwardCompatibilityInterface_p.h"
 #include <QSet>
 #include <QHash>
+#include <QMultiHash>
 #include <QPointer>
 #include <atomic>
 #include "Private/CheckedTempDir.h"
@@ -21,6 +22,6 @@ public:
     bool m_SequentialComputation;
     quint8 m_operativity;
     CheckedTempDir m_dataDir;
-    
+    QMultiHash<qint32, QString> m_errors;
 };
 #endif // AbstrAsyncCalculator_p_h__

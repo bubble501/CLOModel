@@ -48,9 +48,9 @@ PhasedProgressWidget::PhasedProgressWidget(QWidget *parent)
 	MainLay->addWidget(TotalGroup);
 	MainLay->addWidget(PhaseGroup);
 	MainLay->addLayout(BottomLay);
-	connect(m_PhaseProgress, SIGNAL(valueChanged(int)), this, SIGNAL(NeedRefresh()));
-	connect(m_CancelButton, SIGNAL(clicked()), this, SLOT(close()));
-	connect(this, SIGNAL(NeedRefresh()), this, SLOT(UpdateTotalProgress()));
+    connect(m_PhaseProgress, &QProgressBar::valueChanged, this, &PhasedProgressWidget::NeedRefresh);
+    connect(m_CancelButton, &QPushButton::clicked, this, &PhasedProgressWidget::close);
+    connect(this, &PhasedProgressWidget::NeedRefresh, this, &PhasedProgressWidget::UpdateTotalProgress);
 }
 void PhasedProgressWidget::closeEvent(QCloseEvent *event) {
 	emit Cancelled();

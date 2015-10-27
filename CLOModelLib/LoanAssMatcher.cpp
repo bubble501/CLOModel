@@ -189,11 +189,13 @@ int LoanAssMatcher::NumBees() const
 	return Source.entryInfoList().size();
 }
 
-bool LoanAssMatcher::StartCalculation()
+std::tuple<bool, QString> LoanAssMatcher::StartCalculation()
 {
     Q_D( LoanAssMatcher);
-	RETURN_WHEN_RUNNING(true, false)
-	if (!ReadyToCalculate().isEmpty()) return false;
+    RETURN_WHEN_RUNNING(true, std::make_tuple(false, "Calculator already running"))
+    const QString rdyClc = ReadyToCalculate();
+    if (!rdyClc.isEmpty())
+        return std::make_tuple(false, rdyClc);
     QDir Source(d->m_FolderToScan);
 	Source.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
 	Source.setNameFilters(QStringList() << "*.clom");
@@ -211,7 +213,7 @@ bool LoanAssMatcher::StartCalculation()
         CurrentThread->SetModelToScan(d->m_FilesInFolder.at(i).absoluteFilePath());
 		CurrentThread->start();
 	}
-	return true;
+    return std::make_tuple(true,QString());
 }
 
 void LoanAssMatcher::BeeReturned(int Ident, const LoanAssMatcherResult& a)

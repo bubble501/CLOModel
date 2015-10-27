@@ -1111,12 +1111,13 @@ double Waterfall::GetWACostOfCapital(int index)const
     return Result / RunningSum;
 }
 
-bool Waterfall::CalculateTranchesCashFlows()
+std::tuple<bool, QString> Waterfall::CalculateTranchesCashFlows()
 {
     Q_D( Waterfall);
-    if (!ReadyToCalculate().isEmpty()) {
+    const QString rdyClc = ReadyToCalculate();
+    if (!rdyClc.isEmpty()) {
         PrintToTempFile("ReturnFalse.txt", "Not Ready To Calculate");
-        return false;
+        return std::make_tuple(false, rdyClc);
     }
         {//Check if all base rates are valid
             bool KeepSearching = false;
@@ -1129,7 +1130,7 @@ bool Waterfall::CalculateTranchesCashFlows()
                     d->m_GICBaseRateValue = d->m_GICBaseRate.CompileReferenceRateValue(TempTable);
                     if (d->m_GICBaseRateValue.IsEmpty()) {
                         PrintToTempFile("ReturnFalse.txt", "Missing Base Rate Value");
-                        return false;
+                        return std::make_tuple(false, "Missing Base Rate Value");
                     }
                 }
             }
@@ -1147,7 +1148,7 @@ bool Waterfall::CalculateTranchesCashFlows()
                 for (auto SingleRate = (*SingleTranche)->GetRefRateValues().constBegin(); SingleRate != (*SingleTranche)->GetRefRateValues().constEnd(); ++SingleRate) {
                     if (SingleRate.value()->IsEmpty()) {
                         PrintToTempFile("ReturnFalse.txt", "Missing Base Rate Value");
-                        return false;
+                        return std::make_tuple(false, "Missing Base Rate Value");
                     }
                 }
             }
@@ -1158,7 +1159,7 @@ bool Waterfall::CalculateTranchesCashFlows()
                 if ((*SingleStep)->HasParameter(WatFalPrior::wstParameters::Trigger)) {
                     if (!ValidTriggerStructure((*SingleStep)->GetParameter(WatFalPrior::wstParameters::Trigger).toString())) {
                         PrintToTempFile("ReturnFalse.txt", "Invalid Trigger Structure");
-                        return false;
+                        return std::make_tuple(false, "Invalid Trigger Structure");
                     }
                 }
             }
@@ -1459,7 +1460,7 @@ bool Waterfall::CalculateTranchesCashFlows()
                     int RevIdx = SingleStep->GetParameter(WatFalPrior::wstParameters::ReserveIndex).value<IntegerVector>().GetValue(CurrentDate);
                     if (RevIdx< 0 || RevIdx >= d->m_Reserves.size()) {
                         PrintToTempFile("ReturnFalse.txt", "Reserve Fund Fail");
-                        return false;
+                        return std::make_tuple(false, "Invalid Reserve Index in Waterfall");
                     }
                     double FreedAmnt, StacedRsAmt = 0.0;
                     int MostJun = FindMostJuniorLevel(0);
@@ -1521,7 +1522,7 @@ bool Waterfall::CalculateTranchesCashFlows()
                     int CurrCoupIndx = SingleStep->GetParameter(WatFalPrior::wstParameters::CouponIndex).value<IntegerVector>().GetValue(CurrentDate);
                     if (CurrSenGrp > FindMostJuniorLevel(CurrSenGrpLvl)) {
                         PrintToTempFile("ReturnFalse.txt", "Invalid seniority in Interest");
-                        return false;
+                        return std::make_tuple(false, "Invalid seniority in Interest");
                     }
                     if (SingleStep->GetParameter(WatFalPrior::wstParameters::PayAccrue).toInt() & WatFalPrior::wstAccrueOrPay::Accrue) {
                         foreach(auto&& SingleTranche, d->m_Tranches)
@@ -1529,7 +1530,7 @@ bool Waterfall::CalculateTranchesCashFlows()
                             if (SingleTranche->GetProrataGroup(CurrSenGrpLvl) == CurrSenGrp) {
                                 if (!SingleTranche->HasCoupon(CurrCoupIndx)) {
                                     PrintToTempFile("ReturnFalse.txt", SingleTranche->GetTrancheName() + " - Coupon not set in tranche");
-                                    return false;
+                                    return std::make_tuple(false, SingleTranche->GetTrancheName() + " - Coupon not set in tranche");
                                 }
                                 AdjustedCoupon = deannualiseCoupon(SingleTranche->GetCoupon(CurrentDate, CurrCoupIndx), RollingLastIPD, RollingNextIPD, SingleTranche->GetDayCount(CurrCoupIndx).GetValue(CurrentDate));
                                 Solution = SingleTranche->GetCashFlow().GetDeferred(CurrentDate, CurrCoupIndx);
@@ -1619,13 +1620,13 @@ bool Waterfall::CalculateTranchesCashFlows()
                     int CurrCoupIndx = SingleStep->GetParameter(WatFalPrior::wstParameters::CouponIndex).value<IntegerVector>().GetValue(CurrentDate);
                     if (CurrSenGrp > FindMostJuniorLevel(CurrSenGrpLvl)) {
                         PrintToTempFile("ReturnFalse.txt", "Invalid seniority in Deferred Interest");
-                        return false;
+                        return std::make_tuple(false, "Invalid seniority in Deferred Interest");
                     }
                     for (int h = 0; h < d->m_Tranches.size(); h++) {
                         if (d->m_Tranches.at(h)->GetProrataGroup(CurrSenGrpLvl) == CurrSenGrp) {
                             if (!d->m_Tranches.at(h)->HasCoupon(CurrCoupIndx)) {
                                 PrintToTempFile("ReturnFalse.txt", d->m_Tranches.at(h)->GetTrancheName() + " - Coupon not set in tranche");
-                                return false;
+                                return std::make_tuple(false, d->m_Tranches.at(h)->GetTrancheName() + " - Coupon not set in tranche");
                             }
                             ProRataBonds.enqueue(h);
                             TotalPayable +=
@@ -1697,7 +1698,7 @@ bool Waterfall::CalculateTranchesCashFlows()
                     int CurrSenGrp = SingleStep->GetParameter(WatFalPrior::wstParameters::SeniorityGroup).value<IntegerVector>().GetValue(CurrentDate);
                     if (CurrSenGrp > FindMostJuniorLevel(CurrSenGrpLvl)) {
                         PrintToTempFile("ReturnFalse.txt", "Invalid seniority in Principal");
-                        return false;
+                        return std::make_tuple(false, "Invalid seniority in Principal");
                     }
                     TotalPayable = RedeemNotes(AvailablePrincipal.Total(), CurrSenGrp, CurrSenGrpLvl, CurrentDate);
                     AvailablePrincipal -= AvailablePrincipal.Total() - TotalPayable;
@@ -1709,7 +1710,7 @@ bool Waterfall::CalculateTranchesCashFlows()
                     int CurrSenGrp = SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroup).value<IntegerVector>().GetValue(CurrentDate);
                     if (CurrSenGrp > FindMostJuniorLevel(CurrSenGrpLvl)) {
                         PrintToTempFile("ReturnFalse.txt", "Invalid seniority in Turbo");
-                        return false;
+                        return std::make_tuple(false, "Invalid seniority in Turbo");
                     }
                     TotalPayable = RedeemNotes(
                         AvailableInterest*SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionShare).value<BloombergVector>().GetValue(CurrentDate)
@@ -1726,8 +1727,8 @@ bool Waterfall::CalculateTranchesCashFlows()
                     int CurrSenGrp = SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroup).value<IntegerVector>().GetValue(CurrentDate);
                     bool UseToRedeem = SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate) == 2;
                     if (CurrSenGrp > FindMostJuniorLevel(CurrSenGrpLvl)) {
-                        PrintToTempFile("ReturnFalse.txt", "Invalid seniority in Turbo");
-                        return false;
+                        PrintToTempFile("ReturnFalse.txt", "Invalid seniority in Prepayment Fees");
+                        return std::make_tuple(false, "Invalid seniority in Prepayment Fees");
                     }
                     ProRataBonds.clear();
                     bool UsedOriginals = false;
@@ -1770,7 +1771,7 @@ bool Waterfall::CalculateTranchesCashFlows()
                     int CurrSenGrp = SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionGroup).value<IntegerVector>().GetValue(CurrentDate);
                     if (CurrSenGrp > FindMostJuniorLevel(CurrSenGrpLvl)) {
                         PrintToTempFile("ReturnFalse.txt", "Invalid seniority in Excess spread");
-                        return false;
+                        return std::make_tuple(false, "Invalid seniority in Excess spread");
                     }
                     if (SolutionDegree & 1) {
                         d->m_AnnualizedExcess.AddFlow(CurrentDate, AvailableInterest, TrancheCashFlow::TrancheFlowType::InterestFlow);
@@ -1834,7 +1835,7 @@ bool Waterfall::CalculateTranchesCashFlows()
                         )
                         ) {
                         PrintToTempFile("ReturnFalse.txt", "Invalid seniority in PDL cure");
-                        return false;
+                        return std::make_tuple(false, "Invalid seniority in PDL cure");
                     }
                     ProRataBonds.clear();
                     TotalPayable = TestTarget = 0.0;
@@ -1885,7 +1886,7 @@ bool Waterfall::CalculateTranchesCashFlows()
                         )
                         ) {
                         PrintToTempFile("ReturnFalse.txt", "Invalid seniority in OC Test");
-                        return false;
+                        return std::make_tuple(false, "Invalid seniority in OC Test");
                     }
                     ProRataBonds.clear();
                     TotalPayable = Solution = 0.0;
@@ -1933,9 +1934,9 @@ bool Waterfall::CalculateTranchesCashFlows()
                                 double CurrentRedemptionShare = SingleStep->GetParameter(WatFalPrior::wstParameters::RedemptionShare).value<BloombergVector>().GetValue(CurrentDate);
                                 double NeedToCure;
                                 if (IsCallPaymentDate || IsMaturityDate) CurrAddColShare = 0.0;
-                                if (CurrAddColShare + (CurrentRedemptionShare*TestTarget) == 0.0) {
+                                if (Q_UNLIKELY(CurrAddColShare + (CurrentRedemptionShare*TestTarget) == 0.0)) {
                                     PrintToTempFile("ReturnFalse.txt", "OC cure denominator is 0");
-                                    return false;
+                                    return std::make_tuple(false, "OC cure denominator is 0");
                                 }
                                 NeedToCure = ((TotalPayable*TestTarget) - Solution) / (CurrAddColShare + (CurrentRedemptionShare*TestTarget));
                                 Q_ASSERT_X(NeedToCure >= 0.0, "OC Test", "Negative NeedToCure");
@@ -1991,7 +1992,7 @@ bool Waterfall::CalculateTranchesCashFlows()
                     int CurrSourceOfFunding = SingleStep->GetParameter(WatFalPrior::wstParameters::SourceOfFunding).value<IntegerVector>().GetValue(CurrentDate);
                     if (CurrSenGrp > FindMostJuniorLevel(CurrSenGrpLvl)) {
                         PrintToTempFile("ReturnFalse.txt", "Invalid seniority in IC Test");
-                        return false;
+                        return std::make_tuple(false, "Invalid seniority in IC Tes");
                     }
                     ProRataBonds.clear();
                     TotalPayable = Solution = 0.0;
@@ -2008,7 +2009,7 @@ bool Waterfall::CalculateTranchesCashFlows()
                         if (d->m_Tranches.at(h)->GetProrataGroup(CurrSenGrpLvl) <= CurrSenGrp) {
                             if (!d->m_Tranches.at(h)->HasCoupon(CurrCoupIndx)) {
                                 PrintToTempFile("ReturnFalse.txt", d->m_Tranches.at(h)->GetTrancheName() + " - Coupon not set in tranche");
-                                return false;
+                                return std::make_tuple(false, d->m_Tranches.at(h)->GetTrancheName() + " - Coupon not set in tranche");
                             }
                             AdjustedCoupon = deannualiseCoupon((d->m_Tranches.at(h)->GetCoupon(CurrentDate, CurrCoupIndx)), RollingLastIPD, RollingNextIPD, d->m_Tranches.at(h)->GetDayCount(CurrCoupIndx).GetValue(CurrentDate));
                             TotalPayable += AdjustedCoupon*(d->m_Tranches.at(h)->GetCashFlow().GetAmountOutstanding(CurrentDate) + d->m_Tranches.at(h)->GetCashFlow().GetFlow(CurrentDate, TrancheCashFlow::TrancheFlowType::DeferredFlow | CurrCoupIndx));
@@ -2112,7 +2113,7 @@ bool Waterfall::CalculateTranchesCashFlows()
 
                 default:
                     PrintToTempFile("ReturnFalse.txt", "Reached Default");
-                    return false;
+                    return std::make_tuple(false, "Unhandled waterfall step type");
                 }//End Switch
             }//End Cycle through the steps of the waterfall
 
@@ -2234,13 +2235,13 @@ bool Waterfall::CalculateTranchesCashFlows()
             LOGDEBUG(QString("After Tranche %1:\t%2").arg(SingleTranche->GetTrancheName()).arg(CheckResults, 0, 'f'));
         }
         LOGDEBUG(QString("Final Test\t%1").arg(CheckResults, 0, 'f'));
-        if (qAbs(CheckResults) >= 1.0) {
+        if (Q_UNLIKELY(qAbs(CheckResults) >= 1.0)) {
             PrintToTempFile("ReturnFalse.txt", QString("Cash Flows don't Match, Diff: %1; Call %2abled").arg(CheckResults, 0, 'f').arg(d->m_UseCall ? "En" : "Dis"));
 #ifndef DebugLogging
-            return false;
+            return std::make_tuple(false, QString("Cash Flows don't Match, Diff: %1; Call %2abled").arg(CheckResults, 0, 'f').arg(d->m_UseCall ? "En" : "Dis"));
 #endif // !DebugLogging
         }
-        return true;
+        return std::make_tuple(true,QString());
 }
 
 QDataStream& operator<<(QDataStream & stream, const Waterfall& flows)

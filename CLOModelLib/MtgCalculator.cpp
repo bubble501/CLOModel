@@ -59,13 +59,14 @@ Mortgage MtgCalculator::getLoan(qint32 Index) const
     return readTempFile<Mortgage>(d->m_LoansPath.value(Index));
 }
 
-bool MtgCalculator::StartCalculation(bool ignoreCheck)
+std::tuple<bool, QString> MtgCalculator::StartCalculation(bool ignoreCheck)
 {
     Q_D(MtgCalculator);
-	RETURN_WHEN_RUNNING(true, false)
+    RETURN_WHEN_RUNNING(true, std::make_tuple(false, "Calculator already running"))
     if (!ignoreCheck) {
-        if (!ReadyToCalculate().isEmpty())
-            return false;
+        const QString rdyClc = ReadyToCalculate();
+        if (!rdyClc.isEmpty())
+            return std::make_tuple(false, rdyClc);
     }
 	{//Check if all base rates are valid
 		bool CheckAgain = false;
@@ -78,7 +79,7 @@ bool MtgCalculator::StartCalculation(bool ignoreCheck)
 		}
         for (auto i = d->m_LoansPath.constBegin(); CheckAgain && i != d->m_LoansPath.constEnd(); ++i) {
             if (readTempFile<Mortgage>(i.value()).GetFloatingRateValue().IsEmpty()) 
-                return false;
+                return std::make_tuple(false, "Invalid Base Rate");
 		}
 	}
 
@@ -217,9 +218,16 @@ bool MtgCalculator::StartCalculation(bool ignoreCheck)
 		CurrentThread->start();
 		++NumofSent;
 	}
-	return true;
+	return std::make_tuple(true,QString());
 }
-void MtgCalculator::BeeReturned(int Ident, const MtgCashFlow& a) {
+
+std::tuple<bool, QString> MtgCalculator::StartCalculation()
+{
+    return StartCalculation(false);
+}
+
+void MtgCalculator::BeeReturned(int Ident, const MtgCashFlow& a)
+{
     Q_D(MtgCalculator);
 	RETURN_WHEN_RUNNING(false, )
     d->m_AggregatedRes += a;

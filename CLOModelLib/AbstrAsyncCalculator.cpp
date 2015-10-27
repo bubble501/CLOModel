@@ -146,9 +146,40 @@ QList<qint32> AbstrAsyncCalculator::GetResultKeys() const
     return d->m_Result.keys();
 }
 
+const QMultiHash<int, QString>& AbstrAsyncCalculator::errors() const
+{
+    Q_D(const AbstrAsyncCalculator);
+    return d->m_errors;
+}
+
+void AbstrAsyncCalculator::clearErrors()
+{
+    Q_D(AbstrAsyncCalculator);
+    d->m_errors.clear();
+}
+
+QString AbstrAsyncCalculator::allErrors() const
+{
+    Q_D(const AbstrAsyncCalculator);
+
+    QString result;
+    for (auto i = d->m_errors.constBegin(); i != d->m_errors.constEnd(); ++i) {
+        if (i != d->m_errors.constBegin())
+            result += '\n';
+        result += i.value();
+    }
+    return result;
+}
+
 void AbstrAsyncCalculator::SendPctSignal(double a)
 {
     emit ProgressPct(static_cast<int>(a*100.0));
+}
+
+void AbstrAsyncCalculator::addError(int id, QString err)
+{
+    Q_D(AbstrAsyncCalculator);
+    d->m_errors.insert(id,err);
 }
 
 void AbstrAsyncCalculator::StopCalculation()

@@ -154,17 +154,17 @@ StressViewer::StressViewer(StressViewerPrivate* d, QWidget* parent)
 	CentreLay->addLayout(TableToplay, 0, 1);
 	MainLay->addWidget(ConstGroup);
 
-    connect(d->TrancheCombo, SIGNAL(currentTextChanged(QString)), this, SLOT(SetPriceChange()));
-    connect(d->TrancheCombo, SIGNAL(currentTextChanged(QString)), this, SLOT(UpdateTable()), Qt::QueuedConnection);
-    connect(d->DisplayValuesCombo, SIGNAL(currentTextChanged(QString)), this, SLOT(UpdateTable()), Qt::QueuedConnection);
-    connect(d->PriceSpin, SIGNAL(valueChanged(double)), this, SLOT(UpdateTable()), Qt::QueuedConnection);
-    connect(d->VariableParCombo[0], SIGNAL(currentTextChanged(QString)), this, SLOT(UpdateCombos()));
-    connect(d->VariableParCombo[0], SIGNAL(currentTextChanged(QString)), this, SLOT(UpdateTable()), Qt::QueuedConnection);
-    connect(d->VariableParCombo[1], SIGNAL(currentTextChanged(QString)), this, SLOT(UpdateCombos()));
-    connect(d->VariableParCombo[1], SIGNAL(currentTextChanged(QString)), this, SLOT(UpdateTable()), Qt::QueuedConnection);
+    connect(d->TrancheCombo, &QComboBox::currentTextChanged, this, &StressViewer::SetPriceChange);
+    connect(d->TrancheCombo, &QComboBox::currentTextChanged, this, &StressViewer::UpdateTable, Qt::QueuedConnection);
+    connect(d->DisplayValuesCombo, &QComboBox::currentTextChanged, this, &StressViewer::UpdateTable, Qt::QueuedConnection);
+    connect(d->PriceSpin, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &StressViewer::UpdateTable, Qt::QueuedConnection);
+    connect(d->VariableParCombo[0], &QComboBox::currentTextChanged, this, &StressViewer::UpdateCombos);
+    connect(d->VariableParCombo[0], &QComboBox::currentTextChanged, this, &StressViewer::UpdateTable, Qt::QueuedConnection);
+    connect(d->VariableParCombo[1], &QComboBox::currentTextChanged, this, &StressViewer::UpdateCombos);
+    connect(d->VariableParCombo[1], &QComboBox::currentTextChanged, this, &StressViewer::UpdateTable, Qt::QueuedConnection);
     connect(d->StressTable, &QTableWidget::cellDoubleClicked, this, &StressViewer::SetStressLevel, Qt::QueuedConnection);
     for (int j = 0; j < NumStressDimentsions - 2; ++j) 
-        connect(d->ConstParCombo[j], SIGNAL(currentTextChanged(QString)), this, SLOT(UpdateTable()), Qt::QueuedConnection);
+        connect(d->ConstParCombo[j], &QComboBox::currentTextChanged, this, &StressViewer::UpdateTable, Qt::QueuedConnection);
 
 }
 

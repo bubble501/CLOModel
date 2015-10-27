@@ -243,8 +243,6 @@ void Mortgage::SetSize(double a)
 		 return true;
 	 }
 	 
-	 
-	 //if (!ReadyToCalculate().isEmpty()) return false;
 	 bool NullAnchorDates[] = {
          d->m_InterestVect.GetAnchorDate().isNull()
          , d->m_AnnuityVect.GetAnchorDate().isNull()

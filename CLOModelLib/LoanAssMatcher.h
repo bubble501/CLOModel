@@ -18,7 +18,7 @@ protected:
     virtual void BeeReturned(int Ident, const LoanAssMatcherResult& a) override;
     virtual QDataStream& LoadOldVersion(QDataStream& stream) override;
 public slots:
-    virtual bool StartCalculation() override;
+    virtual std::tuple<bool, QString> StartCalculation() override;
 protected slots :
 	void ClearFilesInFolder();
 public:

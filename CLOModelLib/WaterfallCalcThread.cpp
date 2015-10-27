@@ -26,9 +26,10 @@ void WaterfallCalcThread::EmitFromAnonim()
 void WaterfallCalcThread::run()
 {
     Q_D(WaterfallCalcThread);
-    if (d->LocalFall.CalculateTranchesCashFlows())
+    const auto calcRet = d->LocalFall.CalculateTranchesCashFlows();
+    if (std::get<0>(calcRet))
         emit AnonimCalculated(d->Identifier);
 	else
-        emit ErrorCalculation(d->Identifier);
+        emit ErrorCalculation(d->Identifier, std::get<1>(calcRet));
 	exec();
 }

@@ -22,8 +22,8 @@ public:
 	virtual void Reset() override;
 	virtual void ClearWaterfalls();
 public slots:
-    virtual bool StartCalculation() override;
-    virtual bool StartCalculation(bool ignoreCheck);
+    virtual std::tuple<bool, QString> StartCalculation() override;
+    virtual std::tuple<bool, QString> StartCalculation(bool ignoreCheck);
     friend CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const WaterfallCalculator& flows);
     friend CLOMODELLIB_EXPORT QDataStream& operator>>(QDataStream & stream, WaterfallCalculator& flows);
 };

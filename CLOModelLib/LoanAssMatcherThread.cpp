@@ -49,19 +49,20 @@ void LoanAssMatcherThread::run()
 {
     Q_D( LoanAssMatcherThread);
     if (!d->m_AvailableAssumptions) {
-        emit ErrorCalculation(d->Identifier);
+        emit ErrorCalculation(d->Identifier,"No assumptions set");
         return;
     }
     d->Result.Clear();
     QFile ModelFile(d->m_ModelToScan);
-	if (!ModelFile.open(QIODevice::ReadOnly)) return ReturnError();
+	if (!ModelFile.open(QIODevice::ReadOnly)) 
+        return ReturnError("Unable to open File");
 	qint32 VersionChecker;
 	QDataStream out(&ModelFile);
 	out.setVersion(StreamVersionUsed);
 	out >> VersionChecker;
 	if (VersionChecker<qint32(MinimumSupportedVersion) || VersionChecker>qint32(ModelVersionNumber)) {
 		ModelFile.close();
-		return ReturnError();;
+		return ReturnError("Unsupported File Version");;
 	}
 	{QDate Junk; out >> Junk; }
 	{bool Junk; out >> Junk; }
@@ -92,8 +93,8 @@ void LoanAssMatcherThread::run()
     emit AnonimCalculated(d->Identifier);
 }
 
-void LoanAssMatcherThread::ReturnError()
+void LoanAssMatcherThread::ReturnError(const QString& err)
 {
     Q_D( LoanAssMatcherThread);
-    emit ErrorCalculation(d->Identifier);
+    emit ErrorCalculation(d->Identifier, err);
 }

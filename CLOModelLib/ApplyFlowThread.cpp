@@ -29,7 +29,7 @@ void ApplyFlowThread::run()
 {
     Q_D(ApplyFlowThread);
     if (!d->BaseFlow) {
-        emit ErrorCalculation(d->Identifier);
+        emit ErrorCalculation(d->Identifier, "Invalid Base Flow");
         return;
     }
     *castResult() = d->BaseFlow->ApplyScenario(

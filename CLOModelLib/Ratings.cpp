@@ -528,12 +528,12 @@ bool Ratings::saveToDatabase(const QString& isin) const
     return false;
 }
 
-void Ratings::getFromDatabase(const QString& isin)
+bool Ratings::getFromDatabase(const QString& isin)
 {
-    getFromDatabase(isin, QDate::currentDate());
+    return getFromDatabase(isin, QDate::currentDate());
 }
 
-void Ratings::getFromDatabase(const QString& isin, const QDate& refDate)
+bool Ratings::getFromDatabase(const QString& isin, const QDate& refDate)
 {
     reset();
 #ifndef NO_DATABASE
@@ -556,9 +556,11 @@ void Ratings::getFromDatabase(const QString& isin, const QDate& refDate)
         getRatingQuery.bindValue(":isin", isin);
         getRatingQuery.bindValue(":referenceDate", refDate.toString(Qt::ISODate));
         if (!getRatingQuery.exec())
-            return;
+            return false;
         Q_D(const Ratings);
+        bool oneRatingFound=false;
         while (getRatingQuery.next()){
+            oneRatingFound = true;
             const QSqlRecord getRatingRecord = getRatingQuery.record();
             if (std::find(std::begin(d->m_AgencyName), std::end(d->m_AgencyName), getRatingRecord.value("RatingAgency").toString()) == std::end(d->m_AgencyName))
                 continue;
@@ -568,8 +570,10 @@ void Ratings::getFromDatabase(const QString& isin, const QDate& refDate)
                 static_cast<CreditWatch>(getRatingRecord.value("RatingWatch").toInt())
                 );
         }
+        return oneRatingFound;
     }
 #endif
+    return false;
 }
 
 int Ratings::numRatings() const
@@ -741,9 +745,9 @@ const QString RatingsPrivate::m_ratingSyntax[Ratings::CountRatingAcencies][stati
 
 CLOMODELLIB_EXPORT QDataStream& operator<<(QDataStream & stream, const Ratings& flows)
 {
-    stream << static_cast<qint32>(std::distance(std::begin(flows.d_func()->m_ratings), std::end(flows.d_func()->m_ratings)));
+    stream << static_cast<qint32>(flows.d_func()->m_ratings.size());
     std::for_each(std::begin(flows.d_func()->m_ratings), std::end(flows.d_func()->m_ratings), [&stream](Ratings::RatingValue val)->void {stream << static_cast<qint16>(val); });
-    stream << static_cast<qint32>(std::distance(std::begin(flows.d_func()->m_watch), std::end(flows.d_func()->m_watch)));
+    stream << static_cast<qint32>(flows.d_func()->m_watch.size());
     std::for_each(std::begin(flows.d_func()->m_watch), std::end(flows.d_func()->m_watch), [&stream](Ratings::CreditWatch val)->void {stream << static_cast<qint8>(val); });
     return stream;
 }

@@ -125,8 +125,8 @@ public:
     bool downloadRatings(const  QBbgLib::QBbgAbstractResponse  * const res);
     bool downloadRatings(const QString& name, const QString& bbgExtension);
     bool saveToDatabase(const QString& isin) const;
-    void getFromDatabase(const QString& isin);
-    void getFromDatabase(const QString& isin, const QDate& refDate);
+    bool getFromDatabase(const QString& isin);
+    bool getFromDatabase(const QString& isin, const QDate& refDate);
     int numRatings() const;
     void reset();
     friend class RatingsTest;

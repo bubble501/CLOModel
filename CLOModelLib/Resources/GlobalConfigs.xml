@@ -21,6 +21,7 @@
         <InsertCashFlowsQuery xml:space="preserve">INSERT INTO  Cashflows (ISIN,Date,Deferred,Interest,Principal,Balance,Coupon) VALUES (:isin,:date,:deferred,:interest,:principal,:balance,:coupon)</InsertCashFlowsQuery>
         <AddRatingHistoryStoredProc>addRatingHistory(:isin,:agency,:rating,:watch)</AddRatingHistoryStoredProc>
         <GetRatingStoredProc>getRating(:isin,:referenceDate)</GetRatingStoredProc>
+        <RemoveGeographyStoredProc>removeGeography(:dealName,:startDate,:endDate)</RemoveGeographyStoredProc>
 </Database>
 	<Folders>
 		<UnifiedResultsFolder xml:space="preserve">Z:/24AM/Monitoring/Model Results</UnifiedResultsFolder>

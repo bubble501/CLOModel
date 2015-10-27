@@ -810,6 +810,20 @@ bool MtgCalculator::uploadGeographyToDatabase(const QString& DealName, QDate sta
                 }
             }
             db.transaction();
+            {
+                QSqlQuery RemoveGeogrQuery(db);
+                RemoveGeogrQuery.setForwardOnly(true);
+                RemoveGeogrQuery.prepare("{CALL " + GetFromConfig("Database", "RemoveGeographyStoredProc") + "}");
+                RemoveGeogrQuery.bindValue(":dealName", DealName);
+                RemoveGeogrQuery.bindValue(":startDate", startDate.toString(Qt::ISODate));
+                RemoveGeogrQuery.bindValue(":endDate", endDate.toString(Qt::ISODate));
+                if (!RemoveGeogrQuery.exec()) {
+                    DEBG_LOG(QString("uploadGeographyToDatabase() Unable to remove old data for %1").arg(DealName));
+                    db.rollback();
+                    return false;
+                }
+                
+            }
             for (auto i = geogBreak.constBegin(); i != geogBreak.constEnd(); ++i) {
                 QSqlQuery UploadGeogrQuery(db);
                 UploadGeogrQuery.setForwardOnly(true);
@@ -821,7 +835,7 @@ bool MtgCalculator::uploadGeographyToDatabase(const QString& DealName, QDate sta
                 UploadGeogrQuery.bindValue(":endDate", endDate.toString(Qt::ISODate));
                 UploadGeogrQuery.bindValue(":Value", i.value());
                 if (!UploadGeogrQuery.exec()){
-                    DEBG_LOG(QString("uploadGeographyToDatabase() Unable to upload data to Database. Country: %1, Value: %2").arg(i.key()).arg(i.value()));
+                    DEBG_LOG(QString("uploadGeographyToDatabase() Unable to upload data to Database. Deal: %3, Country: %1, Value: %2").arg(i.key()).arg(i.value()).arg(DealName));
                     db.rollback();
                     return false;
                 }
@@ -893,10 +907,11 @@ QString MtgCalculator::GetGeography(const QString& guess, simstring::reader& dbr
 	do {
 		simMatches.clear();
 		dbr.retrieve(guess.toLower().toStdWString(), simstring::cosine, simThreshold, std::back_inserter(simMatches));
-        if (!simMatches.empty()) Result = QString::fromStdWString(simMatches.front());
+        if (!simMatches.empty())
+            Result = QString::fromStdWString(simMatches.front());
 		simThreshold += 0.05;
 	} while (simMatches.size() > 1 && simThreshold<1.0);
-    return Result;
+    return Result.isEmpty() ? guess:Result;
 }
 
 QString MtgCalculator::GetCountryISOCode(QString name) const

@@ -472,6 +472,8 @@ bool Ratings::downloadRatings(const QString& name, const QString& bbgExtension)
 bool Ratings::downloadRatings(const QBbgLib::QBbgAbstractResponse * const res)
 {
     using namespace QBbgLib;
+    if (!res)
+        return false;
     if(res->hasErrors())
         return false;
     auto refResponse = dynamic_cast<const QBbgReferenceDataResponse*>(res);

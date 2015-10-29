@@ -20,7 +20,7 @@ extern QMutex Db_Mutex;
 #endif // _DEBUG
 #define MaximumIRRIterations 10000 //INT_MAX-1
 #define USE_SOFT_COLOUR //Uses softer color in stress test table rather than pure RGB(255,0,0) style ones
-//#define Assumptions_ExcelOverDB // If this symbol is defined, the manual input of properties in excel, if any, will overwrite any scenario property set in the database 
+#define Assumptions_ExcelOverDB // If this symbol is defined, the manual input of properties in excel, if any, will overwrite any scenario property set in the database 
 //#define SaveLoanTape
 //#define DebugLogging
 //#define PrintAggregatedMtgFlows

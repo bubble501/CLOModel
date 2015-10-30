@@ -291,7 +291,7 @@ ReferenceRateFromBBg:
     On Error GoTo 0
     
     Dim AllTheInputs As New Collection
-    AllTheInputs.Add False
+    AllTheInputs.Add False 'Change to true to save inputs
     i = 1
     j = 0
     Do While (True)
@@ -1099,14 +1099,14 @@ Public Sub PopulateDafaultLabels(ByRef a As Collection, Optional ClearAll As Boo
     a.Add "First Fund Cap", "FirstResCapCell"
     a.Add "First Fund Current Amount", "FirstResCurrCell"
     a.Add "First Fund Free After", "FirstResFreedCell"
-    a.Add "First Fund In Waterfall", "FirstResDestinationCell"
+    a.Add "First Fund To Interest", "FirstResDestinationCell"
     a.Add "Second Fund Target", "SecondResTargCell"
     a.Add "Second Fund Multiple", "SecondResMultCell"
     a.Add "Second Fund Floor", "SecondResFloorCell"
     a.Add "Second Fund Cap", "SecondResCapCell"
     a.Add "Second Fund Current Amount", "SecondResCurrCell"
     a.Add "Second Fund Free After", "SecondResFreedCell"
-    a.Add "Second Fund In Waterfall", "SecondResDestinationCell"
+    a.Add "Second Fund To Interest", "SecondResDestinationCell"
     a.Add "Cumulative Reserve", "UseCumulativeReservesCell"
     a.Add "Deal Name", "DealNameCell"
     a.Add "Reinvestment Delay", "ReinvestmentDelayCell"
@@ -1704,12 +1704,13 @@ Public Sub EditLoanScenarios()
     Loop
     Dim NewScenarios As String
     NewScenarios = LoadLoanScenario(result)
-    If (NewScenarios = "") Then Exit Sub
+    If (NewScenarios = "") Then GoTo TerminateEditLoanScenarios
     Dim Singlescenario
     Singlescenario = Split(NewScenarios, "#,#")
     For i = LBound(Singlescenario) To UBound(Singlescenario)
         LoanScenarioProperty.Offset(1 + i - LBound(Singlescenario), 0).Value = Singlescenario(i)
     Next i
+TerminateEditLoanScenarios:
     Application.Calculation = xlCalculationAutomatic
     Application.ScreenUpdating = True
 End Sub

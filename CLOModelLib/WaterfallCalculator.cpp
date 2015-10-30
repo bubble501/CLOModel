@@ -25,8 +25,7 @@ void WaterfallCalculator::AddWaterfall(const Waterfall& a, qint32 ID)
         d->m_CascadesPath.insert(ID, writeTempFile(a));
     }
     else {
-        removeTempFile(cascIter.value());
-        cascIter.value() = writeTempFile(a);
+        editTempFile(cascIter.value(),a);
     }
 
 }

@@ -39,8 +39,7 @@ void ScenarioApplier::AddAssumption(const AssumptionSet& a, qint32 idx)
         d->m_Scenarios.insert(idx, writeTempFile(a));
     }
     else {
-        removeTempFile(FoundAss.value());
-        FoundAss.value() = writeTempFile(a);
+        editTempFile(FoundAss.value(),a);
     }
 }
 

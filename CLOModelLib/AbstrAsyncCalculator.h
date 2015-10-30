@@ -38,6 +38,20 @@ protected:
     virtual int availableThreads() const;
     void insertResult(qint32 Key, const QString& path);
     QString getDataDirPath() const;
+    template <class T> bool editTempFile(const QString& path, const T& val) const
+    {
+        QFile destFile(path);
+        if (destFile.open(QIODevice::WriteOnly)) {
+            QDataStream out(&destFile);
+            out.setVersion(StreamVersionUsed);
+            out << val;
+            destFile.close();
+            return true;
+        }
+        PrintToTempFile("PermissionError", QString("Could not write temporary file %1").arg(path));
+        Q_ASSERT_X(false, "writeTempFile", QString("Unable to write file: %1").arg(path).toLatin1().data());
+        return false;
+    }
     template <class T> QString writeTempFile(const T& val) const
     { 
         QString tempFileName;

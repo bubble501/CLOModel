@@ -47,8 +47,7 @@ void MtgCalculator::SetLoan(const Mortgage& a, qint32 Index)
         d->m_LoansPath.insert(Index,writeTempFile(a));
 	}
     else {
-        removeTempFile(FoundLn.value());
-        FoundLn.value() = writeTempFile(a);
+        editTempFile(FoundLn.value(),a);
     }
 
 }

@@ -948,12 +948,16 @@ QString MtgCalculator::GetCountryISOCode(QString name) const
                 }
 			}
             else if (xml.name() == "Alpha-3") {
+                if (!CountryFound) return QString();
                 if (name.compare(xml.readElementText(), Qt::CaseInsensitive) == 0)
                     NameMatched = true;
             }
 			else if (xml.name() == "Alpha-2") {
+                const QString txElem = xml.readElementText();
 				if (!CountryFound) return QString();
-                CurrentCode = xml.readElementText();
+                if (name.compare(txElem, Qt::CaseInsensitive) == 0)
+                    NameMatched = true;
+                CurrentCode = txElem;
 			}
 		}
 		else if (xml.isEndElement()) {

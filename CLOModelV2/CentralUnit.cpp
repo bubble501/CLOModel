@@ -450,7 +450,7 @@ void CentralUnit::CheckCalculationDone()
 		Structure=ParallWatFalls->GetResult(0);
 		CallStructure = ParallWatFalls->GetResult(1);
 		if(Structure.GetTranchesCount()==0 || CallStructure.GetTranchesCount()==0){
-			QMessageBox::critical(0, "Error", "Critical error in waterfall calculation Results are empty");
+            QMessageBox::critical(0, "Error", "Critical error in waterfall calculation Results are empty.\n" + ParallWatFalls->errors().values().join('\n'));
 			QApplication::quit();
 			return;
 		}

@@ -9,6 +9,9 @@ AbstrAsyncCalculator::~AbstrAsyncCalculator() {}
 AbstrAsyncCalculatorPrivate::AbstrAsyncCalculatorPrivate(AbstrAsyncCalculator *q)
 	:BackwardInterfacePrivate(q)
     , m_resultsFile(TEMP_FILES_DIR)
+    , m_operativity(100)
+    , BeesReturned(0)
+    , m_SequentialComputation(false)
 {
     ENSURE_DIR_EXIST(TEMP_FILES_DIR);
     m_resultsFile.open();
@@ -23,18 +26,14 @@ quint8 AbstrAsyncCalculator::operativity() const
 
 void AbstrAsyncCalculator::setOperativity(quint8 val)
 {
-    Q_ASSERT(val <= 100);
-    RETURN_WHEN_RUNNING(true,)
     Q_D(AbstrAsyncCalculator);
-    d->m_operativity = val;
+    d->m_operativity = qMin(static_cast<quint8>(100), qMax(static_cast<quint8>(1), val));
 }
 
 AbstrAsyncCalculator::AbstrAsyncCalculator(AbstrAsyncCalculatorPrivate *d, QObject* parent)
 	:QObject(parent)
     ,BackwardInterface(d)
 {
-    d->m_SequentialComputation = false;
-    d->BeesReturned = 0;
     setContinueCalculation(false);
     connect(this, &AbstrAsyncCalculator::Progress, this, &AbstrAsyncCalculator::SendPctSignal);
 }
@@ -92,10 +91,9 @@ void AbstrAsyncCalculator::setContinueCalculation(bool val)
 
 int AbstrAsyncCalculator::availableThreads() const
 {
-    Q_D(const AbstrAsyncCalculator);
     return static_cast<int>(
         static_cast<double>(QThread::idealThreadCount()) 
-        * static_cast<double>(d->m_operativity) 
+        * static_cast<double>(operativity()) 
         / 100.0
         );
 }

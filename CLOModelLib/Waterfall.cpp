@@ -2232,7 +2232,7 @@ std::tuple<bool, QString> Waterfall::CalculateTranchesCashFlows()
         {
             CheckTranCashFlow.Clear(); CheckTranCashFlow.AddFlow((*traniter)->GetCashFlow());	
             CheckResults += CheckTranCashFlow.GetTotalFlow(0);
-            LOGDEBUG(QString("After Tranche %1:\t%2").arg(SingleTranche->GetTrancheName()).arg(CheckResults, 0, 'f'));
+            LOGDEBUG(QString("After Tranche %1:\t%2").arg((*traniter)->GetTrancheName()).arg(CheckResults, 0, 'f'));
         }
         LOGDEBUG(QString("Final Test\t%1").arg(CheckResults, 0, 'f'));
         if (Q_UNLIKELY(qAbs(CheckResults) >= 1.0)) {

@@ -188,7 +188,9 @@ std::tuple<bool, QString> MtgCalculator::StartCalculation(bool ignoreCheck)
     d->BeesSent.clear();
     setContinueCalculation(true);
 	int NumberOfThreads = availableThreads();
-    if (d->m_SequentialComputation || NumberOfThreads < 1) NumberOfThreads = 1;
+    if (d->m_SequentialComputation || NumberOfThreads < 1) 
+        NumberOfThreads = 1;
+    LOGDEBUG(QString("Number of Loans Threads: %1").arg(NumberOfThreads));
 	int NumofSent = 0;
 	MtgCalculatorThread* CurrentThread;
     const auto loansKey = d->m_Loans.keys();

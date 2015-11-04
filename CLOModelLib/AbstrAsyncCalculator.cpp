@@ -1,13 +1,19 @@
 #include "AbstrAsyncCalculator.h"
 #include "Private/AbstrAsyncCalculator_p.h"
+#include "Private/InternalItems.h"
 #include <QThread>
+#include <QDir>
 DEFINE_PUBLIC_QOBJECT_COMMONS(AbstrAsyncCalculator)
 AbstrAsyncCalculatorPrivate::~AbstrAsyncCalculatorPrivate(){}
 AbstrAsyncCalculator::~AbstrAsyncCalculator() {}
 AbstrAsyncCalculatorPrivate::AbstrAsyncCalculatorPrivate(AbstrAsyncCalculator *q)
 	:BackwardInterfacePrivate(q)
-    , m_dataDir(QDir::tempPath() + "/CLOModel/")
-{}
+    , m_resultsFile(TEMP_FILES_DIR)
+{
+    ENSURE_DIR_EXIST(TEMP_FILES_DIR);
+    m_resultsFile.open();
+    m_resultsMap.setDevice(&m_resultsFile);
+}
 
 quint8 AbstrAsyncCalculator::operativity() const
 {
@@ -71,28 +77,6 @@ qint32& AbstrAsyncCalculator::getBeesReturned()
     return d->BeesReturned;
 }
 
-QHash<qint32, QString >& AbstrAsyncCalculator::getResultPaths()
-{
-    Q_D(AbstrAsyncCalculator);
-    return d->m_Result;
-}
-
-QString AbstrAsyncCalculator::getResultPaths(qint32 key) const
-{
-    Q_D(const AbstrAsyncCalculator);
-    return d->m_Result.value(key,QString());
-}
-
-const QHash<qint32, QString >& AbstrAsyncCalculator::getResultPaths() const
-{
-    Q_D(const AbstrAsyncCalculator);
-    return d->m_Result;
-}
-void AbstrAsyncCalculator::removeTempFile(const QString& path)
-{
-    QFile::remove(path);
-}
-
 
 bool AbstrAsyncCalculator::ContinueCalculation() const
 {
@@ -116,16 +100,17 @@ int AbstrAsyncCalculator::availableThreads() const
         );
 }
 
-void AbstrAsyncCalculator::insertResult(qint32 Key, const QString& path)
+
+MemoryMappedDevice& AbstrAsyncCalculator::getDevice()
 {
     Q_D(AbstrAsyncCalculator);
-    d->m_Result.insert(Key, path);
+    return d->m_resultsMap;
 }
 
-QString AbstrAsyncCalculator::getDataDirPath() const
+const MemoryMappedDevice& AbstrAsyncCalculator::getDevice() const
 {
     Q_D(const AbstrAsyncCalculator);
-    return d->m_dataDir.path();
+    return d->m_resultsMap;
 }
 
 void AbstrAsyncCalculator::SetSequentialComputation(bool a)
@@ -143,7 +128,7 @@ bool AbstrAsyncCalculator::GetSequentialComputation() const
 QList<qint32> AbstrAsyncCalculator::GetResultKeys() const
 {
     Q_D(const AbstrAsyncCalculator);
-    return d->m_Result.keys();
+    return d->m_resultsMap.keys();
 }
 
 const QMultiHash<int, QString>& AbstrAsyncCalculator::errors() const

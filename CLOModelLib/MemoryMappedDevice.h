@@ -1,19 +1,17 @@
 #ifndef MemoryMappedDevice_h__
 #define MemoryMappedDevice_h__
-
-#include <QHash>
-#include <QMap>
 #include <tuple>
 #include <QByteArray>
 #include <QDataStream>
-#include <QPointer>
-#include "clomodellib_global.h"
+#include "CommonFunctions.h"
 class QIODevice;
+class MemoryMappedDevicePrivate;
 class CLOMODELLIB_EXPORT MemoryMappedDevice
 {
+    DECLARE_PUBLIC_COMMONS(MemoryMappedDevice)
 public:
     MemoryMappedDevice(QIODevice* source);
-    virtual ~MemoryMappedDevice();
+    void setDevice(QIODevice* source = nullptr);
     template <class T> bool setValue(qint32 key, const T& val){
         QByteArray block;
         {
@@ -32,12 +30,15 @@ public:
         readerStream >> result;
         return std::make_tuple(true,result);
     }
+    void clear();
     bool removeValue(qint32 key);
-    QList<qint32> itemKeys() const;
+    QList<qint32> keys() const;
+    bool contains(qint32 key) const;
+    qint32 size() const;
+    qint64 fileSize() const;
+    bool isEmpty() const;
 protected:
-    QPointer<QIODevice> m_device;
-    QHash<qint32, qint64> m_itemsMap;
-    QMap<qint64, bool> m_memoryMap;
+    MemoryMappedDevicePrivate* d_ptr;
     bool writeBlock(qint32 key, const QByteArray& block);
     QByteArray readBlock(qint32 key) const;
     qint64 writeInMap(const QByteArray& block);

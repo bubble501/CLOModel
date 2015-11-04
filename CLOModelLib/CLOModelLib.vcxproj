@@ -73,8 +73,8 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>UNICODE;WIN32;WIN64;QT_DLL;QT_CORE_LIB;QT_GUI_LIB;QT_SQL_LIB;QT_WIDGETS_LIB;CLOMODELLIB_LIB;QT_CONCURRENT_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(QBBGLIBPATH)\include;$(SIMSTRINGPATH)\include\simstring;$(QUAZIPPATH)\include\quazip;$(ZLIBPATH)\include;$(BOOSTPATH);$(KDCHARTPATH)\include\KDChart;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtSql;$(QTDIR)\include\QtWidgets;.\Private;$(QTDIR)\include\QtConcurrent;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>UNICODE;WIN32;WIN64;QT_DLL;QT_CORE_LIB;QT_GUI_LIB;QT_SQL_LIB;QT_WIDGETS_LIB;CLOMODELLIB_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(QBBGLIBPATH)\include;$(SIMSTRINGPATH)\include\simstring;$(QUAZIPPATH)\include\quazip;$(ZLIBPATH)\include;$(BOOSTPATH);$(KDCHARTPATH)\include\KDChart;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtSql;$(QTDIR)\include\QtWidgets;.\Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -86,13 +86,13 @@
       <OutputFile>$(OutDir)\$(ProjectName)d.dll</OutputFile>
       <AdditionalLibraryDirectories>$(QBBGLIBPATH)\lib;$(KDCHARTPATH)\lib;$(QUAZIPPATH)\lib;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>QBbgLibd.lib;QuaZipD.lib;kdchartd2.lib;qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Sqld.lib;Qt5Widgetsd.lib;Qt5Concurrentd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>QBbgLibd.lib;QuaZipD.lib;kdchartd2.lib;qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Sqld.lib;Qt5Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>CLOMODELLIB_LIB;QT_CORE_LIB;QT_DLL;QT_GUI_LIB;QT_SQL_LIB;QT_WIDGETS_LIB;UNICODE;WIN32;WIN64;QT_CONCURRENT_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtSql;$(QTDIR)\include\QtWidgets;.\Private;$(QTDIR)\include\QtConcurrent;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>CLOMODELLIB_LIB;QT_CORE_LIB;QT_DLL;QT_GUI_LIB;QT_SQL_LIB;QT_WIDGETS_LIB;UNICODE;WIN32;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtSql;$(QTDIR)\include\QtWidgets;.\Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -103,15 +103,15 @@
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <AdditionalLibraryDirectories>$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Sqld.lib;Qt5Widgetsd.lib;Qt5Concurrentd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Sqld.lib;Qt5Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <TargetMachine>MachineX64</TargetMachine>
       <AdditionalOptions> /SUBSYSTEM:WINDOWS%40QMAKE_SUBSYSTEM_SUFFIX%40</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>UNICODE;WIN32;WIN64;QT_DLL;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_SQL_LIB;QT_WIDGETS_LIB;CLOMODELLIB_LIB;QT_CONCURRENT_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(QBBGLIBPATH)\include;$(SIMSTRINGPATH)\include\simstring;$(QUAZIPPATH)\include\quazip;$(ZLIBPATH)\include;$(BOOSTPATH);$(KDCHARTPATH)\include\KDChart;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtSql;$(QTDIR)\include\QtWidgets;.\Private;$(QTDIR)\include\QtConcurrent;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>UNICODE;WIN32;WIN64;QT_DLL;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_SQL_LIB;QT_WIDGETS_LIB;CLOMODELLIB_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(QBBGLIBPATH)\include;$(SIMSTRINGPATH)\include\simstring;$(QUAZIPPATH)\include\quazip;$(ZLIBPATH)\include;$(BOOSTPATH);$(KDCHARTPATH)\include\KDChart;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtSql;$(QTDIR)\include\QtWidgets;.\Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat />
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
@@ -122,13 +122,13 @@
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <AdditionalLibraryDirectories>$(QBBGLIBPATH)\lib;$(KDCHARTPATH)\lib;$(QUAZIPPATH)\lib;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>QBbgLib.lib;QuaZip.lib;kdchart2.lib;qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Sql.lib;Qt5Widgets.lib;Qt5Concurrent.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>QBbgLib.lib;QuaZip.lib;kdchart2.lib;qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Sql.lib;Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>CLOMODELLIB_LIB;NDEBUG;QT_CORE_LIB;QT_DLL;QT_GUI_LIB;QT_NO_DEBUG;QT_SQL_LIB;QT_WIDGETS_LIB;UNICODE;WIN32;WIN64;QT_CONCURRENT_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtSql;$(QTDIR)\include\QtWidgets;.\Private;$(QTDIR)\include\QtConcurrent;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>CLOMODELLIB_LIB;NDEBUG;QT_CORE_LIB;QT_DLL;QT_GUI_LIB;QT_NO_DEBUG;QT_SQL_LIB;QT_WIDGETS_LIB;UNICODE;WIN32;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtSql;$(QTDIR)\include\QtWidgets;.\Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>
       </DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -139,7 +139,7 @@
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <AdditionalLibraryDirectories>$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Sql.lib;Qt5Widgets.lib;Qt5Concurrent.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Sql.lib;Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <TargetMachine>MachineX64</TargetMachine>
       <AdditionalOptions> /SUBSYSTEM:WINDOWS%40QMAKE_SUBSYSTEM_SUFFIX%40</AdditionalOptions>
     </Link>
@@ -383,7 +383,6 @@
     </CustomBuild>
     <ClInclude Include="MemoryMappedDevice.h" />
     <ClInclude Include="OnMaturityTrigger.h" />
-    <ClInclude Include="Private\CheckedTempDir.h" />
     <ClInclude Include="Private\LoanAssMatcher_p.h" />
     <ClInclude Include="Private\LoanAssumptionsEditor_p.h" />
     <CustomBuild Include="Private\PoolSizeTriggerSettingWidget.h">
@@ -422,6 +421,7 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DCLOMODELLIB_LIB -DNDEBUG -DQT_CORE_LIB -DQT_DLL -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_SQL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_WINDLL "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtSql" "-I$(QTDIR)\include\QtWidgets" "-I.\Private"</Command>
     </CustomBuild>
+    <ClInclude Include="Private\MemoryMappedDevice_p.h" />
     <ClInclude Include="Private\Ratings_p.h" />
     <ClInclude Include="Private\ReadOnlyColProxy.h" />
     <ClInclude Include="Private\ReinvestmentTest_p.h" />
@@ -874,7 +874,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AbstractBbgVect.cpp" />
-    <ClCompile Include="MemoryMappedDevice.cpp" />
     <ClCompile Include="AbstractTrigger.cpp" />
     <ClCompile Include="AbstrAsyncCalculator.cpp" />
     <ClCompile Include="AbstrAsyncThread.cpp" />
@@ -1190,6 +1189,7 @@
     <ClCompile Include="LoanAssMatcherThread.cpp" />
     <ClCompile Include="LoanAssumption.cpp" />
     <ClCompile Include="LoanAssumptionsEditor.cpp" />
+    <ClCompile Include="MemoryMappedDevice.cpp" />
     <ClCompile Include="Mortgage.cpp" />
     <ClCompile Include="MtgCalculator.cpp" />
     <ClCompile Include="MtgCalculatorThread.cpp" />

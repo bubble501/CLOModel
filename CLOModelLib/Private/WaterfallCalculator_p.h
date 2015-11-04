@@ -3,13 +3,14 @@
 
 #include "Private/AbstrAsyncCalculator_p.h"
 #include "WaterfallCalculator.h"
-#include <QHash>
+#include "MemoryMappedDevice.h"
 class WaterfallCalculatorPrivate : public AbstrAsyncCalculatorPrivate
 {
     DECLARE_PRIVATE_COMMONS(WaterfallCalculator)
     DECLARE_PRIVATE_COMMONS_DATASTREAM(WaterfallCalculator)
 public:
-    QHash<qint32, QString > m_CascadesPath;
+    MemoryMappedDevice m_cascades;
+    QTemporaryFile m_cascadesFile;
 };
 
 

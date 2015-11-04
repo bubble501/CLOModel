@@ -190,7 +190,7 @@ std::tuple<bool, QString> MtgCalculator::StartCalculation(bool ignoreCheck)
 	int NumberOfThreads = availableThreads();
     if (d->m_SequentialComputation || NumberOfThreads < 1) 
         NumberOfThreads = 1;
-    LOGDEBUG(QString("Number of Loans Threads: %1").arg(NumberOfThreads));
+    LOGDEBUG(QString("Number of Loans Threads: %1\nIdeal Threads: %2\nOperativity: %3\nIs Sequential %4").arg(NumberOfThreads).arg(QThread::idealThreadCount()).arg(operativity()).arg(d->m_SequentialComputation ? "True":"False"));
 	int NumofSent = 0;
 	MtgCalculatorThread* CurrentThread;
     const auto loansKey = d->m_Loans.keys();

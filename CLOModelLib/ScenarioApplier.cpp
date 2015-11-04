@@ -2,11 +2,17 @@
 #include "Private/ScenarioApplier_p.h"
 #include <QDir>
 #include "AssumptionSet.h"
+#include "Private/InternalItems.h"
 DEFINE_PUBLIC_QOBJECT_COMMONS(ScenarioApplier)
 ScenarioApplierPrivate::~ScenarioApplierPrivate(){}
 ScenarioApplierPrivate::ScenarioApplierPrivate(ScenarioApplier *q)
     :AbstrAsyncCalculatorPrivate(q)
-{}
+    , m_ScenariosFile(TEMP_FILES_DIR)
+{
+    ENSURE_DIR_EXIST(TEMP_FILES_DIR);
+    m_ScenariosFile.open();
+    m_Scenarios.setDevice(&m_ScenariosFile);
+}
 ScenarioApplier::ScenarioApplier(ScenarioApplierPrivate *d, QObject* parent)
     : TemplAsyncCalculator <ApplyFlowThread, MtgCashFlow>(d, parent)
 {}
@@ -32,15 +38,7 @@ void ScenarioApplier::SetBaseFlows(const MtgCashFlow& val)
 void ScenarioApplier::AddAssumption(const AssumptionSet& a, qint32 idx)
 {
     Q_D( ScenarioApplier);
-	
-    auto FoundAss = d->m_Scenarios.find(idx);
-    if (FoundAss == d->m_Scenarios.end()) {
-        RETURN_WHEN_RUNNING(true, )
-        d->m_Scenarios.insert(idx, writeTempFile(a));
-    }
-    else {
-        editTempFile(FoundAss.value(),a);
-    }
+    d->m_Scenarios.setValue(idx, a);
 }
 
 const MtgCashFlow ScenarioApplier::GetResult(const AssumptionSet& a) const
@@ -63,11 +61,12 @@ std::tuple<bool, QString> ScenarioApplier::StartCalculation()
     if (d->m_SequentialComputation || NumberOfThreads < 1) NumberOfThreads = 1;
 	int NumofSent = 0;
 	ApplyFlowThread* CurrentThread;
-    for (auto SingleScen = d->m_Scenarios.constBegin(); SingleScen != d->m_Scenarios.constEnd(); ++SingleScen) {
+    const auto scenariosKeys = d->m_Scenarios.keys();
+    for (auto SingleScen = scenariosKeys.constBegin(); SingleScen != scenariosKeys.constEnd(); ++SingleScen) {
 		if (NumofSent >= NumberOfThreads) break;
-        if (d->BeesSent.contains(SingleScen.key())) continue;
-		CurrentThread = AddThread(SingleScen.key());
-		CurrentThread->SetAssumption(readTempFile<AssumptionSet>(SingleScen.value()));
+        if (d->BeesSent.contains(*SingleScen)) continue;
+		CurrentThread = AddThread(*SingleScen);
+		CurrentThread->SetAssumption(std::get<1>(d->m_Scenarios.value<AssumptionSet>(*SingleScen)));
         CurrentThread->SetBaseFlow(d->m_BaseFlows);
 		CurrentThread->start();
 		++NumofSent;
@@ -80,10 +79,11 @@ void ScenarioApplier::BeeReturned(int Ident, const MtgCashFlow& a)
 	RETURN_WHEN_RUNNING(false, )
 	TemplAsyncCalculator<ApplyFlowThread, MtgCashFlow>::BeeReturned(Ident, a);
 	ApplyFlowThread* CurrentThread;
-    for (auto SingleScen = d->m_Scenarios.constBegin(); SingleScen != d->m_Scenarios.constEnd(); ++SingleScen) {
-        if (d->BeesSent.contains(SingleScen.key())) continue;
-		CurrentThread = AddThread(SingleScen.key());
-        CurrentThread->SetAssumption(readTempFile<AssumptionSet>(SingleScen.value()));
+    const auto scenariosKeys = d->m_Scenarios.keys();
+    for (auto SingleScen = scenariosKeys.constBegin(); SingleScen != scenariosKeys.constEnd(); ++SingleScen) {
+        if (d->BeesSent.contains(*SingleScen)) continue;
+		CurrentThread = AddThread(*SingleScen);
+        CurrentThread->SetAssumption(std::get<1>(d->m_Scenarios.value<AssumptionSet>(*SingleScen)));
         CurrentThread->SetBaseFlow(d->m_BaseFlows);
 		CurrentThread->start();
 		return;
@@ -112,7 +112,7 @@ void ScenarioApplier::ClearScenarios()
 AssumptionSet ScenarioApplier::GetAssumption(qint32 idx) const
 {
     Q_D(const ScenarioApplier);
-    return readTempFile<AssumptionSet>(d->m_Scenarios.value(idx, QString()));
+    return std::get<1>(d->m_Scenarios.value<AssumptionSet>(idx));
 }
 
 QList<qint32> ScenarioApplier::GetAssumptionKeys() const
@@ -127,8 +127,9 @@ QString ScenarioApplier::ReadyToCalculate()const
 	RETURN_WHEN_RUNNING(true, "Calculator Already Running\n")
 	QString Result;
     if (d->m_BaseFlows.IsEmpty()) Result += "Invalid Base Flows\n";
-    for (auto i = d->m_Scenarios.constBegin(); i != d->m_Scenarios.constEnd(); i++) {
-        const auto currAss= readTempFile<AssumptionSet>(i.value());
+    const auto scenariosKeys = d->m_Scenarios.keys();
+    for (auto i = scenariosKeys.constBegin(); i != scenariosKeys.constEnd(); i++) {
+        const auto currAss = std::get<1>(d->m_Scenarios.value<AssumptionSet>(*i));
         if (!currAss.IsValid())
             Result += "Invalid Scenario: " + currAss.ToString() + '\n';
 	}
@@ -140,8 +141,9 @@ QDataStream& operator<<(QDataStream & stream, const ScenarioApplier& flows) {
 	Q_ASSERT (!flows.ContinueCalculation()) ;
     stream << flows.d_func()->m_BaseFlows;
     stream << static_cast<qint32>(flows.d_func()->m_Scenarios.size());
-    for (auto i = flows.d_func()->m_Scenarios.constBegin(); i != flows.d_func()->m_Scenarios.constEnd(); ++i) {
-        stream << i.key() << flows.readTempFile<AssumptionSet>(i.value());
+    const auto scenariosKeys = flows.d_func()->m_Scenarios.keys();
+    for (auto i = scenariosKeys.constBegin(); i != scenariosKeys.constEnd(); ++i) {
+        stream << *i << std::get<1>(flows.d_func()->m_Scenarios.value<AssumptionSet>(*i));
 	}
 	return flows.SaveToStream(stream);
 }
@@ -158,7 +160,7 @@ QDataStream& ScenarioApplier::LoadOldVersion(QDataStream& stream)
 		stream >> TempKey;
 		TempRes.SetLoadProtocolVersion(loadProtocolVersion());
 		stream >> TempRes;
-        d->m_Scenarios.insert(TempKey, writeTempFile(TempRes));
+        d->m_Scenarios.setValue(TempKey, TempRes);
 	}
 	return TemplAsyncCalculator<ApplyFlowThread, MtgCashFlow>::LoadOldVersion(stream);
 }
@@ -166,9 +168,10 @@ QDataStream& ScenarioApplier::LoadOldVersion(QDataStream& stream)
 qint32 ScenarioApplier::FindAssumption(const AssumptionSet& a)const
 {
     Q_D(const ScenarioApplier);
-    for (auto i = d->m_Scenarios.constBegin(); i != d->m_Scenarios.constEnd(); ++i) {
-        if (a == readTempFile<AssumptionSet>(i.value()))
-            return i.key();
+    const auto scenariosKeys = d->m_Scenarios.keys();
+    for (auto i = scenariosKeys.constBegin(); i != scenariosKeys.constEnd(); ++i) {
+        if (a == std::get<1>(d->m_Scenarios.value<AssumptionSet>(*i)))
+            return *i;
 	}
 	return -1;
 }

@@ -16,7 +16,6 @@
 #include "simstring.h"
 #include <QXmlStreamReader>
 #include "BaseRateTable.h"
-#include <QtConcurrent>
 DEFINE_PUBLIC_QOBJECT_COMMONS(MtgCalculator)
 MtgCalculator::~MtgCalculator()
 {
@@ -30,7 +29,12 @@ MtgCalculatorPrivate::MtgCalculatorPrivate(MtgCalculator *q)
     :AbstrAsyncCalculatorPrivate(q)
     , m_UseStoredCashFlows(false)
     , m_DownloadScenario(false)
-{}
+    , m_loansFile(TEMP_FILES_DIR)
+{
+    ENSURE_DIR_EXIST(TEMP_FILES_DIR);
+    m_loansFile.open();
+    m_Loans.setDevice(&m_loansFile);
+}
 MtgCalculator::MtgCalculator(MtgCalculatorPrivate *d, QObject* parent)
     :TemplAsyncCalculator <MtgCalculatorThread, MtgCashFlow>(d,parent)
 {
@@ -41,21 +45,13 @@ MtgCalculator::MtgCalculator(MtgCalculatorPrivate *d, QObject* parent)
 void MtgCalculator::SetLoan(const Mortgage& a, qint32 Index)
 {
     Q_D(MtgCalculator);
-	auto FoundLn = d->m_LoansPath.find(Index);
-    if (FoundLn == d->m_LoansPath.end()) {
-        RETURN_WHEN_RUNNING(true,)
-        d->m_LoansPath.insert(Index,writeTempFile(a));
-	}
-    else {
-        editTempFile(FoundLn.value(),a);
-    }
-
+    d->m_Loans.setValue(Index, a);
 }
 
 Mortgage MtgCalculator::getLoan(qint32 Index) const
 {
     Q_D(const MtgCalculator);
-    return readTempFile<Mortgage>(d->m_LoansPath.value(Index));
+    return std::get<1>(d->m_Loans.value<Mortgage>(Index));
 }
 
 std::tuple<bool, QString> MtgCalculator::StartCalculation(bool ignoreCheck)
@@ -70,14 +66,15 @@ std::tuple<bool, QString> MtgCalculator::StartCalculation(bool ignoreCheck)
 	{//Check if all base rates are valid
 		bool CheckAgain = false;
 		ConstantBaseRateTable TempTable;
-        for (auto i = d->m_LoansPath.constBegin(); i != d->m_LoansPath.constEnd() && !CheckAgain; ++i) {
-            if (readTempFile<Mortgage>(i.value()).GetFloatingRateValue().IsEmpty()) {
+        const auto loansKey = d->m_Loans.keys();
+        for (auto i = loansKey.constBegin(); i != loansKey.constEnd() && !CheckAgain; ++i) {
+            if (std::get<1>(d->m_Loans.value<Mortgage>(*i)).GetFloatingRateValue().IsEmpty()) {
 				CompileReferenceRateValue(TempTable);
 				CheckAgain = true;
 			}
 		}
-        for (auto i = d->m_LoansPath.constBegin(); CheckAgain && i != d->m_LoansPath.constEnd(); ++i) {
-            if (readTempFile<Mortgage>(i.value()).GetFloatingRateValue().IsEmpty()) 
+        for (auto i = loansKey.constBegin(); CheckAgain && i != loansKey.constEnd(); ++i) {
+            if (std::get<1>(d->m_Loans.value<Mortgage>(*i)).GetFloatingRateValue().IsEmpty())
                 return std::make_tuple(false, "Invalid Base Rate");
 		}
 	}
@@ -191,16 +188,19 @@ std::tuple<bool, QString> MtgCalculator::StartCalculation(bool ignoreCheck)
     d->BeesSent.clear();
     setContinueCalculation(true);
 	int NumberOfThreads = availableThreads();
-    if (d->m_SequentialComputation || NumberOfThreads < 1) NumberOfThreads = 1;
+    if (d->m_SequentialComputation || NumberOfThreads < 1) 
+        NumberOfThreads = 1;
+    LOGDEBUG(QString("Number of Loans Threads: %1\nIdeal Threads: %2\nOperativity: %3\nIs Sequential %4").arg(NumberOfThreads).arg(QThread::idealThreadCount()).arg(operativity()).arg(d->m_SequentialComputation ? "True":"False"));
 	int NumofSent = 0;
 	MtgCalculatorThread* CurrentThread;
-    for (auto SingleLoan = d->m_LoansPath.constBegin(); SingleLoan != d->m_LoansPath.constEnd(); ++SingleLoan) {
+    const auto loansKey = d->m_Loans.keys();
+    for (auto SingleLoan = loansKey.constBegin(); SingleLoan != loansKey.constEnd(); ++SingleLoan) {
 		if (NumofSent >= NumberOfThreads) break;
-        if (d->BeesSent.contains(SingleLoan.key())) continue;
-		CurrentThread = AddThread(SingleLoan.key());
-        CurrentThread->SetLoan(readTempFile<Mortgage>(SingleLoan.value()));
-        if (d->TempProperties.contains(SingleLoan.key())) {
-            const auto CurrProps = d->TempProperties.value(SingleLoan.key());
+        if (d->BeesSent.contains(*SingleLoan)) continue;
+		CurrentThread = AddThread(*SingleLoan);
+        CurrentThread->SetLoan(std::get<1>(d->m_Loans.value<Mortgage>(*SingleLoan)));
+        if (d->TempProperties.contains(*SingleLoan)) {
+            const auto CurrProps = d->TempProperties.value(*SingleLoan);
 			for (auto j = CurrProps->constBegin(); j != CurrProps->constEnd(); ++j) {
 				CurrentThread->SetLoanProperty(j.key(), j.value());
 			}
@@ -231,9 +231,9 @@ void MtgCalculator::BeeReturned(int Ident, const MtgCashFlow& a)
 	RETURN_WHEN_RUNNING(false, )
     d->m_AggregatedRes += a;
 
-    Q_ASSERT(d->m_LoansPath.contains(Ident));
+    Q_ASSERT(d->m_Loans.contains(Ident));
     {
-        auto tempLoan = readTempFile<Mortgage>(d->m_LoansPath.value(Ident));
+        auto tempLoan = std::get<1>(d->m_Loans.value<Mortgage>(Ident));
         tempLoan.SetCashFlows(a);
         SetLoan(tempLoan, Ident);
     }
@@ -241,12 +241,13 @@ void MtgCalculator::BeeReturned(int Ident, const MtgCashFlow& a)
     if (!ContinueCalculation())
         return;
 	MtgCalculatorThread* CurrentThread;
-    for (auto SingleLoan = d->m_LoansPath.constBegin(); SingleLoan != d->m_LoansPath.constEnd(); ++SingleLoan) {
-        if (d->BeesSent.contains(SingleLoan.key())) continue;
-		CurrentThread = AddThread(SingleLoan.key());
-		CurrentThread->SetLoan(readTempFile<Mortgage>(SingleLoan.value()));
-        if (d->TempProperties.contains(SingleLoan.key())) {
-            const auto CurrProps = d->TempProperties.value(SingleLoan.key());
+    const auto loansKeys = d->m_Loans.keys();
+    for (auto SingleLoan = loansKeys.constBegin(); SingleLoan != loansKeys.constEnd(); ++SingleLoan) {
+        if (d->BeesSent.contains(*SingleLoan)) continue;
+		CurrentThread = AddThread(*SingleLoan);
+        CurrentThread->SetLoan(std::get<1>(d->m_Loans.value<Mortgage>(*SingleLoan)));
+        if (d->TempProperties.contains(*SingleLoan)) {
+            const auto CurrProps = d->TempProperties.value(*SingleLoan);
 			for (auto j = CurrProps->constBegin(); j != CurrProps->constEnd(); ++j) {
 				CurrentThread->SetLoanProperty(j.key(), j.value());
 			}
@@ -268,9 +269,7 @@ void MtgCalculator::BeeReturned(int Ident, const MtgCashFlow& a)
 void MtgCalculator::ClearLoans() {
     Q_D(MtgCalculator);
     RETURN_WHEN_RUNNING(true, )
-        for (auto i = d->m_LoansPath.begin(); i != d->m_LoansPath.end(); i = d->m_LoansPath.erase(i))
-            removeTempFile(i.value());
-    Q_ASSERT(d->m_LoansPath.isEmpty());
+    d->m_Loans.clear();
 }
 void MtgCalculator::Reset(){
 	ClearLoans();
@@ -284,12 +283,11 @@ QString MtgCalculator::ReadyToCalculate()const{
 	QString Result;
 	QString TempStr;
     if (d->StartDate.isNull()) Result += "Invalid Start Date\n";
-    Result += QtConcurrent::blockingMappedReduced(d->m_LoansPath, ConcurrentFunctions::checkReadyToCalculateLoan, ConcurrentFunctions::reduceReadyToCalculate, QtConcurrent::UnorderedReduce);
-/*
-    for (auto i = d->m_LoansPath.constBegin(); i != d->m_LoansPath.constEnd(); i++) {
-        TempStr = readTempFile<Mortgage>(i.value()).ReadyToCalculate();
-		if(!TempStr.isEmpty()) Result+=TempStr+'\n';
-	}*/
+    const auto loansKeys = d->m_Loans.keys();
+    for (auto SingleLoan = loansKeys.constBegin(); SingleLoan != loansKeys.constEnd(); ++SingleLoan){
+        TempStr = std::get<1>(d->m_Loans.value<Mortgage>(*SingleLoan)).ReadyToCalculate();
+        if (!TempStr.isEmpty()) Result += TempStr + '\n';
+    }
     if (BloombergVector(d->m_CPRass).IsEmpty(0.0, 1.0)) Result += "CPR Vector: " + d->m_CPRass + '\n';
     if (BloombergVector(d->m_CDRass).IsEmpty(0.0, 1.0)) Result += "CDR Vector: " + d->m_CDRass + '\n';
     if (BloombergVector(d->m_LSass).IsEmpty()) Result += "LS Vector: " + d->m_LSass + '\n';
@@ -303,7 +301,7 @@ QString MtgCalculator::ReadyToCalculate()const{
 QDataStream& operator<<(QDataStream & stream, const MtgCalculator& flows) {
     Q_ASSERT(!flows.ContinueCalculation());
 	stream
-        << static_cast<qint32>(flows.d_func()->m_LoansPath.size())
+        << static_cast<qint32>(flows.d_func()->m_Loans.size())
         << flows.d_func()->m_UseStoredCashFlows
         << flows.d_func()->m_CPRass
         << flows.d_func()->m_CDRass
@@ -313,8 +311,9 @@ QDataStream& operator<<(QDataStream & stream, const MtgCalculator& flows) {
         << flows.d_func()->m_DelinquencyLag
         << flows.d_func()->StartDate
 		;
-    for (auto i = flows.d_func()->m_LoansPath.constBegin(); i != flows.d_func()->m_LoansPath.constEnd(); i++) {
-        stream << i.key() << flows.readTempFile<Mortgage>(i.value());
+    const auto loansKeys = flows.d_func()->m_Loans.keys();
+    for (auto i = loansKeys.constBegin(); i != loansKeys.constEnd(); i++) {
+        stream << *i << std::get<1>(flows.d_func()->m_Loans.value<Mortgage>(*i));
 	}
 	return flows.SaveToStream(stream);
 }
@@ -477,13 +476,13 @@ void MtgCalculator::SetStartDate(const QDate& a)
 int MtgCalculator::NumBees() const
 {
     Q_D(const MtgCalculator);
-    return d->m_LoansPath.size();
+    return d->m_Loans.size();
 }
 
 bool MtgCalculator::hasLoan(qint32 Index)
 {
     Q_D(const MtgCalculator);
-    return d->m_LoansPath.contains(Index);
+    return d->m_Loans.contains(Index);
 }
 
 #ifndef NO_DATABASE
@@ -492,8 +491,9 @@ void MtgCalculator::DownloadScenarios() {
 	RETURN_WHEN_RUNNING(true, )
 	ClearTempProperties();
 	QHash<QString, LoanAssumption> AssumptionCache;
-    for (auto i = d->m_LoansPath.constBegin(); i != d->m_LoansPath.constEnd(); ++i) {
-        const auto tempLoan = readTempFile<Mortgage>(i.value());
+    const auto loansKeys = d->m_Loans.keys();
+    for (auto i = loansKeys.constBegin(); i != loansKeys.constEnd(); ++i) {
+        const auto tempLoan = std::get<1>(d->m_Loans.value<Mortgage>(*i));
         if (tempLoan.HasProperty("Scenario") && tempLoan.HasProperty("Mezzanine")) {
             if (!AssumptionCache.contains(tempLoan.GetProperty("Scenario"))) {
 				LoanAssumption DownloadedAssumption(tempLoan.GetProperty("Scenario"));
@@ -577,91 +577,91 @@ void MtgCalculator::DownloadScenarios() {
 				const auto CurrentAss = AssumptionCache.value(tempLoan.GetProperty("Scenario"));
 				if ((OverrideCurrent || !tempLoan.HasProperty("MaturityExtension"))
 					&&!CurrentAss.GetRawMezzMaturityExtension().isEmpty()) 
-                    AddTempProperty(i.key(),"MaturityExtension", CurrentAss.GetMezzMaturityExtension());
+                    AddTempProperty(*i,"MaturityExtension", CurrentAss.GetMezzMaturityExtension());
 				if ((OverrideCurrent || !tempLoan.HasProperty("StartingHaircut"))
 					&& !CurrentAss.GetRawMezzInitialHaircut().isEmpty())  
-                    AddTempProperty(i.key(),"StartingHaircut", CurrentAss.GetMezzInitialHaircut());
+                    AddTempProperty(*i, "StartingHaircut", CurrentAss.GetMezzInitialHaircut());
 				if ((OverrideCurrent || !tempLoan.HasProperty("PrepaymentFee"))
 					&& !CurrentAss.GetRawMezzPrepaymentFee().isEmpty())
-                    AddTempProperty(i.key(),"PrepaymentFee", CurrentAss.GetMezzPrepaymentFee());
+                    AddTempProperty(*i, "PrepaymentFee", CurrentAss.GetMezzPrepaymentFee());
 				if ((OverrideCurrent || !tempLoan.HasProperty("DayCount"))
 					&&!CurrentAss.GetRawMezzDayCount().isEmpty()) 
-                    AddTempProperty(i.key(),"DayCount", CurrentAss.GetMezzDayCount());
+                    AddTempProperty(*i,"DayCount", CurrentAss.GetMezzDayCount());
 				if ((OverrideCurrent || !tempLoan.HasProperty("Haircut"))
 					&& !CurrentAss.GetRawMezzHaircut().isEmpty()) 
-                    AddTempProperty(i.key(),"Haircut", CurrentAss.GetMezzHaircut());
+                    AddTempProperty(*i,"Haircut", CurrentAss.GetMezzHaircut());
 				if ((OverrideCurrent || !tempLoan.HasProperty("PrepayMultiplier"))
 					&& !CurrentAss.GetRawMezzPrepayMultiplier().isEmpty())
-                    AddTempProperty(i.key(),"PrepayMultiplier", CurrentAss.GetMezzPrepayMultiplier());
+                    AddTempProperty(*i,"PrepayMultiplier", CurrentAss.GetMezzPrepayMultiplier());
 				if ((OverrideCurrent || !tempLoan.HasProperty("LossMultiplier"))
 					&& !CurrentAss.GetRawMezzLossMultiplier().isEmpty()) 
-                    AddTempProperty(i.key(),"LossMultiplier", CurrentAss.GetMezzLossMultiplier());
+                    AddTempProperty(*i,"LossMultiplier", CurrentAss.GetMezzLossMultiplier());
 				if ((OverrideCurrent || !tempLoan.HasProperty("CPR"))
 					&& !CurrentAss.GetRawMezzCPR().isEmpty())
-                    AddTempProperty(i.key(),"CPR", CurrentAss.GetMezzCPR());
+                    AddTempProperty(*i,"CPR", CurrentAss.GetMezzCPR());
 				if ((OverrideCurrent || !tempLoan.HasProperty("CDR"))
 					&& !CurrentAss.GetRawMezzCDR().isEmpty()) 
-                    AddTempProperty(i.key(),"CDR", CurrentAss.GetMezzCDR());
+                    AddTempProperty(*i,"CDR", CurrentAss.GetMezzCDR());
 				if ((OverrideCurrent || !tempLoan.HasProperty("LS"))
 					&& !CurrentAss.GetRawMezzLS().isEmpty()) 
-                    AddTempProperty(i.key(),"LS", CurrentAss.GetMezzLS());
+                    AddTempProperty(*i,"LS", CurrentAss.GetMezzLS());
 				if ((OverrideCurrent || !tempLoan.HasProperty("RecoveryLag"))
 					&& !CurrentAss.GetRawMezzRecoveryLag().isEmpty())
-                    AddTempProperty(i.key(),"RecoveryLag", CurrentAss.GetMezzRecoveryLag());
+                    AddTempProperty(*i,"RecoveryLag", CurrentAss.GetMezzRecoveryLag());
 				if ((OverrideCurrent || !tempLoan.HasProperty("Delinquency"))
 					&& !CurrentAss.GetRawMezzDelinquency().isEmpty())  
-                    AddTempProperty(i.key(),"Delinquency", CurrentAss.GetMezzDelinquency());
+                    AddTempProperty(*i,"Delinquency", CurrentAss.GetMezzDelinquency());
 				if ((OverrideCurrent || !tempLoan.HasProperty("DelinquencyLag"))
 					&& !CurrentAss.GetRawMezzDelinquencyLag().isEmpty())  
-                    AddTempProperty(i.key(),"DelinquencyLag", CurrentAss.GetMezzDelinquencyLag());
+                    AddTempProperty(*i,"DelinquencyLag", CurrentAss.GetMezzDelinquencyLag());
 				if ((OverrideCurrent || !tempLoan.HasProperty("Price"))
 					&& !CurrentAss.GetRawMezzPrice().isEmpty())  
-                    AddTempProperty(i.key(),"Price", CurrentAss.GetMezzPrice());
+                    AddTempProperty(*i,"Price", CurrentAss.GetMezzPrice());
 			}
 			else {
 				auto CurrentAss = AssumptionCache.value(tempLoan.GetProperty("Scenario"));
 				if ((OverrideCurrent || !tempLoan.HasProperty("MaturityExtension"))
 					&& !CurrentAss.GetRawSeniorMaturityExtension().isEmpty()) 
-                    AddTempProperty(i.key(),"MaturityExtension", CurrentAss.GetSeniorMaturityExtension());
+                    AddTempProperty(*i,"MaturityExtension", CurrentAss.GetSeniorMaturityExtension());
 				if ((OverrideCurrent || !tempLoan.HasProperty("StartingHaircut"))
 					&& !CurrentAss.GetRawSeniorInitialHaircut().isEmpty())  
-                    AddTempProperty(i.key(),"StartingHaircut", CurrentAss.GetSeniorInitialHaircut());
+                    AddTempProperty(*i,"StartingHaircut", CurrentAss.GetSeniorInitialHaircut());
 				if ((OverrideCurrent || !tempLoan.HasProperty("PrepaymentFee"))
 					&& !CurrentAss.GetRawSeniorPrepaymentFee().isEmpty())
-                    AddTempProperty(i.key(),"PrepaymentFee", CurrentAss.GetSeniorPrepaymentFee());
+                    AddTempProperty(*i,"PrepaymentFee", CurrentAss.GetSeniorPrepaymentFee());
 				if ((OverrideCurrent || !tempLoan.HasProperty("DayCount"))
 					&& !CurrentAss.GetRawSeniorDayCount().isEmpty()) 
-                    AddTempProperty(i.key(),"DayCount", CurrentAss.GetSeniorDayCount());
+                    AddTempProperty(*i,"DayCount", CurrentAss.GetSeniorDayCount());
 				if ((OverrideCurrent || !tempLoan.HasProperty("Haircut"))
 					&& !CurrentAss.GetRawSeniorHaircut().isEmpty()) 
-                    AddTempProperty(i.key(),"Haircut", CurrentAss.GetSeniorHaircut());
+                    AddTempProperty(*i,"Haircut", CurrentAss.GetSeniorHaircut());
 				if ((OverrideCurrent || !tempLoan.HasProperty("PrepayMultiplier"))
 					&& !CurrentAss.GetRawSeniorPrepayMultiplier().isEmpty())
-                    AddTempProperty(i.key(),"PrepayMultiplier", CurrentAss.GetSeniorPrepayMultiplier());
+                    AddTempProperty(*i,"PrepayMultiplier", CurrentAss.GetSeniorPrepayMultiplier());
 				if ((OverrideCurrent || !tempLoan.HasProperty("LossMultiplier"))
 					&& !CurrentAss.GetRawSeniorLossMultiplier().isEmpty()) 
-                    AddTempProperty(i.key(),"LossMultiplier", CurrentAss.GetSeniorLossMultiplier());
+                    AddTempProperty(*i,"LossMultiplier", CurrentAss.GetSeniorLossMultiplier());
 				if ((OverrideCurrent || !tempLoan.HasProperty("CPR"))
 					&& !CurrentAss.GetRawSeniorCPR().isEmpty()) 
-                    AddTempProperty(i.key(),"CPR", CurrentAss.GetSeniorCPR());
+                    AddTempProperty(*i,"CPR", CurrentAss.GetSeniorCPR());
 				if ((OverrideCurrent || !tempLoan.HasProperty("CDR"))
 					&& !CurrentAss.GetRawSeniorCDR().isEmpty())
-                    AddTempProperty(i.key(),"CDR", CurrentAss.GetSeniorCDR());
+                    AddTempProperty(*i,"CDR", CurrentAss.GetSeniorCDR());
 				if ((OverrideCurrent || !tempLoan.HasProperty("LS"))
 					&& !CurrentAss.GetRawSeniorLS().isEmpty()) 
-                    AddTempProperty(i.key(),"LS", CurrentAss.GetSeniorLS());
+                    AddTempProperty(*i,"LS", CurrentAss.GetSeniorLS());
 				if ((OverrideCurrent || !tempLoan.HasProperty("RecoveryLag"))
 					&& !CurrentAss.GetRawSeniorRecoveryLag().isEmpty()) 
-                    AddTempProperty(i.key(),"RecoveryLag", CurrentAss.GetSeniorRecoveryLag());
+                    AddTempProperty(*i,"RecoveryLag", CurrentAss.GetSeniorRecoveryLag());
 				if ((OverrideCurrent || !tempLoan.HasProperty("Delinquency"))
 					&& !CurrentAss.GetRawSeniorDelinquency().isEmpty())  
-                    AddTempProperty(i.key(),"Delinquency", CurrentAss.GetSeniorDelinquency());
+                    AddTempProperty(*i,"Delinquency", CurrentAss.GetSeniorDelinquency());
 				if ((OverrideCurrent || !tempLoan.HasProperty("DelinquencyLag"))
 					&& !CurrentAss.GetRawSeniorDelinquencyLag().isEmpty())  
-                    AddTempProperty(i.key(),"DelinquencyLag", CurrentAss.GetSeniorDelinquencyLag());
+                    AddTempProperty(*i,"DelinquencyLag", CurrentAss.GetSeniorDelinquencyLag());
 				if ((OverrideCurrent || !tempLoan.HasProperty("Price"))
 					&& !CurrentAss.GetRawSeniorPrice().isEmpty())  
-                    AddTempProperty(i.key(),"Price", CurrentAss.GetSeniorPrice());
+                    AddTempProperty(*i,"Price", CurrentAss.GetSeniorPrice());
 			}
 		}
 	}
@@ -702,15 +702,16 @@ void MtgCalculator::GuessLoanScenarios(bool OverrideAss) {
 		}
 	}
 	Db_Mutex.unlock();
-    for (auto SingleLoan = d->m_LoansPath.constBegin(); SingleLoan != d->m_LoansPath.constEnd(); ++SingleLoan)
+    const auto loansKeys = d->m_Loans.keys();
+    for (auto SingleLoan = loansKeys.constBegin(); SingleLoan != loansKeys.constEnd(); ++SingleLoan)
     {
 		for (auto i = AvailableAssumptions.constBegin(); i != AvailableAssumptions.constEnd(); ++i) {
 			for (const QString& CurrProperty : LoansPropertiesToSearch) {
-                auto tempLoan = readTempFile<Mortgage>(SingleLoan.value());
+                auto tempLoan = std::get<1>(d->m_Loans.value<Mortgage>(*SingleLoan));
                 if (i.value()->MatchPattern(tempLoan.GetProperty(CurrProperty))) {
                     if (!tempLoan.HasProperty("Scenario") || OverrideAss) {
                         tempLoan.SetProperty("Scenario", i.key());
-                        SetLoan(tempLoan, SingleLoan.key());
+                        SetLoan(tempLoan, *SingleLoan);
                     }
 					break;
 				}
@@ -768,7 +769,8 @@ void MtgCalculator::AddTempProperty(qint32 LoanID, const QString& PropertyName, 
 {
     Q_D( MtgCalculator);
 	RETURN_WHEN_RUNNING(true, )
-        if (!d->m_LoansPath.contains(LoanID) || PropertyName.isEmpty() || PropertyValue.isEmpty())return;
+    if (!d->m_Loans.contains(LoanID) || PropertyName.isEmpty() || PropertyValue.isEmpty())
+            return;
     auto iter = d->TempProperties.find(LoanID);
     if (iter == d->TempProperties.end()) iter = d->TempProperties.insert(LoanID, std::make_shared<QHash<QString, QString>>());
 	iter.value()->operator[](PropertyName) = PropertyValue;
@@ -870,7 +872,8 @@ QHash<QString, double> MtgCalculator::GetGeographicBreakdown() const
 		return false;
 	});
 	double SumOut=0.0;
-    if (d->m_LoansPath.isEmpty()) return Result;
+    if (d->m_Loans.isEmpty()) 
+        return Result;
 	QString CurrentGuess;
 	simstring::reader dbr;
     const std::string DbRootFolder(GetFromConfig("Folders","CountriesDBFolder").toStdString());
@@ -880,8 +883,9 @@ QHash<QString, double> MtgCalculator::GetGeographicBreakdown() const
         BuildDBCountries(QString::fromStdString(DbRootFolder + "\\CountriesDB\\ISO3166-1.ssdb"));
 	if (!dbr.open(DbRootFolder + "\\CountriesDB\\ISO3166-1.ssdb")) 
         return Result;
-    for (auto i = d->m_LoansPath.constBegin(); i != d->m_LoansPath.constEnd(); ++i) {
-        const auto tempLoan = readTempFile<Mortgage>(i.value());
+    const auto loansKeys = d->m_Loans.keys();
+    for (auto i = loansKeys.constBegin(); i != loansKeys.constEnd(); ++i) {
+        const auto tempLoan = std::get<1>(d->m_Loans.value<Mortgage>(*i));
         if (tempLoan.GetSize()<0.01) 
             continue;
         SumOut += tempLoan.GetSize();

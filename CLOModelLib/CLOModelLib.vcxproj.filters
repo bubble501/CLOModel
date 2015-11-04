@@ -389,11 +389,14 @@
     <ClInclude Include="Private\Ratings_p.h">
       <Filter>Privates\Common Items</Filter>
     </ClInclude>
-    <ClInclude Include="Private\CheckedTempDir.h">
-      <Filter>Privates\Common Items</Filter>
-    </ClInclude>
     <ClInclude Include="OnMaturityTrigger.h">
       <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryMappedDevice.h">
+      <Filter>Header Files\Common Items</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\MemoryMappedDevice_p.h">
+      <Filter>Privates\Common Items</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -831,6 +834,9 @@
     </ClCompile>
     <ClCompile Include="OnMaturityTrigger.cpp">
       <Filter>Source Files\Triggers</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryMappedDevice.cpp">
+      <Filter>Source Files\Common Items</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

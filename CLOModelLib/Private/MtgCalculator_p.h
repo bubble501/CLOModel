@@ -5,12 +5,15 @@
 #include "MtgCalculator.h"
 #include <QHash>
 #include <QString>
+#include "MemoryMappedDevice.h"
+#include <QTemporaryFile>
 class MtgCalculatorPrivate : public AbstrAsyncCalculatorPrivate
 {
     DECLARE_PRIVATE_COMMONS(MtgCalculator)
     DECLARE_PRIVATE_COMMONS_DATASTREAM(MtgCalculator)
 public:
-    QHash<qint32, QString > m_LoansPath;
+    QTemporaryFile m_loansFile;
+    MemoryMappedDevice m_Loans;
     QString m_CPRass;
     QString m_CDRass;
     QString m_LSass;
@@ -27,20 +30,22 @@ public:
     {
         Q_Q(MtgCalculator);
         static_assert(std::is_base_of<AbstractBaseRateTable, T>::value, "CompileReferenceRateValueTemplate can only be used with a base rate table");
-        for (auto i = m_LoansPath.constBegin(); i != m_LoansPath.constEnd(); ++i) {
-            auto tempMtg = q->readTempFile<Mortgage>(i.value());
+        const auto loansKeys = m_Loans.keys();
+        for (auto i = loansKeys.constBegin(); i != loansKeys.constEnd(); ++i) {
+            auto tempMtg = std::get<1>(m_Loans.value<Mortgage>(*i));
             tempMtg.CompileReferenceRateValue(table);
-            q->SetLoan(tempMtg, i.key());
+            q->SetLoan(tempMtg, *i);
         }
     }
     template <class T> void GetBaseRatesDatabaseTemplate(T& table, bool DownloadAll)
     {
         Q_Q(MtgCalculator);
         static_assert(std::is_base_of<AbstractBaseRateTable, T>::value, "GetBaseRatesDatabaseTemplate can only be used with a base rate table");
-        for (auto i = m_LoansPath.constBegin(); i != m_LoansPath.constEnd(); ++i) {
-            auto tempMtg = q->readTempFile<Mortgage>(i.value());
+        const auto loansKeys = m_Loans.keys();
+        for (auto i = loansKeys.constBegin(); i != loansKeys.constEnd(); ++i) {
+            auto tempMtg = std::get<1>(m_Loans.value<Mortgage>(*i));
             tempMtg.GetBaseRatesDatabase(table, DownloadAll);
-            q->SetLoan(tempMtg, i.key());
+            q->SetLoan(tempMtg, *i);
         }
     }
 };

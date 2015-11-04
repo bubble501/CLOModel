@@ -17,6 +17,7 @@ HEADERS += ./AbstractBbgVect.h \
     ./AbstrAsyncCalculator.h \
     ./AbstrAsyncThread.h \
     ./AbstractTrigger.h \
+    ./OnMaturityTrigger.h \
     ./TrancheTrigger.h \
     ./VectorTrigger.h \
     ./CumulativeLossTrigger.h \
@@ -24,7 +25,6 @@ HEADERS += ./AbstractBbgVect.h \
     ./DeferredInterestTrigger.h \
     ./DelinquencyTrigger.h \
     ./DuringStressTestTrigger.h \
-    ./OnMaturityTrigger.h \
     ./PDLtrigger.h \
     ./PoolSizeTrigger.h \
     ./TriggersResults.h \
@@ -56,7 +56,6 @@ HEADERS += ./AbstractBbgVect.h \
     ./TriggerHelperDialog.h \
     ./TriggerStructHelperWidget.h \
     ./WaterfallStepHelperDialog.h \
-	./Private/InternalItems.h \
     ./Private/AbstractBbgVect_p.h \
     ./Private/BaseRateVect_p.h \
     ./Private/BloombergVector_p.h \
@@ -126,9 +125,10 @@ HEADERS += ./AbstractBbgVect.h \
     ./Private/WaterfallViewer.h \
     ./Private/StressTest_p.h \
     ./Private/AssumptionSet_p.h \
+    ./Private/MemoryMappedDevice_p.h \
     ./Private/Ratings_p.h \
-    ./Private/CheckedTempDir.h \
-    ./Private/InternalItems.h
+    ./Private/InternalItems.h \
+    ./MemoryMappedDevice.h
 SOURCES += ./AbstractBbgVect.cpp \
     ./BaseRateVect.cpp \
     ./BloombergVector.cpp \
@@ -202,5 +202,6 @@ SOURCES += ./AbstractBbgVect.cpp \
     ./Private/RichTextDelegate.cpp \
     ./Private/TrancheViewer.cpp \
     ./Private/WaterfallViewer.cpp \
-    ./Private/InternalItems.cpp
+    ./Private/InternalItems.cpp \
+    ./MemoryMappedDevice.cpp
 RESOURCES += Resources.qrc

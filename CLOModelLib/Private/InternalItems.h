@@ -39,12 +39,10 @@ extern QMutex Db_Mutex;
 #define LOGCONDITIONALLY(Condition,LogMsg)
 #define LOGCONSOLE(LogMsg)
 #endif
+#define TEMP_FILES_DIR QDir::tempPath() + "/CLOModel/"
+#define ENSURE_DIR_EXIST(dirpath) const QDir tmpDir(dirpath); if (!tmpDir.exists()) tmpDir.mkpath(dirpath);
 class QSqlQuery;
-namespace ConcurrentFunctions {
-    QString checkReadyToCalculateLoan(const QString& path);
-    QString checkReadyToCalculateWaterfall(const QString& path);
-    void reduceReadyToCalculate(QString& res, const QString& val);
-}
+
 QString getLastExecutedQuery(const QSqlQuery& query);
 enum DayCountConvention : qint16;
 extern const QString LoansPropertiesToSearch[2]; //Properties in which scenarios will be searched

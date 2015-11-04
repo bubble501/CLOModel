@@ -8,20 +8,22 @@
 #include <QMultiHash>
 #include <QPointer>
 #include <atomic>
-#include "Private/CheckedTempDir.h"
+#include <QTemporaryFile>
+#include "MemoryMappedDevice.h"
 class AbstrAsyncCalculatorPrivate : public BackwardInterfacePrivate
 {
     DECLARE_PRIVATE_COMMONS(AbstrAsyncCalculator)
     DECLARE_PRIVATE_COMMONS_DATASTREAM(AbstrAsyncCalculator)
 public:
     std::atomic_bool m_ContinueCalculation;
-    QHash<qint32, QPointer<QObject> > m_ThreadPool;
-    QHash<qint32, QString > m_Result;
-    QSet<qint32> BeesSent;
     qint32 BeesReturned;
     bool m_SequentialComputation;
     quint8 m_operativity;
-    CheckedTempDir m_dataDir;
+    QTemporaryFile m_resultsFile;
+    MemoryMappedDevice m_resultsMap;
+    QHash<qint32, QPointer<QObject> > m_ThreadPool;
+    QSet<qint32> BeesSent;
     QMultiHash<qint32, QString> m_errors;
+
 };
 #endif // AbstrAsyncCalculator_p_h__

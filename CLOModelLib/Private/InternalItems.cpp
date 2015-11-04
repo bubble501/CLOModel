@@ -35,21 +35,7 @@ QString getLastExecutedQuery(const QSqlQuery&)
 QMutex Db_Mutex;
 #endif
 
-namespace ConcurrentFunctions {
-    QString checkReadyToCalculateLoan(const QString& path)
-    {
-        return AbstrAsyncCalculator::readTempFile<Mortgage>(path).ReadyToCalculate();
-    }
-    QString checkReadyToCalculateWaterfall(const QString& path)
-    {
-        return AbstrAsyncCalculator::readTempFile<Waterfall>(path).ReadyToCalculate();
-    }
-    void reduceReadyToCalculate(QString& res, const QString& val)
-    {
-        if (!val.isEmpty())
-            res += val + '\n';
-    }
-}
+
 
 const QString LoansPropertiesToSearch[] = { "Issuer", "Facility" };
 QString Commarize(double num, unsigned int precision)

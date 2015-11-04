@@ -7,6 +7,7 @@
 #include <AbstrAsyncCalculator.h>
 #include <type_traits>
 #include <QDataStream>
+#include "MemoryMappedDevice.h"
 template <typename ThreadType, typename ResultType>
 class CLOMODELLIB_EXPORT TemplAsyncCalculator : public AbstrAsyncCalculator
 {
@@ -49,21 +50,15 @@ public:
     }
     virtual void ClearResults()
     {
-        auto& tempRes = getResultPaths();
-        for (auto i = tempRes.begin(); i != tempRes.end(); i = tempRes.erase(i))
-            removeTempFile(i.value());
-        Q_ASSERT(getResultPaths().isEmpty());
+        getDevice().clear();
     }
     virtual void RemoveResult(qint32 Key)
     {
-        auto& tempRes = getResultPaths();
-        auto i = tempRes.find(Key);
-        if (i == tempRes.end())
-            return;
-        removeTempFile(i.value());
-        tempRes.erase(i);
+        getDevice().removeValue(Key);
     }
-    virtual const ResultType GetResult(qint32 key)const { return readTempFile<ResultType>(getResultPaths(key)); }
+    virtual const ResultType GetResult(qint32 key)const { 
+        return std::get<1>(getDevice().value<ResultType>(key));
+    }
 protected:	
     TemplAsyncCalculator(AbstrAsyncCalculatorPrivate* d, QObject* parent = nullptr)
         :AbstrAsyncCalculator(d, parent)
@@ -105,18 +100,11 @@ protected:
     }
     void insertResult(qint32 Key, const ResultType& val)
     {
-        AbstrAsyncCalculator::insertResult(Key, writeTempFile(val));
+        getDevice().setValue(Key, val);
     }
     virtual void BeeReturned(int Ident, const ResultType& a)
     {
         RETURN_WHEN_RUNNING(false, )
-            auto& tempRes = getResultPaths();
-        auto FindRe = tempRes.find(Ident);
-        if (FindRe != tempRes.end()) {
-            removeTempFile(FindRe.value());
-            tempRes.erase(FindRe);
-            Q_ASSERT(!getResultPaths().contains(Ident));
-        }
         insertResult(Ident,a);
         getThreadPool().remove(Ident);
         getBeesReturned()++;
@@ -133,11 +121,11 @@ protected:
     virtual QDataStream& SaveToStream(QDataStream& stream) const final
     {
         RETURN_WHEN_RUNNING(true, stream)
-            auto& tempRes = getResultPaths();
+            auto tempRes = GetResultKeys();
         stream << GetSequentialComputation() << static_cast<qint32>(tempRes.size());
         for (auto i = tempRes.constBegin(); i != tempRes.constEnd(); ++i) {
-            stream << i.key()
-                << readTempFile<ResultType>(i.value());
+            stream << *i
+                << std::get<1>(getDevice().value<ResultType>(*i));
         }
         return stream;
     }

@@ -3,14 +3,15 @@
 
 #include "Private/AbstrAsyncCalculator_p.h"
 #include "ScenarioApplier.h"
-#include <QHash>
-
+#include "MemoryMappedDevice.h"
+#include <QTemporaryFile>
 class ScenarioApplierPrivate : public AbstrAsyncCalculatorPrivate
 {
     DECLARE_PRIVATE_COMMONS(ScenarioApplier)
     DECLARE_PRIVATE_COMMONS_DATASTREAM(ScenarioApplier)
 public:
     MtgCashFlow m_BaseFlows;
-    QHash<qint32, QString > m_Scenarios;
+    MemoryMappedDevice m_Scenarios;
+    QTemporaryFile m_ScenariosFile;
 };
 #endif // ScenarioApplier_p_h__

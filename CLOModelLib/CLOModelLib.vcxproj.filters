@@ -111,6 +111,9 @@
     <Filter Include="Privates\Common Items">
       <UniqueIdentifier>{77137145-9124-489e-9e79-74f8da7a8337}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Privates\Common Items\Memory Mapped">
+      <UniqueIdentifier>{07014f8e-199d-42b6-9343-b53be0d33cf6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="clomodellib_global.h">
@@ -394,6 +397,9 @@
     </ClInclude>
     <ClInclude Include="OnMaturityTrigger.h">
       <Filter>Header Files\Triggers</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryMappedDevice.h">
+      <Filter>Privates\Common Items\Memory Mapped</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -831,6 +837,9 @@
     </ClCompile>
     <ClCompile Include="OnMaturityTrigger.cpp">
       <Filter>Source Files\Triggers</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryMappedDevice.cpp">
+      <Filter>Privates\Common Items\Memory Mapped</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

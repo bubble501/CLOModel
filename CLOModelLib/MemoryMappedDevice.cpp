@@ -86,7 +86,9 @@ bool MemoryMappedDevice::removeValue(qint32 key)
     d->m_itemsMap.erase(itemIter);
     if (fileIter != d->m_memoryMap.begin()) {
         if ((fileIter - 1).value()) {
-            d->m_memoryMap.erase(fileIter);
+            fileIter = d->m_memoryMap.erase(fileIter);
+            if (fileIter.value())
+                d->m_memoryMap.erase(fileIter);
             return true;
         }
     }

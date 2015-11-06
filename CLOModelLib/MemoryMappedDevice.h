@@ -37,7 +37,11 @@ public:
     qint32 size() const;
     qint64 fileSize() const;
     bool isEmpty() const;
+    QIODevice* device();
+    QByteArray readAll();
 protected:
+    MemoryMappedDevice(const MemoryMappedDevice&) = delete;
+    MemoryMappedDevice& operator=(const MemoryMappedDevice&) = delete;
     MemoryMappedDevicePrivate* d_ptr;
     bool writeBlock(qint32 key, const QByteArray& block);
     QByteArray readBlock(qint32 key) const;

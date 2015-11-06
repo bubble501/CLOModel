@@ -99,13 +99,13 @@ int AbstrAsyncCalculator::availableThreads() const
 }
 
 
-MemoryMappedDevice& AbstrAsyncCalculator::getDevice()
+MemoryMappedDevice& AbstrAsyncCalculator::getResultsDevice()
 {
     Q_D(AbstrAsyncCalculator);
     return d->m_resultsMap;
 }
 
-const MemoryMappedDevice& AbstrAsyncCalculator::getDevice() const
+const MemoryMappedDevice& AbstrAsyncCalculator::getResultsDevice() const
 {
     Q_D(const AbstrAsyncCalculator);
     return d->m_resultsMap;

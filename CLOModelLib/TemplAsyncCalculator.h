@@ -50,14 +50,14 @@ public:
     }
     virtual void ClearResults()
     {
-        getDevice().clear();
+        getResultsDevice().clear();
     }
     virtual void RemoveResult(qint32 Key)
     {
-        getDevice().removeValue(Key);
+        getResultsDevice().removeValue(Key);
     }
     virtual const ResultType GetResult(qint32 key)const { 
-        return std::get<1>(getDevice().value<ResultType>(key));
+        return std::get<1>(getResultsDevice().value<ResultType>(key));
     }
 protected:	
     TemplAsyncCalculator(AbstrAsyncCalculatorPrivate* d, QObject* parent = nullptr)
@@ -100,7 +100,7 @@ protected:
     }
     void insertResult(qint32 Key, const ResultType& val)
     {
-        getDevice().setValue(Key, val);
+        getResultsDevice().setValue(Key, val);
     }
     virtual void BeeReturned(int Ident, const ResultType& a)
     {
@@ -125,7 +125,7 @@ protected:
         stream << GetSequentialComputation() << static_cast<qint32>(tempRes.size());
         for (auto i = tempRes.constBegin(); i != tempRes.constEnd(); ++i) {
             stream << *i
-                << std::get<1>(getDevice().value<ResultType>(*i));
+                << std::get<1>(getResultsDevice().value<ResultType>(*i));
         }
         return stream;
     }

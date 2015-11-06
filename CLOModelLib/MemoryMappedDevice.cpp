@@ -6,7 +6,7 @@ MemoryMappedDevicePrivate::MemoryMappedDevicePrivate(MemoryMappedDevice *q)
     ,m_device(nullptr)
 {}
 MemoryMappedDevice::MemoryMappedDevice()
-    : MemoryMappedDevice(new MemoryMappedDevicePrivate(this))
+    : MemoryMappedDevice(static_cast<QIODevice*>(nullptr))
 {}
 MemoryMappedDevice::MemoryMappedDevice(MemoryMappedDevicePrivate *d)
 	:d_ptr(d)
@@ -23,7 +23,7 @@ MemoryMappedDevicePrivate::~MemoryMappedDevicePrivate()
     }
 }
 MemoryMappedDevice::MemoryMappedDevice(QIODevice* source)
-    :MemoryMappedDevice()
+    :MemoryMappedDevice(new MemoryMappedDevicePrivate(this))
 {
     setDevice(source);
 }
@@ -121,6 +121,8 @@ qint32 MemoryMappedDevice::size() const
 qint64 MemoryMappedDevice::fileSize() const
 {
     Q_D(const MemoryMappedDevice);
+    if (!d->m_device)
+        return 0;
     return d->m_device->size();
 }
 
@@ -128,6 +130,21 @@ bool MemoryMappedDevice::isEmpty() const
 {
     Q_D(const MemoryMappedDevice);
     return d->m_itemsMap.isEmpty();
+}
+
+QIODevice* MemoryMappedDevice::device()
+{
+    Q_D(MemoryMappedDevice);
+    return d->m_device;
+}
+
+QByteArray MemoryMappedDevice::readAll()
+{
+    Q_D(MemoryMappedDevice);
+    if (!d->m_device)
+        return QByteArray();
+    d->m_device->seek(0);
+    return d->m_device->readAll();
 }
 
 bool MemoryMappedDevice::writeBlock(qint32 key, const QByteArray& block)

@@ -34,8 +34,8 @@ protected:
     virtual bool ContinueCalculation() const;
     virtual void setContinueCalculation(bool val);
     virtual int availableThreads() const;
-    virtual MemoryMappedDevice& getDevice();
-    virtual const MemoryMappedDevice& getDevice() const;
+    virtual MemoryMappedDevice& getResultsDevice();
+    virtual const MemoryMappedDevice& getResultsDevice() const;
 public:
     virtual quint8 operativity() const;
     virtual void setOperativity(quint8 val);

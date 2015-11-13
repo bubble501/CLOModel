@@ -263,7 +263,7 @@ TrancheCashFlow TrancheCashFlow::ScaledCashFlows(double OldSize,double NewSize) 
     for (auto i = Result.d_func()->StartingDeferredInterest.begin(); i != Result.d_func()->StartingDeferredInterest.end(); ++i) {
 		i.value() *= NewSize / OldSize;
 	}
-	Result.AddFlow(GenericCashFlow::ScaledCashFlows(OldSize, NewSize, QList<qint32>(), QList<qint32>()
+	Result.SetFlow(GenericCashFlow::ScaledCashFlows(OldSize, NewSize, QList<qint32>(), QList<qint32>()
 		 << TrancheFlowType::OCFlow
 		 << TrancheFlowType::ICFlow
 		 << TrancheFlowType::OCTarget

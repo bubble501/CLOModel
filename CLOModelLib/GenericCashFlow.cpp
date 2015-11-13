@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <functional>  
 #include "CommonFunctions.h"
+#include "InternalItems.h"
 DEFINE_PUBLIC_COMMONS(GenericCashFlow)
 DEFINE_PUBLIC_COMMONS_COPY(GenericCashFlow)
 
@@ -589,12 +590,12 @@ GenericCashFlow GenericCashFlow::ScaledCashFlows(double OriginalRefSize, double 
     Result.d_func()->m_AdjustHolidays = d->m_AdjustHolidays;
     Result.d_func()->m_CashFlowLabels = d->m_CashFlowLabels;
     Result.Aggregate(d->m_AggregationLevel);
-	if (ResultSize == 0.0 || OriginalRefSize == 0.0) return Result;
+	if (ResultSize == 0.0 || OriginalRefSize == 0.0) 
+        return Result;
 	const double ScaleRatio = ResultSize/OriginalRefSize ;
     for (auto i = d->m_CashFlows.constBegin(); i != d->m_CashFlows.constEnd(); ++i) {
-		auto FlwTpe = this->AvailableFlows(i.key());
+		auto FlwTpe = AvailableFlows(i.key());
 		for (auto j = FlwTpe.constBegin(); j != FlwTpe.constEnd(); ++j) {
-		//for (auto j = i.value()->constBegin(); j != i.value()->constEnd(); ++j) {
 			if ((Groups.isEmpty() || Groups.contains(*j)) && !ExcludeGroups.contains(*j)) {
 				Result.SetFlow(i.key(), GetFlow(i.key(), *j)*ScaleRatio, *j);
 			}

@@ -985,7 +985,7 @@ bool Tranche::saveCashflowsDatabase() const
     return false;
 }
 
-void Tranche::getCashflowsDatabase()
+void Tranche::getCashflowsDatabase(const QDate& startDt)
 {
     Q_D(Tranche);
     d->CashFlow.Clear();
@@ -1013,7 +1013,10 @@ void Tranche::getCashflowsDatabase()
     for (auto applicableIsin = allIsins.constBegin(); DbOpen && applicableIsin != allIsins.constEnd(); ++applicableIsin) {
         QSqlQuery CashFlowsQuery(db);
         CashFlowsQuery.setForwardOnly(true);
-        CashFlowsQuery.prepare("{CALL " + GetFromConfig("Database", "GetCashFlowsProc") + "}");
+        if (startDt.isNull())
+            CashFlowsQuery.prepare("{CALL " + GetFromConfig("Database", "GetCashFlowsProc") + "}");
+        else
+            CashFlowsQuery.prepare("{CALL " + GetFromConfig("Database", "GetAllCashFlowsProc") + "}");
         CashFlowsQuery.bindValue(":ISIN", *applicableIsin);
         //DEBG_LOG(QString("Asking Cash Flows Query: %1").arg(getLastExecutedQuery(CashFlowsQuery)));
         if (!CashFlowsQuery.exec()) {
@@ -1033,6 +1036,10 @@ void Tranche::getCashflowsDatabase()
             d->CashFlow.SetFlow(flowDate, currRec.value("Principal").toDouble(), TrancheCashFlow::PrincipalFlow);
             d->CashFlow.SetFlow(flowDate, currRec.value("Balance").toDouble(), TrancheCashFlow::AmountOutstandingFlow);
             d->CashFlow.SetFlow(flowDate, currRec.value("Deferred").toDouble(), TrancheCashFlow::DeferredFlow);
+        }
+        if (!startDt.isNull()){
+            while (!d->CashFlow.IsEmpty() && d->CashFlow.GetDate(0) <= startDt)
+                d->CashFlow.RemoveFlowsAt(0);
         }
         if (!firstFlow)
             return;

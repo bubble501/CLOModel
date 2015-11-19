@@ -16,6 +16,7 @@
         <GetBondDetailsStoredProc>getBondDetails(:isin)</GetBondDetailsStoredProc>
         <DeleteCashflowsStoredProc>deleteCashflows(:ISIN)</DeleteCashflowsStoredProc>
         <GetCashFlowsProc>getCashFlows(:ISIN)</GetCashFlowsProc>
+        <GetAllCashFlowsProc>getAllCashFlows(:ISIN)</GetAllCashFlowsProc>
         <GetDealInfoStoredProc>getDealInfo(:dealName)</GetDealInfoStoredProc>
         <SetGeographyStoredProc>setGeography(:dealName,:filedName,:fieldDisplayName,:startDate,:endDate,:Value)</SetGeographyStoredProc>
         <InsertCashFlowsQuery xml:space="preserve">INSERT INTO  Cashflows (ISIN,Date,Deferred,Interest,Principal,Balance,Coupon) VALUES (:isin,:date,:deferred,:interest,:principal,:balance,:coupon)</InsertCashFlowsQuery>

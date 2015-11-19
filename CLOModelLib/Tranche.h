@@ -132,7 +132,7 @@ public:
     double getTotalActualCoupon(int index) const;
     double getActualCoupon(int index, qint32 CouponIdx) const;
     bool saveCashflowsDatabase() const;
-    void getCashflowsDatabase();
+    void getCashflowsDatabase(const QDate& startDt=QDate());
     bool getDetailsDatabase();
     const Ratings& getRating() const;
     void setRating(const Ratings& val);

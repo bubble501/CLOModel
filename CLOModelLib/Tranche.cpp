@@ -922,7 +922,7 @@ bool Tranche::saveCashflowsDatabase() const
                         return false;
                     }
                     if (!CheckBondExistQuery.next()) {
-                        DEBG_LOG("saveCashflowsDatabase() Bond not found in Database");
+                        DEBG_LOG(QString("saveCashflowsDatabase() Bond not found in Database: %1").arg(*i));
                         continue;
                     }
                 }
@@ -952,7 +952,7 @@ bool Tranche::saveCashflowsDatabase() const
                     EraseCashflowQuery.prepare("{CALL " + GetFromConfig("Database", "DeleteCashflowsStoredProc") + "}");
                     EraseCashflowQuery.bindValue(":ISIN", *i);
                     dbError = !EraseCashflowQuery.exec();
-                    DEBG_LOG_CONDITION("saveCashflowsDatabase() Failed to delete previous cash flows", dbError);
+                    DEBG_LOG_CONDITION(QString("saveCashflowsDatabase() Failed to delete previous cash flows for %1").arg(*i), dbError);
                 }
                 if (!dbError) {
                     QSqlQuery InsertCashflowQuery(db);
@@ -966,7 +966,7 @@ bool Tranche::saveCashflowsDatabase() const
                     InsertCashflowQuery.bindValue(":balance", balancePar);
                     InsertCashflowQuery.bindValue(":coupon", couponPar);
                     dbError = !InsertCashflowQuery.execBatch();
-                    DEBG_LOG_CONDITION("saveCashflowsDatabase() Failed to upload new cash flows", dbError);
+                    DEBG_LOG_CONDITION(QString("saveCashflowsDatabase() Failed to upload new cash flows for %1").arg(*i), dbError);
                 }
                 if (dbError) {
                     db.rollback();

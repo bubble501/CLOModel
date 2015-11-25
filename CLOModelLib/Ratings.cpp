@@ -200,6 +200,13 @@ bool Ratings::setRating(const QString& val, RatingAgency ag)
         if (static_cast<qint32>(ag) == (1 << agencyIndex))
             break;
     }
+    /////////////////Fix for bloomberg return values in excel//////////////////
+    if (val.trimmed().toUpper().left(4) == "#N/A") {
+        setRating(RatingValue::NR, ag);
+        setWatch(Stable, ag);
+        return true;
+    }
+    //////////////////////////////////////////////////////////////////////////
     const  auto agencySyntax = RatingsPrivate::m_ratingSyntax[agencyIndex];
     QRegularExpression syntaxCheck;
     syntaxCheck.setPatternOptions(QRegularExpression::CaseInsensitiveOption | QRegularExpression::DontCaptureOption);

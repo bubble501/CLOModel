@@ -131,7 +131,7 @@ public:
     double getTotalActualCoupon(const QDate& index) const;
     double getTotalActualCoupon(int index) const;
     double getActualCoupon(int index, qint32 CouponIdx) const;
-    bool saveCashflowsDatabase() const;
+    std::tuple<bool,QString> saveCashflowsDatabase() const;
     void getCashflowsDatabase(const QDate& startDt=QDate());
     bool getDetailsDatabase();
     const Ratings& getRating() const;

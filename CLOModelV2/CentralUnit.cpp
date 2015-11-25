@@ -476,9 +476,10 @@ void CentralUnit::CheckCalculationDone()
         QString notLoadedString(tr("Could not update cashflows in the database for the following bonds:"));
         bool loadFailed = false;
         for (int tranIter = 0; tranIter < applicableStructure.GetTranchesCount(); ++tranIter) {
-            if (!applicableStructure.GetTranche(tranIter)->saveCashflowsDatabase()) {
+            const auto saveResult = applicableStructure.GetTranche(tranIter)->saveCashflowsDatabase();
+            if (!std::get<0>(saveResult)) {
                 loadFailed = true;
-                notLoadedString += '\n' + applicableStructure.GetTranche(tranIter)->GetTrancheName();
+                notLoadedString += '\n' + applicableStructure.GetTranche(tranIter)->GetTrancheName() + ' ' + std::get<1>(saveResult);
             }
         }
         if (loadFailed)

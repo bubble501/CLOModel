@@ -883,7 +883,7 @@ QString TranchePrivate::downloadISIN() const
     return applicableIsin.trimmed();
 }
 
-bool Tranche::saveCashflowsDatabase() const
+std::tuple<bool,QString> Tranche::saveCashflowsDatabase() const
 {
 #ifndef NO_DATABASE
     Q_D(const Tranche);
@@ -893,7 +893,7 @@ bool Tranche::saveCashflowsDatabase() const
         applicableIsin << d->downloadISIN();
     if (applicableIsin.constBegin()->isEmpty()) {
         DEBG_LOG("saveCashflowsDatabase() Invalid ISIN");
-        return false;
+        return std::make_tuple(false, QString("Invalid ISIN"));
     }
     {
         QMutexLocker dbLocker(&Db_Mutex);
@@ -919,7 +919,7 @@ bool Tranche::saveCashflowsDatabase() const
                     CheckBondExistQuery.bindValue(":isin", *i);
                     if (!CheckBondExistQuery.exec()) {
                         DEBG_LOG("saveCashflowsDatabase() Failed to run GetBondDetailsStoredProc");
-                        return false;
+                        return std::make_tuple(false, QString("Failed to run GetBondDetailsStoredProc"));
                     }
                     if (!CheckBondExistQuery.next()) {
                         DEBG_LOG(QString("saveCashflowsDatabase() Bond not found in Database: %1").arg(*i));
@@ -971,18 +971,18 @@ bool Tranche::saveCashflowsDatabase() const
                 if (dbError) {
                     db.rollback();
                     DEBG_LOG("saveCashflowsDatabase() Reached Rollback");
-                    return false;
+                    return std::make_tuple(false, QString("Reached Rollback"));
                 }
                 else {
                     db.commit();
                 }
             }
-            return oneBondFound;
+            return std::make_tuple(oneBondFound, oneBondFound?QString():QString("Bond not found in DB"));
         }
     }
     DEBG_LOG("saveCashflowsDatabase() Failed to open DB");
 #endif // !NO_DATABASE
-    return false;
+    return std::make_tuple(false, "Failed to open DB");
 }
 
 void Tranche::getCashflowsDatabase(const QDate& startDt)

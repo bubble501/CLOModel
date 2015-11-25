@@ -80,7 +80,7 @@ void LoanAssMatcherThread::run()
         for (auto j = d->m_AvailableAssumptions->constBegin(); j != d->m_AvailableAssumptions->constEnd(); ++j) {
 			for (const QString& CurrProperty : LoansPropertiesToSearch) {
                 if (j.value()->MatchPattern(tempLoan.GetProperty(CurrProperty))) {
-                    d->Result.AddScenario(j.value()->GetScenarioName(), tempLoan.GetProperty("Scenario"), tempLoan.GetProperty("Facility"), tempLoan.GetProperty("Issuer"), *i);
+                    d->Result.AddScenario(j.value()->GetScenarioName(), tempLoan.GetProperty("Scenario"), tempLoan.GetProperty("Facility"), tempLoan.GetProperty("Issuer"), *i, tempLoan.GetSize());
 					break;
 				}
 			}

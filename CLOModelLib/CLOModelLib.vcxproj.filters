@@ -838,6 +838,24 @@
     <ClCompile Include="MemoryMappedDevice.cpp">
       <Filter>Source Files\Common Items</Filter>
     </ClCompile>
+    <ClCompile Include="Private\BigNumDelegate.cpp">
+      <Filter>Privates\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_BigNumDelegate.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_BigNumDelegate.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\BigNumSpin.cpp">
+      <Filter>Privates\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_BigNumSpin.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_BigNumSpin.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="AbstrAsyncThread.h">
@@ -950,6 +968,12 @@
     </CustomBuild>
     <CustomBuild Include="Private\TrancheTriggerSettingWidget.h">
       <Filter>Privates\Triggers\Trigger Settings Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\BigNumDelegate.h">
+      <Filter>Privates\Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Private\BigNumSpin.h">
+      <Filter>Privates\Widgets</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

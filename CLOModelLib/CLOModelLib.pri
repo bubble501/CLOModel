@@ -6,6 +6,7 @@ HEADERS += ./AbstractBbgVect.h \
     ./FloorCapVector.h \
     ./IntegerVector.h \
     ./RepaymentVector.h \
+    ./MemoryMappedDevice.h \
     ./Ratings.h \
     ./clomodellib_global.h \
     ./CommonFunctions.h \
@@ -128,7 +129,8 @@ HEADERS += ./AbstractBbgVect.h \
     ./Private/MemoryMappedDevice_p.h \
     ./Private/Ratings_p.h \
     ./Private/InternalItems.h \
-    ./MemoryMappedDevice.h
+    ./Private/BigNumDelegate.h \
+    ./Private/BigNumSpin.h
 SOURCES += ./AbstractBbgVect.cpp \
     ./BaseRateVect.cpp \
     ./BloombergVector.cpp \
@@ -138,6 +140,7 @@ SOURCES += ./AbstractBbgVect.cpp \
     ./IntegerVector.cpp \
     ./RepaymentVector.cpp \
     ./CommonFunctions.cpp \
+    ./MemoryMappedDevice.cpp \
     ./Ratings.cpp \
     ./AbstrAsyncCalculator.cpp \
     ./AbstrAsyncThread.cpp \
@@ -203,5 +206,6 @@ SOURCES += ./AbstractBbgVect.cpp \
     ./Private/TrancheViewer.cpp \
     ./Private/WaterfallViewer.cpp \
     ./Private/InternalItems.cpp \
-    ./MemoryMappedDevice.cpp
+    ./Private/BigNumDelegate.cpp \
+    ./Private/BigNumSpin.cpp
 RESOURCES += Resources.qrc

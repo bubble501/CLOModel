@@ -23,6 +23,7 @@ LoanAssMatcherResultPrivate::LoanAssMatcherResultPrivate(LoanAssMatcherResult *q
     , m_Facility(other.m_Facility)
     , m_CurrScen(other.m_CurrScen)
     , m_DetectedScen(other.m_DetectedScen)
+    , m_size(other.m_size)
 {}
 LoanAssMatcherResult::LoanAssMatcherResult(LoanAssMatcherResultPrivate *d, const LoanAssMatcherResult& other)
 	:BackwardInterface(d,other)
@@ -37,6 +38,7 @@ LoanAssMatcherResult& LoanAssMatcherResult::operator=(const LoanAssMatcherResult
     d->m_CurrScen = other.d_func()->m_CurrScen;
     d->m_DetectedScen = other.d_func()->m_DetectedScen;
     d->m_FilePath = other.d_func()->m_FilePath;
+    d->m_size = other.d_func()->m_size;
 	return *this;
 }
 LoanAssMatcherResult::LoanAssMatcherResult(LoanAssMatcherResultPrivate *d)
@@ -79,7 +81,7 @@ void LoanAssMatcherResult::SetFilePath(const QString& val)
     d->m_FilePath = val;
 }
 
-void LoanAssMatcherResult::AddScenario(const QString& DetectedScen, const QString& CurrScen, const QString& Facility, const QString& Issuer, qint32 LoanID)
+void LoanAssMatcherResult::AddScenario(const QString& DetectedScen, const QString& CurrScen, const QString& Facility, const QString& Issuer, qint32 LoanID, double sze)
 {
     Q_D( LoanAssMatcherResult);
     for (int i = 0; i < d->m_LoanID.size(); ++i) {
@@ -93,6 +95,7 @@ void LoanAssMatcherResult::AddScenario(const QString& DetectedScen, const QStrin
     d->m_Facility.append(Facility);
     d->m_Issuer.append(Issuer);
     d->m_LoanID.append(LoanID);
+    d->m_size.append(sze);
 }
 
 void LoanAssMatcherResult::RemoveScenario(int index) {
@@ -103,6 +106,7 @@ void LoanAssMatcherResult::RemoveScenario(int index) {
     d->m_Facility.removeAt(index);
     d->m_Issuer.removeAt(index);
     d->m_LoanID.removeAt(index);
+    d->m_size.removeAt(index);
 }
 
 int LoanAssMatcherResult::ScenarioCount() const
@@ -121,46 +125,43 @@ void LoanAssMatcherResult::Clear()
     d->m_Facility.clear();
     d->m_Issuer.clear();
     d->m_LoanID.clear();
+    d->m_size.clear();
 }
 
 QString LoanAssMatcherResult::GetDetectScen(int index) const
 {
     Q_D(const LoanAssMatcherResult);
-    if (index < 0 || index >= d->m_DetectedScen.size()) 
-        return QString(); 
-    return d->m_DetectedScen.at(index);
+    return d->m_DetectedScen.value(index);
 }
 
 QString LoanAssMatcherResult::GetCurrScen(int index) const
 {
     Q_D(const LoanAssMatcherResult);
-    if (index < 0 || index >= d->m_CurrScen.size())
-        return QString(); 
-    return d->m_CurrScen.at(index);
+    return d->m_CurrScen.value(index);
 }
 
 QString LoanAssMatcherResult::GetFacility(int index) const
 {
     Q_D(const LoanAssMatcherResult);
-    if (index < 0 || index >= d->m_Facility.size())
-        return QString(); 
-    return d->m_Facility.at(index);
+    return d->m_Facility.value(index);
 }
 
 QString LoanAssMatcherResult::GetIssuer(int index) const
 {
     Q_D(const LoanAssMatcherResult);
-    if (index < 0 || index >= d->m_Issuer.size()) 
-        return QString(); 
-    return d->m_Issuer.at(index);
+    return d->m_Issuer.value(index);
 }
 
 qint32 LoanAssMatcherResult::GetLoanID(int index) const
 {
     Q_D(const LoanAssMatcherResult);
-    if (index < 0 || index >= d->m_LoanID.size()) 
-        return -1; 
-    return d->m_LoanID.at(index);
+    return d->m_LoanID.value(index,-1);
+}
+
+double LoanAssMatcherResult::GetSize(int index) const
+{
+    Q_D(const LoanAssMatcherResult);
+    return d->m_size.value(index, 0.0);
 }
 
 QDataStream& LoanAssMatcherResult::LoadOldVersion(QDataStream & stream)
@@ -175,6 +176,13 @@ QDataStream& LoanAssMatcherResult::LoadOldVersion(QDataStream & stream)
         >> d->m_Issuer
         >> d->m_LoanID
 	;
+    if (loadProtocolVersion() >= 192) {
+        stream >> d->m_size;
+    }
+    else {
+        while (d->m_size.size() < d->m_LoanID.size())
+            d->m_size.append(0.0);
+    }
 	ResetProtocolVersion();
 	return stream;
 }
@@ -189,6 +197,7 @@ QDataStream& operator<<(QDataStream & stream, const LoanAssMatcherResult& flows)
         << flows.d_func()->m_Facility
         << flows.d_func()->m_Issuer
         << flows.d_func()->m_LoanID
+        << flows.d_func()->m_size
 	;
 	return stream;
 }

@@ -14,4 +14,5 @@ public:
     QList<QString> m_Facility;
     QList<QString> m_Issuer;
     QList<qint32> m_LoanID;
+    QList<double> m_size;
 };

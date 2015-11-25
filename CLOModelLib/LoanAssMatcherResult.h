@@ -18,7 +18,7 @@ public:
 	void SetDealName(const QString& val);
 	const QString& GetFilePath() const;
 	void SetFilePath(const QString& val);
-	void AddScenario(const QString& DetectedScen, const QString& CurrScen, const QString& Facility, const QString& Issuer, qint32 LoanID);
+	void AddScenario(const QString& DetectedScen, const QString& CurrScen, const QString& Facility, const QString& Issuer, qint32 LoanID, double sze);
 	void RemoveScenario(int index);
 	int ScenarioCount() const;
 	QString GetDetectScen(int index) const;
@@ -26,6 +26,7 @@ public:
 	QString GetFacility(int index)const;
 	QString GetIssuer(int index) const;
 	qint32 GetLoanID(int index) const;
+    double GetSize(int index) const;
 	void Clear();
 protected:
 	virtual QDataStream& LoadOldVersion(QDataStream & stream) override;

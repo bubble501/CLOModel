@@ -46,6 +46,7 @@
 #include <QTableView>
 #include <QSignalBlocker>
 #include <memory>
+#include "Private/BigNumDelegate.h"
 LoanAssumptionsEditorPrivate::~LoanAssumptionsEditorPrivate(){}
 LoanAssumptionsEditorPrivate::LoanAssumptionsEditorPrivate(LoanAssumptionsEditor *q)
 	:q_ptr(q)
@@ -2329,9 +2330,9 @@ void LoanAssumptionsEditorPrivate::CreateModelScanner()
     m_ScannedPoolsProxy->setFilterRole(Qt::UserRole);
     m_ScannedPoolsProxy->setFilterKeyColumn(0);
     m_ScannedModel = new QStandardItemModel(q);
-    m_ScannedModel->setColumnCount(4);
+    m_ScannedModel->setColumnCount(5);
     m_ScannedModel->setRowCount(0);
-    m_ScannedModel->setHorizontalHeaderLabels(QStringList() << LoanAssumptionsEditor::tr("Issuer") << LoanAssumptionsEditor::tr("Facility") << LoanAssumptionsEditor::tr("Current Scenario") << LoanAssumptionsEditor::tr("Detected Scenario"));
+    m_ScannedModel->setHorizontalHeaderLabels(QStringList() << QObject::tr("Issuer") << QObject::tr("Facility") << QObject::tr("Current Scenario") << QObject::tr("Detected Scenario") << QObject::tr("Size"));
     m_ScannedModelProxy = new ReadOnlyColProxy(q);
     m_ScannedModelProxy->setSourceModel(m_ScannedModel);
     m_ScannedModelProxy->SetReadOnlyCol(QList<qint32>() << 0 << 1 << 2);
@@ -2350,6 +2351,9 @@ void LoanAssumptionsEditorPrivate::CreateModelScanner()
     m_PoolScanDealsView->setSelectionMode(QAbstractItemView::SingleSelection);
     m_PoolScanDealsView->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 
+    BigNumDelegate *sizeDel = new BigNumDelegate(q);
+    sizeDel->setDecimals(0);
+
     m_PoolScanPoolView = new QTableView(q);
     m_PoolScanPoolView->setEditTriggers(QAbstractItemView::CurrentChanged | QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
     m_PoolScanPoolView->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -2357,6 +2361,7 @@ void LoanAssumptionsEditorPrivate::CreateModelScanner()
     m_PoolScanPoolView->horizontalHeader()->setMinimumSectionSize(70);
     m_PoolScanPoolView->horizontalHeader()->setStretchLastSection(true);
     m_PoolScanPoolView->verticalHeader()->hide();
+    m_PoolScanPoolView->setItemDelegateForColumn(4, sizeDel);
     SafeSetModel(m_PoolScanPoolView, m_ScannedModelProxy);
 
 
@@ -2408,8 +2413,8 @@ void LoanAssumptionsEditorPrivate::CreateModelScanner()
     BaseTab->addTab(TempTab, LoanAssumptionsEditor::tr("Scan Models"));
 
     q->connect(m_ClearPoolScanFilterButton, &QPushButton::clicked, m_PoolScanFilterView->selectionModel(), &QItemSelectionModel::clearSelection);
-    q->connect(m_PoolScanFilterView->selectionModel(), &QItemSelectionModel::selectionChanged, [&](const QItemSelection& index, const QItemSelection&) {
-        m_ClearPoolScanFilterButton->setEnabled(!index.isEmpty()); 
+    q->connect(m_PoolScanFilterView->selectionModel(), &QItemSelectionModel::selectionChanged, [&](const QItemSelection&, const QItemSelection&) {
+        m_ClearPoolScanFilterButton->setEnabled(!m_PoolScanFilterView->selectionModel()->selectedIndexes().isEmpty());
     });
     q->connect(m_PoolScanDealsView->selectionModel(), &QItemSelectionModel::currentChanged, [&](const QModelIndex& index, const QModelIndex&) {
 		if (!index.isValid()) {
@@ -2420,11 +2425,12 @@ void LoanAssumptionsEditorPrivate::CreateModelScanner()
 		auto CurrAss=m_PoolMatcher->GetResult(m_ScanPoolsModel->data(CurrentIndex, Qt::UserRole + 2).toInt());
 		m_ScannedModel->setRowCount(CurrAss.ScenarioCount());
 		for (int i = 0; i < CurrAss.ScenarioCount(); ++i) {
-			m_ScannedModel->setData(m_ScannedModel->index(i, 0), CurrAss.GetIssuer(i), Qt::EditRole);
+			m_ScannedModel->setData(m_ScannedModel->index(i, 0), CurrAss.GetIssuer(i));
 			m_ScannedModel->setData(m_ScannedModel->index(i, 0), "#,#"+CurrAss.GetCurrScen(i) + "#,#" + CurrAss.GetDetectScen(i) + "#,#", Qt::UserRole);
-			m_ScannedModel->setData(m_ScannedModel->index(i, 1), CurrAss.GetFacility(i), Qt::EditRole);
-			m_ScannedModel->setData(m_ScannedModel->index(i, 2), CurrAss.GetCurrScen(i), Qt::EditRole);
-			m_ScannedModel->setData(m_ScannedModel->index(i, 3), CurrAss.GetDetectScen(i), Qt::EditRole);
+			m_ScannedModel->setData(m_ScannedModel->index(i, 1), CurrAss.GetFacility(i));
+			m_ScannedModel->setData(m_ScannedModel->index(i, 2), CurrAss.GetCurrScen(i));
+			m_ScannedModel->setData(m_ScannedModel->index(i, 3), CurrAss.GetDetectScen(i));
+            m_ScannedModel->setData(m_ScannedModel->index(i, 4), CurrAss.GetSize(i));
 		}
 	});
     q->connect(m_PoolScanPoolView->horizontalHeader(), &QHeaderView::sectionClicked, [&](int a) {
@@ -2490,7 +2496,7 @@ void LoanAssumptionsEditorPrivate::CreateModelScanner()
 		auto CurrentResult = m_PoolMatcher->GetResult(index);
 		if (CurrentResult.isValid()) {
 			m_ScanPoolsModel->insertRow(m_ScanPoolsModel->rowCount());
-			m_ScanPoolsModel->setData(m_ScanPoolsModel->index(m_ScanPoolsModel->rowCount() - 1, 0), CurrentResult.GetDealName(), Qt::EditRole);
+			m_ScanPoolsModel->setData(m_ScanPoolsModel->index(m_ScanPoolsModel->rowCount() - 1, 0), CurrentResult.GetDealName());
 			QString FilterString("#,#");
 			for (int i = 0; i < CurrentResult.ScenarioCount(); ++i) {
 				if (!FilterString.contains("#,#"+CurrentResult.GetDetectScen(i) + "#,#"))

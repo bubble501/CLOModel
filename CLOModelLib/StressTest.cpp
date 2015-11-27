@@ -379,7 +379,9 @@ void StressTest::RunStressTest()
     d->BaseApplier->SetSequentialComputation(d->SequentialComputation);
     d->BaseApplier->ClearResults();
     d->BaseApplier->ClearScenarios();
+#ifndef NO_DATABASE
     d->BaseCalculator->DownloadScenarios();
+#endif
     d->BaseCalculator->SetStartDate(d->StartDate);
     d->BaseCalculator->SetCDRass("0");
     d->BaseCalculator->SetCPRass("0");

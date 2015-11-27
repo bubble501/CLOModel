@@ -449,7 +449,7 @@ void MtgCalculator::CompileReferenceRateValue(ConstantBaseRateTable& Values)
 	RETURN_WHEN_RUNNING(true, )
         d->CompileReferenceRateValueTemplate(Values);
 }
-#ifndef NO_DATABASE
+ 
 void MtgCalculator::GetBaseRatesDatabase(ConstantBaseRateTable& Values, bool DownloadAll)
 {
     Q_D(MtgCalculator);
@@ -462,7 +462,7 @@ void MtgCalculator::GetBaseRatesDatabase(ForwardBaseRateTable& Values, bool Down
 	RETURN_WHEN_RUNNING(true, )
         d->GetBaseRatesDatabaseTemplate(Values, DownloadAll);
 }
-#endif
+ 
 QDataStream& operator>>(QDataStream & stream, MtgCalculator& flows) {
 	return flows.LoadOldVersion(stream);
 }
@@ -722,12 +722,7 @@ void MtgCalculator::GuessLoanScenarios(bool OverrideAss) {
 
 
 
-void MtgCalculator::SetOverrideAssumptions(bool a)
-{
-    Q_D( MtgCalculator);
-    RETURN_WHEN_RUNNING(true, )
-        d->m_OverrideAssumptions = a;
-}
+
 
 bool MtgCalculator::GetOverrideAssumptions() const
 {
@@ -736,12 +731,6 @@ bool MtgCalculator::GetOverrideAssumptions() const
         d->m_OverrideAssumptions;
 }
 
-MtgCashFlow MtgCalculator::GetAggregatedResults() const
-{
-    Q_D(const MtgCalculator);
-    RETURN_WHEN_RUNNING(true, MtgCashFlow())
-        return d->m_AggregatedRes;
-}
 
 bool MtgCalculator::GetDownloadScenario() const
 {
@@ -758,6 +747,21 @@ void MtgCalculator::SetDownloadScenario(bool val)
 }
 
 #endif
+
+void MtgCalculator::SetOverrideAssumptions(bool a)
+{
+	Q_D(MtgCalculator);
+	RETURN_WHEN_RUNNING(true, )
+		d->m_OverrideAssumptions = a;
+}
+
+MtgCashFlow MtgCalculator::GetAggregatedResults() const
+{
+	Q_D(const MtgCalculator);
+	RETURN_WHEN_RUNNING(true, MtgCashFlow())
+		return d->m_AggregatedRes;
+}
+
 void MtgCalculator::ClearTempProperties()
 {
     Q_D( MtgCalculator);

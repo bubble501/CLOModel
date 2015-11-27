@@ -473,9 +473,14 @@ bool Ratings::downloadRatings(const QBbgLib::QBbgSecurity& sec)
 
 bool Ratings::downloadRatings(const QString& name, const QString& bbgExtension)
 {
+#ifndef NO_BLOOMBERG
     return downloadRatings(QBbgLib::QBbgSecurity(name, QBbgLib::QBbgSecurity::stringToYellowKey(bbgExtension)));
+#else
+	return false;
+#endif
 }
 
+#ifndef NO_BLOOMBERG
 bool Ratings::downloadRatings(const QBbgLib::QBbgAbstractResponse * const res)
 {
     using namespace QBbgLib;
@@ -499,6 +504,8 @@ bool Ratings::downloadRatings(const QBbgLib::QBbgAbstractResponse * const res)
     }
     return false;
 }
+
+#endif
 
 bool Ratings::saveToDatabase(const QString& isin) const
 {

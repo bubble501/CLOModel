@@ -390,7 +390,8 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 				for (int i = 0; i < NumOfBaseRates; i++) {
 					BaseName = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 					BaseVal = pdFreq->dblVal; pdFreq++;
-					CompilationTable.insert(BaseName.trimmed().toUpper(), BaseVal);
+					 //TBDXXX
+					//CompilationTable.SetValue(BaseName.trimmed().toUpper(), BloombergVector(BaseVal));
 				}
 				TempUnit.CompileBaseRates(CompilationTable);
 #endif // NO_BLOOMBERG
@@ -417,7 +418,7 @@ void __stdcall RunModel(LPSAFEARRAY *ArrayData){
 				for (int i = 0; i < NumOfBaseRates; i++) {
 					BaseName = QString::fromWCharArray(pdFreq->bstrVal); pdFreq++;
 					BaseVal = pdFreq->dblVal; pdFreq++;
-					CompilationTable.insert(BaseName.trimmed().toUpper(), BaseVal);
+					CompilationTable.SetValue(BaseName.trimmed().toUpper(), BaseVal);
 				}
 				TempUnit.CompileBaseRates(CompilationTable);
 #endif // NO_BLOOMBERG

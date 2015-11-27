@@ -282,7 +282,9 @@ void CentralUnit::CalculateStress(){
 }
 void CentralUnit::CalculationStep1(){
 	LOGDEBUG("Reached CalculationStep1");
+#ifndef NO_DATABASE
 	LoansCalculator.DownloadScenarios();
+#endif
 	LoansCalculator.SetCPRass(Structure.GetReinvestmentTest().GetCPRAssumption().GetVector());
 	LoansCalculator.SetCDRass(Structure.GetReinvestmentTest().GetCDRAssumption().GetVector());
 	LoansCalculator.SetLSass(Structure.GetReinvestmentTest().GetLSAssumption().GetVector());
@@ -450,7 +452,8 @@ void CentralUnit::CheckCalculationDone()
 		Structure=ParallWatFalls->GetResult(0);
 		CallStructure = ParallWatFalls->GetResult(1);
 		if(Structure.GetTranchesCount()==0 || CallStructure.GetTranchesCount()==0){
-            QMessageBox::critical(0, "Error", "Critical error in waterfall calculation Results are empty.\n" + ParallWatFalls->errors().values().join('\n'));
+			QStringList errorStringList(ParallWatFalls->errors().values());
+			QMessageBox::critical(0, "Error", "Critical error in waterfall calculation Results are empty.\n" + errorStringList.join('\n'));
 			QApplication::quit();
 			return;
 		}

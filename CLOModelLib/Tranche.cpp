@@ -259,7 +259,7 @@ void Tranche::DownloadBaseRates() const {
                     (*( d->ReferenceRateValue[i.key()])) = "0";
 				}
 				else {
-                    d->ReferenceRateValue.insert(i.key(), new BloombergVector("0"));
+					d->ReferenceRateValue.insert(i.key(), std::make_shared<BloombergVector>("0"));
 				}
 			}
 		#endif
@@ -285,11 +285,11 @@ double Tranche::GetCoupon(const QDate& index, qint32 CoupIndex , int Frequency) 
 				#ifndef NO_BLOOMBERG
 					GetRefRateValueFromBloomberg();
 				#else
-					if (ReferenceRateValue.contains(CoupIndex)) {
-						(*(ReferenceRateValue[CoupIndex])) = "0";
+					if (d->ReferenceRateValue.contains(CoupIndex)) {
+						(*(d->ReferenceRateValue[CoupIndex])) = "0";
 					}
 					else {
-						ReferenceRateValue.insert(CoupIndex, new BloombergVector("0"));
+						d->ReferenceRateValue.insert(CoupIndex, std::make_shared<BloombergVector>("0"));
 					}
 				#endif
 			#endif 
@@ -668,6 +668,7 @@ void Tranche::GetDataFromBloomberg()
 }
 void Tranche::GetCashFlowsFromBloomberg(bool useFwdRates)
 {
+#ifndef NO_BLOOMBERG
     Q_D(Tranche);
     d->CashFlow.Clear();
     QBbgLib::QBbgSecurity TempSecurity(d->ISINcode.isEmpty() ? d->TrancheName : *d->ISINcode.constBegin(), QBbgLib::QBbgSecurity::stringToYellowKey(d->BloombergExtension));
@@ -731,6 +732,7 @@ void Tranche::GetCashFlowsFromBloomberg(bool useFwdRates)
         }
         return d->CashFlow.Clear();
     }
+#endif
 }
 double Tranche::GetLossRate() const{
     Q_D(const Tranche);

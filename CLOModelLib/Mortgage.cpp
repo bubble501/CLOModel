@@ -555,7 +555,7 @@ void Mortgage::SetSize(double a)
      Q_D(Mortgage);
      if (d->m_FloatingRateBaseValue.IsEmpty()) {
 #ifdef NO_BLOOMBERG
-			 m_FloatingRateBaseValue="0";
+			 d->m_FloatingRateBaseValue="0";
 #else
          ConstantBaseRateTable junk;
          d->m_FloatingRateBaseValue = d->m_FloatRateBase.GetRefRateValueFromBloomberg(junk);
@@ -581,7 +581,7 @@ void Mortgage::SetSize(double a)
      Q_D(Mortgage);
      if (d->m_FloatingRateBaseValue.IsEmpty()) {
 #ifdef NO_BLOOMBERG
-			 m_FloatingRateBaseValue = "0";
+			 d->m_FloatingRateBaseValue = "0";
 #else
          ConstantBaseRateTable junk;
          d->m_FloatingRateBaseValue = d->m_FloatRateBase.GetRefRateValueFromBloomberg(junk);
